@@ -1,0 +1,21 @@
+article {
+    width: 100%;
+    height: 400px;
+    margin-top: 1rem;
+  }
+  
+  article > div {
+    width: 100% !important;
+    height: 100% !important;
+  }
+  
+  article > div > div {
+    width: 100% !important;
+    height: 100% !important;
+  }
+  
+  .tradingview_7f572 {
+    width: 300px !important;
+    height: 300px !important;
+  }
+  

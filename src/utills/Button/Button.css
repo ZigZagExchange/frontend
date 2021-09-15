@@ -1,0 +1,33 @@
+/* login reg btn */
+.login_reg_btn {
+  width: 100%;
+  padding: 10px 20px;
+  border: none;
+  color: white;
+  font-weight: 500;
+  border-radius: 5px;
+  background-color: #08aff3;
+}
+
+.login_reg_btn span {
+  font-weight: 300;
+}
+
+/* bg_btn */
+.bg_btn {
+  display: flex;
+  align-items: center;
+  padding: 13px 30px;
+  background: linear-gradient(to right, #09aaf5, #05cfe9, #02f1de);
+  border: none;
+  border-radius: 5px;
+  width: 100%;
+  justify-content: center;
+  color: white;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.bg_btn > img {
+  margin-right: 10px;
+}

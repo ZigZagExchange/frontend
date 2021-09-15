@@ -1,0 +1,41 @@
+.estimate_card {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  width: 30%;
+  padding: 40px 20px;
+  border-radius: 5px;
+}
+
+.ec_bg1 {
+  background-color: #202c45;
+}
+
+.ec_bg2 {
+  background-color: #1c1d24;
+}
+
+.estimate_card h2 {
+  color: white;
+  margin: 10px 0;
+}
+.estimate_card h6 {
+  color: #9da2ac;
+}
+
+.estimate_card p {
+  color: #7b89ac;
+}
+
+@media screen and (max-width: 943px) {
+  .estimate_card {
+    padding: 40px 9px;
+  }
+}
+
+@media screen and (max-width: 871px) {
+  .estimate_card {
+    width: 247px;
+  }
+}

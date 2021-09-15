@@ -1,0 +1,106 @@
+.trade_price_table {
+  width: 500px;
+  display: block;
+  overflow: auto;
+  height: 350px;
+  padding: 0 20px;
+}
+
+.trade_price_table::-webkit-scrollbar {
+  width: 5px;
+  position: relative;
+  z-index: 20;
+}
+
+.trade_price_table::-webkit-scrollbar-track {
+  border-radius: 5px;
+  background: hsla(0, 0%, 100%, 0.15);
+  height: 23px;
+}
+
+.trade_price_table::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+  background: hsla(0, 0%, 100%, 0.4);
+}
+
+.trade_price_table::-webkit-scrollbar-thumb:window-inactive {
+  background: #fff;
+}
+
+.trade_price_table tbody {
+  width: 100%;
+  display: table;
+  background-position: top right;
+  background-size: 70% 100%;
+  background-repeat: no-repeat;
+  margin-top: 0.7rem;
+}
+
+.tpt_1 tbody {
+  background-image: url("../../../assets/images/pricetable-bg.png");
+}
+
+.tpt_2 tbody {
+  background-image: url("../../../assets/images/pricetable-green_bg.png");
+}
+
+.tpt_3 tbody {
+  background-image: unset;
+}
+
+.tpt_3 {
+  height: 89%;
+}
+
+.trade_price_table thead {
+  position: sticky;
+  top: 0;
+  display: table;
+  width: 100%;
+  background-color: #171c28;
+}
+
+.trade_price_table th {
+  color: #94a2c9;
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.tpt_1 td:nth-child(1) {
+  color: #c4384e;
+  text-align: start;
+}
+
+.tpt_2 td:nth-child(1) {
+  color: #3fe199;
+  text-align: start;
+}
+
+.tpt_3 td:nth-child(1) {
+  text-align: start;
+}
+.trade_price_table td {
+  color: white;
+  text-align: center;
+}
+.trade_price_table td:nth-child(3) {
+  text-align: right;
+}
+
+@media screen and (min-width: 1800px) {
+  .trade_price_table {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 991px) {
+  .trade_price_table {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .tpt_3 {
+    height: 350px;
+  }
+}

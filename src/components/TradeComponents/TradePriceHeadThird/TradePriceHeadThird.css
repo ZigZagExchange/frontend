@@ -1,0 +1,29 @@
+.trade_price_head_third {
+  width: 500px;
+  display: flex;
+  align-items: center;
+  color: #94a2c9;
+  padding: 20px;
+}
+
+.trade_price_head_third strong {
+  font-size: 1rem;
+  margin-right: 20px;
+}
+
+@media screen and (min-width: 1800px) {
+  .trade_price_head_third {
+    width: 100%;
+  }
+}
+@media screen and (max-width: 991px) {
+  .trade_price_head_third {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 358px) {
+  .trade_price_head_third strong {
+    font-size: 0.8rem;
+  }
+}
