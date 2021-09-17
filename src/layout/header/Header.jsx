@@ -10,6 +10,8 @@ import menu from "../../assets/icons/menu.png";
 import darkPlugHead from "../../assets/icons/dark-plug-head.png";
 // component
 import Button from "../../utills/Button/Button";
+// helpers
+import { signinzksync } from "../../helpers";
 
 const Header = () => {
   // state to open or close the sidebar in mobile
@@ -84,6 +86,7 @@ const Header = () => {
               className="bg_btn"
               text="CONNECT WALLET"
               img={darkPlugHead}
+              onClick={signinzksync}
             />
             <div className="eu_text">
               <span>Eng</span>

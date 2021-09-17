@@ -4,7 +4,7 @@ import "./Button.css";
 const Button = (props) => {
   return (
     <>
-      <button className={props.className}>
+      <button type="button" className={props.className} onClick={props.onClick}>
         <>
           <img src={props.img} alt="..." />
           {props.text}

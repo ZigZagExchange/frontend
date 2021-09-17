@@ -19,16 +19,16 @@ const SpotBox = () => {
         </div>
         <div className="spot_tabs">
           <div className="st_l">
-            <h2 className="trade_price_active_tab">LIMIT</h2>
-            <h2>MARKET</h2>
+            <h2 className="trade_price_active_tab">Limit</h2>
+            <h2>Market</h2>
             <div className="d-flex align-items-center">
               <img src={informationButton} alt="..." />
             </div>
           </div>
         </div>
         <div className="spot_bottom">
-          <SpotForm />
-          <SpotForm />
+          <SpotForm side="buy"/>
+          <SpotForm side="sell"/>
         </div>
       </div>
     </>

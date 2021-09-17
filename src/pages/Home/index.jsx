@@ -25,7 +25,7 @@ const Home = () => {
             <EstimateCard
               // getting data from estimate card component through props
               className="estimate_card ec_bg2"
-              estimateText="Estimated Valueon Ethereum"
+              estimateText="Estimated Value on Ethereum"
               estimateNumber="$3,704.70"
               estimateValue="=1.169ETH"
             />
@@ -33,7 +33,7 @@ const Home = () => {
             <EstimateCard
               // getting data from estimate card component through props
               className="estimate_card ec_bg2"
-              estimateText="Estimated Valueon Loopring"
+              estimateText="Estimated Value on ZKSync"
               estimateNumber="$109.48"
               estimateValue="=0.035ETH"
             />

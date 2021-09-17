@@ -34,11 +34,12 @@
   background-color: transparent;
   outline: none;
   border: none;
-  color: #94a2c9;
+  color: white;
   height: 100%;
+  text-align: right;
 }
 
-.spf_input_box input::placeholder {
+.spf_input_box .spf_desc_text {
   color: #94a2c9;
 }
 
