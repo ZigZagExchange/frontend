@@ -1,20 +1,19 @@
 import * as zksync from "zksync";
 import { ethers } from "ethers";
 
-const zigzagws = new WebSocket('ws://localhost:3004');
+//globals
+let ethWallet;
+let syncWallet;
 
+// Websocket
+const zigzagws = new WebSocket('ws://localhost:3004');
 zigzagws.onopen = function () {
     const msg = JSON.stringify({op:'ping'})
     zigzagws.send(msg);
 }
-
 zigzagws.onmessage = function (e) {
   console.log('received: %s', e.data);
 }
-
-//globals
-let ethWallet;
-let syncWallet;
 
 export async function signinzksync() {
     await window.ethereum.request({
@@ -42,7 +41,7 @@ export async function signinzksync() {
     console.log("Signing Key Set?", signingKeySet);
 
     // TODO: Delete this. It's only for testing
-    await submitorder()
+    await submitorder("ETH-USDT", "buy", 3700, 0.001)
 }
 
 export async function changepubkeyzksync() {
@@ -56,14 +55,23 @@ export async function changepubkeyzksync() {
 }
 
 
-export async function submitorder() {
+export async function submitorder(product, side, price, amount) {
+    const validsides = ["buy","sell"];
+    if (!validsides.includes(side)) {
+        throw new Error("Invalid side");
+    }
+    const currencies = product.split('-');
+    const tokenBuy = (side === "buy") ? currencies[0] : currencies[1];
+    const tokenSell = (side === "sell") ? currencies[0] : currencies[1];
+    const tokenRatio = {}
+    tokenRatio[currencies[0]] = amount;
+    tokenRatio[currencies[1]] = price*amount;
     const order = await syncWallet.getLimitOrder({
-        tokenSell: 'ETH',
-        tokenBuy: 'USDT',
-        ratio: zksync.utils.tokenRatio({
-            ETH: 0.01,
-            USDT: 35,
-        })
+        tokenSell,
+        tokenBuy,
+        ratio: zksync.utils.tokenRatio(tokenRatio)
     });
-    console.log("limit order", order);
+    console.log("sending limit order", order);
+    const msg = {op:"neworder", args: [order]};
+    zigzagws.send(JSON.stringify(msg));
 }
