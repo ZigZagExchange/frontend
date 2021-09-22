@@ -17,10 +17,9 @@ let ethersProvider;
 let syncProvider;
 let ethWallet;
 let syncWallet;
-let openorders;
 
 // Websocket
-const zigzagws = new WebSocket('ws://localhost:3004');
+const zigzagws = new WebSocket('wss://zigzag-rinkeby.herokuapp.com');
 
 zigzagws.onopen = function () {
     // TODO: Subscribe to the current active market instead of ETH-USDT
@@ -37,8 +36,8 @@ zigzagws.onmessage = async function (e) {
         case 'liquidity':
             break
         case 'openorders':
-            // TODO: Update the UI with the order
-            openorders = msg.args[0];
+            // TODO: Update the UI with the orders
+            const openorders = msg.args[0];
             break
         default:
             break
@@ -78,7 +77,7 @@ export async function signinzksync() {
 
     // TODO: Delete this. It's only for testing
     //await submitorder("ETH-USDT", 'b', 3700, 0.001);
-    await sendfillrequest(openorders[0]);
+    //await sendfillrequest(openorders[0]);
 }
 
 export async function changepubkeyzksync() {
