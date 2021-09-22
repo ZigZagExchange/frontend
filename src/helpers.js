@@ -101,12 +101,12 @@ export async function submitorder(product, side, price, amount) {
     const baseCurrency = currencies[0];
     const quoteCurrency = currencies[1];
     let tokenBuy, tokenSell, sellQuantity;
-    if (side == 'b') {
+    if (side === 'b') {
         tokenBuy = currencies[0];
         tokenSell = currencies[1];
         sellQuantity = amount*price;
     }
-    else if (side == 's') {
+    else if (side === 's') {
         tokenBuy = currencies[1];
         tokenSell = currencies[0];
         sellQuantity = amount;
