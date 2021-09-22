@@ -65,6 +65,9 @@ export async function signinzksync() {
     console.log("account state", syncAccountState)
 
     const signingKeySet = await syncWallet.isSigningKeySet();
+    if (!signingKeySet) {
+        await changepubkeyzksync();
+    }
 
     // TODO: Change text on Connect Wallet button to Set Signing Key if signing key is not set
     // TODO: Display Buy / Sell buttons if Signing Key is set
@@ -74,8 +77,8 @@ export async function signinzksync() {
     zigzagws.send(JSON.stringify(msg));
 
     // TODO: Delete this. It's only for testing
-    await submitorder("ETH-USDT", 'b', 3700, 0.1);
-    //await sendfillrequest(openorders[0]);
+    //await submitorder("ETH-USDT", 'b', 3700, 0.001);
+    await sendfillrequest(openorders[0]);
 }
 
 export async function changepubkeyzksync() {
@@ -101,7 +104,7 @@ export async function submitorder(product, side, price, amount) {
     if (side == 'b') {
         tokenBuy = currencies[0];
         tokenSell = currencies[1];
-        sellQuantity = Math.round(amount*price, 6);
+        sellQuantity = amount*price;
     }
     else if (side == 's') {
         tokenBuy = currencies[1];
