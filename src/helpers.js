@@ -45,6 +45,12 @@ zigzagws.onmessage = async function (e) {
 }
 
 export async function signinzksync() {
+    if (!window.ethereum) {
+        window.open("https://metamask.io", '_blank');
+        return
+    }
+    await window.ethereum.enable();
+
     await window.ethereum.request({
         method: 'wallet_switchEthereumChain',
         params: [{ chainId: '0x4' }],
