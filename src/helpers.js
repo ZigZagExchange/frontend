@@ -46,9 +46,11 @@ zigzagws.onmessage = async function (e) {
 
 export async function signinzksync() {
     if (!window.ethereum) {
+        // TODO: Display a message that says Please download and unlock Metamask to continue
         window.open("https://metamask.io", '_blank');
         return
     }
+
     await window.ethereum.enable();
 
     await window.ethereum.request({
