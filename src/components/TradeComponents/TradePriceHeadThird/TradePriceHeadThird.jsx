@@ -5,8 +5,8 @@ const TradePriceHeadThird = () => {
   return (
     <>
       <div className="trade_price_head_third">
-        <strong className="trade_price_active_tab">Market Trades</strong>
-        <strong>My Trades</strong>
+        <strong className="trade_price_active_tab">Open Orders</strong>
+        <strong>Market Trades</strong>
       </div>
     </>
   );

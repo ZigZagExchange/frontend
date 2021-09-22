@@ -1,18 +1,48 @@
 import * as zksync from "zksync";
 import { ethers } from "ethers";
 
+// Data
+//const zkTokenIds = {
+//    0: {name:'ETH',decimals:18},
+//    1: {name:'USDT',decimals:6}
+//}
+//const validMarkets = {
+//    "ETH-BTC": 1,
+//    "ETH-USDT": 1,
+//    "BTC-USDT": 1
+//}
+
 //globals
+let ethersProvider;
+let syncProvider;
 let ethWallet;
 let syncWallet;
+let openorders;
 
 // Websocket
 const zigzagws = new WebSocket('ws://localhost:3004');
+
 zigzagws.onopen = function () {
-    const msg = JSON.stringify({op:'ping'})
-    zigzagws.send(msg);
+    // TODO: Subscribe to the current active market instead of ETH-USDT
+    zigzagws.send(JSON.stringify({op:"subscribemarket", args: ["ETH-USDT"]}))
 }
-zigzagws.onmessage = function (e) {
-  console.log('received: %s', e.data);
+
+zigzagws.onmessage = async function (e) {
+    console.log('received: %s', e.data);
+    const msg = JSON.parse(e.data);
+    switch (msg.op) {
+        case 'userordermatch':
+            broadcastfill(...msg.args);
+            break
+        case 'liquidity':
+            break
+        case 'openorders':
+            // TODO: Update the UI with the order
+            openorders = msg.args[0];
+            break
+        default:
+            break
+    }
 }
 
 export async function signinzksync() {
@@ -21,8 +51,8 @@ export async function signinzksync() {
         params: [{ chainId: '0x4' }],
     });
 
-    const ethersProvider = new ethers.providers.Web3Provider(window.ethereum)
-    const syncProvider = await zksync.getDefaultProvider("rinkeby");
+    ethersProvider = new ethers.providers.Web3Provider(window.ethereum)
+    syncProvider = await zksync.getDefaultProvider("rinkeby");
 
     ethWallet = ethersProvider.getSigner()
     syncWallet = await zksync.Wallet.fromEthSigner(ethWallet, syncProvider);
@@ -40,8 +70,12 @@ export async function signinzksync() {
     // TODO: Display Buy / Sell buttons if Signing Key is set
     console.log("Signing Key Set?", signingKeySet);
 
+    const msg = {op:"login", args:[syncAccountState.id]}
+    zigzagws.send(JSON.stringify(msg));
+
     // TODO: Delete this. It's only for testing
-    await submitorder("ETH-USDT", "buy", 3700, 0.001)
+    await submitorder("ETH-USDT", 'b', 3700, 0.1);
+    //await sendfillrequest(openorders[0]);
 }
 
 export async function changepubkeyzksync() {
@@ -56,22 +90,78 @@ export async function changepubkeyzksync() {
 
 
 export async function submitorder(product, side, price, amount) {
-    const validsides = ["buy","sell"];
+    const validsides = ['b', 's'];
     if (!validsides.includes(side)) {
         throw new Error("Invalid side");
     }
     const currencies = product.split('-');
-    const tokenBuy = (side === "buy") ? currencies[0] : currencies[1];
-    const tokenSell = (side === "sell") ? currencies[0] : currencies[1];
+    const baseCurrency = currencies[0];
+    const quoteCurrency = currencies[1];
+    let tokenBuy, tokenSell, sellQuantity;
+    if (side == 'b') {
+        tokenBuy = currencies[0];
+        tokenSell = currencies[1];
+        sellQuantity = Math.round(amount*price, 6);
+    }
+    else if (side == 's') {
+        tokenBuy = currencies[1];
+        tokenSell = currencies[0];
+        sellQuantity = amount;
+    }
     const tokenRatio = {}
-    tokenRatio[currencies[0]] = amount;
-    tokenRatio[currencies[1]] = price*amount;
-    const order = await syncWallet.getLimitOrder({
+    tokenRatio[baseCurrency] = 1;
+    tokenRatio[quoteCurrency] = price;
+    const order = await syncWallet.getOrder({
         tokenSell,
         tokenBuy,
+        amount: syncProvider.tokenSet.parseToken(tokenSell, sellQuantity.toString()),
         ratio: zksync.utils.tokenRatio(tokenRatio)
     });
     console.log("sending limit order", order);
-    const msg = {op:"neworder", args: [order]};
+    const msg = {op:"submitorder", args: [order]};
     zigzagws.send(JSON.stringify(msg));
+}
+
+
+export async function sendfillrequest(orderreceipt) {
+    const orderId = orderreceipt[0];
+    const market = orderreceipt[1];
+    const baseCurrency = market.split('-')[0];
+    const quoteCurrency = market.split('-')[1];
+    const side = orderreceipt[2];
+    const price = orderreceipt[3];
+    const baseQuantity = orderreceipt[4];
+    const quoteQuantity = orderreceipt[5];
+    let tokenSell, tokenBuy, sellQuantity;
+    if (side === 'b') {
+        tokenSell = baseCurrency;
+        tokenBuy = quoteCurrency;
+        sellQuantity = baseQuantity;
+    }
+    else if (side === 's') {
+        tokenSell = quoteCurrency;
+        tokenBuy = baseCurrency;
+        sellQuantity = quoteQuantity;
+    }
+    const tokenRatio = {};
+    tokenRatio[baseCurrency] = 1;
+    tokenRatio[quoteCurrency] = price;
+    const fillOrder = await syncWallet.getOrder({
+        tokenSell,
+        tokenBuy,
+        amount: syncProvider.tokenSet.parseToken(tokenSell, sellQuantity.toString()),
+        ratio: zksync.utils.tokenRatio(tokenRatio)
+    });
+    const resp = {op:"fillrequest",args: [orderId, fillOrder]}
+    zigzagws.send(JSON.stringify(resp));
+}
+
+export async function broadcastfill(swapOffer, fillOrder) {
+    const swap = await syncWallet.syncSwap({
+        orders: [swapOffer, fillOrder],
+        feeToken: 'ETH',
+    });
+    console.log(swap);
+    const receipt = await swap.awaitReceipt();
+    console.log(receipt);
 }
