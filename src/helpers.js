@@ -83,6 +83,8 @@ export async function signinzksync() {
     const msg = {op:"login", args:[syncAccountState.id]}
     zigzagws.send(JSON.stringify(msg));
 
+    return syncAccountState;
+
     // TODO: Delete this. It's only for testing
     //await submitorder("ETH-USDT", 'b', 3700, 0.001);
     //await sendfillrequest(openorders[0]);

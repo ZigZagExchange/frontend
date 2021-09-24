@@ -7,6 +7,7 @@ import Button from "../Button/Button";
 import darkPlugHead from "../../assets/icons/dark-plug-head.png";
 //helpers
 import { signinzksync } from "../../helpers";
+import {useAuthContext} from "../../context/authContext";
 
 const SpotForm = (props) => {
     const balanceHtml = (props.side === "buy") ?
@@ -19,6 +20,20 @@ const SpotForm = (props) => {
     }
     function updateAmount (e) {
         setAmount(e.target.value);
+    }
+
+    const {user,updateUser} = useAuthContext();
+
+    const signInHandler = async () => {
+        try {
+            const syncAccountSate = await signinzksync();
+
+            //    updating the user in the context
+            updateUser(syncAccountSate);
+
+        } catch (err) {
+            console.log(err)
+        }
     }
 
   return (
@@ -41,9 +56,18 @@ const SpotForm = (props) => {
         <div className="spf_range">
           <RangeSlider />
         </div>
-        <div className="spf_btn">
-          <Button className="bg_btn" text="CONNECT WALLET" img={darkPlugHead} onClick={signinzksync}/>
-        </div>
+          {
+              user ? (
+                  <div className="spf_btn">
+                      <Button className="bg_btn" text={props.side.toUpperCase()} img={darkPlugHead}/>
+                  </div>
+              ) : (
+                  <div className="spf_btn">
+                      <Button className="bg_btn" text="CONNECT WALLET" img={darkPlugHead} onClick={signInHandler}/>
+                  </div>
+              )
+          }
+
       </form>
     </>
   );
