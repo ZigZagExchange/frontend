@@ -6,13 +6,10 @@ import RangeSlider from "../RangeSlider/RangeSlider";
 import Button from "../Button/Button";
 import darkPlugHead from "../../assets/icons/dark-plug-head.png";
 //helpers
-import { signinzksync } from "../../helpers";
+import { signinzksync, submitorder } from "../../helpers";
 import {useAuthContext} from "../../context/authContext";
 
 const SpotForm = (props) => {
-    const balanceHtml = (props.side === "buy") ?
-              <strong>-USDT</strong> :
-              <strong>-ETH</strong>;
     const [price, setPrice] = useState(3370.93);
     const [amount, setAmount] = useState("");
     function updatePrice (e) {
@@ -24,6 +21,20 @@ const SpotForm = (props) => {
 
     const {user,updateUser} = useAuthContext();
 
+    let baseBalance, quoteBalance;
+    if (user) {
+        baseBalance = user.committed.balances.ETH / Math.pow(10,18);
+        quoteBalance = user.committed.balances.USDT / Math.pow(10,6);
+    }
+    else {
+        baseBalance = "-";
+        quoteBalance = "-";
+    }
+
+    const balanceHtml = (props.side === "buy") ?
+              <strong>{quoteBalance} USDT</strong> :
+              <strong>{baseBalance} ETH</strong>;
+
     const signInHandler = async () => {
         try {
             const syncAccountSate = await signinzksync();
@@ -34,6 +45,13 @@ const SpotForm = (props) => {
         } catch (err) {
             console.log(err)
         }
+    }
+
+    const buySellBtnClass = "bg_btn " + props.side.toLowerCase() + "_btn"
+
+    function buySellHandler(e) {
+        const side = props.side.charAt(0);
+        submitorder("ETH-USDT", side, price, amount);
     }
 
   return (
@@ -59,7 +77,7 @@ const SpotForm = (props) => {
           {
               user ? (
                   <div className="spf_btn">
-                      <Button className="bg_btn" text={props.side.toUpperCase()} img={darkPlugHead}/>
+                      <button className={buySellBtnClass} onClick={buySellHandler}>{props.side.toUpperCase()}</button>
                   </div>
               ) : (
                   <div className="spf_btn">

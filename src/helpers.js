@@ -37,7 +37,7 @@ zigzagws.onmessage = async function (e) {
             break
         case 'openorders':
             // TODO: Update the UI with the orders
-            const openorders = msg.args[0];
+            //const openorders = msg.args[0];
             break
         default:
             break

@@ -57,6 +57,16 @@
   margin-top: 15px;
 }
 
+.buy_btn {
+    background: #93C888;
+    text-transform: capitalize;
+}
+
+.sell_btn {
+    background: #c4384e;
+    text-transform: capitalize;
+}
+
 @media screen and (max-width: 655px) {
   .spot_form {
     width: 100%;

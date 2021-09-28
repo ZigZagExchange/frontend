@@ -87,6 +87,14 @@ header {
   transform: rotate(-180deg);
 }
 
+.address_button {
+    border: 2px solid white;
+    border-radius: 15px;
+    padding: 10px;
+    background: none;
+    color: white;
+}
+
 @media screen and (max-width: 991px) {
   .dex_h {
     display: none !important;

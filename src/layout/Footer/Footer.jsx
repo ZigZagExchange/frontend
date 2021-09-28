@@ -18,9 +18,6 @@ const Footer = () => {
           </div>
           <div className="footer_bottom">
             <img src={logo} alt="..." />
-            <strong>
-              CONNECT WALLET<span> TO TRADE</span>
-            </strong>
           </div>
         </div>
       </div>

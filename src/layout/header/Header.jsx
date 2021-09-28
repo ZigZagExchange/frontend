@@ -18,19 +18,20 @@ const Header = () => {
     // state to open or close the sidebar in mobile
     const [show, setShow] = useState(false);
 
-    const {updateUser} = useAuthContext();
+    const {user,updateUser} = useAuthContext();
 
     const signInHandler = async () => {
         try {
-            const syncAccountSate = await signinzksync();
+            const syncAccountState = await signinzksync();
 
             //    updating the user in the context
-            updateUser(syncAccountSate);
+            updateUser(syncAccountState);
 
         } catch (err) {
             console.log(err)
         }
     }
+    console.log(user);
 
     return (
         <>
@@ -67,9 +68,17 @@ const Header = () => {
                         <div className="head_right">
                             <div className="d-flex align-items-center justify-content-between">
                                 <img src={settingIcon} alt="..."/>
-                                <button className="bg_btn">
-                                    <img src={darkPlugHead} alt="..."/> CONNECT WALLET
-                                </button>
+                                {
+                                    user ? (
+                                        <button className="address_button">
+                                            {user.address.slice(0,4)}...{user.address.slice(0,-4)}
+                                        </button>
+                                    ) : (
+                                        <button className="bg_btn">
+                                            <img src={darkPlugHead} alt="..."/> CONNECT WALLET
+                                        </button>
+                                    )
+                                }
                             </div>
                             <div className="eu_text">
                                 <span>Eng</span>
@@ -98,12 +107,18 @@ const Header = () => {
                     </div>
                     <div className="head_right">
                         <img className="me-3" src={settingIcon} alt="..."/>
-                        <Button
-                            className="bg_btn"
-                            text="CONNECT WALLET"
-                            img={darkPlugHead}
-                            onClick={signInHandler}
-                        />
+                        { user ? (
+                            <button className="address_button">
+                                {user.address.slice(0,6)}...{user.address.slice(-4)}
+                            </button>
+                        ) : (
+                            <Button
+                                className="bg_btn"
+                                text="CONNECT WALLET"
+                                img={darkPlugHead}
+                                onClick={signInHandler}
+                            />
+                        )}
                         <div className="eu_text">
                             <span>Eng</span>
                             <hr/>
