@@ -54,12 +54,12 @@ const Header = () => {
                         <div className="head_left">
                             <ul>
                                 <li>
-                                    <NavLink exact to="/trade" activeClassName="active_link">
+                                    <NavLink exact to="/" activeClassName="active_link">
                                         Trade
                                     </NavLink>
                                 </li>
                                 <li>
-                                    <NavLink exact to="/" activeClassName="active_link">
+                                    <NavLink exact to="https://rinkeby.zksync.io" activeClassName="active_link">
                                         Wallet
                                     </NavLink>
                                 </li>
@@ -94,14 +94,14 @@ const Header = () => {
                         <img src={logo} alt="logo"/>
                         <ul>
                             <li>
-                                <NavLink exact to="/trade" activeClassName="active_link">
+                                <NavLink exact to="/" activeClassName="active_link">
                                     Trade
                                 </NavLink>
                             </li>
                             <li>
-                                <NavLink exact to="/" activeClassName="active_link">
+                                <a href="https://rinkeby.zksync.io">
                                     Wallet
-                                </NavLink>
+                                </a>
                             </li>
                         </ul>
                     </div>

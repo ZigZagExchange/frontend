@@ -49,9 +49,9 @@ const SpotForm = (props) => {
 
     const buySellBtnClass = "bg_btn " + props.side.toLowerCase() + "_btn"
 
-    function buySellHandler(e) {
+    async function buySellHandler(e) {
         const side = props.side.charAt(0);
-        submitorder("ETH-USDT", side, price, amount);
+        await submitorder("ETH-USDT", side, price, amount);
     }
 
   return (
@@ -77,7 +77,7 @@ const SpotForm = (props) => {
           {
               user ? (
                   <div className="spf_btn">
-                      <button className={buySellBtnClass} onClick={buySellHandler}>{props.side.toUpperCase()}</button>
+                      <button type="button" className={buySellBtnClass} onClick={buySellHandler}>{props.side.toUpperCase()}</button>
                   </div>
               ) : (
                   <div className="spf_btn">

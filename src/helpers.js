@@ -19,7 +19,9 @@ let ethWallet;
 let syncWallet;
 
 // Websocket
-const zigzagws = new WebSocket('wss://zigzag-rinkeby.herokuapp.com');
+//const zigzagws_url = 'ws://localhost:3004';
+const zigzagws_url = 'wss://zigzag-rinkeby.herokuapp.com';
+const zigzagws = new WebSocket(zigzagws_url);
 
 zigzagws.onopen = function () {
     // TODO: Subscribe to the current active market instead of ETH-USDT
