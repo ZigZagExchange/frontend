@@ -23,12 +23,12 @@ let syncWallet;
 const zigzagws_url = 'wss://zigzag-rinkeby.herokuapp.com';
 const zigzagws = new WebSocket(zigzagws_url);
 
-zigzagws.onopen = function () {
+zigzagws.addEventListener('open', function () {
     // TODO: Subscribe to the current active market instead of ETH-USDT
     zigzagws.send(JSON.stringify({op:"subscribemarket", args: ["ETH-USDT"]}))
-}
+});
 
-zigzagws.onmessage = async function (e) {
+zigzagws.addEventListener('message', async function (e) {
     console.log('received: %s', e.data);
     const msg = JSON.parse(e.data);
     switch (msg.op) {
@@ -44,7 +44,7 @@ zigzagws.onmessage = async function (e) {
         default:
             break
     }
-}
+});
 
 export async function signinzksync() {
     if (!window.ethereum) {
