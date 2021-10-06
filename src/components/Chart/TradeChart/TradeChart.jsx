@@ -1,14 +1,17 @@
 import React from 'react'
 // chart library
 import TradingViewWidget, { Themes } from "react-tradingview-widget";
-
+import {useDataContext} from "../../../context/dataContext"
 // css
 import "./TradeChart.css"
+
+
 const TradeChart = () => {
+    const {dataState} = useDataContext();
     return (
         <>
              <TradingViewWidget
-              symbol="ETHUSDT"
+              symbol={dataState.currency_name}
               theme={Themes.DARK}
               save_image={false}
               hide_top_toolbar={false}

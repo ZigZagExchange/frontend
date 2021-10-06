@@ -5,7 +5,12 @@ import "./SpotBox.css";
 import threeDotIcon from "../../../assets/icons/threedot-icon.png";
 import informationButton from "../../../assets/icons/information-button.png";
 import SpotForm from "../../../utills/SpotForm/SpotForm";
+import {useDataContext} from "../../../context/dataContext"
+
+
+
 const SpotBox = () => {
+  const {dataState} = useDataContext();
   return (
     <>
       <div className="spot_box">
@@ -27,8 +32,8 @@ const SpotBox = () => {
           </div>
         </div>
         <div className="spot_bottom">
-          <SpotForm side="buy"/>
-          <SpotForm side="sell"/>
+          <SpotForm side="buy" name={"BUY" + "  " +"  " + dataState?.currency_name_1} num={1}/>
+          <SpotForm side="sell" name={"SELL" + "  " + "  " + dataState?.currency_name_2} num={2}/>
         </div>
       </div>
     </>

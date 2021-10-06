@@ -1,14 +1,18 @@
 import React from "react";
 // css
 import "./TradePriceTable.css";
-const TradePriceTable = (props) => {
+import {useDataContext} from "../../../context/dataContext"
+
+
+  const TradePriceTable = (props) => {
+  const {dataState} = useDataContext();
   return (
     <>
       <table className={`trade_price_table ${props.className}`}>
         <thead>
           <tr>
-            <th>Price(USDT)</th>
-            <th>Amount(ETH)</th>
+            <th>Price({dataState?.currency_name_1})</th>
+            <th>Amount({dataState?.currency_name_2})</th>
             <th>Total</th>
           </tr>
         </thead>

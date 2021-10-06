@@ -8,8 +8,11 @@ import darkPlugHead from "../../assets/icons/dark-plug-head.png";
 //helpers
 import { signinzksync, submitorder } from "../../helpers";
 import {useAuthContext} from "../../context/authContext";
+import {useDataContext} from "../../context/dataContext"
+
 
 const SpotForm = (props) => {
+  const {dataState} = useDataContext();
     const [price, setPrice] = useState(3370.93);
     const [amount, setAmount] = useState("");
     function updatePrice (e) {
@@ -64,12 +67,12 @@ const SpotForm = (props) => {
         <div className="spf_input_box">
           <span className="spf_desc_text">Price</span>
           <input type="text" value={price} onChange={updatePrice}/>
-          <span>USDT</span>
+          <span>{dataState.currency_name_1}</span>
         </div>
         <div className="spf_input_box">
           <div className="spf_desc_text">Amount</div>
           <input type="text" value={amount} onChange={updateAmount}/>
-          <div>ETH</div>
+          <div>{dataState.currency_name_2}</div>
         </div>
         <div className="spf_range">
           <RangeSlider />
@@ -77,7 +80,10 @@ const SpotForm = (props) => {
           {
               user ? (
                   <div className="spf_btn">
-                      <button type="button" className={buySellBtnClass} onClick={buySellHandler}>{props.side.toUpperCase()}</button>
+                      <button type="button" className={buySellBtnClass} onClick={buySellHandler}>
+                        {/* {props.side.toUpperCase()} */}
+                        {props.name.toUpperCase()}
+                      </button>
                   </div>
               ) : (
                   <div className="spf_btn">

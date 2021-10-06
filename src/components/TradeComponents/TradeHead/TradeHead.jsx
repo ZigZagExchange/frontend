@@ -5,7 +5,7 @@ import "./TradeHead.css";
 import TradeRatesCard from "../TradeRatesCard/TradeRatesCard";
 import TradeSelect from "../TradeSelect/TradeSelect";
 
-const TradeHead = () => {
+const TradeHead = (props) => {
   return (
     <>
       <div className="tl_head">

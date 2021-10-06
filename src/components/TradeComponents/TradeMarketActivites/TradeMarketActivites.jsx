@@ -4,7 +4,11 @@ import "./TradeMarketActivites.css";
 // assets
 import twoUpArrows from "../../../assets/icons/two_uparrows.png";
 import uturnIcon from "../../../assets/icons/u-turn.png";
+import {useDataContext} from "../../../context/dataContext"
+
+
 const TradeMarketActivites = () => {
+  const {dataState} = useDataContext();
   return (
     <>
       <div className="trade_market">
@@ -15,7 +19,7 @@ const TradeMarketActivites = () => {
         <div className="tm_b mt-3">
           <div className="tm_bl">
             <p>
-              SOL<span>/USDT</span>
+              {dataState?.currency_name_1}<span>/{dataState?.currency_name_2}</span>
             </p>
             <p>20:00:06</p>
           </div>
@@ -32,7 +36,7 @@ const TradeMarketActivites = () => {
         <div className="tm_b mt-3">
           <div className="tm_bl">
             <p>
-              AVAX<span>/USDT</span>
+            {dataState?.currency_name_1}<span>/{dataState?.currency_name_2}</span>
             </p>
             <p>20:00:06</p>
           </div>
