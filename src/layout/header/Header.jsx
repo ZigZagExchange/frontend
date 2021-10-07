@@ -11,8 +11,8 @@ import darkPlugHead from "../../assets/icons/dark-plug-head.png";
 // component
 import Button from "../../utills/Button/Button";
 // helpers
-import {useAuthContext} from "../../context/authContext";
 import {signinzksync} from "../../helpers";
+import {useAuthContext} from "../../context/authContext";
 
 const Header = () => {
     // state to open or close the sidebar in mobile
@@ -23,13 +23,15 @@ const Header = () => {
     const signInHandler = async () => {
         try {
             const syncAccountState = await signinzksync();
+
             //    updating the user in the context
             updateUser(syncAccountState);
+
         } catch (err) {
-            updateUser(null);
-            console.log(err.message)
+            console.log(err)
         }
     }
+    console.log(user);
 
     return (
         <>

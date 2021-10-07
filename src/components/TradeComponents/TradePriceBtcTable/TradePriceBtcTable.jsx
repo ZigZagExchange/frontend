@@ -7,11 +7,8 @@ import {TradePriceBtcTableData} from "../../../Data/TradePriceBtcTable";
 import updownIcon from "../../../assets/icons/up-down-arrow.png";
 import arrows from "../../../assets/icons/arrows.png";
 import star from "../../../assets/icons/star-icon.png";
-import {useDataContext} from "../../../context/dataContext"
 
-
-  const TradePriceBtcTable = () => {
-  const {dataState} = useDataContext();
+const TradePriceBtcTable = () => {
   return (
     <>
       <div className="trade_price_btc_table">
@@ -39,8 +36,8 @@ import {useDataContext} from "../../../context/dataContext"
                 <tr key={i}>
                   <td className="d-flex align-items-center">
                     <img className="me-2" src={star} alt="..." />
-                    {dataState?.currency_name_1} / 
-                     <span> {dataState?.currency_name_2}</span>
+                    {d.td1}
+                    <span>{d.span}</span>
                   </td>
                   <td className={d.td2 < 0 ? "down_value" : "up_value"}>
                     {d.td2}

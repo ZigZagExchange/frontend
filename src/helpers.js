@@ -23,51 +23,28 @@ let syncWallet;
 const zigzagws_url = 'wss://zigzag-rinkeby.herokuapp.com';
 const zigzagws = new WebSocket(zigzagws_url);
 
-zigzagws.onopen = function() {
+zigzagws.addEventListener('open', function () {
     // TODO: Subscribe to the current active market instead of ETH-USDT
-    zigzagws.send(
-        JSON.stringify({
-            op: "subscribemarket",
-            args: ["BTC-USDT"]
-        })
-    )
-}
+    zigzagws.send(JSON.stringify({op:"subscribemarket", args: ["ETH-USDT"]}))
+});
 
-export async function subscribeMarket(para) {
-    zigzagws.send(
-        JSON.stringify({
-            op: "subscribemarket",
-            args: [para]
-        })
-    )
-}
-
-zigzagws.onmessage = async function(e) {
-
-    // console.log('received data: ==>', e.data);
+zigzagws.addEventListener('message', async function (e) {
+    console.log('received: %s', e.data);
     const msg = JSON.parse(e.data);
-    // console.log('received args: ==>', msg.args);
-    // console.log('received op: ==>', msg.op);
     switch (msg.op) {
-        case 'subscribemarket':
-            // console.log("subscribemarket ===>", msg)
-            break;
         case 'userordermatch':
-            // console.log("userordermatch ===>", msg)
             broadcastfill(...msg.args);
-            break;
+            break
         case 'liquidity':
-            // console.log("liquidity ===>", msg)
-            break;
+            break
         case 'openorders':
-            // console.log("openorders ===>", msg)
             // TODO: Update the UI with the orders
-            // const . = msg.args[0];
-            break;
+            //const openorders = msg.args[0];
+            break
         default:
-            break;
+            break
     }
-}
+});
 
 export async function signinzksync() {
     if (!window.ethereum) {
@@ -88,11 +65,11 @@ export async function signinzksync() {
 
     ethWallet = ethersProvider.getSigner()
     syncWallet = await zksync.Wallet.fromEthSigner(ethWallet, syncProvider);
-
+    
     // TODO: Display user's address after signin
 
     const syncAccountState = await syncWallet.getAccountState();
-
+    
     // TODO: Use account info to display balances
     console.log("account state", syncAccountState)
 
@@ -105,7 +82,7 @@ export async function signinzksync() {
     // TODO: Display Buy / Sell buttons if Signing Key is set
     console.log("Signing Key Set?", signingKeySet);
 
-    const msg = { op: "login", args: [syncAccountState.id] }
+    const msg = {op:"login", args:[syncAccountState.id]}
     zigzagws.send(JSON.stringify(msg));
 
     return syncAccountState;
@@ -138,8 +115,9 @@ export async function submitorder(product, side, price, amount) {
     if (side === 'b') {
         tokenBuy = currencies[0];
         tokenSell = currencies[1];
-        sellQuantity = amount * price;
-    } else if (side === 's') {
+        sellQuantity = amount*price;
+    }
+    else if (side === 's') {
         tokenBuy = currencies[1];
         tokenSell = currencies[0];
         sellQuantity = amount;
@@ -154,7 +132,7 @@ export async function submitorder(product, side, price, amount) {
         ratio: zksync.utils.tokenRatio(tokenRatio)
     });
     console.log("sending limit order", order);
-    const msg = { op: "submitorder", args: [order] };
+    const msg = {op:"submitorder", args: [order]};
     zigzagws.send(JSON.stringify(msg));
 }
 
@@ -173,7 +151,8 @@ export async function sendfillrequest(orderreceipt) {
         tokenSell = baseCurrency;
         tokenBuy = quoteCurrency;
         sellQuantity = baseQuantity;
-    } else if (side === 's') {
+    }
+    else if (side === 's') {
         tokenSell = quoteCurrency;
         tokenBuy = baseCurrency;
         sellQuantity = quoteQuantity;
@@ -187,7 +166,7 @@ export async function sendfillrequest(orderreceipt) {
         amount: syncProvider.tokenSet.parseToken(tokenSell, sellQuantity.toString()),
         ratio: zksync.utils.tokenRatio(tokenRatio)
     });
-    const resp = { op: "fillrequest", args: [orderId, fillOrder] }
+    const resp = {op:"fillrequest",args: [orderId, fillOrder]}
     zigzagws.send(JSON.stringify(resp));
 }
 
