@@ -85,12 +85,6 @@
   background-color: #171c28;
 }
 
-@media screen and (max-width: 1348px) {
-  .trade_left > div {
-    width: 644px;
-  }
-}
-
 @media screen and (max-width: 991px) {
   .trade_left > div {
     width: 100%;

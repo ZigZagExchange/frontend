@@ -29,7 +29,7 @@ const Trade = () => {
       <Header />
       <div className="trade_section">
         <div className="trade_container">
-          <div className="col-12 col-sm-12 col-md-12 col-lg-6 d-flex flex-column">
+          <div className="col-12 col-xl-6 d-flex flex-column">
             <div className="trade_left">
               <div>
                 {/* Trade Head */}
@@ -40,7 +40,7 @@ const Trade = () => {
             </div>
             <SpotBox />
           </div>
-          <div className="col-12 col-sm-12 col-md-12 col-lg-6">
+          <div className="col-12 col-xl-6">
             <div className="trade_right">
               <div className="col-12 col-sm-12 col-md-12 col-lg-6">
                 <div className="trade_Price">

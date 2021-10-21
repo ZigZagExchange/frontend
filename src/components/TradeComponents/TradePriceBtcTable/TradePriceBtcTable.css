@@ -4,7 +4,6 @@
 }
 
 .trade_price_btc_table table {
-  width: max-content;
   display: block;
   overflow: auto;
   height: 393px;

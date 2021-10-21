@@ -10,7 +10,6 @@
 
 .trade_market::before {
   content: "";
-  width: 500px;
   padding: 0;
   position: absolute;
   height: 2px;
@@ -19,7 +18,6 @@
 
 .tm_h,
 .tm_b {
-  width: 500px;
   padding: 0 20px;
   display: flex;
   align-items: center;
