@@ -1,12 +1,12 @@
 .trade_price_btc_table {
   width: 100%;
   padding-top: 20px;
+  height: 393px;
 }
 
 .trade_price_btc_table table {
-  display: block;
   overflow: auto;
-  height: 393px;
+  width: 100%;
 }
 
 .trade_price_btc_table table::-webkit-scrollbar {
@@ -41,15 +41,10 @@
   font-weight: 400;
   text-align: center;
   padding: 0 20px;
-  width: max-content;
 }
 
 .trade_price_btc_table table th:nth-child(1) {
   text-align: start;
-}
-
-.trade_price_btc_table table tbody {
-  margin-top: 20px;
 }
 
 .trade_price_btc_table table tbody tr:nth-child(even) {
@@ -60,6 +55,8 @@
   text-align: center;
   margin: 6px 0;
   padding-left: 20px;
+  padding-top: 5px;
+  padding-bottom: 5px;
 }
 
 .trade_price_btc_table table td span {
@@ -71,44 +68,13 @@
   color: white;
 }
 
-@media screen and (min-width: 1800px) {
-  .trade_price_btc_table table {
-    width: 100%;
-  }
-  .trade_price_btc_table table th {
-    width: unset;
-  }
-}
-
 @media screen and (max-width: 991px) {
-  .trade_price_btc_table table {
-    width: 100%;
-  }
   .trade_price_btc_table table th {
-    width: 42%;
     padding: 0 20px;
   }
 }
 
-@media screen and (max-width: 881px) {
-  .trade_price_btc_table table th {
-    width: 271px;
-  }
-}
-
-@media screen and (max-width: 436px) {
-  .trade_price_btc_table table th {
-    width: 139px;
-  }
-}
-
 @media screen and (max-width: 421px) {
-  .trade_price_btc_table table {
-    width: max-content;
-  }
-  .trade_price_btc_head {
-    width: 420px;
-  }
   .trade_price_btc_table table tbody {
     font-size: 0.8rem;
   }

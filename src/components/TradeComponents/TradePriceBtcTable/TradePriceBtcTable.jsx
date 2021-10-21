@@ -34,7 +34,7 @@ const TradePriceBtcTable = () => {
             {TradePriceBtcTableData.map((d, i) => {
               return (
                 <tr key={i}>
-                  <td className="d-flex align-items-center">
+                  <td>
                     <img className="me-2" src={star} alt="..." />
                     {d.td1}
                     <span>{d.span}</span>
