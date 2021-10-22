@@ -5,7 +5,7 @@ import "./SpotBox.css";
 import threeDotIcon from "../../../assets/icons/threedot-icon.png";
 import informationButton from "../../../assets/icons/information-button.png";
 import SpotForm from "../../../utills/SpotForm/SpotForm";
-const SpotBox = () => {
+const SpotBox = (props) => {
   return (
     <>
       <div className="spot_box">
@@ -27,8 +27,8 @@ const SpotBox = () => {
           </div>
         </div>
         <div className="spot_bottom">
-          <SpotForm side="buy"/>
-          <SpotForm side="sell"/>
+          <SpotForm side="buy" initPrice={props.initPrice}/>
+          <SpotForm side="sell" initPrice={props.initPrice}/>
         </div>
       </div>
     </>

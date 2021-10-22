@@ -16,7 +16,7 @@ const TradePriceTable = (props) => {
           {props.priceTableData.map((d, i) => {
             return (
               <tr key={i}>
-                <td className={props.value}>{d.td1}</td>
+                <td className={d.side === 'b' ? "up_value": "down_value"}>{d.td1}</td>
                 <td>{d.td2}</td>
                 <td>{d.td3}</td>
               </tr>

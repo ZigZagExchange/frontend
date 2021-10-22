@@ -10,7 +10,7 @@ import { signinzksync, submitorder } from "../../helpers";
 import {useAuthContext} from "../../context/authContext";
 
 const SpotForm = (props) => {
-    const [price, setPrice] = useState(3370.93);
+    const [price, setPrice] = useState(props.initPrice);
     const [amount, setAmount] = useState("");
     function updatePrice (e) {
         setPrice(e.target.value);
@@ -67,9 +67,9 @@ const SpotForm = (props) => {
           <span>USDT</span>
         </div>
         <div className="spf_input_box">
-          <div className="spf_desc_text">Amount</div>
+          <span className="spf_desc_text">Amount</span>
           <input type="text" value={amount} onChange={updateAmount}/>
-          <div>ETH</div>
+          <span>ETH</span>
         </div>
         <div className="spf_range">
           <RangeSlider />

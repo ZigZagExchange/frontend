@@ -33,7 +33,7 @@ html {
 }
 
 .down_value {
-  color: #c4384e;
+  color: #c4384e !important;
 }
 
 .trade_price_active_tab {

@@ -31,7 +31,6 @@ const Header = () => {
             console.log(err)
         }
     }
-    console.log(user);
 
     return (
         <>

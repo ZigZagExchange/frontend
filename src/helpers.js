@@ -19,13 +19,13 @@ let ethWallet;
 let syncWallet;
 
 // Websocket
-//const zigzagws_url = 'ws://localhost:3004';
-const zigzagws_url = 'wss://zigzag-rinkeby.herokuapp.com';
-const zigzagws = new WebSocket(zigzagws_url);
+const zigzagws_url = 'ws://localhost:3004';
+//const zigzagws_url = 'wss://zigzag-rinkeby.herokuapp.com';
+export const zigzagws = new WebSocket(zigzagws_url);
 
 zigzagws.addEventListener('open', function () {
     // TODO: Subscribe to the current active market instead of ETH-USDT
-    zigzagws.send(JSON.stringify({op:"subscribemarket", args: ["ETH-USDT"]}))
+    //zigzagws.send(JSON.stringify({op:"subscribemarket", args: ["ETH-USDT"]}))
 });
 
 zigzagws.addEventListener('message', async function (e) {
@@ -34,12 +34,6 @@ zigzagws.addEventListener('message', async function (e) {
     switch (msg.op) {
         case 'userordermatch':
             broadcastfill(...msg.args);
-            break
-        case 'liquidity':
-            break
-        case 'openorders':
-            // TODO: Update the UI with the orders
-            //const openorders = msg.args[0];
             break
         default:
             break
