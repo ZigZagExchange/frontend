@@ -80,10 +80,6 @@ export async function signinzksync() {
     zigzagws.send(JSON.stringify(msg));
 
     return syncAccountState;
-
-    // TODO: Delete this. It's only for testing
-    //await submitorder("ETH-USDT", 'b', 3700, 0.001);
-    //await sendfillrequest(openorders[0]);
 }
 
 export async function changepubkeyzksync() {

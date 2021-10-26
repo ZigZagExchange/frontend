@@ -27,18 +27,19 @@ class Trade extends React.Component {
 
     constructor(props) {
         super(props)
-        this.state = { marketSummary: {}, lastPrices: {}, openorders: [], currentMarket: "ETH-USDT" }
+        this.state = { marketSummary: {}, lastPrices: {}, openorders: [], liquidity: [], currentMarket: "ETH-USDT" }
     }
 
     componentDidMount() {
         zigzagws.addEventListener('message', async (e) => {
             const msg = JSON.parse(e.data);
+            let newstate;
             switch (msg.op) {
                 case 'openorders':
-                    this.setState({
-                        ...this.state,
-                        openorders: msg.args[0]
-                    })
+                    newstate = { ...this.state }
+                    const openorders = msg.args[0];
+                    newstate.openorders.push(...openorders);
+                    this.setState(newstate);
                     break
                 case 'marketsummary':
                     this.setState({ 
@@ -56,14 +57,20 @@ class Trade extends React.Component {
                     break
                 case 'lastprice':
                     const priceUpdates = msg.args[0];
-                    const newstate = { ...this.state }
+                    newstate = { ...this.state }
                     priceUpdates.forEach(update => {
                         newstate.lastPrices[update[0]] = { price: update[1], change: update[2] };
-                        if (update.market === this.state.currentMarket) {
+                        if (update[0] === this.state.currentMarket) {
                             newstate.marketSummary.price = update[1]
                             newstate.marketSummary.priceChange = update[2]
                         }
                     });
+                    this.setState(newstate);
+                    break
+                case 'liquidity':
+                    newstate = { ...this.state }
+                    const liquidity = msg.args[1];
+                    newstate.liquidity.push(...liquidity);
                     this.setState(newstate);
                     break
                 default:
@@ -83,10 +90,36 @@ class Trade extends React.Component {
           const pctchange = (change / price * 100).toFixed(2);
           lastPriceTableData.push({ td1: market, td2: price, td3: pctchange });
       })
+
       const openOrdersData = [];
-      Object.keys(this.state.openorders).forEach(order => {
-          openOrdersData.push({ td1: order[3], td2: order[4], td3: order[3]*order[4], side: order[2] });
+      const orderbookBids = [];
+      const orderbookAsks = [];
+      this.state.openorders.forEach(order => {
+          const orderrow = { td1: order[3], td2: order[4], td3: order[3]*order[4], side: order[2] };
+          openOrdersData.push(orderrow)
+          if (order[2] === 'b') {
+              orderbookBids.push(orderrow);
+          }
+          else if (order[2] === 's') {
+              orderbookAsks.push(orderrow);
+          }
       })
+
+      this.state.liquidity.forEach(liq => {
+          const quantity = liq[0];
+          const spread = liq[1];
+          const side = liq[2];
+          if (side === 'd' || side === 'b') {
+              const bidPrice = this.state.marketSummary.price * (1 - spread);
+              orderbookBids.push({ td1: bidPrice, td2: quantity, td3: bidPrice*quantity, side: 'b' });
+          }
+          if (side === 'd' || side === 's') {
+              const askPrice = this.state.marketSummary.price * (1 + spread);
+              orderbookAsks.push({ td1: askPrice, td2: quantity, td3: askPrice*quantity, side: 's' });
+          }
+      })
+      orderbookAsks.sort((a,b) => b.td1 - a.td1);
+      orderbookBids.sort((a,b) => b.td1 - a.td1);
 
       return (
         <>
@@ -113,7 +146,7 @@ class Trade extends React.Component {
                       {/* Trade Price Table*/}
                       <TradePriceTable
                         className="tpt_1"
-                        priceTableData={priceTableData}
+                        priceTableData={orderbookAsks}
                       />
                     </div>
                   </div>
@@ -126,13 +159,13 @@ class Trade extends React.Component {
                   <div className="col-12 col-sm-12 col-md-12 col-lg-6">
                     <div className="trade_Price">
                       {/* Trade Price Second Head */}
-                      <TradePriceHeadSecond />
+                      <TradePriceHeadSecond lastPrice={this.state.marketSummary.price} />
                       {/* Trade Price Table*/}
                       <TradePriceTable
                         className="tpt_2"
-                        priceTableData={priceTableData}
+                        priceTableData={orderbookBids}
                       />
-                      <TradeMarketActivites />
+                      {/* <TradeMarketActivites /> */}
                     </div>
                   </div>
                   <div className="col-12 col-sm-12 col-md-12 col-lg-6">

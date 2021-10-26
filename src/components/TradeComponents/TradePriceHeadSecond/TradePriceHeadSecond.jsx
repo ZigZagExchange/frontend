@@ -3,15 +3,15 @@ import React from "react";
 import "./TradePriceHeadSecond.css"
 // assets
 import upArrow from "../../../assets/icons/up-arrow.png";
-const TradePriceHeadSecond = () => {
+const TradePriceHeadSecond = (props) => {
   return (
     <>
       <div className="trade_price_head_2">
         <div>
-          <h2>3370.93</h2>
+          <h2>{props.lastPrice}</h2>
           <img src={upArrow} alt="..." />
         </div>
-        <span>$3370.54</span>
+        <span>${props.lastPrice}</span>
         <span>More</span>
       </div>
     </>

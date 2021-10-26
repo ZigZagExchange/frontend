@@ -35,6 +35,10 @@
   margin-top: 0.7rem;
 }
 
+.tpt_2 {
+    height: 450px;
+}
+
 .tpt_1 tbody {
   background-image: url("../../../assets/images/pricetable-bg.png");
 }
@@ -48,7 +52,7 @@
 }
 
 .tpt_3 {
-  height: 89%;
+  height: 75%;
 }
 
 .trade_price_table thead {
@@ -63,6 +67,15 @@
   color: #94a2c9;
   font-size: 1rem;
   font-weight: 400;
+}
+.trade_price_table th:nth-child(1) {
+  text-align: start;
+}
+.trade_price_table th:nth-child(2) {
+  text-align: right;
+}
+.trade_price_table th:nth-child(3) {
+  text-align: right;
 }
 
 .tpt_1 td:nth-child(1) {
