@@ -9,16 +9,12 @@ import TradePriceTable from "../../components/TradeComponents/TradePriceTable/Tr
 import Header from "../../layout/header/Header";
 import Footer from "../../layout/Footer/Footer";
 
-// table data
-import { priceTableData } from "../../Data/PriceTableData";
-
 // css
 import "./style.css";
 import TradePriceBtcTable from "../../components/TradeComponents/TradePriceBtcTable/TradePriceBtcTable";
 
 // import TradePriceBtcHead from "../../components/TradeComponents/TradePriceBtcHead/TradePriceBtcHead";
 import TradePriceHeadSecond from "../../components/TradeComponents/TradePriceHeadSecond/TradePriceHeadSecond";
-import TradeMarketActivites from "../../components/TradeComponents/TradeMarketActivites/TradeMarketActivites";
 import SpotBox from "../../components/TradeComponents/SpotBox/SpotBox";
 import TradePriceHeadThird from "../../components/TradeComponents/TradePriceHeadThird/TradePriceHeadThird";
 import { zigzagws } from "../../helpers";
@@ -146,6 +142,7 @@ class Trade extends React.Component {
                       {/* Trade Price Table*/}
                       <TradePriceTable
                         className="tpt_1"
+                        useGradient="true"
                         priceTableData={orderbookAsks}
                       />
                     </div>
@@ -163,6 +160,7 @@ class Trade extends React.Component {
                       {/* Trade Price Table*/}
                       <TradePriceTable
                         className="tpt_2"
+                        useGradient="true"
                         priceTableData={orderbookBids}
                       />
                       {/* <TradeMarketActivites /> */}
@@ -183,7 +181,7 @@ class Trade extends React.Component {
                 </div>
               </div>
             </div>
-            <Footer />
+            <Footer openOrders={this.state.openorders} />
           </div>
         </>
       );

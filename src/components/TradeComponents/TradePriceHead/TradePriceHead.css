@@ -35,6 +35,8 @@
   appearance: none;
   background-position: right;
   margin-right: 20px;
+  padding-right: 20px;
+  text-align-last: right;
 }
 
 .tph_r option {

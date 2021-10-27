@@ -3,7 +3,6 @@ import React from "react";
 import "./TradeMarketActivites.css";
 // assets
 import twoUpArrows from "../../../assets/icons/two_uparrows.png";
-import uturnIcon from "../../../assets/icons/u-turn.png";
 const TradeMarketActivites = () => {
   return (
     <>

@@ -18,9 +18,7 @@ const TradePriceHead = () => {
         </div>
         <div className="tph_r">
             <select>
-                <option value="0.00000001">0.00000001</option>
-                <option value="0.00000001">0.00000001</option>
-                <option value="0.00000001">0.00000001</option>
+                <option value="0.01">0.01</option>
             </select>
             <img src={threedotIcon} alt="..." />
         </div>

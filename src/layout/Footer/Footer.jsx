@@ -3,7 +3,7 @@ import React from "react";
 import "./Footer.css";
 // assets
 import logo from "../../assets/icons/footer_logo.png";
-const Footer = () => {
+const Footer = (props) => {
   return (
     <>
       <div className="footer">
@@ -11,10 +11,43 @@ const Footer = () => {
           <hr />
           <div>
             <div className="ft_tabs">
-              <strong>Open Orders (0)</strong>
+              <strong>Open Orders ({props.openOrders.length})</strong>
               <strong>Trade History</strong>
               <strong>Balances</strong>
             </div>
+          </div>
+          <div className="footer_open_orders">
+              <table>
+                <thead>
+                    <tr>
+                      <th>Market</th>
+                      <th>Price</th>
+                      <th>Quantity</th>
+                      <th>Side</th>
+                      <th><a className="cancel_order_link">Cancel All</a></th>
+                    </tr>
+                </thead>
+                <tbody>
+                  {props.openOrders.map((order, i) => {
+                    const id = order[0];
+                    const price = order[3];
+                    const quantity = order[4];
+                    const market = order[1];
+                    const baseCurrency = order[1].split('-')[0];
+                    const side = order[2] === 'b' ? "buy" : "sell";
+                    const classname = order[2] === 'b' ? "up_value" : "down_value";
+                    return (
+                      <tr key={id}> 
+                        <td>{market}</td>
+                        <td>{price}</td>
+                        <td>{quantity} {baseCurrency}</td>
+                        <td className={classname}>{side}</td>
+                        <td><a className="cancel_order_link">Cancel</a></td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
           </div>
           <div className="footer_bottom">
             <img src={logo} alt="..." />

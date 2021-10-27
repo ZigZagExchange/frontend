@@ -63,6 +63,23 @@
   color: white;
 }
 
+.footer_open_orders {
+    margin-top: 10px;
+}
+.footer_open_orders table {
+    width: 100%;
+}
+.footer_open_orders table tbody td,
+.footer_open_orders table thead th {
+    padding: 5px 15px;
+    color: white;
+}
+.cancel_order_link {
+    text-decoration: underline;
+    cursor: pointer;
+    color: gray;
+}
+
 @media screen and (max-width: 697px) {
   .ft_tabs {
     flex-wrap: wrap;

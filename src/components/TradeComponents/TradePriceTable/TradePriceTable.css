@@ -39,14 +39,6 @@
     height: 450px;
 }
 
-.tpt_1 tbody {
-  background-image: url("../../../assets/images/pricetable-bg.png");
-}
-
-.tpt_2 tbody {
-  background-image: url("../../../assets/images/pricetable-green_bg.png");
-}
-
 .tpt_3 tbody {
   background-image: unset;
 }
