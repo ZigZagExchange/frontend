@@ -28,7 +28,7 @@ const TradePriceTable = (props) => {
             const amount = typeof d.td2 === "number" ? d.td2.toFixed(4) : d.td2;
             const total = typeof d.td3 === "number" ? d.td3.toFixed(2) : d.td3;
             return (
-              <tr key={i} style={rowStyle}>
+              <tr key={i} style={rowStyle} onclick={props.onClickRow}>
                 <td className={d.side === 'b' ? "up_value": "down_value"}>{price}</td>
                 <td>{amount}</td>
                 <td>{total}</td>

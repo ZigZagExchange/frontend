@@ -19,8 +19,7 @@ let ethWallet;
 let syncWallet;
 
 // Websocket
-const zigzagws_url = 'ws://localhost:3004';
-//const zigzagws_url = 'wss://zigzag-rinkeby.herokuapp.com';
+const zigzagws_url = process.env.REACT_APP_ZIGZAG_WS;
 export const zigzagws = new WebSocket(zigzagws_url);
 
 zigzagws.addEventListener('open', function () {
@@ -168,4 +167,17 @@ export async function broadcastfill(swapOffer, fillOrder) {
     console.log(swap);
     const receipt = await swap.awaitReceipt();
     console.log(receipt);
+}
+
+export async function cancelorders() {
+    // TODO: Nothing actually happens here. Needs to be completed
+    const amount = zksync.utils.closestPackableTransactionAmount(ethers.utils.parseEther("0"));
+
+    const transfer = await syncWallet.syncTransfer({
+      to: "0x000000000000000000000000000000000000dEaD",
+      token: "ETH",
+      amount,
+    });
+
+    return transfer;
 }

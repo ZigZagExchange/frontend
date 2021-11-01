@@ -24,7 +24,7 @@ const Footer = (props) => {
                       <th>Price</th>
                       <th>Quantity</th>
                       <th>Side</th>
-                      <th><a className="cancel_order_link">Cancel All</a></th>
+                      <th><span className="cancel_order_link">Cancel All</span></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -42,7 +42,7 @@ const Footer = (props) => {
                         <td>{price}</td>
                         <td>{quantity} {baseCurrency}</td>
                         <td className={classname}>{side}</td>
-                        <td><a className="cancel_order_link">Cancel</a></td>
+                        <td><span className="cancel_order_link">Cancel All</span></td>
                       </tr>
                     );
                   })}
