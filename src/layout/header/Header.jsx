@@ -10,27 +10,10 @@ import menu from "../../assets/icons/menu.png";
 import darkPlugHead from "../../assets/icons/dark-plug-head.png";
 // component
 import Button from "../../utills/Button/Button";
-// helpers
-import {signinzksync} from "../../helpers";
-import {useAuthContext} from "../../context/authContext";
 
-const Header = () => {
+const Header = (props) => {
     // state to open or close the sidebar in mobile
     const [show, setShow] = useState(false);
-
-    const {user,updateUser} = useAuthContext();
-
-    const signInHandler = async () => {
-        try {
-            const syncAccountState = await signinzksync();
-
-            //    updating the user in the context
-            updateUser(syncAccountState);
-
-        } catch (err) {
-            console.log(err)
-        }
-    }
 
     return (
         <>
@@ -68,9 +51,9 @@ const Header = () => {
                             <div className="d-flex align-items-center justify-content-between">
                                 <img src={settingIcon} alt="..."/>
                                 {
-                                    user ? (
+                                    props.user.address ? (
                                         <button className="address_button">
-                                            {user.address.slice(0,4)}...{user.address.slice(0,-4)}
+                                            {props.user.address.slice(0,4)}...{props.user.address.slice(0,-4)}
                                         </button>
                                     ) : (
                                         <button className="bg_btn">
@@ -80,9 +63,11 @@ const Header = () => {
                                 }
                             </div>
                             <div className="eu_text">
-                                <span>Eng</span>
-                                <hr/>
-                                <span>USD</span>
+                                <select>
+                                    <option>zkSync</option>
+                                    <option>Starknet</option>
+                                    <option>Loopring</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -106,22 +91,25 @@ const Header = () => {
                     </div>
                     <div className="head_right">
                         <img className="me-3" src={settingIcon} alt="..."/>
-                        { user ? (
+                        { props.user.address ? (
                             <button className="address_button">
-                                {user.address.slice(0,6)}...{user.address.slice(-4)}
+                                {props.user.address.slice(0,6)}...{props.user.address.slice(-4)}
                             </button>
                         ) : (
                             <Button
                                 className="bg_btn"
                                 text="CONNECT WALLET"
                                 img={darkPlugHead}
-                                onClick={signInHandler}
+                                onClick={props.signInHandler}
                             />
                         )}
                         <div className="eu_text">
-                            <span>Eng</span>
-                            <hr/>
-                            <span>USD</span>
+                            <select>
+                                <option>zkSync - Rinkeby</option>
+                                <option disabled>zkSync - Mainnet</option>
+                                <option disabled>Starknet</option>
+                                <option disabled>Loopring</option>
+                            </select>
                         </div>
                         <img src={menu} alt="..."/>
                     </div>

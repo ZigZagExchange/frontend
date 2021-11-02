@@ -1,4 +1,7 @@
 import React from "react";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 // Components
 import TradeChart from "../../components/Chart/TradeChart/TradeChart";
 import TradeHead from "../../components/TradeComponents/TradeHead/TradeHead";
@@ -17,17 +20,20 @@ import TradePriceBtcTable from "../../components/TradeComponents/TradePriceBtcTa
 import TradePriceHeadSecond from "../../components/TradeComponents/TradePriceHeadSecond/TradePriceHeadSecond";
 import SpotBox from "../../components/TradeComponents/SpotBox/SpotBox";
 import TradePriceHeadThird from "../../components/TradeComponents/TradePriceHeadThird/TradePriceHeadThird";
-import { zigzagws } from "../../helpers";
+
+// Helpers
+import { zigzagws, sendfillrequest, signinzksync, broadcastfill, getAccountState } from "../../helpers";
 
 class Trade extends React.Component {
 
     constructor(props) {
         super(props)
-        this.state = { marketSummary: {}, lastPrices: {}, openorders: [], liquidity: [], currentMarket: "ETH-USDT" }
+        this.state = { user: {}, fills: [], marketSummary: {}, lastPrices: {}, openorders: [], liquidity: [], currentMarket: "ETH-USDT" }
     }
 
     componentDidMount() {
         zigzagws.addEventListener('message', async (e) => {
+            console.log(e.data);
             const msg = JSON.parse(e.data);
             let newstate;
             switch (msg.op) {
@@ -69,6 +75,31 @@ class Trade extends React.Component {
                     newstate.liquidity.push(...liquidity);
                     this.setState(newstate);
                     break
+                case 'userordermatch':
+                    const { success, swap } = await broadcastfill(...msg.args);
+                    if (success) {
+                        toast.success("Filled: " + swap.txHash);
+                        newstate = { ...this.state }
+                        newstate.fills.push(swap);
+                        const user = await getAccountState();
+                        newstate.user = user;
+                    }
+                    else {
+                        toast.error(swap.error.message);
+                    }
+                    break
+                case 'cancelorderack':
+                    const canceled_ids = msg.args[0];
+                    newstate = { ...this.state };
+                    const neworders = [];
+                    this.state.openorders.forEach(order => {
+                        if (!canceled_ids.includes(order[0])) {
+                            neworders.push(order);
+                        }
+                    })
+                    newstate.openorders = neworders;
+                    this.setState(newstate);
+                    break
                 default:
                     break
             }
@@ -77,6 +108,31 @@ class Trade extends React.Component {
             zigzagws.send(JSON.stringify({op:"subscribemarket", args: ["ETH-USDT"]}))
         })
     }
+
+    async signInHandler() {
+        let syncAccountState;
+        try {
+            syncAccountState = await signinzksync();
+        } catch (e) {
+            toast.error(e.message);
+            return false;
+        }
+        const newState = { ...this.state };
+        newState.user = syncAccountState;
+        this.setState(newState);
+    }
+
+    async fillOpenOrder(data) {
+        if (this.state.user.address) {
+            try {
+                await sendfillrequest(data.order);
+            } catch (e) {
+                console.log(e);
+                toast.error(e.message);
+            }
+        }
+    }
+
 
     render() {
       const lastPriceTableData = [];
@@ -90,14 +146,20 @@ class Trade extends React.Component {
       const openOrdersData = [];
       const orderbookBids = [];
       const orderbookAsks = [];
+      const useropenorders = [];
       this.state.openorders.forEach(order => {
-          const orderrow = { td1: order[3], td2: order[4], td3: order[3]*order[4], side: order[2] };
-          openOrdersData.push(orderrow)
-          if (order[2] === 'b') {
-              orderbookBids.push(orderrow);
+          if (parseInt(order[7]) === this.state.user.id) {
+              useropenorders.push(order);
           }
-          else if (order[2] === 's') {
-              orderbookAsks.push(orderrow);
+          else {
+              const orderrow = { td1: order[3], td2: order[4], td3: order[3]*order[4], side: order[2], order: order };
+              openOrdersData.push(orderrow)
+              if (order[2] === 'b') {
+                  orderbookBids.push(orderrow);
+              }
+              else if (order[2] === 's') {
+                  orderbookAsks.push(orderrow);
+              }
           }
       })
 
@@ -119,7 +181,8 @@ class Trade extends React.Component {
 
       return (
         <>
-          <Header />
+          <ToastContainer position="bottom-right" theme="colored" />
+          <Header user={this.state.user} signInHandler={this.signInHandler.bind(this)} />
           <div className="trade_section">
             <div className="trade_container">
               <div className="col-12 col-xl-6 d-flex flex-column">
@@ -131,7 +194,7 @@ class Trade extends React.Component {
                     <TradeChart />
                   </div>
                 </div>
-                <SpotBox initPrice={this.state.marketSummary.price}/>
+                <SpotBox initPrice={this.state.marketSummary.price} signInHandler={this.signInHandler.bind(this)} user={this.state.user} />
               </div>
               <div className="col-12 col-xl-6">
                 <div className="trade_right">
@@ -175,13 +238,14 @@ class Trade extends React.Component {
                         className="tpt_3"
                         value="up_value"
                         priceTableData={openOrdersData}
+                        onClickRow={this.fillOpenOrder.bind(this)}
                       />
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-            <Footer openOrders={this.state.openorders} />
+            <Footer openOrders={useropenorders} />
           </div>
         </>
       );

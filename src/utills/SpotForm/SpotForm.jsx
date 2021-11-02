@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { toast } from 'react-toastify';
 // css
 import "./SpotForm.css";
 // components
@@ -6,8 +7,7 @@ import RangeSlider from "../RangeSlider/RangeSlider";
 import Button from "../Button/Button";
 import darkPlugHead from "../../assets/icons/dark-plug-head.png";
 //helpers
-import { signinzksync, submitorder } from "../../helpers";
-import {useAuthContext} from "../../context/authContext";
+import { submitorder } from "../../helpers";
 
 const SpotForm = (props) => {
     const [price, setPrice] = useState(props.initPrice);
@@ -19,12 +19,10 @@ const SpotForm = (props) => {
         setAmount(e.target.value);
     }
 
-    const {user,updateUser} = useAuthContext();
-
     let baseBalance, quoteBalance;
-    if (user) {
-        baseBalance = user.committed.balances.ETH / Math.pow(10,18);
-        quoteBalance = user.committed.balances.USDT / Math.pow(10,6);
+    if (props.user.address) {
+        baseBalance = props.user.committed.balances.ETH / Math.pow(10,18);
+        quoteBalance = props.user.committed.balances.USDT / Math.pow(10,6);
     }
     else {
         baseBalance = "-";
@@ -35,23 +33,16 @@ const SpotForm = (props) => {
               <strong>{quoteBalance} USDT</strong> :
               <strong>{baseBalance} ETH</strong>;
 
-    const signInHandler = async () => {
-        try {
-            const syncAccountSate = await signinzksync();
-
-            //    updating the user in the context
-            updateUser(syncAccountSate);
-
-        } catch (err) {
-            console.log(err)
-        }
-    }
-
     const buySellBtnClass = "bg_btn " + props.side.toLowerCase() + "_btn"
 
     async function buySellHandler(e) {
         const side = props.side.charAt(0);
-        await submitorder("ETH-USDT", side, price, amount);
+        try {
+            await submitorder("ETH-USDT", side, price, amount);
+        } catch (e) {
+            console.log(e);
+            toast.error(e.message);
+        }
     }
 
   return (
@@ -75,13 +66,13 @@ const SpotForm = (props) => {
           <RangeSlider />
         </div>
           {
-              user ? (
+              props.user.address ? (
                   <div className="spf_btn">
                       <button type="button" className={buySellBtnClass} onClick={buySellHandler}>{props.side.toUpperCase()}</button>
                   </div>
               ) : (
                   <div className="spf_btn">
-                      <Button className="bg_btn" text="CONNECT WALLET" img={darkPlugHead} onClick={signInHandler}/>
+                      <Button className="bg_btn" text="CONNECT WALLET" img={darkPlugHead} onClick={props.signInHandler}/>
                   </div>
               )
           }

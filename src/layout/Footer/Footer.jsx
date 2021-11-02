@@ -3,6 +3,9 @@ import React from "react";
 import "./Footer.css";
 // assets
 import logo from "../../assets/icons/footer_logo.png";
+//helpers
+import { cancelorder, cancelallorders } from "../../helpers";
+
 const Footer = (props) => {
   return (
     <>
@@ -12,7 +15,7 @@ const Footer = (props) => {
           <div>
             <div className="ft_tabs">
               <strong>Open Orders ({props.openOrders.length})</strong>
-              <strong>Trade History</strong>
+              <strong>Fills</strong>
               <strong>Balances</strong>
             </div>
           </div>
@@ -24,7 +27,7 @@ const Footer = (props) => {
                       <th>Price</th>
                       <th>Quantity</th>
                       <th>Side</th>
-                      <th><span className="cancel_order_link">Cancel All</span></th>
+                      <th><span onClick={cancelallorders} className="cancel_order_link">Cancel All</span></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -42,7 +45,7 @@ const Footer = (props) => {
                         <td>{price}</td>
                         <td>{quantity} {baseCurrency}</td>
                         <td className={classname}>{side}</td>
-                        <td><span className="cancel_order_link">Cancel All</span></td>
+                        <td><span onClick={() => cancelorder(id)} className="cancel_order_link">Cancel</span></td>
                       </tr>
                     );
                   })}

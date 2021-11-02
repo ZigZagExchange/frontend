@@ -17,6 +17,7 @@ let ethersProvider;
 let syncProvider;
 let ethWallet;
 let syncWallet;
+let syncAccountState;
 
 // Websocket
 const zigzagws_url = process.env.REACT_APP_ZIGZAG_WS;
@@ -27,17 +28,10 @@ zigzagws.addEventListener('open', function () {
     //zigzagws.send(JSON.stringify({op:"subscribemarket", args: ["ETH-USDT"]}))
 });
 
-zigzagws.addEventListener('message', async function (e) {
-    console.log('received: %s', e.data);
-    const msg = JSON.parse(e.data);
-    switch (msg.op) {
-        case 'userordermatch':
-            broadcastfill(...msg.args);
-            break
-        default:
-            break
-    }
-});
+export async function getAccountState() {
+    const syncAccountState = await syncWallet.getAccountState();
+    return syncAccountState;
+}
 
 export async function signinzksync() {
     if (!window.ethereum) {
@@ -59,22 +53,16 @@ export async function signinzksync() {
     ethWallet = ethersProvider.getSigner()
     syncWallet = await zksync.Wallet.fromEthSigner(ethWallet, syncProvider);
     
-    // TODO: Display user's address after signin
-
-    const syncAccountState = await syncWallet.getAccountState();
-    
-    // TODO: Use account info to display balances
+    syncAccountState = await syncWallet.getAccountState();
     console.log("account state", syncAccountState)
+    if (!syncAccountState.id) {
+        throw new Error("Account not found. Please use the Wallet to deposit funds before trying again.");
+    }
 
     const signingKeySet = await syncWallet.isSigningKeySet();
     if (!signingKeySet) {
         await changepubkeyzksync();
     }
-
-    // TODO: Change text on Connect Wallet button to Set Signing Key if signing key is not set
-    // TODO: Display Buy / Sell buttons if Signing Key is set
-    console.log("Signing Key Set?", signingKeySet);
-
     const msg = {op:"login", args:[syncAccountState.id]}
     zigzagws.send(JSON.stringify(msg));
 
@@ -96,6 +84,9 @@ export async function submitorder(product, side, price, amount) {
     const validsides = ['b', 's'];
     if (!validsides.includes(side)) {
         throw new Error("Invalid side");
+    }
+    if (amount < 0.0001) {
+        throw new Error("Quantity must be atleast 0.0001");
     }
     const currencies = product.split('-');
     const baseCurrency = currencies[0];
@@ -164,20 +155,26 @@ export async function broadcastfill(swapOffer, fillOrder) {
         orders: [swapOffer, fillOrder],
         feeToken: 'ETH',
     });
-    console.log(swap);
-    const receipt = await swap.awaitReceipt();
+    let receipt;
+    try {
+        receipt = await swap.awaitReceipt();
+    } catch (e) {
+        return {success: false, swap, receipt: null};
+    }
     console.log(receipt);
+    return {success: true, swap, receipt};
 }
 
-export async function cancelorders() {
-    // TODO: Nothing actually happens here. Needs to be completed
-    const amount = zksync.utils.closestPackableTransactionAmount(ethers.utils.parseEther("0"));
+export async function cancelallorders() {
+    // TODO: Send an on-chain transaction to cancel orders
+    const msg = {op:"cancelall", args: [syncAccountState.id]};
+    zigzagws.send(JSON.stringify(msg));
+    return true;
+}
 
-    const transfer = await syncWallet.syncTransfer({
-      to: "0x000000000000000000000000000000000000dEaD",
-      token: "ETH",
-      amount,
-    });
-
-    return transfer;
+export async function cancelorder(orderid) {
+    // TODO: Send an on-chain transaction to cancel orders
+    const msg = {op:"cancelorder", args: [orderid]};
+    zigzagws.send(JSON.stringify(msg));
+    return true;
 }

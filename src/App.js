@@ -1,7 +1,7 @@
 import "./App.css";
 import AppRoute from "./routes/AppRoute"
-import AuthContextProvider from "./context/authContext";
-import React from 'react'
+import React from 'react';
+
 
 
 class App extends React.Component {
@@ -12,9 +12,7 @@ class App extends React.Component {
     render() {
         return (
             <>
-                <AuthContextProvider>
-                    <AppRoute/>
-                </AuthContextProvider>
+                <AppRoute/>
             </>
         );
     }
