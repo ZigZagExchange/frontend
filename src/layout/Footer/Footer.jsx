@@ -32,13 +32,13 @@ const Footer = (props) => {
                 </thead>
                 <tbody>
                   {props.openOrders.map((order, i) => {
-                    const id = order[0];
-                    const price = order[3];
-                    const quantity = order[4];
-                    const market = order[1];
-                    const baseCurrency = order[1].split('-')[0];
-                    const side = order[2] === 'b' ? "buy" : "sell";
-                    const classname = order[2] === 'b' ? "up_value" : "down_value";
+                    const id = order[1];
+                    const price = order[4];
+                    const quantity = order[5];
+                    const market = order[2];
+                    const baseCurrency = order[2].split('-')[0];
+                    const side = order[3] === 'b' ? "buy" : "sell";
+                    const classname = order[3] === 'b' ? "up_value" : "down_value";
                     return (
                       <tr key={id}> 
                         <td>{market}</td>

@@ -28,7 +28,7 @@ class Trade extends React.Component {
 
     constructor(props) {
         super(props)
-        this.state = { user: {}, fills: [], marketSummary: {}, lastPrices: {}, openorders: [], liquidity: [], currentMarket: "ETH-USDT" }
+        this.state = { chainId: 1000, user: {}, fills: [], marketSummary: {}, lastPrices: {}, openorders: [], liquidity: [], currentMarket: "ETH-USDT" }
     }
 
     componentDidMount() {
@@ -71,15 +71,17 @@ class Trade extends React.Component {
                     break
                 case 'liquidity':
                     newstate = { ...this.state }
-                    const liquidity = msg.args[1];
+                    const liquidity = msg.args[2];
                     newstate.liquidity.push(...liquidity);
                     this.setState(newstate);
                     break
                 case 'userordermatch':
-                    const { success, swap } = await broadcastfill(...msg.args);
+                    const matchedOrderId = msg.args[0];
+                    const { success, swap } = await broadcastfill(msg.args[1], msg.args[2]);
+                    newstate = { ...this.state }
+                    newstate.openorders = newstate.openorders.filter(order => order[1] !== matchedOrderId);
                     if (success) {
                         toast.success("Filled: " + swap.txHash);
-                        newstate = { ...this.state }
                         newstate.fills.push(swap);
                         const user = await getAccountState();
                         newstate.user = user;
@@ -87,13 +89,14 @@ class Trade extends React.Component {
                     else {
                         toast.error(swap.error.message);
                     }
+                    this.setState(newstate);
                     break
                 case 'cancelorderack':
                     const canceled_ids = msg.args[0];
                     newstate = { ...this.state };
                     const neworders = [];
                     this.state.openorders.forEach(order => {
-                        if (!canceled_ids.includes(order[0])) {
+                        if (!canceled_ids.includes(order[1])) {
                             neworders.push(order);
                         }
                     })
@@ -104,15 +107,15 @@ class Trade extends React.Component {
                     break
             }
         })
-        zigzagws.addEventListener('open', function () {
-            zigzagws.send(JSON.stringify({op:"subscribemarket", args: ["ETH-USDT"]}))
+        zigzagws.addEventListener('open', () => {
+            zigzagws.send(JSON.stringify({op:"subscribemarket", args: [this.state.chainId, "ETH-USDT"]}))
         })
     }
 
     async signInHandler() {
         let syncAccountState;
         try {
-            syncAccountState = await signinzksync();
+            syncAccountState = await signinzksync(this.state.chainId);
         } catch (e) {
             toast.error(e.message);
             return false;
@@ -148,18 +151,18 @@ class Trade extends React.Component {
       const orderbookAsks = [];
       const useropenorders = [];
       this.state.openorders.forEach(order => {
-          if (parseInt(order[7]) === this.state.user.id) {
+          const orderrow = { td1: order[4], td2: order[5], td3: order[4]*order[5], side: order[3], order: order };
+          if (parseInt(order[8]) === this.state.user.id) {
               useropenorders.push(order);
           }
           else {
-              const orderrow = { td1: order[3], td2: order[4], td3: order[3]*order[4], side: order[2], order: order };
               openOrdersData.push(orderrow)
-              if (order[2] === 'b') {
-                  orderbookBids.push(orderrow);
-              }
-              else if (order[2] === 's') {
-                  orderbookAsks.push(orderrow);
-              }
+          }
+          if (order[3] === 'b') {
+              orderbookBids.push(orderrow);
+          }
+          else if (order[3] === 's') {
+              orderbookAsks.push(orderrow);
           }
       })
 
@@ -194,7 +197,7 @@ class Trade extends React.Component {
                     <TradeChart />
                   </div>
                 </div>
-                <SpotBox initPrice={this.state.marketSummary.price} signInHandler={this.signInHandler.bind(this)} user={this.state.user} />
+                <SpotBox initPrice={this.state.marketSummary.price} signInHandler={this.signInHandler.bind(this)} user={this.state.user} chainId={this.state.chainId} />
               </div>
               <div className="col-12 col-xl-6">
                 <div className="trade_right">

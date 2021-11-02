@@ -33,7 +33,7 @@ export async function getAccountState() {
     return syncAccountState;
 }
 
-export async function signinzksync() {
+export async function signinzksync(chainid) {
     if (!window.ethereum) {
         // TODO: Display a message that says Please download and unlock Metamask to continue
         window.open("https://metamask.io", '_blank');
@@ -63,7 +63,7 @@ export async function signinzksync() {
     if (!signingKeySet) {
         await changepubkeyzksync();
     }
-    const msg = {op:"login", args:[syncAccountState.id]}
+    const msg = {op:"login", args:[chainid, syncAccountState.id]}
     zigzagws.send(JSON.stringify(msg));
 
     return syncAccountState;
@@ -80,7 +80,7 @@ export async function changepubkeyzksync() {
 }
 
 
-export async function submitorder(product, side, price, amount) {
+export async function submitorder(chainId, product, side, price, amount) {
     const validsides = ['b', 's'];
     if (!validsides.includes(side)) {
         throw new Error("Invalid side");
@@ -112,20 +112,21 @@ export async function submitorder(product, side, price, amount) {
         ratio: zksync.utils.tokenRatio(tokenRatio)
     });
     console.log("sending limit order", order);
-    const msg = {op:"submitorder", args: [order]};
+    const msg = {op:"submitorder", args: [chainId, order]};
     zigzagws.send(JSON.stringify(msg));
 }
 
 
 export async function sendfillrequest(orderreceipt) {
-    const orderId = orderreceipt[0];
-    const market = orderreceipt[1];
+    const chainId = orderreceipt[0];
+    const orderId = orderreceipt[1];
+    const market = orderreceipt[2];
     const baseCurrency = market.split('-')[0];
     const quoteCurrency = market.split('-')[1];
-    const side = orderreceipt[2];
-    const price = orderreceipt[3];
-    const baseQuantity = orderreceipt[4];
-    const quoteQuantity = orderreceipt[5];
+    const side = orderreceipt[3];
+    const price = orderreceipt[4];
+    const baseQuantity = orderreceipt[5];
+    const quoteQuantity = orderreceipt[6];
     let tokenSell, tokenBuy, sellQuantity;
     if (side === 'b') {
         tokenSell = baseCurrency;

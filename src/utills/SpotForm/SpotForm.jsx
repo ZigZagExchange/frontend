@@ -38,7 +38,7 @@ const SpotForm = (props) => {
     async function buySellHandler(e) {
         const side = props.side.charAt(0);
         try {
-            await submitorder("ETH-USDT", side, price, amount);
+            await submitorder(props.chainId, "ETH-USDT", side, price, amount);
         } catch (e) {
             console.log(e);
             toast.error(e.message);
