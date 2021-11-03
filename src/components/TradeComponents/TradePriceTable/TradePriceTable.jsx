@@ -8,8 +8,7 @@ class TradePriceTable extends React.Component {
 
     scrollToBottom = () => {
         if (this.props.scrollToBottom) {
-            const el = document.querySelector("." + this.props.className);
-            el.scrollTop = el.scrollHeight;
+            this.tableDiv.scrollTop = this.tableDiv.scrollHeight;
         }
     }
 
@@ -29,7 +28,7 @@ class TradePriceTable extends React.Component {
       else onClickRow = () => null;
       return (
         <>
-          <table className={`trade_price_table ${this.props.className}`}>
+          <table className={`trade_price_table ${this.props.className}`} ref={el => this.tableDiv = el}>
             <thead>
               <tr>
                 <th>Price</th>
