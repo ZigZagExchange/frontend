@@ -37,9 +37,10 @@
   color: #94a2c9;
   text-transform: uppercase;
   font-weight: 500;
+  cursor: pointer;
 }
 
-.ft_tabs strong:nth-child(1) {
+.ft_tabs strong.selected {
   color: #08aff3;
 }
 

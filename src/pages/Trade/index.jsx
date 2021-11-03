@@ -34,7 +34,7 @@ class Trade extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      chainId: 1000,
+      chainId: 1,
       user: {},
       fills: [],
       marketSummary: {},
@@ -286,6 +286,7 @@ class Trade extends React.Component {
                       className="tpt_1"
                       useGradient="true"
                       priceTableData={orderbookAsks}
+                      scrollToBottom="true"
                     />
                   </div>
                 </div>
@@ -326,7 +327,7 @@ class Trade extends React.Component {
               </div>
             </div>
           </div>
-          <Footer openOrders={useropenorders} />
+          <Footer openOrders={useropenorders} user={this.state.user} chainId={this.state.chainId} />
         </div>
       </>
     );
