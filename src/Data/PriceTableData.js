@@ -75,5 +75,3 @@ export const priceTableData = [
     td3: "7500.23",
   },
 ];
-
-

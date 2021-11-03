@@ -35,7 +35,7 @@ const TradePriceBtcTable = (props) => {
                 <tr key={i}>
                   <td>
                     <img className="me-2" src={star} alt="..." />
-                    {d.td1.replace('-', '/')}
+                    {d.td1.replace("-", "/")}
                     <span>{d.span}</span>
                   </td>
                   <td className={d.td3 < 0 ? "down_value" : "up_value"}>

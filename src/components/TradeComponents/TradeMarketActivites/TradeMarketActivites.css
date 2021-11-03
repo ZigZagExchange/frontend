@@ -59,7 +59,8 @@
 
 @media screen and (min-width: 1800px) {
   .tm_h,
-  .tm_b ,.trade_market::before{
+  .tm_b,
+  .trade_market::before {
     width: 100%;
   }
 }

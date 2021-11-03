@@ -60,13 +60,13 @@
 }
 
 .buy_btn {
-    background: #3fe199;
-    text-transform: capitalize;
+  background: #3fe199;
+  text-transform: capitalize;
 }
 
 .sell_btn {
-    background: #c4384e;
-    text-transform: capitalize;
+  background: #c4384e;
+  text-transform: capitalize;
 }
 
 @media screen and (max-width: 655px) {

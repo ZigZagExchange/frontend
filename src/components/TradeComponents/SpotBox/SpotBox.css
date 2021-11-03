@@ -29,7 +29,6 @@
   background: #fff;
 }
 
-
 .spot_head {
   width: 100%;
   display: flex;
@@ -118,7 +117,6 @@
     width: 100%;
   }
 }
-
 
 @media screen and (max-width: 991px) {
   .spot_bottom {

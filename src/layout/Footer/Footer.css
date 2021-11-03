@@ -64,20 +64,20 @@
 }
 
 .footer_open_orders {
-    margin-top: 10px;
+  margin-top: 10px;
 }
 .footer_open_orders table {
-    width: 100%;
+  width: 100%;
 }
 .footer_open_orders table tbody td,
 .footer_open_orders table thead th {
-    padding: 5px 15px;
-    color: white;
+  padding: 5px 15px;
+  color: white;
 }
 .cancel_order_link {
-    text-decoration: underline;
-    cursor: pointer;
-    color: gray;
+  text-decoration: underline;
+  cursor: pointer;
+  color: gray;
 }
 
 @media screen and (max-width: 697px) {

@@ -27,8 +27,20 @@ const SpotBox = (props) => {
           </div>
         </div>
         <div className="spot_bottom">
-          <SpotForm side="buy" initPrice={props.initPrice} signInHandler={props.signInHandler} user={props.user} chainId={props.chainId} />
-          <SpotForm side="sell" initPrice={props.initPrice} signInHandler={props.signInHandler} user={props.user} chainId={props.chainId} />
+          <SpotForm
+            side="buy"
+            initPrice={props.initPrice}
+            signInHandler={props.signInHandler}
+            user={props.user}
+            chainId={props.chainId}
+          />
+          <SpotForm
+            side="sell"
+            initPrice={props.initPrice}
+            signInHandler={props.signInHandler}
+            user={props.user}
+            chainId={props.chainId}
+          />
         </div>
       </div>
     </>

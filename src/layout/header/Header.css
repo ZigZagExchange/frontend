@@ -68,14 +68,14 @@ header {
 }
 
 .eu_text {
-    margin: 0 40px;
+  margin: 0 40px;
 }
 .eu_text select {
-    background: #191C28;
-    color: white;
-    border: 1px solid white;
-    border-radius: 50px;
-    padding: 10px;
+  background: #191c28;
+  color: white;
+  border: 1px solid white;
+  border-radius: 50px;
+  padding: 10px;
 }
 
 .eu_text span {
@@ -93,11 +93,11 @@ header {
 }
 
 .address_button {
-    border: 2px solid white;
-    border-radius: 15px;
-    padding: 10px;
-    background: none;
-    color: white;
+  border: 2px solid white;
+  border-radius: 15px;
+  padding: 10px;
+  background: none;
+  color: white;
 }
 
 @media screen and (max-width: 991px) {

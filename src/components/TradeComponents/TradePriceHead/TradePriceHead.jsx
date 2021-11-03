@@ -17,10 +17,10 @@ const TradePriceHead = () => {
           <img src={menuIcon3} alt="..." />
         </div>
         <div className="tph_r">
-            <select>
-                <option value="0.01">0.01</option>
-            </select>
-            <img src={threedotIcon} alt="..." />
+          <select>
+            <option value="0.01">0.01</option>
+          </select>
+          <img src={threedotIcon} alt="..." />
         </div>
       </div>
     </>

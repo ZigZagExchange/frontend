@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 // css
 import "./Footer.css";
 // assets
@@ -7,6 +7,68 @@ import logo from "../../assets/icons/footer_logo.png";
 import { cancelorder, cancelallorders } from "../../helpers";
 
 const Footer = (props) => {
+  const explorerLink = "https://rinkeby.zkscan.io";
+  const [tab, setTab] = useState("open_orders");
+  let footerContent;
+  switch (tab) {
+    case "fills":
+    case "balances":
+      footerContent = (
+        <div>
+          <a href={explorerLink}>View Account on Explorer</a>
+        </div>
+      );
+      break;
+    case "open_orders":
+    default:
+      footerContent = (
+        <table>
+          <thead>
+            <tr>
+              <th>Market</th>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th>Side</th>
+              <th>
+                <span onClick={cancelallorders} className="cancel_order_link">
+                  Cancel All
+                </span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {props.openOrders.map((order, i) => {
+              const id = order[1];
+              const price = order[4];
+              const quantity = order[5];
+              const market = order[2];
+              const baseCurrency = order[2].split("-")[0];
+              const side = order[3] === "b" ? "buy" : "sell";
+              const classname = order[3] === "b" ? "up_value" : "down_value";
+              return (
+                <tr key={id}>
+                  <td>{market}</td>
+                  <td>{price}</td>
+                  <td>
+                    {quantity} {baseCurrency}
+                  </td>
+                  <td className={classname}>{side}</td>
+                  <td>
+                    <span
+                      onClick={() => cancelorder(id)}
+                      className="cancel_order_link"
+                    >
+                      Cancel
+                    </span>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      );
+  }
+
   return (
     <>
       <div className="footer">
@@ -14,44 +76,14 @@ const Footer = (props) => {
           <hr />
           <div>
             <div className="ft_tabs">
-              <strong>Open Orders ({props.openOrders.length})</strong>
-              <strong>Fills</strong>
-              <strong>Balances</strong>
+              <strong onClick={() => setTab("open_orders")}>
+                Open Orders ({props.openOrders.length})
+              </strong>
+              <strong onClick={() => setTab("fills")}>Fills</strong>
+              <strong onClick={() => setTab("balances")}>Balances</strong>
             </div>
           </div>
-          <div className="footer_open_orders">
-              <table>
-                <thead>
-                    <tr>
-                      <th>Market</th>
-                      <th>Price</th>
-                      <th>Quantity</th>
-                      <th>Side</th>
-                      <th><span onClick={cancelallorders} className="cancel_order_link">Cancel All</span></th>
-                    </tr>
-                </thead>
-                <tbody>
-                  {props.openOrders.map((order, i) => {
-                    const id = order[1];
-                    const price = order[4];
-                    const quantity = order[5];
-                    const market = order[2];
-                    const baseCurrency = order[2].split('-')[0];
-                    const side = order[3] === 'b' ? "buy" : "sell";
-                    const classname = order[3] === 'b' ? "up_value" : "down_value";
-                    return (
-                      <tr key={id}> 
-                        <td>{market}</td>
-                        <td>{price}</td>
-                        <td>{quantity} {baseCurrency}</td>
-                        <td className={classname}>{side}</td>
-                        <td><span onClick={() => cancelorder(id)} className="cancel_order_link">Cancel</span></td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-          </div>
+          <div className="footer_open_orders">{footerContent}</div>
           <div className="footer_bottom">
             <img src={logo} alt="..." />
           </div>
