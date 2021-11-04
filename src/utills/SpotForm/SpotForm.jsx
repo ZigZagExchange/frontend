@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { toast } from "react-toastify";
 // css
 import "./SpotForm.css";
@@ -9,87 +9,144 @@ import darkPlugHead from "../../assets/icons/dark-plug-head.png";
 //helpers
 import { submitorder } from "../../helpers";
 
-const SpotForm = (props) => {
-  const [price, setPrice] = useState(props.initPrice);
-  const [amount, setAmount] = useState("");
-  function updatePrice(e) {
-    setPrice(e.target.value);
-  }
-  function updateAmount(e) {
-    setAmount(e.target.value);
+class SpotForm extends React.Component {
+  constructor(props) {
+      super(props);
+      this.state = { userHasEditedPrice: false, price: null, amount: "" }
   }
 
-  let baseBalance, quoteBalance;
-  if (props.user.address) {
-    baseBalance = props.user.committed.balances.ETH / Math.pow(10, 18);
-    quoteBalance = props.user.committed.balances.USDT / Math.pow(10, 6);
-  } else {
-    baseBalance = "-";
-    quoteBalance = "-";
+  updatePrice(e) {
+    const newState = { ...this.state }
+    newState.price = e.target.value;
+    newState.userHasEditedPrice = true;
+    this.setState(newState);
   }
 
-  const balanceHtml =
-    props.side === "buy" ? (
-      <strong>{quoteBalance} USDT</strong>
-    ) : (
-      <strong>{baseBalance} ETH</strong>
-    );
+  updateAmount(e) {
+    const newState = { ...this.state }
+    newState.amount = e.target.value;
+    this.setState(newState);
+  }
 
-  const buySellBtnClass = "bg_btn " + props.side.toLowerCase() + "_btn";
+  async buySellHandler(e) {
+    let baseBalance, quoteBalance;
+    if (this.props.user.address) {
+      baseBalance = this.props.user.committed.balances.ETH / Math.pow(10, 18);
+      quoteBalance = this.props.user.committed.balances.USDT / Math.pow(10, 6);
+    } else {
+      baseBalance = "-";
+      quoteBalance = "-";
+    }
+    let price;
+    if (this.state.userHasEditedPrice) {
+        price = this.state.price;
+    }
+    else {
+        if (this.props.side === 'b')
+            price = Math.round(this.props.initPrice*1.002);
+        else if (this.props.side === 's')
+            price = Math.round(this.props.initPrice*0.998);
+    }
 
-  async function buySellHandler(e) {
-    const side = props.side.charAt(0);
+    if (this.props.side === 's' && typeof baseBalance == "number" && this.state.amount > baseBalance) {
+        toast.error("Amount exceeds ETH balance");
+        return
+    }
+    else if (this.props.side === 'b' && typeof quoteBalance == "number" && this.state.amount*price > quoteBalance) {
+        toast.error("Total exceeds USDT balance");
+        return
+    }
+
     try {
-      await submitorder(props.chainId, "ETH-USDT", side, price, amount);
+      await submitorder(this.props.chainId, "ETH-USDT", this.props.side, price, this.state.amount);
     } catch (e) {
       console.log(e);
       toast.error(e.message);
     }
   }
 
-  return (
-    <>
-      <form className="spot_form">
-        <div className="spf_head">
-          <span>Avbl</span>
-          {balanceHtml}
-        </div>
-        <div className="spf_input_box">
-          <span className="spf_desc_text">Price</span>
-          <input type="text" value={price} onChange={updatePrice} />
-          <span>USDT</span>
-        </div>
-        <div className="spf_input_box">
-          <span className="spf_desc_text">Amount</span>
-          <input type="text" value={amount} onChange={updateAmount} />
-          <span>ETH</span>
-        </div>
-        <div className="spf_range">
-          <RangeSlider />
-        </div>
-        {props.user.address ? (
-          <div className="spf_btn">
-            <button
-              type="button"
-              className={buySellBtnClass}
-              onClick={buySellHandler}
-            >
-              {props.side.toUpperCase()}
-            </button>
-          </div>
+
+  render() {
+      let price;
+      if (this.state.userHasEditedPrice) {
+          price = this.state.price;
+      }
+      else {
+          if (this.props.side === 'b')
+              price = Math.round(this.props.initPrice*1.002);
+          else if (this.props.side === 's')
+              price = Math.round(this.props.initPrice*0.998);
+      }
+      let baseBalance, quoteBalance;
+      if (this.props.user.address) {
+        baseBalance = this.props.user.committed.balances.ETH / Math.pow(10, 18);
+        quoteBalance = this.props.user.committed.balances.USDT / Math.pow(10, 6);
+      } else {
+        baseBalance = "-";
+        quoteBalance = "-";
+      }
+
+      const balanceHtml =
+        this.props.side === "b" ? (
+          <strong>{quoteBalance} USDT</strong>
         ) : (
-          <div className="spf_btn">
-            <Button
-              className="bg_btn"
-              text="CONNECT WALLET"
-              img={darkPlugHead}
-              onClick={props.signInHandler}
-            />
-          </div>
-        )}
-      </form>
-    </>
-  );
+          <strong>{baseBalance} ETH</strong>
+        );
+
+      let buySellBtnClass, buttonText;
+      if (this.props.side === 'b') {
+          buySellBtnClass = "bg_btn buy_btn";
+          buttonText = "BUY";
+      }
+      else if (this.props.side === 's') {
+          buySellBtnClass = "bg_btn sell_btn";
+          buttonText = "SELL";
+      }
+
+      return (
+        <>
+          <form className="spot_form">
+            <div className="spf_head">
+              <span>Avbl</span>
+              {balanceHtml}
+            </div>
+            <div className="spf_input_box">
+              <span className="spf_desc_text">Price</span>
+              <input type="text" value={price} onChange={this.updatePrice.bind(this)} />
+              <span>USDT</span>
+            </div>
+            <div className="spf_input_box">
+              <span className="spf_desc_text">Amount</span>
+              <input type="text" value={this.state.amount} onChange={this.updateAmount.bind(this)} />
+              <span>ETH</span>
+            </div>
+            <div className="spf_range">
+              <RangeSlider />
+            </div>
+            {this.props.user.address ? (
+              <div className="spf_btn">
+                <button
+                  type="button"
+                  className={buySellBtnClass}
+                  onClick={this.buySellHandler.bind(this)}
+                >
+                  {buttonText}
+                </button>
+              </div>
+            ) : (
+              <div className="spf_btn">
+                <Button
+                  className="bg_btn"
+                  text="CONNECT WALLET"
+                  img={darkPlugHead}
+                  onClick={this.props.signInHandler}
+                />
+              </div>
+            )}
+          </form>
+        </>
+      );
+  }
 };
 
 export default SpotForm;

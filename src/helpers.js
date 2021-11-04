@@ -97,6 +97,7 @@ export async function changepubkeyzksync() {
 }
 
 export async function submitorder(chainId, product, side, price, amount) {
+  console.log(chainId, product, side, price, amount);
   const validsides = ["b", "s"];
   if (!validsides.includes(side)) {
     throw new Error("Invalid side");
