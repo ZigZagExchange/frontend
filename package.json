@@ -2,7 +2,7 @@
   "name": "zigzag-app",
   "version": "0.1.0",
   "private": true,
-  "license": "GPL v3",
+  "license": "GPL-3.0",
   "dependencies": {
     "@material-ui/core": "^4.12.3",
     "@testing-library/jest-dom": "^5.11.4",
