@@ -1,5 +1,6 @@
 import * as zksync from "zksync";
 import { ethers } from "ethers";
+import { toast } from 'react-toastify';
 
 // Data
 //const zkTokenIds = {
@@ -77,6 +78,7 @@ export async function signinzksync(chainid) {
 
   const signingKeySet = await syncWallet.isSigningKeySet();
   if (!signingKeySet) {
+    toast.info("You need to sign a transaction to register your pubkey with Zigzag");
     await changepubkeyzksync();
   }
   const msg = { op: "login", args: [chainid, syncAccountState.id.toString()] };
@@ -139,8 +141,8 @@ export async function sendfillrequest(orderreceipt) {
   const quoteCurrency = market.split("-")[1];
   const side = orderreceipt[3];
   const price = orderreceipt[4];
-  const baseQuantity = orderreceipt[5];
-  const quoteQuantity = orderreceipt[6];
+  const baseQuantity = Math.round(orderreceipt[5] * 1e8) / 1e8;
+  const quoteQuantity = Math.round(orderreceipt[6] * 1e8) / 1e8;
   let tokenSell, tokenBuy, sellQuantity;
   if (side === "b") {
     tokenSell = baseCurrency;
