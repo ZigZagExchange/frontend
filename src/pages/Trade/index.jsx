@@ -160,7 +160,6 @@ class Trade extends React.Component {
   async fillOpenOrder(data) {
     if (this.state.user.address) {
       try {
-        console.log(data.order);
         await sendfillrequest(data.order);
       } catch (e) {
         console.log(e);
