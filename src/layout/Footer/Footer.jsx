@@ -27,7 +27,7 @@ class Footer extends React.Component {
               explorerLink = "https://zkscan.io/explorer/accounts/" + this.props.user.address;
       }
       let footerContent, classNameOpenOrders = "", classNameFills = "", classNameBalances = "";
-      switch (this.props.tab) {
+      switch (this.state.tab) {
         case "fills":
           if (this.props.user.address) {
               footerContent = (
@@ -59,7 +59,7 @@ class Footer extends React.Component {
                   <th>Quantity</th>
                   <th>Side</th>
                   <th>
-                    <span onClick={cancelallorders} className="cancel_order_link">
+                    <span onClick={() => cancelallorders(this.props.chainId, this.props.user.id)} className="cancel_order_link">
                       Cancel All
                     </span>
                   </th>
@@ -84,7 +84,7 @@ class Footer extends React.Component {
                       <td className={classname}>{side}</td>
                       <td>
                         <span
-                          onClick={() => cancelorder(id)}
+                          onClick={() => cancelorder(this.props.chainId, id)}
                           className="cancel_order_link"
                         >
                           Cancel

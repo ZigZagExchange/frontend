@@ -10,7 +10,7 @@ const TradeHead = (props) => {
     <>
       <div className="tl_head">
         <TradeRatesCard marketSummary={props.marketSummary} />
-        <TradeSelect />
+        <TradeSelect markets={props.markets} />
       </div>
     </>
   );

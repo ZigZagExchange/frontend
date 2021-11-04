@@ -94,6 +94,7 @@ class Trade extends React.Component {
           break;
         case "userordermatch":
           const matchedOrderId = msg.args[0];
+          toast.info("Sign again to broadcast order...");
           const { success, swap } = await broadcastfill(
             msg.args[1],
             msg.args[2]
@@ -165,6 +166,9 @@ class Trade extends React.Component {
         toast.error(e.message);
       }
     }
+    else {
+        toast.error("Must be logged in to fill orders");
+    }
   }
 
   updateChainId(chainId) {
@@ -191,7 +195,9 @@ class Trade extends React.Component {
 
   render() {
     const lastPriceTableData = [];
+    const markets = [];
     Object.keys(this.state.lastPrices).forEach((market) => {
+      markets.push(market);
       const price = this.state.lastPrices[market].price;
       const change = this.state.lastPrices[market].change;
       const pctchange = ((change / price) * 100).toFixed(2);
@@ -263,7 +269,7 @@ class Trade extends React.Component {
               <div className="trade_left">
                 <div>
                   {/* Trade Head */}
-                  <TradeHead marketSummary={this.state.marketSummary} />
+                  <TradeHead marketSummary={this.state.marketSummary} markets={markets} />
                   {/* Trade Chart */}
                   <TradeChart />
                 </div>

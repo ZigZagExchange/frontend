@@ -8,10 +8,6 @@ import arrows from "../../../assets/icons/arrows.png";
 import star from "../../../assets/icons/star-icon.png";
 
 class TradePriceBtcTable extends React.Component {
-    constructor(props) {
-      super(props)
-    }
-
     render() {
 
       return (

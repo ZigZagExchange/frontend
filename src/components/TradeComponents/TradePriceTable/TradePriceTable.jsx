@@ -2,9 +2,6 @@ import React from "react";
 // css
 import "./TradePriceTable.css";
 class TradePriceTable extends React.Component {
-    constructor(props) {
-        super(props)
-    }
 
     scrollToBottom = () => {
         if (this.props.scrollToBottom) {

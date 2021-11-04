@@ -2,15 +2,15 @@ import React from "react";
 // css
 import "./TradeSelect.css";
 
-const TradeSelect = () => {
+const TradeSelect = (props) => {
   return (
     <>
       <div className="tl_select">
         <div>
           <select>
-            <option value="ETH/USDT">ETH/USDT</option>
-            <option value="BTC/USDT">BTC/USDT</option>
-            <option value="ETH/BTC">ETH/BTC</option>
+            {props.markets.map(market =>
+                <option key={market} value={market}>{market.replace('-', '/')}</option>
+            )}
           </select>
         </div>
       </div>

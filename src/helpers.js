@@ -23,9 +23,11 @@ let syncAccountState;
 const zigzagws_url = process.env.REACT_APP_ZIGZAG_WS;
 export const zigzagws = new WebSocket(zigzagws_url);
 
+function pingServer() {
+    zigzagws.send(JSON.stringify({op:"ping"}));
+}
 zigzagws.addEventListener("open", function () {
-  // TODO: Subscribe to the current active market instead of ETH-USDT
-  //zigzagws.send(JSON.stringify({op:"subscribemarket", args: ["ETH-USDT"]}))
+    setInterval(pingServer, 5000);
 });
 
 export async function getAccountState() {
@@ -77,7 +79,7 @@ export async function signinzksync(chainid) {
   if (!signingKeySet) {
     await changepubkeyzksync();
   }
-  const msg = { op: "login", args: [chainid, syncAccountState.id] };
+  const msg = { op: "login", args: [chainid, syncAccountState.id.toString()] };
   zigzagws.send(JSON.stringify(msg));
 
   return syncAccountState;
@@ -180,16 +182,16 @@ export async function broadcastfill(swapOffer, fillOrder) {
   return { success: true, swap, receipt };
 }
 
-export async function cancelallorders() {
+export async function cancelallorders(chainid, userid) {
   // TODO: Send an on-chain transaction to cancel orders
-  const msg = { op: "cancelall", args: [syncAccountState.id] };
+  const msg = { op: "cancelall", args: [chainid, userid.toString()] };
   zigzagws.send(JSON.stringify(msg));
   return true;
 }
 
-export async function cancelorder(orderid) {
+export async function cancelorder(chainid, orderid) {
   // TODO: Send an on-chain transaction to cancel orders
-  const msg = { op: "cancelorder", args: [orderid] };
+  const msg = { op: "cancelorder", args: [chainid, orderid] };
   zigzagws.send(JSON.stringify(msg));
   return true;
 }

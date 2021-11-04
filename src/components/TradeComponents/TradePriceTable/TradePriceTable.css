@@ -47,6 +47,13 @@
   height: 75%;
 }
 
+.tpt_3 tbody tr {
+    cursor: pointer;
+}
+.tpt_3 tbody tr:hover {
+    background-color: #a9a9a936;
+}
+
 .trade_price_table thead {
   position: sticky;
   top: 0;
