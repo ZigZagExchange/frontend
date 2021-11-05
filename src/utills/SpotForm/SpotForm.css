@@ -41,6 +41,12 @@
   padding: 5%;
 }
 
+.spf_input_box input:disabled, 
+.spf_input_box span.text-disabled {
+    background-color: transparent;
+    color: gray;
+}
+
 .spf_input_box .spf_desc_text {
   color: #94a2c9;
 }

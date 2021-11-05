@@ -37,22 +37,13 @@ class SpotForm extends React.Component {
       baseBalance = "-";
       quoteBalance = "-";
     }
-    let price;
-    if (this.state.userHasEditedPrice) {
-        price = this.state.price;
-    }
-    else {
-        if (this.props.side === 'b')
-            price = Math.round(this.props.initPrice*1.002);
-        else if (this.props.side === 's')
-            price = Math.round(this.props.initPrice*0.998);
-    }
+    const price = this.currentPrice();
 
-    if (this.props.side === 's' && typeof baseBalance == "number" && this.state.amount > baseBalance) {
+    if (this.props.side === 's' && typeof baseBalance === "number" && this.state.amount > baseBalance) {
         toast.error("Amount exceeds ETH balance");
         return
     }
-    else if (this.props.side === 'b' && typeof quoteBalance == "number" && this.state.amount*price > quoteBalance) {
+    else if (this.props.side === 'b' && typeof quoteBalance === "number" && this.state.amount*price > quoteBalance) {
         toast.error("Total exceeds USDT balance");
         return
     }
@@ -65,18 +56,63 @@ class SpotForm extends React.Component {
     }
   }
 
+  priceIsDisabled() {
+      return this.props.orderType === "market";
+  }
 
-  render() {
+  amountPercentOfMax() {
+      if (!this.props.user.address) return 0;
+
+      if (this.props.side === 's') {
+          const baseBalance = this.props.user.committed.balances.ETH / Math.pow(10, 18);
+          const amount = this.state.amount || 0;
+          return Math.round(amount / baseBalance * 100)
+      }
+      else if (this.props.side === 'b') {
+          const quoteBalance = this.props.user.committed.balances.USDT / Math.pow(10, 6);
+          const amount = this.state.amount || 0;
+          const total = amount * this.currentPrice()
+          return Math.round(total / quoteBalance * 100)
+      }
+  }
+
+  currentPrice() {
       let price;
       if (this.state.userHasEditedPrice) {
           price = this.state.price;
       }
-      else {
+      else if (this.props.initPrice) {
           if (this.props.side === 'b')
               price = Math.round(this.props.initPrice*1.002);
           else if (this.props.side === 's')
               price = Math.round(this.props.initPrice*0.998);
       }
+      else {
+          price = 0;
+      }
+      return price;
+  }
+
+  rangeSliderHandler(e, val) {
+      if (!this.props.user.address) return false;
+
+      const newstate = { ...this.state }
+      if (this.props.side === 's') {
+          const baseBalance = this.props.user.committed.balances.ETH / Math.pow(10, 18);
+          newstate.amount = parseFloat((baseBalance * val / 100).toPrecision(6))
+      }
+      else if (this.props.side === 'b') {
+          const quoteBalance = this.props.user.committed.balances.USDT / Math.pow(10, 6);
+          const quoteAmount = quoteBalance * val / 100;
+          newstate.amount = parseFloat((quoteAmount / this.currentPrice()).toPrecision(6))
+      }
+      this.setState(newstate);
+  }
+
+  render() {
+      let price = this.currentPrice();
+      if (price === 0) price = "";
+
       let baseBalance, quoteBalance;
       if (this.props.user.address) {
         baseBalance = this.props.user.committed.balances.ETH / Math.pow(10, 18);
@@ -112,16 +148,16 @@ class SpotForm extends React.Component {
             </div>
             <div className="spf_input_box">
               <span className="spf_desc_text">Price</span>
-              <input type="text" value={price} onChange={this.updatePrice.bind(this)} />
-              <span>USDT</span>
+              <input type="text" value={price} onChange={this.updatePrice.bind(this)} disabled={this.priceIsDisabled()}  />
+              <span className={this.priceIsDisabled() ? "text-disabled" : ""}>USDT</span>
             </div>
             <div className="spf_input_box">
               <span className="spf_desc_text">Amount</span>
-              <input type="text" value={this.state.amount} onChange={this.updateAmount.bind(this)} />
+              <input type="text" value={this.state.amount} onChange={this.updateAmount.bind(this)}/>
               <span>ETH</span>
             </div>
             <div className="spf_range">
-              <RangeSlider />
+              <RangeSlider value={this.amountPercentOfMax()} onChange={this.rangeSliderHandler.bind(this)} />
             </div>
             {this.props.user.address ? (
               <div className="spf_btn">

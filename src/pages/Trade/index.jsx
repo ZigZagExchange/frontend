@@ -113,6 +113,29 @@ class Trade extends React.Component {
           }
           this.setState(newstate);
           break;
+        case "ordermatch":
+          const orderid = msg.args[1];
+          const matchedorder = this.state.openorders.find(order => order[1] === orderid);
+          if (matchedorder && matchedorder[8] === this.state.user.id) {
+              const side = matchedorder[3] === 'b' ? "buy" : "sell";
+              const baseCurrency = matchedorder[2].split('-')[0];
+              const baseQuantity = matchedorder[5];
+              const price = matchedorder[4];
+              toast.success(`Your ${side} order for ${baseQuantity} ${baseCurrency} @ ${price} was matched! Updating balances...`)
+          }
+          newstate = { ...this.state };
+          newstate.openorders = this.state.openorders.filter(order => order[1] !== orderid);
+          const user = await getAccountState();
+          newstate.user = user;
+          this.setState(newstate);
+          // Run a balance check after 5 seconds again in case they don't update in time for the first check
+          setTimeout(async () => {
+              newstate = { ...this.state };
+              const user = await getAccountState();
+              newstate.user = user;
+              this.setState(newstate);
+          }, 5000);
+          break
         case "cancelorderack":
           const canceled_ids = msg.args[0];
           newstate = { ...this.state };

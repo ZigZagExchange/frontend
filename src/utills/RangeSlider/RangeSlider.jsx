@@ -61,14 +61,14 @@ const marks = [
     value: 100,
   },
 ];
-const RangeSlider = () => {
+const RangeSlider = (props) => {
   const classes = useStyles();
   return (
     <>
       <Slider
         defaultValue={0}
         aria-labelledby="discrete-slider-always"
-        step={null}
+        step={1}
         marks={marks}
         classes={{
           mark: "custom_range",
@@ -76,6 +76,8 @@ const RangeSlider = () => {
           root: classes.root,
           active: classes.active,
         }}
+        value={props.value}
+        onChange={props.onChange}
       />
     </>
   );

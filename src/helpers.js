@@ -97,7 +97,8 @@ export async function changepubkeyzksync() {
 }
 
 export async function submitorder(chainId, product, side, price, amount) {
-  console.log(chainId, product, side, price, amount);
+  amount = parseFloat(amount).toPrecision(6);
+  price = parseFloat(price).toPrecision(6);
   const validsides = ["b", "s"];
   if (!validsides.includes(side)) {
     throw new Error("Invalid side");
@@ -112,11 +113,11 @@ export async function submitorder(chainId, product, side, price, amount) {
   if (side === "b") {
     tokenBuy = currencies[0];
     tokenSell = currencies[1];
-    sellQuantity = amount * price;
+    sellQuantity = (amount * price).toPrecision(6);
   } else if (side === "s") {
     tokenBuy = currencies[1];
     tokenSell = currencies[0];
-    sellQuantity = amount;
+    sellQuantity = parseFloat(amount).toPrecision(6);
   }
   const tokenRatio = {};
   tokenRatio[baseCurrency] = 1;
@@ -126,7 +127,7 @@ export async function submitorder(chainId, product, side, price, amount) {
     tokenBuy,
     amount: syncProvider.tokenSet.parseToken(
       tokenSell,
-      sellQuantity.toString()
+      sellQuantity
     ),
     ratio: zksync.utils.tokenRatio(tokenRatio),
   });
@@ -141,28 +142,31 @@ export async function sendfillrequest(orderreceipt) {
   const baseCurrency = market.split("-")[0];
   const quoteCurrency = market.split("-")[1];
   const side = orderreceipt[3];
-  const price = orderreceipt[4];
-  const baseQuantity = Math.round(orderreceipt[5] * 1e8) / 1e8;
-  const quoteQuantity = Math.round(orderreceipt[6] * 1e8) / 1e8;
+  let price = orderreceipt[4];
+  const baseQuantity = orderreceipt[5].toPrecision(6);
+  const quoteQuantity = orderreceipt[6].toPrecision(6);
   let tokenSell, tokenBuy, sellQuantity;
   if (side === "b") {
+    price = price * 0.9999; // Add a margin of error to price
     tokenSell = baseCurrency;
     tokenBuy = quoteCurrency;
     sellQuantity = baseQuantity;
   } else if (side === "s") {
+    price = price * 1.0001; // Add a margin of error to price
     tokenSell = quoteCurrency;
     tokenBuy = baseCurrency;
     sellQuantity = quoteQuantity;
   }
   const tokenRatio = {};
   tokenRatio[baseCurrency] = 1;
-  tokenRatio[quoteCurrency] = price;
+  tokenRatio[quoteCurrency] = parseFloat(price.toPrecision(6));
+  console.log(sellQuantity, tokenRatio);
   const fillOrder = await syncWallet.getOrder({
     tokenSell,
     tokenBuy,
     amount: syncProvider.tokenSet.parseToken(
       tokenSell,
-      sellQuantity.toString()
+      sellQuantity
     ),
     ratio: zksync.utils.tokenRatio(tokenRatio),
   });
