@@ -43,6 +43,10 @@ class SpotForm extends React.Component {
         toast.error("Amount exceeds ETH balance");
         return
     }
+    else if (typeof baseBalance === "number" && this.state.amount < 0.002) {
+        toast.error("Minimum order size is 0.002 ETH");
+        return
+    }
     else if (this.props.side === 'b' && typeof quoteBalance === "number" && this.state.amount*price > quoteBalance) {
         toast.error("Total exceeds USDT balance");
         return
