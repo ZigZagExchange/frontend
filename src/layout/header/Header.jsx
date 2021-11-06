@@ -63,21 +63,23 @@ const Header = (props) => {
                 <img src={settingIcon} alt="..." />
                 {props.user.address ? (
                   <button className="address_button">
-                    {props.user.address.slice(0, 4)}...
-                    {props.user.address.slice(0, -4)}
+                    {props.user.address.slice(0, 6)}...
+                    {props.user.address.slice(-4)}
                   </button>
                 ) : (
-                  <button className="bg_btn">
+                  <button className="bg_btn" onClick={props.signInHandler}>
                     <img src={darkPlugHead} alt="..." /> CONNECT WALLET
                   </button>
                 )}
               </div>
               <div className="eu_text">
-                <select value={props.chainId} onChange={props.updateChainId}>
-                  <option>zkSync - Rinkeby</option>
-                  <option>zkSync - Mainnet</option>
+                <select
+                  defaultValue={props.chainId}
+                  onChange={(e) => props.updateChainId(parseInt(e.target.value))}
+                >
+                  <option value="1">zkSync - Mainnet</option>
+                  <option value="1000">zkSync - Rinkeby</option>
                   <option disabled>Starknet</option>
-                  <option disabled>Loopring</option>
                 </select>
               </div>
             </div>
@@ -121,7 +123,6 @@ const Header = (props) => {
                 <option value="1">zkSync - Mainnet</option>
                 <option value="1000">zkSync - Rinkeby</option>
                 <option disabled>Starknet</option>
-                <option disabled>Loopring</option>
               </select>
             </div>
             <img src={menu} alt="..." />
