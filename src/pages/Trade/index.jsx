@@ -173,11 +173,13 @@ class Trade extends React.Component {
         })
       );
     });
-    window.ethereum.on("accountsChanged", (accounts) => {
-      const newState = { ...this.state };
-      newState.user = {};
-      this.setState(newState);
-    });
+    if (window.ethereum) {
+        window.ethereum.on("accountsChanged", (accounts) => {
+          const newState = { ...this.state };
+          newState.user = {};
+          this.setState(newState);
+        });
+    }
   }
 
   async signInHandler() {
