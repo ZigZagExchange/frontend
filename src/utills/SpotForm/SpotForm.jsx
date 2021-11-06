@@ -34,20 +34,30 @@ class SpotForm extends React.Component {
       baseBalance = this.props.user.committed.balances.ETH / Math.pow(10, 18);
       quoteBalance = this.props.user.committed.balances.USDT / Math.pow(10, 6);
     } else {
-      baseBalance = "-";
-      quoteBalance = "-";
+      baseBalance = 0;
+      quoteBalance = 0;
     }
     const price = this.currentPrice();
 
-    if (this.props.side === 's' && typeof baseBalance === "number" && this.state.amount > baseBalance) {
+    baseBalance = parseFloat(baseBalance);
+    quoteBalance = parseFloat(quoteBalance);
+    if (this.props.side === 's' && isNaN(baseBalance)) {
+        toast.error("No ETH balance");
+        return
+    }
+    if (this.props.side ==='b' && isNaN(quoteBalance)) {
+        toast.error("No USDT balance");
+        return
+    }
+    else if (this.props.side === 's'  && this.state.amount > baseBalance) {
         toast.error("Amount exceeds ETH balance");
         return
     }
-    else if (typeof baseBalance === "number" && this.state.amount < 0.002) {
+    else if (this.state.amount < 0.002) {
         toast.error("Minimum order size is 0.002 ETH");
         return
     }
-    else if (this.props.side === 'b' && typeof quoteBalance === "number" && this.state.amount*price > quoteBalance) {
+    else if (this.props.side === 'b' && this.state.amount*price > quoteBalance) {
         toast.error("Total exceeds USDT balance");
         return
     }
@@ -124,6 +134,12 @@ class SpotForm extends React.Component {
       } else {
         baseBalance = "-";
         quoteBalance = "-";
+      }
+      if (isNaN(baseBalance)) {
+        baseBalance = 0;
+      }
+      if (isNaN(quoteBalance)) {
+        quoteBalance = 0;
       }
 
       const balanceHtml =

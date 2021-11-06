@@ -106,8 +106,12 @@ class Trade extends React.Component {
           if (success) {
             toast.success("Filled: " + swap.txHash);
             newstate.fills.push(swap);
-            const user = await getAccountState();
-            newstate.user = user;
+            try {
+                const user = await getAccountState();
+                newstate.user = user;
+            } catch (e) {
+                console.error(e);
+            }
           } else {
             toast.error(swap.error.message);
           }
@@ -125,14 +129,23 @@ class Trade extends React.Component {
           }
           newstate = { ...this.state };
           newstate.openorders = this.state.openorders.filter(order => order[1] !== orderid);
-          const user = await getAccountState();
-          newstate.user = user;
+          try {
+              const user = await getAccountState();
+              newstate.user = user;
+          } catch (e) {
+              console.error(e);
+          }
           this.setState(newstate);
           // Run a balance check after 5 seconds again in case they don't update in time for the first check
           setTimeout(async () => {
               newstate = { ...this.state };
-              const user = await getAccountState();
-              newstate.user = user;
+              try {
+                  const user = await getAccountState();
+                  newstate.user = user;
+              }
+              catch (e) {
+                  console.error(e);
+              }
               this.setState(newstate);
           }, 5000);
           break
