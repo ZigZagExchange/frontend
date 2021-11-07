@@ -247,21 +247,36 @@ class Trade extends React.Component {
     const orderbookAsks = [];
     const useropenorders = [];
     this.state.openorders.forEach((order) => {
+      const market = order[2];
+      const side = order[3];
+      const price = order[4];
+      const baseQuantity = order[5];
+      const quoteQuantity = order[6];
+      const userId = order[8];
+      let spotPrice;
+      try {
+          spotPrice = this.state.lastPrices[market].price;
+      } catch (e) {
+          spotPrice = null;
+      }
       const orderrow = {
-        td1: order[4],
-        td2: order[5],
-        td3: order[4] * order[5],
-        side: order[3],
+        td1: price,
+        td2: baseQuantity,
+        td3: quoteQuantity,
+        side,
         order: order,
       };
-      if (parseInt(order[8]) === this.state.user.id) {
+      if (parseInt(userId) === this.state.user.id) {
         useropenorders.push(order);
-      } else {
+      } 
+      // Only display Market Making orders within 2% of spot
+      // No one is going to fill outside that range
+      else if (spotPrice && price > spotPrice * 0.98 && price < spotPrice * 1.02) {
         openOrdersData.push(orderrow);
       }
-      if (order[3] === "b") {
+      if (side === "b") {
         orderbookBids.push(orderrow);
-      } else if (order[3] === "s") {
+      } else if (side === "s") {
         orderbookAsks.push(orderrow);
       }
     });
