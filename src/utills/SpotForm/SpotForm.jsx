@@ -144,9 +144,9 @@ class SpotForm extends React.Component {
 
       const balanceHtml =
         this.props.side === "b" ? (
-          <strong>{quoteBalance} USDT</strong>
+          <strong>{quoteBalance.toPrecision(8)} USDT</strong>
         ) : (
-          <strong>{baseBalance} ETH</strong>
+          <strong>{baseBalance.toPrecision(8)} ETH</strong>
         );
 
       let buySellBtnClass, buttonText;
