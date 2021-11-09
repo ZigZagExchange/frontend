@@ -106,14 +106,12 @@ class Trade extends React.Component {
           if (success) {
             toast.success("Filled: " + swap.txHash);
             newstate.fills.push(swap);
-            setTimeout(async () => {
-                try {
-                    const user = await getAccountState();
-                    newstate.user = user;
-                } catch (e) {
-                    console.error(e);
-                }
-            }, 5000);
+            try {
+                const user = await getAccountState();
+                newstate.user = user;
+            } catch (e) {
+                console.error(e);
+            }
           } else {
             toast.error(swap.error.message);
           }
@@ -122,32 +120,23 @@ class Trade extends React.Component {
         case "ordermatch":
           const orderid = msg.args[1];
           const matchedorder = this.state.openorders.find(order => order[1] === orderid);
-          newstate = { ...this.state };
           if (matchedorder && matchedorder[8] === this.state.user.id) {
-              const side = matchedorder[3];
-              const sideText = matchedorder[3] === 'b' ? "buy" : "sell";
+              const side = matchedorder[3] === 'b' ? "buy" : "sell";
               const baseCurrency = matchedorder[2].split('-')[0];
               const baseQuantity = matchedorder[5];
-              const quoteQuantity = matchedorder[6];
               const price = matchedorder[4];
-              console.log(this.state.user.committed.balances);
-              const baseQuantityUnits = baseQuantity * 1e18;
-              const quoteQuantityUnits = quoteQuantity * 1e6;
-              const oldBaseQuantityUnits = parseFloat(newstate.user.committed.balances.ETH);
-              const oldQuoteQuantityUnits = parseFloat(newstate.user.committed.balances.USDT);
-              if (side === 's') {
-                  newstate.user.committed.balances.ETH = (oldBaseQuantityUnits - baseQuantityUnits).toFixed(0);
-                  newstate.user.committed.balances.USDT = (oldQuoteQuantityUnits + quoteQuantityUnits).toFixed(0);
-              }
-              else if (side === 'b') {
-                  newstate.user.committed.balances.ETH = (oldBaseQuantityUnits + baseQuantityUnits).toFixed(0);
-                  newstate.user.committed.balances.USDT = (oldQuoteQuantityUnits - quoteQuantityUnits).toFixed(0);
-              }
-              toast.success(`Your ${sideText} order for ${baseQuantity} ${baseCurrency} @ ${price} was matched!`)
+              toast.success(`Your ${side} order for ${baseQuantity} ${baseCurrency} @ ${price} was matched! Updating balances...`)
           }
+          newstate = { ...this.state };
           newstate.openorders = this.state.openorders.filter(order => order[1] !== orderid);
+          try {
+              const user = await getAccountState();
+              newstate.user = user;
+          } catch (e) {
+              console.error(e);
+          }
           this.setState(newstate);
-          // Run the balance check after 5 seconds to let the chain update
+          // Run a balance check after 5 seconds again in case they don't update in time for the first check
           setTimeout(async () => {
               newstate = { ...this.state };
               try {
