@@ -94,7 +94,7 @@ class Trade extends React.Component {
           break;
         case "userordermatch":
           const matchedOrderId = msg.args[0];
-          toast.info("Sign again to broadcast order...");
+          const broadcastOrderToast = toast.info("Sign again to broadcast order...");
           const { success, swap } = await broadcastfill(
             msg.args[1],
             msg.args[2]
@@ -117,6 +117,7 @@ class Trade extends React.Component {
           } else {
             toast.error(swap.error.message);
           }
+          toast.dismiss(broadcastOrderToast);
           this.setState(newstate);
           break;
         case "ordermatch":
@@ -207,17 +208,49 @@ class Trade extends React.Component {
   }
 
   async fillOpenOrder(data) {
-    if (this.state.user.address) {
-      try {
-        await sendfillrequest(data.order);
-      } catch (e) {
-        console.log(e);
-        toast.error(e.message);
-      }
-    }
-    else {
+    if (!this.state.user.address) {
         toast.error("Must be logged in to fill orders");
+        return
     }
+
+    let baseBalance, quoteBalance;
+    if (this.state.user.address) {
+      baseBalance = this.state.user.committed.balances.ETH / Math.pow(10, 18);
+      quoteBalance = this.state.user.committed.balances.USDT / Math.pow(10, 6);
+    } else {
+      baseBalance = 0;
+      quoteBalance = 0;
+    }
+    const baseQuantity = data.order[5];
+    const quoteQuantity = data.order[6];
+
+    baseBalance = parseFloat(baseBalance);
+    quoteBalance = parseFloat(quoteBalance);
+    if (data.side === 'b' && isNaN(baseBalance)) {
+        toast.error("No ETH balance");
+        return
+    }
+    if (data.side ==='s' && isNaN(quoteBalance)) {
+        toast.error("No USDT balance");
+        return
+    }
+    else if (data.side === 'b'  && baseQuantity > baseBalance) {
+        toast.error("Amount exceeds ETH balance");
+        return
+    }
+    else if (data.side === 's' && quoteQuantity > quoteBalance) {
+        toast.error("Total exceeds USDT balance");
+        return
+    }
+    const orderPendingToast = toast.info("Order pending. Sign or Cancel to continue...");
+
+    try {
+      await sendfillrequest(data.order);
+    } catch (e) {
+      console.log(e);
+      toast.error(e.message);
+    }
+    toast.dismiss(orderPendingToast);
   }
 
   updateChainId(chainId) {
