@@ -123,7 +123,7 @@ class Trade extends React.Component {
           newstate = { ...this.state };
 
           const match = msg.args;
-          newstate.fills.push(match);
+          newstate.fills.unshift(match);
 
           const orderid = match[1];
           const matchedorder = this.state.openorders.find(order => order[1] === orderid);

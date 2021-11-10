@@ -3,7 +3,6 @@ import React from "react";
 import "./SpotBox.css";
 // assets
 import threeDotIcon from "../../../assets/icons/threedot-icon.png";
-import informationButton from "../../../assets/icons/information-button.png";
 import SpotForm from "../../../utills/SpotForm/SpotForm";
 
 class SpotBox extends React.Component {
@@ -37,9 +36,6 @@ class SpotBox extends React.Component {
               <div className="st_l">
                 <h2 className={this.orderTypeTabClassName("limit")} onClick={() => this.updateOrderType("limit")}>Limit</h2>
                 <h2 className={this.orderTypeTabClassName("market")} onClick={() => this.updateOrderType("market")}>Market</h2>
-                <div className="d-flex align-items-center">
-                  <img src={informationButton} alt="..." />
-                </div>
               </div>
             </div>
             <div className="spot_bottom">

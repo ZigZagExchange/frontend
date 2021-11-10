@@ -101,7 +101,6 @@ const Header = (props) => {
             </ul>
           </div>
           <div className="head_right">
-            <img className="me-3" src={settingIcon} alt="..." />
             {props.user.address ? (
               <button className="address_button">
                 {props.user.address.slice(0, 6)}...
@@ -125,7 +124,6 @@ const Header = (props) => {
                 <option disabled>Starknet</option>
               </select>
             </div>
-            <img src={menu} alt="..." />
           </div>
         </div>
       </header>
