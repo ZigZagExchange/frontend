@@ -55,6 +55,15 @@ class Trade extends React.Component {
           newstate = { ...this.state };
           const openorders = msg.args[0];
           newstate.openorders.push(...openorders);
+          
+          // zksync warning if more than one limit order is open
+          if (this.state.user.id) {
+              const containsUserOrder = openorders.find(o => o[8] === this.state.user.id.toString());
+              const userOrderCount = newstate.openorders.filter(o => o[8] === this.state.user.id.toString()).length;
+              if (containsUserOrder && userOrderCount > 1) {
+                  toast.warn("Due to limitations of zksync 1.0, newer orders that are filled will cancel older orders. It is recommended to only have one open order at a time.", { autoClose: 15000 });
+              }
+          }
           this.setState(newstate);
           break;
         case "marketsummary":
@@ -127,7 +136,7 @@ class Trade extends React.Component {
 
           const orderid = match[1];
           const matchedorder = this.state.openorders.find(order => order[1] === orderid);
-          if (matchedorder && matchedorder[8] === this.state.user.id) {
+          if (matchedorder && matchedorder[8] === this.state.user.id.toString()) {
               const side = matchedorder[3];
               const sideText = matchedorder[3] === 'b' ? "buy" : "sell";
               const baseCurrency = matchedorder[2].split('-')[0];
