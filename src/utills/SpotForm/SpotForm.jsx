@@ -12,7 +12,7 @@ import { submitorder } from "../../helpers";
 class SpotForm extends React.Component {
   constructor(props) {
       super(props);
-      this.state = { userHasEditedPrice: false, price: null, amount: "" }
+      this.state = { userHasEditedPrice: false, price: null, amount: "", orderButtonDisabled: false }
   }
 
   updatePrice(e) {
@@ -62,12 +62,22 @@ class SpotForm extends React.Component {
         return
     }
 
+    let newstate = { ...this.state };
+    newstate.orderButtonDisabled = true;
+    this.setState(newstate);
+    const orderPendingToast = toast.info("Order pending. Sign or Cancel to continue...");
+
     try {
       await submitorder(this.props.chainId, "ETH-USDT", this.props.side, price, this.state.amount);
     } catch (e) {
       console.log(e);
       toast.error(e.message);
     }
+
+    toast.dismiss(orderPendingToast);
+    newstate = { ...this.state };
+    newstate.orderButtonDisabled = false;
+    this.setState(newstate);
   }
 
   priceIsDisabled() {
@@ -185,6 +195,7 @@ class SpotForm extends React.Component {
                   type="button"
                   className={buySellBtnClass}
                   onClick={this.buySellHandler.bind(this)}
+                  disabled={this.state.orderButtonDisabled}
                 >
                   {buttonText}
                 </button>
