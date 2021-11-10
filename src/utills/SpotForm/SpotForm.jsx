@@ -123,7 +123,8 @@ class SpotForm extends React.Component {
       const newstate = { ...this.state }
       if (this.props.side === 's') {
           const baseBalance = this.props.user.committed.balances.ETH / Math.pow(10, 18);
-          newstate.amount = parseFloat((baseBalance * val / 100).toPrecision(6))
+          const displayAmount = (baseBalance * val / 100).toPrecision(7)
+          newstate.amount = parseFloat(displayAmount.slice(0,-1))
       }
       else if (this.props.side === 'b') {
           const quoteBalance = this.props.user.committed.balances.USDT / Math.pow(10, 6);
