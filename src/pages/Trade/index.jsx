@@ -19,7 +19,6 @@ import TradePriceBtcTable from "../../components/TradeComponents/TradePriceBtcTa
 // import TradePriceBtcHead from "../../components/TradeComponents/TradePriceBtcHead/TradePriceBtcHead";
 import TradePriceHeadSecond from "../../components/TradeComponents/TradePriceHeadSecond/TradePriceHeadSecond";
 import SpotBox from "../../components/TradeComponents/SpotBox/SpotBox";
-import TradePriceHeadThird from "../../components/TradeComponents/TradePriceHeadThird/TradePriceHeadThird";
 
 // Helpers
 import {
@@ -42,6 +41,7 @@ class Trade extends React.Component {
       openorders: [],
       liquidity: [],
       currentMarket: "ETH-USDT",
+      marketDataTab: "openorders",
     };
   }
 
@@ -105,7 +105,6 @@ class Trade extends React.Component {
           );
           if (success) {
             toast.success("Filled: " + swap.txHash);
-            newstate.fills.push(swap);
             setTimeout(async () => {
                 try {
                     const user = await getAccountState();
@@ -121,9 +120,13 @@ class Trade extends React.Component {
           this.setState(newstate);
           break;
         case "ordermatch":
-          const orderid = msg.args[1];
-          const matchedorder = this.state.openorders.find(order => order[1] === orderid);
           newstate = { ...this.state };
+
+          const match = msg.args;
+          newstate.fills.push(match);
+
+          const orderid = match[1];
+          const matchedorder = this.state.openorders.find(order => order[1] === orderid);
           if (matchedorder && matchedorder[8] === this.state.user.id) {
               const side = matchedorder[3];
               const sideText = matchedorder[3] === 'b' ? "buy" : "sell";
@@ -275,6 +278,12 @@ class Trade extends React.Component {
     );
   }
 
+  updateMarketDataTab (tab) {
+      const newstate = { ...this.state }
+      newstate.marketDataTab = tab;
+      this.setState(newstate);
+  }
+
   render() {
     const lastPriceTableData = [];
     const markets = [];
@@ -325,6 +334,16 @@ class Trade extends React.Component {
       }
     });
 
+    const fillData = [];
+    const userFills = [];
+    this.state.fills.forEach(fill => {
+        const accountId = fill[7];
+        if (this.state.user.id && this.state.user.id.toString() === accountId) {
+            userFills.push(fill);
+        }
+        fillData.push({ td1: fill[4], td2: fill[5], td3: fill[6], side: fill[3] });
+    });
+
     this.state.liquidity.forEach((liq) => {
       const quantity = liq[0];
       const spread = liq[1];
@@ -350,6 +369,14 @@ class Trade extends React.Component {
     });
     orderbookAsks.sort((a, b) => b.td1 - a.td1);
     orderbookBids.sort((a, b) => b.td1 - a.td1);
+
+    let openOrdersLatestTradesData;
+    if (this.state.marketDataTab === "openorders") {
+        openOrdersLatestTradesData = openOrdersData;
+    }
+    else if (this.state.marketDataTab === "fills") {
+        openOrdersLatestTradesData = fillData;
+    }
 
     return (
       <>
@@ -416,13 +443,16 @@ class Trade extends React.Component {
                 </div>
                 <div className="col-12 col-sm-12 col-md-12 col-lg-6">
                   <div className="trade_Price trade_price2">
-                    {/* Trade Price Second Head */}
-                    <TradePriceHeadThird />
+                    {/* Trade Price Third Head */}
+                    <div className="trade_price_head_third">
+                      <strong className={this.state.marketDataTab === "openorders" ? "trade_price_active_tab" : ""} onClick={() => this.updateMarketDataTab("openorders")}>Open Orders</strong>
+                      <strong className={this.state.marketDataTab === "fills" ? "trade_price_active_tab" : ""} onClick={() => this.updateMarketDataTab("fills")}>Latest Trades</strong>
+                    </div>
                     {/* Trade Price Table*/}
                     <TradePriceTable
                       className="tpt_3"
                       value="up_value"
-                      priceTableData={openOrdersData}
+                      priceTableData={openOrdersLatestTradesData}
                       onClickRow={this.fillOpenOrder.bind(this)}
                     />
                   </div>
@@ -430,7 +460,7 @@ class Trade extends React.Component {
               </div>
             </div>
           </div>
-          <Footer openOrders={useropenorders} user={this.state.user} chainId={this.state.chainId} />
+          <Footer userFills={userFills} openOrders={useropenorders} user={this.state.user} chainId={this.state.chainId} />
         </div>
       </>
     );

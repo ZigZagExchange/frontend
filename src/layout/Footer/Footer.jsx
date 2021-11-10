@@ -29,13 +29,44 @@ class Footer extends React.Component {
       let footerContent, classNameOpenOrders = "", classNameFills = "", classNameBalances = "";
       switch (this.state.tab) {
         case "fills":
-          if (this.props.user.address) {
-              footerContent = (
-                <div>
-                  <a href={explorerLink} target="_blank" rel="noreferrer">View Account on Explorer</a>
-                </div>
-              );
-          }
+          footerContent = (
+            <table>
+              <thead>
+                <tr>
+                  <th>Market</th>
+                  <th>Price</th>
+                  <th>Quantity</th>
+                  <th>Side</th>
+                  <th>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {this.props.userFills.map((fill, i) => {
+                  const id = fill[1];
+                  const price = fill[4];
+                  const quantity = fill[5];
+                  const market = fill[2];
+                  const baseCurrency = fill[2].split("-")[0];
+                  const side = fill[3] === "b" ? "buy" : "sell";
+                  const classname = fill[3] === "b" ? "up_value" : "down_value";
+                  return (
+                    <tr key={id}>
+                      <td>{market}</td>
+                      <td>{price}</td>
+                      <td>
+                        {quantity} {baseCurrency}
+                      </td>
+                      <td className={classname}>{side}</td>
+                      <td>
+                        <a href={explorerLink}>View Tx</a>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          );
           classNameFills = "selected"
           break
         case "balances":
@@ -109,7 +140,7 @@ class Footer extends React.Component {
                   <strong className={classNameOpenOrders} onClick={() => this.setTab("open_orders")}>
                     Open Orders ({this.props.openOrders.length})
                   </strong>
-                  <strong className={classNameFills} onClick={() => this.setTab("fills")}>Fills</strong>
+                  <strong className={classNameFills} onClick={() => this.setTab("fills")}>Fills ({this.props.userFills.length})</strong>
                   <strong className={classNameBalances} onClick={() => this.setTab("balances")}>Balances</strong>
                 </div>
               </div>
