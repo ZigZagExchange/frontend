@@ -57,7 +57,7 @@ class SpotForm extends React.Component {
         toast.error(`No ${baseCurrency} balance`);
         return
     }
-    if (this.props.side ==='b' && isNaN(quoteBalance)) {
+    else if (this.props.side ==='b' && isNaN(quoteBalance)) {
         toast.error(`No ${quoteCurrency} balance`);
         return
     }
@@ -71,6 +71,10 @@ class SpotForm extends React.Component {
     }
     else if (this.props.side === 'b' && this.state.amount*price > quoteBalance) {
         toast.error(`Total exceeds ${quoteCurrency} balance`);
+        return
+    }
+    else if (isNaN(price) || price > this.props.lastPrice * 1.1 || price < this.props.lastPrice * 0.9) {
+        toast.error(`Price must be within 10% of spot`);
         return
     }
 
@@ -117,11 +121,11 @@ class SpotForm extends React.Component {
       if (this.state.userHasEditedPrice) {
           price = this.state.price;
       }
-      else if (this.props.initPrice) {
+      else if (this.props.lastPrice) {
           if (this.props.side === 'b')
-              price = parseFloat((this.props.initPrice*1.0013).toPrecision(4));
+              price = parseFloat((this.props.lastPrice*1.0013).toPrecision(4));
           else if (this.props.side === 's')
-              price = parseFloat((this.props.initPrice*0.9987).toPrecision(4));
+              price = parseFloat((this.props.lastPrice*0.9987).toPrecision(4));
       }
       else {
           price = 0;

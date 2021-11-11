@@ -414,7 +414,7 @@ class Trade extends React.Component {
                 </div>
               </div>
               <SpotBox
-                initPrice={this.state.marketSummary.price}
+                lastPrice={this.state.marketSummary.price}
                 signInHandler={this.signInHandler.bind(this)}
                 user={this.state.user}
                 chainId={this.state.chainId}

@@ -41,7 +41,7 @@ class SpotBox extends React.Component {
             <div className="spot_bottom">
               <SpotForm
                 side="b"
-                initPrice={this.props.initPrice}
+                lastPrice={this.props.lastPrice}
                 signInHandler={this.props.signInHandler}
                 user={this.props.user}
                 chainId={this.props.chainId}
@@ -50,7 +50,7 @@ class SpotBox extends React.Component {
               />
               <SpotForm
                 side="s"
-                initPrice={this.props.initPrice}
+                lastPrice={this.props.lastPrice}
                 signInHandler={this.props.signInHandler}
                 user={this.props.user}
                 chainId={this.props.chainId}
