@@ -36,7 +36,7 @@ class Trade extends React.Component {
     this.state = {
       chainId: 1,
       user: {},
-      marketFills: [],
+      marketFills: {},
       userFills: [],
       marketSummary: {},
       lastPrices: {},
@@ -134,7 +134,11 @@ class Trade extends React.Component {
           newstate = { ...this.state };
 
           const match = msg.args;
-          newstate.marketFills.unshift(match);
+          const market = match[2];
+          if (!newstate.marketFills[market]) {
+              newstate.marketFills[market] = [];
+          }
+          newstate.marketFills[market].unshift(match);
 
           const orderid = match[1];
           const matchedorder = this.state.openorders.find(order => order[1] === orderid);
@@ -355,9 +359,11 @@ class Trade extends React.Component {
     });
 
     const fillData = [];
-    this.state.marketFills.forEach(fill => {
-        fillData.push({ td1: fill[4], td2: fill[5], td3: fill[6], side: fill[3] });
-    });
+    if (this.state.marketFills[this.state.currentMarket]) {
+        this.state.marketFills[this.state.currentMarket].forEach(fill => {
+            fillData.push({ td1: fill[4], td2: fill[5], td3: fill[6], side: fill[3] });
+        });
+    }
 
     this.state.liquidity.forEach((liq) => {
       const quantity = liq[0];

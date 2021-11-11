@@ -13,6 +13,11 @@ class SpotForm extends React.Component {
   constructor(props) {
       super(props);
       this.state = { userHasEditedPrice: false, price: null, amount: "", orderButtonDisabled: false }
+      this.MINIMUM_AMOUNTS = {
+          "ETH": 0.002,
+          "USDC": 20,
+          "USDT": 20
+      }
   }
 
   updatePrice(e) {
@@ -65,8 +70,8 @@ class SpotForm extends React.Component {
         toast.error(`Amount exceeds ${baseCurrency} balance`);
         return
     }
-    else if (this.state.amount < 0.002) {
-        toast.error(`Minimum order size is 0.002 ${baseCurrency}`);
+    else if (this.state.amount < this.MINIMUM_AMOUNTS[baseCurrency]) {
+        toast.error(`Minimum order size is ${this.MINIMUM_AMOUNTS[baseCurrency]} ${baseCurrency}`);
         return
     }
     else if (this.props.side === 'b' && this.state.amount*price > quoteBalance) {
