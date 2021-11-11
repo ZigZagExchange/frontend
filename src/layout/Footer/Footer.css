@@ -81,6 +81,14 @@
   color: gray;
 }
 
+.footer_links {
+    margin-top: 20px;
+}
+.footer_links a {
+    margin: 5px;
+    color: #08aff3;
+}
+
 @media screen and (max-width: 697px) {
   .ft_tabs {
     flex-wrap: wrap;

@@ -7,7 +7,7 @@ import RangeSlider from "../RangeSlider/RangeSlider";
 import Button from "../Button/Button";
 import darkPlugHead from "../../assets/icons/dark-plug-head.png";
 //helpers
-import { submitorder } from "../../helpers";
+import { submitorder, currencyInfo } from "../../helpers";
 
 class SpotForm extends React.Component {
   constructor(props) {
@@ -28,11 +28,23 @@ class SpotForm extends React.Component {
     this.setState(newState);
   }
 
+  getBaseBalance() {
+      const baseCurrency = this.props.currentMarket.split("-")[0];
+      return this.props.user.committed.balances[baseCurrency] / Math.pow(10, currencyInfo[baseCurrency].decimals);
+  }
+
+  getQuoteBalance() {
+      const quoteCurrency = this.props.currentMarket.split("-")[1];
+      return this.props.user.committed.balances[quoteCurrency] / Math.pow(10, currencyInfo[quoteCurrency].decimals);
+  }
+
   async buySellHandler(e) {
+    const baseCurrency = this.props.currentMarket.split("-")[0];
+    const quoteCurrency = this.props.currentMarket.split("-")[1];
     let baseBalance, quoteBalance;
     if (this.props.user.address) {
-      baseBalance = this.props.user.committed.balances.ETH / Math.pow(10, 18);
-      quoteBalance = this.props.user.committed.balances.USDT / Math.pow(10, 6);
+      baseBalance = this.getBaseBalance();
+      quoteBalance = this.getQuoteBalance();
     } else {
       baseBalance = 0;
       quoteBalance = 0;
@@ -42,23 +54,23 @@ class SpotForm extends React.Component {
     baseBalance = parseFloat(baseBalance);
     quoteBalance = parseFloat(quoteBalance);
     if (this.props.side === 's' && isNaN(baseBalance)) {
-        toast.error("No ETH balance");
+        toast.error(`No ${baseCurrency} balance`);
         return
     }
     if (this.props.side ==='b' && isNaN(quoteBalance)) {
-        toast.error("No USDT balance");
+        toast.error(`No ${quoteCurrency} balance`);
         return
     }
     else if (this.props.side === 's'  && this.state.amount > baseBalance) {
-        toast.error("Amount exceeds ETH balance");
+        toast.error(`Amount exceeds ${baseCurrency} balance`);
         return
     }
     else if (this.state.amount < 0.002) {
-        toast.error("Minimum order size is 0.002 ETH");
+        toast.error(`Minimum order size is 0.002 ${baseCurrency}`);
         return
     }
     else if (this.props.side === 'b' && this.state.amount*price > quoteBalance) {
-        toast.error("Total exceeds USDT balance");
+        toast.error(`Total exceeds ${quoteCurrency} balance`);
         return
     }
 
@@ -68,7 +80,7 @@ class SpotForm extends React.Component {
     const orderPendingToast = toast.info("Order pending. Sign or Cancel to continue...");
 
     try {
-      await submitorder(this.props.chainId, "ETH-USDT", this.props.side, price, this.state.amount);
+      await submitorder(this.props.chainId, this.props.currentMarket, this.props.side, price, this.state.amount);
     } catch (e) {
       console.log(e);
       toast.error(e.message);
@@ -88,12 +100,12 @@ class SpotForm extends React.Component {
       if (!this.props.user.address) return 0;
 
       if (this.props.side === 's') {
-          const baseBalance = this.props.user.committed.balances.ETH / Math.pow(10, 18);
+          const baseBalance = this.getBaseBalance();
           const amount = this.state.amount || 0;
           return Math.round(amount / baseBalance * 100)
       }
       else if (this.props.side === 'b') {
-          const quoteBalance = this.props.user.committed.balances.USDT / Math.pow(10, 6);
+          const quoteBalance = this.getQuoteBalance();
           const amount = this.state.amount || 0;
           const total = amount * this.currentPrice()
           return Math.round(total / quoteBalance * 100)
@@ -107,9 +119,9 @@ class SpotForm extends React.Component {
       }
       else if (this.props.initPrice) {
           if (this.props.side === 'b')
-              price = Math.round(this.props.initPrice*1.0013);
+              price = parseFloat((this.props.initPrice*1.0013).toPrecision(4));
           else if (this.props.side === 's')
-              price = Math.round(this.props.initPrice*0.9987);
+              price = parseFloat((this.props.initPrice*0.9987).toPrecision(4));
       }
       else {
           price = 0;
@@ -122,12 +134,12 @@ class SpotForm extends React.Component {
 
       const newstate = { ...this.state }
       if (this.props.side === 's') {
-          const baseBalance = this.props.user.committed.balances.ETH / Math.pow(10, 18);
+          const baseBalance = this.getBaseBalance();
           const displayAmount = (baseBalance * val / 100).toPrecision(7)
           newstate.amount = parseFloat(displayAmount.slice(0,-1))
       }
       else if (this.props.side === 'b') {
-          const quoteBalance = this.props.user.committed.balances.USDT / Math.pow(10, 6);
+          const quoteBalance = this.getQuoteBalance();
           const quoteAmount = quoteBalance * val / 100;
           newstate.amount = parseFloat((quoteAmount / this.currentPrice()).toPrecision(6))
       }
@@ -138,10 +150,13 @@ class SpotForm extends React.Component {
       let price = this.currentPrice();
       if (price === 0) price = "";
 
+      const baseCurrency = this.props.currentMarket.split("-")[0];
+      const quoteCurrency = this.props.currentMarket.split("-")[1];
+
       let baseBalance, quoteBalance;
       if (this.props.user.address) {
-        baseBalance = this.props.user.committed.balances.ETH / Math.pow(10, 18);
-        quoteBalance = this.props.user.committed.balances.USDT / Math.pow(10, 6);
+        baseBalance = this.getBaseBalance();
+        quoteBalance = this.getQuoteBalance();
       } else {
         baseBalance = "-";
         quoteBalance = "-";
@@ -155,9 +170,9 @@ class SpotForm extends React.Component {
 
       const balanceHtml =
         this.props.side === "b" ? (
-          <strong>{quoteBalance.toPrecision(8)} USDT</strong>
+          <strong>{quoteBalance.toPrecision(8)} {quoteCurrency}</strong>
         ) : (
-          <strong>{baseBalance.toPrecision(8)} ETH</strong>
+          <strong>{baseBalance.toPrecision(8)} {baseCurrency}</strong>
         );
 
       let buySellBtnClass, buttonText;
@@ -185,7 +200,7 @@ class SpotForm extends React.Component {
             <div className="spf_input_box">
               <span className="spf_desc_text">Amount</span>
               <input type="text" value={this.state.amount} onChange={this.updateAmount.bind(this)}/>
-              <span>ETH</span>
+              <span>{baseCurrency}</span>
             </div>
             <div className="spf_range">
               <RangeSlider value={this.amountPercentOfMax()} onChange={this.rangeSliderHandler.bind(this)} />

@@ -51,6 +51,10 @@
   background-color: #232833;
 }
 
+.trade_price_btc_table table tbody tr {
+    cursor: pointer;
+}
+
 .trade_price_btc_table table td {
   text-align: center;
   margin: 6px 0;

@@ -27,6 +27,7 @@ import {
   signinzksync,
   broadcastfill,
   getAccountState,
+  currencyInfo
 } from "../../helpers";
 
 class Trade extends React.Component {
@@ -35,7 +36,8 @@ class Trade extends React.Component {
     this.state = {
       chainId: 1,
       user: {},
-      fills: [],
+      marketFills: [],
+      userFills: [],
       marketSummary: {},
       lastPrices: {},
       openorders: [],
@@ -132,29 +134,30 @@ class Trade extends React.Component {
           newstate = { ...this.state };
 
           const match = msg.args;
-          newstate.fills.unshift(match);
+          newstate.marketFills.unshift(match);
 
           const orderid = match[1];
           const matchedorder = this.state.openorders.find(order => order[1] === orderid);
-          if (matchedorder && matchedorder[8] === this.state.user.id.toString()) {
+          if (matchedorder && this.state.user.id && matchedorder[8] === this.state.user.id.toString()) {
+              newstate.userFills.unshift(matchedorder);
               const side = matchedorder[3];
               const sideText = matchedorder[3] === 'b' ? "buy" : "sell";
               const baseCurrency = matchedorder[2].split('-')[0];
+              const quoteCurrency = matchedorder[2].split('-')[1];
               const baseQuantity = matchedorder[5];
               const quoteQuantity = matchedorder[6];
               const price = matchedorder[4];
-              console.log(this.state.user.committed.balances);
-              const baseQuantityUnits = baseQuantity * 1e18;
-              const quoteQuantityUnits = quoteQuantity * 1e6;
-              const oldBaseQuantityUnits = parseFloat(newstate.user.committed.balances.ETH);
-              const oldQuoteQuantityUnits = parseFloat(newstate.user.committed.balances.USDT);
+              const baseQuantityUnits = baseQuantity * currencyInfo[baseCurrency].decimals;
+              const quoteQuantityUnits = quoteQuantity * currencyInfo[quoteCurrency].decimals;
+              const oldBaseQuantityUnits = parseFloat(newstate.user.committed.balances[baseCurrency]);
+              const oldQuoteQuantityUnits = parseFloat(newstate.user.committed.balances[quoteCurrency]);
               if (side === 's') {
-                  newstate.user.committed.balances.ETH = (oldBaseQuantityUnits - baseQuantityUnits).toFixed(0);
-                  newstate.user.committed.balances.USDT = (oldQuoteQuantityUnits + quoteQuantityUnits).toFixed(0);
+                  newstate.user.committed.balances[baseCurrency] = (oldBaseQuantityUnits - baseQuantityUnits).toFixed(0);
+                  newstate.user.committed.balances[quoteCurrency] = (oldQuoteQuantityUnits + quoteQuantityUnits).toFixed(0);
               }
               else if (side === 'b') {
-                  newstate.user.committed.balances.ETH = (oldBaseQuantityUnits + baseQuantityUnits).toFixed(0);
-                  newstate.user.committed.balances.USDT = (oldQuoteQuantityUnits - quoteQuantityUnits).toFixed(0);
+                  newstate.user.committed.balances[baseCurrency] = (oldBaseQuantityUnits + baseQuantityUnits).toFixed(0);
+                  newstate.user.committed.balances[quoteCurrency] = (oldQuoteQuantityUnits - quoteQuantityUnits).toFixed(0);
               }
               toast.success(`Your ${sideText} order for ${baseQuantity} ${baseCurrency} @ ${price} was matched!`)
           }
@@ -193,7 +196,7 @@ class Trade extends React.Component {
       zigzagws.send(
         JSON.stringify({
           op: "subscribemarket",
-          args: [this.state.chainId, "ETH-USDT"],
+          args: [this.state.chainId, this.state.currentMarket],
         })
       );
     });
@@ -225,10 +228,13 @@ class Trade extends React.Component {
         return
     }
 
+    const baseCurrency = data.order[2].split('-')[0];
+    const quoteCurrency = data.order[2].split('-')[1];
+
     let baseBalance, quoteBalance;
     if (this.state.user.address) {
-      baseBalance = this.state.user.committed.balances.ETH / Math.pow(10, 18);
-      quoteBalance = this.state.user.committed.balances.USDT / Math.pow(10, 6);
+      baseBalance = this.state.user.committed.balances[baseCurrency] / Math.pow(10, 18);
+      quoteBalance = this.state.user.committed.balances[quoteCurrency] / Math.pow(10, 6);
     } else {
       baseBalance = 0;
       quoteBalance = 0;
@@ -239,19 +245,19 @@ class Trade extends React.Component {
     baseBalance = parseFloat(baseBalance);
     quoteBalance = parseFloat(quoteBalance);
     if (data.side === 'b' && isNaN(baseBalance)) {
-        toast.error("No ETH balance");
+        toast.error(`No ${baseCurrency} balance`);
         return
     }
     if (data.side ==='s' && isNaN(quoteBalance)) {
-        toast.error("No USDT balance");
+        toast.error(`No ${quoteCurrency} balance`);
         return
     }
     else if (data.side === 'b'  && baseQuantity > baseBalance) {
-        toast.error("Amount exceeds ETH balance");
+        toast.error(`Amount exceeds ${baseCurrency} balance`);
         return
     }
     else if (data.side === 's' && quoteQuantity > quoteBalance) {
-        toast.error("Total exceeds USDT balance");
+        toast.error(`Total exceeds ${quoteCurrency} balance`);
         return
     }
     const orderPendingToast = toast.info("Order pending. Sign or Cancel to continue...");
@@ -265,7 +271,9 @@ class Trade extends React.Component {
     toast.dismiss(orderPendingToast);
   }
 
-  updateChainId(chainId) {
+  updateMarketChain(chainId, market) {
+    if (typeof market === "undefined") market = this.state.currentMarket;
+    if (typeof chainId === "undefined") chainId = this.state.chainId;
     const newState = { ...this.state };
     zigzagws.send(
       JSON.stringify({
@@ -273,11 +281,15 @@ class Trade extends React.Component {
         args: [this.state.chainId, this.state.currentMarket],
       })
     );
+    if (this.state.chainId !== chainId) {
+        newState.user = {};
+    }
     newState.openorders = [];
+    newState.marketFills = [];
     newState.liquidity = [];
     newState.marketSummary = {};
     newState.chainId = chainId;
-    newState.user = {};
+    newState.currentMarket = market;
     this.setState(newState);
     zigzagws.send(
       JSON.stringify({
@@ -344,12 +356,7 @@ class Trade extends React.Component {
     });
 
     const fillData = [];
-    const userFills = [];
-    this.state.fills.forEach(fill => {
-        const accountId = fill[7];
-        if (this.state.user.id && this.state.user.id.toString() === accountId) {
-            userFills.push(fill);
-        }
+    this.state.marketFills.forEach(fill => {
         fillData.push({ td1: fill[4], td2: fill[5], td3: fill[6], side: fill[3] });
     });
 
@@ -394,7 +401,7 @@ class Trade extends React.Component {
           user={this.state.user}
           signInHandler={this.signInHandler.bind(this)}
           chainId={this.state.chainId}
-          updateChainId={this.updateChainId.bind(this)}
+          updateMarketChain={this.updateMarketChain.bind(this)}
         />
         <div className="trade_section">
           <div className="trade_container">
@@ -402,7 +409,7 @@ class Trade extends React.Component {
               <div className="trade_left">
                 <div>
                   {/* Trade Head */}
-                  <TradeHead marketSummary={this.state.marketSummary} markets={markets} />
+                  <TradeHead updateMarketChain={this.updateMarketChain.bind(this)} marketSummary={this.state.marketSummary} markets={markets} currentMarket={this.state.currentMarket} />
                   {/* Trade Chart */}
                   <TradeChart />
                 </div>
@@ -412,6 +419,7 @@ class Trade extends React.Component {
                 signInHandler={this.signInHandler.bind(this)}
                 user={this.state.user}
                 chainId={this.state.chainId}
+                currentMarket={this.state.currentMarket}
               />
             </div>
             <div className="col-12 col-xl-6">
@@ -432,7 +440,7 @@ class Trade extends React.Component {
                 <div className="col-12 col-sm-12 col-md-12 col-lg-6">
                   <div className="trade_price_btc">
                     {/* <TradePriceBtcHead /> */}
-                    <TradePriceBtcTable rowData={lastPriceTableData} />
+                    <TradePriceBtcTable rowData={lastPriceTableData} updateMarketChain={this.updateMarketChain.bind(this)} />
                   </div>
                 </div>
                 <div className="col-12 col-sm-12 col-md-12 col-lg-6">
@@ -469,7 +477,7 @@ class Trade extends React.Component {
               </div>
             </div>
           </div>
-          <Footer userFills={userFills} openOrders={useropenorders} user={this.state.user} chainId={this.state.chainId} />
+          <Footer userFills={this.state.userFills} openOrders={useropenorders} user={this.state.user} chainId={this.state.chainId} />
         </div>
       </>
     );

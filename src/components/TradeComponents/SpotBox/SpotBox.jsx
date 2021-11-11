@@ -45,6 +45,7 @@ class SpotBox extends React.Component {
                 signInHandler={this.props.signInHandler}
                 user={this.props.user}
                 chainId={this.props.chainId}
+                currentMarket={this.props.currentMarket}
                 orderType={this.state.orderType}
               />
               <SpotForm
@@ -53,6 +54,7 @@ class SpotBox extends React.Component {
                 signInHandler={this.props.signInHandler}
                 user={this.props.user}
                 chainId={this.props.chainId}
+                currentMarket={this.props.currentMarket}
                 orderType={this.state.orderType}
               />
             </div>

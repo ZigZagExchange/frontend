@@ -7,7 +7,10 @@ const TradeSelect = (props) => {
     <>
       <div className="tl_select">
         <div>
-          <select>
+          <select 
+            value={props.currentMarket}
+            onChange={(e) => props.updateMarketChain(undefined, e.target.value)}
+          >
             {props.markets.map(market =>
                 <option key={market} value={market}>{market.replace('-', '/')}</option>
             )}

@@ -4,10 +4,9 @@ import "./TradeRatesCard.css";
 
 class TradeRatesCard extends React.Component {
   render() {
-    let marketDisplay = "--/--";
-    if (this.props.marketSummary.market) {
-      marketDisplay = this.props.marketSummary.market.replace("-", "/");
-    }
+    let marketDisplay = this.props.currentMarket.replace("-", "/");
+    let baseCurrency = this.props.currentMarket.split("-")[0];
+    let quoteCurrency = this.props.currentMarket.split("-")[1];
     const percentChange = (
       (this.props.marketSummary.priceChange / this.props.marketSummary.price) *
       100
@@ -39,11 +38,11 @@ class TradeRatesCard extends React.Component {
             <p>{this.props.marketSummary["24lo"]}</p>
           </div>
           <div className="rates_box rb_text_4">
-            <h2>24h Volume(ETH)</h2>
+            <h2>24h Volume({baseCurrency})</h2>
             <p>{this.props.marketSummary.baseVolume}</p>
           </div>
           <div className="rates_box rb_text_4">
-            <h2>24h Volume(USDT)</h2>
+            <h2>24h Volume({quoteCurrency})</h2>
             <p>{this.props.marketSummary.quoteVolume}</p>
           </div>
         </div>

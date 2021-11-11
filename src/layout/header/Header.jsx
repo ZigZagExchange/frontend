@@ -117,7 +117,7 @@ const Header = (props) => {
             <div className="eu_text">
               <select
                 defaultValue={props.chainId}
-                onChange={(e) => props.updateChainId(parseInt(e.target.value))}
+                onChange={(e) => props.updateMarketChain(parseInt(e.target.value))}
               >
                 <option value="1">zkSync - Mainnet</option>
                 <option value="1000">zkSync - Rinkeby</option>

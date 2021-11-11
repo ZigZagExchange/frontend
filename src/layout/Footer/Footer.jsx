@@ -147,6 +147,11 @@ class Footer extends React.Component {
               <div className="footer_open_orders">{footerContent}</div>
               <div className="footer_bottom">
                 <img src={logo} alt="..." />
+                <div className="footer_links">
+                  <a href="https://discord.gg/ZNWR3Cfr">Discord</a>
+                  <a href="https://twitter.com/ZigZagExchange">Twitter</a>
+                  <a href="http://t.me/zigzagexchange">Telegram</a>
+                </div>
               </div>
             </div>
           </div>

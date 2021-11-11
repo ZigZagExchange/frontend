@@ -13,6 +13,30 @@ import { toast } from 'react-toastify';
 //    "BTC-USDT": 1
 //}
 
+export const currencyInfo = {
+    "ETH": { 
+        decimals: 18, 
+        chain: { 
+            1: { tokenId: 0 },
+            1000: { tokenId: 0 },
+        }
+    },
+    "USDC": { 
+        decimals: 6, 
+        chain: { 
+            1: { tokenId: 2 },
+            1000: { tokenId: 2 },
+        }
+    },
+    "USDT": { 
+        decimals: 6, 
+        chain: { 
+            1: { tokenId: 4 },
+            1000: { tokenId: 1 },
+        }
+    },
+}
+
 //globals
 let ethersProvider;
 let syncProvider;
