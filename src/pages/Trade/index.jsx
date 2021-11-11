@@ -285,7 +285,6 @@ class Trade extends React.Component {
         newState.user = {};
     }
     newState.openorders = [];
-    newState.marketFills = [];
     newState.liquidity = [];
     newState.marketSummary = {};
     newState.chainId = chainId;

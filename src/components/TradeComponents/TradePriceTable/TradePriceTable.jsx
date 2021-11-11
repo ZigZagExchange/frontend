@@ -19,7 +19,7 @@ class TradePriceTable extends React.Component {
 
 
     render() {
-      const baseCurrency = this.props.currentMarket.split("-")[0];
+      //const baseCurrency = this.props.currentMarket.split("-")[0];
       const quoteCurrency = this.props.currentMarket.split("-")[1];
 
       const maxQuantity = Math.max(...this.props.priceTableData.map((d) => d.td2));
