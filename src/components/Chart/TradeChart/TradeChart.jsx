@@ -4,11 +4,11 @@ import TradingViewWidget, { Themes } from "react-tradingview-widget";
 
 // css
 import "./TradeChart.css";
-const TradeChart = () => {
+const TradeChart = (props) => {
   return (
     <>
       <TradingViewWidget
-        symbol="ETHUSDT"
+        symbol={props.currentMarket.replace("-","")}
         theme={Themes.DARK}
         save_image={false}
         hide_top_toolbar={false}

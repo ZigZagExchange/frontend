@@ -19,10 +19,14 @@ class TradePriceTable extends React.Component {
 
 
     render() {
+      const baseCurrency = this.props.currentMarket.split("-")[0];
+      const quoteCurrency = this.props.currentMarket.split("-")[1];
+
       const maxQuantity = Math.max(...this.props.priceTableData.map((d) => d.td2));
       let onClickRow;
       if (this.props.onClickRow) onClickRow = this.props.onClickRow;
       else onClickRow = () => null;
+
       return (
         <>
           <table className={`trade_price_table ${this.props.className}`} ref={el => this.tableDiv = el}>
@@ -30,7 +34,7 @@ class TradePriceTable extends React.Component {
               <tr>
                 <th>Price</th>
                 <th>Amount</th>
-                <th>Total(USDT)</th>
+                <th>Total({quoteCurrency})</th>
               </tr>
             </thead>
             <tbody>

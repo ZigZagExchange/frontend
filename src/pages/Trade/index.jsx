@@ -411,7 +411,7 @@ class Trade extends React.Component {
                   {/* Trade Head */}
                   <TradeHead updateMarketChain={this.updateMarketChain.bind(this)} marketSummary={this.state.marketSummary} markets={markets} currentMarket={this.state.currentMarket} />
                   {/* Trade Chart */}
-                  <TradeChart />
+                  <TradeChart currentMarket={this.state.currentMarket} />
                 </div>
               </div>
               <SpotBox
@@ -433,6 +433,7 @@ class Trade extends React.Component {
                       className="tpt_1"
                       useGradient="true"
                       priceTableData={orderbookAsks}
+                      currentMarket={this.state.currentMarket}
                       scrollToBottom="true"
                     />
                   </div>
@@ -453,6 +454,7 @@ class Trade extends React.Component {
                     <TradePriceTable
                       className="tpt_2"
                       useGradient="true"
+                      currentMarket={this.state.currentMarket}
                       priceTableData={orderbookBids}
                     />
                     {/* <TradeMarketActivites /> */}
@@ -470,6 +472,7 @@ class Trade extends React.Component {
                       className="tpt_3"
                       value="up_value"
                       priceTableData={openOrdersLatestTradesData}
+                      currentMarket={this.state.currentMarket}
                       onClickRow={this.fillOpenOrder.bind(this)}
                     />
                   </div>
