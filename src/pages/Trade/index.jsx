@@ -151,8 +151,8 @@ class Trade extends React.Component {
               const baseQuantity = matchedorder[5];
               const quoteQuantity = matchedorder[6];
               const price = matchedorder[4];
-              const baseQuantityUnits = baseQuantity * currencyInfo[baseCurrency].decimals;
-              const quoteQuantityUnits = quoteQuantity * currencyInfo[quoteCurrency].decimals;
+              const baseQuantityUnits = baseQuantity * Math.pow(10, currencyInfo[baseCurrency].decimals);
+              const quoteQuantityUnits = quoteQuantity * Math.pow(10, currencyInfo[quoteCurrency].decimals);
               const oldBaseQuantityUnits = parseFloat(newstate.user.committed.balances[baseCurrency]);
               const oldQuoteQuantityUnits = parseFloat(newstate.user.committed.balances[quoteCurrency]);
               if (side === 's') {
