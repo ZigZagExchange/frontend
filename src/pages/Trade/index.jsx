@@ -227,7 +227,7 @@ class Trade extends React.Component {
               newstate.user.committed.balances[baseCurrency] = (oldBaseQuantityUnits + baseQuantityUnits).toFixed(0);
               newstate.user.committed.balances[quoteCurrency] = (oldQuoteQuantityUnits - quoteQuantityUnits).toFixed(0);
           }
-          toast.info(`Your ${sideText} order for ${baseQuantity} ${baseCurrency} @ ${price} was matched. Waiting on commitment...`)
+          toast.info(`Your ${sideText} order for ${baseQuantity} ${baseCurrency} @ ${price} was matched`)
       }
       newstate.openorders = state.openorders.filter(order => order[1] !== orderid);
       

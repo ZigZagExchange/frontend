@@ -149,8 +149,8 @@ class SpotForm extends React.Component {
       }
       else if (this.props.side === 'b') {
           const quoteBalance = this.getQuoteBalance();
-          const quoteAmount = quoteBalance * val / 100;
-          newstate.amount = parseFloat((quoteAmount / this.currentPrice()).toPrecision(6))
+          const quoteAmount = (quoteBalance * val / 100 / this.currentPrice()).toPrecision(7);
+          newstate.amount = parseFloat(quoteAmount.slice(0,-1));
       }
       this.setState(newstate);
   }
