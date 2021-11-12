@@ -14,7 +14,7 @@ class SpotForm extends React.Component {
       super(props);
       this.state = { userHasEditedPrice: false, price: null, amount: "", orderButtonDisabled: false }
       this.MINIMUM_AMOUNTS = {
-          "ETH": 0.002,
+          "ETH": 0.004,
           "USDC": 20,
           "USDT": 20
       }
