@@ -20,7 +20,7 @@ const Header = (props) => {
       walletLink = "https://wallet.zksync.io/";
       break;
     case 1000:
-      walletLink = "https://rinkeby.zksync.io";
+      walletLink = "https://rinkeby.zksync.io/";
       break;
     default:
       break;
@@ -52,9 +52,9 @@ const Header = (props) => {
                   </NavLink>
                 </li>
                 <li>
-                  <NavLink exact to={walletLink} activeClassName="active_link">
+                  <a href={walletLink} target="_blank" rel="noreferrer">
                     Wallet
-                  </NavLink>
+                  </a>
                 </li>
               </ul>
             </div>
@@ -96,7 +96,7 @@ const Header = (props) => {
                 </NavLink>
               </li>
               <li>
-                <a href={walletLink}>Wallet</a>
+                <a href={walletLink} target="_blank" rel="noreferrer">Wallet</a>
               </li>
             </ul>
           </div>

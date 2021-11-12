@@ -17,14 +17,16 @@ class Footer extends React.Component {
   }
 
   render () {
-      let explorerLink;
+      let explorerLink, baseExplorerUrl;
       switch (this.props.chainId) {
           case 1000:
               explorerLink = "https://rinkeby.zkscan.io/explorer/accounts/" + this.props.user.address;
+              baseExplorerUrl = "https://rinkeby.zkscan.io";
               break
           case 1:
           default:
               explorerLink = "https://zkscan.io/explorer/accounts/" + this.props.user.address;
+              baseExplorerUrl = "https://zkscan.io";
       }
       let footerContent, classNameOpenOrders = "", classNameFills = "", classNameBalances = "";
       switch (this.state.tab) {
@@ -37,8 +39,8 @@ class Footer extends React.Component {
                   <th>Price</th>
                   <th>Quantity</th>
                   <th>Side</th>
-                  <th>
-                  </th>
+                  <th>Status</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
@@ -49,7 +51,25 @@ class Footer extends React.Component {
                   const market = fill[2];
                   const baseCurrency = fill[2].split("-")[0];
                   const side = fill[3] === "b" ? "buy" : "sell";
-                  const classname = fill[3] === "b" ? "up_value" : "down_value";
+                  const sideclassname = fill[3] === "b" ? "up_value" : "down_value";
+                  let statusText; 
+                  switch (fill[9]) {
+                      case 'r':
+                        statusText = "rejected";
+                        break
+                      case 'f':
+                        statusText = "filled";
+                        break
+                      default:
+                      case 'm':
+                        statusText = "matched";
+                  }
+                  let txHashLink;
+                  if (fill[10]) {
+                      txHashLink = baseExplorerUrl + "/explorer/transactions/" + fill[10];
+                  }
+                  
+                      
                   return (
                     <tr key={id}>
                       <td>{market}</td>
@@ -57,9 +77,13 @@ class Footer extends React.Component {
                       <td>
                         {quantity} {baseCurrency}
                       </td>
-                      <td className={classname}>{side}</td>
+                      <td className={sideclassname}>{side}</td>
+                      <td className={statusText}>{statusText}</td>
                       <td>
-                        <a href={explorerLink}>View Tx</a>
+                        {txHashLink ?
+                            <a href={txHashLink} target="_blank" rel="noreferrer">View Tx</a> :
+                            "Pending"
+                        }
                       </td>
                     </tr>
                   );

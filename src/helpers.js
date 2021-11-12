@@ -54,6 +54,9 @@ function pingServer() {
 zigzagws.addEventListener("open", function () {
     setInterval(pingServer, 5000);
 });
+zigzagws.addEventListener("close", function () {
+    toast.error("Connection to server closed. Please refresh the page");
+});
 
 export async function getAccountState() {
   const syncAccountState = await syncWallet.getAccountState();
@@ -161,6 +164,7 @@ export async function submitorder(chainId, product, side, price, amount) {
 }
 
 export async function sendfillrequest(orderreceipt) {
+  const chainId = orderreceipt[0];
   const orderId = orderreceipt[1];
   const market = orderreceipt[2];
   const baseCurrency = market.split("-")[0];
@@ -194,7 +198,7 @@ export async function sendfillrequest(orderreceipt) {
     ),
     ratio: zksync.utils.tokenRatio(tokenRatio),
   });
-  const resp = { op: "fillrequest", args: [orderId, fillOrder] };
+  const resp = { op: "fillrequest", args: [chainId, orderId, fillOrder] };
   zigzagws.send(JSON.stringify(resp));
 }
 

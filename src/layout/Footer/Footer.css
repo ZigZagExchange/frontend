@@ -80,6 +80,15 @@
   cursor: pointer;
   color: gray;
 }
+.footer_open_orders td.matched {
+    color: yellow;
+}
+.footer_open_orders td.rejected {
+    color: #c4384e;
+}
+.footer_open_orders td.filled {
+    color: #3fe199;
+}
 
 .footer_links {
     margin-top: 20px;
