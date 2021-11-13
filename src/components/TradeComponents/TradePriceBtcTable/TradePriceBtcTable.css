@@ -47,7 +47,7 @@
   text-align: start;
 }
 
-.trade_price_btc_table table tbody tr:nth-child(even) {
+.trade_price_btc_table table tbody tr.selected {
   background-color: #232833;
 }
 

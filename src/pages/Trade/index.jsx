@@ -480,7 +480,7 @@ class Trade extends React.Component {
                 <div className="col-12 col-sm-12 col-md-12 col-lg-6">
                   <div className="trade_price_btc">
                     {/* <TradePriceBtcHead /> */}
-                    <TradePriceBtcTable rowData={lastPriceTableData} updateMarketChain={this.updateMarketChain.bind(this)} />
+                    <TradePriceBtcTable rowData={lastPriceTableData} updateMarketChain={this.updateMarketChain.bind(this)} currentMarket={this.state.currentMarket} />
                   </div>
                 </div>
                 <div className="col-12 col-sm-12 col-md-12 col-lg-6">

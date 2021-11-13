@@ -84,10 +84,14 @@ export async function signinzksync(chainid) {
       ethereumChainId = "0x4";
       ethereumChainName = "rinkeby";
   }
-  await window.ethereum.request({
-    method: "wallet_switchEthereumChain",
-    params: [{ chainId: ethereumChainId }],
-  });
+  try {
+      await window.ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: ethereumChainId }],
+      });
+  } catch (e) {
+      toast.warn("Your version of Metamask doesn't support automated chain switching. Please switch to the required chain manually")
+  }
 
   ethersProvider = new ethers.providers.Web3Provider(window.ethereum);
   syncProvider = await zksync.getDefaultProvider(ethereumChainName);
