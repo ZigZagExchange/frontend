@@ -128,8 +128,13 @@ export async function changepubkeyzksync() {
 }
 
 export async function submitorder(chainId, product, side, price, amount) {
-  amount = parseFloat(amount).toPrecision(6);
-  price = parseFloat(price).toPrecision(6);
+  const currencies = product.split("-");
+  const baseCurrency = currencies[0];
+  const quoteCurrency = currencies[1];
+  if (baseCurrency == "USDC" || baseCurrency == "USDT") {
+      amount = parseFloat(amount).toFixed(7).slice(0,-1);
+  }
+  price = parseFloat(price).toPrecision(8);
   const validsides = ["b", "s"];
   if (!validsides.includes(side)) {
     throw new Error("Invalid side");
@@ -137,9 +142,6 @@ export async function submitorder(chainId, product, side, price, amount) {
   if (amount < 0.0001) {
     throw new Error("Quantity must be atleast 0.0001");
   }
-  const currencies = product.split("-");
-  const baseCurrency = currencies[0];
-  const quoteCurrency = currencies[1];
   let tokenBuy, tokenSell, sellQuantity;
   if (side === "b") {
     tokenBuy = currencies[0];
