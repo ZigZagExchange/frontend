@@ -164,7 +164,7 @@ class SpotForm extends React.Component {
   componentDidUpdate(prevProps, prevState) {
       // Prevents bug where price volatility can cause buy amount to be too large
       // by refreshing a maxed out buy amount to match the new price
-      if (this.props.lastPrice != prevProps.lastPrice && this.state.maxSizeSelected) {
+      if (this.props.lastPrice !== prevProps.lastPrice && this.state.maxSizeSelected) {
           this.rangeSliderHandler(null, 100);
       }
   }

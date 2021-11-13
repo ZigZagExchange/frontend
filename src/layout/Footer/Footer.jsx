@@ -9,7 +9,7 @@ import { cancelorder, cancelallorders } from "../../helpers";
 class Footer extends React.Component {
   constructor (props) {
       super(props);
-      this.state = { tab: "open_orders" };
+      this.state = { tab: "fills" };
   }
 
   setTab(value) {
@@ -39,8 +39,8 @@ class Footer extends React.Component {
                   <th>Price</th>
                   <th>Quantity</th>
                   <th>Side</th>
-                  <th>Status</th>
-                  <th></th>
+                  <th>Order Status</th>
+                  <th>TX Status</th>
                 </tr>
               </thead>
               <tbody>
