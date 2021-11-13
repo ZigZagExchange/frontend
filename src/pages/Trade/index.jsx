@@ -173,8 +173,14 @@ class Trade extends React.Component {
                           newstate.user = await getAccountState();
                       }
                       break
+                  case 'b':
+                      const txhash = update[3];
+                      filledorder = newstate.userFills.find(order => order[1] === orderid);
+                      if (filledorder) {
+                          filledorder[10] = txhash;
+                      }
+                      break
                   case 'r':
-                  default:
                       filledorder = newstate.userFills.find(order => order[1] === orderid);
                       if (filledorder) {
                           const sideText = filledorder[3] === 'b' ? "buy" : "sell";
@@ -187,6 +193,8 @@ class Trade extends React.Component {
                           filledorder[10] = txhash;
                           toast.error(`Your ${sideText} order for ${baseQuantity} ${baseCurrency} @ ${price} was rejected: ${error}`)
                       }
+                      break
+                  default:
                       break
               }
           });
