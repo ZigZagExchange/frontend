@@ -98,6 +98,11 @@
     color: #08aff3;
 }
 
+img.loading-gif {
+    width: 30px;
+    height: 30px;
+}
+
 @media screen and (max-width: 697px) {
   .ft_tabs {
     flex-wrap: wrap;

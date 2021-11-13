@@ -3,6 +3,7 @@ import React from "react";
 import "./Footer.css";
 // assets
 import logo from "../../assets/icons/footer_logo.png";
+import loadingGif from "../../assets/icons/loading.svg";
 //helpers
 import { cancelorder, cancelallorders } from "../../helpers";
 
@@ -82,7 +83,7 @@ class Footer extends React.Component {
                       <td>
                         {txHashLink ?
                             <a href={txHashLink} target="_blank" rel="noreferrer">View Tx</a> :
-                            "Pending"
+                            <span>Pending <img className="loading-gif" src={loadingGif} alt="Pending"/></span>
                         }
                       </td>
                     </tr>

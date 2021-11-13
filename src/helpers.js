@@ -131,7 +131,7 @@ export async function submitorder(chainId, product, side, price, amount) {
   const currencies = product.split("-");
   const baseCurrency = currencies[0];
   const quoteCurrency = currencies[1];
-  if (baseCurrency == "USDC" || baseCurrency == "USDT") {
+  if (baseCurrency === "USDC" || baseCurrency === "USDT") {
       amount = parseFloat(amount).toFixed(7).slice(0,-1);
   }
   price = parseFloat(price).toPrecision(8);
