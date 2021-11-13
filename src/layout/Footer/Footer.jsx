@@ -53,17 +53,22 @@ class Footer extends React.Component {
                   const baseCurrency = fill[2].split("-")[0];
                   const side = fill[3] === "b" ? "buy" : "sell";
                   const sideclassname = fill[3] === "b" ? "up_value" : "down_value";
-                  let statusText; 
+                  let statusText, statusClass; 
                   switch (fill[9]) {
                       case 'r':
                         statusText = "rejected";
+                        statusClass = "rejected";
                         break
                       case 'f':
                         statusText = "filled";
+                        statusClass = "filled";
                         break
                       default:
                       case 'm':
-                        statusText = "matched";
+                        statusText = (
+                            <span>matched <img className="loading-gif" src={loadingGif} alt="Pending"/></span>
+                        )
+                        statusClass = "matched";
                   }
                   let txHashLink;
                   if (fill[10]) {
@@ -79,11 +84,11 @@ class Footer extends React.Component {
                         {quantity} {baseCurrency}
                       </td>
                       <td className={sideclassname}>{side}</td>
-                      <td className={statusText}>{statusText}</td>
+                      <td className={statusClass}>{statusText}</td>
                       <td>
                         {txHashLink ?
                             <a href={txHashLink} target="_blank" rel="noreferrer">View Tx</a> :
-                            <span>Pending <img className="loading-gif" src={loadingGif} alt="Pending"/></span>
+                            ""
                         }
                       </td>
                     </tr>
