@@ -128,9 +128,9 @@ class SpotForm extends React.Component {
       }
       else if (this.props.lastPrice) {
           if (this.props.side === 'b')
-              price = parseFloat((this.props.lastPrice*1.0014).toPrecision(4));
+              price = parseFloat((this.props.lastPrice*1.0014).toPrecision(5));
           else if (this.props.side === 's')
-              price = parseFloat((this.props.lastPrice*0.9986).toPrecision(4));
+              price = parseFloat((this.props.lastPrice*0.9986).toPrecision(5));
       }
       else {
           price = 0;
