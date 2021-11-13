@@ -12,7 +12,7 @@ import { submitorder, currencyInfo } from "../../helpers";
 class SpotForm extends React.Component {
   constructor(props) {
       super(props);
-      this.state = { userHasEditedPrice: false, price: null, amount: "", orderButtonDisabled: false }
+      this.state = { userHasEditedPrice: false, price: null, amount: "", orderButtonDisabled: false, maxSizeSelected: false }
       this.MINIMUM_AMOUNTS = {
           "ETH": 0.004,
           "USDC": 20,
@@ -142,6 +142,12 @@ class SpotForm extends React.Component {
       if (!this.props.user.address) return false;
 
       const newstate = { ...this.state }
+      if (val === 100) {
+          newstate.maxSizeSelected = true;
+      }
+      else {
+          newstate.maxSizeSelected = false;
+      }
       if (this.props.side === 's') {
           const baseBalance = this.getBaseBalance();
           const displayAmount = (baseBalance * val / 100).toPrecision(7)
@@ -153,6 +159,14 @@ class SpotForm extends React.Component {
           newstate.amount = parseFloat(quoteAmount.slice(0,-1));
       }
       this.setState(newstate);
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+      // Prevents bug where price volatility can cause buy amount to be too large
+      // by refreshing a maxed out buy amount to match the new price
+      if (this.props.lastPrice != prevProps.lastPrice && this.state.maxSizeSelected) {
+          this.rangeSliderHandler(null, 100);
+      }
   }
 
   render() {

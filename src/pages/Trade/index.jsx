@@ -200,12 +200,16 @@ class Trade extends React.Component {
   handleOrderMatch(state, orderid) {
       let newstate = { ...state }
       const matchedorder = state.openorders.find(order => order[1] === orderid);
+      if (!matchedorder) {
+          return newstate;
+      }
       matchedorder[9] = 'm';
       const market = matchedorder[2];
       if (!newstate.marketFills[market]) {
           newstate.marketFills[market] = [];
       }
       newstate.marketFills[market].unshift(matchedorder);
+      newstate.openorders = state.openorders.filter(order => order[1] !== orderid);
       if (matchedorder && state.user.id && matchedorder[8] === state.user.id.toString()) {
           newstate.userFills.unshift(matchedorder);
           const sideText = matchedorder[3] === 'b' ? "buy" : "sell";
@@ -228,21 +232,20 @@ class Trade extends React.Component {
               newstate.user.committed.balances[quoteCurrency] = (oldQuoteQuantityUnits - quoteQuantityUnits).toFixed(0);
           }
           toast.info(`Your ${sideText} order for ${baseQuantity} ${baseCurrency} @ ${price} was matched`)
+          
+          // Run the balance check after 5 seconds to let the chain update
+          setTimeout(async () => {
+              newstate = { ...this.state };
+              try {
+                  const user = await getAccountState();
+                  newstate.user = user;
+              }
+              catch (e) {
+                  console.error(e);
+              }
+              this.setState(newstate);
+          }, 5000);
       }
-      newstate.openorders = state.openorders.filter(order => order[1] !== orderid);
-      
-      // Run the balance check after 5 seconds to let the chain update
-      setTimeout(async () => {
-          newstate = { ...this.state };
-          try {
-              const user = await getAccountState();
-              newstate.user = user;
-          }
-          catch (e) {
-              console.error(e);
-          }
-          this.setState(newstate);
-      }, 5000);
 
       return newstate
   }
