@@ -125,14 +125,6 @@ class Trade extends React.Component {
           delete newstate.openorders[matchedOrderId];
           if (success) {
             toast.success("Filled: " + swap.txHash);
-            setTimeout(async () => {
-                try {
-                    const user = await getAccountState();
-                    newstate.user = user;
-                } catch (e) {
-                    console.error(e);
-                }
-            }, 5000);
           } else {
             toast.error(swap.error.message);
           }
@@ -165,7 +157,8 @@ class Trade extends React.Component {
                           filledorder[9] = 'f';
                           filledorder[10] = txhash;
                           toast.success(`Your ${sideText} order for ${baseQuantity} ${baseCurrency} @ ${price} was filled!`)
-                          newstate.user = await getAccountState();
+                          setTimeout(this.updateUser.bind(this), 1000);
+                          setTimeout(this.updateUser.bind(this), 5000);
                       }
                       break
                   case 'b':
@@ -257,6 +250,11 @@ class Trade extends React.Component {
     }
     const newState = { ...this.state };
     newState.user = syncAccountState;
+    for (let orderid in newState.openorders) {
+        if (newState.openorders[orderid][8] === newState.user.id.toString()) {
+            newState.userOrders[orderid] = newState.openorders[orderid];
+        }
+    }
     this.setState(newState);
   }
 
