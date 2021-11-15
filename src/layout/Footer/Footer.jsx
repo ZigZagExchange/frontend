@@ -2,14 +2,15 @@ import React from "react";
 // css
 import "./Footer.css";
 // assets
+import logo from "../../assets/icons/footer_logo.png";
 import loadingGif from "../../assets/icons/loading.svg";
 //helpers
-import { cancelorder, cancelallorders } from "../../helpers";
+import { cancelorder, currencyInfo } from "../../helpers";
 
 class Footer extends React.Component {
   constructor (props) {
       super(props);
-      this.state = { tab: "fills" };
+      this.state = { tab: "orders" };
   }
 
   setTab(value) {
@@ -28,9 +29,11 @@ class Footer extends React.Component {
               explorerLink = "https://zkscan.io/explorer/accounts/" + this.props.user.address;
               baseExplorerUrl = "https://zkscan.io";
       }
-      let footerContent, classNameOpenOrders = "", classNameFills = "", classNameBalances = "";
+      let footerContent, classNameOrders = "", classNameBalances = "";
+      const userOrdersSorted = Object.values(this.props.userOrders);
+      userOrdersSorted.sort((a,b) => b[1] - a[1]);
       switch (this.state.tab) {
-        case "fills":
+        case "orders":
           footerContent = (
             <table>
               <thead>
@@ -44,16 +47,17 @@ class Footer extends React.Component {
                 </tr>
               </thead>
               <tbody>
-                {this.props.userFills.map((fill, i) => {
-                  const id = fill[1];
-                  const price = fill[4];
-                  const quantity = fill[5];
-                  const market = fill[2];
-                  const baseCurrency = fill[2].split("-")[0];
-                  const side = fill[3] === "b" ? "buy" : "sell";
-                  const sideclassname = fill[3] === "b" ? "up_value" : "down_value";
+                {userOrdersSorted.map((order, i) => {
+                  const chainid = order[0];
+                  const orderid = order[1];
+                  const price = order[4];
+                  const quantity = order[5];
+                  const market = order[2];
+                  const baseCurrency = order[2].split("-")[0];
+                  const side = order[3] === "b" ? "buy" : "sell";
+                  const sideclassname = order[3] === "b" ? "up_value" : "down_value";
                   let statusText, statusClass; 
-                  switch (fill[9]) {
+                  switch (order[9]) {
                       case 'r':
                         statusText = "rejected";
                         statusClass = "rejected";
@@ -62,21 +66,33 @@ class Footer extends React.Component {
                         statusText = "filled";
                         statusClass = "filled";
                         break
-                      default:
                       case 'm':
                         statusText = (
                             <span>matched <img className="loading-gif" src={loadingGif} alt="Pending"/></span>
                         )
                         statusClass = "matched";
+                        break
+                      case 'b':
+                        statusText = (
+                            <span>committing <img className="loading-gif" src={loadingGif} alt="Pending"/></span>
+                        )
+                        statusClass = "committing";
+                        break
+                      case 'o':
+                        statusText = "open";
+                        statusClass = "open";
+                        break
+                      default:
+                          break
                   }
                   let txHashLink;
-                  if (fill[10]) {
-                      txHashLink = baseExplorerUrl + "/explorer/transactions/" + fill[10];
+                  if (order[10]) {
+                      txHashLink = baseExplorerUrl + "/explorer/transactions/" + order[10];
                   }
                   
                       
                   return (
-                    <tr key={id}>
+                    <tr key={orderid}>
                       <td>{market}</td>
                       <td>{price}</td>
                       <td>
@@ -87,7 +103,7 @@ class Footer extends React.Component {
                       <td>
                         {txHashLink ?
                             <a href={txHashLink} target="_blank" rel="noreferrer">View Tx</a> :
-                            ""
+                            <span className="cancel_order_link" onClick={() => cancelorder(chainid, orderid)}>Cancel</span>
                         }
                       </td>
                     </tr>
@@ -96,67 +112,50 @@ class Footer extends React.Component {
               </tbody>
             </table>
           );
-          classNameFills = "selected"
+          classNameOrders = "selected"
           break
         case "balances":
-          if (this.props.user.address) {
+          if (this.props.user.committed) {
+              const balancesContent = Object.keys(this.props.user.committed.balances).map(token => {
+                  if (!currencyInfo[token]) return "";
+                  let balance = this.props.user.committed.balances[token];
+                  balance = parseInt(balance) / Math.pow(10, currencyInfo[token].decimals);
+                  return (
+                      <tr>
+                          <td>{token}</td>
+                          <td>{balance}</td>
+                      </tr>
+                  )
+              });
               footerContent = (
                 <div>
+                  <table className="balances_table">
+                    <thead>
+                        <tr>
+                            <th>Token</th>
+                            <th>Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {balancesContent}
+                    </tbody>
+                  </table>
+
                   <a href={explorerLink} target="_blank" rel="noreferrer">View Account on Explorer</a>
                 </div>
               );
           }
+          else {
+            footerContent = (
+                <div>
+                  <a href={explorerLink} target="_blank" rel="noreferrer">View Account on Explorer</a>
+                </div>
+            )
+          }
           classNameBalances = "selected"
           break;
-        case "open_orders":
         default:
-          footerContent = (
-            <table>
-              <thead>
-                <tr>
-                  <th>Market</th>
-                  <th>Price</th>
-                  <th>Quantity</th>
-                  <th>Side</th>
-                  <th>
-                    <span onClick={() => cancelallorders(this.props.chainId, this.props.user.id)} className="cancel_order_link">
-                      Cancel All
-                    </span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {this.props.openOrders.map((order, i) => {
-                  const id = order[1];
-                  const price = order[4];
-                  const quantity = order[5];
-                  const market = order[2];
-                  const baseCurrency = order[2].split("-")[0];
-                  const side = order[3] === "b" ? "buy" : "sell";
-                  const classname = order[3] === "b" ? "up_value" : "down_value";
-                  return (
-                    <tr key={id}>
-                      <td>{market}</td>
-                      <td>{price}</td>
-                      <td>
-                        {quantity} {baseCurrency}
-                      </td>
-                      <td className={classname}>{side}</td>
-                      <td>
-                        <span
-                          onClick={() => cancelorder(this.props.chainId, id)}
-                          className="cancel_order_link"
-                        >
-                          Cancel
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          );
-          classNameOpenOrders = "selected"
+          break
       }
 
       return (
@@ -166,15 +165,13 @@ class Footer extends React.Component {
               <hr />
               <div>
                 <div className="ft_tabs">
-                  <strong className={classNameOpenOrders} onClick={() => this.setTab("open_orders")}>
-                    Open Orders ({this.props.openOrders.length})
+                  <strong className={classNameOrders} onClick={() => this.setTab("orders")}>
+                    Orders ({Object.keys(this.props.userOrders).length})
                   </strong>
-                  <strong className={classNameFills} onClick={() => this.setTab("fills")}>Fills ({this.props.userFills.length})</strong>
                   <strong className={classNameBalances} onClick={() => this.setTab("balances")}>Balances</strong>
                 </div>
               </div>
-              <div className="footer_open_orders">{footerContent}</div>
-              
+              <div className="footer_orders">{footerContent}</div>
             </div>
           </div>
         </>

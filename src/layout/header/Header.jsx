@@ -103,13 +103,13 @@ const Header = (props) => {
           <div className="head_left">
           <ul>
             <li>  
-              <a target="_blank" href="https://discord.gg/zigzag">Discord</a>
+              <a target="_blank" rel="noreferrer" href="https://discord.gg/zigzag">Discord</a>
             </li>
             <li> 
-              <a target="_blank" href="https://twitter.com/ZigZagExchange">Twitter</a>
+              <a target="_blank" rel="noreferrer" href="https://twitter.com/ZigZagExchange">Twitter</a>
             </li>  
             <li>
-              <a target="_blank" href="https://t.me/zigzagexchange">Telegram</a> 
+              <a target="_blank" rel="noreferrer" href="https://t.me/zigzagexchange">Telegram</a> 
             </li>  
             </ul>
                   

@@ -67,14 +67,14 @@
   color: white;
 }
 
-.footer_open_orders {
+.footer_orders {
   margin-top: 10px;
 }
-.footer_open_orders table {
+.footer_orders table {
   width: 100%;
 }
-.footer_open_orders table tbody td,
-.footer_open_orders table thead th {
+.footer_orders table tbody td,
+.footer_orders table thead th {
   padding: 5px 15px;
   color: white;
 }
@@ -83,13 +83,13 @@
   cursor: pointer;
   color: gray;
 }
-.footer_open_orders td.matched {
-    color: yellow;
+.footer_orders td.matched {
+    color: rgb(240, 185, 11);
 }
-.footer_open_orders td.rejected {
+.footer_orders td.rejected {
     color: #c4384e;
 }
-.footer_open_orders td.filled {
+.footer_orders td.filled {
     color: #3fe199;
 }
 
@@ -105,6 +105,22 @@ img.loading-gif {
     width: 30px;
     height: 30px;
 }
+
+.footer_orders td.open {
+    color: gray;
+}
+.footer_orders td.committing {
+    color: rgb(240, 185, 11);
+}
+
+
+.balances_table {
+    color: white;
+    padding: 20px;
+    max-width: 500px;
+    margin-bottom: 30px;
+}
+
 
 @media screen and (max-width: 697px) {
   .ft_tabs {
@@ -141,3 +157,4 @@ img.loading-gif {
     font-size: 0.9rem;
   }
 }
+
