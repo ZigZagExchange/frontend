@@ -37,10 +37,10 @@ class Trade extends React.Component {
       chainId: 1,
       user: {},
       marketFills: {},
-      userFills: [],
+      userOrders: {},
       marketSummary: {},
       lastPrices: {},
-      openorders: [],
+      openorders: {},
       liquidity: [],
       currentMarket: "ETH-USDT",
       marketDataTab: "openorders",
@@ -56,14 +56,23 @@ class Trade extends React.Component {
         case "openorders":
           newstate = { ...this.state };
           const openorders = msg.args[0];
-          newstate.openorders.push(...openorders);
+          openorders.forEach(openorder => {
+              if (openorder[2] === this.state.currentMarket) {
+                  newstate.openorders[openorder[1]] = openorder;
+              }
+          });
           
           // zksync warning if more than one limit order is open
           if (this.state.user.id) {
-              const containsUserOrder = openorders.find(o => o[8] === this.state.user.id.toString());
-              const userOrderCount = newstate.openorders.filter(o => o[8] === this.state.user.id.toString()).length;
-              if (containsUserOrder && userOrderCount > 1) {
-                  toast.warn("Due to limitations of zksync 1.0, newer orders that are filled will cancel older orders. It is recommended to only have one open order at a time.", { autoClose: 15000 });
+              for (let i in openorders) {
+                  if (openorders[i][8] === this.state.user.id.toString()) {
+                      const orderid = openorders[i][1];
+                      newstate.userOrders[orderid] = openorders[i];
+                  }
+              }
+              const userOpenOrders = Object.values(newstate.userOrders).filter(o => o[9] === 'o');
+              if (userOpenOrders.length > 1) {
+                  toast.warn("Filling a new order will cancel all previous orders. It is recommended to only have one open order at a time.", { autoClose: 15000 });
               }
           }
           this.setState(newstate);
@@ -111,9 +120,7 @@ class Trade extends React.Component {
             msg.args[3]
           );
           newstate = { ...this.state };
-          newstate.openorders = newstate.openorders.filter(
-            (order) => order[1] !== matchedOrderId
-          );
+          delete newstate.openorders[matchedOrderId];
           if (success) {
             toast.success("Filled: " + swap.txHash);
             setTimeout(async () => {
@@ -139,13 +146,14 @@ class Trade extends React.Component {
               let filledorder;
               switch (newstatus) {
                   case 'c':
-                      newstate.openorders = newstate.openorders.filter(order => order[1] !== orderid);
+                      delete newstate.openorders[orderid];
+                      delete newstate.userOrders[orderid];
                       break
                   case 'm':
                       newstate = this.handleOrderMatch(newstate, orderid);
                       break
                   case 'f':
-                      filledorder = newstate.userFills.find(order => order[1] === orderid);
+                      filledorder = newstate.userOrders[orderid];
                       if (filledorder) {
                           const txhash = update[3];
                           const sideText = filledorder[3] === 'b' ? "buy" : "sell";
@@ -175,13 +183,14 @@ class Trade extends React.Component {
                       break
                   case 'b':
                       const txhash = update[3];
-                      filledorder = newstate.userFills.find(order => order[1] === orderid);
+                      filledorder = newstate.userOrders[orderid];
                       if (filledorder) {
+                          filledorder[9] = 'b';
                           filledorder[10] = txhash;
                       }
                       break
                   case 'r':
-                      filledorder = newstate.userFills.find(order => order[1] === orderid);
+                      filledorder = newstate.userOrders[orderid];
                       if (filledorder) {
                           const sideText = filledorder[3] === 'b' ? "buy" : "sell";
                           const txhash = update[3];
@@ -223,7 +232,7 @@ class Trade extends React.Component {
 
   handleOrderMatch(state, orderid) {
       let newstate = { ...state }
-      const matchedorder = state.openorders.find(order => order[1] === orderid);
+      const matchedorder = state.openorders[orderid];
       if (!matchedorder) {
           return newstate;
       }
@@ -233,14 +242,11 @@ class Trade extends React.Component {
           newstate.marketFills[market] = [];
       }
       newstate.marketFills[market].unshift(matchedorder);
-      newstate.openorders = state.openorders.filter(order => order[1] !== orderid);
+      delete newstate.openorders[orderid];
       if (matchedorder && state.user.id && matchedorder[8] === state.user.id.toString()) {
-          newstate.userFills.unshift(matchedorder);
-          const sideText = matchedorder[3] === 'b' ? "buy" : "sell";
-          const baseCurrency = matchedorder[2].split('-')[0];
-          const baseQuantity = matchedorder[5];
-          const price = matchedorder[4];
-          toast.info(`Your ${sideText} order for ${baseQuantity} ${baseCurrency} @ ${price} was matched`)
+          if (!newstate.userOrders[matchedorder[1]]) {
+              newstate.userOrders[matchedorder[1]] = matchedorder;
+          }
       }
 
       return newstate
@@ -321,7 +327,7 @@ class Trade extends React.Component {
     if (this.state.chainId !== chainId) {
         newState.user = {};
     }
-    newState.openorders = [];
+    newState.openorders = {};
     newState.liquidity = [];
     newState.marketSummary = {};
     newState.chainId = chainId;
@@ -355,14 +361,13 @@ class Trade extends React.Component {
     const openOrdersData = [];
     const orderbookBids = [];
     const orderbookAsks = [];
-    const useropenorders = [];
-    this.state.openorders.forEach((order) => {
+    for (let orderid in this.state.openorders) {
+      const order = this.state.openorders[orderid];
       const market = order[2];
       const side = order[3];
       const price = order[4];
       const baseQuantity = order[5];
       const quoteQuantity = order[6];
-      const userId = order[8];
       let spotPrice;
       try {
           spotPrice = this.state.lastPrices[market].price;
@@ -376,12 +381,9 @@ class Trade extends React.Component {
         side,
         order: order,
       };
-      if (parseInt(userId) === this.state.user.id) {
-        useropenorders.push(order);
-      } 
       // Only display Market Making orders within 2% of spot
       // No one is going to fill outside that range
-      else if (spotPrice && price > spotPrice * 0.98 && price < spotPrice * 1.02) {
+      if (spotPrice && price > spotPrice * 0.98 && price < spotPrice * 1.02) {
         openOrdersData.push(orderrow);
       }
       if (side === "b") {
@@ -389,7 +391,7 @@ class Trade extends React.Component {
       } else if (side === "s") {
         orderbookAsks.push(orderrow);
       }
-    });
+    }
 
     const fillData = [];
     if (this.state.marketFills[this.state.currentMarket]) {
@@ -432,6 +434,9 @@ class Trade extends React.Component {
         openOrdersLatestTradesData = fillData;
     }
 
+    const activeOrderStatuses = ['o','m','b'];
+    const activeUserOrders = Object.values(this.state.userOrders).filter(order => activeOrderStatuses.includes(order[9])).length;
+
     return (
       <>
         <ToastContainer position="bottom-right" theme="colored" />
@@ -458,6 +463,7 @@ class Trade extends React.Component {
                 user={this.state.user}
                 chainId={this.state.chainId}
                 currentMarket={this.state.currentMarket}
+                activeOrderCount={activeUserOrders}
               />
             </div>
             <div className="col-12 col-xl-6">
@@ -518,7 +524,7 @@ class Trade extends React.Component {
               </div>
             </div>
           </div>
-          <Footer userFills={this.state.userFills} openOrders={useropenorders} user={this.state.user} chainId={this.state.chainId} />
+          <Footer userOrders={this.state.userOrders} user={this.state.user} chainId={this.state.chainId} />
         </div>
       </>
     );

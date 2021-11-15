@@ -47,6 +47,7 @@ class SpotBox extends React.Component {
                 chainId={this.props.chainId}
                 currentMarket={this.props.currentMarket}
                 orderType={this.state.orderType}
+                activeOrderCount={this.props.activeOrderCount}
               />
               <SpotForm
                 side="s"
@@ -56,6 +57,7 @@ class SpotBox extends React.Component {
                 chainId={this.props.chainId}
                 currentMarket={this.props.currentMarket}
                 orderType={this.state.orderType}
+                activeOrderCount={this.props.activeOrderCount}
               />
             </div>
           </div>

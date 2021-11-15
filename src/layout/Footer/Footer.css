@@ -64,14 +64,14 @@
   color: white;
 }
 
-.footer_open_orders {
+.footer_orders {
   margin-top: 10px;
 }
-.footer_open_orders table {
+.footer_orders table {
   width: 100%;
 }
-.footer_open_orders table tbody td,
-.footer_open_orders table thead th {
+.footer_orders table tbody td,
+.footer_orders table thead th {
   padding: 5px 15px;
   color: white;
 }
@@ -80,14 +80,26 @@
   cursor: pointer;
   color: gray;
 }
-.footer_open_orders td.matched {
+.footer_orders td.open {
+    color: gray;
+}
+.footer_orders td.matched {
     color: yellow;
 }
-.footer_open_orders td.rejected {
+.footer_orders td.committing {
+    color: yellow;
+}
+.footer_orders td.rejected {
     color: #c4384e;
 }
-.footer_open_orders td.filled {
+.footer_orders td.filled {
     color: #3fe199;
+}
+.balances_table {
+    color: white;
+    padding: 20px;
+    max-width: 500px;
+    margin-bottom: 30px;
 }
 
 .footer_links {
