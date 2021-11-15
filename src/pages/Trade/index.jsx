@@ -27,7 +27,6 @@ import {
   signinzksync,
   broadcastfill,
   getAccountState,
-  currencyInfo
 } from "../../helpers";
 
 class Trade extends React.Component {
@@ -48,6 +47,9 @@ class Trade extends React.Component {
   }
 
   componentDidMount() {
+    // Update user every 10 seconds
+    setInterval(this.updateUser.bind(this), 10000);
+
     zigzagws.addEventListener("message", async (e) => {
       console.log(e.data);
       const msg = JSON.parse(e.data);
@@ -157,24 +159,9 @@ class Trade extends React.Component {
                       if (filledorder) {
                           const txhash = update[3];
                           const sideText = filledorder[3] === 'b' ? "buy" : "sell";
-                          const side = filledorder[3];
                           const baseCurrency = filledorder[2].split('-')[0];
-                          const quoteCurrency = filledorder[2].split('-')[1];
                           const baseQuantity = filledorder[5];
-                          const quoteQuantity = filledorder[6];
                           const price = filledorder[4];
-                          const baseQuantityUnits = baseQuantity * Math.pow(10, currencyInfo[baseCurrency].decimals);
-                          const quoteQuantityUnits = quoteQuantity * Math.pow(10, currencyInfo[quoteCurrency].decimals);
-                          const oldBaseQuantityUnits = parseFloat(newstate.user.committed.balances[baseCurrency]);
-                          const oldQuoteQuantityUnits = parseFloat(newstate.user.committed.balances[quoteCurrency]);
-                          if (side === 's') {
-                              newstate.user.committed.balances[baseCurrency] = (oldBaseQuantityUnits - baseQuantityUnits).toFixed(0);
-                              newstate.user.committed.balances[quoteCurrency] = (oldQuoteQuantityUnits + quoteQuantityUnits).toFixed(0);
-                          }
-                          else if (side === 'b') {
-                              newstate.user.committed.balances[baseCurrency] = (oldBaseQuantityUnits + baseQuantityUnits).toFixed(0);
-                              newstate.user.committed.balances[quoteCurrency] = (oldQuoteQuantityUnits - quoteQuantityUnits).toFixed(0);
-                          }
                           filledorder[9] = 'f';
                           filledorder[10] = txhash;
                           toast.success(`Your ${sideText} order for ${baseQuantity} ${baseCurrency} @ ${price} was filled!`)
@@ -228,6 +215,14 @@ class Trade extends React.Component {
           this.setState(newState);
         });
     }
+  }
+
+  async updateUser() {
+      if (this.state.user.id) {
+          const newstate = { ...this.state }
+          newstate.user = await getAccountState();
+          this.setState(newstate);
+      }
   }
 
   handleOrderMatch(state, orderid) {
@@ -368,6 +363,7 @@ class Trade extends React.Component {
       const price = order[4];
       const baseQuantity = order[5];
       const quoteQuantity = order[6];
+      const orderstatus = order[9];
       let spotPrice;
       try {
           spotPrice = this.state.lastPrices[market].price;
@@ -386,9 +382,9 @@ class Trade extends React.Component {
       if (spotPrice && price > spotPrice * 0.98 && price < spotPrice * 1.02) {
         openOrdersData.push(orderrow);
       }
-      if (side === "b") {
+      if (side === "b" && orderstatus === 'o') {
         orderbookBids.push(orderrow);
-      } else if (side === "s") {
+      } else if (side === "s" && orderstatus === 'o') {
         orderbookAsks.push(orderrow);
       }
     }
