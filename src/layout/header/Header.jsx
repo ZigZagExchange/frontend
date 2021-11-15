@@ -100,6 +100,20 @@ const Header = (props) => {
               </li>
             </ul>
           </div>
+          <div className="head_left">
+          <ul>
+            <li>  
+              <a target="_blank" href="https://discord.gg/zigzag">Discord</a>
+            </li>
+            <li> 
+              <a target="_blank" href="https://twitter.com/ZigZagExchange">Twitter</a>
+            </li>  
+            <li>
+              <a target="_blank" href="https://t.me/zigzagexchange">Telegram</a> 
+            </li>  
+            </ul>
+                  
+                </div>
           <div className="head_right">
             {props.user.address ? (
               <button className="address_button">

@@ -1,4 +1,5 @@
 .spot_box {
+  border-radius: 5px;
   width: 100%;
   height: max-content;
   padding-bottom: 20px;
@@ -53,14 +54,15 @@
 }
 
 .sh_r {
+  border-radius: 1px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
   width: 90%;
   height: 45px;
   background-color: #1c2029;
-  border-left: 1px solid #94a2c9;
-  border-bottom: 1px solid #94a2c9;
+  border-left: 1px solid #08aff3;
+  border-bottom: 1px solid #08aff3;
   padding-right: 20px;
 }
 

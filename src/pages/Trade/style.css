@@ -2,7 +2,7 @@
   width: 100%;
   min-height: 100vh;
   height: 100%;
-  background-image: url(../../assets/images/Background.png);
+  background-color: #1c2231;
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
@@ -18,9 +18,11 @@
 }
 
 .trade_left {
+  border-radius: 10px;
   width: 100%;
   height: max-content;
   background-color: #171c28;
+  padding: 20px;
 }
 
 .trade_left > div {
@@ -40,6 +42,7 @@
 }
 
 .trade_Price {
+  border-radius: 5px;
   width: 90%;
   margin: 0 auto;
   height: 100%;
@@ -48,11 +51,13 @@
 }
 
 .trade_price2 {
-  height: 515px;
+  
+  height: 544px;
 }
 
 .trade_Price::-webkit-scrollbar,
 .trade_price_btc::-webkit-scrollbar {
+  
   width: 5px;
   height: 5px;
   position: relative;
@@ -78,6 +83,7 @@
 }
 
 .trade_price_btc {
+  border-radius: 10px;
   width: 90%;
   margin: 0 auto;
   height: 100%;
@@ -107,6 +113,7 @@
   }
 }
 .trade_price_head_third {
+  border-radius: 10px;
   display: flex;
   align-items: center;
   color: #94a2c9;
@@ -114,6 +121,7 @@
 }
 
 .trade_price_head_third strong {
+  border-radius: 10px;
   font-size: 1rem;
   margin: 0 auto;
   cursor: pointer;
