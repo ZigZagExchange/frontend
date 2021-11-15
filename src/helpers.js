@@ -55,7 +55,7 @@ zigzagws.addEventListener("open", function () {
     setInterval(pingServer, 5000);
 });
 zigzagws.addEventListener("close", function () {
-    toast.error("Connection to server closed. Please refresh the page", { autoClose: false });
+    toast.error("Connection to server closed. Please refresh the page");
 });
 
 export async function getAccountState() {

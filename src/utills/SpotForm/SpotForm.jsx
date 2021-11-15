@@ -44,10 +44,6 @@ class SpotForm extends React.Component {
   }
 
   async buySellHandler(e) {
-    if (this.props.activeOrderCount > 0) {
-        toast.error("Only one active order permitted at a time");
-        return
-    }
     const baseCurrency = this.props.currentMarket.split("-")[0];
     const quoteCurrency = this.props.currentMarket.split("-")[1];
     let baseBalance, quoteBalance;

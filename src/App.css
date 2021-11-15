@@ -17,10 +17,6 @@ p {
 
 body {
   height: 100vh;
-  background-image: url(./assets/images/Background.png);
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
   font-size: 0.9rem;
 }
 

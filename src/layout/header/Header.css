@@ -68,13 +68,13 @@ header {
 }
 
 .eu_text {
-  margin: 0 40px;
+  margin: 0 20px;
 }
 .eu_text select {
   background: #191c28;
-  color: white;
-  border: 1px solid white;
-  border-radius: 50px;
+  color: #08aff3;
+  border: 1px solid #08aff3;
+  border-radius: 10px;
   padding: 10px;
 }
 
