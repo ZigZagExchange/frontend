@@ -257,6 +257,11 @@ class Trade extends React.Component {
     }
     const newState = { ...this.state };
     newState.user = syncAccountState;
+    for (let orderid in newState.openorders) {
+        if (newState.openorders[orderid][8] === newState.user.id.toString()) {
+            newState.userOrders[orderid] = newState.openorders[orderid];
+        }
+    }
     this.setState(newState);
   }
 
