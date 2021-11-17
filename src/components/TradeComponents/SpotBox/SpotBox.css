@@ -64,6 +64,8 @@
   border-left: 1px solid #08aff3;
   border-bottom: 1px solid #08aff3;
   padding-right: 20px;
+  color: white;
+  font-size: 0.7rem;
 }
 
 .sh_r span,

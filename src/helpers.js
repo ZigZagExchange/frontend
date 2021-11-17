@@ -55,7 +55,7 @@ zigzagws.addEventListener("open", function () {
     setInterval(pingServer, 5000);
 });
 zigzagws.addEventListener("close", function () {
-    toast.error("Connection to server closed. Please refresh the page");
+    toast.error("Connection to server closed. Please refresh the page", { autoClose: false });
 });
 
 export async function getAccountState() {
@@ -121,7 +121,7 @@ export async function signinzksync(chainid) {
 export async function changepubkeyzksync() {
   const changePubkey = await syncWallet.setSigningKey({
     feeToken: "ETH",
-    ethAuthType: "ECDSA",
+    ethAuthType: "ECDSALegacyMessage",
   });
   const receipt = await changePubkey.awaitReceipt();
   console.log(receipt);

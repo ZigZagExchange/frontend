@@ -3,7 +3,6 @@ import { toast } from 'react-toastify';
 // css
 import "./SpotBox.css";
 // assets
-import threeDotIcon from "../../../assets/icons/threedot-icon.png";
 import SpotForm from "../../../utills/SpotForm/SpotForm";
 
 class SpotBox extends React.Component {
@@ -34,7 +33,7 @@ class SpotBox extends React.Component {
                 <h2>SPOT</h2>
               </div>
               <div className="sh_r">
-                <img src={threeDotIcon} alt="..." />
+                Current Fee: 0%
               </div>
             </div>
             <div className="spot_tabs">
