@@ -1,4 +1,5 @@
 import React from "react";
+import { toast } from 'react-toastify';
 // css
 import "./SpotBox.css";
 // assets
@@ -12,6 +13,10 @@ class SpotBox extends React.Component {
   }
 
   updateOrderType(orderType) {
+      if (orderType === "limit") {
+          toast.error("Limit orders disabled on zksync");
+          return
+      }
       const newstate = { ...this.state, orderType }
       this.setState(newstate);
   }

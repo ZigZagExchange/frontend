@@ -127,7 +127,7 @@ class SpotForm extends React.Component {
 
   currentPrice() {
       let price;
-      if (this.state.userHasEditedPrice && this.props.orderType === "limit") {
+      if (this.props.orderType === "limit") {
           price = this.state.price;
       }
       else if (this.props.lastPrice) {

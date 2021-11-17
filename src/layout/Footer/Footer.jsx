@@ -2,7 +2,6 @@ import React from "react";
 // css
 import "./Footer.css";
 // assets
-import logo from "../../assets/icons/footer_logo.png";
 import loadingGif from "../../assets/icons/loading.svg";
 //helpers
 import { cancelorder, currencyInfo } from "../../helpers";
@@ -53,6 +52,7 @@ class Footer extends React.Component {
                   const price = order[4];
                   const quantity = order[5];
                   const market = order[2];
+                  const orderstatus = order[9];
                   const baseCurrency = order[2].split("-")[0];
                   const side = order[3] === "b" ? "buy" : "sell";
                   const sideclassname = order[3] === "b" ? "up_value" : "down_value";
@@ -103,7 +103,8 @@ class Footer extends React.Component {
                       <td>
                         {txHashLink ?
                             <a href={txHashLink} target="_blank" rel="noreferrer">View Tx</a> :
-                            <span className="cancel_order_link" onClick={() => cancelorder(chainid, orderid)}>Cancel</span>
+                            (orderstatus === 'o') ?  <span className="cancel_order_link" onClick={() => cancelorder(chainid, orderid)}>Cancel</span> :
+                            ""
                         }
                       </td>
                     </tr>

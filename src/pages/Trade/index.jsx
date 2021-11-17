@@ -35,7 +35,7 @@ class Trade extends React.Component {
     this.state = {
       chainId: 1,
       user: {},
-      marketFills: {},
+      marketFills: [],
       userOrders: {},
       marketSummary: {},
       lastPrices: {},
@@ -79,6 +79,24 @@ class Trade extends React.Component {
           }
           this.setState(newstate);
           break;
+        case "fillhistory":
+          newstate = { ...this.state };
+          const fillhistory = msg.args[0];
+          fillhistory.forEach(fill => {
+              if (fill[2] === this.state.currentMarket) {
+                  newstate.marketFills.unshift(fill);
+              }
+          });
+          this.setState(newstate);
+          break
+        case "userorders":
+          newstate = { ...this.state };
+          const userorders = msg.args[0];
+          userorders.forEach(order => {
+              newstate.userOrders[order[1]] = order;
+          });
+          this.setState(newstate);
+          break
         case "marketsummary":
           this.setState({
             ...this.state,
@@ -225,11 +243,7 @@ class Trade extends React.Component {
           return newstate;
       }
       matchedorder[9] = 'm';
-      const market = matchedorder[2];
-      if (!newstate.marketFills[market]) {
-          newstate.marketFills[market] = [];
-      }
-      newstate.marketFills[market].unshift(matchedorder);
+      newstate.marketFills.unshift(matchedorder);
       delete newstate.openorders[orderid];
       if (matchedorder && state.user.id && matchedorder[8] === state.user.id.toString()) {
           if (!newstate.userOrders[matchedorder[1]]) {
@@ -323,6 +337,7 @@ class Trade extends React.Component {
     newState.openorders = {};
     newState.liquidity = [];
     newState.marketSummary = {};
+    newState.marketFills = [];
     newState.chainId = chainId;
     newState.currentMarket = market;
     this.setState(newState);
@@ -388,11 +403,9 @@ class Trade extends React.Component {
     }
 
     const fillData = [];
-    if (this.state.marketFills[this.state.currentMarket]) {
-        this.state.marketFills[this.state.currentMarket].forEach(fill => {
-            fillData.push({ td1: fill[4], td2: fill[5], td3: fill[6], side: fill[3] });
-        });
-    }
+    this.state.marketFills.forEach(fill => {
+        fillData.push({ td1: fill[4], td2: fill[5], td3: fill[6], side: fill[3] });
+    });
 
     this.state.liquidity.forEach((liq) => {
       const quantity = liq[0];
