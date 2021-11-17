@@ -148,6 +148,9 @@ class SpotForm extends React.Component {
       const newstate = { ...this.state }
       if (val === 100) {
           newstate.maxSizeSelected = true;
+          if (this.props.side === 'b') {
+              val = 99;
+          }
       }
       else {
           newstate.maxSizeSelected = false;
