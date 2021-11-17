@@ -82,8 +82,11 @@ class Footer extends React.Component {
                         statusText = "open";
                         statusClass = "open";
                         break
+                      case 'c':
                       default:
-                          break
+                        statusText = "canceled";
+                        statusClass = "canceled";
+                        break
                   }
                   let txHashLink;
                   if (order[10]) {

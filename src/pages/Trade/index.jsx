@@ -159,7 +159,7 @@ class Trade extends React.Component {
               switch (newstatus) {
                   case 'c':
                       delete newstate.openorders[orderid];
-                      delete newstate.userOrders[orderid];
+                      newstate.userOrders[orderid][9] = 'c';
                       break
                   case 'm':
                       newstate = this.handleOrderMatch(newstate, orderid);

@@ -112,6 +112,9 @@ img.loading-gif {
 .footer_orders td.committing {
     color: rgb(240, 185, 11);
 }
+.footer_orders td.canceled {
+    color: #b9848d;
+}
 
 
 .balances_table {
