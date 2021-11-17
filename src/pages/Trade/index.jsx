@@ -42,7 +42,7 @@ class Trade extends React.Component {
       openorders: {},
       liquidity: [],
       currentMarket: "ETH-USDT",
-      marketDataTab: "openorders",
+      marketDataTab: "fills",
     };
   }
 
@@ -159,7 +159,9 @@ class Trade extends React.Component {
               switch (newstatus) {
                   case 'c':
                       delete newstate.openorders[orderid];
-                      newstate.userOrders[orderid][9] = 'c';
+                      if (newstate.userOrders[orderid]) {
+                          newstate.userOrders[orderid][9] = 'c';
+                      }
                       break
                   case 'm':
                       newstate = this.handleOrderMatch(newstate, orderid);
