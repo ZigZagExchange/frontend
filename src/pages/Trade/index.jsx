@@ -480,7 +480,6 @@ class Trade extends React.Component {
                 <div className="col-12 col-sm-12 col-md-12 col-lg-6">
                   <div className="trade_Price">
                     {/* Trade Price Head */}
-                    <TradePriceHead />
                     {/* Trade Price Table*/}
                     <TradePriceTable
                       className="tpt_1"

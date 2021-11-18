@@ -1,8 +1,8 @@
 .trade_price_table {
   display: block;
   overflow: auto;
-  height: 350px;
-  padding: 0 20px;
+  height: 415px;
+  padding: 20px 20px 0 20px;
 }
 
 .trade_price_table::-webkit-scrollbar {
