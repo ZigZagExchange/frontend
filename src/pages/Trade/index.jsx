@@ -5,7 +5,6 @@ import "react-toastify/dist/ReactToastify.css";
 // Components
 import TradeChart from "../../components/Chart/TradeChart/TradeChart";
 import TradeHead from "../../components/TradeComponents/TradeHead/TradeHead";
-import TradePriceHead from "../../components/TradeComponents/TradePriceHead/TradePriceHead";
 import TradePriceTable from "../../components/TradeComponents/TradePriceTable/TradePriceTable";
 
 // Layout
