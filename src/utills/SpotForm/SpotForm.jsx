@@ -235,7 +235,7 @@ class SpotForm extends React.Component {
             <div className="spf_input_box">
               <span className="spf_desc_text">Price</span>
               <input type="text" value={price} onChange={this.updatePrice.bind(this)} disabled={this.priceIsDisabled()}  />
-              <span className={this.priceIsDisabled() ? "text-disabled" : ""}>USDT</span>
+              <span className={this.priceIsDisabled() ? "text-disabled" : ""}>{quoteCurrency}</span>
             </div>
             <div className="spf_input_box">
               <span className="spf_desc_text">Amount</span>
