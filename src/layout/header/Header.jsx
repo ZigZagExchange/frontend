@@ -88,7 +88,7 @@ const Header = (props) => {
         {/* desktop header */}
         <div className="d-flex align-items-center justify-content-between w-100 dex_h">
           <div className="head_left">
-            <img src={logo} alt="logo" />
+            <a href="http://info.zigzag.exchange" rel="noreferrer"><img src={logo} alt="logo" /></a>
             <ul>
               <li>
                 <NavLink exact to="/" activeClassName="active_link">

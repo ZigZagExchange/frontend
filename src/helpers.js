@@ -109,7 +109,12 @@ export async function signinzksync(chainid) {
 
   const signingKeySet = await syncWallet.isSigningKeySet();
   if (!signingKeySet) {
-    toast.info("You need to sign a one-time transaction to activate your zksync account. The fee for this tx will be ~0.003 ETH (~$15)");
+    if (chainid === 1) {
+        toast.info("You need to sign a one-time transaction to activate your zksync account. The fee for this tx will be ~0.003 ETH (~$15)");
+    }
+    else if (chainid === 1000) {
+        toast.info("You need to sign a one-time transaction to activate your zksync account.");
+    }
     await changepubkeyzksync();
   }
   const msg = { op: "login", args: [chainid, syncAccountState.id.toString()] };
