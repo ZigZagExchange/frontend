@@ -44,7 +44,13 @@ class SpotForm extends React.Component {
   }
 
   async buySellHandler(e) {
-    const amount = parseFloat(this.state.amount.replace(',', '.'));
+    let amount;
+    if (typeof this.state.amount === "string") {
+        amount = parseFloat(this.state.amount.replace(',', '.'));
+    }
+    else {
+        amount = this.state.amount;
+    }
     if (isNaN(amount)) {
         toast.error("Amount is not a number");
         return
