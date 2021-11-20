@@ -44,6 +44,11 @@ class SpotForm extends React.Component {
   }
 
   async buySellHandler(e) {
+    const amount = parseFloat(this.state.amount.replace(',', '.'));
+    if (isNaN(amount)) {
+        toast.error("Amount is not a number");
+        return
+    }
     if (this.props.activeOrderCount > 0) {
         toast.error("Only one active order permitted at a time");
         return
@@ -70,15 +75,15 @@ class SpotForm extends React.Component {
         toast.error(`No ${quoteCurrency} balance`);
         return
     }
-    else if (this.props.side === 's'  && this.state.amount > baseBalance) {
+    else if (this.props.side === 's'  && amount > baseBalance) {
         toast.error(`Amount exceeds ${baseCurrency} balance`);
         return
     }
-    else if (this.state.amount < this.MINIMUM_AMOUNTS[baseCurrency]) {
+    else if (amount < this.MINIMUM_AMOUNTS[baseCurrency]) {
         toast.error(`Minimum order size is ${this.MINIMUM_AMOUNTS[baseCurrency]} ${baseCurrency}`);
         return
     }
-    else if (this.props.side === 'b' && this.state.amount*price > quoteBalance) {
+    else if (this.props.side === 'b' && amount*price > quoteBalance) {
         toast.error(`Total exceeds ${quoteCurrency} balance`);
         return
     }
@@ -93,7 +98,7 @@ class SpotForm extends React.Component {
     const orderPendingToast = toast.info("Order pending. Sign or Cancel to continue...");
 
     try {
-      await submitorder(this.props.chainId, this.props.currentMarket, this.props.side, price, this.state.amount);
+      await submitorder(this.props.chainId, this.props.currentMarket, this.props.side, price, amount);
     } catch (e) {
       console.log(e);
       toast.error(e.message);

@@ -160,6 +160,8 @@ export async function submitorder(chainId, product, side, price, amount) {
   const tokenRatio = {};
   tokenRatio[baseCurrency] = 1;
   tokenRatio[quoteCurrency] = price;
+  const now_unix = Date.now() / 1000 | 0;
+  const three_minute_expiry = now_unix + 180;
   const order = await syncWallet.getOrder({
     tokenSell,
     tokenBuy,
@@ -168,6 +170,7 @@ export async function submitorder(chainId, product, side, price, amount) {
       sellQuantity
     ),
     ratio: zksync.utils.tokenRatio(tokenRatio),
+    validUntil: three_minute_expiry
   });
   console.log("sending limit order", order);
   const msg = { op: "submitorder", args: [chainId, order] };
