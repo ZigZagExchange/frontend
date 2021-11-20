@@ -1,6 +1,7 @@
 import * as zksync from "zksync";
 import { ethers } from "ethers";
 import { toast } from 'react-toastify';
+import { getStarknet } from "@argent/get-starknet"
 
 // Data
 //const zkTokenIds = {
@@ -61,6 +62,33 @@ zigzagws.addEventListener("close", function () {
 export async function getAccountState() {
   const syncAccountState = await syncWallet.getAccountState();
   return syncAccountState;
+}
+
+export async function signin(chainid) {
+    if (chainid === 1 || chainid === 1000) {
+        return await signinzksync();
+    }
+    else if (chainid === 1001) {
+        return await signinstarknet();
+    }
+}
+
+export async function signinstarknet(chainid) {
+    // check if wallet extension is installed and initialized. Shows a modal prompting the user to download ArgentX otherwise.
+    const starknet = getStarknet({ showModal: true })
+    const [userWalletContractAddress] = await starknet.enable() // may throws when no extension is detected
+    console.log(userWalletContractAddress);
+
+    // check if connection was successful
+    if(starknet.isConnected) {
+        // If the extension was installed and successfully connected, you have access to a starknet.js Signer object to do all kind of requests through the users wallet contract.
+        //starknet.signer.invokeFunction({ ... })
+        console.log("connected")
+    } else {
+        // In case the extension wasn't successfully connected you still have access to a starknet.js Provider to read starknet states and sent anonymous transactions
+        //starknet.provider.callContract( ... )
+        console.error("not connected")
+    }
 }
 
 export async function signinzksync(chainid) {

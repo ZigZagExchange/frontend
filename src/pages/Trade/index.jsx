@@ -23,7 +23,7 @@ import SpotBox from "../../components/TradeComponents/SpotBox/SpotBox";
 import {
   zigzagws,
   sendfillrequest,
-  signinzksync,
+  signin,
   broadcastfill,
   getAccountState,
 } from "../../helpers";
@@ -258,7 +258,7 @@ class Trade extends React.Component {
   async signInHandler() {
     let syncAccountState;
     try {
-      syncAccountState = await signinzksync(this.state.chainId);
+      syncAccountState = await signin(this.state.chainId);
     } catch (e) {
       toast.error(e.message);
       return false;
@@ -334,6 +334,13 @@ class Trade extends React.Component {
     );
     if (this.state.chainId !== chainId) {
         newState.user = {};
+        newState.userOrders = {};
+        zigzagws.send(
+          JSON.stringify({
+            op: "login",
+            args: [this.state.chainId],
+          })
+        );
     }
     newState.openorders = {};
     newState.liquidity = [];
