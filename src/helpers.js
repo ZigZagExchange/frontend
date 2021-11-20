@@ -66,10 +66,10 @@ export async function getAccountState() {
 
 export async function signin(chainid) {
     if (chainid === 1 || chainid === 1000) {
-        return await signinzksync();
+        return await signinzksync(chainid);
     }
     else if (chainid === 1001) {
-        return await signinstarknet();
+        return await signinstarknet(chainid);
     }
 }
 

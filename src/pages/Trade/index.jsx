@@ -265,6 +265,7 @@ class Trade extends React.Component {
     }
     const newState = { ...this.state };
     newState.user = syncAccountState;
+    newState.user.isSignedIn = true;
     for (let orderid in newState.openorders) {
         if (newState.openorders[orderid][8] === newState.user.id.toString()) {
             newState.userOrders[orderid] = newState.openorders[orderid];
@@ -334,13 +335,6 @@ class Trade extends React.Component {
     );
     if (this.state.chainId !== chainId) {
         newState.user = {};
-        newState.userOrders = {};
-        zigzagws.send(
-          JSON.stringify({
-            op: "login",
-            args: [this.state.chainId],
-          })
-        );
     }
     newState.openorders = {};
     newState.liquidity = [];
