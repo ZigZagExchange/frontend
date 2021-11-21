@@ -160,7 +160,7 @@ export async function submitorder(chainId, product, side, price, amount) {
   } else if (side === "s") {
     tokenBuy = currencies[1];
     tokenSell = currencies[0];
-    buyQuantity = prasamount * price;
+    buyQuantity = amount * price;
     sellQuantity = parseFloat(amount);
   }
   sellQuantityWithFee = sellQuantity + currencyInfo[tokenSell].gasFee;
