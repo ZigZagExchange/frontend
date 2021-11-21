@@ -89,6 +89,7 @@ export async function signinstarknet(chainid) {
         //starknet.provider.callContract( ... )
         console.error("not connected")
     }
+    return { address: userWalletContractAddress, id: userWalletContractAddress, committed: { balances: {} } }
 }
 
 export async function signinzksync(chainid) {

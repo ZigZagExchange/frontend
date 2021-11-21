@@ -230,7 +230,7 @@ class Trade extends React.Component {
   }
 
   async updateUser() {
-      if (this.state.user.id) {
+      if (this.state.user.id && this.state.chainId !== 1001) {
           const newstate = { ...this.state }
           newstate.user = await getAccountState();
           this.setState(newstate);
