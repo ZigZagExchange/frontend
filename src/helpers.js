@@ -263,3 +263,14 @@ export async function cancelorder(chainid, orderid) {
   zigzagws.send(JSON.stringify(msg));
   return true;
 }
+
+export function getDetailsWithoutFee(order) {
+    const baseQuantity = order[5];
+    const quoteQuantity = order[6];
+    const baseCurrency = order[2].split("-")[0];
+    const fee = currencyInfo[baseCurrency].gasFee;
+    const baseQuantityWithoutFee = baseQuantity - fee;
+    const priceWithoutFee = quoteQuantity / baseQuantityWithoutFee;
+    const quoteQuantityWithoutFee = priceWithoutFee * baseQuantityWithoutFee;
+    return { price: priceWithoutFee, quoteQuantity: quoteQuantityWithoutFee, baseQuantity: baseQuantityWithoutFee };
+}
