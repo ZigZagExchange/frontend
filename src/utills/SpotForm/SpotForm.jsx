@@ -120,13 +120,14 @@ class SpotForm extends React.Component {
       if (!this.props.user.address) return 0;
 
       const baseCurrency = this.props.currentMarket.split("-")[0];
+      const quoteCurrency = this.props.currentMarket.split("-")[1];
       if (this.props.side === 's') {
           const baseBalance = this.getBaseBalance() - currencyInfo[baseCurrency].gasFee;
           const amount = this.state.amount || 0;
           return Math.round(amount / baseBalance * 100)
       }
       else if (this.props.side === 'b') {
-          const quoteBalance = this.getQuoteBalance() - (currencyInfo[baseCurrency].gasFee * this.currentPrice());
+          const quoteBalance = this.getQuoteBalance() - currencyInfo[quoteCurrency].gasFee;
           const amount = this.state.amount || 0;
           const total = amount * this.currentPrice()
           return Math.round(total / quoteBalance * 100)
@@ -140,9 +141,9 @@ class SpotForm extends React.Component {
       }
       else if (this.props.lastPrice) {
           if (this.props.side === 'b')
-              price = parseFloat((this.props.lastPrice*1.0014).toPrecision(5));
+              price = parseFloat((this.props.lastPrice*1.001).toPrecision(5));
           else if (this.props.side === 's')
-              price = parseFloat((this.props.lastPrice*0.9986).toPrecision(5));
+              price = parseFloat((this.props.lastPrice*0.999).toPrecision(5));
       }
       else {
           price = 0;

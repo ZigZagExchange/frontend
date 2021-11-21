@@ -50,15 +50,19 @@ class Footer extends React.Component {
                 {userOrdersSorted.map((order, i) => {
                   const chainid = order[0];
                   const orderid = order[1];
-                  const price = order[4];
-                  const baseQuantity = order[5];
-                  const quoteQuantity = order[6];
                   const market = order[2];
                   const orderstatus = order[9];
                   const baseCurrency = order[2].split("-")[0];
+                  const quoteCurrency = order[2].split("-")[1];
                   const side = order[3] === "b" ? "buy" : "sell";
                   const sideclassname = order[3] === "b" ? "up_value" : "down_value";
-                  const fee = currencyInfo[baseCurrency].gasFee;
+                  let feeText;
+                  if (order[3] === 's') {
+                      feeText = currencyInfo[baseCurrency].gasFee + ' ' + baseCurrency;
+                  }
+                  if (order[3] === 'b') {
+                      feeText = currencyInfo[quoteCurrency].gasFee + ' ' + quoteCurrency;
+                  }
                   const orderWithoutFee = getDetailsWithoutFee(order);
                   let statusText, statusClass; 
                   switch (order[9]) {
@@ -106,7 +110,7 @@ class Footer extends React.Component {
                         {orderWithoutFee.baseQuantity.toPrecision(6) / 1} {baseCurrency}
                       </td>
                       <td className={sideclassname}>{side}</td>
-                      <td>{fee} {baseCurrency}</td>
+                      <td>{feeText}</td>
                       <td className={statusClass}>{statusText}</td>
                       <td>
                         {txHashLink ?

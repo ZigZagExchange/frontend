@@ -163,12 +163,7 @@ export async function submitorder(chainId, product, side, price, amount) {
     buyQuantity = amount * price;
     sellQuantity = amount;
   }
-  if (tokenSell === "ETH") {
-      sellQuantityWithFee = sellQuantity + 0.0003;
-  }
-  else if (tokenSell === "USDC" || tokenSell === "USDT") {
-      sellQuantityWithFee = sellQuantity + 1;
-  }
+  sellQuantityWithFee = sellQuantity + currencyInfo[tokenSell].gasFee;
   let priceWithFee;
   if (side === 'b') {
       priceWithFee = parseFloat((sellQuantityWithFee / buyQuantity).toPrecision(6));
