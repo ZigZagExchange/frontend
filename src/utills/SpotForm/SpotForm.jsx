@@ -89,6 +89,10 @@ class SpotForm extends React.Component {
         toast.error(`Total exceeds ${quoteCurrency} balance`);
         return
     }
+    else if (amount < this.MINIMUM_AMOUNTS[baseCurrency]) {
+        toast.error(`Minimum order size is ${this.MINIMUM_AMOUNTS[baseCurrency]} ${baseCurrency}`);
+        return
+    }
     else if (isNaN(price) || price > this.props.lastPrice * 1.1 || price < this.props.lastPrice * 0.9) {
         toast.error(`Price must be within 10% of spot`);
         return
