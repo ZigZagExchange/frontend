@@ -172,12 +172,10 @@ class Trade extends React.Component {
                           const txhash = update[3];
                           const sideText = filledorder[3] === 'b' ? "buy" : "sell";
                           const baseCurrency = filledorder[2].split('-')[0];
-                          const baseQuantity = filledorder[5];
-                          const price = filledorder[4];
                           filledorder[9] = 'f';
                           filledorder[10] = txhash;
                           const noFeeOrder = getDetailsWithoutFee(filledorder);
-                          toast.success(`Your ${sideText} order for ${noFeeOrder.baseQuantity.toPrecision(4)} ${baseCurrency} @ ${noFeeOrder.price.toPrecision(4)} was filled!`)
+                          toast.success(`Your ${sideText} order for ${noFeeOrder.baseQuantity.toPrecision(4) / 1} ${baseCurrency} @ ${noFeeOrder.price.toPrecision(4) / 1} was filled!`)
                           setTimeout(this.updateUser.bind(this), 1000);
                           setTimeout(this.updateUser.bind(this), 5000);
                       }
@@ -197,12 +195,10 @@ class Trade extends React.Component {
                           const txhash = update[3];
                           const error = update[4];
                           const baseCurrency = filledorder[2].split('-')[0];
-                          const baseQuantity = filledorder[5];
-                          const price = filledorder[4];
                           filledorder[9] = 'r';
                           filledorder[10] = txhash;
                           const noFeeOrder = getDetailsWithoutFee(filledorder);
-                          toast.error(`Your ${sideText} order for ${noFeeOrder.baseQuantity.toPrecision(4)} ${baseCurrency} @ ${noFeeOrder.price.toPrecision(4)} was rejected: ${error}`)
+                          toast.error(`Your ${sideText} order for ${noFeeOrder.baseQuantity.toPrecision(4) / 1} ${baseCurrency} @ ${noFeeOrder.price.toPrecision(4) / 1} was rejected: ${error}`)
                       }
                       break
                   default:
