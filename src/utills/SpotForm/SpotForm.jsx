@@ -119,13 +119,14 @@ class SpotForm extends React.Component {
   amountPercentOfMax() {
       if (!this.props.user.address) return 0;
 
+      const baseCurrency = this.props.currentMarket.split("-")[0];
       if (this.props.side === 's') {
-          const baseBalance = this.getBaseBalance();
+          const baseBalance = this.getBaseBalance() - currencyInfo[baseCurrency].gasFee;
           const amount = this.state.amount || 0;
           return Math.round(amount / baseBalance * 100)
       }
       else if (this.props.side === 'b') {
-          const quoteBalance = this.getQuoteBalance();
+          const quoteBalance = this.getQuoteBalance() - (currencyInfo[baseCurrency].gasFee * this.currentPrice());
           const amount = this.state.amount || 0;
           const total = amount * this.currentPrice()
           return Math.round(total / quoteBalance * 100)

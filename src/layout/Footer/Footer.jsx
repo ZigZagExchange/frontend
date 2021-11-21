@@ -4,7 +4,7 @@ import "./Footer.css";
 // assets
 import loadingGif from "../../assets/icons/loading.svg";
 //helpers
-import { cancelorder, currencyInfo } from "../../helpers";
+import { cancelorder, currencyInfo, getDetailsWithoutFee } from "../../helpers";
 
 class Footer extends React.Component {
   constructor (props) {
@@ -59,9 +59,7 @@ class Footer extends React.Component {
                   const side = order[3] === "b" ? "buy" : "sell";
                   const sideclassname = order[3] === "b" ? "up_value" : "down_value";
                   const fee = currencyInfo[baseCurrency].gasFee;
-                  const quantityWithoutFee = baseQuantity - fee;
-                  const priceWithoutFee = quoteQuantity / quantityWithoutFee;
-                  console.log(price, priceWithoutFee);
+                  const orderWithoutFee = getDetailsWithoutFee(order);
                   let statusText, statusClass; 
                   switch (order[9]) {
                       case 'r':
@@ -103,9 +101,9 @@ class Footer extends React.Component {
                   return (
                     <tr key={orderid}>
                       <td>{market}</td>
-                      <td>{priceWithoutFee.toPrecision(6) / 1}</td>
+                      <td>{orderWithoutFee.price.toPrecision(6) / 1}</td>
                       <td>
-                        {quantityWithoutFee.toPrecision(6) / 1} {baseCurrency}
+                        {orderWithoutFee.baseQuantity.toPrecision(6) / 1} {baseCurrency}
                       </td>
                       <td className={sideclassname}>{side}</td>
                       <td>{fee} {baseCurrency}</td>

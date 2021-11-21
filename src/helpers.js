@@ -265,12 +265,23 @@ export async function cancelorder(chainid, orderid) {
 }
 
 export function getDetailsWithoutFee(order) {
+    const side = order[3];
     const baseQuantity = order[5];
     const quoteQuantity = order[6];
     const baseCurrency = order[2].split("-")[0];
-    const fee = currencyInfo[baseCurrency].gasFee;
-    const baseQuantityWithoutFee = baseQuantity - fee;
-    const priceWithoutFee = quoteQuantity / baseQuantityWithoutFee;
-    const quoteQuantityWithoutFee = priceWithoutFee * baseQuantityWithoutFee;
+    const quoteCurrency = order[2].split("-")[1];
+    let baseQuantityWithoutFee, quoteQuantityWithoutFee, priceWithoutFee;
+    if (side === 's') {
+        const fee = currencyInfo[baseCurrency].gasFee;
+        baseQuantityWithoutFee = baseQuantity - fee;
+        priceWithoutFee = quoteQuantity / baseQuantityWithoutFee;
+        quoteQuantityWithoutFee = priceWithoutFee * baseQuantityWithoutFee;
+    }
+    else if (side === 'b') {
+        const fee = currencyInfo[quoteCurrency].gasFee;
+        quoteQuantityWithoutFee = quoteQuantity - fee;
+        priceWithoutFee = quoteQuantityWithoutFee / baseQuantity;
+        baseQuantityWithoutFee = quoteQuantityWithoutFee / priceWithoutFee;
+    }
     return { price: priceWithoutFee, quoteQuantity: quoteQuantityWithoutFee, baseQuantity: baseQuantityWithoutFee };
 }
