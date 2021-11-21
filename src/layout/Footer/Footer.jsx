@@ -41,6 +41,7 @@ class Footer extends React.Component {
                   <th>Price</th>
                   <th>Quantity</th>
                   <th>Side</th>
+                  <th>Fee</th>
                   <th>Order Status</th>
                   <th>TX Status</th>
                 </tr>
@@ -50,12 +51,17 @@ class Footer extends React.Component {
                   const chainid = order[0];
                   const orderid = order[1];
                   const price = order[4];
-                  const quantity = order[5];
+                  const baseQuantity = order[5];
+                  const quoteQuantity = order[6];
                   const market = order[2];
                   const orderstatus = order[9];
                   const baseCurrency = order[2].split("-")[0];
                   const side = order[3] === "b" ? "buy" : "sell";
                   const sideclassname = order[3] === "b" ? "up_value" : "down_value";
+                  const fee = currencyInfo[baseCurrency].gasFee;
+                  const quantityWithoutFee = baseQuantity - fee;
+                  const priceWithoutFee = quoteQuantity / quantityWithoutFee;
+                  console.log(price, priceWithoutFee);
                   let statusText, statusClass; 
                   switch (order[9]) {
                       case 'r':
@@ -97,11 +103,12 @@ class Footer extends React.Component {
                   return (
                     <tr key={orderid}>
                       <td>{market}</td>
-                      <td>{price}</td>
+                      <td>{priceWithoutFee.toPrecision(6) / 1}</td>
                       <td>
-                        {quantity} {baseCurrency}
+                        {quantityWithoutFee.toPrecision(6) / 1} {baseCurrency}
                       </td>
                       <td className={sideclassname}>{side}</td>
+                      <td>{fee} {baseCurrency}</td>
                       <td className={statusClass}>{statusText}</td>
                       <td>
                         {txHashLink ?

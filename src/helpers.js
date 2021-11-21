@@ -19,21 +19,24 @@ export const currencyInfo = {
         chain: { 
             1: { tokenId: 0 },
             1000: { tokenId: 0 },
-        }
+        },
+        gasFee: 0.0003
     },
     "USDC": { 
         decimals: 6, 
         chain: { 
             1: { tokenId: 2 },
             1000: { tokenId: 2 },
-        }
+        },
+        gasFee: 1
     },
     "USDT": { 
         decimals: 6, 
         chain: { 
             1: { tokenId: 4 },
             1000: { tokenId: 1 },
-        }
+        },
+        gasFee: 1
     },
 }
 
@@ -133,6 +136,7 @@ export async function changepubkeyzksync() {
 }
 
 export async function submitorder(chainId, product, side, price, amount) {
+  amount = parseFloat(amount); 
   const currencies = product.split("-");
   const baseCurrency = currencies[0];
   const quoteCurrency = currencies[1];
@@ -147,19 +151,34 @@ export async function submitorder(chainId, product, side, price, amount) {
   if (amount < 0.0001) {
     throw new Error("Quantity must be atleast 0.0001");
   }
-  let tokenBuy, tokenSell, sellQuantity;
+  let tokenBuy, tokenSell, sellQuantity, buyQuantity, sellQuantityWithFee;
   if (side === "b") {
     tokenBuy = currencies[0];
     tokenSell = currencies[1];
-    sellQuantity = (amount * price).toPrecision(6);
+    buyQuantity = amount;
+    sellQuantity = amount * price;
   } else if (side === "s") {
     tokenBuy = currencies[1];
     tokenSell = currencies[0];
-    sellQuantity = parseFloat(amount).toPrecision(6);
+    buyQuantity = amount * price;
+    sellQuantity = amount;
+  }
+  if (tokenSell === "ETH") {
+      sellQuantityWithFee = sellQuantity + 0.0003;
+  }
+  else if (tokenSell === "USDC" || tokenSell === "USDT") {
+      sellQuantityWithFee = sellQuantity + 1;
+  }
+  let priceWithFee;
+  if (side === 'b') {
+      priceWithFee = parseFloat((sellQuantityWithFee / buyQuantity).toPrecision(6));
+  }
+  else if (side === 's') {
+      priceWithFee = parseFloat((buyQuantity / sellQuantityWithFee).toPrecision(6));
   }
   const tokenRatio = {};
   tokenRatio[baseCurrency] = 1;
-  tokenRatio[quoteCurrency] = price;
+  tokenRatio[quoteCurrency] = priceWithFee;
   const now_unix = Date.now() / 1000 | 0;
   const three_minute_expiry = now_unix + 180;
   const order = await syncWallet.getOrder({
@@ -167,7 +186,7 @@ export async function submitorder(chainId, product, side, price, amount) {
     tokenBuy,
     amount: syncProvider.tokenSet.parseToken(
       tokenSell,
-      sellQuantity
+      sellQuantityWithFee.toPrecision(6)
     ),
     ratio: zksync.utils.tokenRatio(tokenRatio),
     validUntil: three_minute_expiry

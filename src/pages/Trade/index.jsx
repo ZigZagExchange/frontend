@@ -26,6 +26,7 @@ import {
   signinzksync,
   broadcastfill,
   getAccountState,
+  currencyInfo
 } from "../../helpers";
 
 class Trade extends React.Component {
@@ -405,7 +406,14 @@ class Trade extends React.Component {
 
     const fillData = [];
     this.state.marketFills.forEach(fill => {
-        fillData.push({ td1: fill[4], td2: fill[5], td3: fill[6], side: fill[3] });
+        const baseQuantity = fill[5];
+        const quoteQuantity = fill[6];
+        const baseCurrency = fill[2].split("-")[0];
+        const fee = currencyInfo[baseCurrency].gasFee;
+        const quantityWithoutFee = baseQuantity - fee;
+        const priceWithoutFee = quoteQuantity / quantityWithoutFee;
+        const totalWithoutFee = priceWithoutFee * quantityWithoutFee;
+        fillData.push({ td1: priceWithoutFee, td2: quantityWithoutFee, td3: totalWithoutFee, side: fill[3] });
     });
 
     this.state.liquidity.forEach((liq) => {
