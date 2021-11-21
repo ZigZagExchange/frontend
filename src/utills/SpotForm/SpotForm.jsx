@@ -85,10 +85,6 @@ class SpotForm extends React.Component {
         toast.error(`Amount exceeds ${baseCurrency} balance`);
         return
     }
-    else if (amount < this.MINIMUM_AMOUNTS[baseCurrency]) {
-        toast.error(`Minimum order size is ${this.MINIMUM_AMOUNTS[baseCurrency]} ${baseCurrency}`);
-        return
-    }
     else if (this.props.side === 'b' && amount*price > quoteBalance) {
         toast.error(`Total exceeds ${quoteCurrency} balance`);
         return
@@ -168,7 +164,10 @@ class SpotForm extends React.Component {
       }
       if (this.props.side === 's') {
           const baseBalance = this.getBaseBalance();
-          const displayAmount = (baseBalance * val / 100).toPrecision(7)
+          const baseCurrency = this.props.currentMarket.split("-")[0];
+          let displayAmount = baseBalance * val / 100;
+          displayAmount -= currencyInfo[baseCurrency].gasFee;
+          displayAmount = displayAmount.toPrecision(7);
           if (displayAmount < 1e-5) {
               newstate.amount = 0;
           }
@@ -178,7 +177,10 @@ class SpotForm extends React.Component {
       }
       else if (this.props.side === 'b') {
           const quoteBalance = this.getQuoteBalance();
-          const quoteAmount = (quoteBalance * val / 100 / this.currentPrice()).toPrecision(7);
+          const baseCurrency = this.props.currentMarket.split("-")[0];
+          let quoteAmount = quoteBalance * val / 100 / this.currentPrice();
+          quoteAmount -= currencyInfo[baseCurrency].gasFee;
+          quoteAmount = quoteAmount.toPrecision(7);
           if (quoteAmount < 1e-5) {
               newstate.amount = 0;
           }
