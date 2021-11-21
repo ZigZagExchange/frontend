@@ -33,7 +33,7 @@ class SpotBox extends React.Component {
                 <h2>SPOT</h2>
               </div>
               <div className="sh_r">
-                Current Fee: 0%
+                Fee: $1 / trade
               </div>
             </div>
             <div className="spot_tabs">
