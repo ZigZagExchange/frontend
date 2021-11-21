@@ -26,7 +26,6 @@ import {
   signinzksync,
   broadcastfill,
   getAccountState,
-  currencyInfo,
   getDetailsWithoutFee
 } from "../../helpers";
 
@@ -377,8 +376,6 @@ class Trade extends React.Component {
       const market = order[2];
       const side = order[3];
       const price = order[4];
-      const baseQuantity = order[5];
-      const quoteQuantity = order[6];
       const orderstatus = order[9];
       let spotPrice;
       try {
