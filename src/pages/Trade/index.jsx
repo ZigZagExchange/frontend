@@ -176,7 +176,8 @@ class Trade extends React.Component {
                           const price = filledorder[4];
                           filledorder[9] = 'f';
                           filledorder[10] = txhash;
-                          toast.success(`Your ${sideText} order for ${baseQuantity} ${baseCurrency} @ ${price} was filled!`)
+                          const noFeeOrder = getDetailsWithoutFee(filledorder);
+                          toast.success(`Your ${sideText} order for ${noFeeOrder.baseQuantity.toPrecision(4)} ${baseCurrency} @ ${noFeeOrder.price.toPrecision(4)} was filled!`)
                           setTimeout(this.updateUser.bind(this), 1000);
                           setTimeout(this.updateUser.bind(this), 5000);
                       }
@@ -200,7 +201,8 @@ class Trade extends React.Component {
                           const price = filledorder[4];
                           filledorder[9] = 'r';
                           filledorder[10] = txhash;
-                          toast.error(`Your ${sideText} order for ${baseQuantity} ${baseCurrency} @ ${price} was rejected: ${error}`)
+                          const noFeeOrder = getDetailsWithoutFee(filledorder);
+                          toast.error(`Your ${sideText} order for ${noFeeOrder.baseQuantity.toPrecision(4)} ${baseCurrency} @ ${noFeeOrder.price.toPrecision(4)} was rejected: ${error}`)
                       }
                       break
                   default:
