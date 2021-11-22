@@ -27,6 +27,7 @@ export const currencyInfo = {
         chain: { 
             1: { tokenId: 2 },
             1000: { tokenId: 2 },
+            1001: { contractAddress: "0x0545d006f9f53169a94b568e031a3e16f0ea00e9563dc0255f15c2a1323d6811" },
         }
     },
     "USDT": { 
@@ -34,6 +35,7 @@ export const currencyInfo = {
         chain: { 
             1: { tokenId: 4 },
             1000: { tokenId: 1 },
+            1001: { contractAddress: "0x03d3af6e3567c48173ff9b9ae7efc1816562e558ee0cc9abc0fe1862b2931d9a" },
         }
     },
 }
@@ -79,6 +81,24 @@ export async function signinstarknet(chainid) {
     const [userWalletContractAddress] = await starknet.enable() // may throws when no extension is detected
     console.log(userWalletContractAddress);
 
+    const userAddressInt = new BigInt(userWalletContractAddress, 16);
+    const url = 'https://voyager.online/api/contract/0x03d3af6e3567c48173ff9b9ae7efc1816562e558ee0cc9abc0fe1862b2931d9a/function/balance_of';
+    const balancesReq = await fetch(url, {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json',
+        }
+        body: JSON.stringify({
+            "calldata":{
+                "account":"625378168729347638466932244182683628518042438486921563115826723914350019527"
+            },
+            "signature":[]
+        })
+    })
+    const balanceJson = await balancesReq.json()
+    const balance = parseInt(balanceJson.result.res, 16);
+
+
     // check if connection was successful
     if(starknet.isConnected) {
         // If the extension was installed and successfully connected, you have access to a starknet.js Signer object to do all kind of requests through the users wallet contract.
@@ -89,7 +109,16 @@ export async function signinstarknet(chainid) {
         //starknet.provider.callContract( ... )
         console.error("not connected")
     }
-    return { address: userWalletContractAddress, id: userWalletContractAddress, committed: { balances: {} } }
+    return { 
+        address: userWalletContractAddress, 
+        id: userAddressInt, 
+        committed: { 
+            balances: {
+                USDC: balance,
+                USDT: balance,
+                ETH: balance,
+            } 
+        } }
 }
 
 export async function signinzksync(chainid) {
