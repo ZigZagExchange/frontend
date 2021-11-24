@@ -4,7 +4,7 @@ import "./Footer.css";
 // assets
 import loadingGif from "../../assets/icons/loading.svg";
 //helpers
-import { cancelorder, currencyInfo } from "../../helpers";
+import { cancelorder, currencyInfo, getDetailsWithoutFee } from "../../helpers";
 
 class Footer extends React.Component {
   constructor (props) {
@@ -41,6 +41,7 @@ class Footer extends React.Component {
                   <th>Price</th>
                   <th>Quantity</th>
                   <th>Side</th>
+                  <th>Fee</th>
                   <th>Order Status</th>
                   <th>TX Status</th>
                 </tr>
@@ -49,13 +50,20 @@ class Footer extends React.Component {
                 {userOrdersSorted.map((order, i) => {
                   const chainid = order[0];
                   const orderid = order[1];
-                  const price = order[4];
-                  const quantity = order[5];
                   const market = order[2];
                   const orderstatus = order[9];
                   const baseCurrency = order[2].split("-")[0];
+                  const quoteCurrency = order[2].split("-")[1];
                   const side = order[3] === "b" ? "buy" : "sell";
                   const sideclassname = order[3] === "b" ? "up_value" : "down_value";
+                  let feeText;
+                  if (order[3] === 's') {
+                      feeText = currencyInfo[baseCurrency].gasFee + ' ' + baseCurrency;
+                  }
+                  if (order[3] === 'b') {
+                      feeText = currencyInfo[quoteCurrency].gasFee + ' ' + quoteCurrency;
+                  }
+                  const orderWithoutFee = getDetailsWithoutFee(order);
                   let statusText, statusClass; 
                   switch (order[9]) {
                       case 'r':
@@ -97,11 +105,12 @@ class Footer extends React.Component {
                   return (
                     <tr key={orderid}>
                       <td>{market}</td>
-                      <td>{price}</td>
+                      <td>{orderWithoutFee.price.toPrecision(6) / 1}</td>
                       <td>
-                        {quantity} {baseCurrency}
+                        {orderWithoutFee.baseQuantity.toPrecision(6) / 1} {baseCurrency}
                       </td>
                       <td className={sideclassname}>{side}</td>
+                      <td>{feeText}</td>
                       <td className={statusClass}>{statusText}</td>
                       <td>
                         {txHashLink ?

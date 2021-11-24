@@ -26,6 +26,7 @@ import {
   signin,
   broadcastfill,
   getAccountState,
+  getDetailsWithoutFee
 } from "../../helpers";
 
 class Trade extends React.Component {
@@ -171,11 +172,10 @@ class Trade extends React.Component {
                           const txhash = update[3];
                           const sideText = filledorder[3] === 'b' ? "buy" : "sell";
                           const baseCurrency = filledorder[2].split('-')[0];
-                          const baseQuantity = filledorder[5];
-                          const price = filledorder[4];
                           filledorder[9] = 'f';
                           filledorder[10] = txhash;
-                          toast.success(`Your ${sideText} order for ${baseQuantity} ${baseCurrency} @ ${price} was filled!`)
+                          const noFeeOrder = getDetailsWithoutFee(filledorder);
+                          toast.success(`Your ${sideText} order for ${noFeeOrder.baseQuantity.toPrecision(4) / 1} ${baseCurrency} @ ${noFeeOrder.price.toPrecision(4) / 1} was filled!`)
                           setTimeout(this.updateUser.bind(this), 1000);
                           setTimeout(this.updateUser.bind(this), 5000);
                       }
@@ -195,11 +195,10 @@ class Trade extends React.Component {
                           const txhash = update[3];
                           const error = update[4];
                           const baseCurrency = filledorder[2].split('-')[0];
-                          const baseQuantity = filledorder[5];
-                          const price = filledorder[4];
                           filledorder[9] = 'r';
                           filledorder[10] = txhash;
-                          toast.error(`Your ${sideText} order for ${baseQuantity} ${baseCurrency} @ ${price} was rejected: ${error}`)
+                          const noFeeOrder = getDetailsWithoutFee(filledorder);
+                          toast.error(`Your ${sideText} order for ${noFeeOrder.baseQuantity.toPrecision(4) / 1} ${baseCurrency} @ ${noFeeOrder.price.toPrecision(4) / 1} was rejected: ${error}`)
                       }
                       break
                   default:
@@ -377,8 +376,6 @@ class Trade extends React.Component {
       const market = order[2];
       const side = order[3];
       const price = order[4];
-      const baseQuantity = order[5];
-      const quoteQuantity = order[6];
       const orderstatus = order[9];
       let spotPrice;
       try {
@@ -386,10 +383,11 @@ class Trade extends React.Component {
       } catch (e) {
           spotPrice = null;
       }
+      const orderWithoutFee = getDetailsWithoutFee(order);
       const orderrow = {
-        td1: price,
-        td2: baseQuantity,
-        td3: quoteQuantity,
+        td1: orderWithoutFee.price,
+        td2: orderWithoutFee.baseQuantity,
+        td3: orderWithoutFee.quoteQuantity,
         side,
         order: order,
       };
@@ -407,7 +405,8 @@ class Trade extends React.Component {
 
     const fillData = [];
     this.state.marketFills.forEach(fill => {
-        fillData.push({ td1: fill[4], td2: fill[5], td3: fill[6], side: fill[3] });
+        const orderWithoutFee = getDetailsWithoutFee(fill);
+        fillData.push({ td1: orderWithoutFee.price, td2: orderWithoutFee.baseQuantity, td3: orderWithoutFee.quoteQuantity, side: fill[3] });
     });
 
     this.state.liquidity.forEach((liq) => {

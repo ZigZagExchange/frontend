@@ -23,7 +23,8 @@ export const currencyInfo = {
             1: { tokenId: 0 },
             1000: { tokenId: 0 },
             1001: { contractAddress: "0x06a75fdd9c9e376aebf43ece91ffb315dbaa753f9c0ddfeb8d7f3af0124cd0b6" },
-        }
+        },
+        gasFee: 0.0003
     },
     "USDC": { 
         decimals: 6, 
@@ -31,7 +32,8 @@ export const currencyInfo = {
             1: { tokenId: 2 },
             1000: { tokenId: 2 },
             1001: { contractAddress: "0x0545d006f9f53169a94b568e031a3e16f0ea00e9563dc0255f15c2a1323d6811" },
-        }
+        },
+        gasFee: 1
     },
     "USDT": { 
         decimals: 6, 
@@ -39,7 +41,8 @@ export const currencyInfo = {
             1: { tokenId: 4 },
             1000: { tokenId: 1 },
             1001: { contractAddress: "0x03d3af6e3567c48173ff9b9ae7efc1816562e558ee0cc9abc0fe1862b2931d9a" },
-        }
+        },
+        gasFee: 1
     },
 }
 
@@ -261,6 +264,9 @@ export async function starknetOrderHash(chainId, product, side, price, amount, e
 }
 
 export async function submitorderzksync(chainId, product, side, price, amount) {
+=======
+  amount = parseFloat(amount); 
+>>>>>>> master
   const currencies = product.split("-");
   const baseCurrency = currencies[0];
   const quoteCurrency = currencies[1];
@@ -275,19 +281,29 @@ export async function submitorderzksync(chainId, product, side, price, amount) {
   if (amount < 0.0001) {
     throw new Error("Quantity must be atleast 0.0001");
   }
-  let tokenBuy, tokenSell, sellQuantity;
+  let tokenBuy, tokenSell, sellQuantity, buyQuantity, sellQuantityWithFee;
   if (side === "b") {
     tokenBuy = currencies[0];
     tokenSell = currencies[1];
-    sellQuantity = (amount * price).toPrecision(6);
+    buyQuantity = amount;
+    sellQuantity = parseFloat(amount * price);
   } else if (side === "s") {
     tokenBuy = currencies[1];
     tokenSell = currencies[0];
-    sellQuantity = parseFloat(amount).toPrecision(6);
+    buyQuantity = amount * price;
+    sellQuantity = parseFloat(amount);
+  }
+  sellQuantityWithFee = sellQuantity + currencyInfo[tokenSell].gasFee;
+  let priceWithFee;
+  if (side === 'b') {
+      priceWithFee = parseFloat((sellQuantityWithFee / buyQuantity).toPrecision(6));
+  }
+  else if (side === 's') {
+      priceWithFee = parseFloat((buyQuantity / sellQuantityWithFee).toPrecision(6));
   }
   const tokenRatio = {};
   tokenRatio[baseCurrency] = 1;
-  tokenRatio[quoteCurrency] = price;
+  tokenRatio[quoteCurrency] = priceWithFee;
   const now_unix = Date.now() / 1000 | 0;
   const three_minute_expiry = now_unix + 180;
   const order = await syncWallet.getOrder({
@@ -295,7 +311,7 @@ export async function submitorderzksync(chainId, product, side, price, amount) {
     tokenBuy,
     amount: syncProvider.tokenSet.parseToken(
       tokenSell,
-      sellQuantity
+      sellQuantityWithFee.toPrecision(6)
     ),
     ratio: zksync.utils.tokenRatio(tokenRatio),
     validUntil: three_minute_expiry
@@ -371,4 +387,26 @@ export async function cancelorder(chainid, orderid) {
   const msg = { op: "cancelorder", args: [chainid, orderid] };
   zigzagws.send(JSON.stringify(msg));
   return true;
+}
+
+export function getDetailsWithoutFee(order) {
+    const side = order[3];
+    const baseQuantity = order[5];
+    const quoteQuantity = order[6];
+    const baseCurrency = order[2].split("-")[0];
+    const quoteCurrency = order[2].split("-")[1];
+    let baseQuantityWithoutFee, quoteQuantityWithoutFee, priceWithoutFee;
+    if (side === 's') {
+        const fee = currencyInfo[baseCurrency].gasFee;
+        baseQuantityWithoutFee = baseQuantity - fee;
+        priceWithoutFee = quoteQuantity / baseQuantityWithoutFee;
+        quoteQuantityWithoutFee = priceWithoutFee * baseQuantityWithoutFee;
+    }
+    else if (side === 'b') {
+        const fee = currencyInfo[quoteCurrency].gasFee;
+        quoteQuantityWithoutFee = quoteQuantity - fee;
+        priceWithoutFee = quoteQuantityWithoutFee / baseQuantity;
+        baseQuantityWithoutFee = quoteQuantityWithoutFee / priceWithoutFee;
+    }
+    return { price: priceWithoutFee, quoteQuantity: quoteQuantityWithoutFee, baseQuantity: baseQuantityWithoutFee };
 }

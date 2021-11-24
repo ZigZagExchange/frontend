@@ -85,12 +85,12 @@ class SpotForm extends React.Component {
         toast.error(`Amount exceeds ${baseCurrency} balance`);
         return
     }
-    else if (amount < this.MINIMUM_AMOUNTS[baseCurrency]) {
-        toast.error(`Minimum order size is ${this.MINIMUM_AMOUNTS[baseCurrency]} ${baseCurrency}`);
-        return
-    }
     else if (this.props.side === 'b' && amount*price > quoteBalance) {
         toast.error(`Total exceeds ${quoteCurrency} balance`);
+        return
+    }
+    else if (amount < this.MINIMUM_AMOUNTS[baseCurrency]) {
+        toast.error(`Minimum order size is ${this.MINIMUM_AMOUNTS[baseCurrency]} ${baseCurrency}`);
         return
     }
     else if (isNaN(price) || price > this.props.lastPrice * 1.1 || price < this.props.lastPrice * 0.9) {
@@ -123,13 +123,15 @@ class SpotForm extends React.Component {
   amountPercentOfMax() {
       if (!this.props.user.address) return 0;
 
+      const baseCurrency = this.props.currentMarket.split("-")[0];
+      const quoteCurrency = this.props.currentMarket.split("-")[1];
       if (this.props.side === 's') {
-          const baseBalance = this.getBaseBalance();
+          const baseBalance = this.getBaseBalance() - currencyInfo[baseCurrency].gasFee;
           const amount = this.state.amount || 0;
           return Math.round(amount / baseBalance * 100)
       }
       else if (this.props.side === 'b') {
-          const quoteBalance = this.getQuoteBalance();
+          const quoteBalance = this.getQuoteBalance() - currencyInfo[quoteCurrency].gasFee;
           const amount = this.state.amount || 0;
           const total = amount * this.currentPrice()
           return Math.round(total / quoteBalance * 100)
@@ -138,14 +140,19 @@ class SpotForm extends React.Component {
 
   currentPrice() {
       let price;
+      const baseCurrency = this.props.currentMarket.split("-")[0];
       if (this.props.orderType === "limit") {
           price = this.state.price;
       }
       else if (this.props.lastPrice) {
-          if (this.props.side === 'b')
-              price = parseFloat((this.props.lastPrice*1.0014).toPrecision(5));
-          else if (this.props.side === 's')
-              price = parseFloat((this.props.lastPrice*0.9986).toPrecision(5));
+          if (this.props.side === 'b' && baseCurrency === "ETH")
+              price = parseFloat((this.props.lastPrice*1.001).toPrecision(5));
+          else if (this.props.side === 's' && baseCurrency === "ETH")
+              price = parseFloat((this.props.lastPrice*0.999).toPrecision(5));
+          else if (this.props.side === 'b' && baseCurrency === "USDC")
+              price = parseFloat((this.props.lastPrice*1.0004).toPrecision(6));
+          else if (this.props.side === 's' && baseCurrency === "USDC")
+              price = parseFloat((this.props.lastPrice*0.9996).toPrecision(6));
       }
       else {
           price = 0;
@@ -168,7 +175,10 @@ class SpotForm extends React.Component {
       }
       if (this.props.side === 's') {
           const baseBalance = this.getBaseBalance();
-          const displayAmount = (baseBalance * val / 100).toPrecision(7)
+          const baseCurrency = this.props.currentMarket.split("-")[0];
+          let displayAmount = baseBalance * val / 100;
+          displayAmount -= currencyInfo[baseCurrency].gasFee;
+          displayAmount = displayAmount.toPrecision(7);
           if (displayAmount < 1e-5) {
               newstate.amount = 0;
           }
@@ -178,7 +188,10 @@ class SpotForm extends React.Component {
       }
       else if (this.props.side === 'b') {
           const quoteBalance = this.getQuoteBalance();
-          const quoteAmount = (quoteBalance * val / 100 / this.currentPrice()).toPrecision(7);
+          const baseCurrency = this.props.currentMarket.split("-")[0];
+          let quoteAmount = quoteBalance * val / 100 / this.currentPrice();
+          quoteAmount -= currencyInfo[baseCurrency].gasFee;
+          quoteAmount = quoteAmount.toPrecision(7);
           if (quoteAmount < 1e-5) {
               newstate.amount = 0;
           }
