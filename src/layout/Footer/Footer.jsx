@@ -57,10 +57,13 @@ class Footer extends React.Component {
                   const side = order[3] === "b" ? "buy" : "sell";
                   const sideclassname = order[3] === "b" ? "up_value" : "down_value";
                   let feeText;
-                  if (order[3] === 's') {
+                  if (order[9] === 'r') {
+                      feeText = '0 ' + baseCurrency;
+                  }
+                  else if (order[3] === 's') {
                       feeText = currencyInfo[baseCurrency].gasFee + ' ' + baseCurrency;
                   }
-                  if (order[3] === 'b') {
+                  else if (order[3] === 'b') {
                       feeText = currencyInfo[quoteCurrency].gasFee + ' ' + quoteCurrency;
                   }
                   const orderWithoutFee = getDetailsWithoutFee(order);

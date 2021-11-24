@@ -118,7 +118,7 @@ export async function signinstarknet(chainid) {
     // Mint some tokens if the account is blank
     for (let currency in committedBalances) {
         if (committedBalances[currency].compare(0) === 0) {
-            const mintTokenToast = toast.info(`No ${currency} found. Minting you some`);
+            toast.info(`No ${currency} found. Minting you some`);
             let amount;
             if (currency === "ETH") {
                 amount = bigInt(1e18).toString();
@@ -173,7 +173,7 @@ export async function getStarknetBalance(contractAddress, userAddress) {
 
 export async function mintStarknetBalance(contractAddress, userAddress, amount) {
     const userAddressInt = bigInt(userAddress.slice(2), 16);
-    const balanceJson = await starknet.defaultProvider.addTransaction({
+    await starknet.defaultProvider.addTransaction({
         type: "INVOKE_FUNCTION",
         contract_address: contractAddress,
         entry_point_selector: starknet.stark.getSelectorFromName("mint"),

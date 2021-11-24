@@ -274,6 +274,8 @@ class Trade extends React.Component {
   }
 
   async fillOpenOrder(data) {
+    if (!data.order) return;
+
     if (!this.state.user.address) {
         toast.error("Must be logged in to fill orders");
         return
