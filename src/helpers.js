@@ -213,7 +213,12 @@ export async function signinzksync(chainid) {
   }
 
   ethersProvider = new ethers.providers.Web3Provider(window.ethereum);
-  syncProvider = await zksync.getDefaultProvider(ethereumChainName);
+  try {
+      syncProvider = await zksync.getDefaultProvider(ethereumChainName);
+  } catch(e) {
+      toast.error("Zksync is down. Try again later");
+      throw e;
+  }
 
   ethWallet = ethersProvider.getSigner();
   syncWallet = await zksync.Wallet.fromEthSigner(ethWallet, syncProvider);
