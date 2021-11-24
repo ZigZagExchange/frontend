@@ -1,7 +1,9 @@
 import * as zksync from "zksync";
 import { ethers } from "ethers";
 import { toast } from 'react-toastify';
-import { getStarknet } from "@argent/get-starknet"
+//import { getStarknet } from "@argent/get-starknet"
+import * as starknet from "starknet"
+import bigInt from "big-integer";
 
 // Data
 //const zkTokenIds = {
@@ -20,6 +22,7 @@ export const currencyInfo = {
         chain: { 
             1: { tokenId: 0 },
             1000: { tokenId: 0 },
+            1001: { contractAddress: "0x06a75fdd9c9e376aebf43ece91ffb315dbaa753f9c0ddfeb8d7f3af0124cd0b6" },
         }
     },
     "USDC": { 
@@ -45,7 +48,7 @@ let ethersProvider;
 let syncProvider;
 let ethWallet;
 let syncWallet;
-let syncAccountState;
+let accountState;
 
 // Websocket
 const zigzagws_url = process.env.REACT_APP_ZIGZAG_WS;
@@ -62,8 +65,8 @@ zigzagws.addEventListener("close", function () {
 });
 
 export async function getAccountState() {
-  const syncAccountState = await syncWallet.getAccountState();
-  return syncAccountState;
+  const accountState = await syncWallet.getAccountState();
+  return accountState;
 }
 
 export async function signin(chainid) {
@@ -77,48 +80,72 @@ export async function signin(chainid) {
 
 export async function signinstarknet(chainid) {
     // check if wallet extension is installed and initialized. Shows a modal prompting the user to download ArgentX otherwise.
-    const starknet = getStarknet({ showModal: true })
-    const [userWalletContractAddress] = await starknet.enable() // may throws when no extension is detected
-    console.log(userWalletContractAddress);
+    // const starknet = getStarknet({ showModal: true })
+    // const [userWalletContractAddress] = await starknet.enable() // may throws when no extension is detected
+    // const userAddressInt = bigInt(userWalletContractAddress.slice(2), 16);
+    const keypair = starknet.ec.genKeyPair();
+    localStorage.setItem("starknet-priv", keypair.getPrivate('hex'));
+    const pubkey = keypair.getPublic();
+    //const starknetAccountContract = fs.readFileSync
 
-    const userAddressInt = new BigInt(userWalletContractAddress, 16);
-    const url = 'https://voyager.online/api/contract/0x03d3af6e3567c48173ff9b9ae7efc1816562e558ee0cc9abc0fe1862b2931d9a/function/balance_of';
+    //const balanceWaitToast = toast.info("Waiting on balances to load...", { autoClose: false });
+    //const committedBalances = await getStarknetBalances(chainid, userWalletContractAddress);
+    //toast.dismiss(balanceWaitToast);
+
+    //// check if connection was successful
+    //if(starknet.isConnected) {
+    //    // If the extension was installed and successfully connected, you have access to a starknet.js Signer object to do all kind of requests through the users wallet contract.
+    //    //starknet.signer.invokeFunction({ ... })
+    //    console.log("starknet connected")
+    //} else {
+    //    // In case the extension wasn't successfully connected you still have access to a starknet.js Provider to read starknet states and sent anonymous transactions
+    //    //starknet.provider.callContract( ... )
+    //    console.error("starknet not connected")
+    //}
+    //accountState = { 
+    //    address: userWalletContractAddress, 
+    //    id: userAddressInt, 
+    //    committed: {
+    //        balances: committedBalances
+    //    }
+    //}
+    //return accountState;
+}
+
+export async function getStarknetBalances(chainid, userAddress) {
+    const balances = {};
+    for (let currency in currencyInfo) {
+        const balance = await getStarknetBalance(currencyInfo[currency].chain[chainid].contractAddress, userAddress);
+        balances[currency] = balance;
+    }
+    return balances;
+}
+
+export async function getStarknetBalance(contractAddress, userAddress) {
+    const userAddressInt = bigInt(userAddress.slice(2), 16);
+    const url = `https://voyager.online/api/contract/${contractAddress}/function/balance_of`;
     const balancesReq = await fetch(url, {
         method: "POST",
         headers: {
             'Content-Type': 'application/json',
-        }
+        },
         body: JSON.stringify({
             "calldata":{
-                "account":"625378168729347638466932244182683628518042438486921563115826723914350019527"
+                "account": userAddressInt.toString()
             },
             "signature":[]
         })
     })
-    const balanceJson = await balancesReq.json()
-    const balance = parseInt(balanceJson.result.res, 16);
-
-
-    // check if connection was successful
-    if(starknet.isConnected) {
-        // If the extension was installed and successfully connected, you have access to a starknet.js Signer object to do all kind of requests through the users wallet contract.
-        //starknet.signer.invokeFunction({ ... })
-        console.log("connected")
-    } else {
-        // In case the extension wasn't successfully connected you still have access to a starknet.js Provider to read starknet states and sent anonymous transactions
-        //starknet.provider.callContract( ... )
-        console.error("not connected")
+    let balance;
+    try {
+        const balanceJson = await balancesReq.json()
+        balance = bigInt(balanceJson.result.res.slice(2), 16);
     }
-    return { 
-        address: userWalletContractAddress, 
-        id: userAddressInt, 
-        committed: { 
-            balances: {
-                USDC: balance,
-                USDT: balance,
-                ETH: balance,
-            } 
-        } }
+    catch (e) {
+        console.error(e);
+        balance = bigInt(0);
+    }
+    return balance;
 }
 
 export async function signinzksync(chainid) {
@@ -157,9 +184,9 @@ export async function signinzksync(chainid) {
   ethWallet = ethersProvider.getSigner();
   syncWallet = await zksync.Wallet.fromEthSigner(ethWallet, syncProvider);
 
-  syncAccountState = await syncWallet.getAccountState();
-  console.log("account state", syncAccountState);
-  if (!syncAccountState.id) {
+  accountState = await syncWallet.getAccountState();
+  console.log("account state", accountState);
+  if (!accountState.id) {
     throw new Error(
       "Account not found. Please use the Wallet to deposit funds before trying again."
     );
@@ -175,10 +202,10 @@ export async function signinzksync(chainid) {
     }
     await changepubkeyzksync();
   }
-  const msg = { op: "login", args: [chainid, syncAccountState.id.toString()] };
+  const msg = { op: "login", args: [chainid, accountState.id.toString()] };
   zigzagws.send(JSON.stringify(msg));
 
-  return syncAccountState;
+  return accountState;
 }
 
 export async function changepubkeyzksync() {
@@ -191,6 +218,49 @@ export async function changepubkeyzksync() {
 }
 
 export async function submitorder(chainId, product, side, price, amount) {
+    if (chainId === 1 || chainId === 1000) {
+        return await submitorderzksync(chainId, product, side, price, amount);
+    }
+    else if (chainId === 1001) {
+        return await submitorderstarknet(chainId, product, side, price, amount);
+    }
+}
+
+export async function submitorderstarknet(chainId, product, side, price, amount) {
+    const expiration = Date.now() + 86400;
+    const orderhash = starknetOrderHash(chainId, product, side, price, amount, expiration);
+    console.log(orderhash);
+    const sig = starknet.ec.sign(orderhash);
+
+    const baseCurrency = product.split("-")[0];
+    const quoteCurrency = product.split("-")[0];
+    const baseAsset = currencyInfo[baseCurrency].chain[chainId].contractAddress;
+    const quoteAsset = currencyInfo[quoteCurrency].chain[chainId].contractAddress;
+
+    const starknetOrder = [chainId, accountState.address, baseAsset, quoteAsset, side, amount, price, expiration, sig.r, sig.s];
+    const msg = { op: "submitorder", args: [chainId, starknetOrder] };
+    zigzagws.send(JSON.stringify(msg));
+}
+
+export async function starknetOrderHash(chainId, product, side, price, amount, expiration) {
+    const baseCurrency = product.split("-")[0];
+    const quoteCurrency = product.split("-")[0];
+    const baseAssetInt = bigInt(currencyInfo[baseCurrency].chain[chainId].contractAddress.slice(2), 16);
+    const quoteAssetInt = bigInt(currencyInfo[quoteCurrency].chain[chainId].contractAddress.slice(2), 16);
+    const priceInt = bigInt(price);
+    const sideInt = bigInt(side === 'b' ? 0: 1);
+    const baseQuantityInt = bigInt(amount * Math.pow(currencyInfo[baseCurrency].decimals, 10));
+    let orderhash = starknet.hash.pedersen([bigInt(chainId), accountState.id]);
+    orderhash = starknet.hash.pedersen([orderhash, baseAssetInt]);
+    orderhash = starknet.hash.pedersen([orderhash, quoteAssetInt]);
+    orderhash = starknet.hash.pedersen([orderhash, sideInt]);
+    orderhash = starknet.hash.pedersen([orderhash, baseQuantityInt]);
+    orderhash = starknet.hash.pedersen([orderhash, priceInt]);
+    orderhash = starknet.hash.pedersen([orderhash, expiration]);
+    return orderhash;
+}
+
+export async function submitorderzksync(chainId, product, side, price, amount) {
   const currencies = product.split("-");
   const baseCurrency = currencies[0];
   const quoteCurrency = currencies[1];
