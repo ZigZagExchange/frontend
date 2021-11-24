@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 //import { getStarknet } from "@argent/get-starknet"
 import * as starknet from "starknet"
 import bigInt from "big-integer";
+import starknetAccountContract from "./lib/Account";
 
 // Data
 //const zkTokenIds = {
@@ -82,18 +83,53 @@ export async function signin(chainid) {
 }
 
 export async function signinstarknet(chainid) {
+    let userWalletContractAddress;
     // check if wallet extension is installed and initialized. Shows a modal prompting the user to download ArgentX otherwise.
     // const starknet = getStarknet({ showModal: true })
     // const [userWalletContractAddress] = await starknet.enable() // may throws when no extension is detected
-    // const userAddressInt = bigInt(userWalletContractAddress.slice(2), 16);
-    const keypair = starknet.ec.genKeyPair();
-    localStorage.setItem("starknet-priv", keypair.getPrivate('hex'));
-    const pubkey = keypair.getPublic();
-    //const starknetAccountContract = fs.readFileSync
+    let keypair;
+    if (localStorage.getItem('starknet:privkey')) {
+        keypair = starknet.ec.ec.keyFromPrivate(localStorage.getItem('starknet:privkey'), 'hex');
+    }
+    else {
+        keypair = starknet.ec.genKeyPair();
+        localStorage.setItem("starknet:privkey", keypair.getPrivate('hex'));
+    }
+    if (localStorage.getItem("starknet:account")) {
+        userWalletContractAddress = localStorage.getItem("starknet:account");
+    }
+    else {
+        const starkkey = starknet.ec.getStarkKey(keypair);
+        const starkkeyint = bigInt(starkkey.slice(2), 16);
+        const deployContractToast = toast.info("First time using Zigzag Starknet. Deploying account contract...", { autoClose: false });
+        const deployContractResponse = await starknet.defaultProvider.deployContract(starknetAccountContract, [starkkeyint.toString()])
+        toast.dismiss(deployContractToast);
+        userWalletContractAddress = deployContractResponse.address;
+        console.log(deployContractResponse);
+        toast.success("Account contract deployed");
+        localStorage.setItem("starknet:account", userWalletContractAddress);
+    }
 
-    //const balanceWaitToast = toast.info("Waiting on balances to load...", { autoClose: false });
-    //const committedBalances = await getStarknetBalances(chainid, userWalletContractAddress);
-    //toast.dismiss(balanceWaitToast);
+    const userAddressInt = bigInt(userWalletContractAddress.slice(2), 16);
+    const balanceWaitToast = toast.info("Waiting on balances to load...", { autoClose: false });
+    const committedBalances = await getStarknetBalances(chainid, userWalletContractAddress);
+    toast.dismiss(balanceWaitToast);
+
+    // Mint some tokens if the account is blank
+    for (let currency in committedBalances) {
+        if (committedBalances[currency].compare(0) === 0) {
+            const mintTokenToast = toast.info(`No ${currency} found. Minting you some`);
+            let amount;
+            if (currency === "ETH") {
+                amount = bigInt(1e18).toString();
+            }
+            else {
+                amount = bigInt(5e9).toString();
+            }
+            await mintStarknetBalance(currencyInfo[currency].chain[chainid].contractAddress, userWalletContractAddress, amount);
+            committedBalances[currency] = amount;
+        }
+    }
 
     //// check if connection was successful
     //if(starknet.isConnected) {
@@ -105,20 +141,20 @@ export async function signinstarknet(chainid) {
     //    //starknet.provider.callContract( ... )
     //    console.error("starknet not connected")
     //}
-    //accountState = { 
-    //    address: userWalletContractAddress, 
-    //    id: userAddressInt, 
-    //    committed: {
-    //        balances: committedBalances
-    //    }
-    //}
-    //return accountState;
+    accountState = { 
+        address: userWalletContractAddress, 
+        id: userAddressInt, 
+        committed: {
+            balances: committedBalances
+        }
+    }
+    return accountState;
 }
 
 export async function getStarknetBalances(chainid, userAddress) {
     const balances = {};
     for (let currency in currencyInfo) {
-        const balance = await getStarknetBalance(currencyInfo[currency].chain[chainid].contractAddress, userAddress);
+        let balance = await getStarknetBalance(currencyInfo[currency].chain[chainid].contractAddress, userAddress);
         balances[currency] = balance;
     }
     return balances;
@@ -126,29 +162,24 @@ export async function getStarknetBalances(chainid, userAddress) {
 
 export async function getStarknetBalance(contractAddress, userAddress) {
     const userAddressInt = bigInt(userAddress.slice(2), 16);
-    const url = `https://voyager.online/api/contract/${contractAddress}/function/balance_of`;
-    const balancesReq = await fetch(url, {
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            "calldata":{
-                "account": userAddressInt.toString()
-            },
-            "signature":[]
-        })
-    })
-    let balance;
-    try {
-        const balanceJson = await balancesReq.json()
-        balance = bigInt(balanceJson.result.res.slice(2), 16);
-    }
-    catch (e) {
-        console.error(e);
-        balance = bigInt(0);
-    }
+    const balanceJson = await starknet.defaultProvider.callContract({
+        contract_address: contractAddress,
+        entry_point_selector: starknet.stark.getSelectorFromName("balance_of"),
+        calldata: [userAddressInt.toString()]
+    });
+    const balance = bigInt(balanceJson.result[0].slice(2), 16);
     return balance;
+}
+
+export async function mintStarknetBalance(contractAddress, userAddress, amount) {
+    const userAddressInt = bigInt(userAddress.slice(2), 16);
+    const balanceJson = await starknet.defaultProvider.addTransaction({
+        type: "INVOKE_FUNCTION",
+        contract_address: contractAddress,
+        entry_point_selector: starknet.stark.getSelectorFromName("mint"),
+        calldata: [userAddressInt.toString(), amount, "0"]
+    });
+    return true;
 }
 
 export async function signinzksync(chainid) {
@@ -264,9 +295,7 @@ export async function starknetOrderHash(chainId, product, side, price, amount, e
 }
 
 export async function submitorderzksync(chainId, product, side, price, amount) {
-=======
   amount = parseFloat(amount); 
->>>>>>> master
   const currencies = product.split("-");
   const baseCurrency = currencies[0];
   const quoteCurrency = currencies[1];

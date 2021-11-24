@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { toast } from 'react-toastify';
 // libarary
 import { NavLink } from "react-router-dom";
 // css
@@ -10,6 +11,11 @@ import menu from "../../assets/icons/menu.png";
 import darkPlugHead from "../../assets/icons/dark-plug-head.png";
 // component
 import Button from "../../utills/Button/Button";
+
+function copyToClipboard(address) {
+    navigator.clipboard.writeText(address);
+    toast.info("Copied to clipboard", { autoClose: 3000 });
+}
 
 const Header = (props) => {
   // state to open or close the sidebar in mobile
@@ -116,7 +122,7 @@ const Header = (props) => {
                 </div>
           <div className="head_right">
             {props.user.address ? (
-              <button className="address_button">
+              <button className="address_button" onClick={() => copyToClipboard(props.user.address)}>
                 {props.user.address.slice(0, 6)}...
                 {props.user.address.slice(-4)}
               </button>
