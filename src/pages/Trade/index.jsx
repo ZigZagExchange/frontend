@@ -84,7 +84,7 @@ class Trade extends React.Component {
           newstate = { ...this.state };
           const fillhistory = msg.args[0];
           fillhistory.forEach(fill => {
-              if (fill[2] === this.state.currentMarket) {
+              if (fill[2] === this.state.currentMarket && fill[0] === this.state.chainId) {
                   newstate.marketFills.unshift(fill);
               }
           });
