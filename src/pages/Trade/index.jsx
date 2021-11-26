@@ -59,9 +59,9 @@ class Trade extends React.Component {
         case "orders":
           newstate = { ...this.state };
           const orders = msg.args[0];
-          orders.forEach(openorder => {
-              if (openorder[2] === this.state.currentMarket) {
-                  newstate.orders[openorder[1]] = openorder;
+          orders.forEach(order => {
+              if (order[2] === this.state.currentMarket && order[0] === this.state.chainId) {
+                  newstate.orders[order[1]] = order;
               }
           });
           
