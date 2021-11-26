@@ -421,7 +421,7 @@ export async function cancelorder(chainid, orderid) {
 export function getDetailsWithoutFee(order) {
     const side = order[3];
     const baseQuantity = order[5];
-    const quoteQuantity = order[6];
+    const quoteQuantity = order[4] * order[5];
     const remaining = isNaN(Number(order[11])) ? order[5] : order[11];
     const baseCurrency = order[2].split("-")[0];
     const quoteCurrency = order[2].split("-")[1];

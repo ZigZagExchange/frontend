@@ -7,7 +7,7 @@ import RangeSlider from "../RangeSlider/RangeSlider";
 import Button from "../Button/Button";
 import darkPlugHead from "../../assets/icons/dark-plug-head.png";
 //helpers
-import { submitorder, currencyInfo } from "../../helpers";
+import { submitorder, currencyInfo, isZksyncChain } from "../../helpers";
 
 class SpotForm extends React.Component {
   constructor(props) {
@@ -144,14 +144,24 @@ class SpotForm extends React.Component {
       if (this.props.orderType === "limit" && this.state.price) {
           return this.state.price;
       }
+
+      let spread, stableSpread;
+      if (isZksyncChain(this.props.chainId)) {
+          spread = 0.001;
+          stableSpread = 0.0004;
+      }
+      else {
+          spread = 0.002;
+          stableSpread = 0.0007;
+      }
       if (this.props.side === 'b' && baseCurrency === "ETH")
-          return parseFloat((this.props.lastPrice*1.001).toPrecision(6));
+          return parseFloat((this.props.lastPrice * (1+spread)).toPrecision(6));
       else if (this.props.side === 's' && baseCurrency === "ETH")
-          return parseFloat((this.props.lastPrice*0.999).toPrecision(6));
+          return parseFloat((this.props.lastPrice * (1-spread)).toPrecision(6));
       else if (this.props.side === 'b' && baseCurrency === "USDC")
-          return parseFloat((this.props.lastPrice*1.0004).toPrecision(6));
+          return parseFloat((this.props.lastPrice * (1+stableSpread)).toPrecision(6));
       else if (this.props.side === 's' && baseCurrency === "USDC")
-          return parseFloat((this.props.lastPrice*0.9996).toPrecision(6));
+          return parseFloat((this.props.lastPrice * (1-stableSpread)).toPrecision(6));
       return 0;
   }
 

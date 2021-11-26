@@ -49,7 +49,7 @@ class Footer extends React.Component {
               <th>Side</th>
               <th>Fee</th>
               <th>Order Status</th>
-              <th>TX Status</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
