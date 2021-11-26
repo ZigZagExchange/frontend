@@ -110,7 +110,9 @@ export async function signinstarknet(chainid) {
         localStorage.setItem("starknet:account", userWalletContractAddress);
     }
 
-    const userAddressInt = bigInt(userWalletContractAddress.slice(2), 16);
+    const msg = { op: "login", args: [chainid, userWalletContractAddress] };
+    zigzagws.send(JSON.stringify(msg));
+
     const balanceWaitToast = toast.info("Waiting on balances to load...", { autoClose: false });
     const committedBalances = await getStarknetBalances(chainid, userWalletContractAddress);
     toast.dismiss(balanceWaitToast);
@@ -143,7 +145,7 @@ export async function signinstarknet(chainid) {
     //}
     accountState = { 
         address: userWalletContractAddress, 
-        id: userAddressInt, 
+        id: userWalletContractAddress, 
         committed: {
             balances: committedBalances
         }
@@ -268,35 +270,31 @@ export async function submitorder(chainId, product, side, price, amount) {
 export async function submitorderstarknet(chainId, product, side, price, amount) {
     const expiration = Date.now() + 86400;
     const orderhash = starknetOrderHash(chainId, product, side, price, amount, expiration);
-    console.log(orderhash);
-    const sig = starknet.ec.sign(orderhash);
+    const keypair = starknet.ec.ec.keyFromPrivate(localStorage.getItem('starknet:privkey'), 'hex');
+    const sig = starknet.ec.sign(keypair, orderhash.hash);
 
-    const baseCurrency = product.split("-")[0];
-    const quoteCurrency = product.split("-")[0];
-    const baseAsset = currencyInfo[baseCurrency].chain[chainId].contractAddress;
-    const quoteAsset = currencyInfo[quoteCurrency].chain[chainId].contractAddress;
-
-    const starknetOrder = [chainId, accountState.address, baseAsset, quoteAsset, side, amount, price, expiration, sig.r, sig.s];
+    const starknetOrder = [...orderhash.order, sig.r, sig.s];
     const msg = { op: "submitorder", args: [chainId, starknetOrder] };
     zigzagws.send(JSON.stringify(msg));
 }
 
-export async function starknetOrderHash(chainId, product, side, price, amount, expiration) {
+export function starknetOrderHash(chainId, product, side, price, amount, expiration) {
     const baseCurrency = product.split("-")[0];
-    const quoteCurrency = product.split("-")[0];
-    const baseAssetInt = bigInt(currencyInfo[baseCurrency].chain[chainId].contractAddress.slice(2), 16);
-    const quoteAssetInt = bigInt(currencyInfo[quoteCurrency].chain[chainId].contractAddress.slice(2), 16);
-    const priceInt = bigInt(price);
-    const sideInt = bigInt(side === 'b' ? 0: 1);
-    const baseQuantityInt = bigInt(amount * Math.pow(currencyInfo[baseCurrency].decimals, 10));
-    let orderhash = starknet.hash.pedersen([bigInt(chainId), accountState.id]);
-    orderhash = starknet.hash.pedersen([orderhash, baseAssetInt]);
-    orderhash = starknet.hash.pedersen([orderhash, quoteAssetInt]);
+    const quoteCurrency = product.split("-")[1];
+    const baseAsset = currencyInfo[baseCurrency].chain[chainId].contractAddress;
+    const quoteAsset = currencyInfo[quoteCurrency].chain[chainId].contractAddress;
+    const priceInt = (price*1e6).toFixed(0);
+    const sideInt = side === 'b' ? 0: 1;
+    const baseQuantityInt = (amount * 10**(currencyInfo[baseCurrency].decimals)).toFixed(0);
+    let orderhash = starknet.hash.pedersen([chainId, accountState.address]);
+    orderhash = starknet.hash.pedersen([orderhash, baseAsset]);
+    orderhash = starknet.hash.pedersen([orderhash, quoteAsset]);
     orderhash = starknet.hash.pedersen([orderhash, sideInt]);
     orderhash = starknet.hash.pedersen([orderhash, baseQuantityInt]);
     orderhash = starknet.hash.pedersen([orderhash, priceInt]);
     orderhash = starknet.hash.pedersen([orderhash, expiration]);
-    return orderhash;
+    const starknetOrder = [chainId, accountState.address, baseAsset, quoteAsset, sideInt, baseQuantityInt, priceInt, expiration];
+    return { hash: orderhash, order: starknetOrder } 
 }
 
 export async function submitorderzksync(chainId, product, side, price, amount) {
@@ -311,9 +309,6 @@ export async function submitorderzksync(chainId, product, side, price, amount) {
   const validsides = ["b", "s"];
   if (!validsides.includes(side)) {
     throw new Error("Invalid side");
-  }
-  if (amount < 0.0001) {
-    throw new Error("Quantity must be atleast 0.0001");
   }
   let tokenBuy, tokenSell, sellQuantity, buyQuantity, sellQuantityWithFee;
   if (side === "b") {
@@ -427,12 +422,14 @@ export function getDetailsWithoutFee(order) {
     const side = order[3];
     const baseQuantity = order[5];
     const quoteQuantity = order[6];
+    const remaining = isNaN(Number(order[11])) ? order[5] : order[11];
     const baseCurrency = order[2].split("-")[0];
     const quoteCurrency = order[2].split("-")[1];
-    let baseQuantityWithoutFee, quoteQuantityWithoutFee, priceWithoutFee;
+    let baseQuantityWithoutFee, quoteQuantityWithoutFee, priceWithoutFee, remainingWithoutFee;
     if (side === 's') {
         const fee = currencyInfo[baseCurrency].gasFee;
         baseQuantityWithoutFee = baseQuantity - fee;
+        remainingWithoutFee = Math.max(0, remaining - fee);
         priceWithoutFee = quoteQuantity / baseQuantityWithoutFee;
         quoteQuantityWithoutFee = priceWithoutFee * baseQuantityWithoutFee;
     }
@@ -441,6 +438,12 @@ export function getDetailsWithoutFee(order) {
         quoteQuantityWithoutFee = quoteQuantity - fee;
         priceWithoutFee = quoteQuantityWithoutFee / baseQuantity;
         baseQuantityWithoutFee = quoteQuantityWithoutFee / priceWithoutFee;
+        remainingWithoutFee = Math.min(baseQuantityWithoutFee, remaining);
     }
-    return { price: priceWithoutFee, quoteQuantity: quoteQuantityWithoutFee, baseQuantity: baseQuantityWithoutFee };
+    return { price: priceWithoutFee, quoteQuantity: quoteQuantityWithoutFee, baseQuantity: baseQuantityWithoutFee, remaining: remainingWithoutFee  };
 }
+
+export function isZksyncChain(chainid) {
+      return ([1,1000]).includes(chainid);
+}
+

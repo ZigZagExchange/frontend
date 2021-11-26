@@ -14,9 +14,9 @@ class SpotForm extends React.Component {
       super(props);
       this.state = { userHasEditedPrice: false, price: null, amount: "", orderButtonDisabled: false, maxSizeSelected: false }
       this.MINIMUM_AMOUNTS = {
-          "ETH": 0.004,
-          "USDC": 20,
-          "USDT": 20
+          "ETH": 0.0001,
+          "USDC": 1,
+          "USDT": 1
       }
   }
 
@@ -55,7 +55,7 @@ class SpotForm extends React.Component {
         toast.error("Amount is not a number");
         return
     }
-    if (this.props.activeOrderCount > 0) {
+    if (this.props.activeOrderCount > 0 && ([1,1000]).includes(this.props.chainId) ) {
         toast.error("Only one active order permitted at a time");
         return
     }
@@ -94,7 +94,8 @@ class SpotForm extends React.Component {
         return
     }
     else if (isNaN(price) || price > this.props.lastPrice * 1.1 || price < this.props.lastPrice * 0.9) {
-        toast.error(`Price must be within 10% of spot`);
+        console.log(price);
+        toast.error("Price must be within 10% of spot");
         return
     }
 
@@ -131,33 +132,27 @@ class SpotForm extends React.Component {
           return Math.round(amount / baseBalance * 100)
       }
       else if (this.props.side === 'b') {
-          const quoteBalance = this.getQuoteBalance() - currencyInfo[quoteCurrency].gasFee;
+          const quoteBalance = this.getQuoteBalance();
           const amount = this.state.amount || 0;
-          const total = amount * this.currentPrice()
-          return Math.round(total / quoteBalance * 100)
+          const total = amount * this.currentPrice();
+          return Math.round(total / (quoteBalance - currencyInfo[quoteCurrency].gasFee) * 100);
       }
   }
 
   currentPrice() {
-      let price;
       const baseCurrency = this.props.currentMarket.split("-")[0];
-      if (this.props.orderType === "limit") {
-          price = this.state.price;
+      if (this.props.orderType === "limit" && this.state.price) {
+          return this.state.price;
       }
-      else if (this.props.lastPrice) {
-          if (this.props.side === 'b' && baseCurrency === "ETH")
-              price = parseFloat((this.props.lastPrice*1.001).toPrecision(6));
-          else if (this.props.side === 's' && baseCurrency === "ETH")
-              price = parseFloat((this.props.lastPrice*0.999).toPrecision(6));
-          else if (this.props.side === 'b' && baseCurrency === "USDC")
-              price = parseFloat((this.props.lastPrice*1.0004).toPrecision(6));
-          else if (this.props.side === 's' && baseCurrency === "USDC")
-              price = parseFloat((this.props.lastPrice*0.9996).toPrecision(6));
-      }
-      else {
-          price = 0;
-      }
-      return price;
+      if (this.props.side === 'b' && baseCurrency === "ETH")
+          return parseFloat((this.props.lastPrice*1.001).toPrecision(6));
+      else if (this.props.side === 's' && baseCurrency === "ETH")
+          return parseFloat((this.props.lastPrice*0.999).toPrecision(6));
+      else if (this.props.side === 'b' && baseCurrency === "USDC")
+          return parseFloat((this.props.lastPrice*1.0004).toPrecision(6));
+      else if (this.props.side === 's' && baseCurrency === "USDC")
+          return parseFloat((this.props.lastPrice*0.9996).toPrecision(6));
+      return 0;
   }
 
   rangeSliderHandler(e, val) {
@@ -188,9 +183,8 @@ class SpotForm extends React.Component {
       }
       else if (this.props.side === 'b') {
           const quoteBalance = this.getQuoteBalance();
-          const baseCurrency = this.props.currentMarket.split("-")[0];
-          let quoteAmount = quoteBalance * val / 100 / this.currentPrice();
-          quoteAmount -= currencyInfo[baseCurrency].gasFee;
+          const quoteCurrency = this.props.currentMarket.split("-")[1];
+          let quoteAmount = (quoteBalance - currencyInfo[quoteCurrency].gasFee) * val / 100 / this.currentPrice();
           quoteAmount = quoteAmount.toPrecision(7);
           if (quoteAmount < 1e-5) {
               newstate.amount = 0;

@@ -12,7 +12,7 @@ class SpotBox extends React.Component {
   }
 
   updateOrderType(orderType) {
-      if (orderType === "limit") {
+      if (orderType === "limit" && ([1,1000]).includes(this.props.chainId)) {
           toast.error("Limit orders disabled on zksync");
           return
       }

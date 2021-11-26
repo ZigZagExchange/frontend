@@ -26,7 +26,8 @@ import {
   signin,
   broadcastfill,
   getAccountState,
-  getDetailsWithoutFee
+  getDetailsWithoutFee,
+  isZksyncChain
 } from "../../helpers";
 
 class Trade extends React.Component {
@@ -73,7 +74,7 @@ class Trade extends React.Component {
                   }
               }
               const userOpenOrders = Object.values(newstate.userOrders).filter(o => o[9] === 'o');
-              if (userOpenOrders.length > 1) {
+              if (userOpenOrders.length > 1 && isZksyncChain(this.state.chainId)) {
                   toast.warn("Filling a new order will cancel all previous orders. It is recommended to only have one open order at a time.", { autoClose: 15000 });
               }
           }
@@ -163,6 +164,15 @@ class Trade extends React.Component {
                           newstate.userOrders[orderid][9] = 'c';
                       }
                       break
+                  case 'pm':
+                      const remaining = update[4];
+                      if (newstate.openorders[orderid]) {
+                          newstate.openorders[orderid][11] = remaining;
+                      }
+                      if (newstate.userOrders[orderid]) {
+                          newstate.userOrders[orderid][11] = remaining;
+                      }
+                      break
                   case 'm':
                       newstate = this.handleOrderMatch(newstate, orderid);
                       break
@@ -199,6 +209,7 @@ class Trade extends React.Component {
                           filledorder[10] = txhash;
                           const noFeeOrder = getDetailsWithoutFee(filledorder);
                           toast.error(`Your ${sideText} order for ${noFeeOrder.baseQuantity.toPrecision(4) / 1} ${baseCurrency} @ ${noFeeOrder.price.toPrecision(4) / 1} was rejected: ${error}`)
+                          toast.info(`This happens occasionally. Run the transaction again and you should be fine.`);
                       }
                       break
                   default:
@@ -378,6 +389,8 @@ class Trade extends React.Component {
       const market = order[2];
       const side = order[3];
       const price = order[4];
+      const remaining = isNaN(Number(order[11])) ? order[5] : order[11];
+      const remainingQuote = remaining * price;
       const orderstatus = order[9];
       let spotPrice;
       try {
@@ -386,21 +399,33 @@ class Trade extends React.Component {
           spotPrice = null;
       }
       const orderWithoutFee = getDetailsWithoutFee(order);
-      const orderrow = {
-        td1: orderWithoutFee.price,
-        td2: orderWithoutFee.baseQuantity,
-        td3: orderWithoutFee.quoteQuantity,
-        side,
-        order: order,
-      };
+      let orderrow;
+      if ( isZksyncChain(this.state.chainId) )
+          orderrow = {
+            td1: orderWithoutFee.price,
+            td2: orderWithoutFee.baseQuantity,
+            td3: orderWithoutFee.quoteQuantity,
+            side,
+            order: order,
+          };
+      else {
+          orderrow = {
+            td1: price,
+            td2: remaining,
+            td3: remainingQuote,
+            side,
+            order: order,
+          };
+      }
+
       // Only display Market Making orders within 2% of spot
       // No one is going to fill outside that range
       if (spotPrice && price > spotPrice * 0.98 && price < spotPrice * 1.02) {
         openOrdersData.push(orderrow);
       }
-      if (side === "b" && orderstatus === 'o') {
+      if (side === "b" && (['o','pm','pf']).includes(orderstatus)) {
         orderbookBids.push(orderrow);
-      } else if (side === "s" && orderstatus === 'o') {
+      } else if (side === "s" && (['o','pm','pf']).includes(orderstatus)) {
         orderbookAsks.push(orderrow);
       }
     }
@@ -411,29 +436,31 @@ class Trade extends React.Component {
         fillData.push({ td1: orderWithoutFee.price, td2: orderWithoutFee.baseQuantity, td3: orderWithoutFee.quoteQuantity, side: fill[3] });
     });
 
-    this.state.liquidity.forEach((liq) => {
-      const quantity = liq[0];
-      const spread = liq[1];
-      const side = liq[2];
-      if (side === "d" || side === "b") {
-        const bidPrice = this.state.marketSummary.price * (1 - spread);
-        orderbookBids.push({
-          td1: bidPrice,
-          td2: quantity,
-          td3: bidPrice * quantity,
-          side: "b",
+    if (isZksyncChain(this.state.chainId)) {
+        this.state.liquidity.forEach((liq) => {
+          const quantity = liq[0];
+          const spread = liq[1];
+          const side = liq[2];
+          if (side === "d" || side === "b") {
+            const bidPrice = this.state.marketSummary.price * (1 - spread);
+            orderbookBids.push({
+              td1: bidPrice,
+              td2: quantity,
+              td3: bidPrice * quantity,
+              side: "b",
+            });
+          }
+          if (side === "d" || side === "s") {
+            const askPrice = this.state.marketSummary.price * (1 + spread);
+            orderbookAsks.push({
+              td1: askPrice,
+              td2: quantity,
+              td3: askPrice * quantity,
+              side: "s",
+            });
+          }
         });
-      }
-      if (side === "d" || side === "s") {
-        const askPrice = this.state.marketSummary.price * (1 + spread);
-        orderbookAsks.push({
-          td1: askPrice,
-          td2: quantity,
-          td3: askPrice * quantity,
-          side: "s",
-        });
-      }
-    });
+    }
     orderbookAsks.sort((a, b) => b.td1 - a.td1);
     orderbookBids.sort((a, b) => b.td1 - a.td1);
 
