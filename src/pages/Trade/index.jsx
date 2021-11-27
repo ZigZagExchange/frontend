@@ -586,7 +586,6 @@ class Trade extends React.Component {
                       value="up_value"
                       priceTableData={openOrdersLatestTradesData}
                       currentMarket={this.state.currentMarket}
-                      onClickRow={this.fillOpenOrder.bind(this)}
                     />
                   </div>
                 </div>
