@@ -102,6 +102,11 @@ const Header = (props) => {
                 </NavLink>
               </li>
               <li>
+                <NavLink exact to="/bridge" activeClassName="active_link">
+                  Bridge
+                </NavLink>
+              </li>
+              <li>
                 <a href={walletLink} target="_blank" rel="noreferrer">Wallet</a>
               </li>
             </ul>

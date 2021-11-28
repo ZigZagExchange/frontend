@@ -168,7 +168,7 @@ class Footer extends React.Component {
               explorerLink = "https://zkscan.io/explorer/accounts/" + this.props.user.address;
       }
       let footerContent, classNameOrders = "", classNameBalances = "", classNameHistory = "";
-      const userOrdersSorted = Object.values(this.props.userOrders);
+      const userOrdersSorted = Object.values(this.props.userOrders || []);
       userOrdersSorted.sort((a,b) => b[1] - a[1]);
       switch (this.state.tab) {
         case "orders":
