@@ -17,6 +17,7 @@ import starknetAccountContract from "./lib/Account";
 //    "BTC-USDT": 1
 //}
 
+export const STARKNET_CONTRACT_ADDRESS = "0x074f861a79865af1fb77af6197042e8c73147e28c55ac61e385ac756f89b33d6";
 export const currencyInfo = {
     "ETH": { 
         decimals: 18, 
@@ -110,6 +111,12 @@ export async function signinstarknet(chainid) {
         localStorage.setItem("starknet:account", userWalletContractAddress);
     }
 
+    // Check account initialized
+    const initialized = await checkAccountInitializedStarknet(userWalletContractAddress);
+    if (!initialized) {
+        await initializeAccountStarknet(userWalletContractAddress);
+    }
+
     const msg = { op: "login", args: [chainid, userWalletContractAddress] };
     zigzagws.send(JSON.stringify(msg));
 
@@ -133,6 +140,22 @@ export async function signinstarknet(chainid) {
         }
     }
 
+    // Check allowances
+    const allowanceToast = toast.info("Checking and setting allowances on tokens", { autoClose: false });
+    const allowances = await getStarknetAllowances(chainid, userWalletContractAddress, STARKNET_CONTRACT_ADDRESS);
+    console.log(allowances);
+    toast.dismiss(allowanceToast);
+    
+    // Set allowances if not set
+    for (let currency in allowances) {
+        let amount = bigInt(1e21);
+        if (allowances[currency].compare(amount) === -1) {
+            const setApprovalResult = await setTokenApprovalStarknet(currencyInfo[currency].chain[chainid].contractAddress, userWalletContractAddress, STARKNET_CONTRACT_ADDRESS, amount.toString());
+            console.log(setApprovalResult);
+        }
+    }
+
+
     //// check if connection was successful
     //if(starknet.isConnected) {
     //    // If the extension was installed and successfully connected, you have access to a starknet.js Signer object to do all kind of requests through the users wallet contract.
@@ -153,6 +176,30 @@ export async function signinstarknet(chainid) {
     return accountState;
 }
 
+export async function checkAccountInitializedStarknet(userAddress) {
+    try {
+        await starknet.defaultProvider.callContract({
+            contract_address: userAddress,
+            entry_point_selector: starknet.stark.getSelectorFromName("assert_initialized"),
+            calldata: []
+        });
+        return true;
+    } catch(e) {
+        return false;
+    }
+}
+
+export async function initializeAccountStarknet(userAddress) {
+    const userAddressInt = bigInt(userAddress.slice(2), 16);
+    const result = await starknet.defaultProvider.addTransaction({
+        type: "INVOKE_FUNCTION",
+        contract_address: userAddress,
+        entry_point_selector: starknet.stark.getSelectorFromName("initialize"),
+        calldata: [userAddressInt.toString()]
+    });
+    return result;
+}
+
 export async function getStarknetBalances(chainid, userAddress) {
     const balances = {};
     for (let currency in currencyInfo) {
@@ -161,6 +208,40 @@ export async function getStarknetBalances(chainid, userAddress) {
     }
     return balances;
 }
+
+export async function getStarknetAllowances(chainid, userAddress, spender) {
+    const allowances = {};
+    for (let currency in currencyInfo) {
+        let allowance = await getTokenAllowanceStarknet(currencyInfo[currency].chain[chainid].contractAddress, userAddress, spender);
+        allowances[currency] = allowance;
+    }
+    return allowances;
+}
+
+export async function getTokenAllowanceStarknet(tokenAddress, userAddress, spender) {
+    const contractAddressInt = bigInt(spender.slice(2), 16);
+    const userAddressInt = bigInt(userAddress.slice(2), 16);
+    const allowanceJson = await starknet.defaultProvider.callContract({
+        contract_address: tokenAddress,
+        entry_point_selector: starknet.stark.getSelectorFromName("allowance"),
+        calldata: [userAddressInt.toString(), contractAddressInt]
+    });
+    const allowance = bigInt(allowanceJson.result[0].slice(2), 16);
+    return allowance;
+}
+
+export async function setTokenApprovalStarknet(tokenAddress, userAddress, spender, amount) {
+    const keypair = starknet.ec.ec.keyFromPrivate(localStorage.getItem('starknet:privkey'), 'hex');
+    const spenderInt = bigInt(spender.slice(2), 16);
+    const localSigner = new starknet.Signer(starknet.defaultProvider, userAddress, keypair);
+    return await localSigner.addTransaction({
+        type: "INVOKE_FUNCTION",
+        contract_address: tokenAddress,
+        entry_point_selector: starknet.stark.getSelectorFromName("approve"),
+        calldata: [spenderInt.toString(), amount, "0"]
+    });
+}
+
 
 export async function getStarknetBalance(contractAddress, userAddress) {
     const userAddressInt = bigInt(userAddress.slice(2), 16);
