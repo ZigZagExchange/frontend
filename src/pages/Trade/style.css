@@ -91,7 +91,15 @@
   background-color: #171c28;
 }
 
+.trade_Price {
+  margin-bottom: 10px;
+  box-sizing: border-box;
+}
+
 @media screen and (max-width: 991px) {
+  .trade_Price {
+    margin: 0 auto;
+  }
   .trade_left > div {
     width: 100%;
   }

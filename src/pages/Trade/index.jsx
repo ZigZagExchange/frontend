@@ -269,7 +269,7 @@ class Trade extends React.Component {
     try {
       syncAccountState = await signin(this.state.chainId);
     } catch (e) {
-      toast.error(e.message);
+      if (e) toast.error(e.message);
       return false;
     }
     const newState = { ...this.state };
@@ -543,7 +543,7 @@ class Trade extends React.Component {
                     {/* Trade Price Head */}
                     {/* Trade Price Table*/}
                     <TradePriceTable
-                      className="tpt_1"
+                      className=""
                       useGradient="true"
                       priceTableData={askBins}
                       currentMarket={this.state.currentMarket}
@@ -565,7 +565,7 @@ class Trade extends React.Component {
                     />
                     {/* Trade Price Table*/}
                     <TradePriceTable
-                      className="tpt_2"
+                      className=""
                       useGradient="true"
                       currentMarket={this.state.currentMarket}
                       priceTableData={bidBins}
@@ -582,7 +582,7 @@ class Trade extends React.Component {
                     </div>
                     {/* Trade Price Table*/}
                     <TradePriceTable
-                      className="tpt_3"
+                      className=""
                       value="up_value"
                       priceTableData={openOrdersLatestTradesData}
                       currentMarket={this.state.currentMarket}

@@ -34,7 +34,7 @@ class TradePriceTable extends React.Component {
               <tr>
                 <th>Price</th>
                 <th>Amount</th>
-                <th>Total({quoteCurrency})</th>
+                <th>Total ({quoteCurrency})</th>
               </tr>
             </thead>
             <tbody>

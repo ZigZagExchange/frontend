@@ -38,11 +38,11 @@ class TradeRatesCard extends React.Component {
             <p>{this.props.marketSummary["24lo"]}</p>
           </div>
           <div className="rates_box rb_text_4">
-            <h2>24h Volume({baseCurrency})</h2>
+            <h2>24h Volume ({baseCurrency})</h2>
             <p>{this.props.marketSummary.baseVolume}</p>
           </div>
           <div className="rates_box rb_text_4">
-            <h2>24h Volume({quoteCurrency})</h2>
+            <h2>24h Volume ({quoteCurrency})</h2>
             <p>{this.props.marketSummary.quoteVolume}</p>
           </div>
         </div>
