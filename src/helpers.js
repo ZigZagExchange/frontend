@@ -4,7 +4,7 @@ import Web3 from "web3";
 import Web3Modal from "web3modal";
 import { toast } from 'react-toastify';
 //import { getStarknet } from "@argent/get-starknet"
-import * as starknet from "starknet"
+import * as starknet from "starknet";
 import bigInt from "big-integer";
 import starknetAccountContract from "./lib/Account";
 import WalletConnectProvider from "@walletconnect/web3-provider";

@@ -98,7 +98,6 @@
 }
 .trade_price_table td {
   color: white;
-  text-align: center;
 }
 .trade_price_table td:nth-child(3) {
   text-align: right;
