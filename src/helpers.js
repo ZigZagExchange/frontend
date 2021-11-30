@@ -112,9 +112,11 @@ export async function signinstarknet(chainid) {
     }
 
     // Check account initialized
-    const initialized = await checkAccountInitializedStarknet(userWalletContractAddress);
-    if (!initialized) {
+    if (!localStorage.getItem("starknet:account:initialized")) {
+        const accountInitializeToast = toast.info("Initializing account", { autoClose: false });
         await initializeAccountStarknet(userWalletContractAddress);
+        toast.dismiss(accountInitializeToast);
+        localStorage.setItem("starknet:account:initialized", "1");
     }
 
     const msg = { op: "login", args: [chainid, userWalletContractAddress] };
@@ -139,21 +141,6 @@ export async function signinstarknet(chainid) {
             committedBalances[currency] = amount;
         }
     }
-
-    //// Check allowances
-    //const allowanceToast = toast.info("Checking and setting allowances on tokens", { autoClose: false });
-    //const allowances = await getStarknetAllowances(chainid, userWalletContractAddress, STARKNET_CONTRACT_ADDRESS);
-    //console.log("allowances", allowances);
-    //toast.dismiss(allowanceToast);
-    //
-    //// Set allowances if not set
-    //for (let currency in allowances) {
-    //    let amount = bigInt(1e21);
-    //    if (allowances[currency].compare(amount) === -1) {
-    //        await setTokenApprovalStarknet(currencyInfo[currency].chain[chainid].contractAddress, userWalletContractAddress, STARKNET_CONTRACT_ADDRESS, amount.toString());
-    //    }
-    //}
-
 
     //// check if connection was successful
     //if(starknet.isConnected) {
@@ -291,7 +278,7 @@ export async function signinzksync(chainid) {
         params: [{ chainId: ethereumChainId }],
       });
   } catch (e) {
-      toast.warn("Your version of Metamask doesn't support automated chain switching. Please switch to the required chain manually")
+      throw new Error("Wrong chain. Cannot sign in.");
   }
 
   ethersProvider = new ethers.providers.Web3Provider(window.ethereum);
@@ -348,6 +335,42 @@ export async function submitorder(chainId, product, side, price, amount) {
 }
 
 export async function submitorderstarknet(chainId, product, side, price, amount) {
+    // Check allowances
+    const baseCurrency = product.split("-")[0];
+    const quoteCurrency = product.split("-")[1];
+    let sellCurrency;
+    if (side === 's') {
+        sellCurrency = baseCurrency;
+    }
+    else if (side === 'b') {
+        sellCurrency = quoteCurrency;
+    }
+    let allowance;
+    if (localStorage.getItem("starknet:allowance:" + sellCurrency)) {
+        allowance = bigInt(localStorage.getItem("starknet:allowance:" + sellCurrency));
+    }
+    else {
+        const allowanceToast = toast.info(`Checking allowances on ${sellCurrency}`, { autoClose: false });
+        const userAddress = localStorage.getItem("starknet:account");
+        allowance = await getTokenAllowanceStarknet(currencyInfo[sellCurrency].chain[chainId].contractAddress, userAddress, STARKNET_CONTRACT_ADDRESS);
+        localStorage.setItem("starknet:allowance:" + sellCurrency, allowance);
+        toast.dismiss(allowanceToast);
+    }
+    
+    // Set allowances if not set
+    let approveAmount = bigInt(1e21);
+    if (allowance.compare(approveAmount) === -1) {
+        const setAllowanceToast = toast.info(`Setting allowance on ${sellCurrency}`, { autoClose: false });
+        const userAddress = localStorage.getItem("starknet:account");
+        try {
+            await setTokenApprovalStarknet(currencyInfo[sellCurrency].chain[chainId].contractAddress, userAddress, STARKNET_CONTRACT_ADDRESS, approveAmount.toString());
+        } catch (e) {
+            toast.dismiss(setAllowanceToast);
+            toast.error("Your account is still initializing. Try again in 1 min");
+        }
+        toast.dismiss(setAllowanceToast);
+    }
+
     const expiration = Date.now() + 86400*1000;
     const orderhash = starknetOrderHash(chainId, product, side, price, amount, expiration);
     const keypair = starknet.ec.ec.keyFromPrivate(localStorage.getItem('starknet:privkey'), 'hex');
