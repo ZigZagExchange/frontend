@@ -55,7 +55,7 @@ class SpotForm extends React.Component {
         toast.error("Amount is not a number");
         return
     }
-    if (this.props.activeOrderCount > 0 && ([1,1000]).includes(this.props.chainId) ) {
+    if (this.props.activeOrderCount > 0 && isZksyncChain(this.props.chainId) ) {
         toast.error("Only one active order permitted at a time");
         return
     }
@@ -102,7 +102,10 @@ class SpotForm extends React.Component {
     let newstate = { ...this.state };
     newstate.orderButtonDisabled = true;
     this.setState(newstate);
-    const orderPendingToast = toast.info("Order pending. Sign or Cancel to continue...");
+    let orderPendingToast;
+    if (isZksyncChain(this.props.chainId)) {
+        orderPendingToast = toast.info("Order pending. Sign or Cancel to continue...");
+    }
 
     try {
       await submitorder(this.props.chainId, this.props.currentMarket, this.props.side, price, amount);
@@ -111,7 +114,9 @@ class SpotForm extends React.Component {
       toast.error(e.message);
     }
 
-    toast.dismiss(orderPendingToast);
+    if (isZksyncChain(this.props.chainId)) {
+        toast.dismiss(orderPendingToast);
+    }
     newstate = { ...this.state };
     newstate.orderButtonDisabled = false;
     this.setState(newstate);

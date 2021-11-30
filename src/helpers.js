@@ -17,7 +17,7 @@ import starknetAccountContract from "./lib/Account";
 //    "BTC-USDT": 1
 //}
 
-export const STARKNET_CONTRACT_ADDRESS = "0x074f861a79865af1fb77af6197042e8c73147e28c55ac61e385ac756f89b33d6";
+export const STARKNET_CONTRACT_ADDRESS = "0x04487f07768a4761951e2686652df5fad1ca221073afbe52e2696072654bf7c0";
 export const currencyInfo = {
     "ETH": { 
         decimals: 18, 
@@ -140,20 +140,19 @@ export async function signinstarknet(chainid) {
         }
     }
 
-    // Check allowances
-    const allowanceToast = toast.info("Checking and setting allowances on tokens", { autoClose: false });
-    const allowances = await getStarknetAllowances(chainid, userWalletContractAddress, STARKNET_CONTRACT_ADDRESS);
-    console.log(allowances);
-    toast.dismiss(allowanceToast);
-    
-    // Set allowances if not set
-    for (let currency in allowances) {
-        let amount = bigInt(1e21);
-        if (allowances[currency].compare(amount) === -1) {
-            const setApprovalResult = await setTokenApprovalStarknet(currencyInfo[currency].chain[chainid].contractAddress, userWalletContractAddress, STARKNET_CONTRACT_ADDRESS, amount.toString());
-            console.log(setApprovalResult);
-        }
-    }
+    //// Check allowances
+    //const allowanceToast = toast.info("Checking and setting allowances on tokens", { autoClose: false });
+    //const allowances = await getStarknetAllowances(chainid, userWalletContractAddress, STARKNET_CONTRACT_ADDRESS);
+    //console.log("allowances", allowances);
+    //toast.dismiss(allowanceToast);
+    //
+    //// Set allowances if not set
+    //for (let currency in allowances) {
+    //    let amount = bigInt(1e21);
+    //    if (allowances[currency].compare(amount) === -1) {
+    //        await setTokenApprovalStarknet(currencyInfo[currency].chain[chainid].contractAddress, userWalletContractAddress, STARKNET_CONTRACT_ADDRESS, amount.toString());
+    //    }
+    //}
 
 
     //// check if connection was successful
@@ -349,12 +348,12 @@ export async function submitorder(chainId, product, side, price, amount) {
 }
 
 export async function submitorderstarknet(chainId, product, side, price, amount) {
-    const expiration = Date.now() + 86400;
+    const expiration = Date.now() + 86400*1000;
     const orderhash = starknetOrderHash(chainId, product, side, price, amount, expiration);
     const keypair = starknet.ec.ec.keyFromPrivate(localStorage.getItem('starknet:privkey'), 'hex');
     const sig = starknet.ec.sign(keypair, orderhash.hash);
 
-    const starknetOrder = [...orderhash.order, sig.r, sig.s];
+    const starknetOrder = [...orderhash.order, sig.r.toString(), sig.s.toString()];
     const msg = { op: "submitorder", args: [chainId, starknetOrder] };
     zigzagws.send(JSON.stringify(msg));
 }
@@ -364,7 +363,12 @@ export function starknetOrderHash(chainId, product, side, price, amount, expirat
     const quoteCurrency = product.split("-")[1];
     const baseAsset = currencyInfo[baseCurrency].chain[chainId].contractAddress;
     const quoteAsset = currencyInfo[quoteCurrency].chain[chainId].contractAddress;
-    const priceInt = (price*1e6).toFixed(0);
+    const decimalDifference = currencyInfo[baseCurrency].decimals - currencyInfo[quoteCurrency].decimals;
+    let priceNumerator, priceDenominator;
+    if (product === "ETH-USDT" || product === "ETH-USDC") {
+        priceNumerator = "1";
+        priceDenominator = (1 / price * 10**(decimalDifference)).toFixed(0);
+    }
     const sideInt = side === 'b' ? 0: 1;
     const baseQuantityInt = (amount * 10**(currencyInfo[baseCurrency].decimals)).toFixed(0);
     let orderhash = starknet.hash.pedersen([chainId, accountState.address]);
@@ -372,9 +376,10 @@ export function starknetOrderHash(chainId, product, side, price, amount, expirat
     orderhash = starknet.hash.pedersen([orderhash, quoteAsset]);
     orderhash = starknet.hash.pedersen([orderhash, sideInt]);
     orderhash = starknet.hash.pedersen([orderhash, baseQuantityInt]);
-    orderhash = starknet.hash.pedersen([orderhash, priceInt]);
+    orderhash = starknet.hash.pedersen([orderhash, priceNumerator]);
+    orderhash = starknet.hash.pedersen([orderhash, priceDenominator]);
     orderhash = starknet.hash.pedersen([orderhash, expiration]);
-    const starknetOrder = [chainId, accountState.address, baseAsset, quoteAsset, sideInt, baseQuantityInt, priceInt, expiration];
+    const starknetOrder = [chainId.toString(), accountState.address, baseAsset, quoteAsset, sideInt.toString(), baseQuantityInt.toString(), priceNumerator, priceDenominator, expiration.toString()];
     return { hash: orderhash, order: starknetOrder } 
 }
 

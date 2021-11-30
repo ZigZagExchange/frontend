@@ -4,7 +4,7 @@ import "./Footer.css";
 // assets
 import loadingGif from "../../assets/icons/loading.svg";
 //helpers
-import { cancelorder, currencyInfo, getDetailsWithoutFee } from "../../helpers";
+import { cancelorder, currencyInfo, getDetailsWithoutFee, isZksyncChain } from "../../helpers";
 
 class Footer extends React.Component {
   constructor (props) {
@@ -66,7 +66,7 @@ class Footer extends React.Component {
               const side = order[3] === "b" ? "buy" : "sell";
               const sideclassname = order[3] === "b" ? "up_value" : "down_value";
               let feeText;
-              if (order[9] === 'r') {
+              if (order[9] === 'r' || !isZksyncChain(this.props.chainId)) {
                   feeText = '0 ' + baseCurrency;
               }
               else if (order[3] === 's') {

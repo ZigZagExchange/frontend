@@ -52,8 +52,10 @@ class Trade extends React.Component {
     setInterval(this.updateUser.bind(this), 10000);
 
     zigzagws.addEventListener("message", async (e) => {
-      console.log(e.data);
       const msg = JSON.parse(e.data);
+      if (!(["pong", "lastprice"]).includes(msg.op)) {
+          console.log(e.data);
+      }
       let newstate;
       switch (msg.op) {
         case "orders":
@@ -63,18 +65,15 @@ class Trade extends React.Component {
               if (order[2] === this.state.currentMarket && order[0] === this.state.chainId) {
                   newstate.orders[order[1]] = order;
               }
+              if (this.state.user.id && order[8] === this.state.user.id.toString()) {
+                  newstate.userOrders[order[1]] = order;
+              }
           });
           
           // zksync warning if more than one limit order is open
-          if (this.state.user.id) {
-              for (let i in orders) {
-                  if (orders[i][8] === this.state.user.id.toString()) {
-                      const orderid = orders[i][1];
-                      newstate.userOrders[orderid] = orders[i];
-                  }
-              }
+          if (this.state.user.id && isZksyncChain(this.state.chainId)) {
               const userOpenOrders = Object.values(newstate.userOrders).filter(o => o[9] === 'o');
-              if (userOpenOrders.length > 1 && isZksyncChain(this.state.chainId)) {
+              if (userOpenOrders.length > 1) {
                   toast.warn("Filling a new order will cancel all previous orders. It is recommended to only have one open order at a time.", { autoClose: 15000 });
               }
           }
@@ -87,14 +86,6 @@ class Trade extends React.Component {
               if (fill[2] === this.state.currentMarket && fill[0] === this.state.chainId) {
                   newstate.marketFills.unshift(fill);
               }
-          });
-          this.setState(newstate);
-          break
-        case "userorders":
-          newstate = { ...this.state };
-          const userorders = msg.args[0];
-          userorders.forEach(order => {
-              newstate.userOrders[order[1]] = order;
           });
           this.setState(newstate);
           break
@@ -167,14 +158,32 @@ class Trade extends React.Component {
                   case 'pm':
                       const remaining = update[4];
                       if (newstate.orders[orderid]) {
+                          newstate.orders[orderid][9] = 'pm';
                           newstate.orders[orderid][11] = remaining;
                       }
                       if (newstate.userOrders[orderid]) {
+                          newstate.userOrders[orderid][9] = 'pm';
                           newstate.userOrders[orderid][11] = remaining;
                       }
                       break
                   case 'm':
+                      if (newstate.orders[orderid]) {
+                          newstate.orders[orderid][9] = 'm';
+                          newstate.orders[orderid][11] = 0;
+                      }
+                      if (newstate.userOrders[orderid]) {
+                          newstate.userOrders[orderid][9] = 'm';
+                          newstate.userOrders[orderid][11] = 0;
+                      }
                       newstate = this.handleOrderMatch(newstate, orderid);
+                      break
+                  case 'pf':
+                      if (newstate.orders[orderid]) {
+                          newstate.orders[orderid][9] = 'pf';
+                      }
+                      if (newstate.userOrders[orderid]) {
+                          newstate.userOrders[orderid][9] = 'pf';
+                      }
                       break
                   case 'f':
                       filledorder = newstate.userOrders[orderid];
