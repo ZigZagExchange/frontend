@@ -489,25 +489,30 @@ class Trade extends React.Component {
             }
         }
 
+        // Only display recent trades
+        // There's a bunch of user trades in this list that are too old to display
         const fillData = [];
-        Object.values(this.state.marketFills).forEach((fill) => {
-            if (isZksyncChain(this.state.chainId)) {
-                const orderWithoutFee = getFillDetailsWithoutFee(fill);
-                fillData.push({
-                    td1: orderWithoutFee.price,
-                    td2: orderWithoutFee.baseQuantity,
-                    td3: orderWithoutFee.quoteQuantity,
-                    side: fill[3],
-                });
-            } else {
-                fillData.push({
-                    td1: fill[4],
-                    td2: fill[5],
-                    td3: fill[4] * fill[5],
-                    side: fill[3],
-                });
-            }
-        });
+        const maxFillId = Math.max(...Object.values(this.state.marketFills).map(f => f[1]));
+        Object.values(this.state.marketFills)
+            .filter(fill => fill[1] > maxFillId - 10)
+            .forEach((fill) => {
+                if (isZksyncChain(this.state.chainId)) {
+                    const orderWithoutFee = getFillDetailsWithoutFee(fill);
+                    fillData.push({
+                        td1: orderWithoutFee.price,
+                        td2: orderWithoutFee.baseQuantity,
+                        td3: orderWithoutFee.quoteQuantity,
+                        side: fill[3],
+                    });
+                } else {
+                    fillData.push({
+                        td1: fill[4],
+                        td2: fill[5],
+                        td3: fill[4] * fill[5],
+                        side: fill[3],
+                    });
+                }
+            });
 
         if (isZksyncChain(this.state.chainId)) {
             this.state.liquidity.forEach((liq) => {
