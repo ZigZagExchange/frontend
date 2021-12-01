@@ -494,7 +494,8 @@ class Trade extends React.Component {
         const fillData = [];
         const maxFillId = Math.max(...Object.values(this.state.marketFills).map(f => f[1]));
         Object.values(this.state.marketFills)
-            .filter(fill => fill[1] > maxFillId - 10)
+            .filter(fill => fill[1] > maxFillId - 100)
+            .sort((a,b) => b[1] - a[1])
             .forEach((fill) => {
                 if (isZksyncChain(this.state.chainId)) {
                     const orderWithoutFee = getFillDetailsWithoutFee(fill);
