@@ -396,6 +396,7 @@ class Trade extends React.Component {
         if (this.state.chainId !== chainId) {
             newState.user = {};
             newState.userOrders = {};
+            newState.userFills = {};
         }
         newState.orders = {};
         newState.liquidity = [];
