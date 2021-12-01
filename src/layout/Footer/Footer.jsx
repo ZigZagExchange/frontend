@@ -247,6 +247,7 @@ class Footer extends React.Component {
                                 quoteCurrency;
                         }
                         const fillWithoutFee = getFillDetailsWithoutFee(fill);
+                        console.log(fillWithoutFee);
                         if ([1, 1000].includes(this.props.chainId)) {
                             price = fillWithoutFee.price;
                             baseQuantity = fillWithoutFee.baseQuantity;

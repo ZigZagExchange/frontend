@@ -22,7 +22,6 @@ import SpotBox from "../../components/TradeComponents/SpotBox/SpotBox";
 // Helpers
 import {
     zigzagws,
-    sendfillrequest,
     signin,
     broadcastfill,
     getAccountState,
@@ -108,8 +107,8 @@ class Trade extends React.Component {
                         }
                         if (
                             this.state.user.id &&
-                            (fill[8] === this.state.user.id ||
-                                fill[9] === this.state.user.id)
+                            (fill[8] === this.state.user.id.toString() ||
+                                fill[9] === this.state.user.id.toString())
                         ) {
                             newstate.userFills[fillid] = fill;
                         }
@@ -334,8 +333,13 @@ class Trade extends React.Component {
     async updateUser() {
         if (this.state.user.id) {
             const newstate = { ...this.state };
+            const initChainId = this.state.chainId;
             newstate.user = await getAccountState(this.state.chainId);
-            this.setState(newstate);
+            
+            // Sometimes the user changes chains in the middle of a state update
+            if (this.state.chainId === initChainId) {
+                this.setState(newstate);
+            }
         }
     }
 
@@ -377,61 +381,6 @@ class Trade extends React.Component {
             }
         }
         this.setState(newState);
-    }
-
-    async fillOpenOrder(data) {
-        if (!data.order) return;
-
-        if (!this.state.user.address) {
-            toast.error("Must be logged in to fill orders");
-            return;
-        }
-
-        const baseCurrency = data.order[2].split("-")[0];
-        const quoteCurrency = data.order[2].split("-")[1];
-
-        let baseBalance, quoteBalance;
-        if (this.state.user.address) {
-            baseBalance =
-                this.state.user.committed.balances[baseCurrency] /
-                Math.pow(10, 18);
-            quoteBalance =
-                this.state.user.committed.balances[quoteCurrency] /
-                Math.pow(10, 6);
-        } else {
-            baseBalance = 0;
-            quoteBalance = 0;
-        }
-        const baseQuantity = data.order[5];
-        const quoteQuantity = data.order[6];
-
-        baseBalance = parseFloat(baseBalance);
-        quoteBalance = parseFloat(quoteBalance);
-        if (data.side === "b" && isNaN(baseBalance)) {
-            toast.error(`No ${baseCurrency} balance`);
-            return;
-        }
-        if (data.side === "s" && isNaN(quoteBalance)) {
-            toast.error(`No ${quoteCurrency} balance`);
-            return;
-        } else if (data.side === "b" && baseQuantity > baseBalance) {
-            toast.error(`Amount exceeds ${baseCurrency} balance`);
-            return;
-        } else if (data.side === "s" && quoteQuantity > quoteBalance) {
-            toast.error(`Total exceeds ${quoteCurrency} balance`);
-            return;
-        }
-        const orderPendingToast = toast.info(
-            "Order pending. Sign or Cancel to continue..."
-        );
-
-        try {
-            await sendfillrequest(data.order);
-        } catch (e) {
-            console.log(e);
-            toast.error(e.message);
-        }
-        toast.dismiss(orderPendingToast);
     }
 
     updateMarketChain(chainId, market) {

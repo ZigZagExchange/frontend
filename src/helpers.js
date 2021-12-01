@@ -427,12 +427,10 @@ export async function submitorderstarknet(
     } else if (side === "b") {
         sellCurrency = quoteCurrency;
     }
-    let allowance;
-    if (localStorage.getItem("starknet:allowance:" + sellCurrency)) {
-        allowance = bigInt(
-            localStorage.getItem("starknet:allowance:" + sellCurrency)
-        );
-    } else {
+    let approveAmount = bigInt(1e21);
+    let allowance = localStorage.getItem("starknet:allowance:" + sellCurrency);
+    if (allowance) allowance = bigInt(allowance);
+    if (!allowance || allowance.compare(approveAmount) === -1) {
         const allowanceToast = toast.info(
             `Checking allowances on ${sellCurrency}`,
             { autoClose: false }
@@ -448,7 +446,6 @@ export async function submitorderstarknet(
     }
 
     // Set allowances if not set
-    let approveAmount = bigInt(1e21);
     if (allowance.compare(approveAmount) === -1) {
         const setAllowanceToast = toast.info(
             `Setting allowance on ${sellCurrency}`,
@@ -681,7 +678,7 @@ export function getOrderDetailsWithoutFee(order) {
         remainingWithoutFee = Math.max(0, remaining - fee);
         priceWithoutFee = quoteQuantity / baseQuantityWithoutFee;
         quoteQuantityWithoutFee = priceWithoutFee * baseQuantityWithoutFee;
-    } else if (side === "b") {
+    } else {
         const fee = currencyInfo[quoteCurrency].gasFee;
         quoteQuantityWithoutFee = quoteQuantity - fee;
         priceWithoutFee = quoteQuantityWithoutFee / baseQuantity;
@@ -708,7 +705,7 @@ export function getFillDetailsWithoutFee(fill) {
         baseQuantityWithoutFee = baseQuantity - fee;
         priceWithoutFee = quoteQuantity / baseQuantityWithoutFee;
         quoteQuantityWithoutFee = priceWithoutFee * baseQuantityWithoutFee;
-    } else if (side === "b") {
+    } else {
         const fee = currencyInfo[quoteCurrency].gasFee;
         quoteQuantityWithoutFee = quoteQuantity - fee;
         priceWithoutFee = quoteQuantityWithoutFee / baseQuantity;
