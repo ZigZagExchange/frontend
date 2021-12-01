@@ -2,16 +2,20 @@ import React from "react";
 // css
 import "./Button.css";
 const Button = (props) => {
-  return (
-    <>
-      <button type="button" className={props.className} onClick={props.onClick}>
+    return (
         <>
-          <img src={props.img} alt="..." />
-          {props.text}
+            <button
+                type="button"
+                className={props.className}
+                onClick={props.onClick}
+            >
+                <>
+                    <img src={props.img} alt="..." />
+                    {props.text}
+                </>
+            </button>
         </>
-      </button>
-    </>
-  );
+    );
 };
 
 export default Button;

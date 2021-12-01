@@ -1,64 +1,64 @@
 /* home table */
 
 .home_table {
-  width: 100%;
+    width: 100%;
 }
 
 .home_table table {
-  width: 100%;
+    width: 100%;
 }
 
 .ht_head {
-  height: 40px;
-  background-color: #1c1d246e;
+    height: 40px;
+    background-color: #1c1d246e;
 }
 
 .home_table table th {
-  color: #94a2c9;
-  text-align: left;
-  padding-left: 20px;
+    color: #94a2c9;
+    text-align: left;
+    padding-left: 20px;
 }
 
 .home_table table th img {
-  margin-top: -4px;
-  margin-left: 4px;
+    margin-top: -4px;
+    margin-left: 4px;
 }
 
 .home_table table tbody {
-  background-color: #1c1d24;
+    background-color: #1c1d24;
 }
 
 .home_table td {
-  color: #878b92;
-  padding-left: 20px;
-  padding: 20px 0 20px 20px;
+    color: #878b92;
+    padding-left: 20px;
+    padding: 20px 0 20px 20px;
 }
 
 .home_table td button {
-  border: 1px solid #272e40;
-  background-color: transparent;
-  margin: 0 4px;
-  padding: 4px 12px;
-  border-radius: 5px;
+    border: 1px solid #272e40;
+    background-color: transparent;
+    margin: 0 4px;
+    padding: 4px 12px;
+    border-radius: 5px;
 }
 
 .home_table td button:nth-child(1) {
-  color: #09a9f5;
+    color: #09a9f5;
 }
 
 .home_table td button:nth-child(2) {
-  color: #3fe199;
+    color: #3fe199;
 }
 
 .home_table td button:nth-child(3) {
-  color: #c4384e;
+    color: #c4384e;
 }
 
 @media screen and (max-width: 1103px) {
-  .home_table {
-    overflow: auto;
-  }
-  .home_table table {
-    width: max-content;
-  }
+    .home_table {
+        overflow: auto;
+    }
+    .home_table table {
+        width: max-content;
+    }
 }

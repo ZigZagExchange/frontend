@@ -1,53 +1,53 @@
 /* header field */
 
 .h_fields {
-  width: 100%;
-  margin: 2rem 0;
-  font-size: 1.1rem;
-  display: flex;
-  align-items: center;
+    width: 100%;
+    margin: 2rem 0;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
 }
 
 .search_input {
-  width: 300px;
-  display: flex;
-  padding-left: 30px;
-  align-items: center;
+    width: 300px;
+    display: flex;
+    padding-left: 30px;
+    align-items: center;
 }
 
 .search_input input {
-  background-color: transparent;
-  border: none;
-  outline: none;
-  color: #7b89ac;
-  width: 100%;
-  padding: 0 10px;
+    background-color: transparent;
+    border: none;
+    outline: none;
+    color: #7b89ac;
+    width: 100%;
+    padding: 0 10px;
 }
 
 .search_input input::placeholder {
-  color: #7b89ac;
+    color: #7b89ac;
 }
 
 .hide_checkbox {
-  width: max-content;
-  color: #7b89ac;
+    width: max-content;
+    color: #7b89ac;
 }
 
 .hide_checkbox label {
-  margin-left: 10px;
+    margin-left: 10px;
 }
 
 @media screen and (max-width: 871px) {
-  .search_input {
-    width: 264px;
-  }
+    .search_input {
+        width: 264px;
+    }
 }
 
 @media screen and (max-width: 545px) {
-  .h_fields {
-    flex-direction: column;
-  }
-  .search_input {
-    margin-bottom: 10px;
-  }
+    .h_fields {
+        flex-direction: column;
+    }
+    .search_input {
+        margin-bottom: 10px;
+    }
 }

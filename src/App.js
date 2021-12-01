@@ -3,13 +3,13 @@ import AppRoute from "./routes/AppRoute";
 import React from "react";
 
 class App extends React.Component {
-  render() {
-    return (
-      <>
-        <AppRoute />
-      </>
-    );
-  }
+    render() {
+        return (
+            <>
+                <AppRoute />
+            </>
+        );
+    }
 }
 
-export default App; 
+export default App;

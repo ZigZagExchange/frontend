@@ -184,11 +184,7 @@
         "L1_HANDLER": []
     },
     "program": {
-        "builtins": [
-            "pedersen",
-            "range_check",
-            "ecdsa"
-        ],
+        "builtins": ["pedersen", "range_check", "ecdsa"],
         "data": [
             "0x400380007ffb7ffc",
             "0x400380017ffb7ffd",
@@ -27878,10 +27874,7 @@
                     }
                 },
                 "645": {
-                    "accessible_scopes": [
-                        "__main__",
-                        "__main__.hash_message"
-                    ],
+                    "accessible_scopes": ["__main__", "__main__.hash_message"],
                     "flow_tracking_data": {
                         "ap_tracking": {
                             "group": 52,
@@ -27904,10 +27897,7 @@
                     }
                 },
                 "647": {
-                    "accessible_scopes": [
-                        "__main__",
-                        "__main__.hash_message"
-                    ],
+                    "accessible_scopes": ["__main__", "__main__.hash_message"],
                     "flow_tracking_data": {
                         "ap_tracking": {
                             "group": 52,
@@ -27954,10 +27944,7 @@
                     }
                 },
                 "648": {
-                    "accessible_scopes": [
-                        "__main__",
-                        "__main__.hash_message"
-                    ],
+                    "accessible_scopes": ["__main__", "__main__.hash_message"],
                     "flow_tracking_data": {
                         "ap_tracking": {
                             "group": 52,
@@ -27980,10 +27967,7 @@
                     }
                 },
                 "649": {
-                    "accessible_scopes": [
-                        "__main__",
-                        "__main__.hash_message"
-                    ],
+                    "accessible_scopes": ["__main__", "__main__.hash_message"],
                     "flow_tracking_data": {
                         "ap_tracking": {
                             "group": 52,
@@ -28006,10 +27990,7 @@
                     }
                 },
                 "650": {
-                    "accessible_scopes": [
-                        "__main__",
-                        "__main__.hash_message"
-                    ],
+                    "accessible_scopes": ["__main__", "__main__.hash_message"],
                     "flow_tracking_data": {
                         "ap_tracking": {
                             "group": 52,
@@ -28032,10 +28013,7 @@
                     }
                 },
                 "652": {
-                    "accessible_scopes": [
-                        "__main__",
-                        "__main__.hash_message"
-                    ],
+                    "accessible_scopes": ["__main__", "__main__.hash_message"],
                     "flow_tracking_data": {
                         "ap_tracking": {
                             "group": 53,
@@ -28059,10 +28037,7 @@
                     }
                 },
                 "653": {
-                    "accessible_scopes": [
-                        "__main__",
-                        "__main__.hash_message"
-                    ],
+                    "accessible_scopes": ["__main__", "__main__.hash_message"],
                     "flow_tracking_data": {
                         "ap_tracking": {
                             "group": 53,
@@ -28087,10 +28062,7 @@
                     }
                 },
                 "655": {
-                    "accessible_scopes": [
-                        "__main__",
-                        "__main__.hash_message"
-                    ],
+                    "accessible_scopes": ["__main__", "__main__.hash_message"],
                     "flow_tracking_data": {
                         "ap_tracking": {
                             "group": 53,
@@ -28164,10 +28136,7 @@
                     }
                 },
                 "656": {
-                    "accessible_scopes": [
-                        "__main__",
-                        "__main__.hash_message"
-                    ],
+                    "accessible_scopes": ["__main__", "__main__.hash_message"],
                     "flow_tracking_data": {
                         "ap_tracking": {
                             "group": 53,
@@ -28205,10 +28174,7 @@
                     }
                 },
                 "657": {
-                    "accessible_scopes": [
-                        "__main__",
-                        "__main__.hash_message"
-                    ],
+                    "accessible_scopes": ["__main__", "__main__.hash_message"],
                     "flow_tracking_data": {
                         "ap_tracking": {
                             "group": 53,
@@ -28246,10 +28212,7 @@
                     }
                 },
                 "658": {
-                    "accessible_scopes": [
-                        "__main__",
-                        "__main__.hash_message"
-                    ],
+                    "accessible_scopes": ["__main__", "__main__.hash_message"],
                     "flow_tracking_data": {
                         "ap_tracking": {
                             "group": 53,
@@ -28275,10 +28238,7 @@
                     }
                 },
                 "660": {
-                    "accessible_scopes": [
-                        "__main__",
-                        "__main__.hash_message"
-                    ],
+                    "accessible_scopes": ["__main__", "__main__.hash_message"],
                     "flow_tracking_data": {
                         "ap_tracking": {
                             "group": 53,
@@ -28304,10 +28264,7 @@
                     }
                 },
                 "662": {
-                    "accessible_scopes": [
-                        "__main__",
-                        "__main__.hash_message"
-                    ],
+                    "accessible_scopes": ["__main__", "__main__.hash_message"],
                     "flow_tracking_data": {
                         "ap_tracking": {
                             "group": 54,
@@ -28345,10 +28302,7 @@
                     }
                 },
                 "663": {
-                    "accessible_scopes": [
-                        "__main__",
-                        "__main__.hash_message"
-                    ],
+                    "accessible_scopes": ["__main__", "__main__.hash_message"],
                     "flow_tracking_data": {
                         "ap_tracking": {
                             "group": 54,
@@ -28374,10 +28328,7 @@
                     }
                 },
                 "665": {
-                    "accessible_scopes": [
-                        "__main__",
-                        "__main__.hash_message"
-                    ],
+                    "accessible_scopes": ["__main__", "__main__.hash_message"],
                     "flow_tracking_data": {
                         "ap_tracking": {
                             "group": 54,
@@ -28403,10 +28354,7 @@
                     }
                 },
                 "666": {
-                    "accessible_scopes": [
-                        "__main__",
-                        "__main__.hash_message"
-                    ],
+                    "accessible_scopes": ["__main__", "__main__.hash_message"],
                     "flow_tracking_data": {
                         "ap_tracking": {
                             "group": 54,
@@ -28432,10 +28380,7 @@
                     }
                 },
                 "668": {
-                    "accessible_scopes": [
-                        "__main__",
-                        "__main__.hash_message"
-                    ],
+                    "accessible_scopes": ["__main__", "__main__.hash_message"],
                     "flow_tracking_data": {
                         "ap_tracking": {
                             "group": 54,
@@ -28461,10 +28406,7 @@
                     }
                 },
                 "670": {
-                    "accessible_scopes": [
-                        "__main__",
-                        "__main__.hash_message"
-                    ],
+                    "accessible_scopes": ["__main__", "__main__.hash_message"],
                     "flow_tracking_data": {
                         "ap_tracking": {
                             "group": 54,
@@ -28491,10 +28433,7 @@
                     }
                 },
                 "671": {
-                    "accessible_scopes": [
-                        "__main__",
-                        "__main__.hash_calldata"
-                    ],
+                    "accessible_scopes": ["__main__", "__main__.hash_calldata"],
                     "flow_tracking_data": {
                         "ap_tracking": {
                             "group": 55,
@@ -28519,10 +28458,7 @@
                     }
                 },
                 "673": {
-                    "accessible_scopes": [
-                        "__main__",
-                        "__main__.hash_calldata"
-                    ],
+                    "accessible_scopes": ["__main__", "__main__.hash_calldata"],
                     "flow_tracking_data": {
                         "ap_tracking": {
                             "group": 55,
@@ -28584,10 +28520,7 @@
                     }
                 },
                 "674": {
-                    "accessible_scopes": [
-                        "__main__",
-                        "__main__.hash_calldata"
-                    ],
+                    "accessible_scopes": ["__main__", "__main__.hash_calldata"],
                     "flow_tracking_data": {
                         "ap_tracking": {
                             "group": 55,
@@ -28625,10 +28558,7 @@
                     }
                 },
                 "675": {
-                    "accessible_scopes": [
-                        "__main__",
-                        "__main__.hash_calldata"
-                    ],
+                    "accessible_scopes": ["__main__", "__main__.hash_calldata"],
                     "flow_tracking_data": {
                         "ap_tracking": {
                             "group": 55,
@@ -28666,10 +28596,7 @@
                     }
                 },
                 "676": {
-                    "accessible_scopes": [
-                        "__main__",
-                        "__main__.hash_calldata"
-                    ],
+                    "accessible_scopes": ["__main__", "__main__.hash_calldata"],
                     "flow_tracking_data": {
                         "ap_tracking": {
                             "group": 55,
@@ -28707,10 +28634,7 @@
                     }
                 },
                 "677": {
-                    "accessible_scopes": [
-                        "__main__",
-                        "__main__.hash_calldata"
-                    ],
+                    "accessible_scopes": ["__main__", "__main__.hash_calldata"],
                     "flow_tracking_data": {
                         "ap_tracking": {
                             "group": 55,
@@ -28736,10 +28660,7 @@
                     }
                 },
                 "679": {
-                    "accessible_scopes": [
-                        "__main__",
-                        "__main__.hash_calldata"
-                    ],
+                    "accessible_scopes": ["__main__", "__main__.hash_calldata"],
                     "flow_tracking_data": {
                         "ap_tracking": {
                             "group": 56,
@@ -28765,10 +28686,7 @@
                     }
                 },
                 "681": {
-                    "accessible_scopes": [
-                        "__main__",
-                        "__main__.hash_calldata"
-                    ],
+                    "accessible_scopes": ["__main__", "__main__.hash_calldata"],
                     "flow_tracking_data": {
                         "ap_tracking": {
                             "group": 56,
@@ -29672,9 +29590,7 @@
                 "type": "reference"
             },
             "__main__.assert_initialized": {
-                "decorators": [
-                    "view"
-                ],
+                "decorators": ["view"],
                 "pc": 277,
                 "type": "function"
             },
@@ -29798,9 +29714,7 @@
                 "type": "reference"
             },
             "__main__.assert_only_self": {
-                "decorators": [
-                    "view"
-                ],
+                "decorators": ["view"],
                 "pc": 248,
                 "type": "function"
             },
@@ -29951,9 +29865,7 @@
                 "type": "alias"
             },
             "__main__.constructor": {
-                "decorators": [
-                    "constructor"
-                ],
+                "decorators": ["constructor"],
                 "pc": 425,
                 "type": "function"
             },
@@ -30533,9 +30445,7 @@
                 "type": "reference"
             },
             "__main__.execute": {
-                "decorators": [
-                    "external"
-                ],
+                "decorators": ["external"],
                 "pc": 537,
                 "type": "function"
             },
@@ -31036,9 +30946,7 @@
                 "type": "reference"
             },
             "__main__.get_address": {
-                "decorators": [
-                    "view"
-                ],
+                "decorators": ["view"],
                 "pc": 335,
                 "type": "function"
             },
@@ -31175,9 +31083,7 @@
                 "type": "alias"
             },
             "__main__.get_nonce": {
-                "decorators": [
-                    "view"
-                ],
+                "decorators": ["view"],
                 "pc": 366,
                 "type": "function"
             },
@@ -31306,9 +31212,7 @@
                 "type": "reference"
             },
             "__main__.get_public_key": {
-                "decorators": [
-                    "view"
-                ],
+                "decorators": ["view"],
                 "pc": 304,
                 "type": "function"
             },
@@ -31837,9 +31741,7 @@
                 "type": "alias"
             },
             "__main__.initialize": {
-                "decorators": [
-                    "external"
-                ],
+                "decorators": ["external"],
                 "pc": 451,
                 "type": "function"
             },
@@ -32482,9 +32384,7 @@
                 "type": "reference"
             },
             "__main__.is_valid_signature": {
-                "decorators": [
-                    "view"
-                ],
+                "decorators": ["view"],
                 "pc": 488,
                 "type": "function"
             },
@@ -33198,9 +33098,7 @@
                 "type": "reference"
             },
             "__main__.set_public_key": {
-                "decorators": [
-                    "external"
-                ],
+                "decorators": ["external"],
                 "pc": 397,
                 "type": "function"
             },
@@ -33357,9 +33255,7 @@
                 "type": "alias"
             },
             "__wrappers__.assert_initialized": {
-                "decorators": [
-                    "view"
-                ],
+                "decorators": ["view"],
                 "pc": 288,
                 "type": "function"
             },
@@ -33578,9 +33474,7 @@
                 "type": "alias"
             },
             "__wrappers__.assert_only_self": {
-                "decorators": [
-                    "view"
-                ],
+                "decorators": ["view"],
                 "pc": 261,
                 "type": "function"
             },
@@ -33799,9 +33693,7 @@
                 "type": "alias"
             },
             "__wrappers__.constructor": {
-                "decorators": [
-                    "constructor"
-                ],
+                "decorators": ["constructor"],
                 "pc": 432,
                 "type": "function"
             },
@@ -34058,9 +33950,7 @@
                 "type": "alias"
             },
             "__wrappers__.execute": {
-                "decorators": [
-                    "external"
-                ],
+                "decorators": ["external"],
                 "pc": 611,
                 "type": "function"
             },
@@ -34640,9 +34530,7 @@
                 "type": "reference"
             },
             "__wrappers__.get_address": {
-                "decorators": [
-                    "view"
-                ],
+                "decorators": ["view"],
                 "pc": 350,
                 "type": "function"
             },
@@ -35001,9 +34889,7 @@
                 "type": "reference"
             },
             "__wrappers__.get_nonce": {
-                "decorators": [
-                    "view"
-                ],
+                "decorators": ["view"],
                 "pc": 381,
                 "type": "function"
             },
@@ -35362,9 +35248,7 @@
                 "type": "reference"
             },
             "__wrappers__.get_public_key": {
-                "decorators": [
-                    "view"
-                ],
+                "decorators": ["view"],
                 "pc": 319,
                 "type": "function"
             },
@@ -35723,9 +35607,7 @@
                 "type": "reference"
             },
             "__wrappers__.initialize": {
-                "decorators": [
-                    "external"
-                ],
+                "decorators": ["external"],
                 "pc": 469,
                 "type": "function"
             },
@@ -35982,9 +35864,7 @@
                 "type": "alias"
             },
             "__wrappers__.is_valid_signature": {
-                "decorators": [
-                    "view"
-                ],
+                "decorators": ["view"],
                 "pc": 507,
                 "type": "function"
             },
@@ -36363,9 +36243,7 @@
                 "type": "alias"
             },
             "__wrappers__.set_public_key": {
-                "decorators": [
-                    "external"
-                ],
+                "decorators": ["external"],
                 "pc": 406,
                 "type": "function"
             },
