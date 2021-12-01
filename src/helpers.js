@@ -69,9 +69,21 @@ zigzagws.addEventListener("close", function () {
     toast.error("Connection to server closed. Please refresh the page", { autoClose: false });
 });
 
-export async function getAccountState() {
-  const accountState = await syncWallet.getAccountState();
-  return accountState;
+export async function getAccountState(chainid) {
+  if (isZksyncChain(chainid)) {
+      return await syncWallet.getAccountState();
+  }
+  else {
+      const address = localStorage.getItem("starknet:account");
+      const balances = await getStarknetBalances(chainid, address);
+      return { 
+          address,
+          id: address,
+          committed: {
+              balances
+          }
+      }
+  }
 }
 
 export async function signin(chainid) {
@@ -119,9 +131,6 @@ export async function signinstarknet(chainid) {
         localStorage.setItem("starknet:account:initialized", "1");
     }
 
-    const msg = { op: "login", args: [chainid, userWalletContractAddress] };
-    zigzagws.send(JSON.stringify(msg));
-
     const balanceWaitToast = toast.info("Waiting on balances to load...", { autoClose: false });
     const committedBalances = await getStarknetBalances(chainid, userWalletContractAddress);
     toast.dismiss(balanceWaitToast);
@@ -152,6 +161,10 @@ export async function signinstarknet(chainid) {
     //    //starknet.provider.callContract( ... )
     //    console.error("starknet not connected")
     //}
+
+    const msg = { op: "login", args: [chainid, userWalletContractAddress] };
+    zigzagws.send(JSON.stringify(msg));
+
     accountState = { 
         address: userWalletContractAddress, 
         id: userWalletContractAddress, 
@@ -535,7 +548,7 @@ export async function cancelorder(chainid, orderid) {
   return true;
 }
 
-export function getDetailsWithoutFee(order) {
+export function getOrderDetailsWithoutFee(order) {
     const side = order[3];
     const baseQuantity = order[5];
     const quoteQuantity = order[4] * order[5];
@@ -558,6 +571,28 @@ export function getDetailsWithoutFee(order) {
         remainingWithoutFee = Math.min(baseQuantityWithoutFee, remaining);
     }
     return { price: priceWithoutFee, quoteQuantity: quoteQuantityWithoutFee, baseQuantity: baseQuantityWithoutFee, remaining: remainingWithoutFee  };
+}
+
+export function getFillDetailsWithoutFee(fill) {
+    const side = fill[3];
+    const baseQuantity = fill[5];
+    const quoteQuantity = fill[4] * fill[5];
+    const baseCurrency = fill[2].split("-")[0];
+    const quoteCurrency = fill[2].split("-")[1];
+    let baseQuantityWithoutFee, quoteQuantityWithoutFee, priceWithoutFee;
+    if (side === 's') {
+        const fee = currencyInfo[baseCurrency].gasFee;
+        baseQuantityWithoutFee = baseQuantity - fee;
+        priceWithoutFee = quoteQuantity / baseQuantityWithoutFee;
+        quoteQuantityWithoutFee = priceWithoutFee * baseQuantityWithoutFee;
+    }
+    else if (side === 'b') {
+        const fee = currencyInfo[quoteCurrency].gasFee;
+        quoteQuantityWithoutFee = quoteQuantity - fee;
+        priceWithoutFee = quoteQuantityWithoutFee / baseQuantity;
+        baseQuantityWithoutFee = quoteQuantityWithoutFee / priceWithoutFee;
+    }
+    return { price: priceWithoutFee, quoteQuantity: quoteQuantityWithoutFee, baseQuantity: baseQuantityWithoutFee };
 }
 
 export function isZksyncChain(chainid) {

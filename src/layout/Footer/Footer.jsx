@@ -4,7 +4,7 @@ import "./Footer.css";
 // assets
 import loadingGif from "../../assets/icons/loading.svg";
 //helpers
-import { cancelorder, currencyInfo, getDetailsWithoutFee, isZksyncChain } from "../../helpers";
+import { cancelorder, currencyInfo, getOrderDetailsWithoutFee, getFillDetailsWithoutFee, isZksyncChain } from "../../helpers";
 
 class Footer extends React.Component {
   constructor (props) {
@@ -16,9 +16,8 @@ class Footer extends React.Component {
       this.setState({ tab: value });
   }
 
-  getHistory() {
-      return Object.values(this.props.userOrders)
-          .filter(order => (['f', 'r', 'c']).includes(order[9]))
+  getFills() {
+      return Object.values(this.props.userFills)
           .sort((a,b) => b[1] - a[1]);
   }
 
@@ -29,15 +28,6 @@ class Footer extends React.Component {
   }
 
   renderOrderTable(orders) {
-      let baseExplorerUrl;
-      switch (this.props.chainId) {
-          case 1000:
-              baseExplorerUrl = "https://rinkeby.zkscan.io";
-              break
-          case 1:
-          default:
-              baseExplorerUrl = "https://zkscan.io";
-      }
       return (
         <table>
           <thead>
@@ -75,7 +65,7 @@ class Footer extends React.Component {
               else if (order[3] === 'b') {
                   feeText = currencyInfo[quoteCurrency].gasFee + ' ' + quoteCurrency;
               }
-              const orderWithoutFee = getDetailsWithoutFee(order);
+              const orderWithoutFee = getOrderDetailsWithoutFee(order);
               if ( ([1,1000]).includes(this.props.chainId) ) {
                   price = orderWithoutFee.price;
                   baseQuantity = orderWithoutFee.baseQuantity;
@@ -123,11 +113,6 @@ class Footer extends React.Component {
                     statusClass = "canceled";
                     break
               }
-              let txHashLink;
-              if (order[10]) {
-                  txHashLink = baseExplorerUrl + "/explorer/transactions/" + order[10];
-              }
-              
                   
               return (
                 <tr key={orderid}>
@@ -143,10 +128,128 @@ class Footer extends React.Component {
                   <td>{feeText}</td>
                   <td className={statusClass}>{statusText}</td>
                   <td>
-                    {txHashLink ?
-                        <a href={txHashLink} target="_blank" rel="noreferrer">View Tx</a> :
-                        (orderstatus === 'o') ?  <span className="cancel_order_link" onClick={() => cancelorder(chainid, orderid)}>Cancel</span> :
+                    { (orderstatus === 'o') ?  <span className="cancel_order_link" onClick={() => cancelorder(chainid, orderid)}>Cancel</span> :
                         ""
+                    }
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      );
+  }
+
+  renderFillTable(fills) {
+      let baseExplorerUrl;
+      switch (this.props.chainId) {
+          case 1001:
+              baseExplorerUrl = "https://goerli.voyager.online/tx/";
+              break
+          case 1000:
+              baseExplorerUrl = "https://rinkeby.zkscan.io/explorer/transactions/";
+              break
+          case 1:
+          default:
+              baseExplorerUrl = "https://zkscan.io/explorer/transactions/";
+      }
+      return (
+        <table>
+          <thead>
+            <tr>
+              <th>Market</th>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th>Side</th>
+              <th>Fee</th>
+              <th>Order Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {fills.map((fill, i) => {
+              const fillid = fill[1];
+              const market = fill[2];
+              const side = fill[3];
+              let price = fill[4];
+              let baseQuantity = fill[5];
+              const fillstatus = fill[6];
+              const baseCurrency = fill[2].split("-")[0];
+              const quoteCurrency = fill[2].split("-")[1];
+              const sidetext = fill[3] === "b" ? "buy" : "sell";
+              const sideclassname = fill[3] === "b" ? "up_value" : "down_value";
+              const txhash = fill[7];
+              let feeText;
+              if (fillstatus === 'r' || !isZksyncChain(this.props.chainId)) {
+                  feeText = '0 ' + baseCurrency;
+              }
+              else if (side === 's') {
+                  feeText = currencyInfo[baseCurrency].gasFee + ' ' + baseCurrency;
+              }
+              else if (side === 'b') {
+                  feeText = currencyInfo[quoteCurrency].gasFee + ' ' + quoteCurrency;
+              }
+              const fillWithoutFee = getFillDetailsWithoutFee(fill);
+              if ( ([1,1000]).includes(this.props.chainId) ) {
+                  price = fillWithoutFee.price;
+                  baseQuantity = fillWithoutFee.baseQuantity;
+              }
+              let statusText, statusClass; 
+              switch (fillstatus) {
+                  case 'r':
+                    statusText = "rejected";
+                    statusClass = "rejected";
+                    break
+                  case 'pf':
+                    statusText = "partial fill";
+                    statusClass = "filled";
+                    break
+                  case 'f':
+                    statusText = "filled";
+                    statusClass = "filled";
+                    break
+                  case 'pm':
+                    statusText = (
+                        <span>partial match<img className="loading-gif" src={loadingGif} alt="Pending"/></span>
+                    )
+                    statusClass = "matched";
+                    break
+                  case 'm':
+                    statusText = (
+                        <span>matched <img className="loading-gif" src={loadingGif} alt="Pending"/></span>
+                    )
+                    statusClass = "matched";
+                    break
+                  case 'b':
+                    statusText = (
+                        <span>committing <img className="loading-gif" src={loadingGif} alt="Pending"/></span>
+                    )
+                    statusClass = "committing";
+                    break
+                  case 'o':
+                    statusText = "open";
+                    statusClass = "open";
+                    break
+                  case 'c':
+                  default:
+                    statusText = "canceled";
+                    statusClass = "canceled";
+                    break
+              }
+                  
+              return (
+                <tr key={fillid}>
+                  <td>{market}</td>
+                  <td>{price.toPrecision(6) / 1}</td>
+                  <td>
+                    {baseQuantity.toPrecision(6) / 1} {baseCurrency}
+                  </td>
+                  <td className={sideclassname}>{sidetext}</td>
+                  <td>{feeText}</td>
+                  <td className={statusClass}>{statusText}</td>
+                  <td>
+                    {txhash ?
+                        <a href={baseExplorerUrl + txhash} target="_blank" rel="noreferrer">View Tx</a> : ""
                     }
                   </td>
                 </tr>
@@ -167,7 +270,7 @@ class Footer extends React.Component {
           default:
               explorerLink = "https://zkscan.io/explorer/accounts/" + this.props.user.address;
       }
-      let footerContent, classNameOrders = "", classNameBalances = "", classNameHistory = "";
+      let footerContent, classNameOrders = "", classNameBalances = "", classNameFills = "";
       const userOrdersSorted = Object.values(this.props.userOrders);
       userOrdersSorted.sort((a,b) => b[1] - a[1]);
       switch (this.state.tab) {
@@ -176,8 +279,8 @@ class Footer extends React.Component {
           classNameOrders = "selected"
           break
         case "history":
-          footerContent = this.renderOrderTable(this.getHistory());
-          classNameHistory = "selected"
+          footerContent = this.renderFillTable(this.getFills());
+          classNameFills = "selected"
           break
         case "balances":
           if (this.props.user.committed) {
@@ -233,8 +336,8 @@ class Footer extends React.Component {
                   <strong className={classNameOrders} onClick={() => this.setTab("orders")}>
                     Orders ({this.getOpenOrders().length})
                   </strong>
-                  <strong className={classNameHistory} onClick={() => this.setTab("history")}>
-                    History ({this.getHistory().length})
+                  <strong className={classNameFills} onClick={() => this.setTab("history")}>
+                    Fills ({this.getFills().length})
                   </strong>
                   <strong className={classNameBalances} onClick={() => this.setTab("balances")}>Balances</strong>
                 </div>

@@ -26,7 +26,8 @@ import {
   signin,
   broadcastfill,
   getAccountState,
-  getDetailsWithoutFee,
+  getFillDetailsWithoutFee,
+  getOrderDetailsWithoutFee,
   isZksyncChain
 } from "../../helpers";
 
@@ -36,8 +37,9 @@ class Trade extends React.Component {
     this.state = {
       chainId: 1,
       user: {},
-      marketFills: [],
+      marketFills: {},
       userOrders: {},
+      userFills: {},
       marketSummary: {},
       lastPrices: {},
       orders: {},
@@ -83,8 +85,12 @@ class Trade extends React.Component {
           newstate = { ...this.state };
           const fillhistory = msg.args[0];
           fillhistory.forEach(fill => {
+              const fillid = fill[1];
               if (fill[2] === this.state.currentMarket && fill[0] === this.state.chainId) {
-                  newstate.marketFills.unshift(fill);
+                  newstate.marketFills[fillid] = fill;
+              }
+              if (this.state.user.id && (fill[8] === this.state.user.id || fill[9] === this.state.user.id)) {
+                  newstate.userFills[fillid] = fill;
               }
           });
           this.setState(newstate);
@@ -141,10 +147,29 @@ class Trade extends React.Component {
           toast.dismiss(broadcastOrderToast);
           this.setState(newstate);
           break;
+        case "fillstatus":
+          newstate = { ...this.state };
+          const fillUpdates = msg.args[0];
+          fillUpdates.forEach((update) => {
+              const fillid =  update[1];
+              const newstatus =  update[2];
+              let txhash;
+              if (update[3]) txhash = update[3];
+              if (newstate.marketFills[fillid]) {
+                  newstate.marketFills[fillid][6] = newstatus;
+                  if (txhash) newstate.marketFills[fillid][7] = txhash;
+              }
+              if (newstate.userFills[fillid]) {
+                  newstate.userFills[fillid][6] = newstatus;
+                  if (txhash) newstate.marketFills[fillid][7] = txhash;
+              }
+
+          });
+          break
         case "orderstatus":
           newstate = { ...this.state };
-          const updates = msg.args[0];
-          updates.forEach(async (update) => {
+          const orderUpdates = msg.args[0];
+          orderUpdates.forEach(async (update) => {
               const orderid = update[1];
               const newstatus = update[2];
               let filledorder;
@@ -193,7 +218,7 @@ class Trade extends React.Component {
                           const baseCurrency = filledorder[2].split('-')[0];
                           filledorder[9] = 'f';
                           filledorder[10] = txhash;
-                          const noFeeOrder = getDetailsWithoutFee(filledorder);
+                          const noFeeOrder = getOrderDetailsWithoutFee(filledorder);
                           toast.success(`Your ${sideText} order for ${noFeeOrder.baseQuantity.toPrecision(4) / 1} ${baseCurrency} @ ${noFeeOrder.price.toPrecision(4) / 1} was filled!`)
                           setTimeout(this.updateUser.bind(this), 1000);
                           setTimeout(this.updateUser.bind(this), 5000);
@@ -216,7 +241,7 @@ class Trade extends React.Component {
                           const baseCurrency = filledorder[2].split('-')[0];
                           filledorder[9] = 'r';
                           filledorder[10] = txhash;
-                          const noFeeOrder = getDetailsWithoutFee(filledorder);
+                          const noFeeOrder = getOrderDetailsWithoutFee(filledorder);
                           toast.error(`Your ${sideText} order for ${noFeeOrder.baseQuantity.toPrecision(4) / 1} ${baseCurrency} @ ${noFeeOrder.price.toPrecision(4) / 1} was rejected: ${error}`)
                           toast.info(`This happens occasionally. Run the transaction again and you should be fine.`);
                       }
@@ -249,9 +274,9 @@ class Trade extends React.Component {
   }
 
   async updateUser() {
-      if (this.state.user.id && this.state.chainId !== 1001) {
+      if (this.state.user.id) {
           const newstate = { ...this.state }
-          newstate.user = await getAccountState();
+          newstate.user = await getAccountState(this.state.chainId);
           this.setState(newstate);
       }
   }
@@ -360,7 +385,7 @@ class Trade extends React.Component {
     newState.orders = {};
     newState.liquidity = [];
     newState.marketSummary = {};
-    newState.marketFills = [];
+    newState.marketFills = {}
     newState.chainId = chainId;
     newState.currentMarket = market;
     this.setState(newState);
@@ -406,7 +431,7 @@ class Trade extends React.Component {
       } catch (e) {
           spotPrice = null;
       }
-      const orderWithoutFee = getDetailsWithoutFee(order);
+      const orderWithoutFee = getOrderDetailsWithoutFee(order);
       let orderrow;
       if ( isZksyncChain(this.state.chainId) )
           orderrow = {
@@ -439,9 +464,9 @@ class Trade extends React.Component {
     }
 
     const fillData = [];
-    this.state.marketFills.forEach(fill => {
+    Object.values(this.state.marketFills).forEach(fill => {
         if (isZksyncChain(this.state.chainId)) {
-            const orderWithoutFee = getDetailsWithoutFee(fill);
+            const orderWithoutFee = getFillDetailsWithoutFee(fill);
             fillData.push({ td1: orderWithoutFee.price, td2: orderWithoutFee.baseQuantity, td3: orderWithoutFee.quoteQuantity, side: fill[3] });
         }
         else {
@@ -601,7 +626,7 @@ class Trade extends React.Component {
               </div>
             </div>
           </div>
-          <Footer userOrders={this.state.userOrders} user={this.state.user} chainId={this.state.chainId} />
+          <Footer userFills={this.state.userFills} userOrders={this.state.userOrders} user={this.state.user} chainId={this.state.chainId} />
         </div>
       </>
     );
