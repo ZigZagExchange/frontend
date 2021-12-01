@@ -390,10 +390,16 @@ export async function signinzksync(chainid) {
 export async function changepubkeyzksync() {
     let feeToken = "ETH";
     const balances = accountState.committed.balances;
-    if (!balances.ETH || balances.ETH < 0.005e18) {
+    console.log(balances);
+    console.log(balances.ETH < 0.005e18);
+    if (balances.ETH && balances.ETH > 0.005e18) {
+        feeToken = "ETH";
+    } else if (balances.USDC && balances.USDC > 20e6) {
         feeToken = "USDC";
-    } else if (!balances.USDC || balances.USDC < 20e6) {
+    } else if (!balances.USDC && balances.USDC > 20e6) {
         feeToken = "USDT";
+    } else {
+        feeToken = "ETH";
     }
     const changePubkey = await syncWallet.setSigningKey({
         feeToken,
