@@ -34,7 +34,7 @@ class TradePriceBtcTable extends React.Component {
               <tbody>
                 {this.props.rowData.map((d, i) => {
                   return (
-                    <tr key={i} onClick={(e) => this.props.updateMarketChain(undefined, d.td1)} className={this.props.currentMarket === d.td1 ? "selected" : ""}>
+                    <tr key={i} onClick={(e) => this.props.updateMarketChain(d.td1)} className={this.props.currentMarket === d.td1 ? "selected" : ""}>
                       <td>
                         <img className="me-2" src={star} alt="..." />
                         {d.td1.replace("-", "/")}
