@@ -2,30 +2,30 @@ import React from "react";
 // css
 import "./TradePriceTable.css";
 class TradePriceTable extends React.Component {
-
     scrollToBottom = () => {
         if (this.props.scrollToBottom) {
             this.tableDiv.scrollTop = this.tableDiv.scrollHeight;
         }
-    }
+    };
 
     componentDidMount() {
-      this.scrollToBottom();
+        this.scrollToBottom();
     }
 
     componentDidUpdate() {
-      this.scrollToBottom();
+        this.scrollToBottom();
     }
 
-
     render() {
-      //const baseCurrency = this.props.currentMarket.split("-")[0];
-      const quoteCurrency = this.props.currentMarket.split("-")[1];
+        //const baseCurrency = this.props.currentMarket.split("-")[0];
+        const quoteCurrency = this.props.currentMarket.split("-")[1];
 
-      const maxQuantity = Math.max(...this.props.priceTableData.map((d) => d.td2));
-      let onClickRow;
-      if (this.props.onClickRow) onClickRow = this.props.onClickRow;
-      else onClickRow = () => null;
+        const maxQuantity = Math.max(
+            ...this.props.priceTableData.map((d) => d.td2)
+        );
+        let onClickRow;
+        if (this.props.onClickRow) onClickRow = this.props.onClickRow;
+        else onClickRow = () => null;
 
       return (
         <>
@@ -67,6 +67,6 @@ class TradePriceTable extends React.Component {
         </>
       );
     }
-};
+}
 
 export default TradePriceTable;

@@ -14,13 +14,15 @@
 
 // Atoms
 export * from 'components/atoms/SwapButton'
+export * from 'components/atoms/Button'
+export * from 'components/atoms/Dropdown'
 
 // Molecules
 export * from 'components/molecules/Chart'
 
 // Organisms
 export * from 'components/organisms/Header'
-// export * from 'components/organisms/Footer'
+export * from 'components/organisms/Footer'
 
 // Templates
 export * from 'components/templates/DefaultTemplate'

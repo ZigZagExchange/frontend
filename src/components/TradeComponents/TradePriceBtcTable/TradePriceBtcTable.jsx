@@ -55,6 +55,6 @@ class TradePriceBtcTable extends React.Component {
         </>
       );
     }
-};
+}
 
 export default TradePriceBtcTable;

@@ -1,19 +1,15 @@
+import { useSelector } from 'react-redux'
 import React, { useEffect, useMemo, useState } from 'react'
-// libarary
 import { NavLink } from 'react-router-dom'
-// css
-import './Header.css'
-// assets
+import { Button, Dropdown, Menu, MenuItem } from 'components'
+import { userSelector } from 'lib/store/features/auth/authSlice'
+import { networkSelector } from 'lib/store/features/api/apiSlice'
+import api from 'lib/api'
 import logo from 'assets/images/logo.png'
 import settingIcon from 'assets/icons/setting-icon.png'
 import menu from 'assets/icons/menu.png'
 import darkPlugHead from 'assets/icons/dark-plug-head.png'
-// component
-import Button from 'lib/utils/Button/Button'
-import { useSelector } from 'react-redux'
-import { userSelector } from 'lib/store/features/auth/authSlice'
-import { networkSelector } from 'lib/store/features/api/apiSlice'
-import api from 'lib/api'
+import './Header.css'
 
 export const Header = (props) => {
   // state to open or close the sidebar in mobile
@@ -41,6 +37,22 @@ export const Header = (props) => {
       clearInterval(accountUpdater)
     }
   }, [])
+
+  const handleMenu = ({ key }) => {
+    switch (key) {
+      case 'signOut':
+        api.signOut()
+        return
+      default:
+        throw new Error('Invalid dropdown option')
+    }
+  }
+
+  const dropdownMenu = (
+    <Menu onSelect={handleMenu}>
+      <MenuItem key="signOut">Sign out</MenuItem>
+    </Menu>
+  )
 
   return (
     <>
@@ -78,10 +90,12 @@ export const Header = (props) => {
               <div className="d-flex align-items-center justify-content-between">
                 <img src={settingIcon} alt="..." />
                 {user.address ? (
-                  <button className="address_button">
-                    {user.address.slice(0, 6)}...
-                    {user.address.slice(-4)}
-                  </button>
+                  <Dropdown overlay={dropdownMenu}>
+                    <button className="address_button">
+                      {user.address.slice(0, 6)}...
+                      {user.address.slice(-4)}
+                    </button>
+                  </Dropdown>
                 ) : (
                   <button className="bg_btn" onClick={() => api.signIn(network)}>
                     <img src={darkPlugHead} alt="..." /> CONNECT WALLET
@@ -101,6 +115,7 @@ export const Header = (props) => {
             </div>
           </div>
         ) : null}
+
         {/* desktop header */}
         <div className="d-flex align-items-center justify-content-between w-100 dex_h">
           <div className="head_left">
@@ -123,7 +138,7 @@ export const Header = (props) => {
           </div>
           <div className="head_left">
           <ul>
-            <li>  
+            <li>
               <a target="_blank" rel="noreferrer" href="https://discord.gg/zigzag">Discord</a>
             </li>
             <li> 
@@ -137,10 +152,12 @@ export const Header = (props) => {
                 </div>
           <div className="head_right">
             {user.address ? (
-              <button className="address_button">
-                {user.address.slice(0, 6)}...
-                {user.address.slice(-4)}
-              </button>
+              <Dropdown overlay={dropdownMenu}>
+                <button className="address_button">
+                  {user.address.slice(0, 6)}...
+                  {user.address.slice(-4)}
+                </button>
+              </Dropdown>
             ) : (
               <Button
                 className="bg_btn"

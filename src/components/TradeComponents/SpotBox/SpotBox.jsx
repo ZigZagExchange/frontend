@@ -1,28 +1,30 @@
 import React from "react";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 // css
 import "./SpotBox.css";
 // assets
 import SpotForm from "../../../lib/utils/SpotForm/SpotForm";
 
 class SpotBox extends React.Component {
-  constructor(props) {
-      super(props);
-      this.state = { orderType: 'market' }
-  }
+    constructor(props) {
+        super(props);
+        this.state = { orderType: "market" };
+    }
 
-  updateOrderType(orderType) {
-      if (orderType === "limit" && ([1,1000]).includes(this.props.chainId)) {
-          toast.error("Limit orders disabled on zksync");
-          return
-      }
-      const newstate = { ...this.state, orderType }
-      this.setState(newstate);
-  }
+    updateOrderType(orderType) {
+        if (orderType === "limit" && [1, 1000].includes(this.props.chainId)) {
+            toast.error("Limit orders disabled on zksync");
+            return;
+        }
+        const newstate = { ...this.state, orderType };
+        this.setState(newstate);
+    }
 
-  orderTypeTabClassName(orderType) {
-     return this.state.orderType === orderType ? "trade_price_active_tab" : "";
-  }
+    orderTypeTabClassName(orderType) {
+        return this.state.orderType === orderType
+            ? "trade_price_active_tab"
+            : "";
+    }
 
   render() {
       return (

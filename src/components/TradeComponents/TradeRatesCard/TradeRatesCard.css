@@ -1,86 +1,86 @@
 /* tl_rates */
 
 .tl_rates {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1rem;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
 }
 
 .rates_box {
-  display: flex;
-  flex-direction: column;
-  margin-right: 10px;
+    display: flex;
+    flex-direction: column;
+    margin-right: 10px;
 }
 
 .rates_box h2 {
-  font-size: 0.8rem;
-  color: #94a2c9;
+    font-size: 0.8rem;
+    color: #94a2c9;
 }
 
 .rates_box p {
-  font-size: 0.8rem;
+    font-size: 0.8rem;
 }
 
 .rb_text_1 strong {
-  color: white;
-  font-size: 0.9rem;
+    color: white;
+    font-size: 0.9rem;
 }
 
 .rb_text_1 p {
-  color: #94a2c9;
+    color: #94a2c9;
 }
 
 .rb_text_2 h1 {
-  color: #3fe199;
-  font-size: 0.9rem;
+    color: #3fe199;
+    font-size: 0.9rem;
 }
 
 .rb_text_2 p {
-  color: white;
+    color: white;
 }
 
 .rb_text_3 p {
-  color: #c4384e;
+    color: #c4384e;
 }
 
 .rb_text_4 p {
-  color: white;
+    color: white;
 }
 
 @media screen and (max-width: 1348px) {
-  .trade_left {
-    overflow: auto;
-  }
-  .trade_left::-webkit-scrollbar {
-    width: 5px;
-    height: 5px;
-    position: relative;
-    z-index: 20;
-  }
+    .trade_left {
+        overflow: auto;
+    }
+    .trade_left::-webkit-scrollbar {
+        width: 5px;
+        height: 5px;
+        position: relative;
+        z-index: 20;
+    }
 
-  .trade_left::-webkit-scrollbar-track {
-    border-radius: 5px;
-    background: hsla(0, 0%, 100%, 0.15);
-    height: 23px;
-  }
+    .trade_left::-webkit-scrollbar-track {
+        border-radius: 5px;
+        background: hsla(0, 0%, 100%, 0.15);
+        height: 23px;
+    }
 
-  .trade_left::-webkit-scrollbar-thumb {
-    border-radius: 5px;
-    background: hsla(0, 0%, 100%, 0.4);
-  }
+    .trade_left::-webkit-scrollbar-thumb {
+        border-radius: 5px;
+        background: hsla(0, 0%, 100%, 0.4);
+    }
 
-  .trade_left::-webkit-scrollbar-thumb:window-inactive {
-    background: #fff;
-  }
+    .trade_left::-webkit-scrollbar-thumb:window-inactive {
+        background: #fff;
+    }
 }
 
 @media screen and (max-width: 674px) {
-  .tl_rates {
-    flex-wrap: wrap;
-  }
-  .rates_box {
-    margin-bottom: 15px;
-  }
+    .tl_rates {
+        flex-wrap: wrap;
+    }
+    .rates_box {
+        margin-bottom: 15px;
+    }
 }

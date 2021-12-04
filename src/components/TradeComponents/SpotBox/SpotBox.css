@@ -1,152 +1,152 @@
 .spot_box {
-  border-radius: 5px;
-  width: 100%;
-  height: max-content;
-  padding-bottom: 20px;
-  margin-top: 10px;
-  background-color: #172435;
-  overflow: auto;
+    border-radius: 5px;
+    width: 100%;
+    height: max-content;
+    padding-bottom: 20px;
+    margin-top: 10px;
+    background-color: #172435;
+    overflow: auto;
 }
 
 .spot_box::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
-  position: relative;
-  z-index: 20;
+    width: 5px;
+    height: 5px;
+    position: relative;
+    z-index: 20;
 }
 
 .spot_box::-webkit-scrollbar-track {
-  border-radius: 5px;
-  background: hsla(0, 0%, 100%, 0.15);
-  height: 23px;
+    border-radius: 5px;
+    background: hsla(0, 0%, 100%, 0.15);
+    height: 23px;
 }
 
 .spot_box::-webkit-scrollbar-thumb {
-  border-radius: 5px;
-  background: hsla(0, 0%, 100%, 0.4);
+    border-radius: 5px;
+    background: hsla(0, 0%, 100%, 0.4);
 }
 
 .spot_box::-webkit-scrollbar-thumb:window-inactive {
-  background: #fff;
+    background: #fff;
 }
 
 .spot_head {
-  width: 100%;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
 }
 
 .sh_l {
-  width: 120px;
-  height: 45px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  border-top: 3px solid #08aff3;
+    width: 120px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border-top: 3px solid #08aff3;
 }
 
 .sh_l h2 {
-  font-size: 1.2rem;
-  color: white;
-  font-weight: 700;
+    font-size: 1.2rem;
+    color: white;
+    font-weight: 700;
 }
 
 .sh_r {
-  border-radius: 1px;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  width: 90%;
-  height: 45px;
-  background-color: #1c2029;
-  border-left: 1px solid #08aff3;
-  border-bottom: 1px solid #08aff3;
-  padding-right: 20px;
-  color: white;
-  font-size: 0.7rem;
+    border-radius: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 90%;
+    height: 45px;
+    background-color: #1c2029;
+    border-left: 1px solid #08aff3;
+    border-bottom: 1px solid #08aff3;
+    padding-right: 20px;
+    color: white;
+    font-size: 0.7rem;
 }
 
 .sh_r span,
 .st_r span {
-  color: #94a2c9;
-  border-bottom: 1px solid #94a2c9;
+    color: #94a2c9;
+    border-bottom: 1px solid #94a2c9;
 }
 
 .sh_r div,
 .st_r div {
-  margin: 0 10px;
-  padding: 2px 8px;
-  width: max-content;
-  background-color: #174448;
-  color: #2e9c72;
-  font-weight: 500;
+    margin: 0 10px;
+    padding: 2px 8px;
+    width: max-content;
+    background-color: #174448;
+    color: #2e9c72;
+    font-weight: 500;
 }
 
 .spot_tabs {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
 }
 
 .spot_tabs .st_l,
 .spot_tabs .st_r {
-  display: flex;
-  align-items: center;
+    display: flex;
+    align-items: center;
 }
 
 .spot_tabs .st_l h2 {
-  font-size: 1rem;
-  font-weight: 500;
-  color: #94a2c9;
-  margin-right: 20px;
-  cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #94a2c9;
+    margin-right: 20px;
+    cursor: pointer;
 }
 
 .spot_tabs .st_l div h2 {
-  margin-right: 5px;
+    margin-right: 5px;
 }
 
 .spot_bottom {
-  padding: 0 20px 20px 20px;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+    padding: 0 20px 20px 20px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
 }
 
 @media screen and (min-width: 1370px) {
-  .spot_bottom {
-    width: 100%;
-  }
+    .spot_bottom {
+        width: 100%;
+    }
 }
 
 @media screen and (max-width: 991px) {
-  .spot_bottom {
-    width: 100%;
-  }
+    .spot_bottom {
+        width: 100%;
+    }
 }
 
 @media screen and (max-width: 655px) {
-  .spot_bottom {
-    flex-direction: column;
-  }
+    .spot_bottom {
+        flex-direction: column;
+    }
 }
 
 @media screen and (max-width: 500px) {
-  .spot_tabs .st_l h2 {
-    font-size: 0.8rem;
-  }
+    .spot_tabs .st_l h2 {
+        font-size: 0.8rem;
+    }
 }
 
 @media screen and (max-width: 448px) {
-  .spot_tabs {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .spot_tabs .st_r {
-    margin-top: 10px;
-  }
+    .spot_tabs {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .spot_tabs .st_r {
+        margin-top: 10px;
+    }
 }

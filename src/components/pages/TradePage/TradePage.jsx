@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 // import { ToastContainer, toast } from "react-toastify";
-import { DefaultTemplate, TradeChart } from "components";
+import { DefaultTemplate, Footer, TradeChart } from "components";
 import "react-toastify/dist/ReactToastify.css";
 import TradeHead from "components/TradeComponents/TradeHead/TradeHead";
 import TradePriceTable from "components/TradeComponents/TradePriceTable/TradePriceTable";
-import Footer from "layout/Footer/Footer";
 import TradePriceBtcTable from "components/TradeComponents/TradePriceBtcTable/TradePriceBtcTable";
 import TradePriceHeadSecond from "components/TradeComponents/TradePriceHeadSecond/TradePriceHeadSecond";
 import SpotBox from "components/TradeComponents/SpotBox/SpotBox";

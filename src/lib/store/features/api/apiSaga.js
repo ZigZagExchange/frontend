@@ -10,7 +10,7 @@ function *handleSingleMessageSaga({ payload }) {
 }
 
 function *delegateAuthChange({ type, payload }) {    
-    if (type !== 'auth/signIn') {
+    if (type.indexOf('auth/') !== 0) {
         yield put(resetData())
     }
     

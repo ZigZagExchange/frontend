@@ -1,83 +1,83 @@
 .trade_market {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  color: white;
-  position: relative;
-  margin-top: 10px;
-  padding-bottom: 20px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    color: white;
+    position: relative;
+    margin-top: 10px;
+    padding-bottom: 20px;
 }
 
 .trade_market::before {
-  content: "";
-  padding: 0;
-  position: absolute;
-  height: 2px;
-  background-color: #94a2c9;
+    content: "";
+    padding: 0;
+    position: absolute;
+    height: 2px;
+    background-color: #94a2c9;
 }
 
 .tm_h,
 .tm_b {
-  padding: 0 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .tm_br {
-  display: flex;
-  align-items: center;
-  text-align: end;
+    display: flex;
+    align-items: center;
+    text-align: end;
 }
 
 .tm_br div:nth-child(1) {
-  margin-right: 20px;
+    margin-right: 20px;
 }
 
 .tm_br div:nth-child(2) {
-  padding: 10px 40px;
-  background-color: #3a242c;
+    padding: 10px 40px;
+    background-color: #3a242c;
 }
 
 .tm_h strong {
-  font-size: 1rem;
+    font-size: 1rem;
 }
 
 .tm_bl p,
 .tm_br div p {
-  color: #94a2c9;
+    color: #94a2c9;
 }
 
 .tm_bl p span {
-  color: #4e576d;
-  font-weight: 600;
+    color: #4e576d;
+    font-weight: 600;
 }
 
 .tm_br div span {
-  color: #c4384e;
+    color: #c4384e;
 }
 
 @media screen and (min-width: 1800px) {
-  .tm_h,
-  .tm_b,
-  .trade_market::before {
-    width: 100%;
-  }
+    .tm_h,
+    .tm_b,
+    .trade_market::before {
+        width: 100%;
+    }
 }
 
 @media screen and (max-width: 991px) {
-  .trade_market::before {
-    width: 100%;
-  }
-  .tm_h,
-  .tm_b {
-    width: 100%;
-  }
+    .trade_market::before {
+        width: 100%;
+    }
+    .tm_h,
+    .tm_b {
+        width: 100%;
+    }
 }
 
 @media screen and (max-width: 378px) {
-  .tm_h,
-  .tm_b {
-    font-size: 0.8rem;
-  }
+    .tm_h,
+    .tm_b {
+        font-size: 0.8rem;
+    }
 }

@@ -6,7 +6,7 @@ import loadingGif from "assets/icons/loading.svg";
 //helpers
 import { cancelorder, currencyInfo, getDetailsWithoutFee } from "helpers";
 
-class Footer extends React.Component {
+export class Footer extends React.Component {
   constructor(props) {
     super(props);
     this.state = { tab: "orders" };
@@ -296,5 +296,3 @@ class Footer extends React.Component {
     );
   }
 }
-
-export default Footer;
