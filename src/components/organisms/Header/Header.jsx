@@ -50,7 +50,7 @@ export const Header = (props) => {
 
   const dropdownMenu = (
     <Menu onSelect={handleMenu}>
-      <MenuItem key="signOut">Sign out</MenuItem>
+      <MenuItem key="signOut">Disconnect</MenuItem>
     </Menu>
   )
 
