@@ -421,17 +421,7 @@ class Footer extends React.Component {
                         </div>
                     );
                 } else {
-                    footerContent = (
-                        <div>
-                            <a
-                                href={explorerLink}
-                                target="_blank"
-                                rel="noreferrer"
-                            >
-                                View Account on Explorer
-                            </a>
-                        </div>
-                    );
+                    footerContent = "";
                 }
                 classNameBalances = "selected";
                 break;

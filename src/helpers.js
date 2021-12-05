@@ -279,12 +279,23 @@ export async function initializeAccountStarknet(userAddress) {
 
 export async function getStarknetBalances(chainid, userAddress) {
     const balances = {};
-    for (let currency in currencyInfo) {
-        let balance = await getStarknetBalance(
-            currencyInfo[currency].chain[chainid].contractAddress,
-            userAddress
-        );
-        balances[currency] = balance;
+    for (let i in validMarkets[1001]) {
+        const market = validMarkets[1001][i];
+        const baseCurrency = market.split("-")[0];
+        const quoteCurrency = market.split("-")[1];
+        console.log(market, baseCurrency, quoteCurrency);
+        if (!balances[baseCurrency]) {
+            balances[baseCurrency] = await getStarknetBalance(
+                currencyInfo[baseCurrency].chain[chainid].contractAddress,
+                userAddress
+            );
+        }
+        if (!balances[quoteCurrency]) {
+            balances[quoteCurrency] = await getStarknetBalance(
+                currencyInfo[quoteCurrency].chain[chainid].contractAddress,
+                userAddress
+            );
+        }
     }
     return balances;
 }
