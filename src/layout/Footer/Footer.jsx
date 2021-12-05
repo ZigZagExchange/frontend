@@ -351,6 +351,11 @@ class Footer extends React.Component {
     render() {
         let explorerLink;
         switch (this.props.chainId) {
+            case 1001:
+                explorerLink =
+                    "https://goerli.voyager.io/contract/" +
+                    this.props.user.address;
+                break;
             case 1000:
                 explorerLink =
                     "https://rinkeby.zkscan.io/explorer/accounts/" +

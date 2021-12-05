@@ -16,6 +16,29 @@ import starknetAccountContract from "./lib/Account";
 //    "ETH-USDT": 1,
 //    "BTC-USDT": 1
 //}
+export const validMarkets = {
+    // zkSync Mainnet
+    1: [
+        "ETH-USDT",
+        "ETH-USDC",
+        "ETH-DAI",
+        "USDC-USDT",
+        "WBTC-USDT",
+    ],
+    // zkSync Rinkeby
+    1000: [
+        "ETH-USDT",
+        "ETH-USDC",
+        "USDC-USDT",
+        "ETH-DAI"
+    ],
+    
+    // Starknet Alpha
+    1001: [
+        "ETH-USDT",
+        "ETH-USDC",
+    ]
+}
 
 export const STARKNET_CONTRACT_ADDRESS =
     "0x04487f07768a4761951e2686652df5fad1ca221073afbe52e2696072654bf7c0";

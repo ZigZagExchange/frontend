@@ -28,6 +28,7 @@ import {
     getFillDetailsWithoutFee,
     getOrderDetailsWithoutFee,
     isZksyncChain,
+    validMarkets,
 } from "../../helpers";
 
 class Trade extends React.Component {
@@ -133,11 +134,16 @@ class Trade extends React.Component {
                     const priceUpdates = msg.args[0];
                     newstate = { ...this.state };
                     priceUpdates.forEach((update) => {
-                        newstate.lastPrices[update[0]] = {
-                            price: update[1],
-                            change: update[2],
-                        };
-                        if (update[0] === this.state.currentMarket) {
+                        const market = update[0];
+                        const price = update[1];
+                        const change = update[2];
+                        if (validMarkets[this.state.chainId].includes(market)) {
+                            newstate.lastPrices[market] = { price, change };
+                        }
+                        else {
+                            delete newstate.lastPrices[market];
+                        }
+                        if (market === this.state.currentMarket) {
                             newstate.marketSummary.price = update[1];
                             newstate.marketSummary.priceChange = update[2];
                         }
@@ -398,12 +404,17 @@ class Trade extends React.Component {
             newState.userOrders = {};
             newState.userFills = {};
         }
+        if (!validMarkets[chainId].includes(market)) {
+            newState.currentMarket = "ETH-USDT";
+        }
+        else {
+            newState.currentMarket = market;
+        }
         newState.orders = {};
         newState.liquidity = [];
         newState.marketSummary = {};
         newState.marketFills = {};
         newState.chainId = chainId;
-        newState.currentMarket = market;
         this.setState(newState);
         zigzagws.send(
             JSON.stringify({
@@ -620,6 +631,14 @@ class Trade extends React.Component {
                                 activeOrderCount={activeUserOrders}
                             />
                         </div>
+                        <div className="d-block d-xl-none" style={{"width": "100%"}}>
+                            <Footer
+                                userFills={this.state.userFills}
+                                userOrders={this.state.userOrders}
+                                user={this.state.user}
+                                chainId={this.state.chainId}
+                            />
+                        </div>
                         <div className="col-12 col-xl-6">
                             <div className="trade_right">
                                 <div className="col-12 col-sm-12 col-md-12 col-lg-6">
@@ -722,12 +741,14 @@ class Trade extends React.Component {
                             </div>
                         </div>
                     </div>
-                    <Footer
-                        userFills={this.state.userFills}
-                        userOrders={this.state.userOrders}
-                        user={this.state.user}
-                        chainId={this.state.chainId}
-                    />
+                    <div className="d-none d-xl-block">
+                        <Footer
+                            userFills={this.state.userFills}
+                            userOrders={this.state.userOrders}
+                            user={this.state.user}
+                            chainId={this.state.chainId}
+                        />
+                    </div>
                 </div>
             </>
         );
