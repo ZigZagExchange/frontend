@@ -36,34 +36,70 @@ import api from 'lib/api'
 
 export const STARKNET_CONTRACT_ADDRESS = '0x074f861a79865af1fb77af6197042e8c73147e28c55ac61e385ac756f89b33d6'
 export const currencyInfo = {
-    'ETH': {
+    ETH: {
         decimals: 18,
+        name: "Ethereum",
         chain: {
             1: { tokenId: 0 },
             1000: { tokenId: 0 },
-            1001: { contractAddress: '0x06a75fdd9c9e376aebf43ece91ffb315dbaa753f9c0ddfeb8d7f3af0124cd0b6' },
+            1001: {
+                contractAddress:
+                    "0x06a75fdd9c9e376aebf43ece91ffb315dbaa753f9c0ddfeb8d7f3af0124cd0b6",
+            },
         },
-        gasFee: 0.0003
+        gasFee: 0.0003,
     },
-    'USDC': {
+    USDC: {
         decimals: 6,
+        name: "USD Coin",
         chain: {
             1: { tokenId: 2 },
             1000: { tokenId: 2 },
-            1001: { contractAddress: '0x0545d006f9f53169a94b568e031a3e16f0ea00e9563dc0255f15c2a1323d6811' },
+            1001: {
+                contractAddress:
+                    "0x0545d006f9f53169a94b568e031a3e16f0ea00e9563dc0255f15c2a1323d6811",
+            },
         },
-        gasFee: 1
+        gasFee: 1,
     },
-    'USDT': {
+    USDT: {
         decimals: 6,
+        name: "Tether",
         chain: {
             1: { tokenId: 4 },
             1000: { tokenId: 1 },
-            1001: { contractAddress: '0x03d3af6e3567c48173ff9b9ae7efc1816562e558ee0cc9abc0fe1862b2931d9a' },
+            1001: {
+                contractAddress:
+                    "0x03d3af6e3567c48173ff9b9ae7efc1816562e558ee0cc9abc0fe1862b2931d9a",
+            },
         },
-        gasFee: 1
+        gasFee: 1,
     },
-}
+    DAI: {
+        decimals: 18,
+        name: "Dai",
+        chain: {
+            1: { tokenId: 1 },
+            1000: { tokenId: 19 },
+            1001: {
+                contractAddress: null
+            },
+        },
+        gasFee: 1,
+    },
+    WBTC: {
+        decimals: 8,
+        name: "Bitcoin",
+        chain: {
+            1: { tokenId: 15 },
+            1000: { tokenId: null },
+            1001: {
+                contractAddress: null
+            },
+        },
+        gasFee: 0.00003,
+    },
+};
 
 //globals
 let syncWallet
@@ -332,29 +368,63 @@ export async function cancelorder(chainid, orderid) {
     return true
 }
 
-export function getDetailsWithoutFee(order) {
-    const side = order[3]
-    const baseQuantity = order[5]
-    const quoteQuantity = order[4] * order[5]
-    const remaining = isNaN(Number(order[11])) ? order[5] : order[11]
-    const baseCurrency = order[2].split('-')[0]
-    const quoteCurrency = order[2].split('-')[1]
-    let baseQuantityWithoutFee, quoteQuantityWithoutFee, priceWithoutFee, remainingWithoutFee
-    if (side === 's') {
-        const fee = currencyInfo[baseCurrency].gasFee
-        baseQuantityWithoutFee = baseQuantity - fee
-        remainingWithoutFee = Math.max(0, remaining - fee)
-        priceWithoutFee = quoteQuantity / baseQuantityWithoutFee
-        quoteQuantityWithoutFee = priceWithoutFee * baseQuantityWithoutFee
+
+
+export function getOrderDetailsWithoutFee(order) {
+    const side = order[3];
+    const baseQuantity = order[5];
+    const quoteQuantity = order[4] * order[5];
+    const remaining = isNaN(Number(order[11])) ? order[5] : order[11];
+    const baseCurrency = order[2].split("-")[0];
+    const quoteCurrency = order[2].split("-")[1];
+    let baseQuantityWithoutFee,
+        quoteQuantityWithoutFee,
+        priceWithoutFee,
+        remainingWithoutFee;
+    if (side === "s") {
+        const fee = currencyInfo[baseCurrency].gasFee;
+        baseQuantityWithoutFee = baseQuantity - fee;
+        remainingWithoutFee = Math.max(0, remaining - fee);
+        priceWithoutFee = quoteQuantity / baseQuantityWithoutFee;
+        quoteQuantityWithoutFee = priceWithoutFee * baseQuantityWithoutFee;
+    } else {
+        const fee = currencyInfo[quoteCurrency].gasFee;
+        quoteQuantityWithoutFee = quoteQuantity - fee;
+        priceWithoutFee = quoteQuantityWithoutFee / baseQuantity;
+        baseQuantityWithoutFee = quoteQuantityWithoutFee / priceWithoutFee;
+        remainingWithoutFee = Math.min(baseQuantityWithoutFee, remaining);
     }
-    else if (side === 'b') {
-        const fee = currencyInfo[quoteCurrency].gasFee
-        quoteQuantityWithoutFee = quoteQuantity - fee
-        priceWithoutFee = quoteQuantityWithoutFee / baseQuantity
-        baseQuantityWithoutFee = quoteQuantityWithoutFee / priceWithoutFee
-        remainingWithoutFee = Math.min(baseQuantityWithoutFee, remaining)
+    return {
+        price: priceWithoutFee,
+        quoteQuantity: quoteQuantityWithoutFee,
+        baseQuantity: baseQuantityWithoutFee,
+        remaining: remainingWithoutFee,
+    };
+}
+
+export function getFillDetailsWithoutFee(fill) {
+    const side = fill[3];
+    const baseQuantity = fill[5];
+    const quoteQuantity = fill[4] * fill[5];
+    const baseCurrency = fill[2].split("-")[0];
+    const quoteCurrency = fill[2].split("-")[1];
+    let baseQuantityWithoutFee, quoteQuantityWithoutFee, priceWithoutFee;
+    if (side === "s") {
+        const fee = currencyInfo[baseCurrency].gasFee;
+        baseQuantityWithoutFee = baseQuantity - fee;
+        priceWithoutFee = quoteQuantity / baseQuantityWithoutFee;
+        quoteQuantityWithoutFee = priceWithoutFee * baseQuantityWithoutFee;
+    } else {
+        const fee = currencyInfo[quoteCurrency].gasFee;
+        quoteQuantityWithoutFee = quoteQuantity - fee;
+        priceWithoutFee = quoteQuantityWithoutFee / baseQuantity;
+        baseQuantityWithoutFee = quoteQuantityWithoutFee / priceWithoutFee;
     }
-    return { price: priceWithoutFee, quoteQuantity: quoteQuantityWithoutFee, baseQuantity: baseQuantityWithoutFee, remaining: remainingWithoutFee }
+    return {
+        price: priceWithoutFee,
+        quoteQuantity: quoteQuantityWithoutFee,
+        baseQuantity: baseQuantityWithoutFee,
+    };
 }
 
 export function isZksyncChain(chainid) {
