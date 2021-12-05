@@ -215,6 +215,9 @@ const TradePage = () => {
     (order) => activeOrderStatuses.includes(order[9])
   ).length;
 
+  let tradingViewMarket = currentMarket;
+  if (currentMarket === "WBTC-USDT") tradingViewMarket = "BTC-USDT";
+
   return (
     <DefaultTemplate>
       <div className="trade_section">
@@ -230,7 +233,7 @@ const TradePage = () => {
                   currentMarket={currentMarket}
                 />
                 {/* Trade Chart */}
-                <TradeChart currentMarket={currentMarket} />
+                <TradeChart currentMarket={tradingViewMarket} />
               </div>
             </div>
             <SpotBox

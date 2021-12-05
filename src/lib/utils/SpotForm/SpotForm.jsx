@@ -237,6 +237,8 @@ class SpotForm extends React.Component {
                 newstate.amount = parseFloat(quoteAmount.slice(0, -1));
             }
         }
+
+        if (isNaN(newstate.amount)) newstate.amount = 0;
         this.setState(newstate);
     }
 
