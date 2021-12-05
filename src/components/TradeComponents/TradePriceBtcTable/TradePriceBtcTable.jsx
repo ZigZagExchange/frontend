@@ -4,8 +4,6 @@ import "./TradePriceBtcTable.css";
 // table data
 // assets
 import updownIcon from "../../../assets/icons/up-down-arrow.png";
-import arrows from "../../../assets/icons/arrows.png";
-import star from "../../../assets/icons/star-icon.png";
 
 class TradePriceBtcTable extends React.Component {
     render() {

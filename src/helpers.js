@@ -4,7 +4,6 @@ import { toast } from "react-toastify";
 //import { getStarknet } from "@argent/get-starknet"
 import * as starknet from "starknet";
 import bigInt from "big-integer";
-import starknetAccountContract from "./lib/Account";
 
 // Data
 //const zkTokenIds = {
@@ -45,6 +44,7 @@ export const STARKNET_CONTRACT_ADDRESS =
 export const currencyInfo = {
     ETH: {
         decimals: 18,
+        name: "Ethereum",
         chain: {
             1: { tokenId: 0 },
             1000: { tokenId: 0 },
@@ -57,6 +57,7 @@ export const currencyInfo = {
     },
     USDC: {
         decimals: 6,
+        name: "USD Coin",
         chain: {
             1: { tokenId: 2 },
             1000: { tokenId: 2 },
@@ -69,6 +70,7 @@ export const currencyInfo = {
     },
     USDT: {
         decimals: 6,
+        name: "Tether",
         chain: {
             1: { tokenId: 4 },
             1000: { tokenId: 1 },
@@ -78,6 +80,30 @@ export const currencyInfo = {
             },
         },
         gasFee: 1,
+    },
+    DAI: {
+        decimals: 18,
+        name: "Dai",
+        chain: {
+            1: { tokenId: 1 },
+            1000: { tokenId: 19 },
+            1001: {
+                contractAddress: null
+            },
+        },
+        gasFee: 1,
+    },
+    WBTC: {
+        decimals: 8,
+        name: "Bitcoin",
+        chain: {
+            1: { tokenId: 15 },
+            1000: { tokenId: null },
+            1001: {
+                contractAddress: null
+            },
+        },
+        gasFee: 0.00003,
     },
 };
 
@@ -154,7 +180,7 @@ export async function signinstarknet(chainid) {
         );
         const deployContractResponse =
             await starknet.defaultProvider.deployContract(
-                starknetAccountContract,
+                STARKNET_CONTRACT_ADDRESS,
                 [starkkeyint.toString()]
             );
         toast.dismiss(deployContractToast);
