@@ -1,9 +1,6 @@
 import React from "react";
-// css
-import "./TradePriceBtcTable.css";
-// table data
-// assets
 import updownIcon from "../../../assets/icons/up-down-arrow.png";
+import "./TradePriceBtcTable.css";
 
 class TradePriceBtcTable extends React.Component {
     render() {
@@ -45,10 +42,7 @@ class TradePriceBtcTable extends React.Component {
                                     <tr
                                         key={i}
                                         onClick={(e) =>
-                                            this.props.updateMarketChain(
-                                                undefined,
-                                                d.td1
-                                            )
+                                            this.props.updateMarketChain(d.td1)
                                         }
                                         className={
                                             this.props.currentMarket === d.td1

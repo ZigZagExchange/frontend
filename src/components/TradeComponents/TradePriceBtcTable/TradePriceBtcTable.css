@@ -1,7 +1,7 @@
 .trade_price_btc_table {
-    width: 100%;
-    padding-top: 20px;
-    height: 414px;
+  width: 100%;
+  padding-top: 20px;
+  height: 430px;
 }
 
 .trade_price_btc_table table {
@@ -56,11 +56,10 @@
 }
 
 .trade_price_btc_table table td {
-    text-align: center;
-    margin: 6px 0;
-    padding-left: 20px;
-    padding-top: 5px;
-    padding-bottom: 5px;
+  margin: 6px 0;
+  padding-left: 20px;
+  padding-top: 5px;
+  padding-bottom: 5px;
 }
 
 .trade_price_btc_table table td span {

@@ -1,9 +1,7 @@
-import * as zksync from "zksync";
 import Web3 from 'web3'
 import Web3Modal from 'web3modal'
 import Emitter from 'tiny-emitter'
 import { ethers } from 'ethers'
-import { toast } from 'react-toastify';
 // //import { getStarknet } from '@argent/get-starknet'
 // import * as starknet from 'starknet'
 // import bigInt from 'big-integer'
@@ -18,11 +16,10 @@ export default class API extends Emitter {
     ethersProvider = null
     currencies = null
     websocketUrl = null
-    ethWallet = null
-    syncWallet = null
 
     constructor({ infuraId, websocketUrl, networks, currencies }) {
         super()
+
 
         this.web3 = new Web3(
             window.ethereum || new Web3.providers.HttpProvider(`https://mainnet.infura.io/v3/${infuraId}`)
@@ -119,39 +116,7 @@ export default class API extends Emitter {
 
         const web3Provider = await this.web3Modal.connect()
         this.web3.setProvider(web3Provider || window.ethereum)
-
-        let ethereumChainId;
-        let ethereumChainName;
-        switch (network) {
-            case 1:
-                ethereumChainId = "0x1";
-                ethereumChainName = "mainnet";
-                break;
-            case 1000:
-            default:
-                ethereumChainId = "0x4";
-                ethereumChainName = "rinkeby";
-        }
-        try {
-            await window.ethereum.request({
-                method: "wallet_switchEthereumChain",
-                params: [{ chainId: ethereumChainId }],
-            });
-        } catch (e) {
-            toast.error("Wrong chain. Cannot sign in.");
-            return false;
-        }
-
         this.ethersProvider = new ethers.providers.Web3Provider(web3Provider || window.ethereum)
-        try {
-            this.syncProvider = await zksync.getDefaultProvider(ethereumChainName);
-        } catch (e) {
-            toast.error("Zksync is down. Try again later");
-            throw e;
-        }
-        this.ethWallet = this.ethersProvider.getSigner();
-        this.syncWallet = await zksync.Wallet.fromEthSigner(this.ethWallet, this.syncProvider);
-
         const accountState = await this.apiProvider.signIn(network)
 
         if (accountState) {
