@@ -130,7 +130,7 @@ const TradePage = () => {
         .filter(fill => fill[1] > maxFillId - 500)
         .sort((a,b) => b[1] - a[1])
         .forEach((fill) => {
-            if (api.isZksyncChain(this.state.chainId)) {
+            if (api.isZksyncChain(network)) {
                 const fillWithoutFee = api.getFillDetailsWithoutFee(fill);
                 fillData.push({
                     td1: fillWithoutFee.price,

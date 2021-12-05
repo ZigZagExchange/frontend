@@ -19,9 +19,6 @@ export const authSlice = createSlice({
   reducers: {
     _fills(state, { payload }) {
       payload[0].forEach(fill => {
-        if (fill[2] === state.currentMarket && fill[0] === state.network) {
-          state.marketFills.unshift(fill)
-        }
         const fillid = fill[1];
         if (
             fill[2] === state.currentMarket &&
@@ -120,7 +117,7 @@ export const authSlice = createSlice({
               const baseCurrency = filledOrder[2].split('-')[0]
               filledOrder[9] = 'f'
               filledOrder[10] = txHash
-              const noFeeOrder = api.getDetailsWithoutFee(filledOrder)
+              const noFeeOrder = api.getOrderDetailsWithoutFee(filledOrder)
               toast.success(`Your ${sideText} order for ${noFeeOrder.baseQuantity.toPrecision(4) / 1} ${baseCurrency} @ ${noFeeOrder.price.toPrecision(4) / 1} was filled!`)
             }
             break
@@ -139,7 +136,7 @@ export const authSlice = createSlice({
               const baseCurrency = filledOrder[2].split('-')[0]
               filledOrder[9] = 'r'
               filledOrder[10] = txHash
-              const noFeeOrder = api.getDetailsWithoutFee(filledOrder)
+              const noFeeOrder = api.getOrderDetailsWithoutFee(filledOrder)
               toast.error(`Your ${sideText} order for ${noFeeOrder.baseQuantity.toPrecision(4) / 1} ${baseCurrency} @ ${noFeeOrder.price.toPrecision(4) / 1} was rejected: ${error}`)
               toast.info(`This happens occasionally. Run the transaction again and you should be fine.`)
             }
@@ -178,7 +175,7 @@ export const authSlice = createSlice({
     setCurrentMarket(state, { payload }) {
       if (state.currentMarket !== payload) {
         state.currentMarket = payload
-        state.marketFills = []
+        state.marketFills = {}
         state.marketSummary = {}
         state.liquidity = []
         state.userOrders = {}
@@ -192,7 +189,8 @@ export const authSlice = createSlice({
       state.network = payload
     },
     resetData(state) {
-      state.marketFills = []
+      state.userFills = {}
+      state.marketFills = {}
       state.marketSummary = {}
       state.liquidity = []
       state.userOrders = {}
