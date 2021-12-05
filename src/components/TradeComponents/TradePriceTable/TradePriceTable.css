@@ -1,8 +1,8 @@
 .trade_price_table {
-    display: block;
-    overflow: auto;
-    height: 415px;
-    padding: 0 20px;
+  display: block;
+  overflow: auto;
+  height: 430px;
+  padding: 0 20px;
 }
 
 .trade_price_table::-webkit-scrollbar {
@@ -97,8 +97,7 @@
     text-align: start;
 }
 .trade_price_table td {
-    color: white;
-    text-align: center;
+  color: white;
 }
 .trade_price_table td:nth-child(3) {
     text-align: right;

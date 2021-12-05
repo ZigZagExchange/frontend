@@ -36,6 +36,19 @@ html {
     color: #08aff3 !important;
 }
 
+.zig-dropdown .rc-dropdown-menu > .rc-dropdown-menu-item {
+    font-size: 18px;
+    padding: 15px;
+    cursor: pointer;
+}
+
+.zig-dropdown .rc-dropdown-menu > .rc-dropdown-menu-item:hover,
+.zig-dropdown .rc-dropdown-menu > .rc-dropdown-menu-item-active,
+.zig-dropdown .rc-dropdown-menu > .rc-dropdown-menu-item-selected {
+    background-color: #c0cff8;
+    color: #43f;
+}
+
 @media screen and (min-width: 1800px) {
     html {
         font-size: 18px;

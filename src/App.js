@@ -1,15 +1,19 @@
-import "./App.css";
-import AppRoute from "./routes/AppRoute";
-import React from "react";
+import 'App.css'
+import AppRoutes from 'AppRoutes'
+import React from 'react'
+import Provider from 'lib/Provider'
+import api from 'lib/api'
+
+api.start()
 
 class App extends React.Component {
-    render() {
-        return (
-            <>
-                <AppRoute />
-            </>
-        );
-    }
+  render() {
+    return (
+      <Provider>
+        <AppRoutes />
+      </Provider>
+    )
+  }
 }
 
-export default App;
+export default App; 
