@@ -36,11 +36,6 @@ class TradePriceBtcTable extends React.Component {
                                         src={updownIcon}
                                         alt="..."
                                     />
-                                    <img
-                                        className="ms-2"
-                                        src={arrows}
-                                        alt="..."
-                                    />
                                 </th>
                             </tr>
                         </thead>
@@ -62,11 +57,6 @@ class TradePriceBtcTable extends React.Component {
                                         }
                                     >
                                         <td>
-                                            <img
-                                                className="me-2"
-                                                src={star}
-                                                alt="..."
-                                            />
                                             {d.td1.replace("-", "/")}
                                             <span>{d.span}</span>
                                         </td>
