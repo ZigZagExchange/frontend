@@ -1,6 +1,5 @@
 import Web3 from 'web3'
 import Web3Modal from 'web3modal'
-import { toast } from 'react-toastify'
 import Emitter from 'tiny-emitter'
 import { ethers } from 'ethers'
 import WalletConnectProvider from '@walletconnect/web3-provider'
