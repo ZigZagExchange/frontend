@@ -8,11 +8,12 @@ export const authSlice = createSlice({
     network: 1,
     userId: null,
     currentMarket: 'ETH-USDT',
-    marketFills: [],
+    marketFills: {},
     lastPrices: {},
     marketSummary: {},
     liquidity: [],
     userOrders: {},
+    userFills: {},
     orders: {},
   },
   reducers: {
@@ -21,7 +22,39 @@ export const authSlice = createSlice({
         if (fill[2] === state.currentMarket && fill[0] === state.network) {
           state.marketFills.unshift(fill)
         }
+        const fillid = fill[1];
+        if (
+            fill[2] === state.currentMarket &&
+            fill[0] === state.network
+        ) {
+            state.marketFills[fillid] = fill;
+        }
+        if (
+            state.userId &&
+            (fill[8] === state.userId.toString() ||
+                fill[9] === state.userId.toString())
+        ) {
+            state.userFills[fillid] = fill;
+        }
       });
+    },
+    _fillstatus(state, { payload }) {
+        payload[0].forEach((update) => {
+            const fillid = update[1];
+            const newstatus = update[2];
+            let txhash;
+            if (update[3]) txhash = update[3];
+            if (state.marketFills[fillid]) {
+                state.marketFills[fillid][6] = newstatus;
+                if (txhash)
+                    state.marketFills[fillid][7] = txhash;
+            }
+            if (state.userFills[fillid]) {
+                state.userFills[fillid][6] = newstatus;
+                if (txhash)
+                    state.marketFills[fillid][7] = txhash;
+            }
+        });
     },
     _marketsummary(state, { payload }) {
       state.marketSummary = {
@@ -173,6 +206,7 @@ export const { setNetwork, setUserId, setCurrentMarket, resetData } = authSlice.
 
 export const networkSelector = state => state.api.network
 export const userOrdersSelector = state => state.api.userOrders
+export const userFillsSelector = state => state.api.userFills
 export const allOrdersSelector = state => state.api.orders
 export const marketFillsSelector = state => state.api.marketFills
 export const lastPricesSelector = state => state.api.lastPrices

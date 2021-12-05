@@ -101,6 +101,31 @@ export const currencyInfo = {
     },
 };
 
+
+export const validMarkets = {
+    // zkSync Mainnet
+    1: [
+        "ETH-USDT",
+        "ETH-USDC",
+        "ETH-DAI",
+        "USDC-USDT",
+        "WBTC-USDT",
+    ],
+    // zkSync Rinkeby
+    1000: [
+        "ETH-USDT",
+        "ETH-USDC",
+        "USDC-USDT",
+        "ETH-DAI"
+    ],
+
+    // Starknet Alpha
+    1001: [
+        "ETH-USDT",
+        "ETH-USDC",
+    ]
+}
+
 //globals
 let syncWallet
 let accountState

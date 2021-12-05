@@ -11,6 +11,7 @@ import SpotBox from "components/TradeComponents/SpotBox/SpotBox";
 import {
   networkSelector,
   userOrdersSelector,
+  userFillsSelector,
   allOrdersSelector,
   marketFillsSelector,
   lastPricesSelector,
@@ -31,6 +32,7 @@ const TradePage = () => {
   const network = useSelector(networkSelector);
   const currentMarket = useSelector(currentMarketSelector);
   const userOrders = useSelector(userOrdersSelector);
+  const userFills = useSelector(userFillsSelector);
   const allOrders = useSelector(allOrdersSelector);
   const marketFills = useSelector(marketFillsSelector);
   const lastPrices = useSelector(lastPricesSelector);
@@ -88,7 +90,7 @@ const TradePage = () => {
     } catch (e) {
       spotPrice = null;
     }
-    const orderWithoutFee = api.getDetailsWithoutFee(order);
+    const orderWithoutFee = api.getOrderDetailsWithoutFee(order);
     let orderRow;
     if (api.isZksyncChain(network))
       orderRow = {
@@ -120,25 +122,31 @@ const TradePage = () => {
     }
   }
 
-  const fillData = [];
-  marketFills.forEach((fill) => {
-    if (api.isZksyncChain(network)) {
-      const orderWithoutFee = api.getDetailsWithoutFee(fill);
-      fillData.unshift({
-        td1: orderWithoutFee.price,
-        td2: orderWithoutFee.baseQuantity,
-        td3: orderWithoutFee.quoteQuantity,
-        side: fill[3],
-      });
-    } else {
-      fillData.unshift({
-        td1: fill[4],
-        td2: fill[5],
-        td3: fill[4] * fill[5],
-        side: fill[3],
-      });
-    }
-  });
+    // Only display recent trades
+    // There's a bunch of user trades in this list that are too old to display
+    const fillData = [];
+    const maxFillId = Math.max(...Object.values(marketFills).map(f => f[1]));
+    Object.values(marketFills)
+        .filter(fill => fill[1] > maxFillId - 500)
+        .sort((a,b) => b[1] - a[1])
+        .forEach((fill) => {
+            if (api.isZksyncChain(this.state.chainId)) {
+                const fillWithoutFee = api.getFillDetailsWithoutFee(fill);
+                fillData.push({
+                    td1: fillWithoutFee.price,
+                    td2: fillWithoutFee.baseQuantity,
+                    td3: fillWithoutFee.quoteQuantity,
+                    side: fill[3],
+                });
+            } else {
+                fillData.push({
+                    td1: fill[4],
+                    td2: fill[5],
+                    td3: fill[4] * fill[5],
+                    side: fill[3],
+                });
+            }
+        });
 
   if (api.isZksyncChain(network)) {
     liquidity.forEach((liq) => {
@@ -313,6 +321,7 @@ const TradePage = () => {
           </div>
         </div>
         <Footer
+          userFills={userFills}
           userOrders={userOrders}
           user={user}
           chainId={network}

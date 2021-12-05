@@ -3,6 +3,7 @@ import Web3Modal from 'web3modal'
 import Emitter from 'tiny-emitter'
 import { ethers } from 'ethers'
 import WalletConnectProvider from '@walletconnect/web3-provider'
+import { currencyInfo } from "helpers";
 
 export default class API extends Emitter {
     networks = {}
@@ -176,30 +177,61 @@ export default class API extends Emitter {
         return [1000, 1].includes(this.apiProvider.network)
     }
 
-    getDetailsWithoutFee = (order) => {
-        const side = order[3]
-        const baseQuantity = order[5]
-        const quoteQuantity = order[4] * order[5]
-        const remaining = isNaN(Number(order[11])) ? order[5] : order[11]
-        const baseCurrency = order[2].split('-')[0]
-        const quoteCurrency = order[2].split('-')[1]
-        let baseQuantityWithoutFee, quoteQuantityWithoutFee, priceWithoutFee, remainingWithoutFee
-        if (side === 's') {
-            const fee = this.currencies[baseCurrency].gasFee
-            baseQuantityWithoutFee = baseQuantity - fee
-            remainingWithoutFee = Math.max(0, remaining - fee)
-            priceWithoutFee = quoteQuantity / baseQuantityWithoutFee
-            quoteQuantityWithoutFee = priceWithoutFee * baseQuantityWithoutFee
+    getOrderDetailsWithoutFee(order) {
+        const side = order[3];
+        const baseQuantity = order[5];
+        const quoteQuantity = order[4] * order[5];
+        const remaining = isNaN(Number(order[11])) ? order[5] : order[11];
+        const baseCurrency = order[2].split("-")[0];
+        const quoteCurrency = order[2].split("-")[1];
+        let baseQuantityWithoutFee,
+            quoteQuantityWithoutFee,
+            priceWithoutFee,
+            remainingWithoutFee;
+        if (side === "s") {
+            const fee = currencyInfo[baseCurrency].gasFee;
+            baseQuantityWithoutFee = baseQuantity - fee;
+            remainingWithoutFee = Math.max(0, remaining - fee);
+            priceWithoutFee = quoteQuantity / baseQuantityWithoutFee;
+            quoteQuantityWithoutFee = priceWithoutFee * baseQuantityWithoutFee;
+        } else {
+            const fee = currencyInfo[quoteCurrency].gasFee;
+            quoteQuantityWithoutFee = quoteQuantity - fee;
+            priceWithoutFee = quoteQuantityWithoutFee / baseQuantity;
+            baseQuantityWithoutFee = quoteQuantityWithoutFee / priceWithoutFee;
+            remainingWithoutFee = Math.min(baseQuantityWithoutFee, remaining);
         }
-        else if (side === 'b') {
-            const fee = this.currencies[quoteCurrency].gasFee
-            quoteQuantityWithoutFee = quoteQuantity - fee
-            priceWithoutFee = quoteQuantityWithoutFee / baseQuantity
-            baseQuantityWithoutFee = quoteQuantityWithoutFee / priceWithoutFee
-            remainingWithoutFee = Math.min(baseQuantityWithoutFee, remaining)
+        return {
+            price: priceWithoutFee,
+            quoteQuantity: quoteQuantityWithoutFee,
+            baseQuantity: baseQuantityWithoutFee,
+            remaining: remainingWithoutFee,
+        };
+    }
+
+    getFillDetailsWithoutFee(fill) {
+        const side = fill[3];
+        const baseQuantity = fill[5];
+        const quoteQuantity = fill[4] * fill[5];
+        const baseCurrency = fill[2].split("-")[0];
+        const quoteCurrency = fill[2].split("-")[1];
+        let baseQuantityWithoutFee, quoteQuantityWithoutFee, priceWithoutFee;
+        if (side === "s") {
+            const fee = currencyInfo[baseCurrency].gasFee;
+            baseQuantityWithoutFee = baseQuantity - fee;
+            priceWithoutFee = quoteQuantity / baseQuantityWithoutFee;
+            quoteQuantityWithoutFee = priceWithoutFee * baseQuantityWithoutFee;
+        } else {
+            const fee = currencyInfo[quoteCurrency].gasFee;
+            quoteQuantityWithoutFee = quoteQuantity - fee;
+            priceWithoutFee = quoteQuantityWithoutFee / baseQuantity;
+            baseQuantityWithoutFee = quoteQuantityWithoutFee / priceWithoutFee;
         }
-        
-        return { price: priceWithoutFee, quoteQuantity: quoteQuantityWithoutFee, baseQuantity: baseQuantityWithoutFee, remaining: remainingWithoutFee }
+        return {
+            price: priceWithoutFee,
+            quoteQuantity: quoteQuantityWithoutFee,
+            baseQuantity: baseQuantityWithoutFee,
+        };
     }
 
     submitOrder = async (product, side, price, amount) => {
