@@ -1,6 +1,7 @@
 import React from "react";
 // css
 import "./TradeRatesCard.css";
+import { currencyInfo } from "../../../helpers";
 
 class TradeRatesCard extends React.Component {
     render() {
@@ -18,7 +19,7 @@ class TradeRatesCard extends React.Component {
                 <div className="tl_rates">
                     <div className="rates_box rb_text_1">
                         <strong>{marketDisplay}</strong>
-                        <p>Ethereum</p>
+                        <p>{currencyInfo[baseCurrency].name}</p>
                     </div>
                     <div className="rates_box rb_text_2">
                         <h1>{this.props.marketSummary.price}</h1>
