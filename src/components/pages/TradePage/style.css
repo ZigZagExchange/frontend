@@ -1,0 +1,157 @@
+.trade_section {
+    width: 100%;
+    min-height: 100vh;
+    height: 100%;
+    background-color: #1c2231;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    padding-bottom: 2rem;
+}
+
+.trade_container {
+    width: 95%;
+    margin: 0 auto;
+    padding-top: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.trade_left {
+    border-radius: 10px;
+    width: 100%;
+    height: max-content;
+    background-color: #171c28;
+    padding: 20px;
+}
+
+.trade_left > div {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.trade_table_pad_top {
+  padding-top: 12px;
+  height: 430px;
+}
+
+.trade_right {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding-left: 20px;
+}
+
+.trade_Price {
+    border-radius: 5px;
+    width: 90%;
+    margin: 0 auto;
+    height: 100%;
+    overflow-x: auto;
+    background-color: #171c28;
+}
+
+.trade_price2 {
+  
+  height: 493px;
+}
+
+.trade_Price::-webkit-scrollbar,
+.trade_price_btc::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+    position: relative;
+    z-index: 20;
+}
+
+.trade_Price::-webkit-scrollbar-track,
+.trade_price_btc::-webkit-scrollbar-track {
+    border-radius: 5px;
+    background: hsla(0, 0%, 100%, 0.15);
+    height: 23px;
+}
+
+.trade_Price::-webkit-scrollbar-thumb,
+.trade_price_btc::-webkit-scrollbar-thumb {
+    border-radius: 5px;
+    background: hsla(0, 0%, 100%, 0.4);
+}
+
+.trade_Price::-webkit-scrollbar-thumb:window-inactive,
+.trade_price_btc::-webkit-scrollbar-thumb:window-inactive {
+    background: #fff;
+}
+
+.trade_price_btc {
+    border-radius: 10px;
+    width: 90%;
+    margin: 0 auto;
+    height: 100%;
+    overflow-x: auto;
+    background-color: #171c28;
+}
+
+.trade_Price {
+  margin-bottom: 10px;
+  box-sizing: border-box;
+}
+
+@media screen and (max-width: 991px) {
+  .trade_Price {
+    margin: 0 auto;
+  }
+  .trade_left > div {
+    width: 100%;
+  }
+  .trade_right {
+    margin-top: 2rem;
+    padding-left: 0;
+  }
+  .trade_Price {
+    width: 100%;
+  }
+  .trade_price_btc {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+    .trade_price2 {
+        height: 100%;
+    }
+}
+.trade_price_head_third {
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    color: #94a2c9;
+    padding: 20px;
+}
+
+.trade_price_head_third strong {
+    border-radius: 10px;
+    font-size: 1rem;
+    margin: 0 auto;
+    cursor: pointer;
+}
+
+@media screen and (min-width: 1800px) {
+    .trade_price_head_third {
+        width: 100%;
+    }
+}
+@media screen and (max-width: 991px) {
+    .trade_price_head_third {
+        width: 100%;
+    }
+}
+
+@media screen and (max-width: 358px) {
+    .trade_price_head_third strong {
+        font-size: 0.8rem;
+    }
+}
