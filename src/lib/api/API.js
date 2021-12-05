@@ -1,11 +1,8 @@
 import Web3 from 'web3'
 import Web3Modal from 'web3modal'
+import { toast } from 'react-toastify'
 import Emitter from 'tiny-emitter'
 import { ethers } from 'ethers'
-// //import { getStarknet } from '@argent/get-starknet'
-// import * as starknet from 'starknet'
-// import bigInt from 'big-integer'
-// import starknetAccountContract from './contracts/Account.json'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 
 export default class API extends Emitter {
@@ -16,26 +13,9 @@ export default class API extends Emitter {
     ethersProvider = null
     currencies = null
     websocketUrl = null
-
+    
     constructor({ infuraId, websocketUrl, networks, currencies }) {
         super()
-
-
-        this.web3 = new Web3(
-            window.ethereum || new Web3.providers.HttpProvider(`https://mainnet.infura.io/v3/${infuraId}`)
-        )
-
-        this.web3Modal = new Web3Modal({
-            cacheProvider: false,
-            providerOptions: {
-                walletconnect: {
-                    package: WalletConnectProvider,
-                    options: {
-                        infuraId,
-                    }
-                }
-            }
-        })
         
         if (networks) {
             Object.keys(networks).forEach(k => {
@@ -46,11 +26,10 @@ export default class API extends Emitter {
             })
         }
         
-        this.apiProvider = this.networks[Object.keys(this.networks)[0]][1]
+        this.infuraId = infuraId
         this.websocketUrl = websocketUrl
         this.currencies = currencies
-
-        this.emit('providerChange', this.apiProvider.network)
+        this.setAPIProvider(this.networks[Object.keys(this.networks)[0]][0])
     }
 
     getAPIProvider = (network) => {
@@ -58,7 +37,28 @@ export default class API extends Emitter {
     }
 
     setAPIProvider = (network) => {
+        const networkName = this.getNetworkName(network)
         this.apiProvider = this.getAPIProvider(network)
+
+        this.web3 = new Web3(
+            window.ethereum || new Web3.providers.HttpProvider(
+                `https://${networkName}.infura.io/v3/${this.infuraId}`
+            )
+        )
+
+        this.web3Modal = new Web3Modal({
+            network: networkName,
+            cacheProvider: false,
+            providerOptions: {
+                walletconnect: {
+                    package: WalletConnectProvider,
+                    options: {
+                        infuraId: this.infuraId,
+                    }
+                }
+            }
+        })
+
         this.emit('providerChange', network)
     }
 
@@ -109,14 +109,39 @@ export default class API extends Emitter {
         return this.ws.send(JSON.stringify({ op, args }))
     }
 
+    refreshNetwork = async () => {
+        if (!window.ethereum) return
+        let ethereumChainId
+
+        switch (this.apiProvider.network) {
+            case 1:
+                ethereumChainId = "0x1";
+            break;
+            case 1000:
+                ethereumChainId = "0x4";
+            break;
+            default:
+                return
+        }
+
+        await window.ethereum.enable();
+
+        await window.ethereum.request({
+            method: "wallet_switchEthereumChain",
+            params: [{ chainId: ethereumChainId }],
+        });
+    }
+
     signIn = async (network) => {
         if (network) {
             this.apiProvider = this.getAPIProvider(network)
         }
+        
+        await this.refreshNetwork()
 
-        const web3Provider = await this.web3Modal.connect()
-        this.web3.setProvider(web3Provider || window.ethereum)
-        this.ethersProvider = new ethers.providers.Web3Provider(web3Provider || window.ethereum)
+        const web3Provider = ((await this.web3Modal.connect()) || window.ethereum)
+        this.web3.setProvider(web3Provider)
+        this.ethersProvider = new ethers.providers.Web3Provider(web3Provider)
         const accountState = await this.apiProvider.signIn(network)
 
         if (accountState) {

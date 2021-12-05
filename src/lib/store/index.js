@@ -18,7 +18,7 @@ const persistConfig = {
 
 const apiPersistConfig = {
     key: 'api',
-    whitelist: ['network', 'currentMarket', 'marketSummary'],
+    whitelist: [],
     storage,
 }
 
