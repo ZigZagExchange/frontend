@@ -109,7 +109,8 @@ export const validMarkets = {
         "ETH-USDC",
         "ETH-DAI",
         "USDC-USDT",
-        "WBTC-USDT",
+        //"WBTC-USDT",
+        //"FRAX-USDC",
     ],
     // zkSync Rinkeby
     1000: [
