@@ -2,7 +2,7 @@ import React from "react";
 // css
 import "./TradeMarketActivites.css";
 // assets
-import twoUpArrows from "../../../assets/icons/two_uparrows.png";
+import twoUpArrows from "assets/icons/two_uparrows.png";
 const TradeMarketActivites = () => {
     return (
         <>

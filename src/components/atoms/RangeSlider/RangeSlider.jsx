@@ -61,7 +61,7 @@ const marks = [
         value: 100,
     },
 ];
-const RangeSlider = (props) => {
+export const RangeSlider = (props) => {
     const classes = useStyles();
     return (
         <>
@@ -82,5 +82,3 @@ const RangeSlider = (props) => {
         </>
     );
 };
-
-export default RangeSlider;

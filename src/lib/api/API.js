@@ -1,6 +1,5 @@
 import Web3 from 'web3'
 import Web3Modal from 'web3modal'
-import { toast } from 'react-toastify'
 import Emitter from 'tiny-emitter'
 import { ethers } from 'ethers'
 import WalletConnectProvider from '@walletconnect/web3-provider'
@@ -29,7 +28,7 @@ export default class API extends Emitter {
         this.infuraId = infuraId
         this.websocketUrl = websocketUrl
         this.currencies = currencies
-        this.setAPIProvider(this.networks[Object.keys(this.networks)[0]][0])
+        this.setAPIProvider(this.networks.mainnet[0])
     }
 
     getAPIProvider = (network) => {
@@ -175,6 +174,30 @@ export default class API extends Emitter {
 
     isZksyncChain = () => {
         return [1000, 1].includes(this.apiProvider.network)
+    }
+
+    cancelOrder = async (orderId) => {
+        await this.send('cancelorder', [this.apiProvider.network, orderId])
+        return true
+    }
+
+    depositL2 = (amount, token) => {
+        return this.apiProvider.depositL2(amount, token)
+    }
+
+    withdrawL2 = (amount, token) => {
+        return this.apiProvider.withdrawL2(amount, token)
+    }
+
+    cancelAllOrders = async () => {
+        const { id: userId } = await this.getAccountState()
+        await this.send('cancelall', [this.apiProvider.network, userId])
+        return true
+    }
+    
+    isImplemented = (method) => {
+        console.log(this.apiProvider)
+        return this.apiProvider[method] && !this.apiProvider[method].notImplemented
     }
 
     getDetailsWithoutFee = (order) => {

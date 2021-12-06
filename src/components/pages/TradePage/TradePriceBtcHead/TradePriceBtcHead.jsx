@@ -2,8 +2,8 @@ import React from "react";
 // css
 import "./TradePriceBtcHead.css";
 // assets
-import starIcon from "../../../assets/icons/star-icon.png";
-import selectArrow from "../../../assets/icons/select-arrow.png";
+import starIcon from "assets/icons/star-icon.png";
+import selectArrow from "assets/icons/select-arrow.png";
 const TradePriceBtcHead = () => {
     return (
         <>

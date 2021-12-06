@@ -1,8 +1,7 @@
 import React from "react";
-// css
 import "./TradePriceHeadSecond.css";
-// assets
-import upArrow from "../../../assets/icons/up-arrow.png";
+import upArrow from "assets/icons/up-arrow.png";
+
 const TradePriceHeadSecond = (props) => {
     return (
         <>

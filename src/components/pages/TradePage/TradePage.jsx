@@ -3,11 +3,11 @@ import { useSelector, useDispatch } from "react-redux";
 // import { ToastContainer, toast } from "react-toastify";
 import { DefaultTemplate, Footer, TradeChart } from "components";
 import "react-toastify/dist/ReactToastify.css";
-import TradeHead from "components/TradeComponents/TradeHead/TradeHead";
-import TradePriceTable from "components/TradeComponents/TradePriceTable/TradePriceTable";
-import TradePriceBtcTable from "components/TradeComponents/TradePriceBtcTable/TradePriceBtcTable";
-import TradePriceHeadSecond from "components/TradeComponents/TradePriceHeadSecond/TradePriceHeadSecond";
-import SpotBox from "components/TradeComponents/SpotBox/SpotBox";
+import TradeHead from "components/pages/TradePage/TradeHead/TradeHead";
+import TradePriceTable from "components/pages/TradePage/TradePriceTable/TradePriceTable";
+import TradePriceBtcTable from "components/pages/TradePage/TradePriceBtcTable/TradePriceBtcTable";
+import TradePriceHeadSecond from "components/pages/TradePage/TradePriceHeadSecond/TradePriceHeadSecond";
+import SpotBox from "components/pages/TradePage/SpotBox/SpotBox";
 import {
   networkSelector,
   userOrdersSelector,
@@ -18,11 +18,10 @@ import {
   liquiditySelector,
   currentMarketSelector,
   setCurrentMarket,
+  resetData,
 } from "lib/store/features/api/apiSlice";
 import { userSelector } from "lib/store/features/auth/authSlice";
 import "./style.css";
-
-// import { broadcastfill } from "helpers";
 import api from "lib/api";
 
 const TradePage = () => {
@@ -42,6 +41,7 @@ const TradePage = () => {
 
   useEffect(() => {
     const sub = () => {
+      dispatch(resetData())
       api.subscribeToMarket(currentMarket)
     }
     if (api.ws.readyState === 0) {

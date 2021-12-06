@@ -2,10 +2,10 @@ import React from "react";
 // css
 import "./TradePriceHead.css";
 // assets
-import menuIcon1 from "../../../assets/icons/rectangle.png";
-import menuIcon2 from "../../../assets/icons/rectangle1.png";
-import menuIcon3 from "../../../assets/icons/rectangle2.png";
-import threedotIcon from "../../../assets/icons/threedot-icon.png";
+import menuIcon1 from "assets/icons/rectangle.png";
+import menuIcon2 from "assets/icons/rectangle1.png";
+import menuIcon3 from "assets/icons/rectangle2.png";
+import threedotIcon from "assets/icons/threedot-icon.png";
 
 const TradePriceHead = () => {
     return (

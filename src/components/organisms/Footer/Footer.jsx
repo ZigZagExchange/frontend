@@ -4,7 +4,7 @@ import "./Footer.css";
 // assets
 import loadingGif from "assets/icons/loading.svg";
 //helpers
-import { cancelorder, currencyInfo, getDetailsWithoutFee } from "helpers";
+import api from 'lib/api'
 
 export class Footer extends React.Component {
   constructor(props) {
@@ -54,27 +54,20 @@ export class Footer extends React.Component {
         </thead>
         <tbody>
           {orders.map((order, i) => {
-            const chainid = order[0];
-            const orderid = order[1];
-            const market = order[2];
-            let price = order[4];
-            let baseQuantity = order[5];
-            let remaining = isNaN(Number(order[11])) ? order[5] : order[11];
-            const orderstatus = order[9];
-            const baseCurrency = order[2].split("-")[0];
-            const quoteCurrency = order[2].split("-")[1];
-            const side = order[3] === "b" ? "buy" : "sell";
-            const sideclassname = order[3] === "b" ? "up_value" : "down_value";
+            let [, orderId, market, side, price, baseQuantity, orderStatus] = order;
+            let remaining = isNaN(Number(order[11])) ? baseQuantity : order[11];
+            const [baseCurrency, quoteCurrency] = market.split("-");
+            const sideClassName = side === "b" ? "up_value" : "down_value";
             let feeText;
             if (order[9] === "r") {
               feeText = "0 " + baseCurrency;
             } else if (order[3] === "s") {
-              feeText = currencyInfo[baseCurrency].gasFee + " " + baseCurrency;
+              feeText = api.currencies[baseCurrency].gasFee + " " + baseCurrency;
             } else if (order[3] === "b") {
               feeText =
-                currencyInfo[quoteCurrency].gasFee + " " + quoteCurrency;
+                api.currencies[quoteCurrency].gasFee + " " + quoteCurrency;
             }
-            const orderWithoutFee = getDetailsWithoutFee(order);
+            const orderWithoutFee = api.getDetailsWithoutFee(order);
             if ([1, 1000].includes(this.props.chainId)) {
               price = orderWithoutFee.price;
               baseQuantity = orderWithoutFee.baseQuantity;
@@ -150,7 +143,7 @@ export class Footer extends React.Component {
             }
 
             return (
-              <tr key={orderid}>
+              <tr key={orderId}>
                 <td>{market}</td>
                 <td>{price.toPrecision(6) / 1}</td>
                 <td>
@@ -159,7 +152,7 @@ export class Footer extends React.Component {
                 <td>
                   {remaining.toPrecision(6) / 1} {baseCurrency}
                 </td>
-                <td className={sideclassname}>{side}</td>
+                <td className={sideClassName}>{side === 'b' ? 'buy' : 'sell'}</td>
                 <td>{feeText}</td>
                 <td className={statusClass}>{statusText}</td>
                 <td>
@@ -167,10 +160,10 @@ export class Footer extends React.Component {
                     <a href={txHashLink} target="_blank" rel="noreferrer">
                       View Tx
                     </a>
-                  ) : orderstatus === "o" ? (
+                  ) : orderStatus === "o" ? (
                     <span
                       className="cancel_order_link"
-                      onClick={() => cancelorder(chainid, orderid)}
+                      onClick={() => api.cancelOrder(orderId)}
                     >
                       Cancel
                     </span>
@@ -219,10 +212,10 @@ export class Footer extends React.Component {
           const balancesContent = Object.keys(
             this.props.user.committed.balances
           ).map((token) => {
-            if (!currencyInfo[token]) return "";
+            if (!api.currencies[token]) return "";
             let balance = this.props.user.committed.balances[token];
             balance =
-              parseInt(balance) / Math.pow(10, currencyInfo[token].decimals);
+              parseInt(balance) / Math.pow(10, api.currencies[token].decimals);
             return (
               <tr>
                 <td>{token}</td>

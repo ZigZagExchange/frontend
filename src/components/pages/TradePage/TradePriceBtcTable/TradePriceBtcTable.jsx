@@ -1,5 +1,5 @@
 import React from "react";
-import updownIcon from "../../../assets/icons/up-down-arrow.png";
+import updownIcon from "assets/icons/up-down-arrow.png";
 import "./TradePriceBtcTable.css";
 
 class TradePriceBtcTable extends React.Component {

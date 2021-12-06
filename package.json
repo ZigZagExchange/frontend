@@ -101,6 +101,7 @@
     "start:prod": "env-cmd -f .env.prod node scripts/start.js",
     "build:local": "node scripts/build.js",
     "build:prod": "env-cmd -f .env.prod node scripts/build.js",
+    "analyze": "source-map-explorer 'build/static/js/*.js'",
     "test": "node scripts/test.js",
     "format": "prettier --write src/"
   },
@@ -127,7 +128,8 @@
   "devDependencies": {
     "babel-plugin-styled-components": "^2.0.2",
     "env-cmd": "^10.1.0",
-    "prettier": "2.4.1"
+    "prettier": "2.4.1",
+    "source-map-explorer": "^2.5.2"
   },
   "jest": {
     "roots": [

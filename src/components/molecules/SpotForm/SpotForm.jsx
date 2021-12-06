@@ -1,12 +1,11 @@
 import React from 'react';
 import { toast } from 'react-toastify';
+import api from 'lib/api';
+import { RangeSlider, Button } from 'components';
 import darkPlugHead from 'assets/icons/dark-plug-head.png';
-import { submitorder, currencyInfo, isZksyncChain } from 'helpers';
-import RangeSlider from '../RangeSlider/RangeSlider';
-import { Button } from 'components';
 import './SpotForm.css';
 
-class SpotForm extends React.Component {
+export class SpotForm extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -40,7 +39,7 @@ class SpotForm extends React.Component {
         const baseCurrency = this.props.currentMarket.split("-")[0];
         return (
             this.props.user.committed.balances[baseCurrency] /
-            Math.pow(10, currencyInfo[baseCurrency].decimals)
+            Math.pow(10, api.currencies[baseCurrency].decimals)
         );
     }
 
@@ -48,7 +47,7 @@ class SpotForm extends React.Component {
         const quoteCurrency = this.props.currentMarket.split("-")[1];
         return (
             this.props.user.committed.balances[quoteCurrency] /
-            Math.pow(10, currencyInfo[quoteCurrency].decimals)
+            Math.pow(10, api.currencies[quoteCurrency].decimals)
         );
     }
 
@@ -65,7 +64,7 @@ class SpotForm extends React.Component {
         }
         if (
             this.props.activeOrderCount > 0 &&
-            isZksyncChain(this.props.chainId)
+            api.isZksyncChain(this.props.chainId)
         ) {
             toast.error("Only one active order permitted at a time");
             return;
@@ -115,15 +114,14 @@ class SpotForm extends React.Component {
         newstate.orderButtonDisabled = true;
         this.setState(newstate);
         let orderPendingToast;
-        if (isZksyncChain(this.props.chainId)) {
+        if (api.isZksyncChain(this.props.chainId)) {
             orderPendingToast = toast.info(
                 "Order pending. Sign or Cancel to continue..."
             );
         }
 
         try {
-            await submitorder(
-                this.props.chainId,
+            await api.submitOrder(
                 this.props.currentMarket,
                 this.props.side,
                 price,
@@ -134,7 +132,7 @@ class SpotForm extends React.Component {
             toast.error(e.message);
         }
 
-        if (isZksyncChain(this.props.chainId)) {
+        if (api.isZksyncChain(this.props.chainId)) {
             toast.dismiss(orderPendingToast);
         }
         newstate = { ...this.state };
@@ -153,7 +151,7 @@ class SpotForm extends React.Component {
         const quoteCurrency = this.props.currentMarket.split("-")[1];
         if (this.props.side === "s") {
             const baseBalance =
-                this.getBaseBalance() - currencyInfo[baseCurrency].gasFee;
+                this.getBaseBalance() - api.currencies[baseCurrency].gasFee;
             const amount = this.state.amount || 0;
             return Math.round((amount / baseBalance) * 100);
         } else if (this.props.side === "b") {
@@ -161,7 +159,7 @@ class SpotForm extends React.Component {
             const amount = this.state.amount || 0;
             const total = amount * this.currentPrice();
             return Math.round(
-                (total / (quoteBalance - currencyInfo[quoteCurrency].gasFee)) *
+                (total / (quoteBalance - api.currencies[quoteCurrency].gasFee)) *
                     100
             );
         }
@@ -174,7 +172,7 @@ class SpotForm extends React.Component {
         }
 
         let spread, stableSpread;
-        if (isZksyncChain(this.props.chainId)) {
+        if (api.isZksyncChain(this.props.chainId)) {
             spread = 0.001;
             stableSpread = 0.0004;
         } else {
@@ -216,7 +214,7 @@ class SpotForm extends React.Component {
             const baseBalance = this.getBaseBalance();
             const baseCurrency = this.props.currentMarket.split("-")[0];
             let displayAmount = (baseBalance * val) / 100;
-            displayAmount -= currencyInfo[baseCurrency].gasFee;
+            displayAmount -= api.currencies[baseCurrency].gasFee;
             displayAmount = displayAmount.toPrecision(7);
             if (displayAmount < 1e-5) {
                 newstate.amount = 0;
@@ -227,7 +225,7 @@ class SpotForm extends React.Component {
             const quoteBalance = this.getQuoteBalance();
             const quoteCurrency = this.props.currentMarket.split("-")[1];
             let quoteAmount =
-                ((quoteBalance - currencyInfo[quoteCurrency].gasFee) * val) /
+                ((quoteBalance - api.currencies[quoteCurrency].gasFee) * val) /
                 100 /
                 this.currentPrice();
             quoteAmount = quoteAmount.toPrecision(7);
@@ -339,5 +337,3 @@ class SpotForm extends React.Component {
       );
   }
 };
-
-export default SpotForm;

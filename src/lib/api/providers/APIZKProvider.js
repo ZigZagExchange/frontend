@@ -1,10 +1,12 @@
 import * as zksync from 'zksync'
 import { toast } from 'react-toastify'
+import { toBaseUnit } from 'lib/utils'
 import APIProvider from './APIProvider'
 
 export default class APIZKProvider extends APIProvider {
     static VALID_SIDES = ['b', 's']
     
+    ethWallet = null
     syncWallet = null
     syncProvider = null
 
@@ -70,6 +72,40 @@ export default class APIZKProvider extends APIProvider {
             ? this.syncWallet.getAccountState()
             : {}
     }
+
+    withdrawL2 = async (amountDecimals, token = 'ETH') => {
+        let transfer
+
+        const amount = toBaseUnit(amountDecimals, this.api.currencies[token].decimals)
+        
+        try {
+            transfer = await this.syncWallet.withdrawFromSyncToEthereum({
+                token,
+                ethAddress: await this.ethWallet.getAddress(),
+                amount,
+            })
+            return transfer
+        } finally {
+            if (transfer) await transfer.awaitReceipt()
+        }
+    }
+
+    depositL2 = async (amountDecimals, token = 'ETH') => {
+        let transfer
+
+        const amount = toBaseUnit(amountDecimals, this.api.currencies[token].decimals)
+
+        try {
+            transfer = await this.syncWallet.depositToSyncFromEthereum({
+                token,
+                depositTo: this.syncWallet.address(),
+                amount,
+            })
+            return transfer
+        } finally {
+            if (transfer) await transfer.awaitReceipt()
+        }
+    }
     
     signIn = async () => {
         try {
@@ -81,8 +117,8 @@ export default class APIZKProvider extends APIProvider {
             throw e
         }
 
-        const ethWallet = this.api.ethersProvider.getSigner()
-        this.syncWallet = await zksync.Wallet.fromEthSigner(ethWallet, this.syncProvider)        
+        this.ethWallet = this.api.ethersProvider.getSigner()
+        this.syncWallet = await zksync.Wallet.fromEthSigner(this.ethWallet, this.syncProvider)
         const accountState = await this.syncWallet.getAccountState()        
         const signingKeySet = await this.syncWallet.isSigningKeySet()
         

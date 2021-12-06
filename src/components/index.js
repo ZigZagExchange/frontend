@@ -15,10 +15,12 @@
 // Atoms
 export * from 'components/atoms/SwapButton'
 export * from 'components/atoms/Button'
+export * from 'components/atoms/RangeSlider'
 export * from 'components/atoms/Dropdown'
 
 // Molecules
 export * from 'components/molecules/Chart'
+export * from 'components/molecules/SpotForm'
 
 // Organisms
 export * from 'components/organisms/Header'

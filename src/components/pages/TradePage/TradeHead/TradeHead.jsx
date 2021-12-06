@@ -2,8 +2,8 @@ import React from "react";
 // css
 import "./TradeHead.css";
 // components
-import TradeRatesCard from "../TradeRatesCard/TradeRatesCard";
-import TradeSelect from "../TradeSelect/TradeSelect";
+import TradeRatesCard from "components/pages/TradePage/TradeRatesCard/TradeRatesCard";
+import TradeSelect from "components/pages/TradePage/TradeSelect/TradeSelect";
 
 const TradeHead = (props) => {
     return (

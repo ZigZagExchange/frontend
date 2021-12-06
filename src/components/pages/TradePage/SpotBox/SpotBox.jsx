@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 // css
 import "./SpotBox.css";
 // assets
-import SpotForm from "../../../lib/utils/SpotForm/SpotForm";
+import { SpotForm } from "components";
 
 class SpotBox extends React.Component {
     constructor(props) {

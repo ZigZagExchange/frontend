@@ -14,7 +14,7 @@
 
 .tl_select select {
     width: 100%;
-    background-image: url("../../../assets/icons/select-arrow.png");
+    background-image: url("../../../../assets/icons/select-arrow.png");
     color: #94a2c9;
     border: none;
     display: flex;
