@@ -38,6 +38,54 @@ const api = new API({
             },
             gasFee: 1
         },
+        DAI: {
+            decimals: 18,
+            name: "Dai",
+            chain: {
+                1: { tokenId: 1 },
+                1000: { tokenId: 19 },
+                1001: {
+                    contractAddress: null
+                },
+            },
+            gasFee: 1,
+        },
+        WBTC: {
+            decimals: 8,
+            name: "Bitcoin",
+            chain: {
+                1: { tokenId: 15 },
+                1000: { tokenId: null },
+                1001: {
+                    contractAddress: null
+                },
+            },
+            gasFee: 0.00003,
+        },
+    },
+    validMarkets: {
+        // zkSync Mainnet
+        1: [
+            "ETH-USDT",
+            "ETH-USDC",
+            "ETH-DAI",
+            "USDC-USDT",
+            //"WBTC-USDT",
+            //"FRAX-USDC",
+        ],
+        // zkSync Rinkeby
+        1000: [
+            "ETH-USDT",
+            "ETH-USDC",
+            "USDC-USDT",
+            "ETH-DAI"
+        ],
+
+        // Starknet Alpha
+        1001: [
+            "ETH-USDT",
+            "ETH-USDC",
+        ]
     }
 })
 

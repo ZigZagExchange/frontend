@@ -41,13 +41,13 @@
     height: 100%;
     display: flex;
     flex-wrap: wrap;
-    align-items: flex-start;
+    /* align-items: flex-start; */
     justify-content: space-between;
     padding-left: 20px;
 }
 
 .trade_Price {
-    border-radius: 5px;
+    border-radius: 3px;
     width: 90%;
     margin: 0 auto;
     height: 100%;
