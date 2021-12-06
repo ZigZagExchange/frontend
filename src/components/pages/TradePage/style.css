@@ -56,8 +56,9 @@
 }
 
 .trade_price2 {
-  
+  margin-top: 20px;
   height: 493px;
+  overflow-y: hidden;
 }
 
 .trade_Price::-webkit-scrollbar,

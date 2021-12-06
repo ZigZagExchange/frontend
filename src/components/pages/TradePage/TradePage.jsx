@@ -244,6 +244,14 @@ const TradePage = () => {
               currentMarket={currentMarket}
               activeOrderCount={activeUserOrders}
             />
+            <div className="d-block d-xl-none" style={{"width": "100%"}}>
+                <Footer
+                    userFills={userFills}
+                    userOrders={userOrders}
+                    user={user}
+                    chainId={network}
+                />
+            </div>
           </div>
           <div className="col-12 col-xl-6">
             <div className="trade_right">
@@ -323,12 +331,14 @@ const TradePage = () => {
             </div>
           </div>
         </div>
-        <Footer
-          userFills={userFills}
-          userOrders={userOrders}
-          user={user}
-          chainId={network}
-        />
+        <div className="d-none d-xl-block">
+            <Footer
+              userFills={userFills}
+              userOrders={userOrders}
+              user={user}
+              chainId={network}
+            />
+        </div>
       </div>
     </DefaultTemplate>
   );

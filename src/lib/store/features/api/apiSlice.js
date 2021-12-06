@@ -1,7 +1,6 @@
 import { createSlice, createAction } from '@reduxjs/toolkit'
 import { toast } from 'react-toastify'
 import api from 'lib/api'
-import { validMarkets } from 'helpers'
 
 export const authSlice = createSlice({
   name: 'api',
@@ -70,7 +69,7 @@ export const authSlice = createSlice({
         const market = update[0];
         const price = update[1];
         const change = update[2];
-        if (validMarkets[state.network].includes(market)) {
+        if (api.validMarkets[state.network].includes(market)) {
             state.lastPrices[market] = {
               price: update[1],
               change: update[2],

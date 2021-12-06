@@ -14,7 +14,7 @@ export default class API extends Emitter {
     currencies = null
     websocketUrl = null
     
-    constructor({ infuraId, websocketUrl, networks, currencies }) {
+    constructor({ infuraId, websocketUrl, networks, currencies, validMarkets }) {
         super()
         
         if (networks) {
@@ -29,6 +29,7 @@ export default class API extends Emitter {
         this.infuraId = infuraId
         this.websocketUrl = websocketUrl
         this.currencies = currencies
+        this.validMarkets = validMarkets
         this.setAPIProvider(this.networks[Object.keys(this.networks)[0]][0])
     }
 
