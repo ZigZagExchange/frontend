@@ -1,10 +1,11 @@
 import React from 'react';
 import { toast } from 'react-toastify';
 import darkPlugHead from 'assets/icons/dark-plug-head.png';
-import { submitorder, currencyInfo, isZksyncChain } from 'helpers';
+import { submitorder, isZksyncChain } from 'helpers';
 import RangeSlider from '../RangeSlider/RangeSlider';
 import { Button } from 'components';
 import './SpotForm.css';
+import api from "lib/api";
 
 class SpotForm extends React.Component {
     constructor(props) {
@@ -20,6 +21,8 @@ class SpotForm extends React.Component {
             ETH: 0.0001,
             USDC: 1,
             USDT: 1,
+            WBTC: 0.00001,
+            DAI: 1,
         };
     }
 
@@ -40,7 +43,7 @@ class SpotForm extends React.Component {
         const baseCurrency = this.props.currentMarket.split("-")[0];
         return (
             this.props.user.committed.balances[baseCurrency] /
-            Math.pow(10, currencyInfo[baseCurrency].decimals)
+            Math.pow(10, api.currencies[baseCurrency].decimals)
         );
     }
 
@@ -48,7 +51,7 @@ class SpotForm extends React.Component {
         const quoteCurrency = this.props.currentMarket.split("-")[1];
         return (
             this.props.user.committed.balances[quoteCurrency] /
-            Math.pow(10, currencyInfo[quoteCurrency].decimals)
+            Math.pow(10, api.currencies[quoteCurrency].decimals)
         );
     }
 
@@ -63,6 +66,9 @@ class SpotForm extends React.Component {
             toast.error("Amount is not a number");
             return;
         }
+        const baseCurrency = this.props.currentMarket.split("-")[0];
+        const quoteCurrency = this.props.currentMarket.split("-")[1];
+        amount = parseFloat(amount.toFixed(api.currencies[baseCurrency].decimals));
         if (
             this.props.activeOrderCount > 0 &&
             isZksyncChain(this.props.chainId)
@@ -70,8 +76,6 @@ class SpotForm extends React.Component {
             toast.error("Only one active order permitted at a time");
             return;
         }
-        const baseCurrency = this.props.currentMarket.split("-")[0];
-        const quoteCurrency = this.props.currentMarket.split("-")[1];
         let baseBalance, quoteBalance;
         if (this.props.user.address) {
             baseBalance = this.getBaseBalance();
@@ -153,7 +157,7 @@ class SpotForm extends React.Component {
         const quoteCurrency = this.props.currentMarket.split("-")[1];
         if (this.props.side === "s") {
             const baseBalance =
-                this.getBaseBalance() - currencyInfo[baseCurrency].gasFee;
+                this.getBaseBalance() - api.currencies[baseCurrency].gasFee;
             const amount = this.state.amount || 0;
             return Math.round((amount / baseBalance) * 100);
         } else if (this.props.side === "b") {
@@ -161,7 +165,7 @@ class SpotForm extends React.Component {
             const amount = this.state.amount || 0;
             const total = amount * this.currentPrice();
             return Math.round(
-                (total / (quoteBalance - currencyInfo[quoteCurrency].gasFee)) *
+                (total / (quoteBalance - api.currencies[quoteCurrency].gasFee)) *
                     100
             );
         }
@@ -181,19 +185,19 @@ class SpotForm extends React.Component {
             spread = 0.002;
             stableSpread = 0.0007;
         }
-        if (this.props.side === "b" && baseCurrency === "ETH")
+        if (this.props.side === "b" && (["WBTC", "ETH"]).includes(baseCurrency))
             return parseFloat(
                 (this.props.lastPrice * (1 + spread)).toPrecision(6)
             );
-        else if (this.props.side === "s" && baseCurrency === "ETH")
+        else if (this.props.side === "s" && (["WBTC", "ETH"]).includes(baseCurrency))
             return parseFloat(
                 (this.props.lastPrice * (1 - spread)).toPrecision(6)
             );
-        else if (this.props.side === "b" && baseCurrency === "USDC")
+        else if (this.props.side === "b" && (["USDC", "USDT", "DAI", "FRAX"]).includes(baseCurrency))
             return parseFloat(
                 (this.props.lastPrice * (1 + stableSpread)).toPrecision(6)
             );
-        else if (this.props.side === "s" && baseCurrency === "USDC")
+        else if (this.props.side === "s" && (["USDC", "USDT", "DAI", "FRAX"]).includes(baseCurrency))
             return parseFloat(
                 (this.props.lastPrice * (1 - stableSpread)).toPrecision(6)
             );
@@ -215,9 +219,10 @@ class SpotForm extends React.Component {
         if (this.props.side === "s") {
             const baseBalance = this.getBaseBalance();
             const baseCurrency = this.props.currentMarket.split("-")[0];
+            const decimals = api.currencies[baseCurrency].decimals;
             let displayAmount = (baseBalance * val) / 100;
-            displayAmount -= currencyInfo[baseCurrency].gasFee;
-            displayAmount = displayAmount.toPrecision(7);
+            displayAmount -= api.currencies[baseCurrency].gasFee;
+            displayAmount = parseFloat(displayAmount.toFixed(decimals)).toPrecision(7);
             if (displayAmount < 1e-5) {
                 newstate.amount = 0;
             } else {
@@ -225,12 +230,14 @@ class SpotForm extends React.Component {
             }
         } else if (this.props.side === "b") {
             const quoteBalance = this.getQuoteBalance();
+            const baseCurrency = this.props.currentMarket.split("-")[0];
             const quoteCurrency = this.props.currentMarket.split("-")[1];
+            const decimals = api.currencies[baseCurrency].decimals;
             let quoteAmount =
-                ((quoteBalance - currencyInfo[quoteCurrency].gasFee) * val) /
+                ((quoteBalance - api.currencies[quoteCurrency].gasFee) * val) /
                 100 /
                 this.currentPrice();
-            quoteAmount = quoteAmount.toPrecision(7);
+            quoteAmount = parseFloat(quoteAmount.toFixed(decimals)).toPrecision(7);
             if (quoteAmount < 1e-5) {
                 newstate.amount = 0;
             } else {

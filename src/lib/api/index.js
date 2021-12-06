@@ -70,7 +70,7 @@ const api = new API({
             "ETH-USDC",
             "ETH-DAI",
             "USDC-USDT",
-            //"WBTC-USDT",
+            "WBTC-USDT",
             //"FRAX-USDC",
         ],
         // zkSync Rinkeby
