@@ -127,7 +127,7 @@ const Bridge = () => {
     }
 
     deferredXfer
-      .then(() => api.getAccountState())
+      .then(() => setTimeout(() => api.getAccountState(), 1000))
       .catch(e => console.log(e.message))
   }
 
