@@ -335,17 +335,6 @@ export async function submitorder(chainId, product, side, price, amount) {
     return api.submitOrder(product, side, price, amount)
 }
 
-export async function submitorderstarknet(chainId, product, side, price, amount) {
-    const expiration = Date.now() + 86400
-    const orderhash = starknetOrderHash(chainId, product, side, price, amount, expiration)
-    const keypair = starknet.ec.ec.keyFromPrivate(localStorage.getItem('starknet:privkey'), 'hex')
-    const sig = starknet.ec.sign(keypair, orderhash.hash)
-
-    const starknetOrder = [...orderhash.order, sig.r, sig.s]
-    const msg = { op: 'submitorder', args: [chainId, starknetOrder] }
-    api.ws.send(JSON.stringify(msg))
-}
-
 export function starknetOrderHash(chainId, product, side, price, amount, expiration) {
     const baseCurrency = product.split('-')[0]
     const quoteCurrency = product.split('-')[1]

@@ -61,6 +61,7 @@ export default class APIZKProvider extends APIProvider {
             ratio: zksync.utils.tokenRatio(tokenRatio),
             validUntil: three_minute_expiry
         })
+        this.api.send('submitorder', [this.network, order])
 
         return order
     }

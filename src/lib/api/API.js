@@ -77,7 +77,7 @@ export default class API extends Emitter {
     _socketMsg = (e) => {
         if (!e.data && e.data.length <= 0) return
         const msg = JSON.parse(e.data)
-        //if (!(["lastprice", "pong"]).includes(msg.op)) console.log(e.data);
+        if (!(["lastprice", "pong"]).includes(msg.op)) console.log(e.data);
         this.emit('message', msg.op, msg.args)
     }
 
@@ -247,7 +247,6 @@ export default class API extends Emitter {
     }
 
     submitOrder = async (product, side, price, amount) => {
-        const order = await this.apiProvider.submitOrder(product, side, price, amount)
-        this.send('submitorder', [this.apiProvider.network, order])
+        await this.apiProvider.submitOrder(product, side, price, amount)
     }
 }

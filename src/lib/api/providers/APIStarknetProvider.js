@@ -39,7 +39,6 @@ export default class APIStarknetProvider extends APIProvider {
         const sig = starknet.ec.sign(keypair, orderhash.hash)
     
         const starknetOrder = [...orderhash.order, sig.r.toString(), sig.s.toString()]
-        console.log(starknetOrder);
         this.api.send('submitorder', [this.network, starknetOrder])
     }
 

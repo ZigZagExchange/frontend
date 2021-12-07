@@ -49,7 +49,7 @@ export const authSlice = createSlice({
             if (state.userFills[fillid]) {
                 state.userFills[fillid][6] = newstatus;
                 if (txhash)
-                    state.marketFills[fillid][7] = txhash;
+                    state.userFills[fillid][7] = txhash;
             }
         });
     },

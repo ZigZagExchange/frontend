@@ -21,7 +21,7 @@ export class Footer extends React.Component {
       return Object.values(this.props.userFills).sort((a, b) => b[1] - a[1]);
   }
 
-  getOpenOrders() {
+  getUserOrders() {
       return Object.values(this.props.userOrders)
           .filter((order) => ["o", "pf", "pm", "m", "b"].includes(order[9]))
           .sort((a, b) => b[1] - a[1]);
@@ -242,7 +242,6 @@ export class Footer extends React.Component {
                                 quoteCurrency;
                         }
                         const fillWithoutFee = getFillDetailsWithoutFee(fill);
-                        console.log(fillWithoutFee);
                         if ([1, 1000].includes(this.props.chainId)) {
                             price = fillWithoutFee.price;
                             baseQuantity = fillWithoutFee.baseQuantity;
@@ -365,7 +364,7 @@ export class Footer extends React.Component {
     userOrdersSorted.sort((a, b) => b[1] - a[1]);
     switch (this.state.tab) {
       case "orders":
-        footerContent = this.renderOrderTable(this.getOpenOrders());
+        footerContent = this.renderOrderTable(this.getUserOrders());
         classNameOrders = "selected";
         break;
       case "fills":
@@ -431,7 +430,7 @@ export class Footer extends React.Component {
                   className={classNameOrders}
                   onClick={() => this.setTab("orders")}
                 >
-                  Orders ({this.getOpenOrders().length})
+                  Orders ({this.getUserOrders().length})
                 </strong>
                 <strong
                   className={classNameFills}
