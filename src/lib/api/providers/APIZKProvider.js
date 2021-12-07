@@ -12,7 +12,8 @@ export default class APIZKProvider extends APIProvider {
 
     changePubKey = async () => {
         let feeToken = "ETH";
-        const balances = this._accountState.committed.balances;
+        const accountState = await this.syncWallet.getAccountState()
+        const balances = accountState.committed.balances;
         if (balances.ETH && balances.ETH > 0.005e18) {
             feeToken = "ETH";
         } else if (balances.USDC && balances.USDC > 20e6) {
@@ -169,6 +170,6 @@ export default class APIZKProvider extends APIProvider {
             await setPubkey.awaitReceipt()
         }
 
-        return this._accountState
+        return accountState
     }
 }
