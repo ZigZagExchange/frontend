@@ -56,7 +56,6 @@ const TradePage = () => {
       api.unsubscribeToMarket(currentMarket)
       api.off('open', sub)
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [network, currentMarket])
 
   const updateMarketChain = (market) => {

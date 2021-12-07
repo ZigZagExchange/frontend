@@ -136,7 +136,6 @@ const BridgeCurrencySelector = ({ onChange, currencies, balances = {}, value }) 
 
     setTickers(tickers);
     onChange(api.currencies["ETH"] ? "ETH" : tickers[0]);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user.id, network, currencies]);
 
   const hideOptions = (e) => {
