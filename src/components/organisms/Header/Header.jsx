@@ -93,7 +93,7 @@ export const Header = (props) => {
                       </NavLink>
                     )
                     : (
-                      // eslint-disable-next-line jsx-a11y/anchor-is-valid
+                      // eslint-disable-next-line
                       <a rel="noreferrer">Bridge</a>
                     )}
                 </li>
@@ -152,7 +152,7 @@ export const Header = (props) => {
                     </NavLink>
                   )
                   : (
-                    // eslint-disable-next-line jsx-a11y/anchor-is-valid
+                    // eslint-disable-next-line
                     <a rel="noreferrer">Bridge</a>
                   )}
               </li>

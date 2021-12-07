@@ -12,6 +12,7 @@ export default class APIProvider {
     submitOrder     = notImplemented('submitOrder')
     depositL2       = notImplemented('depositL2')
     withdrawL2      = notImplemented('withdrawL2')
+    getBalances     = notImplemented('getBalances')
 
     constructor(api, network) {
         this.api = api

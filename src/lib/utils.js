@@ -1,6 +1,12 @@
 import { BigNumber } from 'ethers'
 import isString from 'lodash/isString'
 
+export function formatUSD(floatNum) {
+  const num = parseFloat(floatNum || 0).toFixed(2).split('.')
+  num[0] = parseInt(num[0]).toLocaleString()
+  return num.join('.')
+}
+
 export function toBaseUnit(value, decimals) {
     if (!isString(value)) {
       throw new Error('Pass strings to prevent floating point precision issues.')

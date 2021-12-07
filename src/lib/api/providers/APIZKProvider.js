@@ -68,6 +68,22 @@ export default class APIZKProvider extends APIProvider {
         return order
     }
 
+    getBalances = async () => {
+        const account = await this.getAccountState()
+        const balances = {}
+        
+        Object.keys(this.api.currencies).forEach(ticker => {
+            const currency = this.api.currencies[ticker]
+            const balance = ((account && account.committed) ? (account.committed.balances[ticker] || 0) : 0)
+            balances[ticker] = {
+                value: balance,
+                valueReadable: balance && (balance / (10 ** currency.decimals)),
+            }
+        })
+
+        return balances
+    }
+
     getAccountState = async () => {
         return this.syncWallet
             ? this.syncWallet.getAccountState()

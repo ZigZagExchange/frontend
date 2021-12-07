@@ -11,6 +11,7 @@
  */
 
 // Hooks
+export * from 'components/hooks/useCoinEstimator'
 
 // Atoms
 export * from 'components/atoms/SwapButton'

@@ -4,6 +4,7 @@ import Web3Modal from 'web3modal'
 import Emitter from 'tiny-emitter'
 import { ethers } from 'ethers'
 import WalletConnectProvider from '@walletconnect/web3-provider'
+import erc20ContractABI from 'lib/contracts/ERC20.json'
 
 export default class API extends Emitter {
     networks = {}
@@ -29,6 +30,7 @@ export default class API extends Emitter {
         this.infuraId = infuraId
         this.websocketUrl = websocketUrl
         this.currencies = currencies
+        this.validMarkets = validMarkets
         this.setAPIProvider(this.networks.mainnet[0])
     }
 
@@ -59,6 +61,14 @@ export default class API extends Emitter {
             }
         })
 
+        this.getAccountState()
+            .then(accountState => {
+                console.log('Account state', accountState)
+            })
+            .catch(err => {
+                console.log('Failed to switch providers', err)
+            })
+
         this.emit('providerChange', network)
     }
 
@@ -75,7 +85,6 @@ export default class API extends Emitter {
     _socketMsg = (e) => {
         if (!e.data && e.data.length <= 0) return
         const msg = JSON.parse(e.data)
-        if (!(["lastprice", "pong"]).includes(msg.op)) console.log(e.data);
         this.emit('message', msg.op, msg.args)
     }
 
@@ -207,24 +216,59 @@ export default class API extends Emitter {
     }
     
     isImplemented = (method) => {
-        console.log(this.apiProvider)
         return this.apiProvider[method] && !this.apiProvider[method].notImplemented
     }
 
-    getDetailsWithoutFee = (order) => {
+    getBalanceOfCurrency = async (currency) => {
+        try {
+            const [account] = await this.web3.eth.getAccounts()
+            if (currency === 'ETH') return this.web3.eth.getBalance(account)
+            const { contractAddress } = this.currencies[currency].chain[this.apiProvider.network]
+            const contract = new this.web3.eth.Contract(erc20ContractABI, contractAddress)
+            const result = await contract.methods.balanceOf(account).call()
+            return result
+        } catch (e) {
+            return 0
+        }
+    }
+
+    getWalletBalances = async () => {
+        const balances = {}
+        
+        for (const [ticker, currency] of Object.entries(this.currencies)) {
+            const value = await this.getBalanceOfCurrency(ticker)
+            balances[ticker] = {
+                value,
+                valueReadable: parseFloat(value / Math.pow(10, currency.decimals)).toFixed(8),
+            }
+        }
+
+        return balances
+    }
+
+    getBalances = async () => {
+        return this.apiProvider.getBalances()
+    }
+
+    getOrderDetailsWithoutFee = (order) => {
         const side = order[3]
         const baseQuantity = order[5]
         const quoteQuantity = order[4] * order[5]
         const remaining = isNaN(Number(order[11])) ? order[5] : order[11]
-        const baseCurrency = order[2].split('-')[0]
-        const quoteCurrency = order[2].split('-')[1]
+        const [baseCurrency, quoteCurrency] = order[2].split('-')
         let baseQuantityWithoutFee, quoteQuantityWithoutFee, priceWithoutFee, remainingWithoutFee
-        if (side === 's') {
-            const fee = this.currencies[baseCurrency].gasFee
-            baseQuantityWithoutFee = baseQuantity - fee
-            remainingWithoutFee = Math.max(0, remaining - fee)
-            priceWithoutFee = quoteQuantity / baseQuantityWithoutFee
-            quoteQuantityWithoutFee = priceWithoutFee * baseQuantityWithoutFee
+        if (side === "s") {
+            const fee = this.currencies[baseCurrency].gasFee;
+            baseQuantityWithoutFee = baseQuantity - fee;
+            remainingWithoutFee = Math.max(0, remaining - fee);
+            priceWithoutFee = quoteQuantity / baseQuantityWithoutFee;
+            quoteQuantityWithoutFee = priceWithoutFee * baseQuantityWithoutFee;
+        } else {
+            const fee = this.currencies[quoteCurrency].gasFee;
+            quoteQuantityWithoutFee = quoteQuantity - fee;
+            priceWithoutFee = quoteQuantityWithoutFee / baseQuantity;
+            baseQuantityWithoutFee = quoteQuantityWithoutFee / priceWithoutFee;
+            remainingWithoutFee = Math.min(baseQuantityWithoutFee, remaining);
         }
         return {
             price: priceWithoutFee,
@@ -242,12 +286,12 @@ export default class API extends Emitter {
         const quoteCurrency = fill[2].split("-")[1];
         let baseQuantityWithoutFee, quoteQuantityWithoutFee, priceWithoutFee;
         if (side === "s") {
-            const fee = currencyInfo[baseCurrency].gasFee;
+            const fee = this.currencies[baseCurrency].gasFee;
             baseQuantityWithoutFee = baseQuantity - fee;
             priceWithoutFee = quoteQuantity / baseQuantityWithoutFee;
             quoteQuantityWithoutFee = priceWithoutFee * baseQuantityWithoutFee;
         } else {
-            const fee = currencyInfo[quoteCurrency].gasFee;
+            const fee = this.currencies[quoteCurrency].gasFee;
             quoteQuantityWithoutFee = quoteQuantity - fee;
             priceWithoutFee = quoteQuantityWithoutFee / baseQuantity;
             baseQuantityWithoutFee = quoteQuantityWithoutFee / priceWithoutFee;

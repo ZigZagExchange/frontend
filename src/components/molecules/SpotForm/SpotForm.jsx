@@ -108,7 +108,6 @@ export class SpotForm extends React.Component {
             price > this.props.lastPrice * 1.1 ||
             price < this.props.lastPrice * 0.9
         ) {
-            console.log(price);
             toast.error("Price must be within 10% of spot");
             return;
         }

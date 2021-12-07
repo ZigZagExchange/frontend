@@ -1,0 +1,23 @@
+import { useSelector } from 'react-redux'
+import { lastPricesSelector } from 'lib/store/features/api/apiSlice'
+
+const USD_REGEX = /^[A-Z]?USD[A-Z]?$/i
+
+export function useCoinEstimator() {
+    const pairPrices = useSelector(lastPricesSelector)
+    let prices = { DAI: 1 }
+
+    Object.keys(pairPrices).forEach(pair => {
+        const [a, b] = pair.split('-').map(s => s.toUpperCase())
+        if (USD_REGEX.test(a)) {
+            prices[b] = pairPrices[pair].price
+        }
+        if (USD_REGEX.test(b)) {
+            prices[a] = pairPrices[pair].price
+        }
+    })
+
+    return (token) => {
+        return parseFloat(prices && prices[token] ? prices[token] : 0).toFixed(2)
+    }
+}

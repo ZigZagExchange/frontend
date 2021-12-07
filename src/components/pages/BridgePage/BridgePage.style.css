@@ -97,30 +97,6 @@
     color: rgba(185, 205, 255, 0.3);
   }
   
-  .bridge_input_box {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    background: #fff;
-    border-radius: 24px;
-    border: none;
-    -webkit-appearance: none;
-    appearance: none;
-    width: 100%;
-  }
-  
-  .bridge_input_box input,
-  .bridge_input_box input:focus {
-    width: calc(100% - 50px);
-    background: transparent;
-    padding: 20px 30px;
-    font-size: 18px;
-    border: none;
-    outline: none;
-    -webkit-appearance: none;
-    appearance: none;
-  }
-  
   .bridge_coin_name {
     font-size: 20px;
     color: #fff;
@@ -128,6 +104,10 @@
   
   .bridge_coin_title {
     margin-bottom: 24px;
+  }
+
+  .bridge_button {
+    margin-top: 20px;
   }
   
   .bridge_coin_title h5 {
