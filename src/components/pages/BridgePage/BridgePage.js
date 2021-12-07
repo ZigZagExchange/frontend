@@ -119,11 +119,16 @@ const Bridge = () => {
 
   const doTransfer = e => {
     e.preventDefault()
+    let deferredXfer
     if (transfer.type === 'deposit') {
-      api.depositL2(swapDetails.amount, swapDetails.currency)
+      deferredXfer = api.depositL2(swapDetails.amount, swapDetails.currency)
     } else {
-      api.withdrawL2(swapDetails.amount, swapDetails.currency)
+      deferredXfer = api.withdrawL2(swapDetails.amount, swapDetails.currency)
     }
+
+    deferredXfer
+      .then(() => api.getAccountState())
+      .catch(e => console.log(e.message))
   }
 
   return (
