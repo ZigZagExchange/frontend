@@ -1,6 +1,7 @@
 .footer {
     width: 99%;
     margin-top: 20px;
+    margin-bottom: 20px;
     display: flex;
     flex-direction: column;
 }
@@ -9,8 +10,14 @@
     align-content: center;
     border-radius: 10px;
     background-color: #171c28;
-    width: 95%;
+    width: 100%;
     margin: 0 auto;
+}
+
+@media (min-width: 992px) {
+    .footer_container {
+        width: 95%;
+    }
 }
 
 .footer_container hr {

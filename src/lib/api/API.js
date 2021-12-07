@@ -1,4 +1,5 @@
 import Web3 from 'web3'
+import { toast } from 'react-toastify'
 import Web3Modal from 'web3modal'
 import Emitter from 'tiny-emitter'
 import { ethers } from 'ethers'
@@ -13,7 +14,7 @@ export default class API extends Emitter {
     currencies = null
     websocketUrl = null
     
-    constructor({ infuraId, websocketUrl, networks, currencies }) {
+    constructor({ infuraId, websocketUrl, networks, currencies, validMarkets }) {
         super()
         
         if (networks) {
@@ -74,6 +75,7 @@ export default class API extends Emitter {
     _socketMsg = (e) => {
         if (!e.data && e.data.length <= 0) return
         const msg = JSON.parse(e.data)
+        if (!(["lastprice", "pong"]).includes(msg.op)) console.log(e.data);
         this.emit('message', msg.op, msg.args)
     }
 
@@ -138,10 +140,19 @@ export default class API extends Emitter {
         
         await this.refreshNetwork()
 
-        const web3Provider = ((await this.web3Modal.connect()) || window.ethereum)
-        this.web3.setProvider(web3Provider)
-        this.ethersProvider = new ethers.providers.Web3Provider(web3Provider)
-        const accountState = await this.apiProvider.signIn(network)
+        if (this.isZksyncChain(network)) {
+            const web3Provider = ((await this.web3Modal.connect()) || window.ethereum)
+            this.web3.setProvider(web3Provider)
+            this.ethersProvider = new ethers.providers.Web3Provider(web3Provider)
+        }
+        let accountState;
+        try {
+            accountState = await this.apiProvider.signIn(network)
+        } catch (e) {
+            console.error(e);
+            toast.error(e);
+            return false;
+        }
 
         if (accountState) {
             this.send('login', [
@@ -215,19 +226,40 @@ export default class API extends Emitter {
             priceWithoutFee = quoteQuantity / baseQuantityWithoutFee
             quoteQuantityWithoutFee = priceWithoutFee * baseQuantityWithoutFee
         }
-        else if (side === 'b') {
-            const fee = this.currencies[quoteCurrency].gasFee
-            quoteQuantityWithoutFee = quoteQuantity - fee
-            priceWithoutFee = quoteQuantityWithoutFee / baseQuantity
-            baseQuantityWithoutFee = quoteQuantityWithoutFee / priceWithoutFee
-            remainingWithoutFee = Math.min(baseQuantityWithoutFee, remaining)
+        return {
+            price: priceWithoutFee,
+            quoteQuantity: quoteQuantityWithoutFee,
+            baseQuantity: baseQuantityWithoutFee,
+            remaining: remainingWithoutFee,
+        };
+    }
+
+    getFillDetailsWithoutFee(fill) {
+        const side = fill[3];
+        const baseQuantity = fill[5];
+        const quoteQuantity = fill[4] * fill[5];
+        const baseCurrency = fill[2].split("-")[0];
+        const quoteCurrency = fill[2].split("-")[1];
+        let baseQuantityWithoutFee, quoteQuantityWithoutFee, priceWithoutFee;
+        if (side === "s") {
+            const fee = currencyInfo[baseCurrency].gasFee;
+            baseQuantityWithoutFee = baseQuantity - fee;
+            priceWithoutFee = quoteQuantity / baseQuantityWithoutFee;
+            quoteQuantityWithoutFee = priceWithoutFee * baseQuantityWithoutFee;
+        } else {
+            const fee = currencyInfo[quoteCurrency].gasFee;
+            quoteQuantityWithoutFee = quoteQuantity - fee;
+            priceWithoutFee = quoteQuantityWithoutFee / baseQuantity;
+            baseQuantityWithoutFee = quoteQuantityWithoutFee / priceWithoutFee;
         }
-        
-        return { price: priceWithoutFee, quoteQuantity: quoteQuantityWithoutFee, baseQuantity: baseQuantityWithoutFee, remaining: remainingWithoutFee }
+        return {
+            price: priceWithoutFee,
+            quoteQuantity: quoteQuantityWithoutFee,
+            baseQuantity: baseQuantityWithoutFee,
+        };
     }
 
     submitOrder = async (product, side, price, amount) => {
-        const order = await this.apiProvider.submitOrder(product, side, price, amount)
-        this.send('submitorder', [this.apiProvider.network, order])
+        await this.apiProvider.submitOrder(product, side, price, amount)
     }
 }

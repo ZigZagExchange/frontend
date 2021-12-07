@@ -8,20 +8,50 @@ export const authSlice = createSlice({
     network: 1,
     userId: null,
     currentMarket: 'ETH-USDT',
-    marketFills: [],
+    marketFills: {},
     lastPrices: {},
     marketSummary: {},
     liquidity: [],
     userOrders: {},
+    userFills: {},
     orders: {},
   },
   reducers: {
     _fills(state, { payload }) {
       payload[0].forEach(fill => {
-        if (fill[2] === state.currentMarket && fill[0] === state.network) {
-          state.marketFills.unshift(fill)
+        const fillid = fill[1];
+        if (
+            fill[2] === state.currentMarket &&
+            fill[0] === state.network
+        ) {
+            state.marketFills[fillid] = fill;
+        }
+        if (
+            state.userId &&
+            (fill[8] === state.userId.toString() ||
+                fill[9] === state.userId.toString())
+        ) {
+            state.userFills[fillid] = fill;
         }
       });
+    },
+    _fillstatus(state, { payload }) {
+        payload[0].forEach((update) => {
+            const fillid = update[1];
+            const newstatus = update[2];
+            let txhash;
+            if (update[3]) txhash = update[3];
+            if (state.marketFills[fillid]) {
+                state.marketFills[fillid][6] = newstatus;
+                if (txhash)
+                    state.marketFills[fillid][7] = txhash;
+            }
+            if (state.userFills[fillid]) {
+                state.userFills[fillid][6] = newstatus;
+                if (txhash)
+                    state.userFills[fillid][7] = txhash;
+            }
+        });
     },
     _marketsummary(state, { payload }) {
       state.marketSummary = {
@@ -36,13 +66,21 @@ export const authSlice = createSlice({
     },
     _lastprice(state, { payload }) {
       payload[0].forEach((update) => {
-        state.lastPrices[update[0]] = {
-          price: update[1],
-          change: update[2],
-        };
+        const market = update[0];
+        const price = update[1];
+        const change = update[2];
+        if (api.validMarkets[state.network].includes(market)) {
+            state.lastPrices[market] = {
+              price: update[1],
+              change: update[2],
+            };
+        }
+        else {
+            delete state.lastPrices[market];
+        }
         if (update[0] === state.currentMarket) {
-          state.marketSummary.price = update[1];
-          state.marketSummary.priceChange = update[2];
+          state.marketSummary.price = price;
+          state.marketSummary.priceChange = change;
         }
       });
     },
@@ -87,7 +125,7 @@ export const authSlice = createSlice({
               const baseCurrency = filledOrder[2].split('-')[0]
               filledOrder[9] = 'f'
               filledOrder[10] = txHash
-              const noFeeOrder = api.getDetailsWithoutFee(filledOrder)
+              const noFeeOrder = api.getOrderDetailsWithoutFee(filledOrder)
               toast.success(`Your ${sideText} order for ${noFeeOrder.baseQuantity.toPrecision(4) / 1} ${baseCurrency} @ ${noFeeOrder.price.toPrecision(4) / 1} was filled!`)
             }
             break
@@ -106,7 +144,7 @@ export const authSlice = createSlice({
               const baseCurrency = filledOrder[2].split('-')[0]
               filledOrder[9] = 'r'
               filledOrder[10] = txHash
-              const noFeeOrder = api.getDetailsWithoutFee(filledOrder)
+              const noFeeOrder = api.getOrderDetailsWithoutFee(filledOrder)
               toast.error(`Your ${sideText} order for ${noFeeOrder.baseQuantity.toPrecision(4) / 1} ${baseCurrency} @ ${noFeeOrder.price.toPrecision(4) / 1} was rejected: ${error}`)
               toast.info(`This happens occasionally. Run the transaction again and you should be fine.`)
             }
@@ -145,7 +183,7 @@ export const authSlice = createSlice({
     setCurrentMarket(state, { payload }) {
       if (state.currentMarket !== payload) {
         state.currentMarket = payload
-        state.marketFills = []
+        state.marketFills = {}
         state.marketSummary = {}
         state.liquidity = []
         state.userOrders = {}
@@ -159,7 +197,8 @@ export const authSlice = createSlice({
       state.network = payload
     },
     resetData(state) {
-      state.marketFills = []
+      state.userFills = {}
+      state.marketFills = {}
       state.marketSummary = {}
       state.liquidity = []
       state.userOrders = {}
@@ -173,6 +212,7 @@ export const { setNetwork, setUserId, setCurrentMarket, resetData } = authSlice.
 
 export const networkSelector = state => state.api.network
 export const userOrdersSelector = state => state.api.userOrders
+export const userFillsSelector = state => state.api.userFills
 export const allOrdersSelector = state => state.api.orders
 export const marketFillsSelector = state => state.api.marketFills
 export const lastPricesSelector = state => state.api.lastPrices

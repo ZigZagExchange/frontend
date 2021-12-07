@@ -13,7 +13,7 @@ const api = new API({
     currencies: {
         'ETH': {
             image: require('assets/images/currency/ETH.svg'),
-            displayName: 'ETH',
+            name: 'Ethereum',
             decimals: 18,
             chain: {
                 1: { tokenId: 0 , contractAddress: '0x0000000000000000000000000000000000000000' },
@@ -24,7 +24,7 @@ const api = new API({
         },
         'USDC': {
             image: require('assets/images/currency/USDC.svg'),
-            displayName: 'USDC',
+            name: 'USDC',
             decimals: 6,
             chain: {
                 1: { tokenId: 2 , contractAddress: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48' },
@@ -35,7 +35,7 @@ const api = new API({
         },
         'USDT': {
             image: require('assets/images/currency/USDT.svg'),
-            displayName: 'USDT',
+            name: 'USDT',
             decimals: 6,
             chain: {
                 1: { tokenId: 4 , contractAddress: '0xdac17f958d2ee523a2206206994597c13d831ec7' },
@@ -46,7 +46,7 @@ const api = new API({
         },
         'DAI': {
             image: require('assets/images/currency/DAI.svg'),
-            displayName: 'DAI',
+            name: 'DAI',
             decimals: 18,
             chain: {
                 1: { tokenId: 1 , contractAddress: '0x6b175474e89094c44da98b954eedeac495271d0f' },
@@ -56,7 +56,7 @@ const api = new API({
         },
         'WBTC': {
             image: require('assets/images/currency/WBTC.svg'),
-            displayName: 'WBTC',
+            name: 'Bitcoin',
             decimals: 8,
             chain: {
                 1: { tokenId: 15, contractAddress: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599'  },

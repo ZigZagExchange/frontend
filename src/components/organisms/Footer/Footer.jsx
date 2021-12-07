@@ -4,7 +4,8 @@ import "./Footer.css";
 // assets
 import loadingGif from "assets/icons/loading.svg";
 //helpers
-import api from 'lib/api'
+import { cancelorder, currencyInfo, getOrderDetailsWithoutFee, getFillDetailsWithoutFee } from "helpers";
+import api from "lib/api";
 
 export class Footer extends React.Component {
   constructor(props) {
@@ -16,168 +17,331 @@ export class Footer extends React.Component {
     this.setState({ tab: value });
   }
 
-  getHistory() {
-    return Object.values(this.props.userOrders)
-      .filter((order) => ["f", "r", "c"].includes(order[9]))
-      .sort((a, b) => b[1] - a[1]);
+  getFills() {
+      return Object.values(this.props.userFills).sort((a, b) => b[1] - a[1]);
   }
 
-  getOpenOrders() {
-    return Object.values(this.props.userOrders)
-      .filter((order) => ["o", "pf", "pm", "m", "b"].includes(order[9]))
-      .sort((a, b) => b[1] - a[1]);
+  getUserOrders() {
+      return Object.values(this.props.userOrders)
+          .filter((order) => ["o", "pf", "pm", "m", "b"].includes(order[9]))
+          .sort((a, b) => b[1] - a[1]);
   }
 
-  renderOrderTable(orders) {
-    let baseExplorerUrl;
-    switch (this.props.chainId) {
-      case 1000:
-        baseExplorerUrl = "https://rinkeby.zkscan.io";
-        break;
-      case 1:
-      default:
-        baseExplorerUrl = "https://zkscan.io";
+    renderOrderTable(orders) {
+        return (
+            <table>
+                <thead>
+                    <tr>
+                        <th>Market</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Remaining</th>
+                        <th>Side</th>
+                        <th>Fee</th>
+                        <th>Order Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {orders.map((order, i) => {
+                        const chainid = order[0];
+                        const orderid = order[1];
+                        const market = order[2];
+                        let price = order[4];
+                        let baseQuantity = order[5];
+                        let remaining = isNaN(Number(order[11]))
+                            ? order[5]
+                            : order[11];
+                        const orderstatus = order[9];
+                        const baseCurrency = order[2].split("-")[0];
+                        const quoteCurrency = order[2].split("-")[1];
+                        const side = order[3] === "b" ? "buy" : "sell";
+                        const sideclassname =
+                            order[3] === "b" ? "up_value" : "down_value";
+                        let feeText;
+                        if (
+                            order[9] === "r" ||
+                            !api.isZksyncChain(this.props.chainId)
+                        ) {
+                            feeText = "0 " + baseCurrency;
+                        } else if (order[3] === "s") {
+                            feeText =
+                                currencyInfo[baseCurrency].gasFee +
+                                " " +
+                                baseCurrency;
+                        } else if (order[3] === "b") {
+                            feeText =
+                                currencyInfo[quoteCurrency].gasFee +
+                                " " +
+                                quoteCurrency;
+                        }
+                        const orderWithoutFee =
+                            getOrderDetailsWithoutFee(order);
+                        if ([1, 1000].includes(this.props.chainId)) {
+                            price = orderWithoutFee.price;
+                            baseQuantity = orderWithoutFee.baseQuantity;
+                            remaining = orderWithoutFee.remaining;
+                        }
+                        let statusText, statusClass;
+                        switch (order[9]) {
+                            case "r":
+                                statusText = "rejected";
+                                statusClass = "rejected";
+                                break;
+                            case "pf":
+                                statusText = "partial fill";
+                                statusClass = "filled";
+                                break;
+                            case "f":
+                                statusText = "filled";
+                                statusClass = "filled";
+                                break;
+                            case "pm":
+                                statusText = (
+                                    <span>
+                                        partial match
+                                        <img
+                                            className="loading-gif"
+                                            src={loadingGif}
+                                            alt="Pending"
+                                        />
+                                    </span>
+                                );
+                                statusClass = "matched";
+                                break;
+                            case "m":
+                                statusText = (
+                                    <span>
+                                        matched{" "}
+                                        <img
+                                            className="loading-gif"
+                                            src={loadingGif}
+                                            alt="Pending"
+                                        />
+                                    </span>
+                                );
+                                statusClass = "matched";
+                                break;
+                            case "b":
+                                statusText = (
+                                    <span>
+                                        committing{" "}
+                                        <img
+                                            className="loading-gif"
+                                            src={loadingGif}
+                                            alt="Pending"
+                                        />
+                                    </span>
+                                );
+                                statusClass = "committing";
+                                break;
+                            case "o":
+                                statusText = "open";
+                                statusClass = "open";
+                                break;
+                            case "c":
+                            default:
+                                statusText = "canceled";
+                                statusClass = "canceled";
+                                break;
+                        }
+
+                        return (
+                            <tr key={orderid}>
+                                <td>{market}</td>
+                                <td>{price.toPrecision(6) / 1}</td>
+                                <td>
+                                    {baseQuantity.toPrecision(6) / 1}{" "}
+                                    {baseCurrency}
+                                </td>
+                                <td>
+                                    {remaining.toPrecision(6) / 1}{" "}
+                                    {baseCurrency}
+                                </td>
+                                <td className={sideclassname}>{side}</td>
+                                <td>{feeText}</td>
+                                <td className={statusClass}>{statusText}</td>
+                                <td>
+                                    {orderstatus === "o" ? (
+                                        <span
+                                            className="cancel_order_link"
+                                            onClick={() =>
+                                                cancelorder(chainid, orderid)
+                                            }
+                                        >
+                                            Cancel
+                                        </span>
+                                    ) : (
+                                        ""
+                                    )}
+                                </td>
+                            </tr>
+                        );
+                    })}
+                </tbody>
+            </table>
+        );
     }
-    return (
-      <table>
-        <thead>
-          <tr>
-            <th>Market</th>
-            <th>Price</th>
-            <th>Quantity</th>
-            <th>Remaining</th>
-            <th>Side</th>
-            <th>Fee</th>
-            <th>Order Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {orders.map((order, i) => {
-            let [, orderId, market, side, price, baseQuantity, orderStatus] = order;
-            let remaining = isNaN(Number(order[11])) ? baseQuantity : order[11];
-            const [baseCurrency, quoteCurrency] = market.split("-");
-            const sideClassName = side === "b" ? "up_value" : "down_value";
-            let feeText;
-            if (order[9] === "r") {
-              feeText = "0 " + baseCurrency;
-            } else if (order[3] === "s") {
-              feeText = api.currencies[baseCurrency].gasFee + " " + baseCurrency;
-            } else if (order[3] === "b") {
-              feeText =
-                api.currencies[quoteCurrency].gasFee + " " + quoteCurrency;
-            }
-            const orderWithoutFee = api.getDetailsWithoutFee(order);
-            if ([1, 1000].includes(this.props.chainId)) {
-              price = orderWithoutFee.price;
-              baseQuantity = orderWithoutFee.baseQuantity;
-              remaining = orderWithoutFee.remaining;
-            }
-            let statusText, statusClass;
-            switch (order[9]) {
-              case "r":
-                statusText = "rejected";
-                statusClass = "rejected";
-                break;
-              case "pf":
-                statusText = "partial fill";
-                statusClass = "filled";
-                break;
-              case "f":
-                statusText = "filled";
-                statusClass = "filled";
-                break;
-              case "pm":
-                statusText = (
-                  <span>
-                    partial match
-                    <img
-                      className="loading-gif"
-                      src={loadingGif}
-                      alt="Pending"
-                    />
-                  </span>
-                );
-                statusClass = "matched";
-                break;
-              case "m":
-                statusText = (
-                  <span>
-                    matched{" "}
-                    <img
-                      className="loading-gif"
-                      src={loadingGif}
-                      alt="Pending"
-                    />
-                  </span>
-                );
-                statusClass = "matched";
-                break;
-              case "b":
-                statusText = (
-                  <span>
-                    committing{" "}
-                    <img
-                      className="loading-gif"
-                      src={loadingGif}
-                      alt="Pending"
-                    />
-                  </span>
-                );
-                statusClass = "committing";
-                break;
-              case "o":
-                statusText = "open";
-                statusClass = "open";
-                break;
-              case "c":
-              default:
-                statusText = "canceled";
-                statusClass = "canceled";
-                break;
-            }
-            let txHashLink;
-            if (order[10]) {
-              txHashLink =
-                baseExplorerUrl + "/explorer/transactions/" + order[10];
-            }
 
-            return (
-              <tr key={orderId}>
-                <td>{market}</td>
-                <td>{price.toPrecision(6) / 1}</td>
-                <td>
-                  {baseQuantity.toPrecision(6) / 1} {baseCurrency}
-                </td>
-                <td>
-                  {remaining.toPrecision(6) / 1} {baseCurrency}
-                </td>
-                <td className={sideClassName}>{side === 'b' ? 'buy' : 'sell'}</td>
-                <td>{feeText}</td>
-                <td className={statusClass}>{statusText}</td>
-                <td>
-                  {txHashLink ? (
-                    <a href={txHashLink} target="_blank" rel="noreferrer">
-                      View Tx
-                    </a>
-                  ) : orderStatus === "o" ? (
-                    <span
-                      className="cancel_order_link"
-                      onClick={() => api.cancelOrder(orderId)}
-                    >
-                      Cancel
-                    </span>
-                  ) : (
-                    ""
-                  )}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    );
-  }
+    renderFillTable(fills) {
+        let baseExplorerUrl;
+        switch (this.props.chainId) {
+            case 1001:
+                baseExplorerUrl = "https://goerli.voyager.online/tx/";
+                break;
+            case 1000:
+                baseExplorerUrl =
+                    "https://rinkeby.zkscan.io/explorer/transactions/";
+                break;
+            case 1:
+            default:
+                baseExplorerUrl = "https://zkscan.io/explorer/transactions/";
+        }
+        return (
+            <table>
+                <thead>
+                    <tr>
+                        <th>Market</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Side</th>
+                        <th>Fee</th>
+                        <th>Order Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {fills.map((fill, i) => {
+                        const fillid = fill[1];
+                        const market = fill[2];
+                        const side = fill[3];
+                        let price = fill[4];
+                        let baseQuantity = fill[5];
+                        const fillstatus = fill[6];
+                        const baseCurrency = fill[2].split("-")[0];
+                        const quoteCurrency = fill[2].split("-")[1];
+                        const sidetext = fill[3] === "b" ? "buy" : "sell";
+                        const sideclassname =
+                            fill[3] === "b" ? "up_value" : "down_value";
+                        const txhash = fill[7];
+                        let feeText;
+                        if (
+                            fillstatus === "r" ||
+                            !api.isZksyncChain(this.props.chainId)
+                        ) {
+                            feeText = "0 " + baseCurrency;
+                        } else if (side === "s") {
+                            feeText =
+                                currencyInfo[baseCurrency].gasFee +
+                                " " +
+                                baseCurrency;
+                        } else if (side === "b") {
+                            feeText =
+                                currencyInfo[quoteCurrency].gasFee +
+                                " " +
+                                quoteCurrency;
+                        }
+                        const fillWithoutFee = getFillDetailsWithoutFee(fill);
+                        if ([1, 1000].includes(this.props.chainId)) {
+                            price = fillWithoutFee.price;
+                            baseQuantity = fillWithoutFee.baseQuantity;
+                        }
+                        let statusText, statusClass;
+                        switch (fillstatus) {
+                            case "r":
+                                statusText = "rejected";
+                                statusClass = "rejected";
+                                break;
+                            case "pf":
+                                statusText = "partial fill";
+                                statusClass = "filled";
+                                break;
+                            case "f":
+                                statusText = "filled";
+                                statusClass = "filled";
+                                break;
+                            case "pm":
+                                statusText = (
+                                    <span>
+                                        partial match
+                                        <img
+                                            className="loading-gif"
+                                            src={loadingGif}
+                                            alt="Pending"
+                                        />
+                                    </span>
+                                );
+                                statusClass = "matched";
+                                break;
+                            case "m":
+                                statusText = (
+                                    <span>
+                                        matched{" "}
+                                        <img
+                                            className="loading-gif"
+                                            src={loadingGif}
+                                            alt="Pending"
+                                        />
+                                    </span>
+                                );
+                                statusClass = "matched";
+                                break;
+                            case "b":
+                                statusText = (
+                                    <span>
+                                        committing{" "}
+                                        <img
+                                            className="loading-gif"
+                                            src={loadingGif}
+                                            alt="Pending"
+                                        />
+                                    </span>
+                                );
+                                statusClass = "committing";
+                                break;
+                            case "o":
+                                statusText = "open";
+                                statusClass = "open";
+                                break;
+                            case "c":
+                            default:
+                                statusText = "canceled";
+                                statusClass = "canceled";
+                                break;
+                        }
+
+                        return (
+                            <tr key={fillid}>
+                                <td>{market}</td>
+                                <td>{price.toPrecision(6) / 1}</td>
+                                <td>
+                                    {baseQuantity.toPrecision(6) / 1}{" "}
+                                    {baseCurrency}
+                                </td>
+                                <td className={sideclassname}>{sidetext}</td>
+                                <td>{feeText}</td>
+                                <td className={statusClass}>{statusText}</td>
+                                <td>
+                                    {txhash ? (
+                                        <a
+                                            href={baseExplorerUrl + txhash}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                        >
+                                            View Tx
+                                        </a>
+                                    ) : (
+                                        ""
+                                    )}
+                                </td>
+                            </tr>
+                        );
+                    })}
+                </tbody>
+            </table>
+        );
+    }
+
 
   render() {
     let explorerLink;
@@ -195,24 +359,24 @@ export class Footer extends React.Component {
     let footerContent,
       classNameOrders = "",
       classNameBalances = "",
-      classNameHistory = "";
+      classNameFills = "";
     const userOrdersSorted = Object.values(this.props.userOrders || []);
     userOrdersSorted.sort((a, b) => b[1] - a[1]);
     switch (this.state.tab) {
       case "orders":
-        footerContent = this.renderOrderTable(this.getOpenOrders());
+        footerContent = this.renderOrderTable(this.getUserOrders());
         classNameOrders = "selected";
         break;
-      case "history":
-        footerContent = this.renderOrderTable(this.getHistory());
-        classNameHistory = "selected";
+      case "fills":
+        footerContent = this.renderFillTable(this.getFills());
+        classNameFills = "selected";
         break;
       case "balances":
         if (this.props.user.committed) {
           const balancesContent = Object.keys(
             this.props.user.committed.balances
           ).map((token) => {
-            if (!api.currencies[token]) return "";
+            if (!currencyInfo[token]) return "";
             let balance = this.props.user.committed.balances[token];
             balance =
               parseInt(balance) / Math.pow(10, api.currencies[token].decimals);
@@ -266,13 +430,13 @@ export class Footer extends React.Component {
                   className={classNameOrders}
                   onClick={() => this.setTab("orders")}
                 >
-                  Orders ({this.getOpenOrders().length})
+                  Orders ({this.getUserOrders().length})
                 </strong>
                 <strong
-                  className={classNameHistory}
-                  onClick={() => this.setTab("history")}
+                  className={classNameFills}
+                  onClick={() => this.setTab("fills")}
                 >
-                  History ({this.getHistory().length})
+                  Fills ({this.getFills().length})
                 </strong>
                 <strong
                   className={classNameBalances}
