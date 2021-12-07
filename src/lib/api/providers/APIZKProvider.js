@@ -10,6 +10,25 @@ export default class APIZKProvider extends APIProvider {
     syncWallet = null
     syncProvider = null
 
+    changePubKey = async () => {
+        let feeToken = "ETH";
+        const balances = this._accountState.committed.balances;
+        if (balances.ETH && balances.ETH > 0.005e18) {
+            feeToken = "ETH";
+        } else if (balances.USDC && balances.USDC > 20e6) {
+            feeToken = "USDC";
+        } else if (!balances.USDC && balances.USDC > 20e6) {
+            feeToken = "USDT";
+        } else {
+            feeToken = "ETH";
+        }
+        const changeAction = await this.syncWallet.setSigningKey({
+            feeToken,
+            ethAuthType: "ECDSALegacyMessage",
+        });
+        return await changeAction.awaitReceipt();
+    }
+
     submitOrder = async (product, side, price, amount) => {
         amount = parseFloat(amount)
         const currencies = product.split('-')
@@ -136,7 +155,7 @@ export default class APIZKProvider extends APIProvider {
 
         this.ethWallet = this.api.ethersProvider.getSigner()
         this.syncWallet = await zksync.Wallet.fromEthSigner(this.ethWallet, this.syncProvider)
-        const accountState = await this.syncWallet.getAccountState()        
+        const accountState = await this.syncWallet.getAccountState()
         const signingKeySet = await this.syncWallet.isSigningKeySet()
         
         if (! signingKeySet) {
@@ -146,15 +165,10 @@ export default class APIZKProvider extends APIProvider {
             else if (this.network === 1000) {
                 toast.info('You need to sign a one-time transaction to activate your zksync account.')
             }
-         
-            const changePubkey = await this.syncWallet.setSigningKey({
-                feeToken: 'ETH',
-                ethAuthType: 'ECDSALegacyMessage',
-            })
-
-            await changePubkey.awaitReceipt()
+            const setPubkey = await this.changePubKey();
+            await setPubkey.awaitReceipt()
         }
 
-        return accountState
+        return this._accountState
     }
 }

@@ -73,6 +73,8 @@ const api = new API({
             "ETH-DAI",
             "USDC-USDT",
             "WBTC-USDT",
+            "DAI-USDT",
+            "DAI-USDC",
             //"FRAX-USDC",
         ],
         // zkSync Rinkeby
@@ -80,7 +82,9 @@ const api = new API({
             "ETH-USDT",
             "ETH-USDC",
             "USDC-USDT",
-            "ETH-DAI"
+            "ETH-DAI",
+            "DAI-USDT",
+            "DAI-USDC",
         ],
 
         // Starknet Alpha
