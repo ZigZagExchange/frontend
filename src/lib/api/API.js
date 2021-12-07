@@ -1,4 +1,5 @@
 import Web3 from 'web3'
+import { toast } from 'react-toastify'
 import Web3Modal from 'web3modal'
 import Emitter from 'tiny-emitter'
 import { ethers } from 'ethers'
@@ -141,10 +142,19 @@ export default class API extends Emitter {
         
         await this.refreshNetwork()
 
-        const web3Provider = ((await this.web3Modal.connect()) || window.ethereum)
-        this.web3.setProvider(web3Provider)
-        this.ethersProvider = new ethers.providers.Web3Provider(web3Provider)
-        const accountState = await this.apiProvider.signIn(network)
+        if (this.isZksyncChain(network)) {
+            const web3Provider = ((await this.web3Modal.connect()) || window.ethereum)
+            this.web3.setProvider(web3Provider)
+            this.ethersProvider = new ethers.providers.Web3Provider(web3Provider)
+        }
+        let accountState;
+        try {
+            accountState = await this.apiProvider.signIn(network)
+        } catch (e) {
+            console.error(e);
+            toast.error(e);
+            return false;
+        }
 
         if (accountState) {
             this.send('login', [
