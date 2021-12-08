@@ -188,10 +188,10 @@ export default class APIZKProvider extends APIProvider {
             throw e
         }
 
-        const ethWallet = this.api.ethersProvider.getSigner()
-        const { seed, ethSignatureType } = await this.genSeed(ethWallet);
+        this.ethWallet = this.api.ethersProvider.getSigner()
+        const { seed, ethSignatureType } = await this.genSeed(this.ethWallet);
         const syncSigner = await zksync.Signer.fromSeed(seed);
-        this.syncWallet = await zksync.Wallet.fromEthSigner(ethWallet, this.syncProvider, syncSigner, undefined, ethSignatureType)        
+        this.syncWallet = await zksync.Wallet.fromEthSigner(this.ethWallet, this.syncProvider, syncSigner, undefined, ethSignatureType)        
         const accountState = await this.syncWallet.getAccountState()        
         if (!accountState.id) {
             toast.error(
