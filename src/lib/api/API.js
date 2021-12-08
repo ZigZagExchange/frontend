@@ -240,7 +240,9 @@ export default class API extends Emitter {
             const value = await this.getBalanceOfCurrency(ticker)
             balances[ticker] = {
                 value,
-                valueReadable: parseFloat(value / Math.pow(10, currency.decimals)).toFixed(8),
+                valueReadable: parseFloat(
+                    value / Math.pow(10, currency.decimals)
+                ).toFixed(Math.min(5, currency.decimals)),
             }
         }
 

@@ -10,6 +10,23 @@ export default class APIZKProvider extends APIProvider {
     syncWallet = null
     syncProvider = null
 
+    handleBridgeReceipt = (_receipt, amount, token, type) => {
+        let receipt = { date: +(new Date()), network: this.network, amount, token, type }
+        const subdomain = this.network === 1 ? '' : 'rinkeby.'
+        
+        if (!_receipt) {
+            return receipt
+        } if (_receipt.ethTx) {
+            receipt.txId = _receipt.ethTx.hash
+            receipt.txUrl = `https://${subdomain}etherscan.io/tx/${receipt.txId}`
+        } else if (_receipt.txHash) {
+            receipt.txId = _receipt.txHash.split(':')[1]
+            receipt.txUrl = `https://${subdomain}zkscan.io/explorer/transactions/${receipt.txId}`
+        }
+        
+        return receipt
+    }
+
     changePubKey = async () => {
         let feeToken = "ETH";
         const accountState = await this.syncWallet.getAccountState()
@@ -121,9 +138,15 @@ export default class APIZKProvider extends APIProvider {
                 ethAddress: await this.ethWallet.getAddress(),
                 amount,
             })
+
+            await transfer.awaitReceipt()
+
+            this.api.emit('bridgeReceipt',
+                this.handleBridgeReceipt(transfer, amountDecimals, token, 'withdraw')
+            )
             return transfer
-        } finally {
-            if (transfer) await transfer.awaitReceipt()
+        } catch(err) {
+            console.log(err)
         }
     }
 
@@ -138,9 +161,13 @@ export default class APIZKProvider extends APIProvider {
                 depositTo: this.syncWallet.address(),
                 amount,
             })
+
+            this.api.emit('bridgeReceipt',
+                this.handleBridgeReceipt(transfer, amountDecimals, token, 'deposit')
+            )
             return transfer
-        } finally {
-            if (transfer) await transfer.awaitReceipt()
+        } catch(err) {
+            console.log(err)
         }
     }
     

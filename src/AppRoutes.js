@@ -9,7 +9,7 @@ const AppRoutes = () => {
       <Router>
         <Switch>
           <Route exact path="/" component={TradePage} />
-          <Route exact path="/bridge" component={BridgePage} />
+          <Route exact path="/bridge/:tab?" component={BridgePage} />
         </Switch>
       </Router>
     </>
