@@ -6,8 +6,8 @@ const api = new API({
     infuraId: process.env.REACT_APP_INFURA_ID,
     websocketUrl: process.env.REACT_APP_ZIGZAG_WS,
     networks: {
-        mainnet: [1, APIZKProvider],
-        rinkeby: [1000, APIZKProvider],
+        mainnet: [1, APIZKProvider, '0xaBEA9132b05A70803a4E85094fD0e1800777fBEF'],
+        rinkeby: [1000, APIZKProvider, '0x82f67958a5474e40e1485742d648c0b0686b6e5d'],
         starknet: [1001, APIStarknetProvider],
     },
     currencies: {

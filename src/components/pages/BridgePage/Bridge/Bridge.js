@@ -7,6 +7,7 @@ import {
 import { userSelector } from "lib/store/features/auth/authSlice";
 import ethLogo from "assets/images/currency/ETH.svg"
 import api from 'lib/api';
+import { MAX_ALLOWANCE } from 'lib/api/constants';
 import { formatUSD } from 'lib/utils';
 import cx from 'classnames';
 import { BiError } from 'react-icons/bi';
@@ -23,12 +24,14 @@ const Bridge = () => {
   // eslint-disable-next-line
   const user = useSelector(userSelector)
   const [zkBalances, setBalances] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [isApproving, setApproving] = useState(false);
   const [walletBalances, setWalletBalances] = useState({});
   const [formErr, setFormErr] = useState('') // eslint-disable-line no-unused-vars
   const network = useSelector(networkSelector);
   const [transfer, setTransfer] = useState(defaultTransfer);
   const [swapDetails, _setSwapDetails] = useState(() => ({ amount: '', currency: 'ETH' }));
-  const currencies = useMemo(() => transfer.type === 'deposit' ? ['ETH'] : null, [transfer.type])
+  const currencies = useMemo(() => null, [transfer.type])
   const coinEstimator = useCoinEstimator()
 
   useEffect(() => {
@@ -102,11 +105,28 @@ const Bridge = () => {
 
   const balances = transfer.type === 'deposit' ? walletBalances : zkBalances 
   const altBalances = transfer.type === 'deposit' ? zkBalances : walletBalances
+  const hasAllowance = balances[swapDetails.currency] && balances[swapDetails.currency].allowance.gte(MAX_ALLOWANCE.div(3))
   const hasError = formErr && formErr.length > 0
+
+  const approveSpend = (e) => {
+    if (e) e.preventDefault()
+    setApproving(true)
+    api.approveSpendOfCurrency(swapDetails.currency)
+      .then(() => {
+        setApproving(false)
+      })
+      .catch(err => {
+        console.log(err)
+        setApproving(false)
+      })
+  }
 
   const doTransfer = e => {
     e.preventDefault()
     let deferredXfer
+
+    setLoading(true)
+
     if (transfer.type === 'deposit') {
       deferredXfer = api.depositL2(`${swapDetails.amount}`, swapDetails.currency)
     } else {
@@ -116,8 +136,12 @@ const Bridge = () => {
     deferredXfer
       .then(state => {
         setTimeout(() => api.getAccountState(), 1000)
+        setLoading(false)
       })
-      .catch(e => console.log(e.message))
+      .catch(e => {
+        console.log(e.message)
+        setLoading(false)
+      })
   }
 
   return (
@@ -172,7 +196,6 @@ const Bridge = () => {
           {' '}{api.currencies[swapDetails.currency].gasFee}
           {' '}{swapDetails.currency}
         </div>
-
         <div className="bridge_button">
           {!user.id && <Button
             className="bg_btn"
@@ -180,13 +203,21 @@ const Bridge = () => {
             img={darkPlugHead}
             onClick={() => api.signIn(network)}
           />}
+          {user.id && !hasAllowance && <Button
+            loading={isApproving}
+            className={cx("bg_btn", { zig_disabled: formErr.length > 0 || swapDetails.amount.length === 0, })}
+            text="APPROVE"
+            style={{ marginBottom: 10 }}
+            onClick={approveSpend}
+          />}
           {user.id && hasError && <Button
             className="bg_btn zig_btn_disabled bg_err"
             text={formErr}
             icon={<BiError />}
           />}
           {user.id && !hasError && <Button
-            className={cx("bg_btn", { zig_disabled: swapDetails.amount.length === 0 })}
+            loading={loading}
+            className={cx("bg_btn", { zig_disabled: !hasAllowance || swapDetails.amount.length === 0 })}
             text="TRANSFER"
             icon={<MdSwapCalls />}
             onClick={doTransfer}
