@@ -1,13 +1,32 @@
 import * as zksync from 'zksync'
 import { ethers } from 'ethers';
 import { toast } from 'react-toastify'
+import { toBaseUnit } from 'lib/utils'
 import APIProvider from './APIProvider'
 
 export default class APIZKProvider extends APIProvider {
     static VALID_SIDES = ['b', 's']
     
+    ethWallet = null
     syncWallet = null
     syncProvider = null
+
+    handleBridgeReceipt = (_receipt, amount, token, type) => {
+        let receipt = { date: +(new Date()), network: this.network, amount, token, type }
+        const subdomain = this.network === 1 ? '' : 'rinkeby.'
+        
+        if (!_receipt) {
+            return receipt
+        } if (_receipt.ethTx) {
+            receipt.txId = _receipt.ethTx.hash
+            receipt.txUrl = `https://${subdomain}etherscan.io/tx/${receipt.txId}`
+        } else if (_receipt.txHash) {
+            receipt.txId = _receipt.txHash.split(':')[1]
+            receipt.txUrl = `https://${subdomain}zkscan.io/explorer/transactions/${receipt.txId}`
+        }
+        
+        return receipt
+    }
 
     changePubKey = async () => {
         if (this.network === 1) {
@@ -17,7 +36,8 @@ export default class APIZKProvider extends APIProvider {
             toast.info('You need to sign a one-time transaction to activate your zksync account.')
         }
         let feeToken = "ETH";
-        const balances = this._accountState.committed.balances;
+        const accountState = await this.syncWallet.getAccountState()
+        const balances = accountState.committed.balances;
         if (balances.ETH && balances.ETH > 0.005e18) {
             feeToken = "ETH";
         } else if (balances.USDC && balances.USDC > 20e6) {
@@ -92,10 +112,70 @@ export default class APIZKProvider extends APIProvider {
         return order
     }
 
+    getBalances = async () => {
+        const account = await this.getAccountState()
+        const balances = {}
+        
+        Object.keys(this.api.currencies).forEach(ticker => {
+            const currency = this.api.currencies[ticker]
+            const balance = ((account && account.committed) ? (account.committed.balances[ticker] || 0) : 0)
+            balances[ticker] = {
+                value: balance,
+                valueReadable: balance && (balance / (10 ** currency.decimals)),
+            }
+        })
+
+        return balances
+    }
+
     getAccountState = async () => {
         return this.syncWallet
             ? this.syncWallet.getAccountState()
             : {}
+    }
+
+    withdrawL2 = async (amountDecimals, token = 'ETH') => {
+        let transfer
+
+        const amount = toBaseUnit(amountDecimals, this.api.currencies[token].decimals)
+        
+        try {
+            transfer = await this.syncWallet.withdrawFromSyncToEthereum({
+                token,
+                ethAddress: await this.ethWallet.getAddress(),
+                amount,
+            })
+
+            await transfer.awaitReceipt()
+
+            this.api.emit('bridgeReceipt',
+                this.handleBridgeReceipt(transfer, amountDecimals, token, 'withdraw')
+            )
+            return transfer
+        } catch(err) {
+            console.log(err)
+        }
+    }
+
+    depositL2 = async (amountDecimals, token = 'ETH') => {
+        let transfer
+
+        const amount = toBaseUnit(amountDecimals, this.api.currencies[token].decimals)
+
+        try {
+            transfer = await this.syncWallet.depositToSyncFromEthereum({
+                token,
+                depositTo: this.syncWallet.address(),
+                amount,
+            })
+
+            this.api.emit('bridgeReceipt',
+                this.handleBridgeReceipt(transfer, amountDecimals, token, 'deposit')
+            )
+            return transfer
+        } catch(err) {
+            console.log(err)
+        }
     }
     
     signIn = async () => {
@@ -108,12 +188,12 @@ export default class APIZKProvider extends APIProvider {
             throw e
         }
 
-        const ethWallet = this.api.ethersProvider.getSigner()
-        const { seed, ethSignatureType } = await this.genSeed(ethWallet);
+        this.ethWallet = this.api.ethersProvider.getSigner()
+        const { seed, ethSignatureType } = await this.genSeed(this.ethWallet);
         const syncSigner = await zksync.Signer.fromSeed(seed);
-        this.syncWallet = await zksync.Wallet.fromEthSigner(ethWallet, this.syncProvider, syncSigner, undefined, ethSignatureType)        
-        this._accountState = await this.syncWallet.getAccountState()        
-        if (!this._accountState.id) {
+        this.syncWallet = await zksync.Wallet.fromEthSigner(this.ethWallet, this.syncProvider, syncSigner, undefined, ethSignatureType)        
+        const accountState = await this.syncWallet.getAccountState()        
+        if (!accountState.id) {
             toast.error(
                 "Account not found. Please use the Wallet to deposit funds before trying again."
             );
@@ -125,7 +205,7 @@ export default class APIZKProvider extends APIProvider {
             await this.changePubKey();
         }
 
-        return this._accountState
+        return accountState
     }
 
     genSeed = async (ethSigner) => {

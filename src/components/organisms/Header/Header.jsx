@@ -17,14 +17,20 @@ export const Header = (props) => {
   const user = useSelector(userSelector)
   const network = useSelector(networkSelector)
 
-  const walletLink = useMemo(() => {
+  const [walletLink, bridgeLink] = useMemo(() => {
     switch (network) {
       case 1:
-        return 'https://wallet.zksync.io/'
+        return [
+          'https://wallet.zksync.io/',
+          '/bridge'
+        ]
       case 1000:
-        return 'https://rinkeby.zksync.io/'
+        return [
+          'https://rinkeby.zksync.io/',
+          '/bridge'
+        ]
       default:
-        break
+        return []
     }
   }, [network])
 
@@ -80,6 +86,18 @@ export const Header = (props) => {
                   </NavLink>
                 </li>
                 <li>
+                  {bridgeLink
+                    ? (
+                      <NavLink exact to={bridgeLink || ""} activeClassName="active_link">
+                        Bridge
+                      </NavLink>
+                    )
+                    : (
+                      // eslint-disable-next-line
+                      <a rel="noreferrer">Bridge</a>
+                    )}
+                </li>
+                <li>
                   <a href={walletLink} target="_blank" rel="noreferrer">
                     Wallet
                   </a>
@@ -127,9 +145,16 @@ export const Header = (props) => {
                 </NavLink>
               </li>
               <li>
-                <NavLink exact to="/bridge" activeClassName="active_link">
-                  Bridge
-                </NavLink>
+                {bridgeLink
+                  ? (
+                    <NavLink exact to={bridgeLink || ""} activeClassName="active_link">
+                      Bridge
+                    </NavLink>
+                  )
+                  : (
+                    // eslint-disable-next-line
+                    <a rel="noreferrer">Bridge</a>
+                  )}
               </li>
               <li>
                 <a href={walletLink} target="_blank" rel="noreferrer">Wallet</a>

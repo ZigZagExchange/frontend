@@ -9,6 +9,7 @@ export const authSlice = createSlice({
     userId: null,
     currentMarket: 'ETH-USDT',
     marketFills: {},
+    bridgeReceipts: [],
     lastPrices: {},
     marketSummary: {},
     liquidity: [],
@@ -21,37 +22,37 @@ export const authSlice = createSlice({
       payload[0].forEach(fill => {
         const fillid = fill[1];
         if (
-            fill[2] === state.currentMarket &&
-            fill[0] === state.network
+          fill[2] === state.currentMarket &&
+          fill[0] === state.network
         ) {
-            state.marketFills[fillid] = fill;
+          state.marketFills[fillid] = fill;
         }
         if (
-            state.userId &&
-            (fill[8] === state.userId.toString() ||
-                fill[9] === state.userId.toString())
+          state.userId &&
+          (fill[8] === state.userId.toString() ||
+            fill[9] === state.userId.toString())
         ) {
-            state.userFills[fillid] = fill;
+          state.userFills[fillid] = fill;
         }
       });
     },
     _fillstatus(state, { payload }) {
-        payload[0].forEach((update) => {
-            const fillid = update[1];
-            const newstatus = update[2];
-            let txhash;
-            if (update[3]) txhash = update[3];
-            if (state.marketFills[fillid]) {
-                state.marketFills[fillid][6] = newstatus;
-                if (txhash)
-                    state.marketFills[fillid][7] = txhash;
-            }
-            if (state.userFills[fillid]) {
-                state.userFills[fillid][6] = newstatus;
-                if (txhash)
-                    state.userFills[fillid][7] = txhash;
-            }
-        });
+      payload[0].forEach((update) => {
+        const fillid = update[1];
+        const newstatus = update[2];
+        let txhash;
+        if (update[3]) txhash = update[3];
+        if (state.marketFills[fillid]) {
+          state.marketFills[fillid][6] = newstatus;
+          if (txhash)
+            state.marketFills[fillid][7] = txhash;
+        }
+        if (state.userFills[fillid]) {
+          state.userFills[fillid][6] = newstatus;
+          if (txhash)
+            state.userFills[fillid][7] = txhash;
+        }
+      });
     },
     _marketsummary(state, { payload }) {
       state.marketSummary = {
@@ -70,13 +71,13 @@ export const authSlice = createSlice({
         const price = update[1];
         const change = update[2];
         if (api.validMarkets[state.network].includes(market)) {
-            state.lastPrices[market] = {
-              price: update[1],
-              change: update[2],
-            };
+          state.lastPrices[market] = {
+            price: update[1],
+            change: update[2],
+          };
         }
         else {
-            delete state.lastPrices[market];
+          delete state.lastPrices[market];
         }
         if (update[0] === state.currentMarket) {
           state.marketSummary.price = price;
@@ -168,16 +169,16 @@ export const authSlice = createSlice({
       }
 
       if (state.userId) {
-          for (let i in orders) {
-              if (orders[i][8] === state.userId.toString()) {
-                  const orderId = orders[i][1]
-                  state.userOrders[orderId] = orders[i]
-              }
+        for (let i in orders) {
+          if (orders[i][8] === state.userId.toString()) {
+            const orderId = orders[i][1]
+            state.userOrders[orderId] = orders[i]
           }
-          const userOpenOrders = Object.values(state.userOrders).filter(o => o[9] === 'o')
-          if (userOpenOrders.length > 1 && api.isZksyncChain(state.network)) {
-              toast.warn('Filling a new order will cancel all previous orders. It is recommended to only have one open order at a time.', { autoClose: 15000 })
-          }
+        }
+        const userOpenOrders = Object.values(state.userOrders).filter(o => o[9] === 'o')
+        if (userOpenOrders.length > 1 && api.isZksyncChain(state.network)) {
+          toast.warn('Filling a new order will cancel all previous orders. It is recommended to only have one open order at a time.', { autoClose: 15000 })
+        }
       }
     },
     setCurrentMarket(state, { payload }) {
@@ -196,6 +197,30 @@ export const authSlice = createSlice({
     setNetwork(state, { payload }) {
       state.network = payload
     },
+    clearBridgeReceipts(state) {
+      state.bridgeReceipts = []
+    },
+    addBridgeReceipt(state, { payload }) {
+      if (!payload || !payload.txId) return
+      const { amount, token, txUrl, type } = payload
+
+      toast.success(
+        <>
+          Successfully
+          {' '}{type === 'deposit' ? 'deposited' : 'withdrew'}
+          {' '}{amount} {token}
+          {' '}{type === 'deposit' ? 'in your zSync wallet' : 'into your Ethereum wallet'}.
+          <br /><br /><a href={txUrl}
+            style={{ color: 'white', textDecoration: 'underline', fontWeight: 'bold' }}
+            target="_blank"
+            rel="noreferrer">
+              View transaction
+            </a>
+        </>
+      )
+
+      state.bridgeReceipts.unshift(payload)
+    },
     resetData(state) {
       state.userFills = {}
       state.marketFills = {}
@@ -208,7 +233,7 @@ export const authSlice = createSlice({
   },
 })
 
-export const { setNetwork, setUserId, setCurrentMarket, resetData } = authSlice.actions
+export const { setNetwork, clearBridgeReceipts, setUserId, addBridgeReceipt, setCurrentMarket, resetData } = authSlice.actions
 
 export const networkSelector = state => state.api.network
 export const userOrdersSelector = state => state.api.userOrders
@@ -219,6 +244,7 @@ export const lastPricesSelector = state => state.api.lastPrices
 export const marketSummarySelector = state => state.api.marketSummary
 export const liquiditySelector = state => state.api.liquidity
 export const currentMarketSelector = state => state.api.currentMarket
+export const bridgeReceiptsSelector = state => state.api.bridgeReceipts
 
 export const handleMessage = createAction('api/handleMessage')
 

@@ -8,7 +8,7 @@ export default class APIStarknetProvider extends APIProvider {
     static STARKNET_CONTRACT_ADDRESS = '0x074f861a79865af1fb77af6197042e8c73147e28c55ac61e385ac756f89b33d6'
     _accountState = {}
 
-    getAccountState = () => {
+    getAccountState = async () => {
         return this._accountState
     }
 
@@ -140,10 +140,12 @@ export default class APIStarknetProvider extends APIProvider {
     _getBalances = async (userAddress) => {
         const balances = {}
         for (let currency in this.api.currencies) {
-            const contractAddress = this.api.currencies[currency].chain[this.network].contractAddress;
-            if (contractAddress) {
-                let balance = await this._getBalance(contractAddress, userAddress);
-                balances[currency] = balance
+            if (this.api.currencies[currency].chain[this.network]) {
+                const contractAddress = this.api.currencies[currency].chain[this.network].contractAddress;
+                if (contractAddress) {
+                    let balance = await this._getBalance(contractAddress, userAddress);
+                    balances[currency] = balance
+                }
             }
         }
         return balances
@@ -174,8 +176,8 @@ export default class APIStarknetProvider extends APIProvider {
     _getAllowances = async (userAddress, spender) => {
         const allowances = {}
         for (let currency in this.api.currencies) {
-            const contractAddress = this.api.currencies[currency].chain[this.network].contractAddress;
-            if (contractAddress) {
+            if (this.api.currencies[currency].chain[this.network]) {
+                const contractAddress = this.api.currencies[currency].chain[this.network].contractAddress;
                 let allowance = await this._getTokenAllowance(
                     contractAddress,
                     userAddress,

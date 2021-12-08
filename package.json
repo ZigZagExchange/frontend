@@ -28,6 +28,7 @@
     "case-sensitive-paths-webpack-plugin": "2.3.0",
     "classnames": "^2.3.1",
     "css-loader": "4.3.0",
+    "date-fns": "^2.27.0",
     "dotenv": "8.2.0",
     "dotenv-expand": "5.1.0",
     "eslint": "^7.11.0",
@@ -66,6 +67,7 @@
     "react-bootstrap": "^2.0.0-beta.6",
     "react-dev-utils": "^11.0.3",
     "react-dom": "^17.0.2",
+    "react-icons": "^4.3.1",
     "react-redux": "^7.2.6",
     "react-refresh": "^0.8.3",
     "react-router-dom": "^5.3.0",
@@ -110,7 +112,12 @@
     "extends": [
       "react-app",
       "react-app/jest"
-    ]
+    ],
+    "rules": {
+      "react-hooks/exhaustive-deps": [
+        0
+      ]
+    }
   },
   "browserslist": {
     "production": [
@@ -129,7 +136,8 @@
   "devDependencies": {
     "babel-plugin-styled-components": "^2.0.2",
     "env-cmd": "^10.1.0",
-    "prettier": "2.4.1"
+    "prettier": "2.4.1",
+    "source-map-explorer": "^2.5.2"
   },
   "jest": {
     "roots": [

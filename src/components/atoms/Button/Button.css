@@ -13,15 +13,12 @@
   font-weight: 300;
 }
 
-.zig_btn {
-  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.35);
-}
-
 /* bg_btn */
 .bg_btn {
   display: flex;
   align-items: center;
-  padding: 13px 30px;
+  height: 42px;
+  padding: 4px 30px;
   background: linear-gradient(to right, #09aaf5, #05cfe9, #62D2AD);
   border: none;
   border-radius: 5px;
@@ -34,4 +31,27 @@
 
 .bg_btn > img {
   margin-right: 10px;
+}
+
+.bg_err {
+  background: #b66;
+}
+
+.zig_btn {
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.35);
+}
+
+.zig_btn_disabled {
+  pointer-events: none;
+  cursor: default;
+}
+
+.zig_disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.zig_btn_icon {
+  font-size: 18px;
+  margin-right: 6px;
 }

@@ -49,6 +49,15 @@ html {
     color: #43f;
 }
 
+@font-face {
+    font-family: 'Iceland';
+    src: url('./assets/fonts/Iceland.woff2') format('woff2'),
+         url('./assets/fonts/Iceland.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
 @media screen and (min-width: 1800px) {
     html {
         font-size: 18px;
