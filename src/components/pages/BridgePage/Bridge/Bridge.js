@@ -192,8 +192,8 @@ const Bridge = () => {
         </div>
 
         <div className="bridge_transfer_fee">
-          Transfer fee: 0
-          {' '}{swapDetails.currency}
+          Bridge Tax: 0%
+          {' '}(0 {swapDetails.currency})
         </div>
         <div className="bridge_button">
           {!user.id && <Button
