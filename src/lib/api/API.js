@@ -80,6 +80,7 @@ export default class API extends Emitter {
     
     _socketClose = () => {
         clearInterval(this.__pingServerTimeout)
+        toast.error("Connection to server closed. Please refresh page");
         this.emit('close')
     }
 

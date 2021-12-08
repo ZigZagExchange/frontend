@@ -73,6 +73,7 @@ const api = new API({
             "ETH-DAI",
             "USDC-USDT",
             "WBTC-USDT",
+            "WBTC-ETH",
             "DAI-USDT",
             "DAI-USDC",
             //"FRAX-USDC",
