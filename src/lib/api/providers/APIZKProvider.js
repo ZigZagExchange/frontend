@@ -205,7 +205,7 @@ export default class APIZKProvider extends APIProvider {
             await this.changePubKey();
         }
 
-        return accountState
+        return this._accountState
     }
 
     genSeed = async (ethSigner) => {
