@@ -28,6 +28,7 @@
     "case-sensitive-paths-webpack-plugin": "2.3.0",
     "classnames": "^2.3.1",
     "css-loader": "4.3.0",
+    "date-fns": "^2.27.0",
     "dotenv": "8.2.0",
     "dotenv-expand": "5.1.0",
     "eslint": "^7.11.0",
@@ -104,7 +105,6 @@
     "start:prod": "env-cmd -f .env.prod node scripts/start.js",
     "build:local": "node scripts/build.js",
     "build:prod": "env-cmd -f .env.prod node scripts/build.js",
-    "analyze": "source-map-explorer 'build/static/js/*.js'",
     "test": "node scripts/test.js",
     "format": "prettier --write src/"
   },
@@ -114,7 +114,9 @@
       "react-app/jest"
     ],
     "rules": {
-      "react-hooks/exhaustive-deps": [0]
+      "react-hooks/exhaustive-deps": [
+        0
+      ]
     }
   },
   "browserslist": {

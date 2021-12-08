@@ -197,6 +197,9 @@ export const authSlice = createSlice({
     setNetwork(state, { payload }) {
       state.network = payload
     },
+    clearBridgeReceipts(state) {
+      state.bridgeReceipts = []
+    },
     addBridgeReceipt(state, { payload }) {
       if (!payload || !payload.txId) return
       const { amount, token, txUrl, type } = payload
@@ -230,7 +233,7 @@ export const authSlice = createSlice({
   },
 })
 
-export const { setNetwork, setUserId, addBridgeReceipt, setCurrentMarket, resetData } = authSlice.actions
+export const { setNetwork, clearBridgeReceipts, setUserId, addBridgeReceipt, setCurrentMarket, resetData } = authSlice.actions
 
 export const networkSelector = state => state.api.network
 export const userOrdersSelector = state => state.api.userOrders

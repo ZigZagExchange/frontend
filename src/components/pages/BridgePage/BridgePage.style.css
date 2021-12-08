@@ -111,7 +111,9 @@
 }
 
 .bridge_box_transactions {
-  margin: 1px 0;
+  margin: 0 0 25px;
+  overflow-y: auto;
+  overflow-x: hidden;
   width: 100%;
 }
 
@@ -121,10 +123,31 @@
 
 .bridge_box_transaction {
   padding: 15px 20px;
+  cursor: pointer;
+}
+
+.bridge_contain {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.bridge_contain > *:not(:last-child) {
+  margin-right: 12px;
 }
 
 .bridge_box_transaction:hover {
   background: rgba(255, 255, 255, 0.05);
+}
+
+.bridge_box_transaction:active {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.bridge_box_transaction_txId {
+  font-size: 13px;
+  margin-top: 8px;
 }
 
 .bridge_box_transaction_txType_deposit,
@@ -137,6 +160,11 @@
   font-weight: bold;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.8);
+}
+
+.bridge_box_transaction_amount {
+  font-weight: bold;
+  color: #ddf;
 }
 
 .bridge_box_transaction_txType_withdraw {
