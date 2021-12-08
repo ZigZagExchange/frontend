@@ -192,8 +192,7 @@ const Bridge = () => {
         </div>
 
         <div className="bridge_transfer_fee">
-          Estimated transfer fee:
-          {' '}{api.currencies[swapDetails.currency].gasFee}
+          Transfer fee: 0
           {' '}{swapDetails.currency}
         </div>
         <div className="bridge_button">
