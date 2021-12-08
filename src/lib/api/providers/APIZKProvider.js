@@ -192,8 +192,8 @@ export default class APIZKProvider extends APIProvider {
         const { seed, ethSignatureType } = await this.genSeed(ethWallet);
         const syncSigner = await zksync.Signer.fromSeed(seed);
         this.syncWallet = await zksync.Wallet.fromEthSigner(ethWallet, this.syncProvider, syncSigner, undefined, ethSignatureType)        
-        this._accountState = await this.syncWallet.getAccountState()        
-        if (!this._accountState.id) {
+        const accountState = await this.syncWallet.getAccountState()        
+        if (!accountState.id) {
             toast.error(
                 "Account not found. Please use the Wallet to deposit funds before trying again."
             );
@@ -205,7 +205,7 @@ export default class APIZKProvider extends APIProvider {
             await this.changePubKey();
         }
 
-        return this._accountState
+        return accountState
     }
 
     genSeed = async (ethSigner) => {
