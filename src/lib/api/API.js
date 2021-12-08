@@ -72,13 +72,13 @@ export default class API extends Emitter {
     
     _socketClose = () => {
         clearInterval(this.__pingServerTimeout)
+        toast.error("Connection to server closed. Please refresh page");
         this.emit('close')
     }
 
     _socketMsg = (e) => {
         if (!e.data && e.data.length <= 0) return
         const msg = JSON.parse(e.data)
-        if (!(["lastprice", "pong"]).includes(msg.op)) console.log(e.data);
         this.emit('message', msg.op, msg.args)
     }
 

@@ -1,4 +1,5 @@
 import * as zksync from 'zksync'
+import { ethers } from 'ethers';
 import { toast } from 'react-toastify'
 import APIProvider from './APIProvider'
 
@@ -9,6 +10,12 @@ export default class APIZKProvider extends APIProvider {
     syncProvider = null
 
     changePubKey = async () => {
+        if (this.network === 1) {
+            toast.info('You need to sign a one-time transaction to activate your zksync account. The fee for this tx will be ~0.003 ETH (~$15)')
+        }
+        else if (this.network === 1000) {
+            toast.info('You need to sign a one-time transaction to activate your zksync account.')
+        }
         let feeToken = "ETH";
         const balances = this._accountState.committed.balances;
         if (balances.ETH && balances.ETH > 0.005e18) {
@@ -102,21 +109,40 @@ export default class APIZKProvider extends APIProvider {
         }
 
         const ethWallet = this.api.ethersProvider.getSigner()
-        this.syncWallet = await zksync.Wallet.fromEthSigner(ethWallet, this.syncProvider)        
+        const { seed, ethSignatureType } = await this.genSeed(ethWallet);
+        const syncSigner = await zksync.Signer.fromSeed(seed);
+        this.syncWallet = await zksync.Wallet.fromEthSigner(ethWallet, this.syncProvider, syncSigner, undefined, ethSignatureType)        
         this._accountState = await this.syncWallet.getAccountState()        
+        if (!this._accountState.id) {
+            toast.error(
+                "Account not found. Please use the Wallet to deposit funds before trying again."
+            );
+            throw new Error("Account does not exist");
+        }
         const signingKeySet = await this.syncWallet.isSigningKeySet()
         
         if (! signingKeySet) {
-            if (this.network === 1) {
-                toast.info('You need to sign a one-time transaction to activate your zksync account. The fee for this tx will be ~0.003 ETH (~$15)')
-            }
-            else if (this.network === 1000) {
-                toast.info('You need to sign a one-time transaction to activate your zksync account.')
-            }
-            const setPubkey = await this.changePubKey();
-            await setPubkey.awaitReceipt()
+            await this.changePubKey();
         }
 
         return this._accountState
+    }
+
+    genSeed = async (ethSigner) => {
+        let chainID = 1;
+        if (ethSigner.provider) {
+            const network = await ethSigner.provider.getNetwork();
+            chainID = network.chainId;
+        }
+        let message = 'Access zkSync account.\n\nOnly sign this message for a trusted client!';
+        if (chainID !== 1) {
+            message += `\nChain ID: ${chainID}.`;
+        }
+        const signedBytes = zksync.utils.getSignedBytesFromMessage(message, false);
+        const signature = await zksync.utils.signMessagePersonalAPI(ethSigner, signedBytes);
+        const address = await ethSigner.getAddress();
+        const ethSignatureType = await zksync.utils.getEthSignatureType(ethSigner.provider, message, signature, address);
+        const seed = ethers.utils.arrayify(signature);
+        return { seed, ethSignatureType };
     }
 }
