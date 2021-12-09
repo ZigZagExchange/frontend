@@ -34,6 +34,11 @@ export default class API extends Emitter {
         this.currencies = currencies
         this.validMarkets = validMarkets
         this.setAPIProvider(this.networks.mainnet[0])
+
+        if (window.ethereum) {
+            window.ethereum.on('accountsChanged', this.signOut)
+            window.ethereum.on('chainChanged', this.signOut)
+        }
     }
 
     getAPIProvider = (network) => {
