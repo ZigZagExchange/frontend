@@ -43,9 +43,10 @@ export default class APIZKProvider extends APIProvider {
             feeToken = "ETH";
         } else if (balances.USDC && balances.USDC > 20e6) {
             feeToken = "USDC";
-        } else if (!balances.USDC && balances.USDC > 20e6) {
+        } else if (!balances.USDT && balances.USDT > 20e6) {
             feeToken = "USDT";
         } else {
+            toast.warn("Your token balances are very low. You might need to Bridge in more funds first");
             feeToken = "ETH";
         }
         const changeAction = await this.syncWallet.setSigningKey({
