@@ -43,8 +43,12 @@ export default class APIZKProvider extends APIProvider {
             feeToken = "ETH";
         } else if (balances.USDC && balances.USDC > 20e6) {
             feeToken = "USDC";
-        } else if (!balances.USDT && balances.USDT > 20e6) {
+        } else if (balances.USDT && balances.USDT > 20e6) {
             feeToken = "USDT";
+        } else if (balances.DAI && balances.DAI > 20e6) {
+            feeToken = "DAI";
+        } else if (balances.WBTC && balances.WBTC > 0.0003e8) {
+            feeToken = "WBTC";
         } else {
             toast.warn("Your token balances are very low. You might need to Bridge in more funds first");
             feeToken = "ETH";
