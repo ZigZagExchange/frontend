@@ -197,7 +197,7 @@ export default class APIZKProvider extends APIProvider {
         const accountState = await this.syncWallet.getAccountState()        
         if (!accountState.id) {
             toast.error(
-                "Account not found. Please use the Wallet to deposit funds before trying again."
+                "Account not found. Please use the Bridge to deposit funds before trying again."
             );
             throw new Error("Account does not exist");
         }
