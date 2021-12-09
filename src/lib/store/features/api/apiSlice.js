@@ -12,6 +12,7 @@ export const authSlice = createSlice({
     bridgeReceipts: [],
     lastPrices: {},
     marketSummary: {},
+    balances: {},
     liquidity: [],
     userOrders: {},
     userFills: {},
@@ -181,6 +182,9 @@ export const authSlice = createSlice({
         }
       }
     },
+    setBalances(state, { payload }) {
+      state.balances = { ...state.balances, ...payload }
+    },
     setCurrentMarket(state, { payload }) {
       if (state.currentMarket !== payload) {
         state.currentMarket = payload
@@ -189,6 +193,7 @@ export const authSlice = createSlice({
         state.liquidity = []
         state.userOrders = {}
         state.orders = {}
+        state.balances = {}
       }
     },
     setUserId(state, { payload }) {
@@ -229,11 +234,12 @@ export const authSlice = createSlice({
       state.userOrders = {}
       state.orders = {}
       state.lastPrices = {}
+      state.balances = {}
     }
   },
 })
 
-export const { setNetwork, clearBridgeReceipts, setUserId, addBridgeReceipt, setCurrentMarket, resetData } = authSlice.actions
+export const { setNetwork, clearBridgeReceipts, setBalances, setUserId, addBridgeReceipt, setCurrentMarket, resetData } = authSlice.actions
 
 export const networkSelector = state => state.api.network
 export const userOrdersSelector = state => state.api.userOrders
@@ -245,6 +251,7 @@ export const marketSummarySelector = state => state.api.marketSummary
 export const liquiditySelector = state => state.api.liquidity
 export const currentMarketSelector = state => state.api.currentMarket
 export const bridgeReceiptsSelector = state => state.api.bridgeReceipts
+export const balancesSelector = state => state.api.balances
 
 export const handleMessage = createAction('api/handleMessage')
 

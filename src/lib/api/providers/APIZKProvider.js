@@ -3,6 +3,7 @@ import { ethers } from 'ethers';
 import { toast } from 'react-toastify'
 import { toBaseUnit } from 'lib/utils'
 import APIProvider from './APIProvider'
+import { MAX_ALLOWANCE } from '../constants'
 
 export default class APIZKProvider extends APIProvider {
     static VALID_SIDES = ['b', 's']
@@ -115,13 +116,14 @@ export default class APIZKProvider extends APIProvider {
     getBalances = async () => {
         const account = await this.getAccountState()
         const balances = {}
-        
+
         Object.keys(this.api.currencies).forEach(ticker => {
             const currency = this.api.currencies[ticker]
             const balance = ((account && account.committed) ? (account.committed.balances[ticker] || 0) : 0)
             balances[ticker] = {
                 value: balance,
                 valueReadable: balance && (balance / (10 ** currency.decimals)),
+                allowance: MAX_ALLOWANCE,
             }
         })
 

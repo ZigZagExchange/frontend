@@ -24,6 +24,7 @@
   border-radius: 5px;
   width: 100%;
   justify-content: center;
+  position: relative;
   color: white;
   font-size: 0.9rem;
   outline: none;
@@ -31,6 +32,10 @@
 
 .bg_btn > img {
   margin-right: 10px;
+}
+
+.btn_loader {
+  position: absolute;
 }
 
 .bg_err {
@@ -49,6 +54,12 @@
 .zig_disabled {
   opacity: 0.6;
   pointer-events: none;
+}
+
+.zig_btn_loading {
+  opacity: 1;
+  pointer-events: none;
+  background: linear-gradient(to right, #447891, #4a7c85, #486a63);
 }
 
 .zig_btn_icon {

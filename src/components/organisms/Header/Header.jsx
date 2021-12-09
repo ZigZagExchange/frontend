@@ -14,6 +14,7 @@ import './Header.css'
 export const Header = (props) => {
   // state to open or close the sidebar in mobile
   const [show, setShow] = useState(false)
+  const [connecting, setConnecting] = useState(false)
   const user = useSelector(userSelector)
   const network = useSelector(networkSelector)
 
@@ -59,6 +60,13 @@ export const Header = (props) => {
       <MenuItem key="signOut">Disconnect</MenuItem>
     </Menu>
   )
+
+  const connect = () => {
+    setConnecting(true)
+    api.signIn(network)
+      .then(() => setConnecting(false))
+      .catch(() => setConnecting(false))
+  }
 
   return (
     <>
@@ -115,9 +123,9 @@ export const Header = (props) => {
                     </button>
                   </Dropdown>
                 ) : (
-                  <button className="bg_btn" onClick={() => api.signIn(network)}>
+                  <Button loading={connecting} className="bg_btn" onClick={connect}>
                     <img src={darkPlugHead} alt="..." /> CONNECT WALLET
-                  </button>
+                  </Button>
                 )}
               </div>
               <div className="eu_text">
@@ -186,9 +194,10 @@ export const Header = (props) => {
             ) : (
               <Button
                 className="bg_btn"
+                loading={connecting}
                 text="CONNECT WALLET"
                 img={darkPlugHead}
-                onClick={() => api.signIn(network)}
+                onClick={connect}
               />
             )}
             <div className="eu_text">

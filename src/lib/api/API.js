@@ -5,6 +5,7 @@ import Emitter from 'tiny-emitter'
 import { ethers } from 'ethers'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import erc20ContractABI from 'lib/contracts/ERC20.json'
+import { MAX_ALLOWANCE } from './constants'
 
 export default class API extends Emitter {
     networks = {}
@@ -23,6 +24,7 @@ export default class API extends Emitter {
                 this.networks[k] = [
                     networks[k][0],
                     new networks[k][1](this, networks[k][0]),
+                    networks[k][2],
                 ]
             })
         }
@@ -221,16 +223,42 @@ export default class API extends Emitter {
         return this.apiProvider[method] && !this.apiProvider[method].notImplemented
     }
 
-    getBalanceOfCurrency = async (currency) => {
-        try {
+    getNetworkContract = () => {
+        return this.networks[this.getNetworkName(this.apiProvider.network)][2]
+    }
+
+    approveSpendOfCurrency = async (currency) => {
+        const netContract = this.getNetworkContract()
+        if (netContract) {
             const [account] = await this.web3.eth.getAccounts()
-            if (currency === 'ETH') return this.web3.eth.getBalance(account)
             const { contractAddress } = this.currencies[currency].chain[this.apiProvider.network]
             const contract = new this.web3.eth.Contract(erc20ContractABI, contractAddress)
-            const result = await contract.methods.balanceOf(account).call()
+            await contract.methods.approve(netContract, MAX_ALLOWANCE).send({ from: account })
+        }
+    }
+
+    getBalanceOfCurrency = async (currency) => {
+        let result = { balance: 0, allowance: MAX_ALLOWANCE }
+        if (!this.ethersProvider) return result
+        try {
+            const netContract = this.getNetworkContract()
+            const [account] = await this.web3.eth.getAccounts()
+            if (currency === 'ETH') {
+                result.balance = await this.web3.eth.getBalance(account)
+                return result
+            }
+            const { contractAddress } = this.currencies[currency].chain[this.apiProvider.network]
+            const contract = new this.web3.eth.Contract(erc20ContractABI, contractAddress)
+            result.balance = await contract.methods.balanceOf(account).call()
+            if (netContract) {
+                result.allowance = ethers.BigNumber.from(
+                    await contract.methods.allowance(account, netContract).call()
+                )
+            }
             return result
         } catch (e) {
-            return 0
+            console.log(e)
+            return result
         }
     }
 
@@ -238,20 +266,24 @@ export default class API extends Emitter {
         const balances = {}
         
         for (const [ticker, currency] of Object.entries(this.currencies)) {
-            const value = await this.getBalanceOfCurrency(ticker)
+            const { balance, allowance } = await this.getBalanceOfCurrency(ticker)
             balances[ticker] = {
-                value,
+                value: balance,
+                allowance,
                 valueReadable: parseFloat(
-                    value / Math.pow(10, currency.decimals)
+                    balance / Math.pow(10, currency.decimals)
                 ).toFixed(Math.min(5, currency.decimals)),
             }
         }
-
+        
+        this.emit('balanceUpdate', 'wallet', balances)
         return balances
     }
 
     getBalances = async () => {
-        return this.apiProvider.getBalances()
+        const balances = await this.apiProvider.getBalances()
+        this.emit('balanceUpdate', this.apiProvider.network, balances)
+        return balances
     }
 
     getOrderDetailsWithoutFee = (order) => {
