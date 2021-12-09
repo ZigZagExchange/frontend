@@ -220,7 +220,7 @@ export const authSlice = createSlice({
             style={{ color: 'white', textDecoration: 'underline', fontWeight: 'bold' }}
             target="_blank"
             rel="noreferrer">
-              Withdraw FAQ
+              Bridge FAQ
           </a>
           <br />
           <a href={txUrl}
