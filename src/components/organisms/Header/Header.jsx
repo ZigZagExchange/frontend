@@ -196,9 +196,10 @@ export const Header = (props) => {
                   
                 </div>
           <div className="head_right">
-            <div className="eu_text">
+            <label for="networkSelector" className="eu_text">
                 <GoGlobe className="eu_network" />
                 <select
+                  id="networkSelector"
                   defaultValue={network.toString()}
                   onChange={(e) => api.setAPIProvider(parseInt(e.target.value))}
                 >
@@ -207,7 +208,7 @@ export const Header = (props) => {
                   <option value="1001">Starknet</option>
                 </select>
                 <BiChevronDown className="eu_caret" />
-              </div>
+              </label>
             <div className="head_account_area">
               {user.id && user.address ? (
                 <Dropdown overlay={dropdownMenu}>
