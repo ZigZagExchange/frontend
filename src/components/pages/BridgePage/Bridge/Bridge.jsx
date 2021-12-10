@@ -68,8 +68,8 @@ const Bridge = () => {
     _setSwapDetails(details);
 
     const bals = transfer.type === 'deposit' ? walletBalances : zkBalances
-    const detailBalance = parseFloat((bals[details.currency] && bals[details.currency].valueReadable) || 0)
-    const input = parseFloat(details.amount || 0)
+    const detailBalance = parseFloat(bals[details.currency] && bals[details.currency].valueReadable) || 0
+    const input = parseFloat(details.amount) || 0
 
     if (details.amount && details.amount.length > 0) {
       if (input < 0.001) {
@@ -78,7 +78,9 @@ const Bridge = () => {
         setFormErr(`Must be more than ${activationFee} ${swapDetails.currency}`)
       } else if (input > detailBalance) {
         setFormErr('Insufficient balance')
-      } 
+      } else {
+        setFormErr('')
+      }
     } else {
       setFormErr('')
     }

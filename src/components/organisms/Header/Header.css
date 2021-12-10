@@ -106,6 +106,7 @@ header.bridge_header {
 }
 
 .eu_text .eu_network {
+    pointer-events: none;
     font-size: 15px;
     display: block;
     width: 15px;
@@ -115,6 +116,7 @@ header.bridge_header {
     top: 10px;
 }
 .eu_text .eu_caret {
+    pointer-events: none;
     position: relative;
     margin-left: -28px;
     margin-right: 10px;
@@ -158,6 +160,10 @@ header.bridge_header {
 }
 
 @media screen and (max-width: 991px) {
+    #networkSelector {
+        width: 0;
+        opacity: 0.01;
+    }
     .dex_h {
         display: none !important;
     }
