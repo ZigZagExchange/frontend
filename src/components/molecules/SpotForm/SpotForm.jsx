@@ -264,7 +264,7 @@ export class SpotForm extends React.Component {
         const quoteCurrency = this.props.currentMarket.split("-")[1];
 
         let baseBalance, quoteBalance;
-        if (this.props.id) {
+        if (this.props.user.id) {
             baseBalance = this.getBaseBalance();
             quoteBalance = this.getQuoteBalance();
         } else {
