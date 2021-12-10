@@ -165,7 +165,7 @@ export default class API extends Emitter {
         }
         let accountState;
         try {
-            accountState = await this.apiProvider.signIn(network)
+            accountState = await this.apiProvider.signIn()
         } catch (e) {
             console.error(e);
             toast.error(e);
@@ -175,7 +175,7 @@ export default class API extends Emitter {
         if (accountState) {
             this.send('login', [
                 network,
-                accountState.id.toString(),
+                accountState.id && accountState.id.toString(),
             ])
 
             this.emit('signIn', accountState)
@@ -184,7 +184,7 @@ export default class API extends Emitter {
         return accountState
     }
 
-    signOut = () => {
+    signOut = async () => {
         this.emit('signOut')
     }
     

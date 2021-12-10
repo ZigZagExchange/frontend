@@ -50,14 +50,17 @@ export default class APIZKProvider extends APIProvider {
         } else if (balances.WBTC && balances.WBTC > 0.0003e8) {
             feeToken = "WBTC";
         } else {
-            toast.warn("Your token balances are very low. You might need to Bridge in more funds first");
+            toast.warn("Your token balances are very low. You might need to bridge in more funds first.");
             feeToken = "ETH";
         }
-        const changeAction = await this.syncWallet.setSigningKey({
+        const signingKey = await this.syncWallet.setSigningKey({
             feeToken,
             ethAuthType: "ECDSALegacyMessage",
         });
-        return await changeAction.awaitReceipt();
+
+        await signingKey.awaitReceipt();
+
+        return signingKey;
     }
 
     submitOrder = async (product, side, price, amount) => {
@@ -199,17 +202,17 @@ export default class APIZKProvider extends APIProvider {
         const { seed, ethSignatureType } = await this.genSeed(this.ethWallet);
         const syncSigner = await zksync.Signer.fromSeed(seed);
         this.syncWallet = await zksync.Wallet.fromEthSigner(this.ethWallet, this.syncProvider, syncSigner, undefined, ethSignatureType)        
-        const accountState = await this.syncWallet.getAccountState()        
+        const accountState = await this.api.getAccountState()        
+
         if (!accountState.id) {
             toast.error(
-                "Account not found. Please use the Bridge to deposit funds before trying again."
+                "Account not found. Please use the bridge to deposit funds before trying again."
             );
-            throw new Error("Account does not exist");
-        }
-        const signingKeySet = await this.syncWallet.isSigningKeySet()
-        
-        if (! signingKeySet) {
-            await this.changePubKey();
+        } else {
+            const signingKeySet = await this.syncWallet.isSigningKeySet()
+            if (! signingKeySet) {
+                await this.changePubKey();
+            }
         }
 
         return accountState

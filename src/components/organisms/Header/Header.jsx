@@ -1,4 +1,7 @@
 import { useSelector } from 'react-redux'
+import { useHistory, useLocation } from 'react-router-dom'
+import { BiChevronDown } from 'react-icons/bi'
+import { GoGlobe } from 'react-icons/go'
 import React, { useEffect, useMemo, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { Button, Dropdown, Menu, MenuItem } from 'components'
@@ -17,6 +20,8 @@ export const Header = (props) => {
   const [connecting, setConnecting] = useState(false)
   const user = useSelector(userSelector)
   const network = useSelector(networkSelector)
+  const history = useHistory()
+  const location = useLocation()
 
   const [walletLink, bridgeLink] = useMemo(() => {
     switch (network) {
@@ -64,7 +69,12 @@ export const Header = (props) => {
   const connect = () => {
     setConnecting(true)
     api.signIn(network)
-      .then(() => setConnecting(false))
+      .then(state => {
+        if (!state.id && !/^\/bridge(\/.*)?/.test(location.pathname)) {
+          history.push('/bridge')
+        }
+        setConnecting(false)
+      })
       .catch(() => setConnecting(false))
   }
 
@@ -115,7 +125,7 @@ export const Header = (props) => {
             <div className="head_right">
               <div className="d-flex align-items-center justify-content-between">
                 <img src={settingIcon} alt="..." />
-                {user.address ? (
+                {user.id && user.address ? (
                   <Dropdown overlay={dropdownMenu}>
                     <button className="address_button">
                       {user.address.slice(0, 6)}...
@@ -129,6 +139,7 @@ export const Header = (props) => {
                 )}
               </div>
               <div className="eu_text">
+                <GoGlobe className="eu_network" />
                 <select
                   defaultValue={network.toString()}
                   onChange={(e) => api.setAPIProvider(parseInt(e.target.value))}
@@ -137,6 +148,7 @@ export const Header = (props) => {
                   <option value="1000">zkSync - Rinkeby</option>
                   <option value="1001">Starknet Goerli</option>
                 </select>
+                <BiChevronDown className="eu_caret" />
               </div>
             </div>
           </div>
@@ -184,31 +196,35 @@ export const Header = (props) => {
                   
                 </div>
           <div className="head_right">
-            {user.address ? (
-              <Dropdown overlay={dropdownMenu}>
-                <button className="address_button">
-                  {user.address.slice(0, 6)}...
-                  {user.address.slice(-4)}
-                </button>
-              </Dropdown>
-            ) : (
-              <Button
-                className="bg_btn"
-                loading={connecting}
-                text="CONNECT WALLET"
-                img={darkPlugHead}
-                onClick={connect}
-              />
-            )}
             <div className="eu_text">
-              <select
-                defaultValue={network.toString()}
-                onChange={(e) => api.setAPIProvider(parseInt(e.target.value))}
-              >
-                <option value="1">zkSync - Mainnet</option>
-                <option value="1000">zkSync - Rinkeby</option>
-                <option value="1001">Starknet</option>
-              </select>
+                <GoGlobe className="eu_network" />
+                <select
+                  defaultValue={network.toString()}
+                  onChange={(e) => api.setAPIProvider(parseInt(e.target.value))}
+                >
+                  <option value="1">zkSync - Mainnet</option>
+                  <option value="1000">zkSync - Rinkeby</option>
+                  <option value="1001">Starknet</option>
+                </select>
+                <BiChevronDown className="eu_caret" />
+              </div>
+            <div className="head_account_area">
+              {user.id && user.address ? (
+                <Dropdown overlay={dropdownMenu}>
+                  <button className="address_button">
+                    {user.address.slice(0, 6)}...
+                    {user.address.slice(-4)}
+                  </button>
+                </Dropdown>
+              ) : (
+                <Button
+                  className="bg_btn"
+                  loading={connecting}
+                  text="CONNECT WALLET"
+                  img={darkPlugHead}
+                  onClick={connect}
+                />
+              )}
             </div>
           </div>
         </div>

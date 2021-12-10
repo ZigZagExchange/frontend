@@ -75,7 +75,7 @@ export class SpotForm extends React.Component {
             return;
         }
         let baseBalance, quoteBalance;
-        if (this.props.user.address) {
+        if (this.props.user.id) {
             baseBalance = this.getBaseBalance();
             quoteBalance = this.getQuoteBalance();
         } else {
@@ -147,7 +147,7 @@ export class SpotForm extends React.Component {
     }
 
     amountPercentOfMax() {
-        if (!this.props.user.address) return 0;
+        if (!this.props.user.id) return 0;
 
         const baseCurrency = this.props.currentMarket.split("-")[0];
         const quoteCurrency = this.props.currentMarket.split("-")[1];
@@ -201,7 +201,7 @@ export class SpotForm extends React.Component {
     }
 
     rangeSliderHandler(e, val) {
-        if (!this.props.user.address) return false;
+        if (!this.props.id) return false;
 
         const newstate = { ...this.state };
         if (val === 100) {
@@ -264,7 +264,7 @@ export class SpotForm extends React.Component {
         const quoteCurrency = this.props.currentMarket.split("-")[1];
 
         let baseBalance, quoteBalance;
-        if (this.props.user.address) {
+        if (this.props.id) {
             baseBalance = this.getBaseBalance();
             quoteBalance = this.getQuoteBalance();
         } else {
@@ -318,7 +318,7 @@ export class SpotForm extends React.Component {
             <div className="spf_range">
               <RangeSlider value={this.amountPercentOfMax()} onChange={this.rangeSliderHandler.bind(this)} />
             </div>
-            {this.props.user.address ? (
+            {this.props.user.id ? (
               <div className="spf_btn">
                 <button
                   type="button"
