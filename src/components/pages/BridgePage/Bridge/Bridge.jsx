@@ -35,7 +35,7 @@ const Bridge = () => {
   const coinEstimator = useCoinEstimator()
   
   const currencyValue = coinEstimator(swapDetails.currency)
-  const activationFee = (user.address && !user.id ? (15 / currencyValue) : 0)
+  const activationFee = parseFloat((user.address && !user.id ? (15 / currencyValue) : 0).toFixed(5))
   const estimatedValue = (+swapDetails.amount * coinEstimator(swapDetails.currency) || 0)
 
   useEffect(() => {
@@ -74,7 +74,7 @@ const Bridge = () => {
     if (input === 0) {
       setFormErr('')
     } else if (input <= activationFee) {
-      setFormErr(`Must be more than ${+activationFee.toFixed(5)} ${swapDetails.currency}`)
+      setFormErr(`Must be more than ${activationFee} ${swapDetails.currency}`)
     } else if (input < 0.001 && details.amount !== '') {
       setFormErr('Must be at least 0.001')
     } else if (input > detailBalance) {
@@ -213,7 +213,7 @@ const Bridge = () => {
             </div>
           ) : (
             <div className="bridge_transfer_fee">
-              One-Time Activation Fee: (~$15.00)
+              One-Time Activation Fee: ${activationFee} ${swapDetails.currency} (~$15.00)
             </div>
           )}
           <div className="bridge_button">
