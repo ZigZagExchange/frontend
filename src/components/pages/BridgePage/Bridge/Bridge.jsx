@@ -71,14 +71,14 @@ const Bridge = () => {
     const detailBalance = parseFloat((bals[details.currency] && bals[details.currency].valueReadable) || 0)
     const input = parseFloat(details.amount || 0)
 
-    if (input === 0) {
-      setFormErr('')
-    } else if (input <= activationFee) {
-      setFormErr(`Must be more than ${activationFee} ${swapDetails.currency}`)
-    } else if (input < 0.001 && details.amount !== '') {
-      setFormErr('Must be at least 0.001')
-    } else if (input > detailBalance) {
-      setFormErr('Insufficient balance')
+    if (details.amount && details.amount.length > 0) {
+      if (input < 0.001) {
+        setFormErr('Must be at least 0.001')
+      } else if (input <= activationFee) {
+        setFormErr(`Must be more than ${activationFee} ${swapDetails.currency}`)
+      } else if (input > detailBalance) {
+        setFormErr('Insufficient balance')
+      } 
     } else {
       setFormErr('')
     }
