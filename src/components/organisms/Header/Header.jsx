@@ -116,6 +116,11 @@ export const Header = (props) => {
                     )}
                 </li>
                 <li>
+                  <NavLink exact to="/pool" activeClassName="active_link">
+                    Pool
+                  </NavLink>
+                </li>
+                <li>
                   <a href={walletLink} target="_blank" rel="noreferrer">
                     Wallet
                   </a>
@@ -175,6 +180,11 @@ export const Header = (props) => {
                     // eslint-disable-next-line
                     <a rel="noreferrer">Bridge</a>
                   )}
+              </li>
+              <li>
+                <NavLink exact to="/pool" activeClassName="active_link">
+                  Pool
+                </NavLink>
               </li>
               <li>
                 <a href={walletLink} target="_blank" rel="noreferrer">Wallet</a>
