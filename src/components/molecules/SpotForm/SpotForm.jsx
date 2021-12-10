@@ -312,7 +312,7 @@ export class SpotForm extends React.Component {
             </div>
             <div className="spf_input_box">
               <span className="spf_desc_text">Amount</span>
-              <input type="text" value={this.state.amount} onChange={this.updateAmount.bind(this)}/>
+              <input type="text" value={this.state.amount} placeholder="0.00" onChange={this.updateAmount.bind(this)}/>
               <span>{baseCurrency}</span>
             </div>
             <div className="spf_range">
