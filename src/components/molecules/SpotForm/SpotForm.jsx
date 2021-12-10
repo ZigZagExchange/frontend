@@ -201,7 +201,7 @@ export class SpotForm extends React.Component {
     }
 
     rangeSliderHandler(e, val) {
-        if (!this.props.id) return false;
+        if (!this.props.user.id) return false;
 
         const newstate = { ...this.state };
         if (val === 100) {
