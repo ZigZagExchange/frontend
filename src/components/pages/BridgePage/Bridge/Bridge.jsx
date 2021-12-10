@@ -223,7 +223,7 @@ const Bridge = () => {
               img={darkPlugHead}
               onClick={() => api.signIn(network)}
             />}
-            {user.address && !hasAllowance && <Button
+            {user.address && balances[swapDetails.currency] && !hasAllowance && <Button
               loading={isApproving}
               className={cx("bg_btn", { zig_disabled: formErr.length > 0 || swapDetails.amount.length === 0, })}
               text="APPROVE"
