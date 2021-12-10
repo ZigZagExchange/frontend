@@ -197,13 +197,57 @@
   border-bottom-right-radius: 10px;
 }
 
+.bridge_connected_as {
+  font-size: 12px;
+  margin-top: auto;
+  margin-bottom: 10px;
+  padding: 10px 15px;
+  display: flex;
+  justify-content: center;
+  flex: 0 0 auto;
+  color: rgba(255, 255, 255, 0.5);
+  align-items: center;
+}
+
+.bridge_disconnect {
+  display: inline-block;
+  font-size: 18px;
+  line-height: 12px;
+  margin-left: 6px;
+}
+
+.bridge_disconnect > a {
+  display: inline-block;
+  margin-left: 2px;
+  font-size: 12px;
+  color: #69f;
+}
+
+.bridge_disconnect > a:hover {
+  color: #09aaf5;
+}
+
+.bridge_bubble_connected,
+.bridge_bubble_disconnected {
+  width: 6px;
+  height: 6px;
+  border-radius: 6px;
+  background: #c00;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.bridge_bubble_connected {
+  background: #0c0;
+}
+
 .bridge_container {
   width: 100%;
   margin: 0 auto;
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
 }
 
@@ -213,7 +257,7 @@
   background: rgba(0, 0, 0, 0.2);
   border-radius: 24px;
   color: #94a2c9;
-  margin-bottom: 5%;
+  margin-bottom: 15px;
 }
 
 .bridge_box_bottom,

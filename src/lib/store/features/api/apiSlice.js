@@ -216,18 +216,17 @@ export const authSlice = createSlice({
           {' '}{amount} {token}
           {' '}{type === 'deposit' ? 'in your zSync wallet' : 'into your Ethereum wallet. Withdraws can take up to 7 hours to complete'}.
           <br /><br />
-          <a href="https://zksync.io/faq/faq.html#how-long-are-withdrawal-times"
-            style={{ color: 'white', textDecoration: 'underline', fontWeight: 'bold' }}
-            target="_blank"
-            rel="noreferrer">
-              Bridge FAQ
-          </a>
-          <br />
           <a href={txUrl}
             style={{ color: 'white', textDecoration: 'underline', fontWeight: 'bold' }}
             target="_blank"
             rel="noreferrer">
               View transaction
+          </a>{' • '}
+          <a href="https://zksync.io/faq/faq.html#how-long-are-withdrawal-times"
+            style={{ color: 'white', textDecoration: 'underline', fontWeight: 'bold' }}
+            target="_blank"
+            rel="noreferrer">
+              Bridge FAQ
           </a>
         </>
       )

@@ -10,6 +10,18 @@ header {
     position: relative;
 }
 
+header.bridge_header {
+    background: #1c2231;
+}
+
+.bridge_header .head_left ul li a.active_link {
+    color: #08aff3;
+}
+
+.bridge_header .head_left ul li a.active_link:after {
+    display: none;
+}
+
 .mobile_header,
 .mb_h {
     display: none;
@@ -68,14 +80,59 @@ header {
 }
 
 .eu_text {
+    display: flex;
+    align-items: stretch;
+    justify-content: stretch;
     margin: 0 20px;
-}
-.eu_text select {
-    background: #191c28;
+    background: rgba(0, 0, 0, 0.4);
+    border: 0;
+    border-radius: 20px;
     color: #08aff3;
-    border: 1px solid #08aff3;
-    border-radius: 10px;
-    padding: 10px;
+}
+
+.eu_text select {
+    -webkit-appearance: none;
+    text-align: center;
+    background: none;
+    border: none;
+    appearance: none;
+    color: inherit;
+    border-radius: 20px;
+    font-size: 12px;
+    line-height: 1;
+    height: 36px;
+    padding: 10px 30px 10px 38px;
+    margin: 0;
+}
+
+.eu_text .eu_network {
+    font-size: 15px;
+    display: block;
+    width: 15px;
+    margin-right: -30px;
+    margin-left: 15px;
+    position: relative;
+    top: 10px;
+}
+.eu_text .eu_caret {
+    position: relative;
+    margin-left: -28px;
+    margin-right: 10px;
+    font-size: 17px;
+    top: 9px;
+}
+
+.bridge_header .eu_text {
+    margin-right: 0;
+}
+
+.eu_text select:hover {
+    box-shadow: 0 0 3px 1px rgba(8, 175, 243, 0.8);
+}
+
+.eu_text select:focus {
+    box-shadow: 0 0 3px 1px rgba(8, 175, 243, 1);
+    outline: 0;
 }
 
 .eu_text span {
@@ -104,6 +161,7 @@ header {
     .dex_h {
         display: none !important;
     }
+    
     .mb_h {
         display: flex;
     }

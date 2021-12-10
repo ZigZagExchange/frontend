@@ -33,6 +33,10 @@ const Bridge = () => {
   const [swapDetails, _setSwapDetails] = useState(() => ({ amount: '', currency: 'ETH' }));
   const currencies = useMemo(() => null, [transfer.type])
   const coinEstimator = useCoinEstimator()
+  
+  const currencyValue = coinEstimator(swapDetails.currency)
+  const activationFee = (user.address && !user.id ? (15 / currencyValue) : 0)
+  const estimatedValue = (+swapDetails.amount * coinEstimator(swapDetails.currency) || 0)
 
   useEffect(() => {
     api.getBalances().then(newBalances => {
@@ -60,14 +64,18 @@ const Bridge = () => {
       ...swapDetails,
       ...values,
     };
-    
+
     _setSwapDetails(details);
 
     const bals = transfer.type === 'deposit' ? walletBalances : zkBalances
     const detailBalance = parseFloat((bals[details.currency] && bals[details.currency].valueReadable) || 0)
     const input = parseFloat(details.amount || 0)
 
-    if (input < 0.001 && details.amount !== '') {
+    if (input === 0) {
+      setFormErr('')
+    } else if (input <= activationFee) {
+      setFormErr(`Must be more than ${+activationFee.toFixed(5)} ${swapDetails.currency}`)
+    } else if (input < 0.001 && details.amount !== '') {
       setFormErr('Must be at least 0.001')
     } else if (input > detailBalance) {
       setFormErr('Insufficient balance')
@@ -78,10 +86,16 @@ const Bridge = () => {
 
   const switchTransferType = e => {
     if (e) e.preventDefault()
-    setTransfer({ type: transfer.type === 'deposit' ? 'withdraw' : 'deposit' })
-    setSwapDetails({ amount: '', currency: 'ETH' })
+    transfer.type = transfer.type === 'deposit' ? 'withdraw' : 'deposit'
+    setTransfer(transfer)
+    setSwapDetails({})
   }
-  
+
+  const disconnect = () => {
+    api.signOut()
+      .catch(err => console.log(err))
+  }
+
   const ethLayer1Header = (
     <div className="bridge_coin_details">
       <div className="bridge_coin_image" style={{ background: '#fff' }}>
@@ -103,7 +117,7 @@ const Bridge = () => {
     </div>
   )
 
-  const balances = transfer.type === 'deposit' ? walletBalances : zkBalances 
+  const balances = transfer.type === 'deposit' ? walletBalances : zkBalances
   const altBalances = transfer.type === 'deposit' ? zkBalances : walletBalances
   const hasAllowance = balances[swapDetails.currency] && balances[swapDetails.currency].allowance.gte(MAX_ALLOWANCE.div(3))
   const hasError = formErr && formErr.length > 0
@@ -145,85 +159,106 @@ const Bridge = () => {
   }
 
   return (
-    <div className="bridge_box">
-      <div className="bridge_box_top">
-        <div className="bridge_coin_title">
-          <h5>FROM</h5>
-          {transfer.type === 'withdraw' ? zkSyncLayer2Header : ethLayer1Header}
-        </div>
-        <BridgeSwapInput balances={balances} currencies={currencies} value={swapDetails} onChange={setSwapDetails} />
-        <div className="bridge_coin_stats">
-          <div className="bridge_coin_stat">
-            <h5>Estimated value</h5>
-            <span>~${formatUSD((+swapDetails.amount * coinEstimator(swapDetails.currency) || 0))}</span>
+    <>
+      <div className="bridge_box">
+        <div className="bridge_box_top">
+          <div className="bridge_coin_title">
+            <h5>FROM</h5>
+            {transfer.type === 'withdraw' ? zkSyncLayer2Header : ethLayer1Header}
           </div>
-          <div className="bridge_coin_stat">
-            <h5>Available balance</h5>
-            <span>
-              {balances[swapDetails.currency] && balances[swapDetails.currency].valueReadable}
-              {` ${swapDetails.currency}`}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div className="bridge_box_bottom">
-        <div className="bridge_box_swap_wrapper">
-          <SwapButton onClick={switchTransferType} />
-          <h5>Switch</h5>
-        </div>
-
-        <div className="bridge_coin_stats">
-          <div className="bridge_coin_stat">
-            <div className="bridge_coin_details">
-              <div className="bridge_coin_title">
-                <h5>TO</h5>
-                {transfer.type !== 'withdraw' ? zkSyncLayer2Header : ethLayer1Header}
-              </div>
+          <BridgeSwapInput balances={balances} currencies={currencies} value={swapDetails} onChange={setSwapDetails} />
+          <div className="bridge_coin_stats">
+            <div className="bridge_coin_stat">
+              <h5>Estimated value</h5>
+              <span>~${formatUSD(estimatedValue)}</span>
+            </div>
+            <div className="bridge_coin_stat">
+              <h5>Available balance</h5>
+              <span>
+                {balances[swapDetails.currency] && balances[swapDetails.currency].valueReadable}
+                {` ${swapDetails.currency}`}
+              </span>
             </div>
           </div>
-          <div className="bridge_coin_stat">
-            <h5>Available balance</h5>
-            <span>
-              {altBalances[swapDetails.currency] && altBalances[swapDetails.currency].valueReadable}
-                {` ${swapDetails.currency}`}
-            </span>
-          </div>
         </div>
 
-        <div className="bridge_transfer_fee">
-          Bridge Tax: 0%
-          {' '}(0 {swapDetails.currency})
-        </div>
-        <div className="bridge_button">
-          {!user.id && <Button
-            className="bg_btn"
-            text="CONNECT WALLET"
-            img={darkPlugHead}
-            onClick={() => api.signIn(network)}
-          />}
-          {user.id && !hasAllowance && <Button
-            loading={isApproving}
-            className={cx("bg_btn", { zig_disabled: formErr.length > 0 || swapDetails.amount.length === 0, })}
-            text="APPROVE"
-            style={{ marginBottom: 10 }}
-            onClick={approveSpend}
-          />}
-          {user.id && hasError && <Button
-            className="bg_btn zig_btn_disabled bg_err"
-            text={formErr}
-            icon={<BiError />}
-          />}
-          {user.id && !hasError && <Button
-            loading={loading}
-            className={cx("bg_btn", { zig_disabled: !hasAllowance || swapDetails.amount.length === 0 })}
-            text="TRANSFER"
-            icon={<MdSwapCalls />}
-            onClick={doTransfer}
-          />}
+        <div className="bridge_box_bottom">
+          <div className="bridge_box_swap_wrapper">
+            <SwapButton onClick={switchTransferType} />
+            <h5>Switch</h5>
+          </div>
+
+          <div className="bridge_coin_stats">
+            <div className="bridge_coin_stat">
+              <div className="bridge_coin_details">
+                <div className="bridge_coin_title">
+                  <h5>TO</h5>
+                  {transfer.type !== 'withdraw' ? zkSyncLayer2Header : ethLayer1Header}
+                </div>
+              </div>
+            </div>
+            <div className="bridge_coin_stat">
+              <h5>Available balance</h5>
+              <span>
+                {altBalances[swapDetails.currency] && altBalances[swapDetails.currency].valueReadable}
+                {` ${swapDetails.currency}`}
+              </span>
+            </div>
+          </div>
+
+          {!user.address || user.id ? (
+            <div className="bridge_transfer_fee">
+              Bridge Tax: 0%
+              {' '}(0 {swapDetails.currency})
+            </div>
+          ) : (
+            <div className="bridge_transfer_fee">
+              One-Time Activation Fee: (~$15.00)
+            </div>
+          )}
+          <div className="bridge_button">
+            {!user.address && <Button
+              className="bg_btn"
+              text="CONNECT WALLET"
+              img={darkPlugHead}
+              onClick={() => api.signIn(network)}
+            />}
+            {user.address && !hasAllowance && <Button
+              loading={isApproving}
+              className={cx("bg_btn", { zig_disabled: formErr.length > 0 || swapDetails.amount.length === 0, })}
+              text="APPROVE"
+              style={{ marginBottom: 10 }}
+              onClick={approveSpend}
+            />}
+            {user.address && hasError && <Button
+              className="bg_btn zig_btn_disabled bg_err"
+              text={formErr}
+              icon={<BiError />}
+            />}
+            {user.address && !hasError && <Button
+              loading={loading}
+              className={cx("bg_btn", { zig_disabled: !hasAllowance || swapDetails.amount.length === 0 })}
+              text="TRANSFER"
+              icon={<MdSwapCalls />}
+              onClick={doTransfer}
+            />}
+          </div>
         </div>
       </div>
-    </div>
+      {user.address ? (
+        <div className="bridge_connected_as">
+          <span className="bridge_bubble_connected" />
+          {' '}Connected as {`${user.address.substr(0, 6)}...${user.address.substr(-5)}`}
+          <span onClick={disconnect} className="bridge_disconnect">{' • '}<a href="#disconnect">Disconnect</a></span>
+        </div>
+      ) : (
+        <div className="bridge_connected_as">
+          <span className="bridge_bubble_disconnected" />
+          Disconnected
+        </div>
+      )}
+    </>
+
   )
 }
 

@@ -17,7 +17,7 @@ const BridgeReceipts = () => {
                 {receipts.length === 0 && <h5 style={{ padding: 26 }}>No bridge receipts yet.</h5>}
                 {receipts.map((r) => (
                     <div onClick={() => window.open(r.txUrl)} key={r.txId} className="bridge_box_transaction">
-                        <div class="bridge_contain">
+                        <div className="bridge_contain">
                             <div className={`bridge_box_transaction_txType_${r.type}`}>
                                 {r.type}
                             </div>

@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { useSelector } from 'react-redux';
 import { useParams, Link } from 'react-router-dom'
 import { networkSelector } from 'lib/store/features/api/apiSlice';
-import { DefaultTemplate } from 'components';
+import { BridgeTemplate } from 'components';
 import cx from 'classnames';
 import api from 'lib/api';
 import Bridge from './Bridge/Bridge'
@@ -16,7 +16,7 @@ export default function BridgePage() {
   const tab = useParams().tab || 'bridge'
 
   return (
-    <DefaultTemplate>
+    <BridgeTemplate>
       <div className="bridge_section">
         <div className="bridge_container">
           <div className="bridge_head_tabs">
@@ -30,6 +30,6 @@ export default function BridgePage() {
             : <BridgeIncompatible />}
         </div>
       </div>
-    </DefaultTemplate>
+    </BridgeTemplate>
   )
 }
