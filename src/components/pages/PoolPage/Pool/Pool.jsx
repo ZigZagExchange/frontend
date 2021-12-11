@@ -1,5 +1,6 @@
 import React from 'react'
 import { IoMdAddCircleOutline } from 'react-icons/io'
+import { HiOutlineArrowCircleUp } from 'react-icons/hi'
 import horizontalDots from 'assets/icons/threedot-horizontal-icon.png'
 import USDTImage from 'assets/images/currency/USDT.svg'
 import { Button, Dropdown, Menu, MenuItem } from 'components'
@@ -57,18 +58,25 @@ const Pool = () => {
                         </Dropdown>
                         
                     </div>
-                    <table>
-                        <tr>
-                            <th>STAKED</th>
-                            <th>TVL</th>
-                            <th>REWARDS</th>
-                        </tr>
-                        <tr>
-                            <td>50424.6 <strong>USDT</strong></td>
-                            <td>1.8B <strong>USDT</strong></td>
-                            <td>1245 <strong>ZZ</strong></td>
-                        </tr>
-                    </table>
+                    <div className="pool_table">
+                        <table>
+                            <tr>
+                                <th>STAKED</th>
+                                <th>TVL</th>
+                                <th>REWARDS</th>
+                                <th></th>
+                            </tr>
+                            <tr>
+                                <td>50424.6 <strong>USDT</strong></td>
+                                <td>1.8B <strong>USDT</strong></td>
+                                <td>1245 <strong>ZZ</strong></td>
+                                <td width="120"></td>
+                            </tr>
+                        </table>
+                        <Button className="bg_btn zig_btn_sm" style={{ width: 120 }}>
+                            <HiOutlineArrowCircleUp size={18} style={{ marginTop: -3 }} /> WITHDRAW
+                        </Button>
+                    </div>
                 </div>
             </div>
             :

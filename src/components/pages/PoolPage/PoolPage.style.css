@@ -51,6 +51,24 @@
   padding: 15px;
 }
 
+.pool_table {
+  flex: 1 1 auto;
+  position: relative;
+  width: 100%;
+}
+
+.pool_table {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.pool_table > .bg_btn {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
 .pool_box_top {
   display: flex;
   justify-content: space-between;
