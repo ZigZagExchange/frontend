@@ -1,5 +1,5 @@
 import React from 'react'
-import plusSignCircle from 'assets/icons/plus-sign-circle.png'
+import { IoMdAddCircleOutline } from 'react-icons/io'
 import horizontalDots from 'assets/icons/threedot-horizontal-icon.png'
 import USDTImage from 'assets/images/currency/USDT.svg'
 import { Button, Dropdown, Menu, MenuItem } from 'components'
@@ -40,8 +40,8 @@ const Pool = () => {
         <div className="pool_box">
             <div className="pool_box_top">
                 <h4>Mammoth Pool</h4>
-                <Button className="bg_btn" style={{ width: '160px', padding: '10px 5px' }}>
-                    <img src={plusSignCircle} alt="Deposit Tokens" /> Deposit Tokens
+                <Button className="bg_btn" style={{ width: '120px', padding: '10px 5px' }}>
+                    <IoMdAddCircleOutline size={18} style={{ marginTop: -3 }} /> DEPOSIT
                 </Button>
             </div>
             
@@ -59,13 +59,11 @@ const Pool = () => {
                     </div>
                     <table>
                         <tr>
-                            <th>BALANCE</th>
                             <th>STAKED</th>
                             <th>TVL</th>
                             <th>REWARDS</th>
                         </tr>
                         <tr>
-                            <td>12253.1 <strong>USDT</strong></td>
                             <td>50424.6 <strong>USDT</strong></td>
                             <td>1.8B <strong>USDT</strong></td>
                             <td>1245 <strong>ZZ</strong></td>

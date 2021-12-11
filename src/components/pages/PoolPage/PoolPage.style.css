@@ -60,7 +60,7 @@
 }
 
 .pool_box_top h4 {
-  font-size: 20px;
+  font-size: 18px;
   color: rgba(255,255,255,1);
   margin-left: 10px;
 }
@@ -110,6 +110,10 @@
 }
 
 .pool_liquidity_box_top h4 {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
   font-weight: bold;
   color: #E3E9FF;
   font-size: 18px;
@@ -126,6 +130,7 @@
 }
 
 .pool_badge {
+  margin-top: 1px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -147,7 +152,7 @@
 
 .pool_badge.databox_link {
   height: 20px;
-  margin-bottom: -20px;
+  margin-top: 4px;
   color: #69f;
   border: none;
   font-weight: 400;
@@ -166,7 +171,7 @@
   justify-content: center;
   background: rgba(0, 0, 0, 0.2);
   border-radius: 10px;
-  padding: 30px;
+  padding: 20px 10px 16px;
   color: #94a2c9;
   text-align: center;
   flex: 1;
@@ -188,5 +193,11 @@
 .pool_token_image {
   width: 18px;
   height: 18px;
-  margin-right: 5px;
+  margin-right: 8px;
+}
+
+@media (min-width: 992px) {
+  .pool_box_top h4 {
+    font-size: 20px;
+  }
 }
