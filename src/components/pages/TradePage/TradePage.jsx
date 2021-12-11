@@ -215,7 +215,10 @@ const TradePage = () => {
   ).length;
 
   let tradingViewMarket = currentMarket;
-  if (currentMarket === "WBTC-USDT") tradingViewMarket = "BTC-USDT";
+  const baseCurrency = currentMarket.split("-")[0];
+  const quoteCurrency = currentMarket.split("-")[1];
+  if (baseCurrency === "WBTC") tradingViewMarket = "BTC-" + quoteCurrency;
+  if (quoteCurrency === "WBTC") tradingViewMarket = baseCurrency + "-BTC";
 
   return (
     <DefaultTemplate>

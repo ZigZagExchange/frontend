@@ -64,6 +64,26 @@ const api = new API({
             },
             gasFee: 0.00003
         },
+        'FXS': {
+            image: require('assets/images/currency/WBTC.svg'),
+            name: 'Frax Shares',
+            decimals: 18,
+            chain: {
+                1: { tokenId: 120, contractAddress: '0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0'  },
+                1000: { tokenId: null, contractAddress: null  },
+            },
+            gasFee: 0.1
+        },
+        'FRAX': {
+            image: require('assets/images/currency/WBTC.svg'),
+            name: 'Frax',
+            decimals: 18,
+            chain: {
+                1: { tokenId: 92, contractAddress: '0x853d955acef822db058eb8505911ed77f175b99e'  },
+                1000: { tokenId: null, contractAddress: null  },
+            },
+            gasFee: 0.1
+        },
     },
     validMarkets: {
         // zkSync Mainnet
@@ -71,12 +91,14 @@ const api = new API({
             "ETH-USDT",
             "ETH-USDC",
             "ETH-DAI",
+            "ETH-WBTC",
             "USDC-USDT",
             "WBTC-USDT",
-            "WBTC-ETH",
+            "WBTC-USDC",
+            "WBTC-DAI",
             "DAI-USDT",
             "DAI-USDC",
-            //"FRAX-USDC",
+            "FXS-FRAX",
         ],
         // zkSync Rinkeby
         1000: [

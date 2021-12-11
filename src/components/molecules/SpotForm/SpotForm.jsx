@@ -21,6 +21,8 @@ export class SpotForm extends React.Component {
             USDT: 1,
             WBTC: 0.00001,
             DAI: 1,
+            FRAX: 1,
+            FXS: 0.1,
         };
     }
 
@@ -181,11 +183,11 @@ export class SpotForm extends React.Component {
             spread = 0.002;
             stableSpread = 0.0007;
         }
-        if (this.props.side === "b" && (["WBTC", "ETH"]).includes(baseCurrency))
+        if (this.props.side === "b" && (["WBTC", "ETH", "FXS"]).includes(baseCurrency))
             return parseFloat(
                 (this.props.lastPrice * (1 + spread)).toPrecision(6)
             );
-        else if (this.props.side === "s" && (["WBTC", "ETH"]).includes(baseCurrency))
+        else if (this.props.side === "s" && (["WBTC", "ETH", "FXS"]).includes(baseCurrency))
             return parseFloat(
                 (this.props.lastPrice * (1 - spread)).toPrecision(6)
             );
