@@ -120,6 +120,11 @@ export const Header = (props) => {
                     Wallet
                   </a>
                 </li>
+                <li>
+                  <a href="https://gitcoin.co/grants/4352/zigzag-exchange" target="_blank" rel="noreferrer">
+                    Donate
+                  </a>
+                </li>
               </ul>
             </div>
             <div className="head_right">
@@ -178,6 +183,9 @@ export const Header = (props) => {
               </li>
               <li>
                 <a href={walletLink} target="_blank" rel="noreferrer">Wallet</a>
+              </li>
+              <li>
+                <a href="https://gitcoin.co/grants/4352/zigzag-exchange" target="_blank" rel="noreferrer">Donate</a>
               </li>
             </ul>
           </div>
