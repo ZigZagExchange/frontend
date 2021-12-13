@@ -57,7 +57,7 @@ export const HeaderBridge = (props) => {
                 <a href="https://docs.zigzag.exchange/" target="_blank" rel="noreferrer">Docs</a>
               </li>
             </ul>
-            <label for="networkSelector" className="eu_text">
+            <label htmlFor="networkSelector" className="eu_text">
               <GoGlobe className="eu_network" />
               <select
                 id="networkSelector"

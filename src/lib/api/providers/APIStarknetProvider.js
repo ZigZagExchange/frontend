@@ -12,6 +12,10 @@ export default class APIStarknetProvider extends APIProvider {
         return this._accountState
     }
 
+    getProfile = () => {
+        return {}
+    }
+
     submitOrder = async (product, side, price, amount) => {
         // check allowance first
         const baseCurrency = product.split("-")[0];

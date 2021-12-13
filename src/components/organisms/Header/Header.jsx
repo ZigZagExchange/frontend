@@ -196,7 +196,7 @@ export const Header = (props) => {
                   
                 </div>
           <div className="head_right">
-            <label for="networkSelector" className="eu_text">
+            <label htmlFor="networkSelector" className="eu_text">
                 <GoGlobe className="eu_network" />
                 <select
                   id="networkSelector"

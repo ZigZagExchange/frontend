@@ -4,6 +4,7 @@ import { toast } from 'react-toastify'
 import { toBaseUnit } from 'lib/utils'
 import APIProvider from './APIProvider'
 import { MAX_ALLOWANCE } from '../constants'
+import axios from 'axios';
 
 export default class APIZKProvider extends APIProvider {
     static VALID_SIDES = ['b', 's']
@@ -11,6 +12,29 @@ export default class APIZKProvider extends APIProvider {
     ethWallet = null
     syncWallet = null
     syncProvider = null
+    _profiles = {}
+
+    getProfile = async (address) => {
+        if (this._profiles.hasOwnProperty(address)) {
+            return this._profiles[address]
+        }
+
+        if (!address) {
+            return {}
+        }
+
+        try {
+            const { data, status } = await axios.get(`https://ipfs.3box.io/profile?address=${address}`)
+            if (status === 200) {
+                return data
+            }
+        } catch (err) {
+            if (!err.statusCode) {
+                console.log(err)
+            }
+            return {}
+        }
+    }
 
     handleBridgeReceipt = (_receipt, amount, token, type) => {
         let receipt = { date: +(new Date()), network: this.network, amount, token, type }
