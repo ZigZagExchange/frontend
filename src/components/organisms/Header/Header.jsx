@@ -120,6 +120,11 @@ export const Header = (props) => {
                     Wallet
                   </a>
                 </li>
+                <li>
+                  <a href="https://gitcoin.co/grants/4352/zigzag-exchange" target="_blank" rel="noreferrer">
+                    Donate
+                  </a>
+                </li>
               </ul>
             </div>
             <div className="head_right">
@@ -179,6 +184,9 @@ export const Header = (props) => {
               <li>
                 <a href={walletLink} target="_blank" rel="noreferrer">Wallet</a>
               </li>
+              <li>
+                <a href="https://gitcoin.co/grants/4352/zigzag-exchange" target="_blank" rel="noreferrer">Donate</a>
+              </li>
             </ul>
           </div>
           <div className="head_left">
@@ -196,7 +204,7 @@ export const Header = (props) => {
                   
                 </div>
           <div className="head_right">
-            <label for="networkSelector" className="eu_text">
+            <label htmlFor="networkSelector" className="eu_text">
                 <GoGlobe className="eu_network" />
                 <select
                   id="networkSelector"

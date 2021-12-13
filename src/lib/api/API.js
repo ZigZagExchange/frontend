@@ -15,6 +15,8 @@ export default class API extends Emitter {
     ethersProvider = null
     currencies = null
     websocketUrl = null
+    _accountState = null
+    _accountStateLastChecked = 0
     
     constructor({ infuraId, websocketUrl, networks, currencies, validMarkets }) {
         super()
@@ -33,6 +35,7 @@ export default class API extends Emitter {
         this.websocketUrl = websocketUrl
         this.currencies = currencies
         this.validMarkets = validMarkets
+        
         this.setAPIProvider(this.networks.mainnet[0])
 
         if (window.ethereum) {
@@ -80,6 +83,31 @@ export default class API extends Emitter {
         this.emit('providerChange', network)
     }
 
+    getProfile = async (address) => {
+        const defaultProfile = {
+            description: null,
+            website: null,
+            image: null,
+        }
+
+        if (!address) {
+            return { ...defaultProfile }
+        }
+
+        try {
+            defaultProfile.address = address
+            defaultProfile.name = `${address.substr(0, 10)}..${address.substr(-10)}`
+            const profile = await this.apiProvider.getProfile(address)
+            
+            console.log({ profile })
+
+            return { ...defaultProfile, ...profile }
+        } catch (err) {
+            console.log(window.$profileErr = err)
+            return { ...defaultProfile }
+        }
+    }
+
     _socketOpen = () => {
         this.__pingServerTimeout = setInterval(this.ping, 5000)
         this.emit('open')
@@ -117,9 +145,14 @@ export default class API extends Emitter {
     }
 
     getAccountState = async () => {
-        const state = await this.apiProvider.getAccountState()
-        this.emit('accountState', state)
-        return state
+        if (!this._accountState || this._accountStateLastChecked + 3000 <= (new Date())) {
+            this._accountStateLastChecked = +(new Date())
+            this._accountState = await this.apiProvider.getAccountState()
+            this._accountState.profile = await this.getProfile(this._accountState.address)
+            this.emit('accountState', this._accountState)
+        }
+
+        return this._accountState
     }
 
     ping = () => this.send('ping')
@@ -163,6 +196,7 @@ export default class API extends Emitter {
             this.web3.setProvider(web3Provider)
             this.ethersProvider = new ethers.providers.Web3Provider(web3Provider)
         }
+        
         let accountState;
         try {
             accountState = await this.apiProvider.signIn()
