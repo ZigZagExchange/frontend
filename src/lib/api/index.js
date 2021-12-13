@@ -92,7 +92,7 @@ const api = new API({
                 1: { tokenId: 61, contractAddress: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'  },
                 1000: { tokenId: null, contractAddress: null  },
             },
-            gasFee: 0.1
+            gasFee: 0.0003
         },
     },
     validMarkets: {
