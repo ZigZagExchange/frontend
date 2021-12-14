@@ -124,10 +124,15 @@ export class Footer extends React.Component {
                 statusClass = "open";
                 break;
               case "c":
-              default:
                 statusText = "canceled";
                 statusClass = "canceled";
                 break;
+              case "e":
+                statusText = "expired";
+                statusClass = "expired";
+                break;
+              default:
+                break
             }
 
             return (
@@ -275,9 +280,14 @@ export class Footer extends React.Component {
                 statusClass = "open";
                 break;
               case "c":
-              default:
                 statusText = "canceled";
                 statusClass = "canceled";
+                break;
+              case "e":
+                statusText = "expired";
+                statusClass = "expired";
+                break;
+              default:
                 break;
             }
 
@@ -329,8 +339,6 @@ export class Footer extends React.Component {
       classNameOrders = "",
       classNameBalances = "",
       classNameFills = "";
-    const userOrdersSorted = Object.values(this.props.userOrders || []);
-    userOrdersSorted.sort((a, b) => b[1] - a[1]);
     switch (this.state.tab) {
       case "orders":
         footerContent = this.renderOrderTable(this.getUserOrders());

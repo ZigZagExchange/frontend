@@ -191,7 +191,6 @@ export const authSlice = createSlice({
         state.marketFills = {}
         state.marketSummary = {}
         state.liquidity = []
-        state.userOrders = {}
         state.orders = {}
         state.balances = {}
       }
@@ -201,6 +200,7 @@ export const authSlice = createSlice({
     },
     setNetwork(state, { payload }) {
       state.network = payload
+      state.userOrders = {}
     },
     clearBridgeReceipts(state) {
       state.bridgeReceipts = []
@@ -238,7 +238,6 @@ export const authSlice = createSlice({
       state.marketFills = {}
       state.marketSummary = {}
       state.liquidity = []
-      state.userOrders = {}
       state.orders = {}
       state.lastPrices = {}
       state.balances = {}
