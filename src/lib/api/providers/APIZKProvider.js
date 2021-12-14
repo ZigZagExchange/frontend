@@ -24,8 +24,9 @@ export default class APIZKProvider extends APIProvider {
         }
 
         try {
-            const { data, status } = await axios.get(`https://ipfs.3box.io/profile?address=${address}`)
-            if (status === 200) {
+            const { data, statusCode } = await axios.get(`https://ipfs.3box.io/profile?address=${address}`)
+            if (statusCode === 200) {
+                console.log('got data', data)
                 return data
             }
         } catch (err) {
@@ -226,8 +227,7 @@ export default class APIZKProvider extends APIProvider {
         const { seed, ethSignatureType } = await this.genSeed(this.ethWallet);
         const syncSigner = await zksync.Signer.fromSeed(seed);
         this.syncWallet = await zksync.Wallet.fromEthSigner(this.ethWallet, this.syncProvider, syncSigner, undefined, ethSignatureType)        
-        const accountState = await this.api.getAccountState()        
-
+        const accountState = await this.api.getAccountState()
         if (!accountState.id) {
             toast.error(
                 "Account not found. Please use the bridge to deposit funds before trying again."
