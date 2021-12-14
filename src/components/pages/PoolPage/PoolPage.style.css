@@ -127,6 +127,15 @@
   margin-bottom: 10px;
 }
 
+.pool_modal_tip_box{
+  background:rgba(0, 0, 0, 0.4);
+  border-radius: 6px;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  color: #636EA8;
+}
+
 .pool_liquidity_box_top h4 {
   display: flex;
   flex-direction: row;

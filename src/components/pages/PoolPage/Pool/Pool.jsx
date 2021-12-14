@@ -1,12 +1,13 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { IoMdAddCircleOutline } from 'react-icons/io'
 import { HiOutlineArrowCircleUp } from 'react-icons/hi'
 import horizontalDots from 'assets/icons/threedot-horizontal-icon.png'
 import USDTImage from 'assets/images/currency/USDT.svg'
-import { Button, Dropdown, Menu, MenuItem } from 'components'
+import { Button, Dropdown, Menu, MenuItem, Modal } from 'components'
+import PoolModalInput from '../PoolModalInput/PoolModalInput'
 
 const Pool = () => {
-  // eslint-disable-next-line
+  const [show, setShow] = useState(false);
   const arePoolsActive = true; // used for testing
 
   const handleMenu = ({ key }) => {
@@ -41,9 +42,21 @@ const Pool = () => {
         <div className="pool_box">
             <div className="pool_box_top">
                 <h4>Mammoth Pool</h4>
-                <Button className="bg_btn" style={{ width: '120px', padding: '10px 5px' }}>
+                <Button className="bg_btn" style={{ width: '120px', padding: '10px 5px' }} onClick={() => setShow(true)}>
                     <IoMdAddCircleOutline size={18} style={{ marginTop: -3 }} /> DEPOSIT
                 </Button>
+
+                <Modal title="Deposit Tokens" onClose={() => setShow(false)} show={show}>
+                    <div className="pool_modal_tip_box">
+                        <strong>Tip:</strong> When you add liquidity, you will receive pool tokens representing your position. These tokens automatically earn fees proportional to your share of the pool, and can be redeemed at any time.
+                    </div>
+                    <PoolModalInput currency="USDC" balance="2299"/>
+                    <PoolModalInput currency="USDT" balance="8303"/>
+                    <Button className="bg_btn" onClick={() => setShow(false)}>
+                        APPROVE
+                    </Button>
+                </Modal>
+            
             </div>
             
             {arePoolsActive ? 

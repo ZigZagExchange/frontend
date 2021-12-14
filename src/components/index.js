@@ -18,6 +18,7 @@ export * from 'components/atoms/SwapButton'
 export * from 'components/atoms/Button'
 export * from 'components/atoms/RangeSlider'
 export * from 'components/atoms/Dropdown'
+export * from 'components/atoms/Modal'
 
 // Molecules
 export * from 'components/molecules/Chart'
