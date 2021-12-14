@@ -1,8 +1,9 @@
-import React, { useMemo, useEffect, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { useSelector } from "react-redux";
 import { SwapButton, Button, useCoinEstimator } from 'components'
 import {
   networkSelector,
+  balancesSelector,
 } from "lib/store/features/api/apiSlice"
 import { userSelector } from "lib/store/features/auth/authSlice";
 import ethLogo from "assets/images/currency/ETH.svg"
@@ -22,11 +23,10 @@ const defaultTransfer = {
 
 const Bridge = () => {
   // eslint-disable-next-line
-  const user = useSelector(userSelector)
-  const [zkBalances, setBalances] = useState({});
+  const user = useSelector(userSelector);
+  // const balanceData = useSelector(balancesSelector);
   const [loading, setLoading] = useState(false);
   const [isApproving, setApproving] = useState(false);
-  const [walletBalances, setWalletBalances] = useState({});
   const [formErr, setFormErr] = useState('') // eslint-disable-line no-unused-vars
   const network = useSelector(networkSelector);
   const [transfer, setTransfer] = useState(defaultTransfer);
@@ -38,26 +38,9 @@ const Bridge = () => {
   const activationFee = parseFloat((user.address && !user.id ? (15 / currencyValue) : 0).toFixed(5))
   const estimatedValue = (+swapDetails.amount * coinEstimator(swapDetails.currency) || 0)
 
-  useEffect(() => {
-    api.getBalances().then(newBalances => {
-      setBalances(newBalances)
-    })
-  }, [user])
-
-  useEffect(() => {
-    const watchWalletFn = () => {
-      api.getWalletBalances().then(newWalletBalances => {
-        setWalletBalances(newWalletBalances)
-      })
-    }
-
-    let watchWallet = setInterval(watchWalletFn, 7000)
-    watchWalletFn()
-
-    return () => {
-      clearInterval(watchWallet)
-    }
-  }, [])
+  // const key = `${network}-${user.id}`
+  let walletBalances = {}
+  let zkBalances = {}
 
   const setSwapDetails = values => {
     const details = {

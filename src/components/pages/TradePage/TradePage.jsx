@@ -46,6 +46,7 @@ const TradePage = () => {
       dispatch(resetData())
       api.subscribeToMarket(currentMarket)
     }
+    
     if (api.ws.readyState === 0) {
       api.on('open', sub)
     } else {
@@ -53,8 +54,11 @@ const TradePage = () => {
     }
 
     return () => {
-      api.unsubscribeToMarket(currentMarket)
-      api.off('open', sub)
+      if (api.ws.readyState !== 0) {
+        api.unsubscribeToMarket(currentMarket)
+      } else {
+        api.off('open', sub)
+      }
     }
   }, [network, currentMarket])
 
@@ -91,7 +95,7 @@ const TradePage = () => {
     }
     const orderWithoutFee = api.getOrderDetailsWithoutFee(order);
     let orderRow;
-    if (api.isZksyncChain(network))
+    if (api.isZksyncChain())
       orderRow = {
         td1: orderWithoutFee.price,
         td2: orderWithoutFee.baseQuantity,
@@ -129,7 +133,7 @@ const TradePage = () => {
         .filter(fill => fill[1] > maxFillId - 500)
         .sort((a,b) => b[1] - a[1])
         .forEach((fill) => {
-            if (api.isZksyncChain(network)) {
+            if (api.isZksyncChain()) {
                 const fillWithoutFee = api.getFillDetailsWithoutFee(fill);
                 fillData.push({
                     td1: fillWithoutFee.price,
@@ -147,7 +151,7 @@ const TradePage = () => {
             }
         });
 
-  if (api.isZksyncChain(network)) {
+  if (api.isZksyncChain()) {
     liquidity.forEach((liq) => {
       const quantity = liq[0];
       const spread = liq[1];
@@ -242,7 +246,6 @@ const TradePage = () => {
               lastPrice={marketSummary.price}
               signInHandler={() => api.signIn(network)}
               user={user}
-              chainId={network}
               currentMarket={currentMarket}
               activeOrderCount={activeUserOrders}
             />
@@ -251,7 +254,6 @@ const TradePage = () => {
                     userFills={userFills}
                     userOrders={userOrders}
                     user={user}
-                    chainId={network}
                 />
             </div>
           </div>
@@ -338,7 +340,6 @@ const TradePage = () => {
               userFills={userFills}
               userOrders={userOrders}
               user={user}
-              chainId={network}
             />
         </div>
       </div>

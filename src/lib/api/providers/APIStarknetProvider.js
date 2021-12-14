@@ -67,7 +67,6 @@ export default class APIStarknetProvider extends APIProvider {
             const deployContractResponse = await starknet.defaultProvider.deployContract(starknetAccountContract, [starkkeyint.toString()])
             toast.dismiss(deployContractToast)
             userWalletContractAddress = deployContractResponse.address
-            console.log(deployContractResponse)
             toast.success('Account contract deployed')
             localStorage.setItem('starknet:account', userWalletContractAddress)
         }

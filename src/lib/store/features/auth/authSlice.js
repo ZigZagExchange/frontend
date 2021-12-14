@@ -6,13 +6,13 @@ export const authSlice = createSlice({
     user: {},
   },
   reducers: {
-    updateAccountState(state, action) {
-      if (state.user && state.user.id) {
-        state.user = action.payload
+    updateAccountState(state, { payload }) {
+      if (state.user && (state.user.id && payload.id) !== undefined) {
+        state.user = payload
       }
     },
     signIn(state, action) {
-        state.user = action.payload
+      state.user = action.payload
     },
     signOut(state) {
         state.user = {}

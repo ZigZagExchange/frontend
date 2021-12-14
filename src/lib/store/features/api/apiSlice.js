@@ -177,13 +177,16 @@ export const authSlice = createSlice({
           }
         }
         const userOpenOrders = Object.values(state.userOrders).filter(o => o[9] === 'o')
-        if (userOpenOrders.length > 1 && api.isZksyncChain(state.network)) {
+        if (userOpenOrders.length > 1 && api.isZksyncChain()) {
           toast.warn('Filling a new order will cancel all previous orders. It is recommended to only have one open order at a time.', { autoClose: 15000 })
         }
       }
     },
     setBalances(state, { payload }) {
-      state.balances = { ...state.balances, ...payload }
+      state.balances[`${state.network}-${state.userId}`] = {
+        ...(state.balances[`${state.network}-${state.userId}`] || {}),
+        ...payload,
+      }
     },
     setCurrentMarket(state, { payload }) {
       if (state.currentMarket !== payload) {
@@ -192,7 +195,6 @@ export const authSlice = createSlice({
         state.marketSummary = {}
         state.liquidity = []
         state.orders = {}
-        state.balances = {}
       }
     },
     setUserId(state, { payload }) {
@@ -257,7 +259,7 @@ export const marketSummarySelector = state => state.api.marketSummary
 export const liquiditySelector = state => state.api.liquidity
 export const currentMarketSelector = state => state.api.currentMarket
 export const bridgeReceiptsSelector = state => state.api.bridgeReceipts
-export const balancesSelector = state => state.api.balances
+export const balancesSelector = (state => state.api.balances[`${state.network}-${state.userId}`] || {})
 
 export const handleMessage = createAction('api/handleMessage')
 

@@ -51,7 +51,7 @@ export class Footer extends React.Component {
             const side = order[3] === "b" ? "buy" : "sell";
             const sideclassname = order[3] === "b" ? "up_value" : "down_value";
             let feeText;
-            if (order[9] === "r" || !api.isZksyncChain(this.props.chainId)) {
+            if (order[9] === "r" || !api.isZksyncChain()) {
               feeText = "0 " + baseCurrency;
             } else if (order[3] === "s") {
               feeText =
@@ -61,7 +61,7 @@ export class Footer extends React.Component {
                 api.currencies[quoteCurrency].gasFee + " " + quoteCurrency;
             }
             const orderWithoutFee = api.getOrderDetailsWithoutFee(order);
-            if ([1, 1000].includes(this.props.chainId)) {
+            if (api.isZksyncChain()) {
               price = orderWithoutFee.price;
               baseQuantity = orderWithoutFee.baseQuantity;
               remaining = orderWithoutFee.remaining;
@@ -170,7 +170,7 @@ export class Footer extends React.Component {
 
   renderFillTable(fills) {
     let baseExplorerUrl;
-    switch (this.props.chainId) {
+    switch (api.apiProvider.network) {
       case 1001:
         baseExplorerUrl = "https://goerli.voyager.online/tx/";
         break;
@@ -208,7 +208,7 @@ export class Footer extends React.Component {
             const sideclassname = fill[3] === "b" ? "up_value" : "down_value";
             const txhash = fill[7];
             let feeText;
-            if (fillstatus === "r" || !api.isZksyncChain(this.props.chainId)) {
+            if (fillstatus === "r" || !api.isZksyncChain()) {
               feeText = "0 " + baseCurrency;
             } else if (side === "s") {
               feeText =
@@ -218,7 +218,7 @@ export class Footer extends React.Component {
                 api.currencies[quoteCurrency].gasFee + " " + quoteCurrency;
             }
             const fillWithoutFee = api.getFillDetailsWithoutFee(fill);
-            if ([1, 1000].includes(this.props.chainId)) {
+            if (api.isZksyncChain()) {
               price = fillWithoutFee.price;
               baseQuantity = fillWithoutFee.baseQuantity;
             }
@@ -324,7 +324,7 @@ export class Footer extends React.Component {
 
   render() {
     let explorerLink;
-    switch (this.props.chainId) {
+    switch (api.apiProvider.network) {
       case 1000:
         explorerLink =
           "https://rinkeby.zkscan.io/explorer/accounts/" +

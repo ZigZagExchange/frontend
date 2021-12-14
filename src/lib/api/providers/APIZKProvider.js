@@ -5,13 +5,14 @@ import { toBaseUnit } from 'lib/utils'
 import APIProvider from './APIProvider'
 import { MAX_ALLOWANCE } from '../constants'
 import axios from 'axios';
-
 export default class APIZKProvider extends APIProvider {
+    static SEEDS_STORAGE_KEY = '@ZZ/ZKSYNC_SEEDS'
     static VALID_SIDES = ['b', 's']
     
     ethWallet = null
     syncWallet = null
     syncProvider = null
+    zksyncCompatible = true
     _profiles = {}
 
     getProfile = async (address) => {
@@ -223,15 +224,20 @@ export default class APIZKProvider extends APIProvider {
             throw e
         }
 
-        this.ethWallet = this.api.ethersProvider.getSigner()
-        const { seed, ethSignatureType } = await this.genSeed(this.ethWallet);
-        const syncSigner = await zksync.Signer.fromSeed(seed);
-        this.syncWallet = await zksync.Wallet.fromEthSigner(this.ethWallet, this.syncProvider, syncSigner, undefined, ethSignatureType)        
+        try {
+            this.ethWallet = this.api.ethersProvider.getSigner()
+            const { seed, ethSignatureType } = await this.getSeed(this.ethWallet);
+            console.log({ seed, ethSignatureType })
+            const syncSigner = await zksync.Signer.fromSeed(seed);
+            this.syncWallet = await zksync.Wallet.fromEthSigner(this.ethWallet, this.syncProvider, syncSigner, undefined, ethSignatureType)        
+        } catch (err) {
+            console.log(err)
+            throw err            
+        }
+
         const accountState = await this.api.getAccountState()
         if (!accountState.id) {
-            toast.error(
-                "Account not found. Please use the bridge to deposit funds before trying again."
-            );
+            toast.error("Account not found. Please use the bridge to deposit funds before trying again.");
         } else {
             const signingKeySet = await this.syncWallet.isSigningKeySet()
             if (! signingKeySet) {
@@ -240,6 +246,35 @@ export default class APIZKProvider extends APIProvider {
         }
 
         return accountState
+    }
+
+    getSeeds = () => {
+        try {
+            return JSON.parse(window.localStorage.getItem(APIZKProvider.SEEDS_STORAGE_KEY) || '{}')
+        } catch {
+            return {}
+        }
+    }
+
+    getSeedKey = async (ethSigner) => {
+        return `${this.network}-${await ethSigner.getAddress()}`
+    }
+
+    getSeed = async (ethSigner) => {
+        const seedKey = await this.getSeedKey(ethSigner)
+        let seeds = this.getSeeds(ethSigner)
+        
+        // if (!seeds[seedKey]) {
+            seeds[seedKey] = await this.genSeed(ethSigner)
+            // seeds[seedKey].seed = Array.from(seeds[seedKey].seed)
+            window.localStorage.setItem(
+                APIZKProvider.SEEDS_STORAGE_KEY,
+                JSON.stringify(seeds),
+            )
+        // }
+        
+        // seeds[seedKey].seed = Uint8Array.from(seeds[seedKey].seed)
+        return seeds[seedKey]
     }
 
     genSeed = async (ethSigner) => {

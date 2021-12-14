@@ -1,12 +1,28 @@
 import { REHYDRATE } from 'redux-persist'
-import { takeEvery, select } from 'redux-saga/effects'
+import { takeEvery, select, apply, all } from 'redux-saga/effects'
 import api from 'lib/api'
 
-function *handleHydration() {
-    const network = yield select(state => state.api && state.api.network)
-    if (network) api.setAPIProvider(network)
+function *handleHydration({ payload }) {
+    if (payload && payload.network) {
+        const user = yield select(state => state.auth && state.auth.user)
+        api.setAPIProvider(payload.network)
+        
+        if (user && user.id) {
+            try {
+                yield apply(api, api.signIn, [payload.network])
+            } catch (err) {
+                console.log('There was an error reauthenticating', err)
+            }
+        }
+    }
 }
 
-export function *networkHandlerSaga() {
+export function *authHandlerSaga() {
     yield takeEvery(REHYDRATE, handleHydration)
+}
+
+export default function *authSaga() {
+    yield all([
+        authHandlerSaga(),
+    ])
 }

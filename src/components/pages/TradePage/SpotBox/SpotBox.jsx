@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import "./SpotBox.css";
 // assets
 import { SpotForm } from "components";
+import api from "lib/api";
 
 class SpotBox extends React.Component {
     constructor(props) {
@@ -12,7 +13,7 @@ class SpotBox extends React.Component {
     }
 
     updateOrderType(orderType) {
-        if (orderType === "limit" && [1, 1000].includes(this.props.chainId)) {
+        if (orderType === "limit" && api.isZksyncChain()) {
             toast.error("Limit orders disabled on zksync");
             return;
         }
@@ -50,7 +51,6 @@ class SpotBox extends React.Component {
                 lastPrice={this.props.lastPrice}
                 signInHandler={this.props.signInHandler}
                 user={this.props.user}
-                chainId={this.props.chainId}
                 currentMarket={this.props.currentMarket}
                 orderType={this.state.orderType}
                 activeOrderCount={this.props.activeOrderCount}
@@ -60,7 +60,6 @@ class SpotBox extends React.Component {
                 lastPrice={this.props.lastPrice}
                 signInHandler={this.props.signInHandler}
                 user={this.props.user}
-                chainId={this.props.chainId}
                 currentMarket={this.props.currentMarket}
                 orderType={this.state.orderType}
                 activeOrderCount={this.props.activeOrderCount}
