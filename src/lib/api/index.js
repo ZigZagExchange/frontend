@@ -82,7 +82,7 @@ const api = new API({
                 1: { tokenId: 92, contractAddress: '0x853d955acef822db058eb8505911ed77f175b99e'  },
                 1000: { tokenId: null, contractAddress: null  },
             },
-            gasFee: 0.1
+            gasFee: 1,
         },
         'WETH': {
             image: require('assets/images/currency/ETH.svg'),
@@ -108,8 +108,9 @@ const api = new API({
             "WBTC-DAI",
             "DAI-USDT",
             "DAI-USDC",
-            "FXS-FRAX",
             "WETH-ETH",
+            "FXS-FRAX",
+            "ETH-FRAX",
         ],
         // zkSync Rinkeby
         1000: [
