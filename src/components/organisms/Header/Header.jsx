@@ -1,6 +1,8 @@
 import { useSelector } from 'react-redux'
 import { useHistory, useLocation } from 'react-router-dom'
-import { BiChevronDown } from 'react-icons/bi'
+import { BiDonateHeart, BiChevronDown } from 'react-icons/bi'
+import { FaDiscord, FaTelegramPlane, FaTwitter } from 'react-icons/fa'
+import { CgExternal } from 'react-icons/cg'
 import { GoGlobe } from 'react-icons/go'
 import React, { useEffect, useMemo, useState } from 'react'
 import { NavLink } from 'react-router-dom'
@@ -122,12 +124,12 @@ export const Header = (props) => {
                 </li>
                 <li>
                   <a href={walletLink} target="_blank" rel="noreferrer">
-                    Wallet
+                    Wallet <CgExternal />
                   </a>
                 </li>
                 <li>
                   <a href="https://gitcoin.co/grants/4352/zigzag-exchange" target="_blank" rel="noreferrer">
-                    Donate
+                    Donate <BiDonateHeart />
                   </a>
                 </li>
               </ul>
@@ -174,6 +176,11 @@ export const Header = (props) => {
                   Trade
                 </NavLink>
               </li>
+              {process.env.NODE_ENV === 'development' && <li>
+                <NavLink exact to="/pool" activeClassName="active_link">
+                  Pool
+                </NavLink>
+              </li>}
               <li>
                 {bridgeLink
                   ? (
@@ -187,28 +194,23 @@ export const Header = (props) => {
                   )}
               </li>
               <li>
-                <NavLink exact to="/pool" activeClassName="active_link">
-                  Pool
-                </NavLink>
+                <a href={walletLink} target="_blank" rel="noreferrer">Wallet <CgExternal /></a>
               </li>
               <li>
-                <a href={walletLink} target="_blank" rel="noreferrer">Wallet</a>
-              </li>
-              <li>
-                <a href="https://gitcoin.co/grants/4352/zigzag-exchange" target="_blank" rel="noreferrer">Donate</a>
+                <a href="https://gitcoin.co/grants/4352/zigzag-exchange" target="_blank" rel="noreferrer">Donate <BiDonateHeart /></a>
               </li>
             </ul>
           </div>
           <div className="head_left">
           <ul>
-            <li>
-              <a target="_blank" rel="noreferrer" href="https://discord.gg/zigzag">Discord</a>
+            <li className="head_social_link">
+              <a target="_blank" rel="noreferrer" href="https://discord.gg/zigzag"><FaDiscord /></a>
             </li>
-            <li> 
-              <a target="_blank" rel="noreferrer" href="https://twitter.com/ZigZagExchange">Twitter</a>
+            <li className="head_social_link"> 
+              <a target="_blank" rel="noreferrer" href="https://twitter.com/ZigZagExchange"><FaTwitter /></a>
             </li>  
-            <li>
-              <a target="_blank" rel="noreferrer" href="https://t.me/zigzagexchange">Telegram</a> 
+            <li className="head_social_link">
+              <a target="_blank" rel="noreferrer" href="https://t.me/zigzagexchange"><FaTelegramPlane /></a> 
             </li>  
             </ul>
                   

@@ -12,7 +12,7 @@ export default class APIStarknetProvider extends APIProvider {
         return this._accountState
     }
 
-    getProfile = () => {
+    getProfile = async () => {
         return {}
     }
 
@@ -105,6 +105,7 @@ export default class APIStarknetProvider extends APIProvider {
                 committedBalances[currency] = amount
             }
         }
+        
         this._accountState = {
             address: userWalletContractAddress,
             id: userWalletContractAddress,
