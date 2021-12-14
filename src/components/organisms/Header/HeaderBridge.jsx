@@ -57,9 +57,10 @@ export const HeaderBridge = (props) => {
                 <a href="https://docs.zigzag.exchange/" target="_blank" rel="noreferrer">Docs</a>
               </li>
             </ul>
-            <div className="eu_text">
+            <label htmlFor="networkSelector" className="eu_text">
               <GoGlobe className="eu_network" />
               <select
+                id="networkSelector"
                 defaultValue={network.toString()}
                 onChange={(e) => api.setAPIProvider(parseInt(e.target.value))}
               >
@@ -67,7 +68,7 @@ export const HeaderBridge = (props) => {
                 <option value="1000">zkSync - Rinkeby</option>
               </select>
               <BiChevronDown className="eu_caret" />
-            </div>
+            </label>
           </div>
         </div>
       </header>

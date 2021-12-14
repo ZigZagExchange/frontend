@@ -17,10 +17,13 @@ export class SpotForm extends React.Component {
         };
         this.MINIMUM_AMOUNTS = {
             ETH: 0.0001,
+            WETH: 0.0001,
             USDC: 1,
             USDT: 1,
             WBTC: 0.00001,
             DAI: 1,
+            FRAX: 1,
+            FXS: 0.1,
         };
     }
 
@@ -181,11 +184,11 @@ export class SpotForm extends React.Component {
             spread = 0.002;
             stableSpread = 0.0007;
         }
-        if (this.props.side === "b" && (["WBTC", "ETH"]).includes(baseCurrency))
+        if (this.props.side === "b" && (["WBTC", "ETH", "FXS", "WETH"]).includes(baseCurrency))
             return parseFloat(
                 (this.props.lastPrice * (1 + spread)).toPrecision(6)
             );
-        else if (this.props.side === "s" && (["WBTC", "ETH"]).includes(baseCurrency))
+        else if (this.props.side === "s" && (["WBTC", "ETH", "FXS", "WETH"]).includes(baseCurrency))
             return parseFloat(
                 (this.props.lastPrice * (1 - spread)).toPrecision(6)
             );
@@ -312,7 +315,7 @@ export class SpotForm extends React.Component {
             </div>
             <div className="spf_input_box">
               <span className="spf_desc_text">Amount</span>
-              <input type="text" value={this.state.amount} onChange={this.updateAmount.bind(this)}/>
+              <input type="text" value={this.state.amount} placeholder="0.00" onChange={this.updateAmount.bind(this)}/>
               <span>{baseCurrency}</span>
             </div>
             <div className="spf_range">

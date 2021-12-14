@@ -1,11 +1,11 @@
 import { useSelector } from 'react-redux'
 import { lastPricesSelector } from 'lib/store/features/api/apiSlice'
 
-const USD_REGEX = /^[A-Z]?USD[A-Z]?$/i
+const USD_REGEX = /^([A-Z]?USD[A-Z]|FRAX)?$/i
 
 export function useCoinEstimator() {
     const pairPrices = useSelector(lastPricesSelector)
-    let prices = { DAI: 1 }
+    let prices = { DAI: 1, FRAX: 1 }
 
     Object.keys(pairPrices).forEach(pair => {
         const [a, b] = pair.split('-').map(s => s.toUpperCase())
