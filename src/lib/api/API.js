@@ -15,8 +15,6 @@ export default class API extends Emitter {
     ethersProvider = null
     currencies = null
     websocketUrl = null
-    _accountState = null
-    _accountStateLastChecked = 0
     
     constructor({ infuraId, websocketUrl, networks, currencies, validMarkets }) {
         super()
@@ -60,7 +58,7 @@ export default class API extends Emitter {
 
         this.web3Modal = new Web3Modal({
             network: networkName,
-            cacheProvider: false,
+            cacheProvider: true,
             theme: "dark",
             providerOptions: {
                 walletconnect: {
@@ -73,9 +71,6 @@ export default class API extends Emitter {
         })
 
         this.getAccountState()
-            .then(accountState => {
-                console.log('Account state', accountState)
-            })
             .catch(err => {
                 console.log('Failed to switch providers', err)
             })
@@ -98,12 +93,9 @@ export default class API extends Emitter {
             defaultProfile.address = address
             defaultProfile.name = `${address.substr(0, 10)}..${address.substr(-10)}`
             const profile = await this.apiProvider.getProfile(address)
-            
-            console.log({ profile })
-
             return { ...defaultProfile, ...profile }
         } catch (err) {
-            console.log(window.$profileErr = err)
+            console.log(err)
             return { ...defaultProfile }
         }
     }
@@ -145,14 +137,10 @@ export default class API extends Emitter {
     }
 
     getAccountState = async () => {
-        if (!this._accountState || this._accountStateLastChecked + 3000 <= (new Date())) {
-            this._accountStateLastChecked = +(new Date())
-            this._accountState = await this.apiProvider.getAccountState()
-            this._accountState.profile = await this.getProfile(this._accountState.address)
-            this.emit('accountState', this._accountState)
-        }
-
-        return this._accountState
+        const accountState = await this.apiProvider.getAccountState()
+        accountState.profile = await this.getProfile(accountState.address)
+        this.emit('accountState', accountState)
+        return accountState
     }
 
     ping = () => this.send('ping')
@@ -192,7 +180,7 @@ export default class API extends Emitter {
         await this.refreshNetwork()
 
         if (this.isZksyncChain(network)) {
-            const web3Provider = ((await this.web3Modal.connect()) || window.ethereum)
+            const web3Provider = await this.web3Modal.connect()
             this.web3.setProvider(web3Provider)
             this.ethersProvider = new ethers.providers.Web3Provider(web3Provider)
         }
@@ -219,6 +207,7 @@ export default class API extends Emitter {
     }
 
     signOut = async () => {
+        this.web3Modal.clearCachedProvider()
         this.emit('signOut')
     }
     
