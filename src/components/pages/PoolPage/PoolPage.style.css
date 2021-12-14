@@ -1,0 +1,230 @@
+.pool_section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 80px);
+  height: 100%;
+  background-color: #1c2231;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  padding-bottom: 2rem;
+}
+
+.pool_incompatible {
+  width: 100%;
+  min-height: 200px;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pool_container {
+  width: 100%;
+  margin: 0 auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.pool_databox_container {
+  display: flex;
+  width: 800px;
+  max-width: 90%;
+  gap: 10px;
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+
+.pool_box {
+  width: 800px;
+  max-width: 90%;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 10px;
+  color: #94a2c9;
+  margin-bottom: 5%;
+  padding: 15px;
+}
+
+.pool_table {
+  flex: 1 1 auto;
+  position: relative;
+  width: 100%;
+}
+
+.pool_table {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.pool_table > .bg_btn {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
+.pool_box_top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+}
+
+.pool_box_top h4 {
+  font-size: 18px;
+  color: rgba(255,255,255,1);
+  margin-left: 10px;
+}
+
+.pool_box_top h4 span {
+  color: rgba(255,255,255,0.5);
+}
+
+.pool_liquidity_container {
+  display: flex;
+  flex-direction: column;
+  height: 500px;
+  width: 100%;
+  overflow-x: auto;
+}
+
+.pool_liquidity_container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.pool_liquidity_container::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+.pool_liquidity_container::-webkit-scrollbar-thumb {
+  background-color: #222737;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 10px;
+}
+
+.pool_liquidity_box {
+  display: flex;
+  flex-direction: column;
+  background: #222737;
+  border-radius: 6px;
+  padding: 15px;
+  margin-bottom: 8px;
+}
+
+.pool_liquidity_box_top {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.pool_modal_tip_box{
+  background:rgba(0, 0, 0, 0.4);
+  border-radius: 6px;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  color: #636EA8;
+}
+
+.pool_liquidity_box_top h4 {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  font-weight: bold;
+  color: #E3E9FF;
+  font-size: 18px;
+}
+
+.pool_liquidity_box th{
+  font-weight: 400;
+  font-size: 0.7rem;
+}
+
+.pool_liquidity_box td{
+  color: #E3E9FF;
+  font-size: 0.8rem;
+}
+
+.pool_badge {
+  margin-top: 1px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 18px;
+  font-size: 12px;
+  padding: 12px;
+  font-weight: bold;
+  background: rgba(0, 0, 0, 0.4);
+  color: #62D2AD;
+  margin-left: 10px;
+  font-family: monospace;
+  border-radius: 6px;
+}
+
+.pool_badge.success {
+  background: #3C7E58;
+  color: #9CF5B5;
+}
+
+.pool_badge.databox_link {
+  height: 20px;
+  margin-top: 4px;
+  color: #69f;
+  border: none;
+  font-weight: 400;
+  text-decoration: none;
+}
+
+.pool_badge.databox_link:hover{
+  background:rgba(0, 0, 0, 0.6);
+  color: #08aff3;
+}
+
+.pool_databox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  padding: 20px 10px 16px;
+  color: #94a2c9;
+  text-align: center;
+  flex: 1;
+}
+
+.pool_databox_title{
+  font-weight: bold;
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  color: #8390b5;
+}
+
+.pool_databox_number{
+  color: #cedafb;
+  font-size: 1.75rem;
+  margin: 5px 0;
+}
+
+.pool_token_image {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+}
+
+@media (min-width: 992px) {
+  .pool_box_top h4 {
+    font-size: 20px;
+  }
+}

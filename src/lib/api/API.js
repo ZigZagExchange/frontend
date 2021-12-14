@@ -185,14 +185,7 @@ export default class API extends Emitter {
             this.ethersProvider = new ethers.providers.Web3Provider(web3Provider)
         }
         
-        let accountState;
-        try {
-            accountState = await this.apiProvider.signIn()
-        } catch (e) {
-            console.error(e);
-            toast.error(e);
-            return false;
-        }
+        const accountState = await this.apiProvider.signIn()
 
         if (accountState) {
             this.send('login', [

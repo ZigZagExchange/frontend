@@ -118,6 +118,11 @@ export const Header = (props) => {
                     )}
                 </li>
                 <li>
+                  <NavLink exact to="/pool" activeClassName="active_link">
+                    Pool
+                  </NavLink>
+                </li>
+                <li>
                   <a href={walletLink} target="_blank" rel="noreferrer">
                     Wallet <CgExternal />
                   </a>
@@ -171,6 +176,11 @@ export const Header = (props) => {
                   Trade
                 </NavLink>
               </li>
+              {process.env.NODE_ENV === 'development' && <li>
+                <NavLink exact to="/pool" activeClassName="active_link">
+                  Pool
+                </NavLink>
+              </li>}
               <li>
                 {bridgeLink
                   ? (

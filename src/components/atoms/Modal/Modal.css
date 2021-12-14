@@ -1,0 +1,58 @@
+.zig_modal {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all 0.3s ease-in-out;
+  pointer-events: none;
+}
+
+.zig_modal.enter-done {
+  opacity: 1;
+  pointer-events: visible;
+}
+
+.zig_modal.exit {
+  opacity: 0;
+}
+
+.zig_modal_content {
+  width: 500px;
+  max-width: 90%;
+  background-color: #232735;
+  transition: all 0.3s ease-in-out;
+  transform: translateY(-200px);
+  border-radius: 6px;
+  color: #cedafb;
+}
+
+.zig_modal.enter-done .zig_modal_content {
+  transform: translateY(0);
+}
+
+.zig_modal.exit .zig_modal_content {
+  transform: translateY(-200px);
+}
+
+.zig_modal_header,
+.zig_modal_body {
+  padding: 15px;
+}
+
+.zig_modal_body {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 0 0 6px 6px;
+  font-size: 0.8rem;
+}
+
+.zig_modal_title {
+  margin: 0;
+  font-size: 18px;
+  color: rgba(255,255,255,1);
+}

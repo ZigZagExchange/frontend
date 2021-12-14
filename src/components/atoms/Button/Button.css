@@ -51,6 +51,12 @@
   text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.35);
 }
 
+.zig_btn_sm {
+  padding: 0;
+  width: auto;
+  height: 34px;
+}
+
 .zig_btn_disabled {
   pointer-events: none;
   cursor: default;
