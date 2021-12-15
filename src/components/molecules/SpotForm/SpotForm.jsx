@@ -16,7 +16,7 @@ export class SpotForm extends React.Component {
             maxSizeSelected: false,
         };
         this.MINIMUM_AMOUNTS = {
-            ETH: 0.0001,
+            ETH: 0.0002,
             WETH: 0.0001,
             USDC: 1,
             USDT: 1,
