@@ -129,16 +129,18 @@ export default class APIZKProvider extends APIProvider {
         
         const tokenRatio = {}
         tokenRatio[baseCurrency] = 1
-        tokenRatio[quoteCurrency] = priceWithFee
+        tokenRatio[quoteCurrency] = priceWithFee.toString()
         const now_unix = Date.now() / 1000 | 0
         const three_minute_expiry = now_unix + 180
+        const parsedSellQuantity = this.syncProvider.tokenSet.parseToken(
+            tokenSell,
+            sellQuantityWithFee.toFixed(this.api.currencies[tokenSell].decimals)
+        );
+        const packedSellQuantity = zksync.utils.closestPackableTransactionAmount(parsedSellQuantity);
         const order = await this.syncWallet.getOrder({
             tokenSell,
             tokenBuy,
-            amount: this.syncProvider.tokenSet.parseToken(
-                tokenSell,
-                sellQuantityWithFee.toPrecision(6)
-            ),
+            amount: packedSellQuantity,
             ratio: zksync.utils.tokenRatio(tokenRatio),
             validUntil: three_minute_expiry
         })
