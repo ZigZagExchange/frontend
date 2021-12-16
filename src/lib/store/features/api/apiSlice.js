@@ -233,7 +233,6 @@ export const authSlice = createSlice({
       state.bridgeReceipts.unshift(payload)
     },
     resetData(state) {
-      state.userFills = {}
       state.marketFills = {}
       state.marketSummary = {}
       state.liquidity = []
