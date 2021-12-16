@@ -200,7 +200,6 @@ export const authSlice = createSlice({
     },
     setNetwork(state, { payload }) {
       state.network = payload
-      state.userOrders = {}
     },
     clearBridgeReceipts(state) {
       state.bridgeReceipts = []
