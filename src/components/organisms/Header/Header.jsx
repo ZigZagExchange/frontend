@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux'
 import { useHistory, useLocation } from 'react-router-dom'
-import { BiDonateHeart, BiChevronDown } from 'react-icons/bi'
+import { BiChevronDown } from 'react-icons/bi'
 import { FaDiscord, FaTelegramPlane, FaTwitter } from 'react-icons/fa'
 import { GoGlobe } from 'react-icons/go'
 import React, { useState } from 'react'
@@ -89,11 +89,6 @@ export const Header = (props) => {
                     Pool
                   </NavLink>
                 </li>
-                <li>
-                  <a href="https://gitcoin.co/grants/4352/zigzag-exchange" target="_blank" rel="noreferrer">
-                    Donate <BiDonateHeart />
-                  </a>
-                </li>
               </ul>
             </div>
             <div className="head_right">
@@ -153,9 +148,6 @@ export const Header = (props) => {
                   Pool
                 </NavLink>
               </li>}
-              <li>
-                <a href="https://gitcoin.co/grants/4352/zigzag-exchange" target="_blank" rel="noreferrer">Donate <BiDonateHeart /></a>
-              </li>
             </ul>
           </div>
           <div className="head_left head_left_socials">

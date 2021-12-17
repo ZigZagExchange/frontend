@@ -18,7 +18,7 @@ const persistConfig = {
 
 const apiPersistConfig = {
     key: 'api',
-    whitelist: ['userId', 'balances', 'currentMarket', 'bridgeReceipts', 'network'],
+    whitelist: ['userId', 'currentMarket', 'bridgeReceipts', 'network'],
     storage,
 }
 
@@ -56,7 +56,10 @@ api.on('bridgeReceipt', (bridgeReceipt) => {
 })
 
 api.on('balanceUpdate', (network, balances) => {
-    store.dispatch(setBalances({ network, balances }))
+    store.dispatch(setBalances({
+        key: network,
+        balances,
+    }))
 })
 
 api.on('signIn', (accountState) => {

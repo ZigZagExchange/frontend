@@ -2,6 +2,8 @@ import { createSlice, createAction } from '@reduxjs/toolkit'
 import { toast } from 'react-toastify'
 import api from 'lib/api'
 
+const makeScope = state => `${state.network}-${state.userId}`
+
 export const authSlice = createSlice({
   name: 'api',
   initialState: {
@@ -183,9 +185,14 @@ export const authSlice = createSlice({
       }
     },
     setBalances(state, { payload }) {
-      state.balances[`${state.network}-${state.userId}`] = {
-        ...(state.balances[`${state.network}-${state.userId}`] || {}),
-        ...payload,
+      const scope = makeScope(state)
+      state.balances[scope] = state.balances[scope] || {}
+      state.balances[scope] = {
+        ...state.balances[scope],
+        [payload.key]: {
+          ...(state.balances[scope][payload.key] || {}),
+          ...payload.balances,
+        },
       }
     },
     setCurrentMarket(state, { payload }) {
@@ -257,7 +264,7 @@ export const marketSummarySelector = state => state.api.marketSummary
 export const liquiditySelector = state => state.api.liquidity
 export const currentMarketSelector = state => state.api.currentMarket
 export const bridgeReceiptsSelector = state => state.api.bridgeReceipts
-export const balancesSelector = (state => state.api.balances[`${state.network}-${state.userId}`] || {})
+export const balancesSelector = (state => state.api.balances[makeScope(state.api)] || {})
 
 export const handleMessage = createAction('api/handleMessage')
 

@@ -16,6 +16,10 @@ export default class APIStarknetProvider extends APIProvider {
         return {}
     }
 
+    getBalances = async () => {
+        return {}
+    }
+
     submitOrder = async (product, side, price, amount) => {
         // check allowance first
         const baseCurrency = product.split("-")[0];

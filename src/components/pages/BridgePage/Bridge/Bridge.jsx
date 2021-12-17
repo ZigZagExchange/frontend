@@ -24,7 +24,7 @@ const defaultTransfer = {
 const Bridge = () => {
   // eslint-disable-next-line
   const user = useSelector(userSelector);
-  // const balanceData = useSelector(balancesSelector);
+  const balanceData = useSelector(balancesSelector);
   const [loading, setLoading] = useState(false);
   const [isApproving, setApproving] = useState(false);
   const [formErr, setFormErr] = useState('') // eslint-disable-line no-unused-vars
@@ -38,9 +38,8 @@ const Bridge = () => {
   const activationFee = parseFloat((user.address && !user.id ? (15 / currencyValue) : 0).toFixed(5))
   const estimatedValue = (+swapDetails.amount * coinEstimator(swapDetails.currency) || 0)
 
-  // const key = `${network}-${user.id}`
-  let walletBalances = {}
-  let zkBalances = {}
+  let walletBalances = balanceData.wallet || {}
+  let zkBalances = balanceData[network] || {}
 
   const setSwapDetails = values => {
     const details = {

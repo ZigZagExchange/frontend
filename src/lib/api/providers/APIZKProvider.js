@@ -1,3 +1,5 @@
+import get from 'lodash/get'
+import GIXI from 'gixi'
 import * as zksync from 'zksync'
 import { ethers } from 'ethers';
 import { toast } from 'react-toastify'
@@ -16,26 +18,32 @@ export default class APIZKProvider extends APIProvider {
     _profiles = {}
 
     getProfile = async (address) => {
-        if (this._profiles.hasOwnProperty(address)) {
-            return this._profiles[address]
-        }
-
         if (!address) {
             return {}
-        }
-
-        try {
-            const { data, statusCode } = await axios.get(`https://ipfs.3box.io/profile?address=${address}`)
-            if (statusCode === 200) {
-                console.log('got data', data)
-                return data
+        } else if (!this._profiles[address]) {
+            try {
+                const { data } = await axios.get(`https://ipfs.3box.io/profile?address=${address}`)
+                const profile = this._profiles[address] = {
+                    coverPhoto: get(data, 'coverPhoto.0.contentUrl./'),
+                    image: get(data, 'image.0.contentUrl./'),
+                    description: get(data, 'description'),
+                    emoji: get(data, 'emoji'),
+                    website: get(data, 'website'),
+                    location: get(data, 'location'),
+                    twitter_proof: get(data, 'twitter_proof'),
+                }
+                
+                if (!profile.image) {
+                    profile.image = (new GIXI(480, address)).getImage()
+                }
+            } catch (err) {
+                if (!err.statusCode) {
+                    throw err
+                }
             }
-        } catch (err) {
-            if (!err.statusCode) {
-                console.log(err)
-            }
-            return {}
+            console.log(this._profiles[address])
         }
+        return this._profiles[address]
     }
 
     handleBridgeReceipt = (_receipt, amount, token, type) => {
@@ -229,7 +237,6 @@ export default class APIZKProvider extends APIProvider {
         try {
             this.ethWallet = this.api.ethersProvider.getSigner()
             const { seed, ethSignatureType } = await this.getSeed(this.ethWallet);
-            console.log({ seed, ethSignatureType })
             const syncSigner = await zksync.Signer.fromSeed(seed);
             this.syncWallet = await zksync.Wallet.fromEthSigner(this.ethWallet, this.syncProvider, syncSigner, undefined, ethSignatureType)        
         } catch (err) {
@@ -266,16 +273,19 @@ export default class APIZKProvider extends APIProvider {
         const seedKey = await this.getSeedKey(ethSigner)
         let seeds = this.getSeeds(ethSigner)
         
-        // if (!seeds[seedKey]) {
+        if (!seeds[seedKey]) {
             seeds[seedKey] = await this.genSeed(ethSigner)
-            // seeds[seedKey].seed = Array.from(seeds[seedKey].seed)
+            seeds[seedKey].seed = await (new Blob([seeds[seedKey].seed], { type: 'text/plain; charset=utf-8' })).text()
             window.localStorage.setItem(
                 APIZKProvider.SEEDS_STORAGE_KEY,
                 JSON.stringify(seeds),
             )
-        // }
+        }
         
-        // seeds[seedKey].seed = Uint8Array.from(seeds[seedKey].seed)
+        seeds[seedKey].seed = new Uint8Array(
+            await (new Blob([seeds[seedKey].seed], { type: 'text/plain; charset=utf-8' })).arrayBuffer()
+        )
+        
         return seeds[seedKey]
     }
 

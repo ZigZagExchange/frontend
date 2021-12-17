@@ -156,6 +156,8 @@ export default class API extends Emitter {
         if (!window.ethereum) return
         let ethereumChainId
 
+        await this.signOut();
+
         switch (this.apiProvider.network) {
             case 1:
                 ethereumChainId = "0x1";
@@ -167,7 +169,7 @@ export default class API extends Emitter {
                 return
         }
 
-        await window.ethereum.enable();
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
 
         await window.ethereum.request({
             method: "wallet_switchEthereumChain",
@@ -191,7 +193,13 @@ export default class API extends Emitter {
                     this.ethersProvider = new ethers.providers.Web3Provider(web3Provider)
                 }
                 
-                const accountState = await apiProvider.signIn(...args)
+                let accountState
+                try {
+                    accountState = await apiProvider.signIn(...args)
+                } catch (err) {
+                    await this.signOut()
+                    throw err
+                }
         
                 if (accountState && accountState.id) {
                     this.send('login', [
@@ -326,6 +334,8 @@ export default class API extends Emitter {
         }
 
         const tickers = Object.keys(this.currencies)
+            .filter(ticker => this.currencies[ticker].chain[this.apiProvider.network])
+            
         await Promise.all(tickers.map(ticker => getBalance(ticker)))
 
         return balances
