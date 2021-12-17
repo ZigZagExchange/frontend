@@ -226,7 +226,21 @@ export default class APIZKProvider extends APIProvider {
         }
 
         this.ethWallet = this.api.ethersProvider.getSigner()
-        const { seed, ethSignatureType } = await this.genSeed(this.ethWallet);
+
+        let seed, ethSignatureType;
+        if (localStorage.getItem("zksync:seed")) {
+            ethSignatureType = localStorage.getItem("zksync:eth_signature_type");
+            const jsonSeed = localStorage.getItem("zksync:seed");
+            seed = Uint8Array.from(JSON.parse(jsonSeed));
+        }
+        else {
+            const genSeedResult = await this.genSeed(this.ethWallet);
+            seed = genSeedResult.seed;
+            ethSignatureType = genSeedResult.ethSignatureType;
+            const jsonSeed = JSON.stringify(Array.from(seed));
+            localStorage.setItem("zksync:seed", jsonSeed);
+            localStorage.setItem("zksync:eth_signature_type", ethSignatureType);
+        }
         const syncSigner = await zksync.Signer.fromSeed(seed);
         this.syncWallet = await zksync.Wallet.fromEthSigner(this.ethWallet, this.syncProvider, syncSigner, undefined, ethSignatureType)        
         const accountState = await this.api.getAccountState()

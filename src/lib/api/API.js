@@ -200,6 +200,8 @@ export default class API extends Emitter {
     }
 
     signOut = async () => {
+        localStorage.removeItem("zksync:seed");
+        localStorage.removeItem("zksync:eth_signature_type");
         this.web3Modal.clearCachedProvider()
         this.emit('signOut')
     }
