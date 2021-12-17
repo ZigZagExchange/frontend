@@ -20,7 +20,7 @@ export class SpotForm extends React.Component {
             WETH: 0.0001,
             USDC: 1,
             USDT: 1,
-            WBTC: 0.00002,
+            WBTC: 0.0002,
             DAI: 1,
             FRAX: 1,
             FXS: 0.1,

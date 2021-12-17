@@ -153,6 +153,14 @@ export const authSlice = createSlice({
               toast.info(`This happens occasionally. Run the transaction again and you should be fine.`)
             }
             break
+          case 'e':
+            if (state.userOrders[orderId]) {
+                state.userOrders[orderId][9] = 'e'
+            }
+            if (state.orders[orderId]) {
+                state.orders[orderId][9] = 'e'
+            }
+            break
           default:
             break
         }

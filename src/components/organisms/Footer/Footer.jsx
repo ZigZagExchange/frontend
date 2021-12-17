@@ -19,7 +19,6 @@ export class Footer extends React.Component {
 
   getUserOrders() {
     return Object.values(this.props.userOrders)
-      .filter((order) => ["o", "pf", "pm", "m", "b"].includes(order[9]))
       .sort((a, b) => b[1] - a[1]);
   }
 

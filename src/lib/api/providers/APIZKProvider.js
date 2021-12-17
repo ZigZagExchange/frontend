@@ -139,7 +139,7 @@ export default class APIZKProvider extends APIProvider {
         tokenRatio[baseCurrency] = 1
         tokenRatio[quoteCurrency] = priceWithFee.toString()
         const now_unix = Date.now() / 1000 | 0
-        const three_minute_expiry = now_unix + 180
+        const two_minute_expiry = now_unix + 120
         const parsedSellQuantity = this.syncProvider.tokenSet.parseToken(
             tokenSell,
             sellQuantityWithFee.toFixed(this.api.currencies[tokenSell].decimals)
@@ -150,7 +150,7 @@ export default class APIZKProvider extends APIProvider {
             tokenBuy,
             amount: packedSellQuantity,
             ratio: zksync.utils.tokenRatio(tokenRatio),
-            validUntil: three_minute_expiry
+            validUntil: two_minute_expiry
         })
         this.api.send('submitorder', [this.network, order])
 
