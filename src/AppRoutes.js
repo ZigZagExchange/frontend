@@ -10,7 +10,7 @@ import api from 'lib/api'
 const AppRoutes = () => {
   // persist login across sessions
   const network = useSelector(networkSelector)
-  if (localStorage.getItem("zksync:seed")) {
+  if (localStorage.getItem("zksync:seed") && api.isZksyncChain(network)) {
     api.signIn(network);
   }
 
