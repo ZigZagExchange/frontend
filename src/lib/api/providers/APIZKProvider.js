@@ -1,5 +1,4 @@
 import get from 'lodash/get'
-import GIXI from 'gixi'
 import * as zksync from 'zksync'
 import { ethers } from 'ethers';
 import { toast } from 'react-toastify'
@@ -15,35 +14,31 @@ export default class APIZKProvider extends APIProvider {
     syncWallet = null
     syncProvider = null
     zksyncCompatible = true
-    _profiles = {}
 
     getProfile = async (address) => {
-        if (!address) {
-            return {}
-        } else if (!this._profiles[address]) {
-            try {
-                const { data } = await axios.get(`https://ipfs.3box.io/profile?address=${address}`)
-                const profile = this._profiles[address] = {
-                    coverPhoto: get(data, 'coverPhoto.0.contentUrl./'),
-                    image: get(data, 'image.0.contentUrl./'),
-                    description: get(data, 'description'),
-                    emoji: get(data, 'emoji'),
-                    website: get(data, 'website'),
-                    location: get(data, 'location'),
-                    twitter_proof: get(data, 'twitter_proof'),
-                }
-                
-                if (!profile.image) {
-                    profile.image = (new GIXI(480, address)).getImage()
-                }
-            } catch (err) {
-                if (!err.statusCode) {
-                    throw err
-                }
+        try {
+            const { data } = await axios.get(`https://ipfs.3box.io/profile?address=${address}`)
+            const profile = {
+                coverPhoto: get(data, 'coverPhoto.0.contentUrl./'),
+                image: get(data, 'image.0.contentUrl./'),
+                description: get(data, 'description'),
+                emoji: get(data, 'emoji'),
+                website: get(data, 'website'),
+                location: get(data, 'location'),
+                twitter_proof: get(data, 'twitter_proof'),
+                name: get(data, 'name'),
             }
-            console.log(this._profiles[address])
+            
+            if (profile.image) {
+                profile.image = `https://gateway.ipfs.io/ipfs/${profile.image}`
+            }
+        } catch (err) {
+            if (!err.response) {
+                throw err
+            }
         }
-        return this._profiles[address]
+
+        return {}
     }
 
     handleBridgeReceipt = (_receipt, amount, token, type) => {

@@ -5,12 +5,11 @@ import { FaDiscord, FaTelegramPlane, FaTwitter } from 'react-icons/fa'
 import { GoGlobe } from 'react-icons/go'
 import React, { useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import { Button, Dropdown, Menu, MenuItem } from 'components'
+import { Button, Dropdown, AccountDropdown, Menu, MenuItem } from 'components'
 import { userSelector } from 'lib/store/features/auth/authSlice'
 import { networkSelector } from 'lib/store/features/api/apiSlice'
 import api from 'lib/api'
 import logo from 'assets/images/logo.png'
-import settingIcon from 'assets/icons/setting-icon.png'
 import menu from 'assets/icons/menu.png'
 import darkPlugHead from 'assets/icons/dark-plug-head.png'
 import './Header.css'
@@ -93,7 +92,6 @@ export const Header = (props) => {
             </div>
             <div className="head_right">
               <div className="d-flex align-items-center justify-content-between">
-                <img src={settingIcon} alt="..." />
                 {user.id && user.address ? (
                   <Dropdown overlay={dropdownMenu}>
                     <button className="address_button">
@@ -185,12 +183,7 @@ export const Header = (props) => {
               </label>
             <div className="head_account_area">
               {user.id && user.address ? (
-                <Dropdown overlay={dropdownMenu}>
-                  <button className="address_button">
-                    {user.address.slice(0, 6)}...
-                    {user.address.slice(-4)}
-                  </button>
-                </Dropdown>
+                <AccountDropdown />
               ) : (
                 <Button
                   className="bg_btn"

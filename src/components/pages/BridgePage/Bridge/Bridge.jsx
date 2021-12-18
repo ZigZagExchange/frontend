@@ -22,12 +22,11 @@ const defaultTransfer = {
 }
 
 const Bridge = () => {
-  // eslint-disable-next-line
   const user = useSelector(userSelector);
   const balanceData = useSelector(balancesSelector);
   const [loading, setLoading] = useState(false);
   const [isApproving, setApproving] = useState(false);
-  const [formErr, setFormErr] = useState('') // eslint-disable-line no-unused-vars
+  const [formErr, setFormErr] = useState('')
   const network = useSelector(networkSelector);
   const [transfer, setTransfer] = useState(defaultTransfer);
   const [swapDetails, _setSwapDetails] = useState(() => ({ amount: '', currency: 'ETH' }));

@@ -1,4 +1,5 @@
 import Web3 from 'web3'
+import { createIcon } from '@download/blockies'
 import { toast } from 'react-toastify'
 import Web3Modal from 'web3modal'
 import Emitter from 'tiny-emitter'
@@ -7,6 +8,10 @@ import WalletConnectProvider from '@walletconnect/web3-provider'
 import erc20ContractABI from 'lib/contracts/ERC20.json'
 import { MAX_ALLOWANCE } from './constants'
 
+const chainMap = {
+    '0x1': 1,
+    '0x4': 1000,
+}
 export default class API extends Emitter {
     networks = {}
     ws = null
@@ -15,6 +20,7 @@ export default class API extends Emitter {
     currencies = null
     websocketUrl = null
     _signInProgress = null
+    _profiles = {}
     
     constructor({ infuraId, websocketUrl, networks, currencies, validMarkets }) {
         super()
@@ -33,12 +39,18 @@ export default class API extends Emitter {
         this.websocketUrl = websocketUrl
         this.currencies = currencies
         this.validMarkets = validMarkets
-        
-        this.setAPIProvider(this.networks.mainnet[0])
 
         if (window.ethereum) {
             window.ethereum.on('accountsChanged', this.signOut)
-            window.ethereum.on('chainChanged', this.signOut)
+            window.ethereum.on('chainChanged', chainId => {
+                this.signOut().then(() => {
+                    this.setAPIProvider(chainMap[chainId])
+                })
+            })
+
+            this.setAPIProvider(chainMap[window.ethereum.chainId] || 1)
+        } else {
+            this.setAPIProvider(this.networks.mainnet[0])
         }
     }
 
@@ -48,6 +60,12 @@ export default class API extends Emitter {
 
     setAPIProvider = (network) => {
         const networkName = this.getNetworkName(network)
+        
+        if (!networkName) {
+            this.signOut()
+            return
+        }
+
         const apiProvider = this.getAPIProvider(network) 
         this.apiProvider = apiProvider
         
@@ -82,25 +100,26 @@ export default class API extends Emitter {
     }
 
     getProfile = async (address) => {
-        const defaultProfile = {
-            description: null,
-            website: null,
-            image: null,
+        if (!this._profiles[address]) {
+            const profile = this._profiles[address] = {
+                description: null,
+                website: null,
+                image: null,
+                address,
+            }
+
+            if (!address) {
+                return profile
+            }
+
+            profile.name = `${address.substr(0, 6)}…${address.substr(-6)}`
+            Object.assign(profile, await this.apiProvider.getProfile(address))
+            if (!profile.image) {
+                profile.image = createIcon({ seed: address }).toDataURL()
+            }
         }
 
-        if (!address) {
-            return { ...defaultProfile }
-        }
-
-        try {
-            defaultProfile.address = address
-            defaultProfile.name = `${address.substr(0, 10)}..${address.substr(-10)}`
-            const profile = await this.apiProvider.getProfile(address)
-            return { ...defaultProfile, ...profile }
-        } catch (err) {
-            console.log(err)
-            return { ...defaultProfile }
-        }
+        return this._profiles[address]
     }
 
     _socketOpen = () => {

@@ -23,6 +23,7 @@ export * from 'components/atoms/Modal'
 // Molecules
 export * from 'components/molecules/Chart'
 export * from 'components/molecules/SpotForm'
+export * from 'components/molecules/AccountDropdown'
 
 // Organisms
 export * from 'components/organisms/Header'

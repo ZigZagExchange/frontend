@@ -92,7 +92,7 @@ export const authSlice = createSlice({
       state.liquidity = state.liquidity.concat(payload[2]);
     },
     _orderstatus(state, { payload }) {
-      payload[0].forEach(async (update) => {
+      (payload[0] || []).forEach(async (update) => {
         let filledOrder
         const [, orderId, newStatus, txHash] = update
         switch (newStatus) {
@@ -230,7 +230,7 @@ export const authSlice = createSlice({
           Successfully
           {' '}{type === 'deposit' ? 'deposited' : 'withdrew'}
           {' '}{amount} {token}
-          {' '}{type === 'deposit' ? 'in your zSync wallet' : 'into your Ethereum wallet. Withdraws can take up to 7 hours to complete'}.
+          {' '}{type === 'deposit' ? 'in your zkSync wallet' : 'into your Ethereum wallet. Withdraws can take up to 7 hours to complete'}.
           <br /><br />
           <a href={txUrl}
             style={{ color: 'white', textDecoration: 'underline', fontWeight: 'bold' }}
@@ -252,10 +252,9 @@ export const authSlice = createSlice({
     resetData(state) {
       state.marketFills = {}
       state.marketSummary = {}
-      state.liquidity = []
+      // state.lastPrices = {}
       state.orders = {}
-      state.lastPrices = {}
-      state.balances = {}
+      state.liquidity = []
     }
   },
 })
