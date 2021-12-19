@@ -1,6 +1,7 @@
 import { useSelector } from 'react-redux'
 import React, { useState, useEffect } from 'react'
 import { IoMdLogOut } from 'react-icons/io'
+import { AiOutlineCaretDown } from 'react-icons/ai'
 import styled, { css } from '@xstyled/styled-components'
 import { useCoinEstimator } from 'components'
 import Loader from "react-loader-spinner"
@@ -46,6 +47,11 @@ const DropdownButton = styled.div`
     &:hover {
         background: rgba(0, 0, 0, 0.9);
         color: rgba(255, 255, 255, 0.6);
+    }
+
+    svg {
+        margin-left: 5px;
+        font-size: 13px;
     }
 `
 
@@ -232,6 +238,7 @@ export const AccountDropdown = () => {
             <DropdownButton onClick={() => setShow(!show)} tabIndex="0">
                 <AvatarImg src={profile.image} alt={profile.name} />
                 {profile.name}
+                <AiOutlineCaretDown />
             </DropdownButton>
             <DropdownDisplay>
                 <DropdownHeader>
