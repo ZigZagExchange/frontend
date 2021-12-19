@@ -252,7 +252,6 @@ export const authSlice = createSlice({
     resetData(state) {
       state.marketFills = {}
       state.marketSummary = {}
-      // state.lastPrices = {}
       state.orders = {}
       state.liquidity = []
     }

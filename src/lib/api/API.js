@@ -114,6 +114,7 @@ export default class API extends Emitter {
 
             profile.name = `${address.substr(0, 6)}…${address.substr(-6)}`
             Object.assign(profile, await this.apiProvider.getProfile(address))
+
             if (!profile.image) {
                 profile.image = createIcon({ seed: address }).toDataURL()
             }

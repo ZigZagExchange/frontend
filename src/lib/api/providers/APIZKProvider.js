@@ -32,6 +32,8 @@ export default class APIZKProvider extends APIProvider {
             if (profile.image) {
                 profile.image = `https://gateway.ipfs.io/ipfs/${profile.image}`
             }
+            
+            return profile
         } catch (err) {
             if (!err.response) {
                 throw err
