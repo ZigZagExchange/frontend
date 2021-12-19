@@ -5,6 +5,7 @@ import Web3Modal from 'web3modal'
 import Emitter from 'tiny-emitter'
 import { ethers } from 'ethers'
 import WalletConnectProvider from '@walletconnect/web3-provider'
+import { getENSName } from 'lib/ens'
 import erc20ContractABI from 'lib/contracts/ERC20.json'
 import { MAX_ALLOWANCE } from './constants'
 
@@ -113,7 +114,13 @@ export default class API extends Emitter {
             }
 
             profile.name = `${address.substr(0, 6)}…${address.substr(-6)}`
-            Object.assign(profile, await this.apiProvider.getProfile(address))
+            Object.assign(
+                profile,
+                ...(await Promise.all([
+                    this._fetchENSName(address),
+                    this.apiProvider.getProfile(address),
+                ]))
+            )
 
             if (!profile.image) {
                 profile.image = createIcon({ seed: address }).toDataURL()
@@ -121,6 +128,12 @@ export default class API extends Emitter {
         }
 
         return this._profiles[address]
+    }
+
+    _fetchENSName = async (address) => {
+        let name = await getENSName(address)
+        if (name) return { name }
+        return {}
     }
 
     _socketOpen = () => {

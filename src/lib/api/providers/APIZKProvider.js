@@ -21,14 +21,16 @@ export default class APIZKProvider extends APIProvider {
             const profile = {
                 coverPhoto: get(data, 'coverPhoto.0.contentUrl./'),
                 image: get(data, 'image.0.contentUrl./'),
-                description: get(data, 'description'),
-                emoji: get(data, 'emoji'),
-                website: get(data, 'website'),
-                location: get(data, 'location'),
-                twitter_proof: get(data, 'twitter_proof'),
-                name: get(data, 'name'),
+                description: data.description,
+                emoji: data.emoji,
+                website: data.website,
+                location: data.location,
+                twitter_proof: data.twitter_proof,
             }
-            
+
+            if (data.name) {
+                profile.name = data.name
+            }
             if (profile.image) {
                 profile.image = `https://gateway.ipfs.io/ipfs/${profile.image}`
             }

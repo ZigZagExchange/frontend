@@ -256,12 +256,12 @@ export const AccountDropdown = () => {
                             />
                         </LoaderContainer>}
                     {wallet && <CurrencyList>
-                        {tickers.map(ticker => {
+                        {tickers.map((ticker, key) => {
                             if (!wallet[ticker] || wallet[ticker].value === 0) {
                                 return null
                             }
                             return (
-                                <CurrencyListItem>
+                                <CurrencyListItem key={key}>
                                     <img className="currency-icon" src={api.currencies[ticker].image.default} alt={ticker} />
                                     <div>
                                         <strong>{wallet[ticker].valueReadable} {ticker}</strong>
