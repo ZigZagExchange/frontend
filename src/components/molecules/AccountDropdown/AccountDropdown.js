@@ -282,7 +282,7 @@ export const AccountDropdown = () => {
                 <DropdownFooter>
                     <SignOutButton onClick={() => api.signOut()}>
                         <IoMdLogOut style={{ position: 'relative', top: -1 }} />
-                        {' '}Sign Out
+                        {' '}Disconnect
                     </SignOutButton>
                 </DropdownFooter>
             </DropdownDisplay>
