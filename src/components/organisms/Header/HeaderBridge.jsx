@@ -71,7 +71,6 @@ export const HeaderBridge = (props) => {
               >
                 <option value="1">zkSync - Mainnet</option>
                 <option value="1000">zkSync - Rinkeby</option>
-                <option value="1001">Starknet</option>
               </select>
               <BiChevronDown className="eu_caret" />
             </label>
