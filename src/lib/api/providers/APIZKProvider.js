@@ -86,6 +86,7 @@ export default class APIZKProvider extends APIProvider {
             toast.warn("Your token balances are very low. You might need to bridge in more funds first.");
             feeToken = "ETH";
         }
+
         const signingKey = await this.syncWallet.setSigningKey({
             feeToken,
             ethAuthType: "ECDSALegacyMessage",
@@ -274,17 +275,14 @@ export default class APIZKProvider extends APIProvider {
         
         if (!seeds[seedKey]) {
             seeds[seedKey] = await this.genSeed(ethSigner)
-            seeds[seedKey].seed = await (new Blob([seeds[seedKey].seed], { type: 'text/plain; charset=utf-8' })).text()
+            seeds[seedKey].seed = seeds[seedKey].seed.toString().split(',').map(x => +x)
             window.localStorage.setItem(
                 APIZKProvider.SEEDS_STORAGE_KEY,
                 JSON.stringify(seeds),
             )
         }
         
-        seeds[seedKey].seed = new Uint8Array(
-            await (new Blob([seeds[seedKey].seed], { type: 'text/plain; charset=utf-8' })).arrayBuffer()
-        )
-        
+        seeds[seedKey].seed = Uint8Array.from(seeds[seedKey].seed)
         return seeds[seedKey]
     }
 
