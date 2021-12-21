@@ -123,6 +123,11 @@ export const Header = (props) => {
                   </NavLink>
                 </li>
                 <li>
+                  <NavLink exact to="/swap" activeClassName="active_link">
+                    Swap
+                  </NavLink>
+                </li>
+                <li>
                   <a href={walletLink} target="_blank" rel="noreferrer">
                     Wallet <CgExternal />
                   </a>
@@ -179,6 +184,11 @@ export const Header = (props) => {
               {process.env.NODE_ENV === 'development' && <li>
                 <NavLink exact to="/pool" activeClassName="active_link">
                   Pool
+                </NavLink>
+              </li>}
+              {process.env.NODE_ENV === 'development' && <li>
+                <NavLink exact to="/swap" activeClassName="active_link">
+                  Swap
                 </NavLink>
               </li>}
               <li>
