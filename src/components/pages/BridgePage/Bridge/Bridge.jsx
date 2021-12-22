@@ -32,7 +32,6 @@ const Bridge = () => {
   const [swapDetails, _setSwapDetails] = useState(() => ({ amount: '', currency: 'ETH' }));
   const currencies = useMemo(() => null, [transfer.type])
   const coinEstimator = useCoinEstimator()
-  
   const currencyValue = coinEstimator(swapDetails.currency)
   const activationFee = parseFloat((user.address && !user.id ? (15 / currencyValue) : 0).toFixed(5))
   const estimatedValue = (+swapDetails.amount * coinEstimator(swapDetails.currency) || 0)
