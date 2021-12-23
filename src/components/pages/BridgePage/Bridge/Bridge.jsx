@@ -1,9 +1,11 @@
-import React, { useMemo, useEffect, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { useSelector } from "react-redux";
 import { SwapButton, Button, useCoinEstimator } from 'components'
 import {
   networkSelector,
+  balancesSelector,
 } from "lib/store/features/api/apiSlice"
+import Loader from "react-loader-spinner"
 import { userSelector } from "lib/store/features/auth/authSlice";
 import ethLogo from "assets/images/currency/ETH.svg"
 import api from 'lib/api';
@@ -21,43 +23,23 @@ const defaultTransfer = {
 }
 
 const Bridge = () => {
-  // eslint-disable-next-line
-  const user = useSelector(userSelector)
-  const [zkBalances, setBalances] = useState({});
+  const user = useSelector(userSelector);
+  const balanceData = useSelector(balancesSelector);
   const [loading, setLoading] = useState(false);
   const [isApproving, setApproving] = useState(false);
-  const [walletBalances, setWalletBalances] = useState({});
-  const [formErr, setFormErr] = useState('') // eslint-disable-line no-unused-vars
+  const [formErr, setFormErr] = useState('')
+  const [bridgeFee, setBridgeFee] = useState(null)
   const network = useSelector(networkSelector);
   const [transfer, setTransfer] = useState(defaultTransfer);
   const [swapDetails, _setSwapDetails] = useState(() => ({ amount: '', currency: 'ETH' }));
   const currencies = useMemo(() => null, [transfer.type])
   const coinEstimator = useCoinEstimator()
-  
   const currencyValue = coinEstimator(swapDetails.currency)
   const activationFee = parseFloat((user.address && !user.id ? (15 / currencyValue) : 0).toFixed(5))
   const estimatedValue = (+swapDetails.amount * coinEstimator(swapDetails.currency) || 0)
 
-  useEffect(() => {
-    api.getBalances().then(newBalances => {
-      setBalances(newBalances)
-    })
-  }, [user])
-
-  useEffect(() => {
-    const watchWalletFn = () => {
-      api.getWalletBalances().then(newWalletBalances => {
-        setWalletBalances(newWalletBalances)
-      })
-    }
-
-    let watchWallet = setInterval(watchWalletFn, 7000)
-    watchWalletFn()
-
-    return () => {
-      clearInterval(watchWallet)
-    }
-  }, [])
+  let walletBalances = balanceData.wallet || {}
+  let zkBalances = balanceData[network] || {}
 
   const setSwapDetails = values => {
     const details = {
@@ -67,22 +49,37 @@ const Bridge = () => {
 
     _setSwapDetails(details);
 
-    const bals = transfer.type === 'deposit' ? walletBalances : zkBalances
-    const detailBalance = parseFloat(bals[details.currency] && bals[details.currency].valueReadable) || 0
-    const input = parseFloat(details.amount) || 0
+    const setFee = bridgeFee => {
+      setBridgeFee(bridgeFee)
 
-    if (details.amount && details.amount.length > 0) {
-      if (input < 0.001) {
-        setFormErr('Must be at least 0.001')
-      } else if (input <= activationFee) {
-        setFormErr(`Must be more than ${activationFee} ${swapDetails.currency}`)
-      } else if (input > detailBalance) {
-        setFormErr('Insufficient balance')
+      const bals = transfer.type === 'deposit' ? walletBalances : zkBalances
+      const detailBalance = parseFloat(bals[details.currency] && bals[details.currency].valueReadable) || 0
+      const input = parseFloat(details.amount) || 0
+      if (input > 0) {
+        if (input < 0.001) {
+          setFormErr('Must be at least 0.001')
+        } else if (input <= activationFee) {
+          setFormErr(`Must be more than ${activationFee} ${swapDetails.currency}`)
+        } else if (input > (detailBalance - parseFloat(bridgeFee))) {
+          setFormErr('Insufficient balance')
+        } else {
+          setFormErr('')
+        }
       } else {
         setFormErr('')
       }
+    }
+
+    if (api.apiProvider.syncWallet && transfer.type === 'withdraw') {
+      setFee(null)
+      api.withdrawL2Fee(details.currency)
+        .then(fee => setFee(fee))
+        .catch(err => {
+          console.log(err)
+          setFee(null)
+        })  
     } else {
-      setFormErr('')
+      setFee(0)
     }
   }
 
@@ -168,7 +165,7 @@ const Bridge = () => {
             <h5>FROM</h5>
             {transfer.type === 'withdraw' ? zkSyncLayer2Header : ethLayer1Header}
           </div>
-          <BridgeSwapInput balances={balances} currencies={currencies} value={swapDetails} onChange={setSwapDetails} />
+          <BridgeSwapInput bridgeFee={bridgeFee} balances={balances} currencies={currencies} value={swapDetails} onChange={setSwapDetails} />
           <div className="bridge_coin_stats">
             <div className="bridge_coin_stat">
               <h5>Estimated value</h5>
@@ -207,15 +204,25 @@ const Bridge = () => {
               </span>
             </div>
           </div>
-
-          {!user.address || user.id ? (
+          {transfer.type === 'deposit' && user.address && !user.id && <div className="bridge_transfer_fee">
+            One-Time Activation Fee: ${activationFee} ${swapDetails.currency} (~$15.00)
+          </div>}
+          {user.address ? (
             <div className="bridge_transfer_fee">
-              Bridge Tax: 0%
-              {' '}(0 {swapDetails.currency})
+              Bridge Fee: {typeof bridgeFee !== 'number' ? (
+                <div style={{ display: 'inline-flex', margin: '0 5px' }}>
+                    <Loader
+                    type="TailSpin"
+                    color="#444"
+                    height={16}
+                    width={16}
+                  />
+                </div>
+              ) : bridgeFee} {swapDetails.currency}
             </div>
           ) : (
             <div className="bridge_transfer_fee">
-              One-Time Activation Fee: ${activationFee} ${swapDetails.currency} (~$15.00)
+              🔗 &nbsp;Please connect your wallet
             </div>
           )}
           <div className="bridge_button">
@@ -239,7 +246,7 @@ const Bridge = () => {
             />}
             {user.address && !hasError && <Button
               loading={loading}
-              className={cx("bg_btn", { zig_disabled: !hasAllowance || swapDetails.amount.length === 0 })}
+              className={cx("bg_btn", { zig_disabled: bridgeFee === null || !hasAllowance || swapDetails.amount.length === 0 })}
               text="TRANSFER"
               icon={<MdSwapCalls />}
               onClick={doTransfer}

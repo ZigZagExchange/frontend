@@ -31,10 +31,6 @@
   outline: none;
 }
 
-.bg_btn:hover {
-  background-size: 150%;
-}
-
 .bg_btn > img {
   margin-right: 10px;
 }

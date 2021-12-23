@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { lastPricesSelector } from 'lib/store/features/api/apiSlice'
 
@@ -7,17 +8,19 @@ export function useCoinEstimator() {
     const pairPrices = useSelector(lastPricesSelector)
     let prices = { DAI: 1, FRAX: 1 }
 
-    Object.keys(pairPrices).forEach(pair => {
-        const [a, b] = pair.split('-').map(s => s.toUpperCase())
-        if (USD_REGEX.test(a)) {
-            prices[b] = pairPrices[pair].price
+    return useMemo(() => {
+        Object.keys(pairPrices).forEach(pair => {
+            const [a, b] = pair.split('-').map(s => s.toUpperCase())
+            if (USD_REGEX.test(a)) {
+                prices[b] = pairPrices[pair].price
+            }
+            if (USD_REGEX.test(b)) {
+                prices[a] = pairPrices[pair].price
+            }
+        })
+    
+        return (token) => {
+            return parseFloat(prices && prices[token] ? prices[token] : 0).toFixed(2)
         }
-        if (USD_REGEX.test(b)) {
-            prices[a] = pairPrices[pair].price
-        }
-    })
-
-    return (token) => {
-        return parseFloat(prices && prices[token] ? prices[token] : 0).toFixed(2)
-    }
+    }, [pairPrices])
 }

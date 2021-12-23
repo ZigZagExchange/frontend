@@ -1,3 +1,4 @@
+import get from 'lodash/get'
 import * as zksync from 'zksync'
 import { ethers } from 'ethers';
 import { toast } from 'react-toastify'
@@ -5,36 +6,44 @@ import { toBaseUnit } from 'lib/utils'
 import APIProvider from './APIProvider'
 import { MAX_ALLOWANCE } from '../constants'
 import axios from 'axios';
-
 export default class APIZKProvider extends APIProvider {
+    static SEEDS_STORAGE_KEY = '@ZZ/ZKSYNC_SEEDS'
     static VALID_SIDES = ['b', 's']
     
     ethWallet = null
     syncWallet = null
     syncProvider = null
-    _profiles = {}
+    zksyncCompatible = true
+    _tokenWithdrawFees = {}
 
     getProfile = async (address) => {
-        if (this._profiles.hasOwnProperty(address)) {
-            return this._profiles[address]
-        }
-
-        if (!address) {
-            return {}
-        }
-
         try {
-            const { data, statusCode } = await axios.get(`https://ipfs.3box.io/profile?address=${address}`)
-            if (statusCode === 200) {
-                console.log('got data', data)
-                return data
+            const { data } = await axios.get(`https://ipfs.3box.io/profile?address=${address}`)
+            const profile = {
+                coverPhoto: get(data, 'coverPhoto.0.contentUrl./'),
+                image: get(data, 'image.0.contentUrl./'),
+                description: data.description,
+                emoji: data.emoji,
+                website: data.website,
+                location: data.location,
+                twitter_proof: data.twitter_proof,
             }
+
+            if (data.name) {
+                profile.name = data.name
+            }
+            if (profile.image) {
+                profile.image = `https://gateway.ipfs.io/ipfs/${profile.image}`
+            }
+            
+            return profile
         } catch (err) {
-            if (!err.statusCode) {
-                console.log(err)
+            if (!err.response) {
+                throw err
             }
-            return {}
         }
+
+        return {}
     }
 
     handleBridgeReceipt = (_receipt, amount, token, type) => {
@@ -78,6 +87,7 @@ export default class APIZKProvider extends APIProvider {
             toast.warn("Your token balances are very low. You might need to bridge in more funds first.");
             feeToken = "ETH";
         }
+
         const signingKey = await this.syncWallet.setSigningKey({
             feeToken,
             ethAuthType: "ECDSALegacyMessage",
@@ -215,6 +225,27 @@ export default class APIZKProvider extends APIProvider {
         }
     }
     
+    depositL2Fee = async (token = 'ETH') => {
+        return 0
+    }
+    
+    withdrawL2Fee = async (token = 'ETH') => {
+        if (! this._tokenWithdrawFees[token]) {
+            const fee = await this.syncProvider.getTransactionFee(
+                'Withdraw',
+                [this.syncWallet.address()],
+                token,
+            )
+    
+            this._tokenWithdrawFees[token] = (
+                parseInt(fee.totalFee)
+                / 10 ** this.api.currencies[token].decimals
+            )
+        }
+
+        return this._tokenWithdrawFees[token]
+    }
+
     signIn = async () => {
         try {
             this.syncProvider = await zksync.getDefaultProvider(
@@ -225,15 +256,21 @@ export default class APIZKProvider extends APIProvider {
             throw e
         }
 
-        this.ethWallet = this.api.ethersProvider.getSigner()
-        const { seed, ethSignatureType } = await this.genSeed(this.ethWallet);
-        const syncSigner = await zksync.Signer.fromSeed(seed);
-        this.syncWallet = await zksync.Wallet.fromEthSigner(this.ethWallet, this.syncProvider, syncSigner, undefined, ethSignatureType)        
+        try {
+            this.ethWallet = this.api.ethersProvider.getSigner()
+            const { seed, ethSignatureType } = await this.getSeed(this.ethWallet);
+            const syncSigner = await zksync.Signer.fromSeed(seed);
+            this.syncWallet = await zksync.Wallet.fromEthSigner(this.ethWallet, this.syncProvider, syncSigner, undefined, ethSignatureType)        
+        } catch (err) {
+            console.log(err)
+            throw err            
+        }
+
         const accountState = await this.api.getAccountState()
         if (!accountState.id) {
-            toast.error(
-                "Account not found. Please use the bridge to deposit funds before trying again."
-            );
+            if (!/^\/bridge(\/.*)?$/.test(window.location.pathname)) {
+                toast.error("Account not found. Please use the bridge to deposit funds before trying again.");
+            }
         } else {
             const signingKeySet = await this.syncWallet.isSigningKeySet()
             if (! signingKeySet) {
@@ -242,6 +279,35 @@ export default class APIZKProvider extends APIProvider {
         }
 
         return accountState
+    }
+
+    getSeeds = () => {
+        try {
+            return JSON.parse(window.localStorage.getItem(APIZKProvider.SEEDS_STORAGE_KEY) || '{}')
+        } catch {
+            return {}
+        }
+    }
+
+    getSeedKey = async (ethSigner) => {
+        return `${this.network}-${await ethSigner.getAddress()}`
+    }
+
+    getSeed = async (ethSigner) => {
+        const seedKey = await this.getSeedKey(ethSigner)
+        let seeds = this.getSeeds(ethSigner)
+        
+        if (!seeds[seedKey]) {
+            seeds[seedKey] = await this.genSeed(ethSigner)
+            seeds[seedKey].seed = seeds[seedKey].seed.toString().split(',').map(x => +x)
+            window.localStorage.setItem(
+                APIZKProvider.SEEDS_STORAGE_KEY,
+                JSON.stringify(seeds),
+            )
+        }
+        
+        seeds[seedKey].seed = Uint8Array.from(seeds[seedKey].seed)
+        return seeds[seedKey]
     }
 
     genSeed = async (ethSigner) => {

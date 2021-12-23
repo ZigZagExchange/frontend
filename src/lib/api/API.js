@@ -1,20 +1,28 @@
 import Web3 from 'web3'
+import { createIcon } from '@download/blockies'
 import { toast } from 'react-toastify'
 import Web3Modal from 'web3modal'
 import Emitter from 'tiny-emitter'
 import { ethers } from 'ethers'
 import WalletConnectProvider from '@walletconnect/web3-provider'
+import { getENSName } from 'lib/ens'
+import { formatAmount } from 'lib/utils'
 import erc20ContractABI from 'lib/contracts/ERC20.json'
 import { MAX_ALLOWANCE } from './constants'
 
+const chainMap = {
+    '0x1': 1,
+    '0x4': 1000,
+}
 export default class API extends Emitter {
     networks = {}
     ws = null
     apiProvider = null
-    syncProvider = null
     ethersProvider = null
     currencies = null
     websocketUrl = null
+    _signInProgress = null
+    _profiles = {}
     
     constructor({ infuraId, websocketUrl, networks, currencies, validMarkets }) {
         super()
@@ -33,12 +41,18 @@ export default class API extends Emitter {
         this.websocketUrl = websocketUrl
         this.currencies = currencies
         this.validMarkets = validMarkets
-        
-        this.setAPIProvider(this.networks.mainnet[0])
 
         if (window.ethereum) {
             window.ethereum.on('accountsChanged', this.signOut)
-            window.ethereum.on('chainChanged', this.signOut)
+            window.ethereum.on('chainChanged', chainId => {
+                this.signOut().then(() => {
+                    this.setAPIProvider(chainMap[chainId])
+                })
+            })
+
+            this.setAPIProvider(chainMap[window.ethereum.chainId] || 1)
+        } else {
+            this.setAPIProvider(this.networks.mainnet[0])
         }
     }
 
@@ -48,27 +62,36 @@ export default class API extends Emitter {
 
     setAPIProvider = (network) => {
         const networkName = this.getNetworkName(network)
-        this.apiProvider = this.getAPIProvider(network)
+        
+        if (!networkName) {
+            this.signOut()
+            return
+        }
 
-        this.web3 = new Web3(
-            window.ethereum || new Web3.providers.HttpProvider(
-                `https://${networkName}.infura.io/v3/${this.infuraId}`
+        const apiProvider = this.getAPIProvider(network) 
+        this.apiProvider = apiProvider
+        
+        if (this.isZksyncChain()) {
+            this.web3 = new Web3(
+                window.ethereum || new Web3.providers.HttpProvider(
+                    `https://${networkName}.infura.io/v3/${this.infuraId}`
+                )
             )
-        )
-
-        this.web3Modal = new Web3Modal({
-            network: networkName,
-            cacheProvider: true,
-            theme: "dark",
-            providerOptions: {
-                walletconnect: {
-                    package: WalletConnectProvider,
-                    options: {
-                        infuraId: this.infuraId,
+    
+            this.web3Modal = new Web3Modal({
+                network: networkName,
+                cacheProvider: true,
+                theme: "dark",
+                providerOptions: {
+                    walletconnect: {
+                        package: WalletConnectProvider,
+                        options: {
+                            infuraId: this.infuraId,
+                        }
                     }
                 }
-            }
-        })
+            })
+        }
 
         this.getAccountState()
             .catch(err => {
@@ -79,25 +102,39 @@ export default class API extends Emitter {
     }
 
     getProfile = async (address) => {
-        const defaultProfile = {
-            description: null,
-            website: null,
-            image: null,
+        if (!this._profiles[address]) {
+            const profile = this._profiles[address] = {
+                description: null,
+                website: null,
+                image: null,
+                address,
+            }
+
+            if (!address) {
+                return profile
+            }
+
+            profile.name = `${address.substr(0, 6)}…${address.substr(-6)}`
+            Object.assign(
+                profile,
+                ...(await Promise.all([
+                    this._fetchENSName(address),
+                    this.apiProvider.getProfile(address),
+                ]))
+            )
+
+            if (!profile.image) {
+                profile.image = createIcon({ seed: address }).toDataURL()
+            }
         }
 
-        if (!address) {
-            return { ...defaultProfile }
-        }
+        return this._profiles[address]
+    }
 
-        try {
-            defaultProfile.address = address
-            defaultProfile.name = `${address.substr(0, 10)}..${address.substr(-10)}`
-            const profile = await this.apiProvider.getProfile(address)
-            return { ...defaultProfile, ...profile }
-        } catch (err) {
-            console.log(err)
-            return { ...defaultProfile }
-        }
+    _fetchENSName = async (address) => {
+        let name = await getENSName(address)
+        if (name) return { name }
+        return {}
     }
 
     _socketOpen = () => {
@@ -137,7 +174,7 @@ export default class API extends Emitter {
     }
 
     getAccountState = async () => {
-        const accountState = await this.apiProvider.getAccountState()
+        const accountState = { ...(await this.apiProvider.getAccountState()) }
         accountState.profile = await this.getProfile(accountState.address)
         this.emit('accountState', accountState)
         return accountState
@@ -153,6 +190,8 @@ export default class API extends Emitter {
         if (!window.ethereum) return
         let ethereumChainId
 
+        await this.signOut();
+
         switch (this.apiProvider.network) {
             case 1:
                 ethereumChainId = "0x1";
@@ -164,7 +203,7 @@ export default class API extends Emitter {
                 return
         }
 
-        await window.ethereum.enable();
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
 
         await window.ethereum.request({
             method: "wallet_switchEthereumChain",
@@ -172,35 +211,63 @@ export default class API extends Emitter {
         });
     }
 
-    signIn = async (network) => {
-        if (network) {
-            this.apiProvider = this.getAPIProvider(network)
+    signIn = async (network, ...args) => {
+        if (!this._signInProgress) {
+            this._signInProgress = Promise.resolve().then(async () => {
+                const apiProvider = this.apiProvider
+
+                if (network) {
+                    this.apiProvider = this.getAPIProvider(network)
+                }
+                
+                await this.refreshNetwork()
+                if (this.isZksyncChain()) {
+                    const web3Provider = await this.web3Modal.connect()
+                    this.web3.setProvider(web3Provider)
+                    this.ethersProvider = new ethers.providers.Web3Provider(web3Provider)
+                }
+                
+                let accountState
+                try {
+                    accountState = await apiProvider.signIn(...args)
+                } catch (err) {
+                    await this.signOut()
+                    throw err
+                }
+        
+                if (accountState && accountState.id) {
+                    this.send('login', [
+                        network,
+                        accountState.id && accountState.id.toString(),
+                    ])
+                }
+        
+                this.emit('signIn', accountState)
+                return accountState
+            }).finally(() => {
+                this._signInProgress = null
+            })
         }
         
-        await this.refreshNetwork()
-
-        if (this.isZksyncChain(network)) {
-            const web3Provider = await this.web3Modal.connect()
-            this.web3.setProvider(web3Provider)
-            this.ethersProvider = new ethers.providers.Web3Provider(web3Provider)
-        }
-        
-        const accountState = await this.apiProvider.signIn()
-
-        if (accountState) {
-            this.send('login', [
-                network,
-                accountState.id && accountState.id.toString(),
-            ])
-
-            this.emit('signIn', accountState)
-        }
-
-        return accountState
+        return this._signInProgress
     }
 
     signOut = async () => {
-        this.web3Modal.clearCachedProvider()
+        if (this._signInProgress) {
+            return
+        } else if (!this.apiProvider) {
+            return
+        } else if (this.web3Modal) {
+            this.web3Modal.clearCachedProvider()
+        }
+
+        this.web3 = null
+        this.web3Modal = null
+        this.ethersProvider = null
+        this.setAPIProvider(this.apiProvider.network)
+        this.emit('balanceUpdate', 'wallet', {})
+        this.emit('balanceUpdate', this.apiProvider.network, {})
+        this.emit('accountState', {})
         this.emit('signOut')
     }
     
@@ -218,7 +285,7 @@ export default class API extends Emitter {
     }
 
     isZksyncChain = () => {
-        return [1000, 1].includes(this.apiProvider.network)
+        return !!this.apiProvider.zksyncCompatible
     }
 
     cancelOrder = async (orderId) => {
@@ -226,12 +293,20 @@ export default class API extends Emitter {
         return true
     }
 
-    depositL2 = (amount, token) => {
+    depositL2 = async (amount, token) => {
         return this.apiProvider.depositL2(amount, token)
     }
 
-    withdrawL2 = (amount, token) => {
+    withdrawL2 = async (amount, token) => {
         return this.apiProvider.withdrawL2(amount, token)
+    }
+
+    depositL2Fee = async (token) => {
+        return this.apiProvider.depositL2Fee(token)
+    }
+
+    withdrawL2Fee = async (token) => {
+        return this.apiProvider.withdrawL2Fee(token)
     }
 
     cancelAllOrders = async () => {
@@ -259,8 +334,10 @@ export default class API extends Emitter {
     }
 
     getBalanceOfCurrency = async (currency) => {
+        const { contractAddress } = this.currencies[currency].chain[this.apiProvider.network]
         let result = { balance: 0, allowance: MAX_ALLOWANCE }
-        if (!this.ethersProvider) return result
+        if (!this.ethersProvider || !contractAddress) return result
+        
         try {
             const netContract = this.getNetworkContract()
             const [account] = await this.web3.eth.getAccounts()
@@ -268,7 +345,6 @@ export default class API extends Emitter {
                 result.balance = await this.web3.eth.getBalance(account)
                 return result
             }
-            const { contractAddress } = this.currencies[currency].chain[this.apiProvider.network]
             const contract = new this.web3.eth.Contract(erc20ContractABI, contractAddress)
             result.balance = await contract.methods.balanceOf(account).call()
             if (netContract) {
@@ -286,18 +362,22 @@ export default class API extends Emitter {
     getWalletBalances = async () => {
         const balances = {}
         
-        for (const [ticker, currency] of Object.entries(this.currencies)) {
+        const getBalance = async (ticker) => {
             const { balance, allowance } = await this.getBalanceOfCurrency(ticker)
             balances[ticker] = {
                 value: balance,
                 allowance,
-                valueReadable: parseFloat(
-                    balance / Math.pow(10, currency.decimals)
-                ).toFixed(Math.min(5, currency.decimals)),
+                valueReadable: formatAmount(balance, this.currencies[ticker]),
             }
+
+            this.emit('balanceUpdate', 'wallet', { ...balances })
         }
-        
-        this.emit('balanceUpdate', 'wallet', balances)
+
+        const tickers = Object.keys(this.currencies)
+            .filter(ticker => this.currencies[ticker].chain[this.apiProvider.network])
+            
+        await Promise.all(tickers.map(ticker => getBalance(ticker)))
+
         return balances
     }
 

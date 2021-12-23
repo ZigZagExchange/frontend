@@ -1,5 +1,5 @@
 import API from './API'
-import APIStarknetProvider from './providers/APIStarknetProvider'
+// import APIStarknetProvider from './providers/APIStarknetProvider'
 import APIZKProvider from './providers/APIZKProvider'
 
 const api = new API({
@@ -8,7 +8,7 @@ const api = new API({
     networks: {
         mainnet: [1, APIZKProvider, '0xaBEA9132b05A70803a4E85094fD0e1800777fBEF'],
         rinkeby: [1000, APIZKProvider, '0x82f67958a5474e40e1485742d648c0b0686b6e5d'],
-        starknet: [1001, APIStarknetProvider],
+        // starknet: [1001, APIStarknetProvider],
     },
     currencies: {
         'ETH': {
@@ -60,7 +60,6 @@ const api = new API({
             decimals: 8,
             chain: {
                 1: { tokenId: 15, contractAddress: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599'  },
-                1000: { tokenId: 13, contractAddress: '0xd93addb2921b8061b697c2ab055979bbefe2b7ac'  },
             },
             gasFee: 0.00003
         },
@@ -70,7 +69,6 @@ const api = new API({
             decimals: 18,
             chain: {
                 1: { tokenId: 120, contractAddress: '0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0'  },
-                1000: { tokenId: null, contractAddress: null  },
             },
             gasFee: 0.1
         },
@@ -80,7 +78,6 @@ const api = new API({
             decimals: 18,
             chain: {
                 1: { tokenId: 92, contractAddress: '0x853d955acef822db058eb8505911ed77f175b99e'  },
-                1000: { tokenId: null, contractAddress: null  },
             },
             gasFee: 1,
         },
@@ -90,7 +87,6 @@ const api = new API({
             decimals: 18,
             chain: {
                 1: { tokenId: 61, contractAddress: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'  },
-                1000: { tokenId: null, contractAddress: null  },
             },
             gasFee: 0.0003
         },

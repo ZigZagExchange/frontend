@@ -11,12 +11,12 @@ import 'react-toastify/dist/ReactToastify.css'
 function Provider({ children }) {
   return (
     <ThemeProvider theme={theme}>
-      <ReduxProvider store={store}>
         <PersistGate loading={null} persistor={persistor}>
-          {children}
-          <ToastContainer position="bottom-right" theme="colored" />
+          <ReduxProvider store={store}>
+              {children}
+              <ToastContainer position="bottom-right" theme="colored" />
+          </ReduxProvider>
         </PersistGate>
-      </ReduxProvider>
     </ThemeProvider>
   )
 }

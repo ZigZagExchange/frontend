@@ -1,17 +1,16 @@
 import { useSelector } from 'react-redux'
 import { useHistory, useLocation } from 'react-router-dom'
-import { BiDonateHeart, BiChevronDown } from 'react-icons/bi'
+import { BiChevronDown } from 'react-icons/bi'
 import { FaDiscord, FaTelegramPlane, FaTwitter } from 'react-icons/fa'
-import { CgExternal } from 'react-icons/cg'
 import { GoGlobe } from 'react-icons/go'
-import React, { useEffect, useMemo, useState } from 'react'
+import { HiExternalLink } from 'react-icons/hi'
+import React, { useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import { Button, Dropdown, Menu, MenuItem } from 'components'
+import { Button, Dropdown, AccountDropdown, Menu, MenuItem } from 'components'
 import { userSelector } from 'lib/store/features/auth/authSlice'
 import { networkSelector } from 'lib/store/features/api/apiSlice'
 import api from 'lib/api'
 import logo from 'assets/images/logo.png'
-import settingIcon from 'assets/icons/setting-icon.png'
 import menu from 'assets/icons/menu.png'
 import darkPlugHead from 'assets/icons/dark-plug-head.png'
 import './Header.css'
@@ -25,32 +24,7 @@ export const Header = (props) => {
   const history = useHistory()
   const location = useLocation()
 
-  const [walletLink, bridgeLink] = useMemo(() => {
-    switch (network) {
-      case 1:
-        return [
-          'https://wallet.zksync.io/',
-          '/bridge'
-        ]
-      case 1000:
-        return [
-          'https://rinkeby.zksync.io/',
-          '/bridge'
-        ]
-      default:
-        return []
-    }
-  }, [network])
-
-  useEffect(() => {
-    const accountUpdater = setInterval(() => {
-      api.getAccountState() 
-    }, 3000)
-
-    return () => {
-      clearInterval(accountUpdater)
-    }
-  }, [])
+  const hasBridge = api.isImplemented('depositL2')
 
   const handleMenu = ({ key }) => {
     switch (key) {
@@ -105,38 +79,26 @@ export const Header = (props) => {
                     Trade
                   </NavLink>
                 </li>
-                <li>
-                  {bridgeLink
-                    ? (
-                      <NavLink exact to={bridgeLink || ""} activeClassName="active_link">
-                        Bridge
-                      </NavLink>
-                    )
-                    : (
-                      // eslint-disable-next-line
-                      <a rel="noreferrer">Bridge</a>
-                    )}
-                </li>
-                <li>
+                {hasBridge && <li>
+                  <NavLink exact to="/bridge" activeClassName="active_link">
+                    Bridge
+                  </NavLink>
+                </li>}
+                {hasBridge && <li>
+                  <a href="https://docs.zigzag.exchange/" target="_blank" rel="noreferrer">
+                    Docs
+                    {' '}<HiExternalLink />
+                  </a>
+                </li>}
+                {process.env.NODE_ENV === 'development' && <li>
                   <NavLink exact to="/pool" activeClassName="active_link">
                     Pool
                   </NavLink>
-                </li>
-                <li>
-                  <a href={walletLink} target="_blank" rel="noreferrer">
-                    Wallet <CgExternal />
-                  </a>
-                </li>
-                <li>
-                  <a href="https://gitcoin.co/grants/4352/zigzag-exchange" target="_blank" rel="noreferrer">
-                    Donate <BiDonateHeart />
-                  </a>
-                </li>
+                </li>}
               </ul>
             </div>
             <div className="head_right">
               <div className="d-flex align-items-center justify-content-between">
-                <img src={settingIcon} alt="..." />
                 {user.id && user.address ? (
                   <Dropdown overlay={dropdownMenu}>
                     <button className="address_button">
@@ -153,12 +115,16 @@ export const Header = (props) => {
               <div className="eu_text">
                 <GoGlobe className="eu_network" />
                 <select
-                  defaultValue={network.toString()}
-                  onChange={(e) => api.setAPIProvider(parseInt(e.target.value))}
+                  value={network.toString()}
+                  onChange={(e) => {
+                    api.setAPIProvider(parseInt(e.target.value))
+                    api.refreshNetwork().catch(err => {
+                      console.log(err)
+                    })
+                  }}
                 >
                   <option value="1">zkSync - Mainnet</option>
                   <option value="1000">zkSync - Rinkeby</option>
-                  <option value="1001">Starknet Goerli</option>
                 </select>
                 <BiChevronDown className="eu_caret" />
               </div>
@@ -167,7 +133,7 @@ export const Header = (props) => {
         ) : null}
 
         {/* desktop header */}
-        <div className="d-flex align-items-center justify-content-between w-100 dex_h">
+        <div className="head_wrapper_desktop dex_h">
           <div className="head_left">
             <a href="http://info.zigzag.exchange" rel="noreferrer"><img src={logo} alt="logo" /></a>
             <ul>
@@ -176,32 +142,25 @@ export const Header = (props) => {
                   Trade
                 </NavLink>
               </li>
+              {hasBridge && <li>
+                <NavLink exact to="/bridge" activeClassName="active_link">
+                  Bridge
+                </NavLink>
+              </li>}
+              {hasBridge && <li>
+                <a href="https://docs.zigzag.exchange/" target="_blank" rel="noreferrer">
+                  Docs
+                  {' '}<HiExternalLink />
+                </a>
+              </li>}
               {process.env.NODE_ENV === 'development' && <li>
                 <NavLink exact to="/pool" activeClassName="active_link">
                   Pool
                 </NavLink>
               </li>}
-              <li>
-                {bridgeLink
-                  ? (
-                    <NavLink exact to={bridgeLink || ""} activeClassName="active_link">
-                      Bridge
-                    </NavLink>
-                  )
-                  : (
-                    // eslint-disable-next-line
-                    <a rel="noreferrer">Bridge</a>
-                  )}
-              </li>
-              <li>
-                <a href={walletLink} target="_blank" rel="noreferrer">Wallet <CgExternal /></a>
-              </li>
-              <li>
-                <a href="https://gitcoin.co/grants/4352/zigzag-exchange" target="_blank" rel="noreferrer">Donate <BiDonateHeart /></a>
-              </li>
             </ul>
           </div>
-          <div className="head_left">
+          <div className="head_left head_left_socials">
           <ul>
             <li className="head_social_link">
               <a target="_blank" rel="noreferrer" href="https://discord.gg/zigzag"><FaDiscord /></a>
@@ -220,23 +179,22 @@ export const Header = (props) => {
                 <GoGlobe className="eu_network" />
                 <select
                   id="networkSelector"
-                  defaultValue={network.toString()}
-                  onChange={(e) => api.setAPIProvider(parseInt(e.target.value))}
+                  value={network.toString()}
+                  onChange={(e) => {
+                    api.setAPIProvider(parseInt(e.target.value))
+                    api.refreshNetwork().catch(err => {
+                      console.log(err)
+                    })
+                  }}
                 >
                   <option value="1">zkSync - Mainnet</option>
                   <option value="1000">zkSync - Rinkeby</option>
-                  <option value="1001">Starknet</option>
                 </select>
                 <BiChevronDown className="eu_caret" />
               </label>
             <div className="head_account_area">
               {user.id && user.address ? (
-                <Dropdown overlay={dropdownMenu}>
-                  <button className="address_button">
-                    {user.address.slice(0, 6)}...
-                    {user.address.slice(-4)}
-                  </button>
-                </Dropdown>
+                <AccountDropdown />
               ) : (
                 <Button
                   className="bg_btn"

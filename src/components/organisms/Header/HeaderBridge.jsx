@@ -61,8 +61,13 @@ export const HeaderBridge = (props) => {
               <GoGlobe className="eu_network" />
               <select
                 id="networkSelector"
-                defaultValue={network.toString()}
-                onChange={(e) => api.setAPIProvider(parseInt(e.target.value))}
+                value={network.toString()}
+                onChange={(e) => {
+                  api.setAPIProvider(parseInt(e.target.value))
+                  api.refreshNetwork().catch(err => {
+                    console.log(err)
+                  })
+              }}
               >
                 <option value="1">zkSync - Mainnet</option>
                 <option value="1000">zkSync - Rinkeby</option>

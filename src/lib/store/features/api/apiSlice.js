@@ -2,6 +2,8 @@ import { createSlice, createAction } from '@reduxjs/toolkit'
 import { toast } from 'react-toastify'
 import api from 'lib/api'
 
+const makeScope = state => `${state.network}-${state.userId}`
+
 export const authSlice = createSlice({
   name: 'api',
   initialState: {
@@ -90,7 +92,7 @@ export const authSlice = createSlice({
       state.liquidity = state.liquidity.concat(payload[2]);
     },
     _orderstatus(state, { payload }) {
-      payload[0].forEach(async (update) => {
+      (payload[0] || []).forEach(async (update) => {
         let filledOrder
         const [, orderId, newStatus, txHash] = update
         switch (newStatus) {
@@ -185,13 +187,21 @@ export const authSlice = createSlice({
           }
         }
         const userOpenOrders = Object.values(state.userOrders).filter(o => o[9] === 'o')
-        if (userOpenOrders.length > 1 && api.isZksyncChain(state.network)) {
+        if (userOpenOrders.length > 1 && api.isZksyncChain()) {
           toast.warn('Filling a new order will cancel all previous orders. It is recommended to only have one open order at a time.', { autoClose: 15000 })
         }
       }
     },
     setBalances(state, { payload }) {
-      state.balances = { ...state.balances, ...payload }
+      const scope = makeScope(state)
+      state.balances[scope] = state.balances[scope] || {}
+      state.balances[scope] = {
+        ...state.balances[scope],
+        [payload.key]: {
+          ...(state.balances[scope][payload.key] || {}),
+          ...payload.balances,
+        },
+      }
     },
     setCurrentMarket(state, { payload }) {
       if (state.currentMarket !== payload) {
@@ -200,7 +210,6 @@ export const authSlice = createSlice({
         state.marketSummary = {}
         state.liquidity = []
         state.orders = {}
-        state.balances = {}
       }
     },
     setUserId(state, { payload }) {
@@ -221,7 +230,7 @@ export const authSlice = createSlice({
           Successfully
           {' '}{type === 'deposit' ? 'deposited' : 'withdrew'}
           {' '}{amount} {token}
-          {' '}{type === 'deposit' ? 'in your zSync wallet' : 'into your Ethereum wallet. Withdraws can take up to 7 hours to complete'}.
+          {' '}{type === 'deposit' ? 'in your zkSync wallet' : 'into your Ethereum wallet. Withdraws can take up to 7 hours to complete'}.
           <br /><br />
           <a href={txUrl}
             style={{ color: 'white', textDecoration: 'underline', fontWeight: 'bold' }}
@@ -243,10 +252,8 @@ export const authSlice = createSlice({
     resetData(state) {
       state.marketFills = {}
       state.marketSummary = {}
-      state.liquidity = []
       state.orders = {}
-      state.lastPrices = {}
-      state.balances = {}
+      state.liquidity = []
     }
   },
 })
@@ -263,7 +270,7 @@ export const marketSummarySelector = state => state.api.marketSummary
 export const liquiditySelector = state => state.api.liquidity
 export const currentMarketSelector = state => state.api.currentMarket
 export const bridgeReceiptsSelector = state => state.api.bridgeReceipts
-export const balancesSelector = state => state.api.balances
+export const balancesSelector = (state => state.api.balances[makeScope(state.api)] || {})
 
 export const handleMessage = createAction('api/handleMessage')
 

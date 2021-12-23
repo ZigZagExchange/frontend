@@ -4,7 +4,7 @@ import createSagaMiddleware from 'redux-saga'
 import { persistStore, persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 import authReducer, { signIn, signOut, updateAccountState } from 'lib/store/features/auth/authSlice'
-import apiReducer, { handleMessage, addBridgeReceipt, setNetwork } from 'lib/store/features/api/apiSlice'
+import apiReducer, { handleMessage, setBalances, addBridgeReceipt, setNetwork } from 'lib/store/features/api/apiSlice'
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2'
 import api from 'lib/api'
 import sagas from './sagas'
@@ -18,14 +18,20 @@ const persistConfig = {
 
 const apiPersistConfig = {
     key: 'api',
-    whitelist: ['bridgeReceipts', 'network'],
+    whitelist: ['userId', 'currentMarket', 'bridgeReceipts', 'network'],
+    storage,
+}
+
+const authPersistConfig = {
+    key: 'auth',
+    whitelist: ['user'],
     storage,
 }
 
 const sagaMiddleware = createSagaMiddleware()
 
 const rootReducer = combineReducers({
-    auth: authReducer,
+    auth: persistReducer(authPersistConfig, authReducer),
     api: persistReducer(apiPersistConfig, apiReducer),
 })
 
@@ -47,6 +53,13 @@ api.on('accountState', (accountState) => {
 
 api.on('bridgeReceipt', (bridgeReceipt) => {
     store.dispatch(addBridgeReceipt(bridgeReceipt))
+})
+
+api.on('balanceUpdate', (network, balances) => {
+    store.dispatch(setBalances({
+        key: network,
+        balances,
+    }))
 })
 
 api.on('signIn', (accountState) => {

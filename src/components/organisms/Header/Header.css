@@ -5,13 +5,19 @@ header {
     background-color: #171c28;
     padding: 0 40px;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
     position: relative;
 }
 
 header.bridge_header {
     background: #1c2231;
+}
+
+.head_wrapper_desktop {
+    display: grid;
+    grid-template-columns: 3fr 1fr 3fr;
+    width: 100%;
 }
 
 .bridge_header .head_left ul li a.active_link {
@@ -62,7 +68,10 @@ header.bridge_header {
 
 .head_right {
     display: flex;
+    flex-direction: row;
     align-items: center;
+    flex: .75 1 auto;
+    justify-content: flex-end;
 }
 
 .border_btn {
@@ -159,13 +168,22 @@ header.bridge_header {
     color: white;
 }
 
+.head_left_socials {
+    justify-content: center
+}
+
+.head_left_socials > ul {
+    padding: 0;
+}
+
 .head_social_link {
     font-size: 20px;
 }
 
 @media screen and (max-width: 991px) {
     #networkSelector {
-        width: 0;
+        width: 1px;
+        overflow: hidden;
         opacity: 0.01;
     }
     .dex_h {

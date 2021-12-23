@@ -8,7 +8,7 @@ import PoolModalInput from '../PoolModalInput/PoolModalInput'
 
 const Pool = () => {
   const [show, setShow] = useState(false);
-  const arePoolsActive = true; // used for testing
+  const arePoolsActive = false; // used for testing
 
   const handleMenu = ({ key }) => {
     switch (key) {

@@ -72,7 +72,7 @@ export class SpotForm extends React.Component {
         amount = parseFloat(amount.toFixed(api.currencies[baseCurrency].decimals));
         if (
             this.props.activeOrderCount > 0 &&
-            api.isZksyncChain(this.props.chainId)
+            api.isZksyncChain()
         ) {
             toast.error("Only one active order permitted at a time");
             return;
@@ -119,7 +119,7 @@ export class SpotForm extends React.Component {
         newstate.orderButtonDisabled = true;
         this.setState(newstate);
         let orderPendingToast;
-        if (api.isZksyncChain(this.props.chainId)) {
+        if (api.isZksyncChain()) {
             orderPendingToast = toast.info(
                 "Order pending. Sign or Cancel to continue..."
             );
@@ -137,7 +137,7 @@ export class SpotForm extends React.Component {
             toast.error(e.message);
         }
 
-        if (api.isZksyncChain(this.props.chainId)) {
+        if (api.isZksyncChain()) {
             toast.dismiss(orderPendingToast);
         }
         newstate = { ...this.state };
@@ -177,7 +177,7 @@ export class SpotForm extends React.Component {
         }
 
         let spread, stableSpread;
-        if (api.isZksyncChain(this.props.chainId)) {
+        if (api.isZksyncChain()) {
             spread = 0.001;
             stableSpread = 0.0004;
         } else {
