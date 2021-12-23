@@ -208,7 +208,7 @@ const Bridge = () => {
             One-Time Activation Fee: ${activationFee} ${swapDetails.currency} (~$15.00)
           </div>}
           {user.address ? (
-            <div className="bridge_transfer_fee">
+            user.id && <div className="bridge_transfer_fee">
               Bridge Fee: {typeof bridgeFee !== 'number' ? (
                 <div style={{ display: 'inline-flex', margin: '0 5px' }}>
                     <Loader
