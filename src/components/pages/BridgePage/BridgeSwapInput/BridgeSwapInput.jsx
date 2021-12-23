@@ -50,13 +50,16 @@ const BridgeInputBox = styled.div`
   }
 `;
 
-const BridgeSwapInput = ({ value = {}, onChange, currencies, balances = {}, className }) => {
+const BridgeSwapInput = ({ value = {}, onChange, bridgeFee, currencies, balances = {}, className }) => {
   const setCurrency = useCallback(currency => onChange({ currency, amount: '' }), [onChange])
   const setAmount = useCallback(e => onChange({ amount: e.target.value.replace(/[^0-9.]/g,'') }), [onChange])
   
+  let maxBalance = parseFloat((balances[value.currency] && balances[value.currency].valueReadable) || 0)
+  maxBalance -= parseFloat(bridgeFee)
+
   const setMax = () => {
-    if(parseFloat((balances[value.currency] && balances[value.currency].valueReadable)) > 0){
-      onChange({ amount: ((balances[value.currency] && balances[value.currency].valueReadable) || '') })
+    if(maxBalance > 0){
+      onChange({ amount: (maxBalance || '') })
     }
   }
 

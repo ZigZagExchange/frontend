@@ -12,6 +12,8 @@ export default class APIProvider {
     submitOrder     = notImplemented('submitOrder')
     depositL2       = notImplemented('depositL2')
     withdrawL2      = notImplemented('withdrawL2')
+    depositL2Fee    = notImplemented('depositL2Fee')
+    withdrawL2Fee   = notImplemented('withdrawL2Fee')
     getBalances     = notImplemented('getBalances')
     getProfile      = notImplemented('getProfile')
 

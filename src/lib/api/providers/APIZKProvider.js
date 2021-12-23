@@ -14,6 +14,7 @@ export default class APIZKProvider extends APIProvider {
     syncWallet = null
     syncProvider = null
     zksyncCompatible = true
+    _tokenWithdrawFees = {}
 
     getProfile = async (address) => {
         try {
@@ -224,6 +225,27 @@ export default class APIZKProvider extends APIProvider {
         }
     }
     
+    depositL2Fee = async (token = 'ETH') => {
+        return 0
+    }
+    
+    withdrawL2Fee = async (token = 'ETH') => {
+        if (! this._tokenWithdrawFees[token]) {
+            const fee = await this.syncProvider.getTransactionFee(
+                'Withdraw',
+                [this.syncWallet.address()],
+                token,
+            )
+    
+            this._tokenWithdrawFees[token] = (
+                parseInt(fee.totalFee)
+                / 10 ** this.api.currencies[token].decimals
+            )
+        }
+
+        return this._tokenWithdrawFees[token]
+    }
+
     signIn = async () => {
         try {
             this.syncProvider = await zksync.getDefaultProvider(
@@ -246,7 +268,9 @@ export default class APIZKProvider extends APIProvider {
 
         const accountState = await this.api.getAccountState()
         if (!accountState.id) {
-            toast.error("Account not found. Please use the bridge to deposit funds before trying again.");
+            if (!/^\/bridge(\/.*)?$/.test(window.location.pathname)) {
+                toast.error("Account not found. Please use the bridge to deposit funds before trying again.");
+            }
         } else {
             const signingKeySet = await this.syncWallet.isSigningKeySet()
             if (! signingKeySet) {

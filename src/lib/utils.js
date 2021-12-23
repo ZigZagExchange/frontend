@@ -7,6 +7,12 @@ export function formatUSD(floatNum) {
   return num.join('.')
 }
 
+export function formatAmount(amount, currency) {
+  return parseFloat(
+    amount / Math.pow(10, currency.decimals)
+  ).toFixed(Math.min(5, currency.decimals))
+}
+
 export function toBaseUnit(value, decimals) {
     if (!isString(value)) {
       throw new Error('Pass strings to prevent floating point precision issues.')

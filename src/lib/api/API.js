@@ -6,6 +6,7 @@ import Emitter from 'tiny-emitter'
 import { ethers } from 'ethers'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { getENSName } from 'lib/ens'
+import { formatAmount } from 'lib/utils'
 import erc20ContractABI from 'lib/contracts/ERC20.json'
 import { MAX_ALLOWANCE } from './constants'
 
@@ -292,12 +293,20 @@ export default class API extends Emitter {
         return true
     }
 
-    depositL2 = (amount, token) => {
+    depositL2 = async (amount, token) => {
         return this.apiProvider.depositL2(amount, token)
     }
 
-    withdrawL2 = (amount, token) => {
+    withdrawL2 = async (amount, token) => {
         return this.apiProvider.withdrawL2(amount, token)
+    }
+
+    depositL2Fee = async (token) => {
+        return this.apiProvider.depositL2Fee(token)
+    }
+
+    withdrawL2Fee = async (token) => {
+        return this.apiProvider.withdrawL2Fee(token)
     }
 
     cancelAllOrders = async () => {
@@ -358,9 +367,7 @@ export default class API extends Emitter {
             balances[ticker] = {
                 value: balance,
                 allowance,
-                valueReadable: parseFloat(
-                    balance / Math.pow(10, this.currencies[ticker].decimals)
-                ).toFixed(Math.min(5, this.currencies[ticker].decimals)),
+                valueReadable: formatAmount(balance, this.currencies[ticker]),
             }
 
             this.emit('balanceUpdate', 'wallet', { ...balances })
