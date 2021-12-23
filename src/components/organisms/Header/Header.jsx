@@ -3,6 +3,7 @@ import { useHistory, useLocation } from 'react-router-dom'
 import { BiChevronDown } from 'react-icons/bi'
 import { FaDiscord, FaTelegramPlane, FaTwitter } from 'react-icons/fa'
 import { GoGlobe } from 'react-icons/go'
+import { HiExternalLink } from 'react-icons/hi'
 import React, { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { Button, Dropdown, AccountDropdown, Menu, MenuItem } from 'components'
@@ -83,11 +84,17 @@ export const Header = (props) => {
                     Bridge
                   </NavLink>
                 </li>}
-                <li>
+                {hasBridge && <li>
+                  <a href="https://docs.zigzag.exchange/" target="_blank" rel="noreferrer">
+                    Docs
+                    {' '}<HiExternalLink />
+                  </a>
+                </li>}
+                {process.env.NODE_ENV === 'development' && <li>
                   <NavLink exact to="/pool" activeClassName="active_link">
                     Pool
                   </NavLink>
-                </li>
+                </li>}
               </ul>
             </div>
             <div className="head_right">
@@ -139,6 +146,12 @@ export const Header = (props) => {
                 <NavLink exact to="/bridge" activeClassName="active_link">
                   Bridge
                 </NavLink>
+              </li>}
+              {hasBridge && <li>
+                <a href="https://docs.zigzag.exchange/" target="_blank" rel="noreferrer">
+                  Docs
+                  {' '}<HiExternalLink />
+                </a>
               </li>}
               {process.env.NODE_ENV === 'development' && <li>
                 <NavLink exact to="/pool" activeClassName="active_link">
