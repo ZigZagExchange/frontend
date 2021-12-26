@@ -9,7 +9,7 @@ export const authSlice = createSlice({
   initialState: {
     network: 1,
     userId: null,
-    currentMarket: 'ETH-USDT',
+    currentMarket: 'ETH-USDC',
     marketFills: {},
     bridgeReceipts: [],
     lastPrices: {},
