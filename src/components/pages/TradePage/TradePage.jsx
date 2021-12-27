@@ -248,6 +248,7 @@ const TradePage = () => {
               user={user}
               currentMarket={currentMarket}
               activeOrderCount={activeUserOrders}
+              liquidity={liquidity}
             />
             <div className="d-block d-xl-none" style={{"width": "100%"}}>
                 <Footer

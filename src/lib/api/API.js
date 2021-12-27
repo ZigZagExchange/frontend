@@ -440,7 +440,23 @@ export default class API extends Emitter {
         };
     }
 
-    submitOrder = async (product, side, price, amount) => {
-        await this.apiProvider.submitOrder(product, side, price, amount)
+    submitOrder = async (product, side, price, amount, orderType) => {
+        await this.apiProvider.submitOrder(product, side, price, amount, orderType)
+    }
+
+    calculatePriceFromLiquidity = (quantity, spotPrice, side, liquidity) => {
+        //let availableLiquidity;
+        //if (side === 's') {
+        //    availableLiquidity = liquidity.filter(l => (['d','s']).includes(l[2]));
+        //} else if (side === 'b') {
+        //    availableLiquidity = liquidity.filter(l => (['d','b']).includes(l[2]));
+        //}
+        //availableLiquidity.sort((a,b) => a[1] - b[1]);
+        //const avgSpread = 0;
+        //for (let i in availableLiquidity) {
+        //    const spread = availableLiquidity[2];
+        //    const amount = availableLiquidity[2];
+        //}
+
     }
 }

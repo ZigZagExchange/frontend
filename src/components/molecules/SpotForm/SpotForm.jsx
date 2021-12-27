@@ -108,10 +108,16 @@ export class SpotForm extends React.Component {
             return;
         } else if (
             isNaN(price) ||
-            price > this.props.lastPrice * 1.1 ||
-            price < this.props.lastPrice * 0.9
+            price > this.props.lastPrice * 1.2 ||
+            price < this.props.lastPrice * 0.8
         ) {
-            toast.error("Price must be within 10% of spot");
+            toast.error("Price must be within 20% of spot");
+            return;
+        } else if (
+            (this.props.side === 'b' && price > this.props.lastPrice * 1.005) ||
+            (this.props.side === 's' && price < this.props.lastPrice * 0.995)
+        ) {
+            toast.error("Limit orders cannot exceed 0.5% beyond spot");
             return;
         }
 
@@ -130,7 +136,8 @@ export class SpotForm extends React.Component {
                 this.props.currentMarket,
                 this.props.side,
                 price,
-                amount
+                amount,
+                this.props.orderType
             );
         } catch (e) {
             console.log(e);
