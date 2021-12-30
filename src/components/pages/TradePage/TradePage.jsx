@@ -85,6 +85,7 @@ const TradePage = () => {
     const price = order[4];
     const remaining = isNaN(Number(order[11])) ? order[5] : order[11];
     const remainingQuote = remaining * price;
+    const userid = order[8];
     const orderStatus = order[9];
 
     let spotPrice;
@@ -113,14 +114,10 @@ const TradePage = () => {
       };
     }
 
-    // Only display Market Making orders within 2% of spot
-    // No one is going to fill outside that range
-    if (spotPrice && price > spotPrice * 0.98 && price < spotPrice * 1.02) {
-      openOrdersData.push(orderRow);
-    }
-    if (side === "b" && ["o", "pm", "pf"].includes(orderStatus)) {
+    // Only display your own orders. other people's orders aren't fillable
+    if (side === "b" && userid === user.id.toString()) {
       orderbookBids.push(orderRow);
-    } else if (side === "s" && ["o", "pm", "pf"].includes(orderStatus)) {
+    } else if (side === "s" && userid === user.id.toString()) {
       orderbookAsks.push(orderRow);
     }
   }
