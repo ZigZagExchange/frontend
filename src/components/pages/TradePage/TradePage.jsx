@@ -265,7 +265,7 @@ const TradePage = () => {
                   {/* Trade Price Head */}
                   {/* Trade Price Table*/}
                   <TradePriceTable
-                    className="trade_table_pad_top"
+                    className="trade_table_asks"
                     useGradient="true"
                     priceTableData={askBins}
                     currentMarket={currentMarket}
