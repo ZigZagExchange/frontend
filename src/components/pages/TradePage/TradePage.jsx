@@ -107,9 +107,9 @@ const TradePage = () => {
     }
 
     // Only display your own orders. other people's orders aren't fillable
-    if (side === "b" && userid === user.id.toString()) {
+    if (side === "b" && user.id && userid === user.id.toString()) {
       orderbookBids.push(orderRow);
-    } else if (side === "s" && userid === user.id.toString()) {
+    } else if (side === "s" && user.id && userid === user.id.toString()) {
       orderbookAsks.push(orderRow);
     }
   }

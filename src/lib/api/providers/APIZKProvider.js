@@ -141,10 +141,10 @@ export default class APIZKProvider extends APIProvider {
         tokenRatio[quoteCurrency] = priceWithFee.toString()
         const now_unix = Date.now() / 1000 | 0
         const two_minute_expiry = now_unix + 120
-        const three_day_expiry = now_unix + 3*24*3600;
+        const one_day_expiry = now_unix + 24*3600;
         let validUntil;
         if (orderType === "limit") {
-            validUntil = three_day_expiry;
+            validUntil = one_day_expiry;
         } else {
             validUntil = two_minute_expiry;
         }
