@@ -84,7 +84,7 @@ const TradePage = () => {
     const price = order[4];
     const remaining = isNaN(Number(order[11])) ? order[5] : order[11];
     const remainingQuote = remaining * price;
-    const userid = order[8];
+    const orderStatus = order[9];
 
     const orderWithoutFee = api.getOrderDetailsWithoutFee(order);
     let orderRow;
@@ -106,10 +106,9 @@ const TradePage = () => {
       };
     }
 
-    // Only display your own orders. other people's orders aren't fillable
-    if (side === "b" && user.id && userid === user.id.toString()) {
+    if (side === "b" && ["o", "pm", "pf"].includes(orderStatus)) {
       orderbookBids.push(orderRow);
-    } else if (side === "s" && user.id && userid === user.id.toString()) {
+    } else if (side === "s" && ["o", "pm", "pf"].includes(orderStatus)) {
       orderbookAsks.push(orderRow);
     }
   }
