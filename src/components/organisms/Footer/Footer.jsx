@@ -46,7 +46,6 @@ export class Footer extends React.Component {
             let remaining = isNaN(Number(order[11])) ? order[5] : order[11];
             const orderStatus = order[9];
             const baseCurrency = order[2].split("-")[0];
-            const quoteCurrency = order[2].split("-")[1];
             const side = order[3] === "b" ? "buy" : "sell";
             const sideclassname = order[3] === "b" ? "up_value" : "down_value";
             const expiration = order[7];
