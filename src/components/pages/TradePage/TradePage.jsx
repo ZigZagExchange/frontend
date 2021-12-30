@@ -84,7 +84,6 @@ const TradePage = () => {
     const price = order[4];
     const remaining = isNaN(Number(order[11])) ? order[5] : order[11];
     const remainingQuote = remaining * price;
-    const userid = order[8];
     const orderStatus = order[9];
 
     const orderWithoutFee = api.getOrderDetailsWithoutFee(order);
