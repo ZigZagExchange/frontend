@@ -80,20 +80,12 @@ const TradePage = () => {
 
   for (let orderid in allOrders) {
     const order = allOrders[orderid];
-    const market = order[2];
     const side = order[3];
     const price = order[4];
     const remaining = isNaN(Number(order[11])) ? order[5] : order[11];
     const remainingQuote = remaining * price;
     const userid = order[8];
-    const orderStatus = order[9];
 
-    let spotPrice;
-    try {
-      spotPrice = lastPrices[market].price;
-    } catch (e) {
-      spotPrice = null;
-    }
     const orderWithoutFee = api.getOrderDetailsWithoutFee(order);
     let orderRow;
     if (api.isZksyncChain())
