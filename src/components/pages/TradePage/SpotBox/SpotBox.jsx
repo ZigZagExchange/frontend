@@ -1,10 +1,10 @@
 import React from "react";
-import { toast } from "react-toastify";
+//import { toast } from "react-toastify";
 // css
 import "./SpotBox.css";
 // assets
 import { SpotForm } from "components";
-import api from "lib/api";
+//import api from "lib/api";
 
 class SpotBox extends React.Component {
     constructor(props) {
@@ -13,10 +13,6 @@ class SpotBox extends React.Component {
     }
 
     updateOrderType(orderType) {
-        if (orderType === "limit" && api.isZksyncChain()) {
-            toast.error("Limit orders disabled on zksync");
-            return;
-        }
         const newstate = { ...this.state, orderType };
         this.setState(newstate);
     }
@@ -54,6 +50,7 @@ class SpotBox extends React.Component {
                 currentMarket={this.props.currentMarket}
                 orderType={this.state.orderType}
                 activeOrderCount={this.props.activeOrderCount}
+                liquidity={this.props.liquidity}
               />
               <SpotForm
                 side="s"
@@ -63,6 +60,7 @@ class SpotBox extends React.Component {
                 currentMarket={this.props.currentMarket}
                 orderType={this.state.orderType}
                 activeOrderCount={this.props.activeOrderCount}
+                liquidity={this.props.liquidity}
               />
             </div>
           </div>

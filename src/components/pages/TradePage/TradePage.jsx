@@ -80,19 +80,12 @@ const TradePage = () => {
 
   for (let orderid in allOrders) {
     const order = allOrders[orderid];
-    const market = order[2];
     const side = order[3];
     const price = order[4];
     const remaining = isNaN(Number(order[11])) ? order[5] : order[11];
     const remainingQuote = remaining * price;
-    const orderStatus = order[9];
+    const userid = order[8];
 
-    let spotPrice;
-    try {
-      spotPrice = lastPrices[market].price;
-    } catch (e) {
-      spotPrice = null;
-    }
     const orderWithoutFee = api.getOrderDetailsWithoutFee(order);
     let orderRow;
     if (api.isZksyncChain())
@@ -113,14 +106,10 @@ const TradePage = () => {
       };
     }
 
-    // Only display Market Making orders within 2% of spot
-    // No one is going to fill outside that range
-    if (spotPrice && price > spotPrice * 0.98 && price < spotPrice * 1.02) {
-      openOrdersData.push(orderRow);
-    }
-    if (side === "b" && ["o", "pm", "pf"].includes(orderStatus)) {
+    // Only display your own orders. other people's orders aren't fillable
+    if (side === "b" && user.id && userid === user.id.toString()) {
       orderbookBids.push(orderRow);
-    } else if (side === "s" && ["o", "pm", "pf"].includes(orderStatus)) {
+    } else if (side === "s" && user.id && userid === user.id.toString()) {
       orderbookAsks.push(orderRow);
     }
   }
@@ -248,6 +237,7 @@ const TradePage = () => {
               user={user}
               currentMarket={currentMarket}
               activeOrderCount={activeUserOrders}
+              liquidity={liquidity}
             />
             <div className="d-block d-xl-none" style={{"width": "100%"}}>
                 <Footer
@@ -264,7 +254,7 @@ const TradePage = () => {
                   {/* Trade Price Head */}
                   {/* Trade Price Table*/}
                   <TradePriceTable
-                    className="trade_table_pad_top"
+                    className="trade_table_asks"
                     useGradient="true"
                     priceTableData={askBins}
                     currentMarket={currentMarket}

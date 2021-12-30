@@ -31,9 +31,8 @@
     padding: 20px;
 }
 
-.trade_table_pad_top {
+.trade_table_asks th {
   padding-top: 12px;
-  height: 430px;
 }
 
 .trade_right {

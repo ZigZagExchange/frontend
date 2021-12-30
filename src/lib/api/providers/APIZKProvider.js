@@ -98,7 +98,7 @@ export default class APIZKProvider extends APIProvider {
         return signingKey;
     }
 
-    submitOrder = async (product, side, price, amount) => {
+    submitOrder = async (product, side, price, amount, orderType) => {
         amount = parseFloat(amount)
         const currencies = product.split('-')
         const baseCurrency = currencies[0]
@@ -141,6 +141,13 @@ export default class APIZKProvider extends APIProvider {
         tokenRatio[quoteCurrency] = priceWithFee.toString()
         const now_unix = Date.now() / 1000 | 0
         const two_minute_expiry = now_unix + 120
+        const one_day_expiry = now_unix + 24*3600;
+        let validUntil;
+        if (orderType === "limit") {
+            validUntil = one_day_expiry;
+        } else {
+            validUntil = two_minute_expiry;
+        }
         const parsedSellQuantity = this.syncProvider.tokenSet.parseToken(
             tokenSell,
             sellQuantityWithFee.toFixed(this.api.currencies[tokenSell].decimals)
@@ -151,7 +158,7 @@ export default class APIZKProvider extends APIProvider {
             tokenBuy,
             amount: packedSellQuantity,
             ratio: zksync.utils.tokenRatio(tokenRatio),
-            validUntil: two_minute_expiry
+            validUntil
         })
         this.api.send('submitorder', [this.network, order])
 
