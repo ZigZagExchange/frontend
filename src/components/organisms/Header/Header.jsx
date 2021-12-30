@@ -90,6 +90,12 @@ export const Header = (props) => {
                     {' '}<HiExternalLink />
                   </a>
                 </li>}
+                {hasBridge && <li>
+                  <a href="https://zigzag.banxa.com/" target="_blank" rel="noreferrer">
+                    Fiat
+                    {' '}<HiExternalLink />
+                  </a>
+                </li>}
                 {process.env.NODE_ENV === 'development' && <li>
                   <NavLink exact to="/pool" activeClassName="active_link">
                     Pool
@@ -150,6 +156,12 @@ export const Header = (props) => {
               {hasBridge && <li>
                 <a href="https://docs.zigzag.exchange/" target="_blank" rel="noreferrer">
                   Docs
+                  {' '}<HiExternalLink />
+                </a>
+              </li>}
+              {hasBridge && <li>
+                <a href="https://zigzag.banxa.com/" target="_blank" rel="noreferrer">
+                  Fiat
                   {' '}<HiExternalLink />
                 </a>
               </li>}
