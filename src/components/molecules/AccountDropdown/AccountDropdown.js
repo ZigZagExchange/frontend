@@ -201,7 +201,7 @@ export const AccountDropdown = () => {
     const network = useSelector(networkSelector);
     const balanceData = useSelector(balancesSelector);
     const [show, setShow] = useState(false)
-    const [selectedLayer, setSelectedLayer] = useState(1)
+    const [selectedLayer, setSelectedLayer] = useState(2)
     const coinEstimator = useCoinEstimator();
     const { profile } = user
 
