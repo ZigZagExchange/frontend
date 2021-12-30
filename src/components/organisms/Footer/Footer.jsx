@@ -32,7 +32,7 @@ export class Footer extends React.Component {
             <th>Quantity</th>
             <th>Remaining</th>
             <th>Side</th>
-            <th>Fee</th>
+            <th>Expiry</th>
             <th>Order Status</th>
             <th>Action</th>
           </tr>
@@ -46,19 +46,22 @@ export class Footer extends React.Component {
             let remaining = isNaN(Number(order[11])) ? order[5] : order[11];
             const orderStatus = order[9];
             const baseCurrency = order[2].split("-")[0];
-            const quoteCurrency = order[2].split("-")[1];
             const side = order[3] === "b" ? "buy" : "sell";
             const sideclassname = order[3] === "b" ? "up_value" : "down_value";
-            let feeText;
-            if (order[9] === "r" || !api.isZksyncChain()) {
-              feeText = "0 " + baseCurrency;
-            } else if (order[3] === "s") {
-              feeText =
-                api.currencies[baseCurrency].gasFee + " " + baseCurrency;
-            } else if (order[3] === "b") {
-              feeText =
-                api.currencies[quoteCurrency].gasFee + " " + quoteCurrency;
+            const expiration = order[7];
+            const now = Date.now() / 1000 | 0;
+            const timeToExpiry = expiration - now;
+            let expiryText;
+            if (timeToExpiry > 86400) {
+                expiryText = Math.floor(timeToExpiry / 86400) + "d";
             }
+            else if (timeToExpiry > 3600) {
+                expiryText = Math.floor(timeToExpiry / 3600) + "h";
+            }
+            else {
+                expiryText = Math.floor(timeToExpiry / 3600) + "m";
+            }
+
             const orderWithoutFee = api.getOrderDetailsWithoutFee(order);
             if (api.isZksyncChain()) {
               price = orderWithoutFee.price;
@@ -145,7 +148,7 @@ export class Footer extends React.Component {
                   {remaining.toPrecision(6) / 1} {baseCurrency}
                 </td>
                 <td className={sideclassname}>{side}</td>
-                <td>{feeText}</td>
+                <td>{expiryText}</td>
                 <td className={statusClass}>{statusText}</td>
                 <td>
                   {orderStatus === "o" ? (
