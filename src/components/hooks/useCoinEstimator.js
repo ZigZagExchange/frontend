@@ -18,6 +18,10 @@ export function useCoinEstimator() {
                 prices[a] = pairPrices[pair].price
             }
         })
+        
+        if (!prices.WETH && prices.ETH) {
+            prices.WETH = prices.ETH
+        }
     
         return (token) => {
             return parseFloat(prices && prices[token] ? prices[token] : 0).toFixed(2)
