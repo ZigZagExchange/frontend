@@ -4,7 +4,7 @@ import api from 'lib/api'
 
 const makeScope = state => `${state.network}-${state.userId}`
 
-export const authSlice = createSlice({
+export const apiSlice = createSlice({
   name: 'api',
   initialState: {
     network: 1,
@@ -186,10 +186,6 @@ export const authSlice = createSlice({
             state.userOrders[orderId] = orders[i]
           }
         }
-        const userOpenOrders = Object.values(state.userOrders).filter(o => o[9] === 'o')
-        if (userOpenOrders.length > 1 && api.isZksyncChain()) {
-          toast.warn('Filling a new order will cancel all previous orders. It is recommended to only have one open order at a time.', { autoClose: 15000 })
-        }
       }
     },
     setBalances(state, { payload }) {
@@ -254,11 +250,15 @@ export const authSlice = createSlice({
       state.marketSummary = {}
       state.orders = {}
       state.liquidity = []
+    },
+    clearUserOrders(state) {
+        state.userOrders = {};
+        state.userFills = {};
     }
   },
 })
 
-export const { setNetwork, clearBridgeReceipts, setBalances, setUserId, addBridgeReceipt, setCurrentMarket, resetData } = authSlice.actions
+export const { setNetwork, clearBridgeReceipts, setBalances, setUserId, addBridgeReceipt, setCurrentMarket, resetData, clearUserOrders } = apiSlice.actions
 
 export const networkSelector = state => state.api.network
 export const userOrdersSelector = state => state.api.userOrders
@@ -274,4 +274,4 @@ export const balancesSelector = (state => state.api.balances[makeScope(state.api
 
 export const handleMessage = createAction('api/handleMessage')
 
-export default authSlice.reducer
+export default apiSlice.reducer

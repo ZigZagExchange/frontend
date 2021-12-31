@@ -58,8 +58,11 @@ export class Footer extends React.Component {
             else if (timeToExpiry > 3600) {
                 expiryText = Math.floor(timeToExpiry / 3600) + "h";
             }
-            else {
+            else if (timeToExpiry > 0) {
                 expiryText = Math.floor(timeToExpiry / 3600) + "m";
+            }
+            else {
+                expiryText = "--"
             }
 
             const orderWithoutFee = api.getOrderDetailsWithoutFee(order);
