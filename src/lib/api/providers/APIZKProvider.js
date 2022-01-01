@@ -334,4 +334,32 @@ export default class APIZKProvider extends APIProvider {
         const seed = ethers.utils.arrayify(signature);
         return { seed, ethSignatureType };
     }
+
+    refreshArweaveAllocation = async (address) => {
+        const url = "https://zigzag-arweave-bridge.herokuapp.com/allocation/zksync?address=" + address;
+        try {
+            const allocation = await fetch(url).then(r => r.json());
+            const bytes = allocation.remaining_bytes;
+            this.api.emit('arweaveAllocationUpdate', bytes);
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    purchaseArweaveBytes = async (currency, bytes) => {
+        const BYTES_PER_DOLLAR = 10**6;
+        const ARWEAVE_BRIDGE_ADDRESS = "0xCb7AcA0cdEa76c5bD5946714083c559E34627607";
+        const decimals = this.api.currencies[currency].decimals;
+        console.log(currency, bytes, decimals, BYTES_PER_DOLLAR);
+        const amount = (bytes / BYTES_PER_DOLLAR * 10**decimals).toString();
+        return await this.syncWallet.syncTransfer({
+            to: ARWEAVE_BRIDGE_ADDRESS,
+            token: currency,
+            amount,
+        });
+    }
+
+    signMessage = async (message) => {
+        return await this.ethWallet.signMessage(message);
+    }
 }

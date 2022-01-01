@@ -19,6 +19,7 @@ export const apiSlice = createSlice({
     userOrders: {},
     userFills: {},
     orders: {},
+    arweaveAllocation: 0
   },
   reducers: {
     _fills(state, { payload }) {
@@ -254,11 +255,14 @@ export const apiSlice = createSlice({
     clearUserOrders(state) {
         state.userOrders = {};
         state.userFills = {};
+    },
+    setArweaveAllocation(state, { payload }) {
+        state.arweaveAllocation = payload;
     }
   },
 })
 
-export const { setNetwork, clearBridgeReceipts, setBalances, setUserId, addBridgeReceipt, setCurrentMarket, resetData, clearUserOrders } = apiSlice.actions
+export const { setNetwork, clearBridgeReceipts, setBalances, setUserId, addBridgeReceipt, setCurrentMarket, resetData, clearUserOrders, setArweaveAllocation } = apiSlice.actions
 
 export const networkSelector = state => state.api.network
 export const userOrdersSelector = state => state.api.userOrders
@@ -270,6 +274,7 @@ export const marketSummarySelector = state => state.api.marketSummary
 export const liquiditySelector = state => state.api.liquidity
 export const currentMarketSelector = state => state.api.currentMarket
 export const bridgeReceiptsSelector = state => state.api.bridgeReceipts
+export const arweaveAllocationSelector = state => state.api.arweaveAllocation
 export const balancesSelector = (state => state.api.balances[makeScope(state.api)] || {})
 
 export const handleMessage = createAction('api/handleMessage')

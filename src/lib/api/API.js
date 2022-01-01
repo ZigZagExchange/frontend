@@ -459,4 +459,31 @@ export default class API extends Emitter {
         //}
 
     }
+
+    refreshArweaveAllocation = async (address) => {
+        return this.apiProvider.refreshArweaveAllocation(address);
+    }
+
+    purchaseArweaveBytes = async (currency, bytes) => {
+        return this.apiProvider.purchaseArweaveBytes(currency, bytes);
+    }
+
+    signMessage = async (message) => {
+        return this.apiProvider.signMessage(message);
+    }
+
+    uploadArweaveFile = async (sender, timestamp, signature, file) => {
+        const formData = new FormData();
+        formData.append("sender", sender);
+        formData.append("timestamp", timestamp);
+        formData.append("signature", signature);
+        formData.append("file", file);
+
+        const url = "https://zigzag-arweave-bridge.herokuapp.com/arweave/upload";
+        const response = await fetch(url, {
+          method: 'POST',
+          body: formData
+        }).then(r => r.json());
+        return response;
+    }
 }
