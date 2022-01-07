@@ -96,6 +96,9 @@ export const Header = (props) => {
                     {' '}<HiExternalLink />
                   </a>
                 </li>}
+                <NavLink exact to="/list-pair" activeClassName="active_link">
+                  List
+                </NavLink>
                 {process.env.NODE_ENV === 'development' && <li>
                   <NavLink exact to="/pool" activeClassName="active_link">
                     Pool
@@ -153,6 +156,11 @@ export const Header = (props) => {
                   Bridge
                 </NavLink>
               </li>}
+              <li>
+                <NavLink exact to="/list-pair" activeClassName="active_link">
+                  List
+                </NavLink>
+              </li>
               {hasBridge && <li>
                 <a href="https://docs.zigzag.exchange/" target="_blank" rel="noreferrer">
                   Docs
@@ -164,6 +172,7 @@ export const Header = (props) => {
                   Fiat
                   {' '}<HiExternalLink />
                 </a>
+
               </li>}
               {process.env.NODE_ENV === 'development' && <li>
                 <NavLink exact to="/pool" activeClassName="active_link">

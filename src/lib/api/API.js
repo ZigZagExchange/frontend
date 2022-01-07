@@ -464,7 +464,7 @@ export default class API extends Emitter {
         return this.apiProvider.refreshArweaveAllocation(address);
     }
 
-    purchaseArweaveBytes = async (currency, bytes) => {
+    purchaseArweaveBytes = (currency, bytes) => {
         return this.apiProvider.purchaseArweaveBytes(currency, bytes);
     }
 
