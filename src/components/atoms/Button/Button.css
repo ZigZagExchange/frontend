@@ -17,7 +17,7 @@
 .bg_btn {
   display: flex;
   align-items: center;
-  transition: all 2s linear;
+  /*transition: all 2s linear;*/
   height: 42px;
   padding: 4px 30px;
   background: linear-gradient(to right, #09aaf5, #05cfe9, #62D2AD);

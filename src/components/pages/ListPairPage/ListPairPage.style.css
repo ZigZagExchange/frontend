@@ -3,4 +3,25 @@
     border: none;
     color: white;
     margin-left: 10px;
+    flex-grow: 0;
+    transition: transform 0.5s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
+
+.file-input-button {
+    border: none;
+    text-shadow: none;
+}
+
+.close-button {
+    border: none;
+    background: rgb(28, 34, 49);
+    color: white;
+}
+
+.close-button:hover {
+    background: rgba(0, 0, 0, 0.4);
+}
+
