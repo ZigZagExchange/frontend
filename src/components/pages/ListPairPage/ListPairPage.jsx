@@ -1,14 +1,14 @@
 import React, {useState, useEffect, useRef} from "react";
 import {useSelector} from 'react-redux';
 import {userSelector} from "lib/store/features/auth/authSlice";
-import {arweaveAllocationSelector, networkSelector} from "lib/store/features/api/apiSlice";
+import {arweaveAllocationSelector} from "lib/store/features/api/apiSlice";
 import api from 'lib/api';
 import './ListPairPage.style.css'
 import {Button, DefaultTemplate} from 'components';
 import {BsLink45Deg, HiOutlineRefresh, IoCloseSharp} from "react-icons/all";
-import darkPlugHead from "../../../assets/icons/dark-plug-head.png";
 import cx from "classnames";
 import 'bootstrap'
+import ConnectWalletButton from "../../molecules/ConnectWalletButton/ConnectWalletButton";
 
 
 export default function ListPairPage() {
@@ -19,6 +19,10 @@ export default function ListPairPage() {
   const [fileToUpload, setFileToUpload] = useState(null)
   const [isFileUploadLoading, setIsFileUploadLoading] = useState(false)
   const fileInputRef = useRef()
+
+  // TODO: Modal for successful upload receipt
+  // TODO: Waiting on full validation from
+
 
   // test txid for receipt
   // ILvtamrekb_DUWjhx-Pwa2X6xCLpajouQvrq3aURzB0
@@ -32,12 +36,6 @@ export default function ListPairPage() {
     setFileToUpload(null)
   }
 
-  useEffect(() => {
-    if (user.address) {
-      refreshUserArweaveAllocation()
-    }
-  }, []);
-
   async function handleFileUpload(e) {
     const timestamp = Date.now();
     const message = `${user.address}:${timestamp}`;
@@ -45,7 +43,6 @@ export default function ListPairPage() {
       setIsFileUploadLoading(true)
       const signature = await api.signMessage(message);
       const response = await api.uploadArweaveFile(user.address, timestamp, signature, fileToUpload);
-      console.log(response);
       setTxId(response.arweave_txid);
       clearFileInput()
       refreshUserArweaveAllocation()
@@ -53,6 +50,27 @@ export default function ListPairPage() {
       setIsFileUploadLoading(false)
     }
   }
+
+  const onFileChange = (e) => {
+    const fileReader = new FileReader()
+    fileReader.onload = (e) => {
+      try {
+        const contents = JSON.parse(e.target.result)
+      } catch (e) {
+        console.log(e)
+      }
+    }
+
+    const file = e.target.files[0]
+    fileReader.readAsText(file)
+    setFileToUpload(file)
+  }
+
+  useEffect(() => {
+    if (user.address) {
+      refreshUserArweaveAllocation()
+    }
+  }, []);
 
   return (
     <DefaultTemplate>
@@ -100,9 +118,10 @@ export default function ListPairPage() {
                     type="file"
                     name="file"
                     id="arweave-file-upload"
+                    accept="application/json"
                     ref={fileInputRef}
                     style={{display: "none"}}
-                    onChange={(e) => setFileToUpload(e.target.files[0])}
+                    onChange={onFileChange}
                   />
                   Add file
                 </Button>
@@ -174,19 +193,3 @@ const PurchaseButton = ({onSuccess}) => {
     Purchase 100kB (0.10 USDC)
   </Button>
 }
-
-const ConnectWalletButton = () => {
-  const network = useSelector(networkSelector);
-  const [isLoading, setIsLoading] = useState(false)
-  return <Button
-    loading={isLoading}
-    className="bg_btn"
-    text="CONNECT WALLET"
-    img={darkPlugHead}
-    onClick={() => {
-      setIsLoading(true)
-      api.signIn(network).finally(() => setIsLoading(false))
-    }}
-  />
-}
-

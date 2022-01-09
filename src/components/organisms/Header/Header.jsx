@@ -14,11 +14,12 @@ import logo from 'assets/images/logo.png'
 import menu from 'assets/icons/menu.png'
 import darkPlugHead from 'assets/icons/dark-plug-head.png'
 import './Header.css'
+import ConnectWalletButton from "../../molecules/ConnectWalletButton/ConnectWalletButton";
 
 export const Header = (props) => {
   // state to open or close the sidebar in mobile
   const [show, setShow] = useState(false)
-  const [connecting, setConnecting] = useState(false)
+  // const [connecting, setConnecting] = useState(false)
   const user = useSelector(userSelector)
   const network = useSelector(networkSelector)
   const history = useHistory()
@@ -42,16 +43,11 @@ export const Header = (props) => {
     </Menu>
   )
 
-  const connect = () => {
-    setConnecting(true)
-    api.signIn(network)
-      .then(state => {
-        if (!state.id && !/^\/bridge(\/.*)?/.test(location.pathname)) {
-          history.push('/bridge')
-        }
-        setConnecting(false)
-      })
-      .catch(() => setConnecting(false))
+  // TODO: is this needed?
+  const pushToBridgeMaybe = (state) => {
+    if (!state.id && !/^\/bridge(\/.*)?/.test(location.pathname)) {
+      history.push('/bridge')
+    }
   }
 
   return (
@@ -116,9 +112,7 @@ export const Header = (props) => {
                     </button>
                   </Dropdown>
                 ) : (
-                  <Button loading={connecting} className="bg_btn" onClick={connect}>
-                    <img src={darkPlugHead} alt="..." /> CONNECT WALLET
-                  </Button>
+                  <ConnectWalletButton onSuccess={pushToBridgeMaybe}/>
                 )}
               </div>
               <div className="eu_text">
@@ -217,13 +211,7 @@ export const Header = (props) => {
               {user.id && user.address ? (
                 <AccountDropdown />
               ) : (
-                <Button
-                  className="bg_btn"
-                  loading={connecting}
-                  text="CONNECT WALLET"
-                  img={darkPlugHead}
-                  onClick={connect}
-                />
+                <ConnectWalletButton onSuccess={pushToBridgeMaybe}/>
               )}
             </div>
           </div>

@@ -17,6 +17,7 @@ import { MdSwapCalls } from 'react-icons/md';
 import darkPlugHead from 'assets/icons/dark-plug-head.png';
 import logo from 'assets/images/logo.png'
 import BridgeSwapInput from '../BridgeSwapInput/BridgeSwapInput';
+import ConnectWalletButton from "../../../molecules/ConnectWalletButton/ConnectWalletButton";
 
 const defaultTransfer = {
   type: 'deposit',
@@ -226,12 +227,7 @@ const Bridge = () => {
             </div>
           )}
           <div className="bridge_button">
-            {!user.address && <Button
-              className="bg_btn"
-              text="CONNECT WALLET"
-              img={darkPlugHead}
-              onClick={() => api.signIn(network)}
-            />}
+            {!user.address && <ConnectWalletButton/>}
             {user.address && balances[swapDetails.currency] && !hasAllowance && <Button
               loading={isApproving}
               className={cx("bg_btn", { zig_disabled: formErr.length > 0 || swapDetails.amount.length === 0, })}

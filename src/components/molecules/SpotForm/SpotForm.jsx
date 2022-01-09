@@ -4,6 +4,7 @@ import api from 'lib/api';
 import { RangeSlider, Button } from 'components';
 import darkPlugHead from 'assets/icons/dark-plug-head.png';
 import './SpotForm.css';
+import ConnectWalletButton from "../ConnectWalletButton/ConnectWalletButton";
 
 export class SpotForm extends React.Component {
     constructor(props) {
@@ -341,12 +342,7 @@ export class SpotForm extends React.Component {
               </div>
             ) : (
               <div className="spf_btn">
-                <Button
-                  className="bg_btn"
-                  text="CONNECT WALLET"
-                  img={darkPlugHead}
-                  onClick={this.props.signInHandler}
-                />
+                <ConnectWalletButton/>
               </div>
             )}
           </form>
