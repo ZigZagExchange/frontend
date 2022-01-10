@@ -1,5 +1,4 @@
 import React from "react";
-import PropTypes from "prop-types";
 import styled, {css} from '@xstyled/styled-components'
 
 
@@ -27,17 +26,6 @@ const Pane = ({size, variant = "secondary", children}) => {
   return <PaneStyled size={size} variant={variant}>
     {children && children}
   </PaneStyled>
-}
-
-Pane.defaultProps = {
-  size: "sm",
-  variant: "primary"
-}
-
-Pane.propTypes = {
-  size: PropTypes.oneOf(["sm", "md"]),
-  children: PropTypes.any,
-  variant: PropTypes.oneOf(["primary", "secondary"])
 }
 
 export default Pane

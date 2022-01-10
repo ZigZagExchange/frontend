@@ -71,9 +71,8 @@ export default function ListPairPage() {
     setFileToUpload(file)
 
     if (Number(file.size) > arweaveAllocation) {
-      console.log("debug:: show modal")
-      setIsAllocationModalOpen(true)
       setIsAllocationInsufficient(true)
+      setIsAllocationModalOpen(true)
     }
   }
 
@@ -165,9 +164,8 @@ export default function ListPairPage() {
                   <Button
                     className={cx("bg_btn", "mt-3", {zig_disabled: !fileToUpload})}
                     onClick={handleFileUpload}
-                    disabled={!fileToUpload}
+                    disabled={!fileToUpload || isAllocationInsufficient}
                     loading={isFileUploadLoading}
-                    disabled={isAllocationInsufficient}
                   >
                     UPLOAD
                   </Button>

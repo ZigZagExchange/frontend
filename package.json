@@ -64,7 +64,6 @@
     "postcss-preset-env": "6.7.0",
     "postcss-safe-parser": "5.0.2",
     "prompts": "2.4.0",
-    "prop-types": "^15.8.1",
     "rc-dropdown": "^3.2.0",
     "rc-menu": "^9.0.14",
     "react": "^17.0.2",
