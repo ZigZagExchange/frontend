@@ -34,7 +34,7 @@ export const HeaderBridge = (props) => {
       <header className="bridge_header">
         <div className="d-flex align-items-center justify-content-center w-100">
           <div className="head_left">
-            <a href="http://info.zigzag.exchange" rel="noreferrer"><img src={logo} alt="logo" /></a>
+            <a href="http://info.zigzag.exchange" rel="noreferrer"><img src={logo} alt="logo" height="30"/></a>
             <ul>
               <li>
                 <NavLink exact to="/" activeClassName="active_link">

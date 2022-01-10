@@ -3,7 +3,11 @@ import { useHistory, useLocation } from 'react-router-dom'
 import { BiChevronDown } from 'react-icons/bi'
 import { FaDiscord, FaTelegramPlane, FaTwitter } from 'react-icons/fa'
 import { GoGlobe } from 'react-icons/go'
-import { HiExternalLink } from 'react-icons/hi'
+import { MdPool } from 'react-icons/md'
+import { MdMoving } from 'react-icons/md'
+import { MdLinearScale } from 'react-icons/md'
+import { MdSwapVert } from 'react-icons/md'
+import { MdInfo } from 'react-icons/md'
 import React, { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { Button, Dropdown, AccountDropdown, Menu, MenuItem } from 'components'
@@ -58,7 +62,7 @@ export const Header = (props) => {
     <>
       <header>
         <div className="mobile_header mb_h">
-          <img src={logo} alt="logo" />
+          <img src={logo} alt="logo" height="30"/>
           {/* open sidebar function */}
           <img
             onClick={() => {
@@ -71,35 +75,38 @@ export const Header = (props) => {
         {/* mobile sidebar */}
         {show ? (
           <div className="mb_header_container mb_h">
-            <img src={logo} alt="logo" />
+            <img src={logo} alt="logo" height="30" />
             <div className="head_left">
               <ul>
                 <li>
                   <NavLink exact to="/" activeClassName="active_link">
+                    <MdMoving />{' '}
                     Trade
                   </NavLink>
                 </li>
                 {hasBridge && <li>
                   <NavLink exact to="/bridge" activeClassName="active_link">
+                    <MdLinearScale />{' '}
                     Bridge
                   </NavLink>
                 </li>}
                 {hasBridge && <li>
-                  <a href="https://docs.zigzag.exchange/" target="_blank" rel="noreferrer">
-                    Docs
-                    {' '}<HiExternalLink />
-                  </a>
-                </li>}
-                {hasBridge && <li>
-                  <a href="https://zigzag.banxa.com/" target="_blank" rel="noreferrer">
-                    Fiat
-                    {' '}<HiExternalLink />
-                  </a>
+                  <NavLink exact to="/bridge" activeClassName="active_link">
+                    <MdSwapVert />{' '}
+                    Swap
+                  </NavLink>
                 </li>}
                 {process.env.NODE_ENV === 'development' && <li>
                   <NavLink exact to="/pool" activeClassName="active_link">
+                    <MdPool />{' '}
                     Pool
                   </NavLink>
+                </li>}
+                {hasBridge && <li>
+                  <a href="https://docs.zigzag.exchange/" rel="noreferrer">
+                    <MdInfo />{' '}
+                    Docs
+                  </a>
                 </li>}
               </ul>
             </div>
@@ -141,38 +148,41 @@ export const Header = (props) => {
         {/* desktop header */}
         <div className="head_wrapper_desktop dex_h">
           <div className="head_left">
-            <a href="http://info.zigzag.exchange" rel="noreferrer"><img src={logo} alt="logo" /></a>
+            <a href="http://info.zigzag.exchange" rel="noreferrer"><img src={logo} alt="logo" height="30" /></a>
             <ul>
               <li>
                 <NavLink exact to="/" activeClassName="active_link">
+                  <MdMoving />{' '}
                   Trade
                 </NavLink>
               </li>
               {hasBridge && <li>
                 <NavLink exact to="/bridge" activeClassName="active_link">
+                  <MdLinearScale />{' '}
                   Bridge
                 </NavLink>
               </li>}
               {hasBridge && <li>
-                <a href="https://docs.zigzag.exchange/" target="_blank" rel="noreferrer">
-                  Docs
-                  {' '}<HiExternalLink />
-                </a>
-              </li>}
-              {hasBridge && <li>
-                <a href="https://zigzag.banxa.com/" target="_blank" rel="noreferrer">
-                  Fiat
-                  {' '}<HiExternalLink />
-                </a>
+                <NavLink exact to="/bridge" activeClassName="active_link">
+                  <MdSwapVert />{' '}
+                  Swap
+                </NavLink>
               </li>}
               {process.env.NODE_ENV === 'development' && <li>
                 <NavLink exact to="/pool" activeClassName="active_link">
+                  <MdPool />{' '}
                   Pool
                 </NavLink>
               </li>}
+              {hasBridge && <li>
+                <a href="https://docs.zigzag.exchange/" rel="noreferrer">
+                  <MdInfo />{' '}
+                  Docs
+                </a>
+              </li>}
             </ul>
           </div>
-          <div className="head_left head_left_socials">
+          <div className="head_left head_right_socials">
           <ul>
             <li className="head_social_link">
               <a target="_blank" rel="noreferrer" href="https://discord.gg/zigzag"><FaDiscord /></a>

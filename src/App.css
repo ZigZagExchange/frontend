@@ -18,6 +18,7 @@ p {
 body {
     height: 100vh;
     font-size: 0.9rem;
+    background: #1c2231;
 }
 
 html {
@@ -67,4 +68,9 @@ html {
 /* WalletConnect customization */
 .walletconnect-modal__base div:nth-child(3) {
     overflow-y: scroll;
+}
+
+/* template wrapper for header */
+.template_wrapper{
+    padding-top: 80px;
 }

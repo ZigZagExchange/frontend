@@ -1,10 +1,12 @@
-import { HeaderBridge } from 'components'
-
+import { Header } from 'components'
+// import { HeaderBridge } from 'components'
 export const BridgeTemplate = ({ children }) => {
     return (
         <>
-            <HeaderBridge />
-            {children}
+            <Header />
+            <div className='template_wrapper'>
+                {children}
+            </div>
         </>
     )
 }
