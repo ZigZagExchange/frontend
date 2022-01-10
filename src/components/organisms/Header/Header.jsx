@@ -182,21 +182,20 @@ export const Header = (props) => {
               </li>}
             </ul>
           </div>
-          <div className="head_left head_right_socials">
-          <ul>
-            <li className="head_social_link">
-              <a target="_blank" rel="noreferrer" href="https://discord.gg/zigzag"><FaDiscord /></a>
-            </li>
-            <li className="head_social_link"> 
-              <a target="_blank" rel="noreferrer" href="https://twitter.com/ZigZagExchange"><FaTwitter /></a>
-            </li>  
-            <li className="head_social_link">
-              <a target="_blank" rel="noreferrer" href="https://t.me/zigzagexchange"><FaTelegramPlane /></a> 
-            </li>  
-            </ul>
-                  
-                </div>
           <div className="head_right">
+            <div className="head_socials">
+              <ul>
+                <li>
+                  <a target="_blank" rel="noreferrer" href="https://discord.gg/zigzag"><FaDiscord /></a>
+                </li>
+                <li> 
+                  <a target="_blank" rel="noreferrer" href="https://twitter.com/ZigZagExchange"><FaTwitter /></a>
+                </li>  
+                <li>
+                  <a target="_blank" rel="noreferrer" href="https://t.me/zigzagexchange"><FaTelegramPlane /></a> 
+                </li>  
+              </ul>
+            </div>
             <label htmlFor="networkSelector" className="eu_text">
                 <GoGlobe className="eu_network" />
                 <select
