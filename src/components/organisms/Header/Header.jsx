@@ -14,7 +14,7 @@ import logo from 'assets/images/logo.png'
 import menu from 'assets/icons/menu.png'
 import darkPlugHead from 'assets/icons/dark-plug-head.png'
 import './Header.css'
-import ConnectWalletButton from "../../molecules/ConnectWalletButton/ConnectWalletButton";
+import ConnectWalletButton from "../../atoms/ConnectWalletButton/ConnectWalletButton";
 
 export const Header = (props) => {
   // state to open or close the sidebar in mobile

@@ -4,25 +4,29 @@ import {userSelector} from "lib/store/features/auth/authSlice";
 import {arweaveAllocationSelector} from "lib/store/features/api/apiSlice";
 import api from 'lib/api';
 import './ListPairPage.style.css'
-import {Button, DefaultTemplate} from 'components';
-import {BsLink45Deg, HiOutlineRefresh, IoCloseSharp} from "react-icons/all";
+import {Button, DefaultTemplate, Modal} from 'components';
+import {BsLink45Deg, HiOutlineRefresh, IoCloseSharp, RiErrorWarningLine} from "react-icons/all";
 import cx from "classnames";
 import 'bootstrap'
-import ConnectWalletButton from "../../molecules/ConnectWalletButton/ConnectWalletButton";
+import ConnectWalletButton from "../../atoms/ConnectWalletButton/ConnectWalletButton";
+import Pane from "../../atoms/Pane/Pane";
+import AllocationModal from "./AllocationModal";
+import {Col, Row} from "react-bootstrap";
 
 
 export default function ListPairPage() {
   const user = useSelector(userSelector);
-  const isUserLoggedIn = Object.keys(user).length !== 0
+  const isUserLoggedIn = user.id !== null && user.id !== undefined
   const arweaveAllocation = useSelector(arweaveAllocationSelector);
   const [txid, setTxId] = useState("");
   const [fileToUpload, setFileToUpload] = useState(null)
   const [isFileUploadLoading, setIsFileUploadLoading] = useState(false)
   const fileInputRef = useRef()
+  const [isAllocationModalOpen, setIsAllocationModalOpen] = useState(false)
+  const [isAllocationInsufficient, setIsAllocationInsufficient] = useState(false)
 
   // TODO: Modal for successful upload receipt
   // TODO: Waiting on full validation from
-
 
   // test txid for receipt
   // ILvtamrekb_DUWjhx-Pwa2X6xCLpajouQvrq3aURzB0
@@ -48,6 +52,7 @@ export default function ListPairPage() {
       refreshUserArweaveAllocation()
     } finally {
       setIsFileUploadLoading(false)
+      refreshUserArweaveAllocation()
     }
   }
 
@@ -64,6 +69,12 @@ export default function ListPairPage() {
     const file = e.target.files[0]
     fileReader.readAsText(file)
     setFileToUpload(file)
+
+    if (Number(file.size) > arweaveAllocation) {
+      console.log("debug:: show modal")
+      setIsAllocationModalOpen(true)
+      setIsAllocationInsufficient(true)
+    }
   }
 
   useEffect(() => {
@@ -76,7 +87,7 @@ export default function ListPairPage() {
     <DefaultTemplate>
       <div className={"p-4"}
            style={{background: "#1c2231", width: "100%", height: "calc(100vh - 80px)", color: "white"}}>
-        <div className={"d-flex justify-content-center"}>
+        <div className={"d-flex justify-content-center h-100 align-items-center"}>
           {!isUserLoggedIn && <div className={"d-flex flex-column align-items-center"}>
             <BsLink45Deg size={30}/>
             <h3>Connect wallet</h3>
@@ -89,107 +100,99 @@ export default function ListPairPage() {
           </div>}
 
           {isUserLoggedIn && <div>
-            <div>
-              <h3>Allocation</h3>
-              <div className={"d-flex align-items-center"}>
-                <div className={"arweave-allocation"}>
-                  Available Bytes: {arweaveAllocation}
+            <Pane size={"md"}>
+              <div style={{minWidth: "300px"}}>
+                <h3>List Pair</h3>
+                <div className={"mt-2 d-flex justify-content-between align-items-center"}>
+                  <div className={"d-flex align-items-center mt-3 justify-content-between"} style={{flexGrow: 1}}>
+                    <Button onClick={() => fileInputRef.current.click()}
+                            className={cx("bg_btn_secondary", "p-1", "rounded", "w-100", {"d-none": fileToUpload})}>
+                      <input
+                        type="file"
+                        name="file"
+                        id="arweave-file-upload"
+                        accept="application/json"
+                        ref={fileInputRef}
+                        style={{display: "none"}}
+                        onChange={onFileChange}
+                      />
+                      SELECT FILE
+                    </Button>
+                    {fileToUpload && <div
+                      style={{
+                        flexGrow: 1,
+                        maxWidth: "150px",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        fontSize: "16px"
+                      }}
+                    >
+                      {fileToUpload.name}
+                    </div>}
+                    {fileToUpload && <Button
+                      className={"rounded close-button"}
+                      onClick={() => {
+                        clearFileInput()
+                        setIsAllocationInsufficient(false)
+                      }}>
+                      <IoCloseSharp/>
+                    </Button>}
+                  </div>
                 </div>
-                <RefreshButton onClick={() => refreshUserArweaveAllocation()}/>
-              </div>
-              <div className={"d-flex mt-3"}>
-                <div>
-                  <PurchaseButton onSuccess={() => {
-                    // API cache needs a bit of time to update. 1s should do it.
-                    setTimeout(() => {
-                      refreshUserArweaveAllocation()
-                    }, 1 * 1000)
-                  }}/>
-                </div>
-              </div>
-            </div>
 
-            <h3 className={"mt-5"}>Upload</h3>
-            <div className={"mt-2 d-flex justify-content-between align-items-center"}>
-              <div className={"d-flex align-items-center"} style={{flexGrow: 1}}>
-                <Button onClick={() => fileInputRef.current.click()}
-                        className={cx("file-input-button", "p-1", "rounded")}>
-                  <input
-                    type="file"
-                    name="file"
-                    id="arweave-file-upload"
-                    accept="application/json"
-                    ref={fileInputRef}
-                    style={{display: "none"}}
-                    onChange={onFileChange}
-                  />
-                  Add file
-                </Button>
-                {fileToUpload && <div
-                  style={{
-                    marginLeft: "10px",
-                    flexGrow: 1,
-                    maxWidth: "150px",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis"
-                  }}
-                >
-                  {fileToUpload.name}
-                </div>}
+                {isAllocationInsufficient && <div className={"mt-3"}>
+                    <Row>
+                      <Col sm={8} className={"d-flex align-items-center"}>
+                        <RiErrorWarningLine size={18} color={"red"}/>
+                        <div style={{marginLeft: "8px", fontSize: "12px"}}>Insufficient allocation</div>
+                      </Col>
+                      <Col sm={4} className={"d-flex justify-content-end align-items-center"}>
+                        <Button
+                          className={"bg_btn"}
+                          onClick={() => setIsAllocationModalOpen(true)}
+                          style={{
+                            fontSize: "14px",
+                            maxWidth: "fit-content",
+                            height: "auto",
+                            padding: "4px 15px"
+                          }}
+                        >
+                          Purchase
+                        </Button>
+                      </Col>
+                    </Row>
+                  </div>}
+                  <Button
+                    className={cx("bg_btn", "mt-3", {zig_disabled: !fileToUpload})}
+                    onClick={handleFileUpload}
+                    disabled={!fileToUpload}
+                    loading={isFileUploadLoading}
+                    disabled={isAllocationInsufficient}
+                  >
+                    UPLOAD
+                  </Button>
               </div>
-              {fileToUpload && <Button
-                className={"rounded close-button"}
-                onClick={() => clearFileInput()}>
-                <IoCloseSharp/>
-              </Button>}
-            </div>
-            {fileToUpload && <div className={"mt-2"}>
-              Size (bytes): {fileToUpload.size}
-            </div>}
-            <Button
-              className={cx("bg_btn", "mt-3", {zig_disabled: !fileToUpload})}
-              onClick={handleFileUpload}
-              disabled={!fileToUpload}
-              loading={isFileUploadLoading}
-            >
-              Upload
-            </Button>
+            </Pane>
+
             {txid && <div className={"mt-2"}>
               TXID: {txid}
             </div>}
           </div>}
         </div>
       </div>
+      <AllocationModal
+        onClose={() => setIsAllocationModalOpen(false)}
+        show={isAllocationModalOpen}
+        fileSize={fileToUpload?.size}
+        onSuccess={() => {
+          // API cache needs a bit of time to update. 1s should do it.
+          setTimeout(() => {
+            refreshUserArweaveAllocation()
+          }, 1 * 1000)
+        }}
+      />
     </DefaultTemplate>
   )
 }
 
-const RefreshButton = ({onClick}) => {
-  const [rotation, setRotation] = useState(0)
-  return <button
-    style={{
-      transform: `rotateZ(${rotation}deg)`,
-    }}
-    onClick={() => {
-      onClick()
-      setRotation(rotation - 180)
-    }}
-    className={"refresh-button"}
-  >
-    <HiOutlineRefresh size={18}/>
-  </button>
-}
 
-const PurchaseButton = ({onSuccess}) => {
-  const [isLoading, setIsLoading] = useState(false)
-  return <Button loading={isLoading} className="bg_btn" onClick={() => {
-    setIsLoading(true)
-    api.purchaseArweaveBytes("USDC", 10 ** 5)
-      .then((transaction) => {
-        transaction.awaitReceipt().then(() => onSuccess())
-      })
-      .finally(() => setIsLoading(false))
-  }}>
-    Purchase 100kB (0.10 USDC)
-  </Button>
-}

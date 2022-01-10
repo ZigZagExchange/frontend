@@ -4,7 +4,10 @@ import {
 } from '@xstyled/styled-components'
 
 const colors = {
-
+  gray: {
+    100: "#242734",
+    200: "#191B24"
+  }
 }
 
 const space = {

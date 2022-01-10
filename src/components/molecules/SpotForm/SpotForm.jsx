@@ -4,7 +4,7 @@ import api from 'lib/api';
 import { RangeSlider, Button } from 'components';
 import darkPlugHead from 'assets/icons/dark-plug-head.png';
 import './SpotForm.css';
-import ConnectWalletButton from "../ConnectWalletButton/ConnectWalletButton";
+import ConnectWalletButton from "../../atoms/ConnectWalletButton/ConnectWalletButton";
 
 export class SpotForm extends React.Component {
     constructor(props) {

@@ -17,7 +17,7 @@ import { MdSwapCalls } from 'react-icons/md';
 import darkPlugHead from 'assets/icons/dark-plug-head.png';
 import logo from 'assets/images/logo.png'
 import BridgeSwapInput from '../BridgeSwapInput/BridgeSwapInput';
-import ConnectWalletButton from "../../../molecules/ConnectWalletButton/ConnectWalletButton";
+import ConnectWalletButton from "../../../atoms/ConnectWalletButton/ConnectWalletButton";
 
 const defaultTransfer = {
   type: 'deposit',
