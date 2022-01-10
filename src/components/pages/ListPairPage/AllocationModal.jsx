@@ -32,7 +32,7 @@ const AllocationModal = ({onClose, show, onSuccess, fileSize}) => {
       To list a new pair you must purchase space on arweave where your metadata will be stored.
     </div>
     <div className={"mb-4"}>
-      <Pane variant={"secondary"}>
+      <Pane size={"xs"}>
         <div className={"d-flex justify-content-around align-items-center"}>
 
           {userHasExistingAllocation ?

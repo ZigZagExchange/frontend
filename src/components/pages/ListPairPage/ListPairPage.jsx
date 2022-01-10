@@ -4,8 +4,8 @@ import {userSelector} from "lib/store/features/auth/authSlice";
 import {arweaveAllocationSelector} from "lib/store/features/api/apiSlice";
 import api from 'lib/api';
 import './ListPairPage.style.css'
-import {Button, DefaultTemplate, Modal} from 'components';
-import {BsLink45Deg, HiOutlineRefresh, IoCloseSharp, RiErrorWarningLine} from "react-icons/all";
+import {Button, DefaultTemplate} from 'components';
+import {BsLink45Deg, IoCloseSharp, RiErrorWarningLine} from "react-icons/all";
 import cx from "classnames";
 import 'bootstrap'
 import ConnectWalletButton from "../../atoms/ConnectWalletButton/ConnectWalletButton";
@@ -58,14 +58,6 @@ export default function ListPairPage() {
 
   const onFileChange = (e) => {
     const fileReader = new FileReader()
-    fileReader.onload = (e) => {
-      try {
-        const contents = JSON.parse(e.target.result)
-      } catch (e) {
-        console.log(e)
-      }
-    }
-
     const file = e.target.files[0]
     fileReader.readAsText(file)
     setFileToUpload(file)
@@ -99,7 +91,7 @@ export default function ListPairPage() {
           </div>}
 
           {isUserLoggedIn && <div>
-            <Pane size={"md"}>
+            <Pane size={"sm"} variant={"secondary"}>
               <div style={{minWidth: "300px"}}>
                 <h3>List Pair</h3>
                 <div className={"mt-2 d-flex justify-content-between align-items-center"}>
