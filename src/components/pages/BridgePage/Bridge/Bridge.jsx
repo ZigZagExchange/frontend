@@ -163,7 +163,7 @@ const Bridge = () => {
     <>
       <div className="bridge_box">
         {/*<div className="bridge_box_top">*/}
-          <Pane size={"md"} variant={"secondary"}>
+          <Pane size={"md"} variant={"light"}>
             <div className="bridge_coin_title">
               <h5>FROM</h5>
               {transfer.type === 'withdraw' ? zkSyncLayer2Header : ethLayer1Header}
@@ -186,7 +186,7 @@ const Bridge = () => {
         {/*</div>*/}
 
         {/*<div className="bridge_box_bottom">*/}
-          <Pane size={"md"} style={{borderTopRightRadius: 0, borderTopLeftRadius: 0}}>
+          <Pane size={"md"} borderTopRightRadius={0} borderTopLeftRadius={0}>
           <div className="bridge_box_swap_wrapper">
             <SwapButton onClick={switchTransferType} />
             <h5>Switch</h5>

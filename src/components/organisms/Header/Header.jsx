@@ -15,6 +15,7 @@ import menu from 'assets/icons/menu.png'
 import darkPlugHead from 'assets/icons/dark-plug-head.png'
 import './Header.css'
 import ConnectWalletButton from "../../atoms/ConnectWalletButton/ConnectWalletButton";
+import {Dev, isDev} from "../../../lib/helpers/env";
 
 export const Header = (props) => {
   // state to open or close the sidebar in mobile
@@ -95,11 +96,18 @@ export const Header = (props) => {
                 <NavLink exact to="/list-pair" activeClassName="active_link">
                   List
                 </NavLink>
-                {process.env.NODE_ENV === 'development' && <li>
-                  <NavLink exact to="/pool" activeClassName="active_link">
-                    Pool
-                  </NavLink>
-                </li>}
+                <Dev>
+                  <li>
+                    <NavLink exact to="/pool" activeClassName="active_link">
+                      Pool
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink exact to="/dsl" activeClassName="active-link">
+                      DSL
+                    </NavLink>
+                  </li>
+                </Dev>
               </ul>
             </div>
             <div className="head_right">
@@ -168,11 +176,18 @@ export const Header = (props) => {
                 </a>
 
               </li>}
-              {process.env.NODE_ENV === 'development' && <li>
-                <NavLink exact to="/pool" activeClassName="active_link">
-                  Pool
-                </NavLink>
-              </li>}
+              <Dev>
+                <li>
+                  <NavLink exact to="/pool" activeClassName="active_link">
+                    Pool
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink exact to="/dsl" activeClassName="active-link">
+                    DSL
+                  </NavLink>
+                </li>
+              </Dev>
             </ul>
           </div>
           <div className="head_left head_left_socials">

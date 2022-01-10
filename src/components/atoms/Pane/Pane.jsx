@@ -1,36 +1,39 @@
 import React from "react";
-import styled, {css} from '@xstyled/styled-components'
+import {x} from '@xstyled/styled-components'
 
+const sizes = {
+  xs: {
+    borderRadius: 1,
+    padding: 1
+  },
+  sm: {
+    borderRadius: 4,
+    padding: 7
+  },
+  md: {
+    borderRadius: 9,
+    padding: 10
+  }
+}
 
-const PaneStyled = styled.div`
-  ${({ size }) => size === "xs" && css`
-    border-radius: ${({ theme }) => theme.space[1]};
-    padding: ${({theme}) => theme.space[3]};
-  `}
-  
-  ${({ size }) => size === "sm" && css`
-    border-radius: ${({ theme }) => theme.space[4]};
-    padding: ${({theme}) => theme.space[7]};
-  `}
+const colors = {
+  light: {
+    backgroundColor: "blue-500"
+  },
+  dark: {
+    backgroundColor: "blue-600"
+  },
+}
 
-  ${({ size }) => size === "md" && css`
-    border-radius: ${({ theme }) => theme.space[9]};
-    padding: ${({theme}) => theme.space[10]};
-  `}
-  
-  ${({ variant }) => variant === "primary" && css`
-    background: ${({theme}) => theme.colors.blue[600]};
-  `}
-
-  ${({ variant }) => variant === "secondary" && css`
-    background: ${({theme}) => theme.colors.blue[500]};
-  `}
-`
-
-const Pane = ({size = "sm", variant = "primary", style, children}) => {
-  return <PaneStyled size={size} variant={variant} style={style}>
+const Pane = ({
+    size = "sm",
+    variant = "dark",
+    children,
+    ...rest
+}) => {
+  return <x.div {...sizes[size]} {...colors[variant]} {...rest}>
     {children && children}
-  </PaneStyled>
+  </x.div>
 }
 
 export default Pane

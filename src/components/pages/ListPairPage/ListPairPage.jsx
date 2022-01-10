@@ -12,6 +12,9 @@ import ConnectWalletButton from "../../atoms/ConnectWalletButton/ConnectWalletBu
 import Pane from "../../atoms/Pane/Pane";
 import AllocationModal from "./AllocationModal";
 import {Col, Row} from "react-bootstrap";
+import {x} from "@xstyled/styled-components"
+import Form from "../../atoms/Form/Form";
+import NumberInput from "../../atoms/Form/NumberInput";
 
 
 export default function ListPairPage() {
@@ -56,17 +59,6 @@ export default function ListPairPage() {
     }
   }
 
-  const onFileChange = (e) => {
-    const fileReader = new FileReader()
-    const file = e.target.files[0]
-    fileReader.readAsText(file)
-    setFileToUpload(file)
-
-    if (Number(file.size) > arweaveAllocation) {
-      setIsAllocationInsufficient(true)
-      setIsAllocationModalOpen(true)
-    }
-  }
 
   useEffect(() => {
     if (user.address) {
@@ -91,47 +83,36 @@ export default function ListPairPage() {
           </div>}
 
           {isUserLoggedIn && <div>
-            <Pane size={"sm"} variant={"secondary"}>
-              <div style={{minWidth: "300px"}}>
-                <h3>List Pair</h3>
-                <div className={"mt-2 d-flex justify-content-between align-items-center"}>
-                  <div className={"d-flex align-items-center mt-3 justify-content-between"} style={{flexGrow: 1}}>
-                    <Button onClick={() => fileInputRef.current.click()}
-                            className={cx("bg_btn_secondary", "p-1", "rounded", "w-100", {"d-none": fileToUpload})}>
-                      <input
-                        type="file"
-                        name="file"
-                        id="arweave-file-upload"
-                        accept="application/json"
-                        ref={fileInputRef}
-                        style={{display: "none"}}
-                        onChange={onFileChange}
-                      />
-                      SELECT FILE
-                    </Button>
-                    {fileToUpload && <div
-                      style={{
-                        flexGrow: 1,
-                        maxWidth: "150px",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        fontSize: "16px"
-                      }}
-                    >
-                      {fileToUpload.name}
-                    </div>}
-                    {fileToUpload && <Button
-                      className={"rounded close-button"}
-                      onClick={() => {
-                        clearFileInput()
-                        setIsAllocationInsufficient(false)
-                      }}>
-                      <IoCloseSharp/>
-                    </Button>}
-                  </div>
-                </div>
+            <Pane size={"sm"} variant={"light"}>
+              <x.div maxWidth={"500px"}>
+                <x.div fontSize={28} mb={2}>List Pair</x.div>
+                  <Form onSubmit={(data) => console.log(data)}>
+                    <x.div spaceY={3}>
+                      <NumberInput block name={"zz_id"} label={"Zig Zag Chain ID"}/>
+                      <NumberInput block name={"baseAssetContractAddress"} label={"Base Asset ID"}/>
+                      <NumberInput block name={"quoteAssetContractAddress"} label={"Quote Asset ID"}/>
+                    </x.div>
+                  </Form>
 
-                {isAllocationInsufficient && <div className={"mt-3"}>
+                  {fileToUpload && <x.div
+                      flexGrow={1}
+                      maxWidth={"150px"}
+                      overflow={"hidden"}
+                      textOverflow={"ellipsis"}
+                      fontSize={"16px"}
+                  >
+                    {fileToUpload.name}
+                  </x.div>}
+                  {fileToUpload && <Button
+                    className={"rounded close-button"}
+                    onClick={() => {
+                      clearFileInput()
+                      setIsAllocationInsufficient(false)
+                    }}>
+                    <IoCloseSharp/>
+                  </Button>}
+
+                {isAllocationInsufficient && <x.div mt={3}>
                     <Row>
                       <Col sm={8} className={"d-flex align-items-center"}>
                         <RiErrorWarningLine size={18} color={"red"}/>
@@ -152,7 +133,7 @@ export default function ListPairPage() {
                         </Button>
                       </Col>
                     </Row>
-                  </div>}
+                  </x.div>}
                   <Button
                     className={cx("bg_btn", "mt-3", {zig_disabled: !fileToUpload})}
                     onClick={handleFileUpload}
@@ -161,7 +142,7 @@ export default function ListPairPage() {
                   >
                     UPLOAD
                   </Button>
-              </div>
+              </x.div>
             </Pane>
 
             {txid && <div className={"mt-2"}>
