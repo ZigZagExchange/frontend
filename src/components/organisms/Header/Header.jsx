@@ -91,7 +91,7 @@ export const Header = (props) => {
                   </NavLink>
                 </li>}
                 {hasBridge && <li>
-                  <NavLink exact to="/bridge" activeClassName="active_link">
+                  <NavLink exact to="/swap" activeClassName="active_link">
                     <MdSwapVert />{' '}
                     Swap
                   </NavLink>
@@ -163,7 +163,7 @@ export const Header = (props) => {
                 </NavLink>
               </li>}
               {hasBridge && <li>
-                <NavLink exact to="/bridge" activeClassName="active_link">
+                <NavLink exact to="/swap" activeClassName="active_link">
                   <MdSwapVert />{' '}
                   Swap
                 </NavLink>
