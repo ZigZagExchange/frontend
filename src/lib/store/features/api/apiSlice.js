@@ -89,8 +89,8 @@ export const apiSlice = createSlice({
         }
       });
     },
-    _liquidity(state, { payload }) {
-      state.liquidity = state.liquidity.concat(payload[2]);
+    _liquidity2(state, { payload }) {
+      state.liquidity = state.liquidity = payload[2];
     },
     _orderstatus(state, { payload }) {
       (payload[0] || []).forEach(async (update) => {

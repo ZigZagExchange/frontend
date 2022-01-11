@@ -150,6 +150,7 @@ export default class API extends Emitter {
 
     _socketMsg = (e) => {
         if (!e.data && e.data.length <= 0) return
+        console.log(e.data.toString());
         const msg = JSON.parse(e.data)
         this.emit('message', msg.op, msg.args)
     }

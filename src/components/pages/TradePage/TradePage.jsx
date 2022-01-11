@@ -141,24 +141,22 @@ const TradePage = () => {
 
   if (api.isZksyncChain()) {
     liquidity.forEach((liq) => {
-      const quantity = liq[0];
-      const spread = liq[1];
-      const side = liq[2];
-      if (side === "d" || side === "b") {
-        const bidPrice = marketSummary.price * (1 - spread);
+      const side = liq[0];
+      const price = liq[1];
+      const quantity = liq[2];
+      if (side === "b") {
         orderbookBids.push({
-          td1: bidPrice,
+          td1: price,
           td2: quantity,
-          td3: bidPrice * quantity,
+          td3: price * quantity,
           side: "b",
         });
       }
-      if (side === "d" || side === "s") {
-        const askPrice = marketSummary.price * (1 + spread);
+      if (side === "s") {
         orderbookAsks.push({
-          td1: askPrice,
+          td1: price,
           td2: quantity,
-          td3: askPrice * quantity,
+          td3: price * quantity,
           side: "s",
         });
       }
