@@ -137,8 +137,8 @@ export default class APIZKProvider extends APIProvider {
         }
         
         const tokenRatio = {}
-        tokenRatio[baseCurrency] = 1
-        tokenRatio[quoteCurrency] = priceWithFee.toString()
+        tokenRatio[baseCurrency] = amount.toString();
+        tokenRatio[quoteCurrency] = (amount * price).toString();
         const now_unix = Date.now() / 1000 | 0
         const two_minute_expiry = now_unix + 120
         const one_day_expiry = now_unix + 24*3600;
