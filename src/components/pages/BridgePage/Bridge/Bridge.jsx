@@ -17,6 +17,8 @@ import { MdSwapCalls } from 'react-icons/md';
 import darkPlugHead from 'assets/icons/dark-plug-head.png';
 import logo from 'assets/images/logo.png'
 import BridgeSwapInput from '../BridgeSwapInput/BridgeSwapInput';
+import ConnectWalletButton from "../../../atoms/ConnectWalletButton/ConnectWalletButton";
+import Pane from "../../../atoms/Pane/Pane";
 
 const defaultTransfer = {
   type: 'deposit',
@@ -160,28 +162,31 @@ const Bridge = () => {
   return (
     <>
       <div className="bridge_box">
-        <div className="bridge_box_top">
-          <div className="bridge_coin_title">
-            <h5>FROM</h5>
-            {transfer.type === 'withdraw' ? zkSyncLayer2Header : ethLayer1Header}
-          </div>
-          <BridgeSwapInput bridgeFee={bridgeFee} balances={balances} currencies={currencies} value={swapDetails} onChange={setSwapDetails} />
-          <div className="bridge_coin_stats">
-            <div className="bridge_coin_stat">
-              <h5>Estimated value</h5>
-              <span>~${formatUSD(estimatedValue)}</span>
+        {/*<div className="bridge_box_top">*/}
+          <Pane size={"md"} variant={"light"}>
+            <div className="bridge_coin_title">
+              <h5>FROM</h5>
+              {transfer.type === 'withdraw' ? zkSyncLayer2Header : ethLayer1Header}
             </div>
-            <div className="bridge_coin_stat">
-              <h5>Available balance</h5>
-              <span>
-                {balances[swapDetails.currency] && balances[swapDetails.currency].valueReadable}
-                {` ${swapDetails.currency}`}
-              </span>
+            <BridgeSwapInput bridgeFee={bridgeFee} balances={balances} currencies={currencies} value={swapDetails} onChange={setSwapDetails} />
+            <div className="bridge_coin_stats">
+              <div className="bridge_coin_stat">
+                <h5>Estimated value</h5>
+                <span>~${formatUSD(estimatedValue)}</span>
+              </div>
+              <div className="bridge_coin_stat">
+                <h5>Available balance</h5>
+                <span>
+                  {balances[swapDetails.currency] && balances[swapDetails.currency].valueReadable}
+                  {` ${swapDetails.currency}`}
+                </span>
+              </div>
             </div>
-          </div>
-        </div>
+          </Pane>
+        {/*</div>*/}
 
-        <div className="bridge_box_bottom">
+        {/*<div className="bridge_box_bottom">*/}
+          <Pane size={"md"} borderTopRightRadius={0} borderTopLeftRadius={0}>
           <div className="bridge_box_swap_wrapper">
             <SwapButton onClick={switchTransferType} />
             <h5>Switch</h5>
@@ -226,12 +231,7 @@ const Bridge = () => {
             </div>
           )}
           <div className="bridge_button">
-            {!user.address && <Button
-              className="bg_btn"
-              text="CONNECT WALLET"
-              img={darkPlugHead}
-              onClick={() => api.signIn(network)}
-            />}
+            {!user.address && <ConnectWalletButton/>}
             {user.address && balances[swapDetails.currency] && !hasAllowance && <Button
               loading={isApproving}
               className={cx("bg_btn", { zig_disabled: formErr.length > 0 || swapDetails.amount.length === 0, })}
@@ -252,7 +252,8 @@ const Bridge = () => {
               onClick={doTransfer}
             />}
           </div>
-        </div>
+        </Pane>
+        {/*</div>*/}
       </div>
       {user.address ? (
         <div className="bridge_connected_as">

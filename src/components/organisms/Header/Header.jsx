@@ -14,11 +14,13 @@ import logo from 'assets/images/logo.png'
 import menu from 'assets/icons/menu.png'
 import darkPlugHead from 'assets/icons/dark-plug-head.png'
 import './Header.css'
+import ConnectWalletButton from "../../atoms/ConnectWalletButton/ConnectWalletButton";
+import {Dev, isDev} from "../../../lib/helpers/env";
 
 export const Header = (props) => {
   // state to open or close the sidebar in mobile
   const [show, setShow] = useState(false)
-  const [connecting, setConnecting] = useState(false)
+  // const [connecting, setConnecting] = useState(false)
   const user = useSelector(userSelector)
   const network = useSelector(networkSelector)
   const history = useHistory()
@@ -42,16 +44,11 @@ export const Header = (props) => {
     </Menu>
   )
 
-  const connect = () => {
-    setConnecting(true)
-    api.signIn(network)
-      .then(state => {
-        if (!state.id && !/^\/bridge(\/.*)?/.test(location.pathname)) {
-          history.push('/bridge')
-        }
-        setConnecting(false)
-      })
-      .catch(() => setConnecting(false))
+  // TODO: is this needed?
+  const pushToBridgeMaybe = (state) => {
+    if (!state.id && !/^\/bridge(\/.*)?/.test(location.pathname)) {
+      history.push('/bridge')
+    }
   }
 
   return (
@@ -96,11 +93,21 @@ export const Header = (props) => {
                     {' '}<HiExternalLink />
                   </a>
                 </li>}
-                {process.env.NODE_ENV === 'development' && <li>
-                  <NavLink exact to="/pool" activeClassName="active_link">
-                    Pool
-                  </NavLink>
-                </li>}
+                <NavLink exact to="/list-pair" activeClassName="active_link">
+                  List
+                </NavLink>
+                <Dev>
+                  <li>
+                    <NavLink exact to="/pool" activeClassName="active_link">
+                      Pool
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink exact to="/dsl" activeClassName="active-link">
+                      DSL
+                    </NavLink>
+                  </li>
+                </Dev>
               </ul>
             </div>
             <div className="head_right">
@@ -113,9 +120,7 @@ export const Header = (props) => {
                     </button>
                   </Dropdown>
                 ) : (
-                  <Button loading={connecting} className="bg_btn" onClick={connect}>
-                    <img src={darkPlugHead} alt="..." /> CONNECT WALLET
-                  </Button>
+                  <ConnectWalletButton onSuccess={pushToBridgeMaybe}/>
                 )}
               </div>
               <div className="eu_text">
@@ -153,6 +158,11 @@ export const Header = (props) => {
                   Bridge
                 </NavLink>
               </li>}
+              <li>
+                <NavLink exact to="/list-pair" activeClassName="active_link">
+                  List
+                </NavLink>
+              </li>
               {hasBridge && <li>
                 <a href="https://docs.zigzag.exchange/" target="_blank" rel="noreferrer">
                   Docs
@@ -164,12 +174,20 @@ export const Header = (props) => {
                   Fiat
                   {' '}<HiExternalLink />
                 </a>
+
               </li>}
-              {process.env.NODE_ENV === 'development' && <li>
-                <NavLink exact to="/pool" activeClassName="active_link">
-                  Pool
-                </NavLink>
-              </li>}
+              <Dev>
+                <li>
+                  <NavLink exact to="/pool" activeClassName="active_link">
+                    Pool
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink exact to="/dsl" activeClassName="active-link">
+                    DSL
+                  </NavLink>
+                </li>
+              </Dev>
             </ul>
           </div>
           <div className="head_left head_left_socials">
@@ -208,13 +226,7 @@ export const Header = (props) => {
               {user.id && user.address ? (
                 <AccountDropdown />
               ) : (
-                <Button
-                  className="bg_btn"
-                  loading={connecting}
-                  text="CONNECT WALLET"
-                  img={darkPlugHead}
-                  onClick={connect}
-                />
+                <ConnectWalletButton onSuccess={pushToBridgeMaybe}/>
               )}
             </div>
           </div>

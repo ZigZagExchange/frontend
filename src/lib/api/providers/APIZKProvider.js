@@ -352,7 +352,7 @@ export default class APIZKProvider extends APIProvider {
         const decimals = this.api.currencies[currency].decimals;
         console.log(currency, bytes, decimals, BYTES_PER_DOLLAR);
         const amount = (bytes / BYTES_PER_DOLLAR * 10**decimals).toString();
-        return await this.syncWallet.syncTransfer({
+        return this.syncWallet.syncTransfer({
             to: ARWEAVE_BRIDGE_ADDRESS,
             token: currency,
             amount,

@@ -34,6 +34,7 @@ export const Button = (props) => {
       style={props.style}
       className={cx("zig_btn", props.className, { 'zig_btn_loading': loading })}
       onClick={loading ? null : props.onClick}
+      disabled={props.disabled}
     >
       <span style={{ opacity: loading ? 0 : 1 }}>{buttonContent}</span>
       {loading && loadingContent}

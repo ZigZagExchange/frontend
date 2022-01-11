@@ -4,7 +4,9 @@ import {
 } from '@xstyled/styled-components'
 
 const colors = {
-
+  "blue-400": "#1c2231",
+  "blue-500": "#161B27",
+  "blue-600": "#121620",
 }
 
 const space = {
@@ -62,7 +64,8 @@ const fontSizes = {
 const theme = {
   colors: {
       ...defaultTheme.colors,
-      ...generateHexAlphaVariants(colors),
+      // ...generateHexAlphaVariants(colors),
+      ...colors
   },
   space,
   screens: {

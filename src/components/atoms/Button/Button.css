@@ -17,7 +17,7 @@
 .bg_btn {
   display: flex;
   align-items: center;
-  transition: all 2s linear;
+  /*transition: all 2s linear;*/
   height: 42px;
   padding: 4px 30px;
   background: linear-gradient(to right, #09aaf5, #05cfe9, #62D2AD);
@@ -29,6 +29,29 @@
   color: white;
   font-size: 0.9rem;
   outline: none;
+}
+
+.bg_btn:disabled {
+    background: #0e1118;
+    color: #505050;
+}
+
+.bg_btn_secondary {
+    display: flex;
+    align-items: center;
+    height: 42px;
+    padding: 4px 30px;
+    background: white;
+    border: none;
+    border-radius: 5px;
+    width: 100%;
+    justify-content: center;
+    position: relative;
+    color: black;
+    font-size: 0.9rem;
+    outline: none;
+    text-shadow: none !important;
+    font-weight: 500;
 }
 
 .bg_btn > img {

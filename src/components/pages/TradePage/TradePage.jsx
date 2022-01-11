@@ -232,7 +232,6 @@ const TradePage = () => {
             </div>
             <SpotBox
               lastPrice={marketSummary.price}
-              signInHandler={() => api.signIn(network)}
               user={user}
               currentMarket={currentMarket}
               activeOrderCount={activeUserOrders}

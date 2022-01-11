@@ -28,3 +28,6 @@ yarn-error.log*
 
 # Using yarn, ignore package-lock.json
 package-lock.json
+
+# intellij users
+.idea
