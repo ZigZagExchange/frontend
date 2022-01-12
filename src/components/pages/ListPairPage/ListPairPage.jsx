@@ -3,15 +3,12 @@ import {useSelector} from 'react-redux';
 import {userSelector} from "lib/store/features/auth/authSlice";
 import {arweaveAllocationSelector} from "lib/store/features/api/apiSlice";
 import api from 'lib/api';
-import './ListPairPage.style.css'
 import {Button, DefaultTemplate} from 'components';
-import {BsLink45Deg, IoCloseSharp, RiErrorWarningLine} from "react-icons/all";
-import cx from "classnames";
+import {BsLink45Deg, RiErrorWarningLine} from "react-icons/all";
 import 'bootstrap'
 import ConnectWalletButton from "../../atoms/ConnectWalletButton/ConnectWalletButton";
 import Pane from "../../atoms/Pane/Pane";
 import AllocationModal from "./AllocationModal";
-import {Col, Row} from "react-bootstrap";
 import {x} from "@xstyled/styled-components"
 import Form from "../../atoms/Form/Form";
 import NumberInput from "../../atoms/Form/NumberInput";
@@ -19,6 +16,7 @@ import Submit from "../../atoms/Form/Submit";
 import {max, min, required} from "../../atoms/Form/validation";
 import {jsonify} from "../../../lib/helpers/strings";
 import {Dev} from "../../../lib/helpers/env";
+import SuccessModal from "./SuccessModal";
 
 
 export default function ListPairPage() {
@@ -31,6 +29,7 @@ export default function ListPairPage() {
   const [txid, setTxId] = useState("");
   const [fileToUpload, setFileToUpload] = useState(null)
   const [isAllocationModalOpen, setIsAllocationModalOpen] = useState(false)
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
   const [isAllocationInsufficient, setIsAllocationInsufficient] = useState(false)
 
   // TODO: Modal for successful upload receipt
@@ -49,7 +48,7 @@ export default function ListPairPage() {
     }
   }, []);
 
-  const onFormSubmit = async (formData) => {
+  const onFormSubmit = async (formData, resetForm) => {
     return new Promise(async (resolve, reject) => {
       const fileData = new TextEncoder().encode(jsonify(formData))
       const file = new File([fileData], `${formData.baseAssetId}-${formData.quoteAssetId}.json`)
@@ -64,9 +63,16 @@ export default function ListPairPage() {
 
       const timestamp = Date.now();
       const message = `${user.address}:${timestamp}`;
-      const signature = await api.signMessage(message);
-      const response = await api.uploadArweaveFile(user.address, timestamp, signature, file);
-      setTxId(response.arweave_txid);
+      try {
+        const signature = await api.signMessage(message);
+        const response = await api.uploadArweaveFile(user.address, timestamp, signature, file);
+        setTxId(response.arweave_txid);
+        setIsSuccessModalOpen(true);
+        resetForm()
+      } catch (e) {
+        reject(e)
+        return
+      }
       refreshUserArweaveAllocation();
       resolve()
     })
@@ -94,7 +100,16 @@ export default function ListPairPage() {
 
           {isUserLoggedIn && <Pane size={"sm"} variant={"light"} maxWidth={"500px"} margin={"auto"}>
             <x.div fontSize={28} mb={2}>List Pair</x.div>
-            <Form onSubmit={onFormSubmit}>
+            <Form initialValues={{
+              baseAssetId: "",
+              quoteAssetId: "",
+              baseFee: "",
+              quoteFee: "",
+              minSize: "",
+              maxSize: "",
+              zigzagChainId: "",
+              pricePrecisionDecimal: ""
+            }} onSubmit={onFormSubmit}>
               <x.div display={"grid"} gridTemplateColumns={2} rowGap={3} columnGap={6} mb={5}>
                 <NumberInput block name={"baseAssetId"} label={"Base Asset ID"} validate={required}/>
                 <NumberInput block name={"quoteAssetId"} label={"Quote Asset ID"} validate={required}/>
@@ -117,7 +132,7 @@ export default function ListPairPage() {
               </x.div>}
 
               <Dev>
-                <x.div color={"blue-gray-400"} mb={3} textAlign={"right"}>
+                <x.div fontSize={12} color={"blue-gray-500"} mb={3} textAlign={"right"}>
                   arweave allocation: {arweaveAllocationKB} kB
                 </x.div>
               </Dev>
@@ -144,6 +159,14 @@ export default function ListPairPage() {
               setFileToUpload(null)
             }
           }, 1 * 1000)
+        }}
+      />
+      <SuccessModal
+        txid={txid}
+        show={isSuccessModalOpen}
+        onClose={() => {
+          setIsSuccessModalOpen(false);
+          setTxId(null);
         }}
       />
     </DefaultTemplate>

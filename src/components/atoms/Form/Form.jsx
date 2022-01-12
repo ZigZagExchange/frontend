@@ -8,8 +8,9 @@ import {Dev} from "../../../lib/helpers/env";
 
 const Form = ({initialValues={}, onSubmit, children}) => {
     return <Formik
+        enableReinitialize
         initialValues={initialValues}
-        onSubmit={(values, actions) => onSubmit(values)}
+        onSubmit={(values, actions) => onSubmit(values, actions.resetForm)}
     >
         {({
             handleSubmit,
@@ -21,7 +22,7 @@ const Form = ({initialValues={}, onSubmit, children}) => {
             {errors.name && <x.div>
                 {errors.name}
             </x.div>}
-            {/*<Debug/>*/}
+            <Debug/>
         </FormikForm>}
     </Formik>
 }
