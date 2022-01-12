@@ -2,12 +2,13 @@ import {useSelector} from "react-redux";
 import {arweaveAllocationSelector} from "../../../lib/store/features/api/apiSlice";
 import React, {useEffect, useState} from "react";
 import {Modal} from "../../atoms/Modal";
-import {Button} from "../../atoms/Button";
 import api from "../../../lib/api";
 import Pane from "../../atoms/Pane/Pane";
 import {FaEquals, FaTimes, FaMinus} from "react-icons/all";
 import {userSelector} from "../../../lib/store/features/auth/authSlice";
-
+import Submit from "../../atoms/Form/Submit";
+import Form from "../../atoms/Form/Form";
+import {x} from "@xstyled/styled-components";
 
 const AllocationModal = ({onClose, show, onSuccess, fileSize}) => {
   const user = useSelector(userSelector)
@@ -15,8 +16,6 @@ const AllocationModal = ({onClose, show, onSuccess, fileSize}) => {
   const userHasExistingAllocation = arweaveAllocation !== 0
   const fileSizeKB = fileSize / 1000
   const arweaveAllocationKB = arweaveAllocation / 1000
-
-  const [isLoading, setIsLoading] = useState(false)
   const [KBtoPurchase, setBytesToPurchase] = useState(null)
 
   const pricePerKB = 0.001
@@ -28,55 +27,51 @@ const AllocationModal = ({onClose, show, onSuccess, fileSize}) => {
   }, [fileSize, user.address, arweaveAllocation])
 
   return <Modal title={"Purchase Arweave Allocation"} show={show} onClose={onClose}>
-    <div className={"mb-4"} style={{fontSize: "14px"}}>
-      To list a new pair you must purchase space on arweave where your metadata will be stored.
-    </div>
-    <div className={"mb-4"}>
-      <Pane size={"xs"}>
-        <div className={"d-flex justify-content-around align-items-center"}>
+    <x.div fontSize={14}>
+      ZigZag enables permissionless pair listings by storing your pair's metadata on arweave.
+      You must purchase space there first.
+    </x.div>
+    <Pane size={"xs"} my={8}>
+      <x.div display={"flex"} justifyContent={"space-around"} alignItems={"center"}>
+        {userHasExistingAllocation ?
+            <x.div display={"flex"} alignItems={"center"}>
+              <x.div fontSize={28} mr={3}>(</x.div>
+              <AllocationItem label={"file size"}>{fileSizeKB} kB</AllocationItem>
+              <FaMinus size={18} style={{margin: "0px 10px"}}/>
+              <AllocationItem label={"existing"}>
+                {arweaveAllocationKB} kB
+              </AllocationItem>
+              <x.div fontSize={28} ml={3}>)</x.div>
+            </x.div>
+            : <AllocationItem label={"file size"}>{fileSizeKB} kB</AllocationItem>
+        }
+        <FaTimes size={18}/>
+        <AllocationItem label={"$/kB"}>${pricePerKB}</AllocationItem>
+        <FaEquals size={18}/>
+        <AllocationItem label={"total price"}>~${KBtoPurchase}</AllocationItem>
+      </x.div>
+    </Pane>
 
-          {userHasExistingAllocation ?
-              <div className={"d-flex align-items-center"}>
-                <div style={{fontSize: "28px", marginRight: "8px"}}>(</div>
-                <AllocationItem label={"file size"}>{fileSizeKB} kB</AllocationItem>
-                <FaMinus size={18} style={{margin: "0px 10px"}}/>
-                <AllocationItem label={"existing"}>
-                  {arweaveAllocationKB} kB
-                </AllocationItem>
-                <div style={{fontSize: "28px", marginLeft: "8px"}}>)</div>
-              </div>
-              : <AllocationItem label={"file size"}>{fileSizeKB} kB</AllocationItem>
-          }
-          <FaTimes size={18}/>
-          <AllocationItem label={"$/kB"}>${pricePerKB}</AllocationItem>
-          <FaEquals size={18}/>
-          <AllocationItem label={"total price"}>~${KBtoPurchase}</AllocationItem>
-        </div>
-      </Pane>
-    </div>
-
-    <Button loading={isLoading} className="bg_btn" onClick={() => {
-      setIsLoading(true)
-      api.purchaseArweaveBytes("USDC", fileSize)
+    <Form onSubmit={() => {
+      return api.purchaseArweaveBytes("USDC", fileSize)
         .then((transaction) => {
           transaction.awaitReceipt().then(() => onSuccess())
         })
-        .finally(() => setIsLoading(false))
     }}>
-      PURCHASE
-    </Button>
+      <Submit>PURCHASE</Submit>
+    </Form>
   </Modal>
 }
 
 const AllocationItem = ({label, children}) => {
-  return <div className={"d-flex flex-column align-items-center"}>
-    <div style={{fontSize: "20px"}}>
+  return <x.div display={"flex"} flexDirection={"column"} alignItems={"center"}>
+    <x.div fontSize={20}>
       {children}
-    </div>
-    <div style={{fontSize: "12px"}}>
+    </x.div>
+    <x.div fontSize={12}>
       {label}
-    </div>
-  </div>
+    </x.div>
+  </x.div>
 }
 
 export default AllocationModal;

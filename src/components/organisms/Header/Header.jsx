@@ -183,7 +183,7 @@ export const Header = (props) => {
                   </NavLink>
                 </li>
                 <li>
-                  <NavLink exact to="/dsl" activeClassName="active-link">
+                  <NavLink exact to="/dsl" activeClassName="active_link">
                     DSL
                   </NavLink>
                 </li>

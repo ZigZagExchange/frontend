@@ -13,5 +13,13 @@ export const min = (minValue, customErrorString) => (formValue) => {
     }
 }
 
+export const requiredError = "required"
+export const required = (formValue) => {
+  if (formValue === null || formValue === undefined || formValue === "") {
+    return requiredError
+  }
+}
 
+export const composeValidators = (...validators) => (value) =>
+  validators.reduce((error, validator) => error || validator(value), undefined)
 

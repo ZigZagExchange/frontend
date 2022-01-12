@@ -16,22 +16,24 @@ const Form = ({initialValues={}, onSubmit, children}) => {
             errors
         }) => <FormikForm onSubmit={handleSubmit}>
             {children && children}
+
+            {/*TODO: what errors are here*/}
             {errors.name && <x.div>
                 {errors.name}
             </x.div>}
-            <Dev>
-                <Debug/>
-            </Dev>
+            {/*<Debug/>*/}
         </FormikForm>}
     </Formik>
 }
 
 const Debug = () => {
     const form = useFormikContext()
-    return <x.div mt={6} color={"blue-gray-500"} style={{overflowWrap: "anywhere"}}>
+    return <Dev>
+      <x.div mt={6} color={"blue-gray-500"} w={"full"} style={{overflowWrap: "anywhere"}} maxWidth={"fit-content"}>
         <x.div>values: {jsonify(form.values)}</x.div>
         <x.div>errors: {jsonify(form.errors)}</x.div>
-    </x.div>
+      </x.div>
+    </Dev>
 }
 
 export default Form;

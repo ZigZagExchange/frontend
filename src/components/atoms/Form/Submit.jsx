@@ -4,15 +4,13 @@ import {useFormikContext} from "formik";
 import Loader from "react-loader-spinner";
 
 const Submit = ({children, ...rest}) => {
-    const state = useFormikContext()
-    console.log("debug:: state", state)
-    return <Button type={"submit"} isLoading={state.isSubmitting} {...rest}>
+    const {errors, isSubmitting} = useFormikContext()
+    const isDisabled = Object.keys(errors).length !== 0
+    return <Button isDisabled={isDisabled} type={"submit"} isLoading={isSubmitting} {...rest}>
         {children ? children : "Submit"}
     </Button>
 }
 
-
-// TODO: discuss w frontend bois if they are ok w variant & sizing API rather than passing specific CSS classes
 const sizes = {
     sm: {
         p: 2,
@@ -27,12 +25,13 @@ const sizes = {
 
 const variants = {
     primary: {
-        backgroundImage: 'gradient-to-r',
-        gradientFrom: 'blue-100',
+        backgroundImage: {_: 'gradient-to-r', disabled: "none"},
+        backgroundColor: {disabled: "blue-400"},
+        gradientFrom: {_: 'blue-100', disabled: "none"},
         gradientVia: 'blue-200',
         gradientTo: 'teal-100',
         border: 'none',
-        color: 'white',
+        color: {_: "white", disabled: "blue-300"},
         fontWeight: 'bold'
     },
     secondary: {
@@ -41,28 +40,32 @@ const variants = {
     }
 }
 
-const Button = ({variant = "primary", size = "sm", children, isLoading, ...rest}) => {
-    return <x.button position={"relative"} {...variants[variant]} {...sizes[size]} {...rest}>
-        {children && children}
-        {isLoading && <x.div
-            left={0}
-            top={0}
-            w={"full"}
-            h={"full"}
-            position={"absolute"}
-            display={"flex"}
-            justifyContent={"center"}
-            alignItems={"center"}
-            background={"rgba(0,0,0,0.6)"}
+const Button = ({variant = "primary", size = "sm", children, isLoading, type="button", isDisabled}) => {
+    return <x.div position={"relative"}>
+      {isLoading &&
+        <x.div
+          left={0}
+          top={0}
+          w={"full"}
+          h={"full"}
+          position={"absolute"}
+          display={"flex"}
+          justifyContent={"center"}
+          alignItems={"center"}
+          background={"rgba(0,0,0,0.6)"}
+          zIndex={2}
         >
-            <Loader
-                type="TailSpin"
-                color="white"
-                height={24}
-                width={24}
-            />
+          <Loader
+            type="TailSpin"
+            color="white"
+            height={24}
+            width={24}
+          />
         </x.div>}
-    </x.button>
+      <x.button type={type} disabled={isDisabled} position={"relative"} {...variants[variant]} {...sizes[size]} w={"full"}>
+        {children && children}
+      </x.button>
+    </x.div>
 }
 
 export default Submit;

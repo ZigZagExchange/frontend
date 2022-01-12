@@ -16,17 +16,20 @@ import {x} from "@xstyled/styled-components"
 import Form from "../../atoms/Form/Form";
 import NumberInput from "../../atoms/Form/NumberInput";
 import Submit from "../../atoms/Form/Submit";
-import {max} from "../../atoms/Form/validation";
+import {max, min, required} from "../../atoms/Form/validation";
+import {jsonify} from "../../../lib/helpers/strings";
+import {Dev} from "../../../lib/helpers/env";
 
 
 export default function ListPairPage() {
   const user = useSelector(userSelector);
   const isUserLoggedIn = user.id !== null && user.id !== undefined
+
   const arweaveAllocation = useSelector(arweaveAllocationSelector);
+  const arweaveAllocationKB = Number(arweaveAllocation) / 1000
+
   const [txid, setTxId] = useState("");
   const [fileToUpload, setFileToUpload] = useState(null)
-  const [isFileUploadLoading, setIsFileUploadLoading] = useState(false)
-  const fileInputRef = useRef()
   const [isAllocationModalOpen, setIsAllocationModalOpen] = useState(false)
   const [isAllocationInsufficient, setIsAllocationInsufficient] = useState(false)
 
@@ -40,125 +43,90 @@ export default function ListPairPage() {
     return api.refreshArweaveAllocation(user.address)
   }
 
-  const clearFileInput = () => {
-    fileInputRef.current.value = null
-    setFileToUpload(null)
-  }
-
-  async function handleFileUpload(e) {
-    const timestamp = Date.now();
-    const message = `${user.address}:${timestamp}`;
-    try {
-      setIsFileUploadLoading(true)
-      const signature = await api.signMessage(message);
-      const response = await api.uploadArweaveFile(user.address, timestamp, signature, fileToUpload);
-      setTxId(response.arweave_txid);
-      clearFileInput()
-      refreshUserArweaveAllocation()
-    } finally {
-      setIsFileUploadLoading(false)
-      refreshUserArweaveAllocation()
-    }
-  }
-
-
   useEffect(() => {
     if (user.address) {
       refreshUserArweaveAllocation()
     }
   }, []);
 
+  const onFormSubmit = async (formData) => {
+    return new Promise(async (resolve, reject) => {
+      const fileData = new TextEncoder().encode(jsonify(formData))
+      const file = new File([fileData], `${formData.baseAssetId}-${formData.quoteAssetId}.json`)
+
+      if (file.size > arweaveAllocation) {
+        setFileToUpload(file)
+        setIsAllocationInsufficient(true)
+        setIsAllocationModalOpen(true)
+        reject()
+        return
+      }
+
+      const timestamp = Date.now();
+      const message = `${user.address}:${timestamp}`;
+      const signature = await api.signMessage(message);
+      const response = await api.uploadArweaveFile(user.address, timestamp, signature, file);
+      setTxId(response.arweave_txid);
+      refreshUserArweaveAllocation();
+      resolve()
+    })
+  }
+
   return (
     <DefaultTemplate>
-      <div className={"p-4"}
-           style={{background: "#1c2231", width: "100%", height: "calc(100vh - 80px)", color: "white"}}>
-        <div className={"d-flex justify-content-center h-100 align-items-center"}>
-          {!isUserLoggedIn && <div className={"d-flex flex-column align-items-center"}>
+      <x.div p={4}
+             backgroundColor={"blue-400"}
+             w={"full"}
+             style={{height: "calc(100vh - 80px)"}}
+             color={"white"}
+      >
+        <x.div h={"full"} display={"flex"} alignItems={"center"}>
+          {!isUserLoggedIn && <x.div display={"flex"} flexDirection={"column"} alignItems={"center"}>
             <BsLink45Deg size={30}/>
             <h3>Connect wallet</h3>
-            <div className={"mt-2"}>
+            <x.div mt={2}>
               Connect your wallet to list new trading pairs
-            </div>
-            <div className={"mt-4"}>
+            </x.div>
+            <x.div mt={4}>
               <ConnectWalletButton/>
-            </div>
-          </div>}
+            </x.div>
+          </x.div>}
 
-          {isUserLoggedIn && <div>
-            <Pane size={"sm"} variant={"light"}>
-              <x.div maxWidth={"500px"}>
-                <x.div fontSize={28} mb={2}>List Pair</x.div>
-                  <Form onSubmit={(data) => console.log(data)}>
-                    <x.div display={"grid"} gridTemplateColumns={2} rowGap={3} columnGap={6}>
-                      <NumberInput block name={"baseAssetID"} label={"Base Asset ID"}/>
-                      <NumberInput block name={"quoteAssetID"} label={"Quote Asset ID"}/>
-                      <NumberInput block name={"baseFee"} label={"Base Fee"}/>
-                      <NumberInput block name={"quoteFee"} label={"Quote Fee"}/>
-                      <NumberInput block name={"minSize"} label={"Min Size"}/>
-                      <NumberInput block name={"maxSize"} label={"Max Size"}/>
-                      <NumberInput block name={"zzID"} label={"Zig Zag Chain ID"}/>
-                      <NumberInput block name={"pricePrecisionDecimal"} label={"Price Precision Decimals"}/>
-                    </x.div>
-                    <Submit w={"full"} mt={5}/>
-                  </Form>
-
-                  {fileToUpload && <x.div
-                      flexGrow={1}
-                      maxWidth={"150px"}
-                      overflow={"hidden"}
-                      textOverflow={"ellipsis"}
-                      fontSize={"16px"}
-                  >
-                    {fileToUpload.name}
-                  </x.div>}
-                  {fileToUpload && <Button
-                    className={"rounded close-button"}
-                    onClick={() => {
-                      clearFileInput()
-                      setIsAllocationInsufficient(false)
-                    }}>
-                    <IoCloseSharp/>
-                  </Button>}
-
-                {isAllocationInsufficient && <x.div mt={3}>
-                    <Row>
-                      <Col sm={8} className={"d-flex align-items-center"}>
-                        <RiErrorWarningLine size={18} color={"red"}/>
-                        <div style={{marginLeft: "8px", fontSize: "12px"}}>Insufficient allocation</div>
-                      </Col>
-                      <Col sm={4} className={"d-flex justify-content-end align-items-center"}>
-                        <Button
-                          className={"bg_btn"}
-                          onClick={() => setIsAllocationModalOpen(true)}
-                          style={{
-                            fontSize: "14px",
-                            maxWidth: "fit-content",
-                            height: "auto",
-                            padding: "4px 15px"
-                          }}
-                        >
-                          Purchase
-                        </Button>
-                      </Col>
-                    </Row>
-                  </x.div>}
-                  <Button
-                    className={cx("bg_btn", "mt-3", {zig_disabled: !fileToUpload})}
-                    onClick={handleFileUpload}
-                    disabled={!fileToUpload || isAllocationInsufficient}
-                    loading={isFileUploadLoading}
-                  >
-                    UPLOAD
-                  </Button>
+          {isUserLoggedIn && <Pane size={"sm"} variant={"light"} maxWidth={"500px"} margin={"auto"}>
+            <x.div fontSize={28} mb={2}>List Pair</x.div>
+            <Form onSubmit={onFormSubmit}>
+              <x.div display={"grid"} gridTemplateColumns={2} rowGap={3} columnGap={6} mb={5}>
+                <NumberInput block name={"baseAssetId"} label={"Base Asset ID"} validate={required}/>
+                <NumberInput block name={"quoteAssetId"} label={"Quote Asset ID"} validate={required}/>
+                <NumberInput block name={"baseFee"} label={"Base Fee"} validate={required}/>
+                <NumberInput block name={"quoteFee"} label={"Quote Fee"} validate={required}/>
+                <NumberInput block name={"minSize"} label={"Min Size"} validate={required}/>
+                <NumberInput block name={"maxSize"} label={"Max Size"} validate={required}/>
+                <NumberInput block name={"zigzagChainId"} label={"Zig Zag Chain ID"} validate={required}/>
+                <NumberInput block name={"pricePrecisionDecimal"} label={"Price Precision Decimals"}
+                             validate={required}/>
               </x.div>
-            </Pane>
+              {isAllocationInsufficient && <x.div display={"flex"} alignItems={"center"} justifyContent={"space-between"} mb={4}>
+                <x.div display={"flex"} alignItems={"center"}>
+                  <RiErrorWarningLine size={18} color={"red"}/>
+                  <x.div ml={1} fontSize={12} color={"blue-gray-400"}>Insufficient arweave allocation</x.div>
+                </x.div>
+                <x.div color={"blue-gray-400"}>
+                  {arweaveAllocationKB} kB
+                </x.div>
+              </x.div>}
 
-            {txid && <div className={"mt-2"}>
-              TXID: {txid}
-            </div>}
-          </div>}
-        </div>
-      </div>
+              <Dev>
+                <x.div color={"blue-gray-400"} mb={3} textAlign={"right"}>
+                  arweave allocation: {arweaveAllocationKB} kB
+                </x.div>
+              </Dev>
+
+              <Submit w={"full"} mt={5}>{isAllocationInsufficient ? "PURCHASE ALLOCATION" : "LIST"}</Submit>
+            </Form>
+          </Pane>}
+        </x.div>
+      </x.div>
       <AllocationModal
         onClose={() => setIsAllocationModalOpen(false)}
         show={isAllocationModalOpen}
@@ -167,6 +135,14 @@ export default function ListPairPage() {
           // API cache needs a bit of time to update. 1s should do it.
           setTimeout(() => {
             refreshUserArweaveAllocation()
+            if (fileToUpload.size > arweaveAllocation) {
+              setIsAllocationInsufficient(true)
+              setIsAllocationModalOpen(true)
+            } else {
+              setIsAllocationInsufficient(false)
+              setIsAllocationModalOpen(false)
+              setFileToUpload(null)
+            }
           }, 1 * 1000)
         }}
       />
