@@ -83,71 +83,74 @@ export default function ListPairPage() {
       <x.div p={4}
              backgroundColor={"blue-400"}
              w={"full"}
-             style={{height: "calc(100vh - 80px)"}}
+             h={"full"}
+             style={{minHeight: "calc(100vh - 80px)"}}
              color={"white"}
+             display={"flex"}
+             alignItems={"center"}
+             justifyContent={"center"}
       >
-        <x.div h={"full"} display={"flex"} alignItems={"center"}>
-          {!isUserLoggedIn && <x.div
-            display={"flex"}
-            flexDirection={"column"}
-            alignItems={"center"}
-            justifyContent={"center"}
-            w={"full"}
-            h={"full"}
-          >
-            <BsLink45Deg size={30}/>
-            <h3>Connect wallet</h3>
-            <x.div mt={2}>
-              Connect your wallet to list new trading pairs
-            </x.div>
-            <x.div mt={4}>
-              <ConnectWalletButton/>
-            </x.div>
-          </x.div>}
+        {!isUserLoggedIn && <Pane
+          size={"md"}
+          variant={"light"}
+          display={"flex"}
+          flexDirection={"column"}
+          alignItems={"center"}
+          justifyContent={"center"}
+        >
+          <BsLink45Deg size={30}/>
+          <h3>Connect wallet</h3>
+          <x.div mt={2}>
+            Connect your wallet to list new trading pairs
+          </x.div>
+          <x.div mt={4}>
+            <ConnectWalletButton/>
+          </x.div>
+        </Pane>}
 
-          {isUserLoggedIn && <Pane size={"sm"} variant={"light"} maxWidth={"500px"} margin={"auto"}>
-            <x.div fontSize={28} mb={2}>List Pair</x.div>
-            <Form initialValues={{
-              baseAssetId: "",
-              quoteAssetId: "",
-              baseFee: "",
-              quoteFee: "",
-              minSize: "",
-              maxSize: "",
-              zigzagChainId: "",
-              pricePrecisionDecimal: ""
-            }} onSubmit={onFormSubmit}>
-              <x.div display={"grid"} gridTemplateColumns={2} rowGap={3} columnGap={6} mb={5}>
-                <NumberInput block name={"baseAssetId"} label={"Base Asset ID"} validate={required}/>
-                <NumberInput block name={"quoteAssetId"} label={"Quote Asset ID"} validate={required}/>
-                <NumberInput block name={"baseFee"} label={"Base Fee"} validate={required}/>
-                <NumberInput block name={"quoteFee"} label={"Quote Fee"} validate={required}/>
-                <NumberInput block name={"minSize"} label={"Min Size"} validate={required}/>
-                <NumberInput block name={"maxSize"} label={"Max Size"} validate={required}/>
-                <NumberInput block name={"zigzagChainId"} label={"Zig Zag Chain ID"} validate={required}/>
-                <NumberInput block name={"pricePrecisionDecimal"} label={"Price Precision Decimals"}
-                             validate={required}/>
+        {isUserLoggedIn && <Pane size={"sm"} variant={"light"} maxWidth={"500px"} margin={"auto"}>
+          <x.div fontSize={28} mb={2}>List New Market</x.div>
+          <Form initialValues={{
+            baseAssetId: "",
+            quoteAssetId: "",
+            baseFee: "",
+            quoteFee: "",
+            minSize: "",
+            maxSize: "",
+            zigzagChainId: "",
+            pricePrecisionDecimal: ""
+          }} onSubmit={onFormSubmit}>
+            <x.div display={"grid"} gridTemplateColumns={2} rowGap={3} columnGap={6} mb={5}>
+              <NumberInput block name={"baseAssetId"} label={"Base Asset ID"} validate={required} hideValidation/>
+              <NumberInput block name={"quoteAssetId"} label={"Quote Asset ID"} validate={required} hideValidation/>
+              <NumberInput block name={"baseFee"} label={"Base Fee"} validate={required} hideValidation/>
+              <NumberInput block name={"quoteFee"} label={"Quote Fee"} validate={required} hideValidation/>
+              <NumberInput block name={"minSize"} label={"Min Size"} validate={required} hideValidation/>
+              <NumberInput block name={"maxSize"} label={"Max Size"} validate={required} hideValidation/>
+              <NumberInput block name={"zigzagChainId"} label={"Zig Zag Chain ID"} validate={required} hideValidation/>
+              <NumberInput block name={"pricePrecisionDecimal"} label={"Price Precision Decimals"}
+                           validate={required} hideValidation/>
+            </x.div>
+            {isAllocationInsufficient &&
+            <x.div display={"flex"} alignItems={"center"} justifyContent={"space-between"} mb={4}>
+              <x.div display={"flex"} alignItems={"center"}>
+                <RiErrorWarningLine size={18} color={"red"}/>
+                <x.div ml={1} fontSize={12} color={"blue-gray-400"}>Insufficient arweave allocation</x.div>
               </x.div>
-              {isAllocationInsufficient && <x.div display={"flex"} alignItems={"center"} justifyContent={"space-between"} mb={4}>
-                <x.div display={"flex"} alignItems={"center"}>
-                  <RiErrorWarningLine size={18} color={"red"}/>
-                  <x.div ml={1} fontSize={12} color={"blue-gray-400"}>Insufficient arweave allocation</x.div>
-                </x.div>
-                <x.div color={"blue-gray-400"}>
-                  {arweaveAllocationKB} kB
-                </x.div>
-              </x.div>}
+              <x.div color={"blue-gray-400"}>
+                {arweaveAllocationKB} kB
+              </x.div>
+            </x.div>}
 
-              <Dev>
-                <x.div fontSize={12} color={"blue-gray-500"} mb={3} textAlign={"right"}>
-                  arweave allocation: {arweaveAllocationKB} kB
-                </x.div>
-              </Dev>
+            <Dev>
+              <x.div fontSize={12} color={"blue-gray-500"} mb={3} textAlign={"right"}>
+                arweave allocation: {arweaveAllocationKB} kB
+              </x.div>
+            </Dev>
 
-              <Submit block mt={5}>{isAllocationInsufficient ? "PURCHASE ALLOCATION" : "LIST"}</Submit>
-            </Form>
-          </Pane>}
-        </x.div>
+            <Submit block mt={5}>{isAllocationInsufficient ? "PURCHASE ALLOCATION" : "LIST"}</Submit>
+          </Form>
+        </Pane>}
       </x.div>
       <AllocationModal
         onClose={() => setIsAllocationModalOpen(false)}

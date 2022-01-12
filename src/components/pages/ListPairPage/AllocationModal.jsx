@@ -52,13 +52,13 @@ const AllocationModal = ({onClose, show, onSuccess, fileSize}) => {
       </x.div>
     </Pane>
 
-    <Form onSubmit={() => {
-      return api.purchaseArweaveBytes("USDC", fileSize)
-        .then((transaction) => {
-          transaction.awaitReceipt().then(() => onSuccess())
-        })
+    <Form onSubmit={async () => {
+      const transaction = await api.purchaseArweaveBytes("USDC", fileSize)
+      const receipt = await transaction.awaitReceipt()
+      console.log("debug:: receipt", receipt)
+      onSuccess()
     }}>
-      <Submit>PURCHASE</Submit>
+      <Submit block>PURCHASE</Submit>
     </Form>
   </Modal>
 }

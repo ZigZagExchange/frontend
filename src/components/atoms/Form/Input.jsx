@@ -11,6 +11,7 @@ const Input = ({
     block,
     value,
     onChange,
+    hideValidation,
     ...rest
 }) => {
     const validators = Array.isArray(validate) ? composeValidators(...validate) : validate
@@ -24,7 +25,7 @@ const Input = ({
         }
     }, [value])
 
-  return <FieldSet name={name}>
+  return <FieldSet name={name} w={block ? "full" : "inherit"}>
         {label && <Label name={name} isRequired={isRequired} highlightRequired={meta.error === requiredError}>
           {label}
         </Label>}
@@ -41,7 +42,7 @@ const Input = ({
         }}
         value={field.value}
       />
-      {meta.error && meta.touched && <ErrorMessage error={meta.error}/>}
+      {meta.error && meta.touched && !hideValidation && <ErrorMessage error={meta.error}/>}
     </FieldSet>
 }
 
@@ -51,8 +52,8 @@ const ErrorMessage = ({error}) => {
   </x.div>
 }
 
-const FieldSet = ({name, children}) => {
-    return <x.div name={name} height={"fit-content"}>
+const FieldSet = ({name, children, ...rest}) => {
+    return <x.div name={name} height={"fit-content"} {...rest}>
         {children}
     </x.div>
 }

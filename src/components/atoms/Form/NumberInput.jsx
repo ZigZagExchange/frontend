@@ -10,7 +10,8 @@ const NumberInput = ({
      block,
      label,
      value,
-     onChange
+     onChange,
+     hideValidation
 }) => {
     return <Input
       name={name}
@@ -19,6 +20,7 @@ const NumberInput = ({
       label={label}
       value={value}
       onChange={onChange}
+      hideValidation={hideValidation}
       type={"number"}
       p={2}
       border={"2px solid"}
