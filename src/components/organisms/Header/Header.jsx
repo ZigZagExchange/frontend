@@ -77,7 +77,7 @@ export const Header = (props) => {
           <div className="mb_header_container mb_h">
             <img src={logo} alt="logo" height="30" />
             <div className="head_left">
-              <ul>
+              <ul className="header_menu">
                 <li>
                   <NavLink exact to="/" activeClassName="active_link">
                     <MdMoving />{' '}
@@ -149,7 +149,7 @@ export const Header = (props) => {
         <div className="head_wrapper_desktop dex_h">
           <div className="head_left">
             <a href="http://info.zigzag.exchange" rel="noreferrer"><img src={logo} alt="logo" height="30" /></a>
-            <ul>
+            <ul className="header_menu">
               <li>
                 <NavLink exact to="/" activeClassName="active_link">
                   <MdMoving />{' '}
