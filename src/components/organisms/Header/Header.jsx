@@ -23,9 +23,6 @@ export const Header = (props) => {
   // const [connecting, setConnecting] = useState(false)
   const user = useSelector(userSelector)
   const network = useSelector(networkSelector)
-  const history = useHistory()
-  const location = useLocation()
-
   const hasBridge = api.isImplemented('depositL2')
 
   const handleMenu = ({ key }) => {
@@ -43,13 +40,6 @@ export const Header = (props) => {
       <MenuItem key="signOut">Disconnect</MenuItem>
     </Menu>
   )
-
-  // TODO: is this needed?
-  const pushToBridgeMaybe = (state) => {
-    if (!state.id && !/^\/bridge(\/.*)?/.test(location.pathname)) {
-      history.push('/bridge')
-    }
-  }
 
   return (
     <>
@@ -120,7 +110,7 @@ export const Header = (props) => {
                     </button>
                   </Dropdown>
                 ) : (
-                  <ConnectWalletButton onSuccess={pushToBridgeMaybe}/>
+                  <ConnectWalletButton/>
                 )}
               </div>
               <div className="eu_text">
@@ -224,9 +214,9 @@ export const Header = (props) => {
               </label>
             <div className="head_account_area">
               {user.id && user.address ? (
-                <AccountDropdown />
+                <AccountDropdown/>
               ) : (
-                <ConnectWalletButton onSuccess={pushToBridgeMaybe}/>
+                <ConnectWalletButton/>
               )}
             </div>
           </div>
