@@ -87,7 +87,14 @@ export default function ListPairPage() {
              color={"white"}
       >
         <x.div h={"full"} display={"flex"} alignItems={"center"}>
-          {!isUserLoggedIn && <x.div display={"flex"} flexDirection={"column"} alignItems={"center"}>
+          {!isUserLoggedIn && <x.div
+            display={"flex"}
+            flexDirection={"column"}
+            alignItems={"center"}
+            justifyContent={"center"}
+            w={"full"}
+            h={"full"}
+          >
             <BsLink45Deg size={30}/>
             <h3>Connect wallet</h3>
             <x.div mt={2}>
