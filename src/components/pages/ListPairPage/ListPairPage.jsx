@@ -15,6 +15,8 @@ import {Col, Row} from "react-bootstrap";
 import {x} from "@xstyled/styled-components"
 import Form from "../../atoms/Form/Form";
 import NumberInput from "../../atoms/Form/NumberInput";
+import Submit from "../../atoms/Form/Submit";
+import {max} from "../../atoms/Form/validation";
 
 
 export default function ListPairPage() {
@@ -87,11 +89,17 @@ export default function ListPairPage() {
               <x.div maxWidth={"500px"}>
                 <x.div fontSize={28} mb={2}>List Pair</x.div>
                   <Form onSubmit={(data) => console.log(data)}>
-                    <x.div spaceY={3}>
-                      <NumberInput block name={"zz_id"} label={"Zig Zag Chain ID"}/>
-                      <NumberInput block name={"baseAssetContractAddress"} label={"Base Asset ID"}/>
-                      <NumberInput block name={"quoteAssetContractAddress"} label={"Quote Asset ID"}/>
+                    <x.div display={"grid"} gridTemplateColumns={2} rowGap={3} columnGap={6}>
+                      <NumberInput block name={"baseAssetID"} label={"Base Asset ID"}/>
+                      <NumberInput block name={"quoteAssetID"} label={"Quote Asset ID"}/>
+                      <NumberInput block name={"baseFee"} label={"Base Fee"}/>
+                      <NumberInput block name={"quoteFee"} label={"Quote Fee"}/>
+                      <NumberInput block name={"minSize"} label={"Min Size"}/>
+                      <NumberInput block name={"maxSize"} label={"Max Size"}/>
+                      <NumberInput block name={"zzID"} label={"Zig Zag Chain ID"}/>
+                      <NumberInput block name={"pricePrecisionDecimal"} label={"Price Precision Decimals"}/>
                     </x.div>
+                    <Submit w={"full"} mt={5}/>
                   </Form>
 
                   {fileToUpload && <x.div

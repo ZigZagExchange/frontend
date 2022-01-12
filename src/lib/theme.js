@@ -4,6 +4,10 @@ import {
 } from '@xstyled/styled-components'
 
 const colors = {
+  "teal-100": "#62D2AD",
+
+  "blue-100": "#09AAF5",
+  "blue-200": "#08CFE8",
   "blue-400": "#1c2231",
   "blue-500": "#161B27",
   "blue-600": "#121620",

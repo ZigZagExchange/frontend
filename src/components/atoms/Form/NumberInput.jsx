@@ -10,15 +10,14 @@ const NumberInput = ({
      label
 }) => {
     const type = "number"
-    const [field, meta, helpers] = useField({name, type})
+    const [field, meta, helpers] = useField({name, type, validate})
+
+
     console.log("field", field)
     console.log("meta", meta)
     console.log("helpers", helpers)
 
-    return <x.div
-        w={block ? "100%" : "200px"}
-        display={block ? "block" : "inline-block"}
-    >
+    return <x.div w={block ? "100%" : "200px"}>
         {label && <x.label for={name} mb={2}>{label}</x.label>}
         <x.input
             {...field}
