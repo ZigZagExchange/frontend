@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {useField} from "formik";
 import {x} from "@xstyled/styled-components"
 import {composeValidators, required, requiredError} from "./validation";
@@ -9,11 +9,21 @@ const Input = ({
     label,
     type,
     block,
+    value,
+    onChange,
     ...rest
 }) => {
     const validators = Array.isArray(validate) ? composeValidators(...validate) : validate
     const isRequired = Array.isArray(validate) ? validate.includes(required) : validate === required
     const [field, meta, helpers] = useField({name, type, validate: validators})
+
+    // controlled input
+    useEffect(() => {
+        if (value !== undefined && onChange) {
+            helpers.setValue(value)
+        }
+    }, [value])
+
   return <FieldSet name={name}>
         {label && <Label name={name} isRequired={isRequired} highlightRequired={meta.error === requiredError}>
           {label}
@@ -23,6 +33,13 @@ const Input = ({
         {...rest}
         name={name}
         type={type}
+        onChange={(e) => {
+            if (value !== undefined && onChange) {
+              onChange(e.target.value)
+            }
+            field.onChange(e)
+        }}
+        value={field.value}
       />
       {meta.error && meta.touched && <ErrorMessage error={meta.error}/>}
     </FieldSet>
@@ -35,9 +52,9 @@ const ErrorMessage = ({error}) => {
 }
 
 const FieldSet = ({name, children}) => {
-    return <x.fieldset name={name}>
+    return <x.div name={name} height={"fit-content"}>
         {children}
-    </x.fieldset>
+    </x.div>
 }
 
 const Label = ({name, isRequired, children, highlightRequired}) => {

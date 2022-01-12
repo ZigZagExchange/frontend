@@ -144,7 +144,7 @@ export default function ListPairPage() {
                 </x.div>
               </Dev>
 
-              <Submit w={"full"} mt={5}>{isAllocationInsufficient ? "PURCHASE ALLOCATION" : "LIST"}</Submit>
+              <Submit block mt={5}>{isAllocationInsufficient ? "PURCHASE ALLOCATION" : "LIST"}</Submit>
             </Form>
           </Pane>}
         </x.div>

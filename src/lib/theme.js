@@ -5,7 +5,9 @@ import {
 
 const colors = {
   "teal-100": "#62D2AD",
+  "teal-200": "#6699ff",
 
+  // primary text blue
   "blue-100": "#09AAF5",
   "blue-200": "#08CFE8",
   "blue-300": "#51638c",

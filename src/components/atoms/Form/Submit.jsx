@@ -12,14 +12,21 @@ const Submit = ({children, ...rest}) => {
 }
 
 const sizes = {
+    xs: {
+      px: 1.5,
+      py: 1,
+      borderRadius: 2,
+      fontSize: 12
+    },
     sm: {
-        p: 2,
-        borderRadius: 2,
-        fontSize: 16
+      p: 2,
+      borderRadius: 3,
+      fontSize: 16
     },
     md: {
-        p: 4,
-        borderRadius: 4
+      p: 4,
+      borderRadius: 4,
+      fontSize: 22
     }
 }
 
@@ -35,13 +42,23 @@ const variants = {
         fontWeight: 'bold'
     },
     secondary: {
-        backgroundColor: "blue-400",
+        backgroundColor: {_: "blue-600", hover: "black"},
+        color: {_: "teal-200", hover: "blue-100"},
         border: "none"
     }
 }
 
-const Button = ({variant = "primary", size = "sm", children, isLoading, type="button", isDisabled}) => {
-    return <x.div position={"relative"}>
+export const Button = ({
+     variant = "primary",
+     size = "sm",
+     children,
+     isLoading,
+     type="button",
+     isDisabled,
+     block,
+     onClick
+}) => {
+    return <x.div position={"relative"} w={block ? "full" : "fit-content"}>
       {isLoading &&
         <x.div
           left={0}
@@ -62,7 +79,15 @@ const Button = ({variant = "primary", size = "sm", children, isLoading, type="bu
             width={24}
           />
         </x.div>}
-      <x.button type={type} disabled={isDisabled} position={"relative"} {...variants[variant]} {...sizes[size]} w={"full"}>
+      <x.button
+          onClick={onClick}
+          type={type}
+          disabled={isDisabled}
+          position={"relative"}
+          {...variants[variant]}
+          {...sizes[size]}
+          w={"full"}
+      >
         {children && children}
       </x.button>
     </x.div>

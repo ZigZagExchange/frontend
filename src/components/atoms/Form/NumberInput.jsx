@@ -8,13 +8,17 @@ const NumberInput = ({
      placeholder,
      validate,
      block,
-     label
+     label,
+     value,
+     onChange
 }) => {
     return <Input
       name={name}
       placeholder={placeholder}
       validate={validate}
       label={label}
+      value={value}
+      onChange={onChange}
       type={"number"}
       p={2}
       border={"2px solid"}
