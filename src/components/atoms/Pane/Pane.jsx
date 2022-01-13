@@ -4,15 +4,15 @@ import {x} from '@xstyled/styled-components'
 const sizes = {
   xs: {
     borderRadius: 1,
-    padding: 1
+    p: 2
   },
   sm: {
     borderRadius: 4,
-    padding: 7
+    p: 7
   },
   md: {
     borderRadius: 9,
-    padding: 10
+    p: 10
   }
 }
 

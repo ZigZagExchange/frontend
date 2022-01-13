@@ -3,6 +3,13 @@ import {
 } from '@xstyled/styled-components'
 
 const colors = {
+  "teal-100": "#62D2AD",
+  "teal-200": "#6699ff",
+
+  // primary text blue
+  "blue-100": "#09AAF5",
+  "blue-200": "#08CFE8",
+  "blue-300": "#51638c",
   "blue-400": "#1c2231",
   "blue-500": "#161B27",
   "blue-600": "#121620",
