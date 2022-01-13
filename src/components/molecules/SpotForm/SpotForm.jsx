@@ -26,7 +26,7 @@ export class SpotForm extends React.Component {
             FXS: 0.1,
         };
     }
-
+    
     updatePrice(e) {
         const newState = { ...this.state };
         newState.price = e.target.value;
@@ -41,18 +41,20 @@ export class SpotForm extends React.Component {
     }
 
     getBaseBalance() {
-        const baseCurrency = this.props.currentMarket.split("-")[0];
+        const marketInfo = api.getMarketInfo(this.props.currentMarket);
+        if (!marketInfo) return 0;
         return (
-            this.props.user.committed.balances[baseCurrency] /
-            Math.pow(10, api.currencies[baseCurrency].decimals)
+            this.props.user.committed.balances[this.props.marketInfo.baseAsset.symbol] /
+            Math.pow(10, this.props.marketInfo.baseAsset.decimals)
         );
     }
 
     getQuoteBalance() {
-        const quoteCurrency = this.props.currentMarket.split("-")[1];
+        const marketInfo = api.getMarketInfo(this.props.currentMarket);
+        if (!marketInfo) return 0;
         return (
-            this.props.user.committed.balances[quoteCurrency] /
-            Math.pow(10, api.currencies[quoteCurrency].decimals)
+            this.props.user.committed.balances[marketInfo.quoteAsset.symbol] /
+            Math.pow(10, marketInfo.quoteAsset.decimals)
         );
     }
 
@@ -67,9 +69,8 @@ export class SpotForm extends React.Component {
             toast.error("Amount is not a number");
             return;
         }
-        const baseCurrency = this.props.currentMarket.split("-")[0];
-        const quoteCurrency = this.props.currentMarket.split("-")[1];
-        amount = parseFloat(amount.toFixed(api.currencies[baseCurrency].decimals));
+        const marketInfo = api.getMarketInfo(this.props.currentMarket);
+        amount = parseFloat(amount.toFixed(marketInfo.baseAsset.decimals));
         if (
             this.props.activeOrderCount > 0 &&
             api.isZksyncChain()
@@ -79,8 +80,8 @@ export class SpotForm extends React.Component {
         }
         let baseBalance, quoteBalance;
         if (this.props.user.id) {
-            baseBalance = this.getBaseBalance();
-            quoteBalance = this.getQuoteBalance();
+            baseBalance = await this.getBaseBalance();
+            quoteBalance = await this.getQuoteBalance();
         } else {
             baseBalance = 0;
             quoteBalance = 0;
@@ -90,20 +91,20 @@ export class SpotForm extends React.Component {
         baseBalance = parseFloat(baseBalance);
         quoteBalance = parseFloat(quoteBalance);
         if (this.props.side === "s" && isNaN(baseBalance)) {
-            toast.error(`No ${baseCurrency} balance`);
+            toast.error(`No ${marketInfo.baseAsset.symbol} balance`);
             return;
         } else if (this.props.side === "b" && isNaN(quoteBalance)) {
-            toast.error(`No ${quoteCurrency} balance`);
+            toast.error(`No ${marketInfo.quoteAsset.symbol} balance`);
             return;
         } else if (this.props.side === "s" && amount > baseBalance) {
-            toast.error(`Amount exceeds ${baseCurrency} balance`);
+            toast.error(`Amount exceeds ${marketInfo.baseAsset.symbol} balance`);
             return;
         } else if (this.props.side === "b" && amount * price > quoteBalance) {
-            toast.error(`Total exceeds ${quoteCurrency} balance`);
+            toast.error(`Total exceeds ${marketInfo.quoteAsset.symbol} balance`);
             return;
-        } else if (amount < this.MINIMUM_AMOUNTS[baseCurrency]) {
+        } else if (amount < this.MINIMUM_AMOUNTS[marketInfo.baseAsset.symbol]) {
             toast.error(
-                `Minimum order size is ${this.MINIMUM_AMOUNTS[baseCurrency]} ${baseCurrency}`
+                `Minimum order size is ${this.MINIMUM_AMOUNTS[marketInfo.baseAsset.symbol]} ${marketInfo.baseAsset.symbol}`
             );
             return;
         } else if (
@@ -159,11 +160,11 @@ export class SpotForm extends React.Component {
     amountPercentOfMax() {
         if (!this.props.user.id) return 0;
 
-        const baseCurrency = this.props.currentMarket.split("-")[0];
-        const quoteCurrency = this.props.currentMarket.split("-")[1];
+        const marketInfo = api.getMarketInfo(this.props.currentMarket);
+        if (!this.marketInfo) return 0;
+
         if (this.props.side === "s") {
-            const baseBalance =
-                this.getBaseBalance() - api.currencies[baseCurrency].gasFee;
+            const baseBalance = this.getBaseBalance() - marketInfo.baseFee;
             const amount = this.state.amount || 0;
             return Math.round((amount / baseBalance) * 100);
         } else if (this.props.side === "b") {
@@ -171,14 +172,16 @@ export class SpotForm extends React.Component {
             const amount = this.state.amount || 0;
             const total = amount * this.currentPrice();
             return Math.round(
-                (total / (quoteBalance - api.currencies[quoteCurrency].gasFee)) *
+                (total / (quoteBalance - marketInfo.quoteFee)) *
                     100
             );
         }
     }
 
     currentPrice() {
-        const baseCurrency = this.props.currentMarket.split("-")[0];
+        const marketInfo = api.getMarketInfo(this.props.currentMarket);
+        if (!this.marketInfo) return 0;
+
         if (this.props.orderType === "limit" && this.state.price) {
             return this.state.price;
         }
@@ -191,22 +194,14 @@ export class SpotForm extends React.Component {
             spread = 0.002;
             stableSpread = 0.0007;
         }
-        if (this.props.side === "b" && (["WBTC", "ETH", "FXS", "WETH"]).includes(baseCurrency))
-            return parseFloat(
-                (this.props.lastPrice * (1 + spread)).toPrecision(6)
-            );
-        else if (this.props.side === "s" && (["WBTC", "ETH", "FXS", "WETH"]).includes(baseCurrency))
-            return parseFloat(
-                (this.props.lastPrice * (1 - spread)).toPrecision(6)
-            );
-        else if (this.props.side === "b" && (["USDC", "USDT", "DAI", "FRAX"]).includes(baseCurrency))
-            return parseFloat(
-                (this.props.lastPrice * (1 + stableSpread)).toPrecision(6)
-            );
-        else if (this.props.side === "s" && (["USDC", "USDT", "DAI", "FRAX"]).includes(baseCurrency))
-            return parseFloat(
-                (this.props.lastPrice * (1 - stableSpread)).toPrecision(6)
-            );
+        if (this.props.side === "b") {
+            const asks = this.props.liquidity.filter(l => l[1] == "s").map(l => l[1]);
+            return Math.min(asks);
+        }
+        else if (this.props.side === "s") {
+            const bids = this.props.liquidity.filter(l => l[1] == "b").map(l => l[1]);
+            return Math.max(bids);
+        }
         return 0;
     }
 

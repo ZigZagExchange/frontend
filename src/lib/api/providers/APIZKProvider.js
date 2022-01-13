@@ -10,6 +10,7 @@ export default class APIZKProvider extends APIProvider {
     static SEEDS_STORAGE_KEY = '@ZZ/ZKSYNC_SEEDS'
     static VALID_SIDES = ['b', 's']
     
+    marketsCache = {}
     ethWallet = null
     syncWallet = null
     syncProvider = null
@@ -98,10 +99,16 @@ export default class APIZKProvider extends APIProvider {
         return signingKey;
     }
 
-    getMarketInfo = async (market) => {
-        return fetch(`https://zigzag-markets.herokuapp.com/markets?id=${market}&chainid=${this.network}`)
+    getMarketInfo = (market) => {
+        return this.marketsCache[market];
+    }
+
+    updateMarketInfo = async (market) => {
+        const marketInfo = await fetch(`https://zigzag-markets.herokuapp.com/markets?id=${market}&chainid=${this.network}`)
             .then(r => r.json())
             .then(r => r[0]);
+        this.marketsCache[market] = marketInfo;
+        return this.marketsCache[market];
     }
 
     submitOrder = async (market, side, price, amount, orderType) => {

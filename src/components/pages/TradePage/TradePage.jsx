@@ -40,11 +40,13 @@ const TradePage = () => {
   const dispatch = useDispatch();
   const lastPriceTableData = [];
   const markets = [];
+  const marketInfo = api.getMarketInfo(currentMarket);
 
   useEffect(() => {
     const sub = () => {
       dispatch(resetData())
       api.subscribeToMarket(currentMarket)
+      api.updateMarketInfo(currentMarket)
     }
     
     if (api.ws.readyState === 0) {
@@ -205,10 +207,8 @@ const TradePage = () => {
   ).length;
 
   let tradingViewMarket = currentMarket;
-  const baseCurrency = currentMarket.split("-")[0];
-  const quoteCurrency = currentMarket.split("-")[1];
-  if (baseCurrency === "WBTC") tradingViewMarket = "BTC-" + quoteCurrency;
-  if (quoteCurrency === "WBTC") tradingViewMarket = baseCurrency + "-BTC";
+  if (marketInfo && marketInfo.baseAsset.symbol === "WBTC") tradingViewMarket = "BTC-" + marketInfo.quoteAsset.symbol;
+  if (marketInfo && marketInfo.quoteAsset.symbol === "WBTC") tradingViewMarket = marketInfo.baseAsset.symbol + "-BTC";
 
   return (
     <DefaultTemplate>
