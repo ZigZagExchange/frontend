@@ -41,8 +41,12 @@
     color: white;
 }
 
-.rb_text_3 p {
+.rb_text_3_down_value p {
     color: #c4384e;
+}
+
+.rb_text_3_up_value  p {
+    color: #3fe199;
 }
 
 .rb_text_4 p {
