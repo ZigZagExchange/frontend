@@ -39,7 +39,7 @@
 .trade_price_btc_table table th {
     color: #94a2c9;
     font-weight: 400;
-    text-align: center;
+    text-align: start;
     padding: 0 20px;
 }
 
