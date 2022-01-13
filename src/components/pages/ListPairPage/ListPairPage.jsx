@@ -1,7 +1,6 @@
 import React, {useState, useEffect, useRef} from "react";
 import {useSelector} from 'react-redux';
 import {userSelector} from "lib/store/features/auth/authSlice";
-import {arweaveAllocationSelector} from "lib/store/features/api/apiSlice";
 import api from 'lib/api';
 import './ListPairPage.style.css'
 import {Button, DefaultTemplate} from 'components';
@@ -20,7 +19,6 @@ import NumberInput from "../../atoms/Form/NumberInput";
 export default function ListPairPage() {
   const user = useSelector(userSelector);
   const isUserLoggedIn = user.id !== null && user.id !== undefined
-  const arweaveAllocation = useSelector(arweaveAllocationSelector);
   const [txid, setTxId] = useState("");
   const [fileToUpload, setFileToUpload] = useState(null)
   const [isFileUploadLoading, setIsFileUploadLoading] = useState(false)

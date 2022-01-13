@@ -14,7 +14,6 @@ import { formatUSD } from 'lib/utils';
 import cx from 'classnames';
 import { BiError } from 'react-icons/bi';
 import { MdSwapCalls } from 'react-icons/md';
-import darkPlugHead from 'assets/icons/dark-plug-head.png';
 import logo from 'assets/images/logo.png'
 import BridgeSwapInput from '../BridgeSwapInput/BridgeSwapInput';
 import ConnectWalletButton from "../../../atoms/ConnectWalletButton/ConnectWalletButton";

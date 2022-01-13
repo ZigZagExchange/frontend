@@ -6,16 +6,15 @@ import { GoGlobe } from 'react-icons/go'
 import { HiExternalLink } from 'react-icons/hi'
 import React, { useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import { Button, Dropdown, AccountDropdown, Menu, MenuItem } from 'components'
+import { Dropdown, AccountDropdown, Menu, MenuItem } from 'components'
 import { userSelector } from 'lib/store/features/auth/authSlice'
 import { networkSelector } from 'lib/store/features/api/apiSlice'
 import api from 'lib/api'
 import logo from 'assets/images/logo.png'
 import menu from 'assets/icons/menu.png'
-import darkPlugHead from 'assets/icons/dark-plug-head.png'
 import './Header.css'
 import ConnectWalletButton from "../../atoms/ConnectWalletButton/ConnectWalletButton";
-import {Dev, isDev} from "../../../lib/helpers/env";
+import {Dev } from "../../../lib/helpers/env";
 
 export const Header = (props) => {
   // state to open or close the sidebar in mobile

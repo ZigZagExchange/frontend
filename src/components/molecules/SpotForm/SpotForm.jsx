@@ -1,8 +1,7 @@
 import React from 'react';
 import { toast } from 'react-toastify';
 import api from 'lib/api';
-import { RangeSlider, Button } from 'components';
-import darkPlugHead from 'assets/icons/dark-plug-head.png';
+import { RangeSlider } from 'components';
 import './SpotForm.css';
 import ConnectWalletButton from "../../atoms/ConnectWalletButton/ConnectWalletButton";
 

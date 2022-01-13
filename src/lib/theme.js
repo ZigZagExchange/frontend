@@ -1,6 +1,5 @@
 import {
     defaultTheme,
-    generateHexAlphaVariants,
 } from '@xstyled/styled-components'
 
 const colors = {

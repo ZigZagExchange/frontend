@@ -138,12 +138,10 @@ export default class API extends Emitter {
     }
 
     _socketOpen = () => {
-        this.__pingServerTimeout = setInterval(this.ping, 5000)
         this.emit('open')
     }
     
     _socketClose = () => {
-        clearInterval(this.__pingServerTimeout)
         toast.error("Connection to server closed. Please refresh page");
         this.emit('close')
     }
@@ -180,8 +178,6 @@ export default class API extends Emitter {
         this.emit('accountState', accountState)
         return accountState
     }
-
-    ping = () => this.send('ping')
 
     send = (op, args) => {
         return this.ws.send(JSON.stringify({ op, args }))
@@ -439,6 +435,10 @@ export default class API extends Emitter {
             quoteQuantity: quoteQuantityWithoutFee,
             baseQuantity: baseQuantityWithoutFee,
         };
+    }
+
+    getMarketInfo = async (market) => {
+        await this.apiProvider.getMarketInfo(market);
     }
 
     submitOrder = async (product, side, price, amount, orderType) => {

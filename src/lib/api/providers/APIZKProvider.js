@@ -98,47 +98,39 @@ export default class APIZKProvider extends APIProvider {
         return signingKey;
     }
 
-    submitOrder = async (product, side, price, amount, orderType) => {
-        amount = parseFloat(amount)
-        const currencies = product.split('-')
-        const baseCurrency = currencies[0]
-        const quoteCurrency = currencies[1]
+    getMarketInfo = async (market) => {
+        return fetch(`https://zigzag-markets.herokuapp.com/markets?id=${market}&chainid=${this.network}`)
+            .then(r => r.json())
+            .then(r => r[0]);
+    }
 
-        if (baseCurrency === 'USDC' || baseCurrency === 'USDT') {
-            amount = parseFloat(amount).toFixed(7).slice(0, -1)
-        }
-
-        price = parseFloat(price).toPrecision(8)
+    submitOrder = async (market, side, price, amount, orderType) => {
+        const marketInfo = await this.getMarketInfo(market);
+        console.log(marketInfo);
+        amount = parseFloat(amount).toFixed(marketInfo.baseAsset.decimals);
+        price = parseFloat(price).toFixed(marketInfo.pricePrecisionDecimals);
         
         if (!APIZKProvider.VALID_SIDES.includes(side)) {
             throw new Error('Invalid side')
         }
         
-        let tokenBuy, tokenSell, sellQuantity, buyQuantity, sellQuantityWithFee
+        let tokenBuy, tokenSell, sellQuantity, sellQuantityWithFee;
         
         if (side === 'b') {
-            [tokenBuy, tokenSell] = currencies
-            buyQuantity = amount
             sellQuantity = parseFloat(amount * price)
+            sellQuantityWithFee = sellQuantity + marketInfo.quoteFee;
+            tokenSell = marketInfo.quoteAssetId;
+            tokenBuy = marketInfo.baseAssetId
         } else if (side === 's') {
-            [tokenSell, tokenBuy] = currencies
-            buyQuantity = amount * price
             sellQuantity = parseFloat(amount)
-        }
-
-        sellQuantityWithFee = sellQuantity + this.api.currencies[tokenSell].gasFee
-        let priceWithFee = 0
-        
-        if (side === 'b') {
-            priceWithFee = parseFloat((sellQuantityWithFee / buyQuantity).toPrecision(6))
-        }
-        else if (side === 's') {
-            priceWithFee = parseFloat((buyQuantity / sellQuantityWithFee).toPrecision(6))
+            sellQuantityWithFee = sellQuantity + marketInfo.baseFee;
+            tokenSell = marketInfo.baseAssetId;
+            tokenBuy = marketInfo.quoteAssetId;
         }
         
         const tokenRatio = {}
-        tokenRatio[baseCurrency] = amount.toString();
-        tokenRatio[quoteCurrency] = (amount * price).toString();
+        tokenRatio[marketInfo.baseAssetId] = amount;
+        tokenRatio[marketInfo.quoteAssetId] = (amount * price).toFixed(marketInfo.quoteAsset.decimals);
         const now_unix = Date.now() / 1000 | 0
         const two_minute_expiry = now_unix + 120
         const one_day_expiry = now_unix + 24*3600;
@@ -150,7 +142,7 @@ export default class APIZKProvider extends APIProvider {
         }
         const parsedSellQuantity = this.syncProvider.tokenSet.parseToken(
             tokenSell,
-            sellQuantityWithFee.toFixed(this.api.currencies[tokenSell].decimals)
+            sellQuantityWithFee.toString()
         );
         const packedSellQuantity = zksync.utils.closestPackableTransactionAmount(parsedSellQuantity);
         const order = await this.syncWallet.getOrder({
@@ -160,7 +152,7 @@ export default class APIZKProvider extends APIProvider {
             ratio: zksync.utils.tokenRatio(tokenRatio),
             validUntil
         })
-        this.api.send('submitorder', [this.network, order])
+        this.api.send('submitorder2', [this.network, market, order])
 
         return order
     }
