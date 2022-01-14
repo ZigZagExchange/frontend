@@ -211,6 +211,8 @@ export class SpotForm extends React.Component {
     }
 
     rangeSliderHandler(e, val) {
+        const marketInfo = api.getMarketInfo(this.props.currentMarket);
+        if (!marketInfo) return 0;
         if (!this.props.user.id) return false;
 
         const newstate = { ...this.state };
@@ -224,10 +226,9 @@ export class SpotForm extends React.Component {
         }
         if (this.props.side === "s") {
             const baseBalance = this.getBaseBalance();
-            const baseCurrency = this.props.currentMarket.split("-")[0];
-            const decimals = api.currencies[baseCurrency].decimals;
+            const decimals = marketInfo.baseAsset.decimals;
             let displayAmount = (baseBalance * val) / 100;
-            displayAmount -= api.currencies[baseCurrency].gasFee;
+            displayAmount -= marketInfo.baseFee;
             displayAmount = parseFloat(displayAmount.toFixed(decimals)).toPrecision(7);
             if (displayAmount < 1e-5) {
                 newstate.amount = 0;
@@ -236,11 +237,9 @@ export class SpotForm extends React.Component {
             }
         } else if (this.props.side === "b") {
             const quoteBalance = this.getQuoteBalance();
-            const baseCurrency = this.props.currentMarket.split("-")[0];
-            const quoteCurrency = this.props.currentMarket.split("-")[1];
-            const decimals = api.currencies[baseCurrency].decimals;
+            const decimals = marketInfo.baseFee;
             let quoteAmount =
-                ((quoteBalance - api.currencies[quoteCurrency].gasFee) * val) /
+                ((quoteBalance - marketInfo.quoteFee) * val) /
                 100 /
                 this.currentPrice();
             quoteAmount = parseFloat(quoteAmount.toFixed(decimals)).toPrecision(7);
@@ -267,11 +266,10 @@ export class SpotForm extends React.Component {
     }
 
     render() {
+        const marketInfo = api.getMarketInfo(this.props.currentMarket);
+
         let price = this.currentPrice();
         if (price === 0) price = "";
-
-        const baseCurrency = this.props.currentMarket.split("-")[0];
-        const quoteCurrency = this.props.currentMarket.split("-")[1];
 
         let baseBalance, quoteBalance;
         if (this.props.user.id) {
@@ -291,11 +289,11 @@ export class SpotForm extends React.Component {
         const balanceHtml =
             this.props.side === "b" ? (
                 <strong>
-                    {quoteBalance.toPrecision(8)} {quoteCurrency}
+                    {quoteBalance.toPrecision(8)} {marketInfo && marketInfo.quoteAsset.symbol}
                 </strong>
             ) : (
                 <strong>
-                    {baseBalance.toPrecision(8)} {baseCurrency}
+                    {baseBalance.toPrecision(8)} {marketInfo && marketInfo.baseAsset.symbol}
                 </strong>
             );
 
@@ -318,12 +316,12 @@ export class SpotForm extends React.Component {
             <div className="spf_input_box">
               <span className="spf_desc_text">Price</span>
               <input type="text" value={!isNaN(price) ? price : ''} onChange={this.updatePrice.bind(this)} disabled={this.priceIsDisabled()}  />
-              <span className={this.priceIsDisabled() ? "text-disabled" : ""}>{quoteCurrency}</span>
+              <span className={this.priceIsDisabled() ? "text-disabled" : ""}>{marketInfo && marketInfo.quoteAsset.symbol}</span>
             </div>
             <div className="spf_input_box">
               <span className="spf_desc_text">Amount</span>
               <input type="text" value={this.state.amount} placeholder="0.00" onChange={this.updateAmount.bind(this)}/>
-              <span>{baseCurrency}</span>
+              <span>{marketInfo && marketInfo.baseAsset.symbol}</span>
             </div>
             <div className="spf_range">
               <RangeSlider value={this.amountPercentOfMax()} onChange={this.rangeSliderHandler.bind(this)} />
