@@ -49,11 +49,13 @@ const TradePage = () => {
   }
 
   const { search } = useLocation()
-  const params = new URLSearchParams(search)
-  const marketFromURL = params.get(idQueryParam)
-  if (marketFromURL) {
-    updateMarketChain(marketFromURL)
-  }
+  useEffect(() => {
+    const params = new URLSearchParams(search)
+    const marketFromURL = params.get(idQueryParam)
+    if (marketFromURL) {
+      updateMarketChain(marketFromURL)
+    }
+  }, [])
 
   useEffect(() => {
     const sub = () => {
