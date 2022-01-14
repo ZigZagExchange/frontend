@@ -182,7 +182,7 @@ const Bridge = () => {
             </div>
           </Pane>
 
-          <Pane size={"md"} borderRadius={"0 0 xl xl"}>
+          <Pane size={"md"} borderRadius={"0 0 3xl 3xl"}>
             <div className="bridge_box_swap_wrapper">
               <SwapButton onClick={switchTransferType} />
               <h5>Switch</h5>

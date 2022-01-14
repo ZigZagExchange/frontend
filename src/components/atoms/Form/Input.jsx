@@ -19,6 +19,8 @@ const Input = ({
     const isRequired = Array.isArray(validate) ? validate.includes(required) : validate === required
     const [field, meta, helpers] = useField({name, type, validate: validators})
     const Component = type === "select" ? x.select : x.input
+    const isError = meta.error && meta.touched
+
 
     // controlled input
     useEffect(() => {
@@ -47,12 +49,12 @@ const Input = ({
               children={children}
             />
         </x.div>
-        {meta.error && meta.touched && !hideValidation && <ErrorMessage error={meta.error}/>}
+        {isError && !hideValidation && <ErrorMessage error={meta.error}/>}
       </FieldSet>
 }
 
 const ErrorMessage = ({error}) => {
-  return <x.div mt={1} color={"red"}>
+  return <x.div mt={1} color={"red"} fontSize={12}>
     {error}
   </x.div>
 }

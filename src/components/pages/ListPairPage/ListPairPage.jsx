@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from "react";
+import React, {useState, useEffect, useRef, useCallback, useMemo} from "react";
 import {useSelector} from 'react-redux';
 import {userSelector} from "lib/store/features/auth/authSlice";
 import api from 'lib/api';
@@ -12,12 +12,14 @@ import {x} from "@xstyled/styled-components"
 import Form from "../../atoms/Form/Form";
 import NumberInput from "../../atoms/Form/NumberInput";
 import Submit from "../../atoms/Form/Submit";
-import {max, min, required} from "../../atoms/Form/validation";
+import {forceValidation, gte, max, min, required} from "../../atoms/Form/validation";
 import {jsonify} from "../../../lib/helpers/strings";
 import {Dev} from "../../../lib/helpers/env";
 import SuccessModal from "./SuccessModal";
 import {arweaveAllocationSelector} from "lib/store/features/api/apiSlice";
 import SelectInput from "../../atoms/Form/SelectInput";
+import {model} from "../../atoms/Form/helpers";
+import {debounce} from "lodash"
 
 
 export default function ListPairPage() {
@@ -33,11 +35,18 @@ export default function ListPairPage() {
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
   const [isAllocationInsufficient, setIsAllocationInsufficient] = useState(false)
 
-  // TODO: Modal for successful upload receipt
-  // TODO: Waiting on full validation from
+  const [baseAssetId, setBaseAssetId] = useState("")
+  const [quoteAssetId, setQuoteAssetId] = useState("")
+  const [baseAssetIdSymbolPreview, setBaseAssetIdSymbolPreview] = useState(null)
+  const [quoteAssetIdSymbolPreview, setQuoteAssetIdSymbolPreview] = useState(null)
 
-  // test txid for receipt
-  // ILvtamrekb_DUWjhx-Pwa2X6xCLpajouQvrq3aURzB0
+  const [isBaseAssetIdInvalid, setIsBaseAssetIdInvalid] = useState(false)
+  const [isQuoteAssetIdInvalid, setIsQuoteAssetIdInvalid] = useState(false)
+
+
+  // we purchase 500k bytes at once so the user does not have to
+  // repeatedly repurchase space if wanting to list more than 1 market
+  const bytesToPurchase = 500000
 
   const refreshUserArweaveAllocation = () => {
     return api.refreshArweaveAllocation(user.address)
@@ -48,6 +57,51 @@ export default function ListPairPage() {
       refreshUserArweaveAllocation()
     }
   }, []);
+
+
+
+  function getBaseInfo(baseAssetId) {
+    console.log("debug:: base asset id", baseAssetId)
+    if (baseAssetId && baseAssetId !== "") {
+      api.tokenInfo(baseAssetId).then(res => {
+        setBaseAssetIdSymbolPreview(res.symbol)
+        setIsBaseAssetIdInvalid(false)
+      }).catch(e => {
+        setBaseAssetIdSymbolPreview(null)
+        setIsBaseAssetIdInvalid(true)
+      })
+    } else {
+      setBaseAssetIdSymbolPreview(null)
+    }
+  }
+
+  function getQuoteInfo(quoteAssetId) {
+    console.log("debug:: base asset id", quoteAssetId)
+    if (quoteAssetId && quoteAssetId !== "") {
+      api.tokenInfo(quoteAssetId).then(res => {
+        setQuoteAssetIdSymbolPreview(res.symbol)
+        setIsQuoteAssetIdInvalid(false)
+      }).catch(e => {
+        setQuoteAssetIdSymbolPreview(null)
+        setIsQuoteAssetIdInvalid(true)
+      })
+    } else {
+      setQuoteAssetIdSymbolPreview(null)
+    }
+  }
+
+  const queryBaseTokenInfo = useCallback(debounce(getBaseInfo, 500), [])
+  useEffect(() => {
+    queryBaseTokenInfo(baseAssetId)
+  }, [baseAssetId])
+
+
+  const queryQuoteTokenInfo = useCallback(debounce(getQuoteInfo, 500), [])
+  useEffect(() => {
+    queryQuoteTokenInfo(quoteAssetId)
+  }, [quoteAssetId])
+
+
 
   const onFormSubmit = async (formData, resetForm) => {
     return new Promise(async (resolve, reject) => {
@@ -111,9 +165,19 @@ export default function ListPairPage() {
 
         {isUserLoggedIn && <Pane size={"sm"} variant={"light"} maxWidth={"500px"} margin={"auto"}>
           <x.div fontSize={28} mb={2}>List New Market</x.div>
+          {(baseAssetId || quoteAssetId) &&
+          <x.div display={"flex"} fontSize={35} justifyContent={"center"} my={4}>
+            <x.span color={baseAssetIdSymbolPreview ? "blue-gray-400" : "blue-gray-600"}>
+              {baseAssetIdSymbolPreview ? baseAssetIdSymbolPreview : "XXX"}
+            </x.span>
+            <x.span color={baseAssetIdSymbolPreview && quoteAssetIdSymbolPreview ? "blue-gray-400" : "blue-gray-600"}>-</x.span>
+            <x.span color={quoteAssetIdSymbolPreview ? "blue-gray-400" : "blue-gray-600"}>
+              {quoteAssetIdSymbolPreview ? quoteAssetIdSymbolPreview : "XXX"}
+            </x.span>
+          </x.div>}
           <Form initialValues={{
-            baseAssetId: "",
-            quoteAssetId: "",
+            baseAssetId: baseAssetId,
+            quoteAssetId: quoteAssetId,
             baseFee: "",
             quoteFee: "",
             minSize: "",
@@ -122,16 +186,28 @@ export default function ListPairPage() {
             pricePrecisionDecimal: "",
           }} onSubmit={onFormSubmit}>
             <x.div display={"grid"} gridTemplateColumns={2} rowGap={3} columnGap={6} mb={5}>
-              <NumberInput block name={"baseAssetId"} label={"Base Asset ID"} validate={required} hideValidation/>
-              <NumberInput block name={"quoteAssetId"} label={"Quote Asset ID"} validate={required} hideValidation/>
-              <NumberInput block name={"baseFee"} label={"Base Fee"} validate={required} hideValidation/>
-              <NumberInput block name={"quoteFee"} label={"Quote Fee"} validate={required} hideValidation/>
-              <NumberInput block name={"minSize"} label={"Min Size"} validate={[required, min(0.0001)]} hideValidation/>
-              <NumberInput block name={"maxSize"} label={"Max Size"} validate={required} hideValidation/>
+              <NumberInput
+                block
+                {...model(baseAssetId, setBaseAssetId)}
+                name={"baseAssetId"}
+                label={"Base Asset ID"}
+                validate={[required, min(0), forceValidation(isBaseAssetIdInvalid, "invalid asset on zksync")]}
+              />
+              <NumberInput
+                block
+                {...model(quoteAssetId, setQuoteAssetId)}
+                name={"quoteAssetId"}
+                label={"Quote Asset ID"}
+                validate={[required, min(0), forceValidation(isQuoteAssetIdInvalid, "invalid asset on zksync")]}
+              />
+              <NumberInput block name={"baseFee"} label={"Base Fee"} validate={[required, min(0)]}/>
+              <NumberInput block name={"quoteFee"} label={"Quote Fee"} validate={[required, min(0)]}/>
+              <NumberInput block name={"minSize"} label={"Min Size"} validate={[required, min(0)]}/>
+              <NumberInput block name={"maxSize"} label={"Max Size"} validate={[required, min(0)]}/>
               <SelectInput name={"zigzagChainId"} label={"Ethereum Network"}
-                           items={[{name: "Mainnet", id: 1}, {name: "Rinkeby", id: 2}]} validate={required} hideValidation/>
+                           items={[{name: "Mainnet", id: 1}, {name: "Rinkeby", id: 1000}]} validate={required}/>
               <NumberInput block name={"pricePrecisionDecimal"} label={"Price Precision Decimals"}
-                           validate={required} hideValidation/>
+                           validate={[required, max(18)]}/>
             </x.div>
             {isAllocationInsufficient &&
             <x.div display={"flex"} alignItems={"center"} justifyContent={"space-between"} mb={4}>
@@ -157,28 +233,29 @@ export default function ListPairPage() {
       <AllocationModal
         onClose={() => setIsAllocationModalOpen(false)}
         show={isAllocationModalOpen}
-        fileSize={fileToUpload?.size}
+        fileSizeBytes={bytesToPurchase}
         onSuccess={() => {
-          // API cache needs a bit of time to update. 1s should do it.
+          // API cache needs a bit of time to update. Arweave bridge runs on a 5 second loop
+          // we timeout here so we make sure we get fresh data
           setTimeout(() => {
             refreshUserArweaveAllocation()
             if (fileToUpload.size > arweaveAllocation) {
               setIsAllocationInsufficient(true)
-              setIsAllocationModalOpen(true)
             } else {
               setIsAllocationInsufficient(false)
-              setIsAllocationModalOpen(false)
               setFileToUpload(null)
             }
-          }, 1 * 1000)
+          }, 1 * 5000)
+          setIsAllocationModalOpen(false)
         }}
       />
       <SuccessModal
-        txid={txid}
-        show={isSuccessModalOpen}
+        txid={"3tyKfXAzRfMJSmhVYea5rRcv6pNG-0Jp-pTthCzG8DU"}
+        show={true}
         onClose={() => {
           setIsSuccessModalOpen(false);
           setTxId(null);
+
         }}
       />
     </DefaultTemplate>

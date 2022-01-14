@@ -20,6 +20,19 @@ export const required = (formValue) => {
   }
 }
 
+export const gte = (greaterThan, customErrorString) => (formValue) => {
+  const error = customErrorString ? customErrorString : `Must be greater than or equal to ${greaterThan}`
+  if (formValue < greaterThan) {
+    return error
+  }
+}
+
+export const forceValidation = (showThrow, errorMessage) => (formValue) => {
+  if (showThrow) {
+    return errorMessage
+  }
+}
+
 export const composeValidators = (...validators) => (value) =>
   validators.reduce((error, validator) => error || validator(value), undefined)
 

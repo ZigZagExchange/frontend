@@ -490,4 +490,8 @@ export default class API extends Emitter {
         }).then(r => r.json());
         return response;
     }
+
+    tokenInfo = (tokenLike) => {
+        return this.apiProvider.tokenInfo(tokenLike)
+    }
 }

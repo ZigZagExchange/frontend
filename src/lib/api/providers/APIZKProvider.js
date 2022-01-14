@@ -16,6 +16,8 @@ export default class APIZKProvider extends APIProvider {
     syncProvider = null
     zksyncCompatible = true
     _tokenWithdrawFees = {}
+    // some methods are only available on the rest provider
+    _restProvider = null
 
     getProfile = async (address) => {
         try {
@@ -257,6 +259,9 @@ export default class APIZKProvider extends APIProvider {
             this.syncProvider = await zksync.getDefaultProvider(
                 this.api.getNetworkName(this.network)
             )
+            this._restProvider = await zksync.getDefaultRestProvider(
+              this.api.getNetworkName(this.network)
+            )
         } catch (e) {
             toast.error('Zksync is down. Try again later')
             throw e
@@ -360,5 +365,9 @@ export default class APIZKProvider extends APIProvider {
 
     signMessage = async (message) => {
         return await this.ethWallet.signMessage(message);
+    }
+
+    tokenInfo = (tokenLike) => {
+        return this._restProvider.tokenInfo(tokenLike)
     }
 }

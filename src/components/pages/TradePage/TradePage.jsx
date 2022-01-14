@@ -24,6 +24,8 @@ import {
 import { userSelector } from "lib/store/features/auth/authSlice";
 import "./style.css";
 import api from "lib/api";
+import {useLocation} from "react-router-dom";
+import {idQueryParam} from "../ListPairPage/SuccessModal";
 
 const TradePage = () => {
   const [marketDataTab, updateMarketDataTab] = useState('fills')
@@ -41,6 +43,17 @@ const TradePage = () => {
   const lastPriceTableData = [];
   const markets = [];
   const marketInfo = api.getMarketInfo(currentMarket);
+
+  const updateMarketChain = (market) => {
+    dispatch(setCurrentMarket(market));
+  }
+
+  const { search } = useLocation()
+  const params = new URLSearchParams(search)
+  const marketFromURL = params.get(idQueryParam)
+  if (marketFromURL) {
+    updateMarketChain(marketFromURL)
+  }
 
   useEffect(() => {
     const sub = () => {
@@ -64,9 +77,6 @@ const TradePage = () => {
     }
   }, [network, currentMarket])
 
-  const updateMarketChain = (market) => {
-    dispatch(setCurrentMarket(market));
-  }
 
   Object.keys(lastPrices).forEach((market) => {
     markets.push(market);
