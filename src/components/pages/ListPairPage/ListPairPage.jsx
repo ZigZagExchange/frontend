@@ -43,7 +43,6 @@ export default function ListPairPage() {
   const [isBaseAssetIdInvalid, setIsBaseAssetIdInvalid] = useState(false)
   const [isQuoteAssetIdInvalid, setIsQuoteAssetIdInvalid] = useState(false)
 
-
   // we purchase 500k bytes at once so the user does not have to
   // repeatedly repurchase space if wanting to list more than 1 market
   const bytesToPurchase = 500000
@@ -59,9 +58,7 @@ export default function ListPairPage() {
   }, []);
 
 
-
   function getBaseInfo(baseAssetId) {
-    console.log("debug:: base asset id", baseAssetId)
     if (baseAssetId && baseAssetId !== "") {
       api.tokenInfo(baseAssetId).then(res => {
         setBaseAssetIdSymbolPreview(res.symbol)
@@ -76,7 +73,6 @@ export default function ListPairPage() {
   }
 
   function getQuoteInfo(quoteAssetId) {
-    console.log("debug:: base asset id", quoteAssetId)
     if (quoteAssetId && quoteAssetId !== "") {
       api.tokenInfo(quoteAssetId).then(res => {
         setQuoteAssetIdSymbolPreview(res.symbol)
@@ -250,8 +246,8 @@ export default function ListPairPage() {
         }}
       />
       <SuccessModal
-        txid={"3tyKfXAzRfMJSmhVYea5rRcv6pNG-0Jp-pTthCzG8DU"}
-        show={true}
+        txid={txid}
+        show={isSuccessModalOpen}
         onClose={() => {
           setIsSuccessModalOpen(false);
           setTxId(null);
