@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { networkSelector } from "lib/store/features/api/apiSlice";
 import { userSelector } from "lib/store/features/auth/authSlice";
 import styled, { css } from "@xstyled/styled-components";
-import { FiChevronDown } from 'react-icons/fi';
+import { FiChevronDown } from "react-icons/fi";
 import { useCoinEstimator } from "components";
 import { formatUSD } from "lib/utils";
 import api from "lib/api";
@@ -22,7 +22,7 @@ const StyledBridgeCurrencySelector = styled.div`
   user-select: none;
 
   &:hover {
-    border-color: #7B8AB6;
+    border-color: #7b8ab6;
   }
 
   select {
@@ -54,7 +54,7 @@ const BridgeCurrencyWrapper = styled.div`
       margin-left: 5px;
     }
   }
-`
+`;
 
 const BridgeCurrencyOptions = styled.ul`
   position: absolute;
@@ -72,11 +72,13 @@ const BridgeCurrencyOptions = styled.ul`
   transform: rotate(180deg) translateY(20px);
   cursor: pointer;
 
-  ${p => p.show && css`
-    opacity: 1;
-    pointer-events: all;
-    transform: rotate(0deg) translateY(0);
-  `}
+  ${(p) =>
+    p.show &&
+    css`
+      opacity: 1;
+      pointer-events: all;
+      transform: rotate(0deg) translateY(0);
+    `}
 
   .currencyBalance {
     line-height: 1.1;
@@ -86,7 +88,7 @@ const BridgeCurrencyOptions = styled.ul`
     strong {
       display: block;
       font-weight: 600;
-      font-family: 'Iceland', sans-serif;
+      font-family: "Iceland", sans-serif;
       font-size: 18px;
       color: #226;
     }
@@ -116,13 +118,19 @@ const BridgeCurrencyOptions = styled.ul`
       background: #eee;
     }
 
-    &:active, &:focus {
+    &:active,
+    &:focus {
       background: #def;
     }
   }
-`
+`;
 
-const BridgeCurrencySelector = ({ onChange, currencies, balances = {}, value }) => {
+const BridgeCurrencySelector = ({
+  onChange,
+  currencies,
+  balances = {},
+  value,
+}) => {
   const [tickers, setTickers] = useState([]);
   const [showingOptions, setShowingOptions] = useState(false);
   const network = useSelector(networkSelector);
@@ -130,34 +138,36 @@ const BridgeCurrencySelector = ({ onChange, currencies, balances = {}, value }) 
   const coinEstimator = useCoinEstimator();
 
   useEffect(() => {
-    const tickers = (currencies || Object.keys(api.currencies)).filter((c) => {
-      return api.currencies[c].chain[network];
-    }).sort();
+    const tickers = (currencies || Object.keys(api.currencies))
+      .filter((c) => {
+        return api.currencies[c].chain[network];
+      })
+      .sort();
 
     setTickers(tickers);
     onChange(api.currencies["ETH"] ? "ETH" : tickers[0]);
   }, [user.id, network, currencies]);
 
   const hideOptions = (e) => {
-    if (e) e.preventDefault()
+    if (e) e.preventDefault();
     setShowingOptions(false);
-  }
+  };
 
   const toggleOptions = (e) => {
-    if (e) e.preventDefault()
-    e.stopPropagation()
-    setShowingOptions(!showingOptions)
-  }
+    if (e) e.preventDefault();
+    e.stopPropagation();
+    setShowingOptions(!showingOptions);
+  };
 
   useEffect(() => {
     if (showingOptions) {
-      window.addEventListener('click', hideOptions, false)
+      window.addEventListener("click", hideOptions, false);
     }
 
     return () => {
-      window.removeEventListener('click', hideOptions)
-    }
-  }, [showingOptions])
+      window.removeEventListener("click", hideOptions);
+    };
+  }, [showingOptions]);
 
   if (!value) {
     return null;
@@ -165,10 +175,10 @@ const BridgeCurrencySelector = ({ onChange, currencies, balances = {}, value }) 
 
   const currency = api.currencies[value];
 
-  const selectOption = ticker => (e) => {
-    if (e) e.preventDefault()
-    onChange(ticker)
-  }
+  const selectOption = (ticker) => (e) => {
+    if (e) e.preventDefault();
+    onChange(ticker);
+  };
 
   return (
     <BridgeCurrencyWrapper>
@@ -182,22 +192,35 @@ const BridgeCurrencySelector = ({ onChange, currencies, balances = {}, value }) 
         </div>
       </StyledBridgeCurrencySelector>
       <BridgeCurrencyOptions onClick={hideOptions} show={showingOptions}>
-        {tickers.map((ticker, key) => (
-          ticker === value ? null :
-          <li key={key} onClick={selectOption(ticker)} tabIndex="0" className="currencyOption">
-            <div className="currencyIcon">
-              <img src={api.currencies[ticker].image.default} alt={currency.name} />
-            </div>
-            <div className="currencyName">
-              {ticker}
-            </div>
-            {balances[ticker] && (
-              <div className="currencyBalance">
-                <strong>{balances[ticker].valueReadable}</strong>
-                <small>${formatUSD(coinEstimator(ticker) * balances[ticker].valueReadable)}</small>
-              </div>)}
-          </li>
-        ))}
+        {tickers.map((ticker, key) =>
+          ticker === value ? null : (
+            <li
+              key={key}
+              onClick={selectOption(ticker)}
+              tabIndex="0"
+              className="currencyOption"
+            >
+              <div className="currencyIcon">
+                <img
+                  src={api.currencies[ticker].image.default}
+                  alt={currency.name}
+                />
+              </div>
+              <div className="currencyName">{ticker}</div>
+              {balances[ticker] && (
+                <div className="currencyBalance">
+                  <strong>{balances[ticker].valueReadable}</strong>
+                  <small>
+                    $
+                    {formatUSD(
+                      coinEstimator(ticker) * balances[ticker].valueReadable
+                    )}
+                  </small>
+                </div>
+              )}
+            </li>
+          )
+        )}
       </BridgeCurrencyOptions>
     </BridgeCurrencyWrapper>
   );

@@ -9,20 +9,19 @@ const InputContainer = styled.div`
   background: transparent;
   border-radius: 10px;
   padding: 10px;
-  border: 1px solid rgba(255,255,255,0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   position: relative;
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
-  
 
-  &:hover{
-    border: 1px solid rgba(255,255,255,0.4);
+  &:hover {
+    border: 1px solid rgba(255, 255, 255, 0.4);
   }
 
   input,
   input:focus {
-    font-family: 'Iceland', sans-serif;
+    font-family: "Iceland", sans-serif;
     width: calc(100% - 148px);
     height: 30px;
     background: transparent;
@@ -59,25 +58,28 @@ const InputContainer = styled.div`
 const BalanceText = styled.div`
   margin: 5px 11px 10px 0px;
   text-align: right;
-  color: rgba(250,250,250,0.5);
+  color: rgba(250, 250, 250, 0.5);
   font-family: monospace;
-`
+`;
 
 const PoolModalInput = (props) => {
-  
-
   return (
     <>
-    <InputContainer>
-      <div className="leftGroup">
-        <img src={api.currencies[props.currency].image.default} alt={props.currency.name}  className="pool_token_image"/> {props.currency}
-      </div>
-      <input placeholder="0.00" type="text" />
-      <a className="maxLink" href="#max">
-        Max
-      </a>
-    </InputContainer>
-    <BalanceText>Balance: {props.balance}</BalanceText>
+      <InputContainer>
+        <div className="leftGroup">
+          <img
+            src={api.currencies[props.currency].image.default}
+            alt={props.currency.name}
+            className="pool_token_image"
+          />{" "}
+          {props.currency}
+        </div>
+        <input placeholder="0.00" type="text" />
+        <a className="maxLink" href="#max">
+          Max
+        </a>
+      </InputContainer>
+      <BalanceText>Balance: {props.balance}</BalanceText>
     </>
   );
 };

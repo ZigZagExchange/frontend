@@ -1,9 +1,9 @@
 import React from "react";
-import "./Footer.css";
+import "./TradeOrdersTable.css";
 import loadingGif from "assets/icons/loading.svg";
 import api from "lib/api";
 
-export class Footer extends React.Component {
+export class TradeOrdersTable extends React.Component {
   constructor(props) {
     super(props);
     this.state = { tab: "orders" };
@@ -18,8 +18,7 @@ export class Footer extends React.Component {
   }
 
   getUserOrders() {
-    return Object.values(this.props.userOrders)
-      .sort((a, b) => b[1] - a[1]);
+    return Object.values(this.props.userOrders).sort((a, b) => b[1] - a[1]);
   }
 
   renderOrderTable(orders) {
@@ -49,20 +48,17 @@ export class Footer extends React.Component {
             const side = order[3] === "b" ? "buy" : "sell";
             const sideclassname = order[3] === "b" ? "up_value" : "down_value";
             const expiration = order[7];
-            const now = Date.now() / 1000 | 0;
+            const now = (Date.now() / 1000) | 0;
             const timeToExpiry = expiration - now;
             let expiryText;
             if (timeToExpiry > 86400) {
-                expiryText = Math.floor(timeToExpiry / 86400) + "d";
-            }
-            else if (timeToExpiry > 3600) {
-                expiryText = Math.floor(timeToExpiry / 3600) + "h";
-            }
-            else if (timeToExpiry > 0) {
-                expiryText = Math.floor(timeToExpiry / 3600) + "m";
-            }
-            else {
-                expiryText = "--"
+              expiryText = Math.floor(timeToExpiry / 86400) + "d";
+            } else if (timeToExpiry > 3600) {
+              expiryText = Math.floor(timeToExpiry / 3600) + "h";
+            } else if (timeToExpiry > 0) {
+              expiryText = Math.floor(timeToExpiry / 3600) + "m";
+            } else {
+              expiryText = "--";
             }
 
             const orderWithoutFee = api.getOrderDetailsWithoutFee(order);
@@ -137,7 +133,7 @@ export class Footer extends React.Component {
                 statusClass = "expired";
                 break;
               default:
-                break
+                break;
             }
 
             return (
@@ -340,17 +336,17 @@ export class Footer extends React.Component {
         explorerLink =
           "https://zkscan.io/explorer/accounts/" + this.props.user.address;
     }
-    let footerContent,
+    let ordersTableContent,
       classNameOrders = "",
       classNameBalances = "",
       classNameFills = "";
     switch (this.state.tab) {
       case "orders":
-        footerContent = this.renderOrderTable(this.getUserOrders());
+        ordersTableContent = this.renderOrderTable(this.getUserOrders());
         classNameOrders = "selected";
         break;
       case "fills":
-        footerContent = this.renderFillTable(this.getFills());
+        ordersTableContent = this.renderFillTable(this.getFills());
         classNameFills = "selected";
         break;
       case "balances":
@@ -369,7 +365,7 @@ export class Footer extends React.Component {
               </tr>
             );
           });
-          footerContent = (
+          ordersTableContent = (
             <div>
               <table className="balances_table">
                 <thead>
@@ -387,7 +383,7 @@ export class Footer extends React.Component {
             </div>
           );
         } else {
-          footerContent = (
+          ordersTableContent = (
             <div>
               <a href={explorerLink} target="_blank" rel="noreferrer">
                 View Account on Explorer
@@ -403,9 +399,8 @@ export class Footer extends React.Component {
 
     return (
       <>
-        <div className="footer">
-          <div className="footer_container">
-            <hr />
+        <div className="ordersTable">
+          <div className="ordersTable_container">
             <div>
               <div className="ft_tabs">
                 <strong
@@ -428,7 +423,7 @@ export class Footer extends React.Component {
                 </strong>
               </div>
             </div>
-            <div className="footer_orders">{footerContent}</div>
+            <div className="ordersTable_orders">{ordersTableContent}</div>
           </div>
         </div>
       </>

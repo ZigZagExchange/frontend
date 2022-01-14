@@ -1,89 +1,89 @@
 .spot_form {
-    width: 48%;
-    color: white;
+  width: 100%;
+  color: white;
 }
 
 .spf_head {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .spf_head span {
-    color: #74777f;
+  color: #74777f;
 }
 
 .spf_head strong {
-    color: #94a2c9;
+  color: #94a2c9;
 }
 
 .spf_input_box {
-    margin-top: 10px;
-    width: 100%;
-    height: 40px;
-    border-radius: 5px;
-    padding: 0 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #2b3e5a;
+  margin-top: 10px;
+  width: 100%;
+  height: 40px;
+  border-radius: 5px;
+  padding: 0 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #2b3e5a;
 }
 
 .spf_input_box input {
-    background-color: transparent;
-    outline: none;
-    border: none;
-    color: white;
-    height: 100%;
-    text-align: right;
-    width: 100%;
-    margin: 0 7px 1px;
-    line-height: 12px;
+  background-color: transparent;
+  outline: none;
+  border: none;
+  color: white;
+  height: 100%;
+  text-align: right;
+  width: 100%;
+  margin: 0 7px 1px;
+  line-height: 12px;
 }
 
 .spf_input_box input:disabled,
 .spf_input_box span.text-disabled {
-    background-color: transparent;
-    color: gray;
+  background-color: transparent;
+  color: gray;
 }
 
 .spf_input_box .spf_desc_text {
-    color: #94a2c9;
+  color: #94a2c9;
 }
 
 .spf_input_box span {
-    /* font-size: 0.8rem; */
+  /* font-size: 0.8rem; */
 }
 
 .spf_range {
-    width: 98%;
-    padding-left: 10px;
+  width: 98%;
+  padding-left: 10px;
 }
 
 .spf_btn {
-    width: 100%;
-    margin-top: 15px;
+  width: 100%;
+  margin-top: 15px;
 }
 
 .buy_btn {
-    background: #3fe199;
-    text-transform: capitalize;
+  background: #2fb549;
+  text-transform: capitalize;
 }
 
 .sell_btn {
-    background: #c4384e;
-    text-transform: capitalize;
+  background: #c4384e;
+  text-transform: capitalize;
 }
 
 @media screen and (max-width: 655px) {
-    .spot_form {
-        width: 100%;
-    }
+  .spot_form {
+    width: 100%;
+  }
 }
 
 @media screen and (max-width: 355px) {
-    .spf_input_box input {
-        width: 50%;
-    }
+  .spf_input_box input {
+    width: 50%;
+  }
 }

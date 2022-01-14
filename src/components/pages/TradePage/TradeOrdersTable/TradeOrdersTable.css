@@ -1,0 +1,187 @@
+.ordersTable {
+  display: flex;
+  flex-direction: column;
+}
+
+.ordersTable_orders::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+  position: relative;
+  z-index: 20;
+}
+
+.ordersTable_orders::-webkit-scrollbar-track {
+  border-radius: 5px;
+  background: hsla(0, 0%, 100%, 0.15);
+  height: 23px;
+}
+
+.ordersTable_orders::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+  background: hsla(0, 0%, 100%, 0.4);
+}
+
+.ordersTable_orders::-webkit-scrollbar-thumb:window-inactive {
+  background: #fff;
+}
+
+.ordersTable_container {
+  align-content: center;
+  background: rgb(32, 39, 55);
+  background: linear-gradient(
+    162deg,
+    rgba(32, 39, 55, 1) 0%,
+    rgba(14, 17, 24, 1) 100%
+  );
+  width: 100%;
+  height: 400px;
+  margin: 0 auto;
+}
+
+.ordersTable_container hr {
+  width: 100%;
+  background-color: #242a3a;
+  height: 2px;
+}
+
+.ordersTable_container p {
+  color: white;
+}
+
+.ordersTable_container > div {
+  width: 100%;
+  padding: 0 20px;
+}
+
+.ft_tabs {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.ft_tabs strong {
+  margin-right: 30px;
+  color: #94a2c9;
+  text-transform: uppercase;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.ft_tabs strong.selected {
+  color: #08aff3;
+}
+
+.ordersTable_bottom {
+  margin-top: 40px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ordersTable_bottom strong {
+  color: #08aff3;
+  margin-top: 15px;
+  letter-spacing: 1px;
+  word-spacing: 2.5px;
+}
+
+.ordersTable_bottom strong span {
+  color: white;
+}
+
+.ordersTable_orders {
+  margin-top: 10px;
+  max-height: 300px;
+  overflow-y: scroll;
+}
+.ordersTable_orders table {
+  width: 100%;
+}
+.ordersTable_orders table tbody td,
+.ordersTable_orders table thead th {
+  padding: 5px 15px;
+  color: white;
+}
+.cancel_order_link {
+  text-decoration: underline;
+  cursor: pointer;
+  color: gray;
+}
+.ordersTable_orders td.matched {
+  color: rgb(240, 185, 11);
+}
+.ordersTable_orders td.rejected {
+  color: #c4384e;
+}
+.ordersTable_orders td.filled {
+  color: #3fe199;
+}
+
+.ordersTable_links {
+  margin-top: 20px;
+}
+.ordersTable_links a {
+  margin: 5px;
+  color: #08aff3;
+}
+
+img.loading-gif {
+  width: 30px;
+  height: 30px;
+}
+
+.ordersTable_orders td.open {
+  color: gray;
+}
+.ordersTable_orders td.committing {
+  color: rgb(240, 185, 11);
+}
+.ordersTable_orders td.canceled {
+  color: #b9848d;
+}
+
+.balances_table {
+  color: white;
+  padding: 20px;
+  max-width: 500px;
+  margin-bottom: 30px;
+}
+
+@media screen and (max-width: 697px) {
+  .ft_tabs {
+    flex-wrap: wrap;
+  }
+  .ft_tabs strong {
+    font-size: 1rem;
+    margin-bottom: 10px;
+    margin-right: 15px;
+  }
+}
+
+@media screen and (max-width: 411px) {
+  .ft_tabs {
+    flex-wrap: wrap;
+  }
+  .ft_tabs strong {
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+    margin-right: 15px;
+  }
+}
+
+@media screen and (max-width: 365px) {
+  .ft_tabs strong {
+    font-size: 0.8rem;
+    margin-bottom: 10px;
+    margin-right: 10px;
+  }
+}
+
+@media screen and (max-width: 349px) {
+  .ordersTable_bottom strong {
+    font-size: 0.9rem;
+  }
+}

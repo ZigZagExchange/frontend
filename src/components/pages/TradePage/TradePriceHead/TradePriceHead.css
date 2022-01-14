@@ -1,56 +1,56 @@
 .trade_price_head {
-    margin: 0 auto;
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+  margin: 0 auto;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .tph_l {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .tph_l img {
-    margin-right: 10px;
+  margin-right: 10px;
 }
 
 .tph_r {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .tph_r select {
-    width: 120px;
-    background-image: url("../../../assets/icons/select-arrow.png");
-    color: white;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    outline: none;
-    background-color: transparent;
-    background-size: 8px 6px;
-    background-repeat: no-repeat;
-    appearance: none;
-    background-position: right;
-    margin-right: 20px;
-    padding-right: 20px;
-    text-align-last: right;
+  width: 120px;
+  background-image: url("../../../assets/icons/select-arrow.png");
+  color: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  outline: none;
+  background-color: transparent;
+  background-size: 8px 6px;
+  background-repeat: no-repeat;
+  appearance: none;
+  background-position: right;
+  margin-right: 20px;
+  padding-right: 20px;
+  text-align-last: right;
 }
 
 .tph_r option {
-    color: #94a2c9;
-    text-align: center;
+  color: #94a2c9;
+  text-align: center;
 }
 
 @media screen and (min-width: 1800px) {
-    .trade_price_head {
-        width: 100%;
-    }
+  .trade_price_head {
+    width: 100%;
+  }
 }
 @media screen and (max-width: 991px) {
-    .trade_price_head {
-        width: 100%;
-    }
+  .trade_price_head {
+    width: 100%;
+  }
 }

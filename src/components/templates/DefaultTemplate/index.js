@@ -1,2 +1,1 @@
-export * from './DefaultTemplate'
-export * from './BridgeTemplate'
+export * from "./DefaultTemplate";

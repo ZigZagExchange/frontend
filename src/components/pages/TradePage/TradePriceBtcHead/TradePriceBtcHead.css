@@ -1,36 +1,36 @@
 .trade_price_btc_head {
-    width: 500px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px;
+  width: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
 }
 
 .trade_price_btc_head div {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .trade_price_btc_head div h2 {
-    font-size: 1rem;
-    color: #94a2c9;
-    font-weight: 500;
+  font-size: 1rem;
+  color: #94a2c9;
+  font-weight: 500;
 }
 
 @media screen and (min-width: 1800px) {
-    .trade_price_btc_head {
-        width: 100%;
-    }
+  .trade_price_btc_head {
+    width: 100%;
+  }
 }
 
 @media screen and (max-width: 991px) {
-    .trade_price_btc_head {
-        width: 100%;
-    }
+  .trade_price_btc_head {
+    width: 100%;
+  }
 }
 
 @media screen and (max-width: 421px) {
-    .trade_price_btc_head div h2 {
-        font-size: 0.9rem;
-    }
+  .trade_price_btc_head div h2 {
+    font-size: 0.9rem;
+  }
 }

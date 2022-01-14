@@ -8,7 +8,7 @@ import "./TradeChart.css";
 export const TradeChart = (props) => {
   return (
     <TradingViewWidget
-      symbol={props.currentMarket.replace("-","")}
+      symbol={props.currentMarket.replace("-", "")}
       theme={Themes.DARK}
       save_image={false}
       hide_top_toolbar={false}

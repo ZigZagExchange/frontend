@@ -3,71 +3,82 @@ import React from "react";
 // css
 import "./SpotBox.css";
 // assets
-import { SpotForm } from "components";
+import { SpotForm, Tabs } from "components";
 //import api from "lib/api";
 
 class SpotBox extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = { orderType: "market" };
-    }
-
-    updateOrderType(orderType) {
-        const newstate = { ...this.state, orderType };
-        this.setState(newstate);
-    }
-
-    orderTypeTabClassName(orderType) {
-        return this.state.orderType === orderType
-            ? "trade_price_active_tab"
-            : "";
-    }
-
-  render() {
-      return (
-        <>
-          <div className="spot_box">
-            <div className="spot_head">
-              <div className="sh_l">
-                <h2>SPOT</h2>
-              </div>
-              <div className="sh_r">
-                Gas fee: $1 / trade
-              </div>
-            </div>
-            <div className="spot_tabs">
-              <div className="st_l">
-                <h2 className={this.orderTypeTabClassName("limit")} onClick={() => this.updateOrderType("limit")}>Limit</h2>
-                <h2 className={this.orderTypeTabClassName("market")} onClick={() => this.updateOrderType("market")}>Market</h2>
-              </div>
-            </div>
-            <div className="spot_bottom">
-              <SpotForm
-                side="b"
-                lastPrice={this.props.lastPrice}
-                signInHandler={this.props.signInHandler}
-                user={this.props.user}
-                currentMarket={this.props.currentMarket}
-                orderType={this.state.orderType}
-                activeOrderCount={this.props.activeOrderCount}
-                liquidity={this.props.liquidity}
-              />
-              <SpotForm
-                side="s"
-                lastPrice={this.props.lastPrice}
-                signInHandler={this.props.signInHandler}
-                user={this.props.user}
-                currentMarket={this.props.currentMarket}
-                orderType={this.state.orderType}
-                activeOrderCount={this.props.activeOrderCount}
-                liquidity={this.props.liquidity}
-              />
-            </div>
-          </div>
-        </>
-      );
+  constructor(props) {
+    super(props);
+    this.state = { orderType: "market" };
   }
 
+  updateOrderType(orderType) {
+    const newstate = { ...this.state, orderType };
+    this.setState(newstate);
+  }
+
+  orderTypeTabClassName(orderType) {
+    return this.state.orderType === orderType ? "trade_price_active_tab" : "";
+  }
+
+  render() {
+    return (
+      <>
+        <div className="spot_box">
+          <div className="spot_head">
+            <div className="sh_l">
+              <h2>SPOT</h2>
+            </div>
+            <div className="sh_r">Gas fee: $1 / trade</div>
+          </div>
+          <div className="spot_tabs">
+            <div className="st_l">
+              <h2
+                className={this.orderTypeTabClassName("limit")}
+                onClick={() => this.updateOrderType("limit")}
+              >
+                Limit
+              </h2>
+              <h2
+                className={this.orderTypeTabClassName("market")}
+                onClick={() => this.updateOrderType("market")}
+              >
+                Market
+              </h2>
+            </div>
+          </div>
+          <div className="spot_bottom">
+            <Tabs style={{ width: "100%" }}>
+              <div label="Buy">
+                <SpotForm
+                  side="b"
+                  lastPrice={this.props.lastPrice}
+                  signInHandler={this.props.signInHandler}
+                  user={this.props.user}
+                  currentMarket={this.props.currentMarket}
+                  orderType={this.state.orderType}
+                  activeOrderCount={this.props.activeOrderCount}
+                  liquidity={this.props.liquidity}
+                />
+              </div>
+              <div label="Sell">
+                <SpotForm
+                  side="s"
+                  lastPrice={this.props.lastPrice}
+                  signInHandler={this.props.signInHandler}
+                  user={this.props.user}
+                  currentMarket={this.props.currentMarket}
+                  orderType={this.state.orderType}
+                  activeOrderCount={this.props.activeOrderCount}
+                  liquidity={this.props.liquidity}
+                />
+              </div>
+            </Tabs>
+          </div>
+        </div>
+      </>
+    );
+  }
 }
 
 export default SpotBox;
