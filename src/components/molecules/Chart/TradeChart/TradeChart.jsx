@@ -1,14 +1,18 @@
 import React from "react";
-// chart library
 import TradingViewWidget, { Themes } from "react-tradingview-widget";
-
-// css
 import "./TradeChart.css";
+import api from "lib/api";
 
 export const TradeChart = (props) => {
+  const marketInfo = api.getMarketInfo(props.currentMarket);
+  let symbol = "";
+  if (marketInfo) {
+      symbol = marketInfo.baseAsset.symbol + marketInfo.quoteAsset.symbol;
+  }
+
   return (
     <TradingViewWidget
-      symbol={props.currentMarket.replace("-","")}
+      symbol={symbol}
       theme={Themes.DARK}
       save_image={false}
       hide_top_toolbar={false}
