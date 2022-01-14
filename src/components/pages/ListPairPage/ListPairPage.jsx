@@ -17,6 +17,7 @@ import {jsonify} from "../../../lib/helpers/strings";
 import {Dev} from "../../../lib/helpers/env";
 import SuccessModal from "./SuccessModal";
 import {arweaveAllocationSelector} from "lib/store/features/api/apiSlice";
+import SelectInput from "../../atoms/Form/SelectInput";
 
 
 export default function ListPairPage() {
@@ -101,7 +102,7 @@ export default function ListPairPage() {
           <BsLink45Deg size={30}/>
           <h3>Connect wallet</h3>
           <x.div mt={2}>
-            Connect your wallet to list new trading pairs
+            Connect your wallet to list new markets
           </x.div>
           <x.div mt={4}>
             <ConnectWalletButton/>
@@ -117,17 +118,18 @@ export default function ListPairPage() {
             quoteFee: "",
             minSize: "",
             maxSize: "",
-            zigzagChainId: "",
-            pricePrecisionDecimal: ""
+            zigzagChainId: 1,
+            pricePrecisionDecimal: "",
           }} onSubmit={onFormSubmit}>
             <x.div display={"grid"} gridTemplateColumns={2} rowGap={3} columnGap={6} mb={5}>
               <NumberInput block name={"baseAssetId"} label={"Base Asset ID"} validate={required} hideValidation/>
               <NumberInput block name={"quoteAssetId"} label={"Quote Asset ID"} validate={required} hideValidation/>
               <NumberInput block name={"baseFee"} label={"Base Fee"} validate={required} hideValidation/>
               <NumberInput block name={"quoteFee"} label={"Quote Fee"} validate={required} hideValidation/>
-              <NumberInput block name={"minSize"} label={"Min Size"} validate={required} hideValidation/>
+              <NumberInput block name={"minSize"} label={"Min Size"} validate={[required, min(0.0001)]} hideValidation/>
               <NumberInput block name={"maxSize"} label={"Max Size"} validate={required} hideValidation/>
-              <NumberInput block name={"zigzagChainId"} label={"Zig Zag Chain ID"} validate={required} hideValidation/>
+              <SelectInput name={"zigzagChainId"} label={"Ethereum Network"}
+                           items={[{name: "Mainnet", id: 1}, {name: "Rinkeby", id: 2}]} validate={required} hideValidation/>
               <NumberInput block name={"pricePrecisionDecimal"} label={"Price Precision Decimals"}
                            validate={required} hideValidation/>
             </x.div>

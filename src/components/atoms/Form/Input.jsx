@@ -12,11 +12,13 @@ const Input = ({
     value,
     onChange,
     hideValidation,
+    children,
     ...rest
 }) => {
     const validators = Array.isArray(validate) ? composeValidators(...validate) : validate
     const isRequired = Array.isArray(validate) ? validate.includes(required) : validate === required
     const [field, meta, helpers] = useField({name, type, validate: validators})
+    const Component = type === "select" ? x.select : x.input
 
     // controlled input
     useEffect(() => {
@@ -25,25 +27,28 @@ const Input = ({
         }
     }, [value])
 
-  return <FieldSet name={name} w={block ? "full" : "inherit"}>
-        {label && <Label name={name} isRequired={isRequired} highlightRequired={meta.error === requiredError}>
-          {label}
-        </Label>}
-      <x.input
-        {...field}
-        {...rest}
-        name={name}
-        type={type}
-        onChange={(e) => {
-            if (value !== undefined && onChange) {
-              onChange(e.target.value)
-            }
-            field.onChange(e)
-        }}
-        value={field.value}
-      />
-      {meta.error && meta.touched && !hideValidation && <ErrorMessage error={meta.error}/>}
-    </FieldSet>
+    return <FieldSet name={name} w={block ? "full" : "inherit"}>
+          {label && <Label name={name} isRequired={isRequired} highlightRequired={meta.error === requiredError}>
+            {label}
+          </Label>}
+        <x.div>
+            <Component
+              {...field}
+              {...rest}
+              name={name}
+              type={type}
+              onChange={(e) => {
+                  if (value !== undefined && onChange) {
+                      onChange(e.target.value)
+                  }
+                  field.onChange(e)
+              }}
+              value={field.value}
+              children={children}
+            />
+        </x.div>
+        {meta.error && meta.touched && !hideValidation && <ErrorMessage error={meta.error}/>}
+      </FieldSet>
 }
 
 const ErrorMessage = ({error}) => {

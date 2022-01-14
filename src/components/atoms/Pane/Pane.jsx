@@ -11,7 +11,7 @@ const sizes = {
     p: 7
   },
   md: {
-    borderRadius: 9,
+    borderRadius: "xl",
     p: 10
   }
 }
