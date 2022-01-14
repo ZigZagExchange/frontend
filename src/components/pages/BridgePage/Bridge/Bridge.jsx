@@ -161,7 +161,6 @@ const Bridge = () => {
   return (
     <>
       <div className="bridge_box">
-        {/*<div className="bridge_box_top">*/}
           <Pane size={"md"} variant={"light"}>
             <div className="bridge_coin_title">
               <h5>FROM</h5>
@@ -182,77 +181,74 @@ const Bridge = () => {
               </div>
             </div>
           </Pane>
-        {/*</div>*/}
 
-        {/*<div className="bridge_box_bottom">*/}
-          <Pane size={"md"} borderTopRightRadius={0} borderTopLeftRadius={0}>
-          <div className="bridge_box_swap_wrapper">
-            <SwapButton onClick={switchTransferType} />
-            <h5>Switch</h5>
-          </div>
+          <Pane size={"md"} borderRadius={"0 0 xl xl"}>
+            <div className="bridge_box_swap_wrapper">
+              <SwapButton onClick={switchTransferType} />
+              <h5>Switch</h5>
+            </div>
 
-          <div className="bridge_coin_stats">
-            <div className="bridge_coin_stat">
-              <div className="bridge_coin_details">
-                <div className="bridge_coin_title">
-                  <h5>TO</h5>
-                  {transfer.type !== 'withdraw' ? zkSyncLayer2Header : ethLayer1Header}
+            <div className="bridge_coin_stats">
+              <div className="bridge_coin_stat">
+                <div className="bridge_coin_details">
+                  <div className="bridge_coin_title">
+                    <h5>TO</h5>
+                    {transfer.type !== 'withdraw' ? zkSyncLayer2Header : ethLayer1Header}
+                  </div>
                 </div>
               </div>
+              <div className="bridge_coin_stat">
+                <h5>Available balance</h5>
+                <span>
+                  {altBalances[swapDetails.currency] && altBalances[swapDetails.currency].valueReadable}
+                  {` ${swapDetails.currency}`}
+                </span>
+              </div>
             </div>
-            <div className="bridge_coin_stat">
-              <h5>Available balance</h5>
-              <span>
-                {altBalances[swapDetails.currency] && altBalances[swapDetails.currency].valueReadable}
-                {` ${swapDetails.currency}`}
-              </span>
+            {transfer.type === 'deposit' && user.address && !user.id && <div className="bridge_transfer_fee">
+              One-Time Activation Fee: {activationFee} {swapDetails.currency} (~$15.00)
+            </div>}
+            {user.address ? (
+              user.id && <div className="bridge_transfer_fee">
+                Bridge Fee: {typeof bridgeFee !== 'number' ? (
+                  <div style={{ display: 'inline-flex', margin: '0 5px' }}>
+                      <Loader
+                      type="TailSpin"
+                      color="#444"
+                      height={16}
+                      width={16}
+                    />
+                  </div>
+                ) : bridgeFee} {swapDetails.currency}
+              </div>
+            ) : (
+              <div className="bridge_transfer_fee">
+                🔗 &nbsp;Please connect your wallet
+              </div>
+            )}
+            <div className="bridge_button">
+              {!user.address && <ConnectWalletButton/>}
+              {user.address && balances[swapDetails.currency] && !hasAllowance && <Button
+                loading={isApproving}
+                className={cx("bg_btn", { zig_disabled: formErr.length > 0 || swapDetails.amount.length === 0, })}
+                text="APPROVE"
+                style={{ marginBottom: 10 }}
+                onClick={approveSpend}
+              />}
+              {user.address && hasError && <Button
+                className="bg_btn zig_btn_disabled bg_err"
+                text={formErr}
+                icon={<BiError />}
+              />}
+              {user.address && !hasError && <Button
+                loading={loading}
+                className={cx("bg_btn", { zig_disabled: bridgeFee === null || !hasAllowance || swapDetails.amount.length === 0 })}
+                text="TRANSFER"
+                icon={<MdSwapCalls />}
+                onClick={doTransfer}
+              />}
             </div>
-          </div>
-          {transfer.type === 'deposit' && user.address && !user.id && <div className="bridge_transfer_fee">
-            One-Time Activation Fee: {activationFee} {swapDetails.currency} (~$15.00)
-          </div>}
-          {user.address ? (
-            user.id && <div className="bridge_transfer_fee">
-              Bridge Fee: {typeof bridgeFee !== 'number' ? (
-                <div style={{ display: 'inline-flex', margin: '0 5px' }}>
-                    <Loader
-                    type="TailSpin"
-                    color="#444"
-                    height={16}
-                    width={16}
-                  />
-                </div>
-              ) : bridgeFee} {swapDetails.currency}
-            </div>
-          ) : (
-            <div className="bridge_transfer_fee">
-              🔗 &nbsp;Please connect your wallet
-            </div>
-          )}
-          <div className="bridge_button">
-            {!user.address && <ConnectWalletButton/>}
-            {user.address && balances[swapDetails.currency] && !hasAllowance && <Button
-              loading={isApproving}
-              className={cx("bg_btn", { zig_disabled: formErr.length > 0 || swapDetails.amount.length === 0, })}
-              text="APPROVE"
-              style={{ marginBottom: 10 }}
-              onClick={approveSpend}
-            />}
-            {user.address && hasError && <Button
-              className="bg_btn zig_btn_disabled bg_err"
-              text={formErr}
-              icon={<BiError />}
-            />}
-            {user.address && !hasError && <Button
-              loading={loading}
-              className={cx("bg_btn", { zig_disabled: bridgeFee === null || !hasAllowance || swapDetails.amount.length === 0 })}
-              text="TRANSFER"
-              icon={<MdSwapCalls />}
-              onClick={doTransfer}
-            />}
-          </div>
-        </Pane>
-        {/*</div>*/}
+          </Pane>
       </div>
       {user.address ? (
         <div className="bridge_connected_as">

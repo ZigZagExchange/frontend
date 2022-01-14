@@ -5,12 +5,14 @@ import Submit, {Button} from "./Submit";
 import {jsonify} from "../../../lib/helpers/strings";
 import {max, min, required} from "./validation";
 import {x} from "@xstyled/styled-components";
+import SelectInput from "./SelectInput";
 
 const FormDemo = () => {
     const [numberInput, setNumberInput] = useState(1)
+    const [selectInputValue, setSelectInput] = useState("test")
 
     return <Form
-      initialValues={{numberInput: "", another: "", controlled: numberInput}}
+      initialValues={{numberInput: "", another: "", controlled: numberInput, test: selectInputValue}}
       onSubmit={async (data, resetForm) => {
       alert(jsonify(data))
       resetForm()
@@ -40,6 +42,34 @@ const FormDemo = () => {
               </Button>
             </x.div>
           </x.div>
+
+        <x.div row>
+          <x.div col>
+            <SelectInput
+              label={"Controlled Select Input"}
+              value={selectInputValue}
+              onChange={(value) => setSelectInput(value)}
+              name={"test"}
+              items={[{name: "test", id: "test"}, {name: "great", id: "great"}]}
+              validate={required}
+            />
+            <x.div color={"white"}>{selectInputValue}</x.div>
+          </x.div>
+          <x.div col display={"flex"} justifyContent={"center"} alignItems={"center"} w={"full"}>
+            <Button
+              variant={"secondary"}
+              onClick={() => {
+              if (selectInputValue === "test") {
+                setSelectInput("great")
+              } else {
+                setSelectInput("test")
+              }
+            }}>
+              Change controlled
+            </Button>
+          </x.div>
+
+        </x.div>
 
           <Submit block/>
       </x.div>
