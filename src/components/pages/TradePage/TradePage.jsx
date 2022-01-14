@@ -48,11 +48,13 @@ const TradePage = () => {
     dispatch(setCurrentMarket(market));
   }
 
+  // example:: eDS8OHoqrf_e9-kylZGTMpxF_zG4-LDtDtz5NnOks-0
+
   const { search } = useLocation()
   useEffect(() => {
     const params = new URLSearchParams(search)
     const marketFromURL = params.get(idQueryParam)
-    if (marketFromURL) {
+    if (marketFromURL && currentMarket !== marketFromURL) {
       updateMarketChain(marketFromURL)
     }
   }, [])
