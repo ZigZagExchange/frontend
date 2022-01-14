@@ -44,8 +44,8 @@ export class SpotForm extends React.Component {
         const marketInfo = api.getMarketInfo(this.props.currentMarket);
         if (!marketInfo) return 0;
         return (
-            this.props.user.committed.balances[this.props.marketInfo.baseAsset.symbol] /
-            Math.pow(10, this.props.marketInfo.baseAsset.decimals)
+            this.props.user.committed.balances[marketInfo.baseAsset.symbol] /
+            Math.pow(10, marketInfo.baseAsset.decimals)
         );
     }
 
@@ -115,8 +115,8 @@ export class SpotForm extends React.Component {
             toast.error("Price must be within 20% of spot");
             return;
         } else if (
-            (this.props.side === 'b' && price > this.props.lastPrice * 1.005) ||
-            (this.props.side === 's' && price < this.props.lastPrice * 0.995)
+            (this.props.side === 'b' && price > this.getFirstAsk() * 1.005) ||
+            (this.props.side === 's' && price < this.getFirstBid() * 0.995)
         ) {
             toast.error("Limit orders cannot exceed 0.5% beyond spot");
             return;
@@ -180,29 +180,34 @@ export class SpotForm extends React.Component {
 
     currentPrice() {
         const marketInfo = api.getMarketInfo(this.props.currentMarket);
-        if (!this.marketInfo) return 0;
+        if (!marketInfo) return 0;
 
         if (this.props.orderType === "limit" && this.state.price) {
             return this.state.price;
         }
 
         let spread, stableSpread;
-        if (api.isZksyncChain()) {
-            spread = 0.001;
-            stableSpread = 0.0004;
-        } else {
-            spread = 0.002;
-            stableSpread = 0.0007;
-        }
         if (this.props.side === "b") {
-            const asks = this.props.liquidity.filter(l => l[1] == "s").map(l => l[1]);
-            return Math.min(asks);
+            return (this.getFirstAsk() * 1.0003).toFixed(marketInfo.pricePrecisionDecimals);
         }
         else if (this.props.side === "s") {
-            const bids = this.props.liquidity.filter(l => l[1] == "b").map(l => l[1]);
-            return Math.max(bids);
+            return (this.getFirstBid() * 0.9997).toFixed(marketInfo.pricePrecisionDecimals);
         }
         return 0;
+    }
+
+    getFirstAsk() {
+        const marketInfo = api.getMarketInfo(this.props.currentMarket);
+        if (!marketInfo) return 0;
+        const asks = this.props.liquidity.filter(l => l[0] == "s").map(l => l[1]);
+        return Math.min(...asks).toFixed(marketInfo.pricePrecisionDecimals);
+    }
+
+    getFirstBid() {
+        const marketInfo = api.getMarketInfo(this.props.currentMarket);
+        if (!marketInfo) return 0;
+        const bids = this.props.liquidity.filter(l => l[0] == "b").map(l => l[1]);
+        return Math.max(...bids).toFixed(marketInfo.pricePrecisionDecimals);
     }
 
     rangeSliderHandler(e, val) {
