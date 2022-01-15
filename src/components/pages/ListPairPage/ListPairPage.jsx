@@ -37,6 +37,10 @@ export default function ListPairPage() {
 
   const [baseAssetId, setBaseAssetId] = useState("")
   const [quoteAssetId, setQuoteAssetId] = useState("")
+  const [maxSize, setMaxSize] = useState("")
+  const [minSize, setMinSize] = useState("")
+  const [zigZagChainId, setZigZagChainId] = useState(1)
+
   const [baseAssetIdSymbolPreview, setBaseAssetIdSymbolPreview] = useState(null)
   const [quoteAssetIdSymbolPreview, setQuoteAssetIdSymbolPreview] = useState(null)
 
@@ -46,6 +50,8 @@ export default function ListPairPage() {
   // we purchase 500k bytes at once so the user does not have to
   // repeatedly repurchase space if wanting to list more than 1 market
   const bytesToPurchase = 500000
+
+  // TODO ** MUST BE CONNECTED TO MAINNET to view page **
 
   const refreshUserArweaveAllocation = () => {
     return api.refreshArweaveAllocation(user.address)
@@ -58,12 +64,13 @@ export default function ListPairPage() {
   }, []);
 
 
-  function getBaseInfo(baseAssetId) {
+  function getBaseInfo(baseAssetId, chainId) {
     if (baseAssetId && baseAssetId !== "") {
-      api.tokenInfo(baseAssetId).then(res => {
+      api.tokenInfo(baseAssetId, chainId).then(res => {
         setBaseAssetIdSymbolPreview(res.symbol)
         setIsBaseAssetIdInvalid(false)
       }).catch(e => {
+        console.log("debug:: error getting token info", e)
         setBaseAssetIdSymbolPreview(null)
         setIsBaseAssetIdInvalid(true)
       })
@@ -72,9 +79,10 @@ export default function ListPairPage() {
     }
   }
 
-  function getQuoteInfo(quoteAssetId) {
+  function getQuoteInfo(quoteAssetId, chainId) {
     if (quoteAssetId && quoteAssetId !== "") {
-      api.tokenInfo(quoteAssetId).then(res => {
+      api.tokenInfo(quoteAssetId, chainId).then(res => {
+        console.log("debug:: quote res", res)
         setQuoteAssetIdSymbolPreview(res.symbol)
         setIsQuoteAssetIdInvalid(false)
       }).catch(e => {
@@ -88,15 +96,14 @@ export default function ListPairPage() {
 
   const queryBaseTokenInfo = useCallback(debounce(getBaseInfo, 500), [])
   useEffect(() => {
-    queryBaseTokenInfo(baseAssetId)
-  }, [baseAssetId])
+    queryBaseTokenInfo(baseAssetId, zigZagChainId)
+  }, [baseAssetId, zigZagChainId])
 
 
   const queryQuoteTokenInfo = useCallback(debounce(getQuoteInfo, 500), [])
   useEffect(() => {
-    queryQuoteTokenInfo(quoteAssetId)
-  }, [quoteAssetId])
-
+    queryQuoteTokenInfo(quoteAssetId, zigZagChainId)
+  }, [quoteAssetId, zigZagChainId])
 
 
   const onFormSubmit = async (formData, resetForm) => {
@@ -163,47 +170,75 @@ export default function ListPairPage() {
           <x.div fontSize={28} mb={2}>List New Market</x.div>
           {(baseAssetId || quoteAssetId) &&
           <x.div display={"flex"} fontSize={35} justifyContent={"center"} my={4}>
-            <x.span color={baseAssetIdSymbolPreview ? "blue-gray-400" : "blue-gray-600"}>
+            <x.span color={baseAssetIdSymbolPreview ? "blue-gray-400" : "blue-gray-800"}>
               {baseAssetIdSymbolPreview ? baseAssetIdSymbolPreview : "XXX"}
             </x.span>
-            <x.span color={baseAssetIdSymbolPreview && quoteAssetIdSymbolPreview ? "blue-gray-400" : "blue-gray-600"}>-</x.span>
-            <x.span color={quoteAssetIdSymbolPreview ? "blue-gray-400" : "blue-gray-600"}>
+            <x.span color={baseAssetIdSymbolPreview && quoteAssetIdSymbolPreview ? "blue-gray-400" : "blue-gray-800"}>-</x.span>
+            <x.span color={quoteAssetIdSymbolPreview ? "blue-gray-400" : "blue-gray-800"}>
               {quoteAssetIdSymbolPreview ? quoteAssetIdSymbolPreview : "XXX"}
             </x.span>
           </x.div>}
-          <Form initialValues={{
-            baseAssetId: baseAssetId,
-            quoteAssetId: quoteAssetId,
-            baseFee: "",
-            quoteFee: "",
-            minSize: "",
-            maxSize: "",
-            zigzagChainId: 1,
-            pricePrecisionDecimal: "",
-          }} onSubmit={onFormSubmit}>
+          <Form
+            initialValues={{
+              baseAssetId: baseAssetId,
+              quoteAssetId: quoteAssetId,
+              baseFee: "",
+              quoteFee: "",
+              minSize: minSize,
+              maxSize: maxSize,
+              zigzagChainId: zigZagChainId,
+              pricePrecisionDecimal: "",
+            }}
+            onSubmit={onFormSubmit}
+          >
             <x.div display={"grid"} gridTemplateColumns={2} rowGap={3} columnGap={6} mb={5}>
               <NumberInput
-                block
                 {...model(baseAssetId, setBaseAssetId)}
-                name={"baseAssetId"}
+                block
                 label={"Base Asset ID"}
-                validate={[required, min(0), forceValidation(isBaseAssetIdInvalid, "invalid asset on zksync")]}
+                name={"baseAssetId"}
+                validate={[
+                  required,
+                  min(0),
+                  forceValidation(isBaseAssetIdInvalid, "invalid asset on zksync")
+                ]}
               />
               <NumberInput
-                block
                 {...model(quoteAssetId, setQuoteAssetId)}
-                name={"quoteAssetId"}
+                block
                 label={"Quote Asset ID"}
-                validate={[required, min(0), forceValidation(isQuoteAssetIdInvalid, "invalid asset on zksync")]}
+                name={"quoteAssetId"}
+                validate={[
+                  required,
+                  min(0),
+                  forceValidation(isQuoteAssetIdInvalid, "invalid asset on zksync")
+                ]}
               />
               <NumberInput block name={"baseFee"} label={"Base Fee"} validate={[required, min(0)]}/>
               <NumberInput block name={"quoteFee"} label={"Quote Fee"} validate={[required, min(0)]}/>
-              <NumberInput block name={"minSize"} label={"Min Size"} validate={[required, min(0)]}/>
-              <NumberInput block name={"maxSize"} label={"Max Size"} validate={[required, min(0)]}/>
-              <SelectInput name={"zigzagChainId"} label={"Ethereum Network"}
-                           items={[{name: "Mainnet", id: 1}, {name: "Rinkeby", id: 1000}]} validate={required}/>
+              <NumberInput
+                block
+                {...model(minSize, setMinSize)}
+                name={"minSize"}
+                label={"Min Size"}
+                validate={[required, min(0), max(maxSize)]}
+              />
+              <NumberInput
+                block
+                {...model(maxSize, setMaxSize)}
+                name={"maxSize"}
+                label={"Max Size"}
+                validate={[required, min(minSize)]}
+              />
               <NumberInput block name={"pricePrecisionDecimal"} label={"Price Precision Decimals"}
                            validate={[required, max(18)]}/>
+              <SelectInput
+                {...model(zigZagChainId, setZigZagChainId)}
+                name={"zigzagChainId"}
+                label={"Ethereum Network"}
+                items={[{name: "Mainnet", id: 1}, {name: "Rinkeby", id: 1000}]}
+                validate={required}
+              />
             </x.div>
             {isAllocationInsufficient &&
             <x.div display={"flex"} alignItems={"center"} justifyContent={"space-between"} mb={4}>
@@ -247,11 +282,12 @@ export default function ListPairPage() {
       />
       <SuccessModal
         txid={txid}
+        // txid={"-C60-kmz6VjDiWv_MsKzLXqNA_vC7c29sdaasOInaj8"}
         show={isSuccessModalOpen}
+        // show={true}
         onClose={() => {
           setIsSuccessModalOpen(false);
           setTxId(null);
-
         }}
       />
     </DefaultTemplate>

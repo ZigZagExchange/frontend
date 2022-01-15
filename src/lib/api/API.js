@@ -491,7 +491,7 @@ export default class API extends Emitter {
         return response;
     }
 
-    tokenInfo = (tokenLike) => {
-        return this.apiProvider.tokenInfo(tokenLike)
+    tokenInfo = (tokenLike, chainId) => {
+        return this.apiProvider.tokenInfo(tokenLike, chainId)
     }
 }

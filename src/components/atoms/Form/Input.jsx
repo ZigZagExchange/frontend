@@ -17,20 +17,25 @@ const Input = ({
 }) => {
     const validators = Array.isArray(validate) ? composeValidators(...validate) : validate
     const isRequired = Array.isArray(validate) ? validate.includes(required) : validate === required
-    const [field, meta, helpers] = useField({name, type, validate: validators})
-    const Component = type === "select" ? x.select : x.input
-    const isError = meta.error && meta.touched
 
+    const [field, meta, helpers] = useField({name, type, validate: validators})
+    const isError = meta.error && meta.touched
+    const Component = type === "select" ? x.select : x.input
 
     // controlled input
     useEffect(() => {
-        if (value !== undefined && onChange) {
-            helpers.setValue(value)
+        if (value !== undefined && onChange && value !== field.value) {
+          // https://github.com/jaredpalmer/formik/issues/2059
+            helpers.setValue(value, true).then(res => helpers.setTouched(true))
         }
     }, [value])
 
     return <FieldSet name={name} w={block ? "full" : "inherit"}>
-          {label && <Label name={name} isRequired={isRequired} highlightRequired={meta.error === requiredError}>
+          {label && <Label
+            name={name}
+            isRequired={isRequired}
+            highlightRequired={meta.error === requiredError}
+          >
             {label}
           </Label>}
         <x.div>

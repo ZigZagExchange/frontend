@@ -30,7 +30,7 @@ const NumberInput = ({
       color={"white"}
       borderRadius={4}
       fontSize={18}
-      w={"100%"}
+      w={block ? "100%" : "inherit"}
     />
 }
 

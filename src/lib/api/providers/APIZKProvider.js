@@ -16,8 +16,6 @@ export default class APIZKProvider extends APIProvider {
     syncProvider = null
     zksyncCompatible = true
     _tokenWithdrawFees = {}
-    // some methods are only available on the rest provider
-    _restProvider = null
 
     getProfile = async (address) => {
         try {
@@ -259,11 +257,9 @@ export default class APIZKProvider extends APIProvider {
 
     signIn = async () => {
         try {
+            console.log("debug:: nework name", this.network, this.api.getNetworkName(this.network))
             this.syncProvider = await zksync.getDefaultProvider(
                 this.api.getNetworkName(this.network)
-            )
-            this._restProvider = await zksync.getDefaultRestProvider(
-              this.api.getNetworkName(this.network)
             )
         } catch (e) {
             toast.error('Zksync is down. Try again later')
@@ -370,7 +366,20 @@ export default class APIZKProvider extends APIProvider {
         return await this.ethWallet.signMessage(message);
     }
 
-    tokenInfo = (tokenLike) => {
-        return this._restProvider.tokenInfo(tokenLike)
+    tokenInfo = async (tokenLike, chainId) => {
+        let baseUrl
+        if (chainId === "1" || chainId === 1) {
+            baseUrl = 'https://api.zksync.io/api/v0.2'
+        } else if (chainId === "1000" || chainId === 1000) {
+            baseUrl = 'https://rinkeby-api.zksync.io/api/v0.2'
+        } else {
+            throw Error("Unknown chain id")
+        }
+        try {
+            const res = await axios.get(baseUrl + `/tokens/${tokenLike}`)
+            return res.data.result
+        } catch (e) {
+            console.error("Could not get token info")
+        }
     }
 }
