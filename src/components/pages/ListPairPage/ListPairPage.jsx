@@ -231,7 +231,7 @@ export default function ListPairPage() {
                 validate={[required, min(minSize)]}
               />
               <NumberInput block name={"pricePrecisionDecimal"} label={"Price Precision Decimals"}
-                           validate={[required, max(18)]}/>
+                           validate={[required, max(18), min(1e-18)]}/>
               <SelectInput
                 {...model(zigZagChainId, setZigZagChainId)}
                 name={"zigzagChainId"}
@@ -264,12 +264,12 @@ export default function ListPairPage() {
       <AllocationModal
         onClose={() => setIsAllocationModalOpen(false)}
         show={isAllocationModalOpen}
-        fileSizeBytes={bytesToPurchase}
+        bytesToPurchase={bytesToPurchase}
         onSuccess={() => {
           // API cache needs a bit of time to update. Arweave bridge runs on a 5 second loop
           // we timeout here so we make sure we get fresh data
-          setTimeout(() => {
-            refreshUserArweaveAllocation()
+          setTimeout(async () => {
+            await refreshUserArweaveAllocation()
             if (fileToUpload.size > arweaveAllocation) {
               setIsAllocationInsufficient(true)
             } else {
