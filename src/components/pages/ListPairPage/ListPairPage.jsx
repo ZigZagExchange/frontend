@@ -12,7 +12,7 @@ import {x} from "@xstyled/styled-components"
 import Form from "../../atoms/Form/Form";
 import NumberInput from "../../atoms/Form/NumberInput";
 import Submit from "../../atoms/Form/Submit";
-import {forceValidation, gte, max, min, required} from "../../atoms/Form/validation";
+import {forceValidation, max, min, required} from "../../atoms/Form/validation";
 import {jsonify} from "../../../lib/helpers/strings";
 import {Dev} from "../../../lib/helpers/env";
 import SuccessModal from "./SuccessModal";
