@@ -110,6 +110,7 @@
     "analyze": "source-map-explorer 'build/static/js/*.js'",
     "start:local": "node scripts/start.js",
     "start:prod": "env-cmd -f .env.prod node scripts/start.js",
+    "start:staging": "env-cmd -f .env.staging node scripts/start.js",
     "build:local": "node scripts/build.js",
     "build:prod": "env-cmd -f .env.prod node scripts/build.js",
     "test": "node scripts/test.js",

@@ -6,6 +6,7 @@ import { toBaseUnit } from 'lib/utils'
 import APIProvider from './APIProvider'
 import { MAX_ALLOWANCE } from '../constants'
 import axios from 'axios';
+
 export default class APIZKProvider extends APIProvider {
     static SEEDS_STORAGE_KEY = '@ZZ/ZKSYNC_SEEDS'
     static VALID_SIDES = ['b', 's']
@@ -100,7 +101,7 @@ export default class APIZKProvider extends APIProvider {
     }
 
     submitOrder = async (market, side, price, amount, orderType) => {
-        const marketInfo = this.marketinfo;
+        const marketInfo = this.api._marketInfo;
         amount = parseFloat(amount).toFixed(marketInfo.baseAsset.decimals);
         price = parseFloat(price).toFixed(marketInfo.pricePrecisionDecimals);
         
