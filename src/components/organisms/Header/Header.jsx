@@ -1,5 +1,4 @@
 import { useSelector } from 'react-redux'
-import { useHistory, useLocation } from 'react-router-dom'
 import { BiChevronDown } from 'react-icons/bi'
 import { FaDiscord, FaTelegramPlane, FaTwitter } from 'react-icons/fa'
 import { GoGlobe } from 'react-icons/go'

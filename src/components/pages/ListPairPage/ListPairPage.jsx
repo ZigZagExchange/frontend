@@ -1,8 +1,8 @@
-import React, {useState, useEffect, useRef, useCallback, useMemo} from "react";
+import React, {useState, useEffect, useCallback} from "react";
 import {useSelector} from 'react-redux';
 import {userSelector} from "lib/store/features/auth/authSlice";
 import api from 'lib/api';
-import {Button, DefaultTemplate} from 'components';
+import {DefaultTemplate} from 'components';
 import {BsLink45Deg, RiErrorWarningLine} from "react-icons/all";
 import 'bootstrap'
 import ConnectWalletButton from "../../atoms/ConnectWalletButton/ConnectWalletButton";

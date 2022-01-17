@@ -1,5 +1,4 @@
 import React from "react";
-import api from "lib/api";
 // css
 import "./TradeRatesCard.css";
 

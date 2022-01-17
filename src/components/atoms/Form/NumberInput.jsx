@@ -1,6 +1,4 @@
 import React from "react";
-import {useField} from "formik";
-import { x } from "@xstyled/styled-components";
 import Input from "./Input";
 
 const NumberInput = ({

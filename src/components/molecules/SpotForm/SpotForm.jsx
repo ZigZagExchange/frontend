@@ -186,7 +186,6 @@ export class SpotForm extends React.Component {
             return this.state.price;
         }
 
-        let spread, stableSpread;
         if (this.props.side === "b") {
             return (this.getFirstAsk() * 1.0003).toFixed(marketInfo.pricePrecisionDecimals);
         }
@@ -199,14 +198,14 @@ export class SpotForm extends React.Component {
     getFirstAsk() {
         const marketInfo = this.props.marketInfo;
         if (!marketInfo) return 0;
-        const asks = this.props.liquidity.filter(l => l[0] == "s").map(l => l[1]);
+        const asks = this.props.liquidity.filter(l => l[0] === "s").map(l => l[1]);
         return Math.min(...asks).toFixed(marketInfo.pricePrecisionDecimals);
     }
 
     getFirstBid() {
         const marketInfo = this.props.marketInfo;
         if (!marketInfo) return 0;
-        const bids = this.props.liquidity.filter(l => l[0] == "b").map(l => l[1]);
+        const bids = this.props.liquidity.filter(l => l[0] === "b").map(l => l[1]);
         return Math.max(...bids).toFixed(marketInfo.pricePrecisionDecimals);
     }
 

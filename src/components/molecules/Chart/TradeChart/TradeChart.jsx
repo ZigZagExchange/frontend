@@ -1,7 +1,6 @@
 import React from "react";
 import TradingViewWidget, { Themes } from "react-tradingview-widget";
 import "./TradeChart.css";
-import api from "lib/api";
 
 export const TradeChart = (props) => {
   let symbol = "";
