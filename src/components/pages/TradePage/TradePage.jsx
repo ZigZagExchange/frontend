@@ -18,6 +18,7 @@ import {
   marketSummarySelector,
   liquiditySelector,
   currentMarketSelector,
+  marketInfoSelector,
   setCurrentMarket,
   resetData,
 } from "lib/store/features/api/apiSlice";
@@ -39,10 +40,10 @@ const TradePage = () => {
   const lastPrices = useSelector(lastPricesSelector);
   const marketSummary = useSelector(marketSummarySelector);
   const liquidity = useSelector(liquiditySelector);
+  const marketInfo = useSelector(marketInfoSelector);
   const dispatch = useDispatch();
   const lastPriceTableData = [];
   const markets = [];
-  const marketInfo = api.getMarketInfo(currentMarket);
 
   const updateMarketChain = (market) => {
     dispatch(setCurrentMarket(market));
@@ -63,7 +64,6 @@ const TradePage = () => {
     const sub = () => {
       dispatch(resetData())
       api.subscribeToMarket(currentMarket)
-      api.updateMarketInfo(currentMarket)
     }
     
     if (api.ws.readyState === 0) {
@@ -237,9 +237,10 @@ const TradePage = () => {
                   marketSummary={marketSummary}
                   markets={markets}
                   currentMarket={currentMarket}
+                  marketInfo={marketInfo}
                 />
                 {/* Trade Chart */}
-                <TradeChart currentMarket={tradingViewMarket} />
+                <TradeChart currentMarket={tradingViewMarket} marketInfo={marketInfo} />
               </div>
             </div>
             <SpotBox
@@ -248,6 +249,7 @@ const TradePage = () => {
               currentMarket={currentMarket}
               activeOrderCount={activeUserOrders}
               liquidity={liquidity}
+              marketInfo={marketInfo}
             />
             <div className="d-block d-xl-none" style={{"width": "100%"}}>
                 <Footer

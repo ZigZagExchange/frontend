@@ -41,7 +41,7 @@ export class SpotForm extends React.Component {
     }
 
     getBaseBalance() {
-        const marketInfo = api.getMarketInfo(this.props.currentMarket);
+        const marketInfo = this.props.marketInfo;
         if (!marketInfo) return 0;
         return (
             this.props.user.committed.balances[marketInfo.baseAsset.symbol] /
@@ -50,7 +50,7 @@ export class SpotForm extends React.Component {
     }
 
     getQuoteBalance() {
-        const marketInfo = api.getMarketInfo(this.props.currentMarket);
+        const marketInfo = this.props.marketInfo;
         if (!marketInfo) return 0;
         return (
             this.props.user.committed.balances[marketInfo.quoteAsset.symbol] /
@@ -69,7 +69,7 @@ export class SpotForm extends React.Component {
             toast.error("Amount is not a number");
             return;
         }
-        const marketInfo = api.getMarketInfo(this.props.currentMarket);
+        const marketInfo = this.props.marketInfo;
         amount = parseFloat(amount.toFixed(marketInfo.baseAsset.decimals));
         if (
             this.props.activeOrderCount > 0 &&
@@ -160,7 +160,7 @@ export class SpotForm extends React.Component {
     amountPercentOfMax() {
         if (!this.props.user.id) return 0;
 
-        const marketInfo = api.getMarketInfo(this.props.currentMarket);
+        const marketInfo = this.props.marketInfo;
         if (!this.marketInfo) return 0;
 
         if (this.props.side === "s") {
@@ -179,7 +179,7 @@ export class SpotForm extends React.Component {
     }
 
     currentPrice() {
-        const marketInfo = api.getMarketInfo(this.props.currentMarket);
+        const marketInfo = this.props.marketInfo;
         if (!marketInfo) return 0;
 
         if (this.props.orderType === "limit" && this.state.price) {
@@ -197,21 +197,21 @@ export class SpotForm extends React.Component {
     }
 
     getFirstAsk() {
-        const marketInfo = api.getMarketInfo(this.props.currentMarket);
+        const marketInfo = this.props.marketInfo;
         if (!marketInfo) return 0;
         const asks = this.props.liquidity.filter(l => l[0] == "s").map(l => l[1]);
         return Math.min(...asks).toFixed(marketInfo.pricePrecisionDecimals);
     }
 
     getFirstBid() {
-        const marketInfo = api.getMarketInfo(this.props.currentMarket);
+        const marketInfo = this.props.marketInfo;
         if (!marketInfo) return 0;
         const bids = this.props.liquidity.filter(l => l[0] == "b").map(l => l[1]);
         return Math.max(...bids).toFixed(marketInfo.pricePrecisionDecimals);
     }
 
     rangeSliderHandler(e, val) {
-        const marketInfo = api.getMarketInfo(this.props.currentMarket);
+        const marketInfo = this.props.marketInfo;
         if (!marketInfo) return 0;
         if (!this.props.user.id) return false;
 
@@ -266,7 +266,7 @@ export class SpotForm extends React.Component {
     }
 
     render() {
-        const marketInfo = api.getMarketInfo(this.props.currentMarket);
+        const marketInfo = this.props.marketInfo;
 
         let price = this.currentPrice();
         if (price === 0) price = "";

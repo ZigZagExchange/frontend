@@ -50,6 +50,7 @@ class SpotBox extends React.Component {
                 orderType={this.state.orderType}
                 activeOrderCount={this.props.activeOrderCount}
                 liquidity={this.props.liquidity}
+                marketInfo={this.props.marketInfo}
               />
               <SpotForm
                 side="s"
@@ -59,6 +60,7 @@ class SpotBox extends React.Component {
                 orderType={this.state.orderType}
                 activeOrderCount={this.props.activeOrderCount}
                 liquidity={this.props.liquidity}
+                marketInfo={this.props.marketInfo}
               />
             </div>
           </div>

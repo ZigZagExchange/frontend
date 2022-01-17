@@ -101,23 +101,8 @@ export default class APIZKProvider extends APIProvider {
         return signingKey;
     }
 
-    getMarketInfo = (market) => {
-        return this.marketsCache[market];
-    }
-
-    updateMarketInfo = async (market) => {
-        if (this.marketsCache[market]) {
-            return this.marketsCache[market];
-        }
-        const marketInfo = await fetch(`https://zigzag-markets.herokuapp.com/markets?id=${market}&chainid=${this.network}`)
-            .then(r => r.json())
-            .then(r => r[0]);
-        this.marketsCache[market] = marketInfo;
-        return this.marketsCache[market];
-    }
-
     submitOrder = async (market, side, price, amount, orderType) => {
-        const marketInfo = await this.getMarketInfo(market);
+        const marketInfo = this.marketinfo;
         amount = parseFloat(amount).toFixed(marketInfo.baseAsset.decimals);
         price = parseFloat(price).toFixed(marketInfo.pricePrecisionDecimals);
         

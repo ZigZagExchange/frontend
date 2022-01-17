@@ -12,6 +12,7 @@ const TradeHead = (props) => {
                 <TradeRatesCard
                     marketSummary={props.marketSummary}
                     currentMarket={props.currentMarket}
+                    marketInfo={props.marketInfo}
                 />
                 <TradeSelect
                     updateMarketChain={props.updateMarketChain}

@@ -3,7 +3,7 @@ import Form from "./Form";
 import NumberInput from "./NumberInput";
 import Submit, {Button} from "./Submit";
 import {jsonify} from "../../../lib/helpers/strings";
-import {max, min, required} from "./validation";
+import {required} from "./validation";
 import {x} from "@xstyled/styled-components";
 import SelectInput from "./SelectInput";
 

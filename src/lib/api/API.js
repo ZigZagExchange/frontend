@@ -436,14 +436,6 @@ export default class API extends Emitter {
         };
     }
 
-    updateMarketInfo = async (market) => {
-        return this.apiProvider.updateMarketInfo(market);
-    }
-
-    getMarketInfo = (market) => {
-        return this.apiProvider.getMarketInfo(market);
-    }
-
     submitOrder = async (product, side, price, amount, orderType) => {
         await this.apiProvider.submitOrder(product, side, price, amount, orderType)
     }

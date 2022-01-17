@@ -5,7 +5,7 @@ import "./TradeRatesCard.css";
 
 class TradeRatesCard extends React.Component {
     render() {
-        const marketInfo = api.getMarketInfo(this.props.currentMarket);
+        const marketInfo = this.props.marketInfo;
 
         let marketDisplay = "--/--";
         if (marketInfo) {
@@ -22,7 +22,7 @@ class TradeRatesCard extends React.Component {
                 <div className="tl_rates">
                     <div className="rates_box rb_text_1">
                         <strong>{marketDisplay}</strong>
-                        <p>{this.marketInfo && this.marketInfo.baseAsset.symbol}</p>
+                        <p>{marketInfo && marketInfo.baseAsset.symbol}</p>
                     </div>
                     <div className="rates_box rb_text_2">
                         <h1>{this.props.marketSummary.price}</h1>

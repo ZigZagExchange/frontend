@@ -4,10 +4,9 @@ import "./TradeChart.css";
 import api from "lib/api";
 
 export const TradeChart = (props) => {
-  const marketInfo = api.getMarketInfo(props.currentMarket);
   let symbol = "";
-  if (marketInfo) {
-      symbol = marketInfo.baseAsset.symbol + marketInfo.quoteAsset.symbol;
+  if (props.marketInfo) {
+      symbol = props.marketInfo.baseAsset.symbol + props.marketInfo.quoteAsset.symbol;
   }
 
   return (
