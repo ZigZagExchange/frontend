@@ -10,26 +10,26 @@ import Submit from "../../atoms/Form/Submit";
 import Form from "../../atoms/Form/Form";
 import {x} from "@xstyled/styled-components";
 
-const AllocationModal = ({onClose, show, onSuccess, fileSize}) => {
+const AllocationModal = ({onClose, show, onSuccess, bytesToPurchase}) => {
   const user = useSelector(userSelector)
   const arweaveAllocation = Number(useSelector(arweaveAllocationSelector));
   const userHasExistingAllocation = arweaveAllocation !== 0
-  const fileSizeKB = fileSize / 1000
+  const fileSizeKB = bytesToPurchase / 1000
   const arweaveAllocationKB = arweaveAllocation / 1000
-  const [KBtoPurchase, setBytesToPurchase] = useState(null)
+  const [KBtoPurchase, setKBToPurchase] = useState(null)
 
   const pricePerKB = 0.001
   useEffect(() => {
     if (user.address) {
       api.refreshArweaveAllocation(user.address)
-      setBytesToPurchase(Number(((fileSize - arweaveAllocation) / 1000) * pricePerKB).toPrecision(2))
+      setKBToPurchase(Number(((bytesToPurchase - arweaveAllocation) / 1000) * pricePerKB).toPrecision(2))
     }
-  }, [fileSize, user.address, arweaveAllocation])
+  }, [bytesToPurchase, user.address, arweaveAllocation])
 
   return <Modal title={"Purchase Arweave Allocation"} show={show} onClose={onClose}>
     <x.div fontSize={14}>
       ZigZag enables permissionless pair listings by storing your pair's metadata on arweave.
-      You must purchase space there first.
+      You must purchase space on arweave first.
     </x.div>
     <Pane size={"xs"} my={8}>
       <x.div display={"flex"} justifyContent={"space-around"} alignItems={"center"}>
@@ -53,9 +53,8 @@ const AllocationModal = ({onClose, show, onSuccess, fileSize}) => {
     </Pane>
 
     <Form onSubmit={async () => {
-      const transaction = await api.purchaseArweaveBytes("USDC", fileSize)
-      const receipt = await transaction.awaitReceipt()
-      console.log("debug:: receipt", receipt)
+      const transaction = await api.purchaseArweaveBytes("USDC", bytesToPurchase)
+      await transaction.awaitReceipt()
       onSuccess()
     }}>
       <Submit block>PURCHASE</Submit>
