@@ -28,7 +28,13 @@ class TradeRatesCard extends React.Component {
                         <h1>{this.props.marketSummary.price}</h1>
                         <p>${this.props.marketSummary.price}</p>
                     </div>
-                    <div className="rates_box rb_text_3">
+                    <div
+                      className={
+                        this.props.marketSummary.priceChange < 0
+                          ? "rates_box rb_text_3_down_value"
+                          : "rates_box rb_text_3_up_value"
+                      }
+                    >
                         <h2>24h Change</h2>
                         <p>
                             {this.props.marketSummary.priceChange}{" "}
