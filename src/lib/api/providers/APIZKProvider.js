@@ -128,7 +128,6 @@ export default class APIZKProvider extends APIProvider {
             tokenRatio[marketInfo.quoteAssetId] = (amount * price).toFixed(marketInfo.quoteAsset.decimals);
             fullSellQuantity = (sellQuantityWithFee * 10**(marketInfo.baseAsset.decimals)).toFixed(0);
         }
-        console.log(tokenRatio);
         
         const now_unix = Date.now() / 1000 | 0
         const two_minute_expiry = now_unix + 120
