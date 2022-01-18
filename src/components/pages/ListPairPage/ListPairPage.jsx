@@ -221,7 +221,7 @@ export default function ListPairPage() {
                 {...model(minSize, setMinSize)}
                 name={"minSize"}
                 label={"Min Size"}
-                validate={[required, min(0), max(maxSize)]}
+                validate={[required, min(1e-18), max(maxSize)]}
               />
               <NumberInput
                 block
@@ -231,7 +231,7 @@ export default function ListPairPage() {
                 validate={[required, min(minSize)]}
               />
               <NumberInput block name={"pricePrecisionDecimal"} label={"Price Precision Decimals"}
-                           validate={[required, max(18), min(1e-18)]}/>
+                           validate={[required, max(18), min(0)]}/>
               <SelectInput
                 {...model(zigZagChainId, setZigZagChainId)}
                 name={"zigzagChainId"}

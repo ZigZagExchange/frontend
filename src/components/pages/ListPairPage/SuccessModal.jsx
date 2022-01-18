@@ -5,6 +5,8 @@ import {BsFillCheckCircleFill} from "react-icons/all";
 import {Link} from "react-router-dom";
 import styled from '@xstyled/styled-components'
 import axios from "axios";
+import Loader from "react-loader-spinner";
+
 
 export const marketQueryParam = "market"
 export const networkQueryParam = "network"
@@ -49,16 +51,18 @@ const SuccessModal = ({txid, show, onClose}) => {
   const viewMarketURL = `https://zigzag-markets.herokuapp.com/markets?id=${txid}`
 
   useEffect(() => {
-    axios.get(viewMarketURL).then(res => {
-      const data = res.data[0]
-      setAlias(data.alias)
-      setBaseAsset(data.baseAsset.symbol)
-      setQuoteAsset(data.quoteAsset.symbol)
+    if (show) {
+      axios.get(viewMarketURL).then(res => {
+        const data = res.data[0]
+        setAlias(data.alias)
+        setBaseAsset(data.baseAsset.symbol)
+        setQuoteAsset(data.quoteAsset.symbol)
 
-      const chainId = Number(data.zigzagChainId)
-      setPairNetwork(getMarketChainFromId(chainId))
-    }).catch(err => console.error(err))
-  }, [])
+        const chainId = Number(data.zigzagChainId)
+        setPairNetwork(getMarketChainFromId(chainId))
+      }).catch(err => console.error(err))
+    }
+  }, [show])
 
   return <Modal show={show} onClose={onClose}>
     <x.div mb={3} display={"flex"} justifyContent={"center"} alignItems={"center"} flexDirection={"column"}>
@@ -67,9 +71,16 @@ const SuccessModal = ({txid, show, onClose}) => {
         <x.div fontSize={32}>
           Market Listed
         </x.div>
-        <x.div fontSize={18} color={"blue-gray-500"}>
-          {alias} on {pairNetwork}
-        </x.div>
+        {alias
+          ? <x.div fontSize={18} color={"blue-gray-500"}>
+            {alias} on {pairNetwork}
+          </x.div>
+          : <Loader
+          type={"TailSpin"}
+          color={"#64748b"}
+          height={22}
+          width={22}
+          />}
       </x.div>
     </x.div>
     <x.div w={"full"} display={"flex"} flexDirection={"column"} alignItems={"center"} mb={6} fontSize={14}>
