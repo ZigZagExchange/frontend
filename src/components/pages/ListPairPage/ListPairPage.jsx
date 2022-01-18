@@ -175,7 +175,7 @@ export default function ListPairPage() {
             <x.span color={baseAssetIdSymbolPreview ? "blue-gray-400" : "blue-gray-800"}>
               {baseAssetIdSymbolPreview ? baseAssetIdSymbolPreview : "XXX"}
             </x.span>
-            <x.span color={baseAssetIdSymbolPreview && quoteAssetIdSymbolPreview ? "blue-gray-400" : "blue-gray-800"}>-</x.span>
+            <x.span color={baseAssetIdSymbolPreview && quoteAssetIdSymbolPreview ? "blue-gray-400" : "blue-gray-800"}>/</x.span>
             <x.span color={quoteAssetIdSymbolPreview ? "blue-gray-400" : "blue-gray-800"}>
               {quoteAssetIdSymbolPreview ? quoteAssetIdSymbolPreview : "XXX"}
             </x.span>
