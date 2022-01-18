@@ -26,7 +26,7 @@ import { userSelector } from "lib/store/features/auth/authSlice";
 import "./style.css";
 import api from "lib/api";
 import {useLocation,useHistory} from "react-router-dom";
-import {idQueryParam} from "../ListPairPage/SuccessModal";
+import {getChainIdFromMarketChain, marketQueryParam} from "../ListPairPage/SuccessModal";
 
 const TradePage = () => {
   const [marketDataTab, updateMarketDataTab] = useState('fills')
@@ -51,20 +51,12 @@ const TradePage = () => {
   const updateMarketChain = (market) => {
     dispatch(setCurrentMarket(market));
   }
-  // example:: eDS8OHoqrf_e9-kylZGTMpxF_zG4-LDtDtz5NnOks-0
 
   useEffect(() => {
     const urlParams = new URLSearchParams(search);
-    const marketFromURL = urlParams.get(idQueryParam)
+    const marketFromURL = urlParams.get(marketQueryParam)
     const networkFromURL = urlParams.get("network");
-    let chainid;
-    if (networkFromURL === "zksync") {
-        chainid = 1;
-    }
-    else if (networkFromURL === "zksync-rinkeby") {
-        chainid = 1000;
-    }
-    console.log(chainid);
+    const chainid = getChainIdFromMarketChain(networkFromURL)
     if (marketFromURL && currentMarket !== marketFromURL) {
       updateMarketChain(marketFromURL)
     }

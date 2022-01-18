@@ -54,6 +54,11 @@ export const HeaderBridge = (props) => {
                   )}
               </li>
               <li>
+                <NavLink exact to="/list-pair" activeClassName="active_link">
+                  List
+                </NavLink>
+              </li>
+              <li>
                 <a href="https://docs.zigzag.exchange/" target="_blank" rel="noreferrer">Docs</a>
               </li>
               <li>
