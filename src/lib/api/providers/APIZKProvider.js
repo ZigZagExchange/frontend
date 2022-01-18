@@ -242,7 +242,6 @@ export default class APIZKProvider extends APIProvider {
 
     signIn = async () => {
         try {
-            console.log("debug:: nework name", this.network, this.api.getNetworkName(this.network))
             this.syncProvider = await zksync.getDefaultProvider(
                 this.api.getNetworkName(this.network)
             )

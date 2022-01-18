@@ -69,7 +69,6 @@ export default function ListPairPage() {
         setBaseAssetIdSymbolPreview(res.symbol)
         setIsBaseAssetIdInvalid(false)
       }).catch(e => {
-        console.log("debug:: error getting token info", e)
         setBaseAssetIdSymbolPreview(null)
         setIsBaseAssetIdInvalid(true)
       })
@@ -81,7 +80,6 @@ export default function ListPairPage() {
   function getQuoteInfo(quoteAssetId, chainId) {
     if (quoteAssetId && quoteAssetId !== "") {
       api.tokenInfo(quoteAssetId, chainId).then(res => {
-        console.log("debug:: quote res", res)
         setQuoteAssetIdSymbolPreview(res.symbol)
         setIsQuoteAssetIdInvalid(false)
       }).catch(e => {
