@@ -23,6 +23,7 @@ export default class API extends Emitter {
     websocketUrl = null
     _signInProgress = null
     _profiles = {}
+    _marketInfo = null
     
     constructor({ infuraId, websocketUrl, networks, currencies, validMarkets }) {
         super()
@@ -138,12 +139,10 @@ export default class API extends Emitter {
     }
 
     _socketOpen = () => {
-        this.__pingServerTimeout = setInterval(this.ping, 5000)
         this.emit('open')
     }
     
     _socketClose = () => {
-        clearInterval(this.__pingServerTimeout)
         toast.error("Connection to server closed. Please refresh page");
         this.emit('close')
     }
@@ -152,6 +151,11 @@ export default class API extends Emitter {
         if (!e.data && e.data.length <= 0) return
         const msg = JSON.parse(e.data)
         this.emit('message', msg.op, msg.args)
+
+        // Is there a better way to do this? Not sure. 
+        if (msg.op === "marketinfo") {
+            this._marketInfo = msg.args[0];
+        }
     }
 
     start = () => {
@@ -179,8 +183,6 @@ export default class API extends Emitter {
         this.emit('accountState', accountState)
         return accountState
     }
-
-    ping = () => this.send('ping')
 
     send = (op, args) => {
         return this.ws.send(JSON.stringify({ op, args }))
@@ -458,5 +460,36 @@ export default class API extends Emitter {
         //    const amount = availableLiquidity[2];
         //}
 
+    }
+
+    refreshArweaveAllocation = async (address) => {
+        return this.apiProvider.refreshArweaveAllocation(address);
+    }
+
+    purchaseArweaveBytes = (currency, bytes) => {
+        return this.apiProvider.purchaseArweaveBytes(currency, bytes);
+    }
+
+    signMessage = async (message) => {
+        return this.apiProvider.signMessage(message);
+    }
+
+    uploadArweaveFile = async (sender, timestamp, signature, file) => {
+        const formData = new FormData();
+        formData.append("sender", sender);
+        formData.append("timestamp", timestamp);
+        formData.append("signature", signature);
+        formData.append("file", file);
+
+        const url = "https://zigzag-arweave-bridge.herokuapp.com/arweave/upload";
+        const response = await fetch(url, {
+          method: 'POST',
+          body: formData
+        }).then(r => r.json());
+        return response;
+    }
+
+    tokenInfo = (tokenLike, chainId) => {
+        return this.apiProvider.tokenInfo(tokenLike, chainId)
     }
 }

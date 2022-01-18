@@ -18,12 +18,15 @@ import {
   marketSummarySelector,
   liquiditySelector,
   currentMarketSelector,
+  marketInfoSelector,
   setCurrentMarket,
   resetData,
 } from "lib/store/features/api/apiSlice";
 import { userSelector } from "lib/store/features/auth/authSlice";
 import "./style.css";
 import api from "lib/api";
+import {useLocation,useHistory} from "react-router-dom";
+import {getChainIdFromMarketChain, marketQueryParam} from "../ListPairPage/SuccessModal";
 
 const TradePage = () => {
   const [marketDataTab, updateMarketDataTab] = useState('fills')
@@ -37,9 +40,43 @@ const TradePage = () => {
   const lastPrices = useSelector(lastPricesSelector);
   const marketSummary = useSelector(marketSummarySelector);
   const liquidity = useSelector(liquiditySelector);
+  const marketInfo = useSelector(marketInfoSelector);
   const dispatch = useDispatch();
   const lastPriceTableData = [];
   const markets = [];
+
+  const { search } = useLocation()
+  const history = useHistory();
+
+  const updateMarketChain = (market) => {
+    dispatch(setCurrentMarket(market));
+  }
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(search);
+    const marketFromURL = urlParams.get(marketQueryParam)
+    const networkFromURL = urlParams.get("network");
+    const chainid = getChainIdFromMarketChain(networkFromURL)
+    console.log(chainid);
+    if (marketFromURL && currentMarket !== marketFromURL) {
+      updateMarketChain(marketFromURL)
+    }
+    if (chainid && network !== chainid) {
+      api.setAPIProvider(chainid)
+      api.signOut();
+    }
+  }, [])
+
+  // Update URL when market or network update
+  useEffect(() => {
+      let networkText;
+      if (network === 1) {
+          networkText = "zksync";
+      } else if (network === 1000) {
+          networkText = "zksync-rinkeby";
+      }
+      history.push(`/?market=${currentMarket}&network=${networkText}`);
+  }, [network, currentMarket])
 
   useEffect(() => {
     const sub = () => {
@@ -62,9 +99,6 @@ const TradePage = () => {
     }
   }, [network, currentMarket])
 
-  const updateMarketChain = (market) => {
-    dispatch(setCurrentMarket(market));
-  }
 
   Object.keys(lastPrices).forEach((market) => {
     markets.push(market);
@@ -141,24 +175,22 @@ const TradePage = () => {
 
   if (api.isZksyncChain()) {
     liquidity.forEach((liq) => {
-      const quantity = liq[0];
-      const spread = liq[1];
-      const side = liq[2];
-      if (side === "d" || side === "b") {
-        const bidPrice = marketSummary.price * (1 - spread);
+      const side = liq[0];
+      const price = liq[1];
+      const quantity = liq[2];
+      if (side === "b") {
         orderbookBids.push({
-          td1: bidPrice,
+          td1: price,
           td2: quantity,
-          td3: bidPrice * quantity,
+          td3: price * quantity,
           side: "b",
         });
       }
-      if (side === "d" || side === "s") {
-        const askPrice = marketSummary.price * (1 + spread);
+      if (side === "s") {
         orderbookAsks.push({
-          td1: askPrice,
+          td1: price,
           td2: quantity,
-          td3: askPrice * quantity,
+          td3: price * quantity,
           side: "s",
         });
       }
@@ -207,10 +239,8 @@ const TradePage = () => {
   ).length;
 
   let tradingViewMarket = currentMarket;
-  const baseCurrency = currentMarket.split("-")[0];
-  const quoteCurrency = currentMarket.split("-")[1];
-  if (baseCurrency === "WBTC") tradingViewMarket = "BTC-" + quoteCurrency;
-  if (quoteCurrency === "WBTC") tradingViewMarket = baseCurrency + "-BTC";
+  if (marketInfo && marketInfo.baseAsset.symbol === "WBTC") tradingViewMarket = "BTC-" + marketInfo.quoteAsset.symbol;
+  if (marketInfo && marketInfo.quoteAsset.symbol === "WBTC") tradingViewMarket = marketInfo.baseAsset.symbol + "-BTC";
 
   return (
     <DefaultTemplate>
@@ -225,18 +255,19 @@ const TradePage = () => {
                   marketSummary={marketSummary}
                   markets={markets}
                   currentMarket={currentMarket}
+                  marketInfo={marketInfo}
                 />
                 {/* Trade Chart */}
-                <TradeChart currentMarket={tradingViewMarket} />
+                <TradeChart currentMarket={tradingViewMarket} marketInfo={marketInfo} />
               </div>
             </div>
             <SpotBox
               lastPrice={marketSummary.price}
-              signInHandler={() => api.signIn(network)}
               user={user}
               currentMarket={currentMarket}
               activeOrderCount={activeUserOrders}
               liquidity={liquidity}
+              marketInfo={marketInfo}
             />
             <div className="d-block d-xl-none" style={{"width": "100%"}}>
                 <Footer

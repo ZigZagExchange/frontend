@@ -14,13 +14,18 @@ export const apiSlice = createSlice({
     bridgeReceipts: [],
     lastPrices: {},
     marketSummary: {},
+    marketinfo: null,
     balances: {},
     liquidity: [],
     userOrders: {},
     userFills: {},
     orders: {},
+    arweaveAllocation: 0
   },
   reducers: {
+    _marketinfo(state, { payload }) {
+        state.marketinfo = payload[0];
+    },
     _fills(state, { payload }) {
       payload[0].forEach(fill => {
         const fillid = fill[1];
@@ -88,8 +93,8 @@ export const apiSlice = createSlice({
         }
       });
     },
-    _liquidity(state, { payload }) {
-      state.liquidity = state.liquidity.concat(payload[2]);
+    _liquidity2(state, { payload }) {
+      state.liquidity = state.liquidity = payload[2];
     },
     _orderstatus(state, { payload }) {
       (payload[0] || []).forEach(async (update) => {
@@ -246,6 +251,7 @@ export const apiSlice = createSlice({
       state.bridgeReceipts.unshift(payload)
     },
     resetData(state) {
+      state.marketinfo = null;
       state.marketFills = {}
       state.marketSummary = {}
       state.orders = {}
@@ -254,11 +260,14 @@ export const apiSlice = createSlice({
     clearUserOrders(state) {
         state.userOrders = {};
         state.userFills = {};
+    },
+    setArweaveAllocation(state, { payload }) {
+        state.arweaveAllocation = payload;
     }
   },
 })
 
-export const { setNetwork, clearBridgeReceipts, setBalances, setUserId, addBridgeReceipt, setCurrentMarket, resetData, clearUserOrders } = apiSlice.actions
+export const { setNetwork, clearBridgeReceipts, setBalances, setUserId, addBridgeReceipt, setCurrentMarket, resetData, clearUserOrders, setArweaveAllocation } = apiSlice.actions
 
 export const networkSelector = state => state.api.network
 export const userOrdersSelector = state => state.api.userOrders
@@ -270,6 +279,8 @@ export const marketSummarySelector = state => state.api.marketSummary
 export const liquiditySelector = state => state.api.liquidity
 export const currentMarketSelector = state => state.api.currentMarket
 export const bridgeReceiptsSelector = state => state.api.bridgeReceipts
+export const marketInfoSelector = state => state.api.marketinfo
+export const arweaveAllocationSelector = state => state.api.arweaveAllocation
 export const balancesSelector = (state => state.api.balances[makeScope(state.api)] || {})
 
 export const handleMessage = createAction('api/handleMessage')

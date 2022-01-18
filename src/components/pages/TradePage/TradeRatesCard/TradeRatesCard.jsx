@@ -1,13 +1,15 @@
 import React from "react";
-import api from "lib/api";
 // css
 import "./TradeRatesCard.css";
 
 class TradeRatesCard extends React.Component {
     render() {
-        let marketDisplay = this.props.currentMarket.replace("-", "/");
-        let baseCurrency = this.props.currentMarket.split("-")[0];
-        let quoteCurrency = this.props.currentMarket.split("-")[1];
+        const marketInfo = this.props.marketInfo;
+
+        let marketDisplay = "--/--";
+        if (marketInfo) {
+            marketDisplay = `${marketInfo.baseAsset.symbol}/${marketInfo.quoteAsset.symbol}`;
+        }
         const percentChange = (
             (this.props.marketSummary.priceChange /
                 this.props.marketSummary.price) *
@@ -19,7 +21,7 @@ class TradeRatesCard extends React.Component {
                 <div className="tl_rates">
                     <div className="rates_box rb_text_1">
                         <strong>{marketDisplay}</strong>
-                        <p>{api.currencies[baseCurrency].name}</p>
+                        <p>{marketInfo && marketInfo.baseAsset.symbol}</p>
                     </div>
                     <div className="rates_box rb_text_2">
                         <h1>{this.props.marketSummary.price}</h1>
@@ -47,11 +49,11 @@ class TradeRatesCard extends React.Component {
                         <p>{this.props.marketSummary["24lo"]}</p>
                     </div>
                     <div className="rates_box rb_text_4">
-                        <h2>24h Volume({baseCurrency})</h2>
+                        <h2>24h Volume({marketInfo && marketInfo.baseAsset.symbol})</h2>
                         <p>{this.props.marketSummary.baseVolume}</p>
                     </div>
                     <div className="rates_box rb_text_4">
-                        <h2>24h Volume({quoteCurrency})</h2>
+                        <h2>24h Volume({marketInfo && marketInfo.quoteAsset.symbol})</h2>
                         <p>{this.props.marketSummary.quoteVolume}</p>
                     </div>
                 </div>
