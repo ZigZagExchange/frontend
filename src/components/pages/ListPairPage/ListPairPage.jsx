@@ -21,7 +21,6 @@ import SelectInput from "../../atoms/Form/SelectInput";
 import {model} from "../../atoms/Form/helpers";
 import {debounce} from "lodash"
 
-
 export default function ListPairPage() {
   const user = useSelector(userSelector);
   const isUserLoggedIn = user.id !== null && user.id !== undefined
@@ -125,6 +124,7 @@ export default function ListPairPage() {
         const signature = await api.signMessage(message);
         const response = await api.uploadArweaveFile(user.address, timestamp, signature, file);
         setTxId(response.arweave_txid);
+
         setIsSuccessModalOpen(true);
         resetForm()
       } catch (e) {
@@ -285,7 +285,6 @@ export default function ListPairPage() {
         // txid={"-C60-kmz6VjDiWv_MsKzLXqNA_vC7c29sdaasOInaj8"}
         show={isSuccessModalOpen}
         // show={true}
-
         onClose={() => {
           setIsSuccessModalOpen(false);
           setTxId(null);
