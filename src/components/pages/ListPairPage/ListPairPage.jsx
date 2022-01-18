@@ -189,7 +189,7 @@ export default function ListPairPage() {
               minSize: minSize,
               maxSize: maxSize,
               zigzagChainId: zigZagChainId,
-              pricePrecisionDecimal: "",
+              pricePrecisionDecimals: "",
             }}
             onSubmit={onFormSubmit}
           >
@@ -232,7 +232,7 @@ export default function ListPairPage() {
                 label={"Max Size"}
                 validate={[required, min(minSize)]}
               />
-              <NumberInput block name={"pricePrecisionDecimal"} label={"Price Precision Decimals"}
+              <NumberInput block name={"pricePrecisionDecimals"} label={"Price Precision Decimals"}
                            validate={[required, max(18), min(0)]}/>
               <SelectInput
                 {...model(zigZagChainId, setZigZagChainId)}
