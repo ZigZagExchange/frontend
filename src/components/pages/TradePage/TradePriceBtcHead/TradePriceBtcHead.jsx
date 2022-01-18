@@ -17,10 +17,6 @@ const TradePriceBtcHead = () => {
                     <img src={selectArrow} alt="..." />
                 </div>
                 <div>
-                    <h2 className="me-2">FIAT</h2>
-                    <img src={selectArrow} alt="..." />
-                </div>
-                <div>
                     <h2 className="me-2">ZONES</h2>
                     <img src={selectArrow} alt="..." />
                 </div>
