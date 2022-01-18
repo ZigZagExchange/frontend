@@ -25,7 +25,7 @@ import {
 import { userSelector } from "lib/store/features/auth/authSlice";
 import "./style.css";
 import api from "lib/api";
-import {useLocation} from "react-router-dom";
+import {useLocation,useHistory} from "react-router-dom";
 import {idQueryParam} from "../ListPairPage/SuccessModal";
 
 const TradePage = () => {
@@ -45,16 +45,18 @@ const TradePage = () => {
   const lastPriceTableData = [];
   const markets = [];
 
+  const { search } = useLocation()
+  const history = useHistory();
+
   const updateMarketChain = (market) => {
     dispatch(setCurrentMarket(market));
   }
   // example:: eDS8OHoqrf_e9-kylZGTMpxF_zG4-LDtDtz5NnOks-0
 
-  const { search } = useLocation()
   useEffect(() => {
-    const params = new URLSearchParams(search)
-    const marketFromURL = params.get(idQueryParam)
-    const networkFromURL = params.get("network");
+    const urlParams = new URLSearchParams(search);
+    const marketFromURL = urlParams.get(idQueryParam)
+    const networkFromURL = urlParams.get("network");
     let chainid;
     if (networkFromURL === "zksync") {
         chainid = 1;
@@ -70,7 +72,18 @@ const TradePage = () => {
       api.setAPIProvider(chainid)
       api.signOut();
     }
-  }, [search])
+  }, [])
+
+  // Update URL when market or network update
+  useEffect(() => {
+      let networkText;
+      if (network === 1) {
+          networkText = "zksync";
+      } else if (network === 1000) {
+          networkText = "zksync-rinkeby";
+      }
+      history.push(`/?market=${currentMarket}&network=${networkText}`);
+  }, [network, currentMarket])
 
   useEffect(() => {
     const sub = () => {
