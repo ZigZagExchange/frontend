@@ -1,12 +1,23 @@
 import {
-  defaultTheme,
-  generateHexAlphaVariants,
-} from "@xstyled/styled-components";
+    defaultTheme,
+} from '@xstyled/styled-components'
 
 const colors = {
+
   zzDarkest: "#171c28",
   zzLightBorder: "rgba(235, 235, 255, 0.08)",
-};
+  
+  "teal-100": "#62D2AD",
+  "teal-200": "#6699ff",
+
+  // primary text blue
+  "blue-100": "#09AAF5",
+  "blue-200": "#08CFE8",
+  "blue-300": "#51638c",
+  "blue-400": "#1c2231",
+  "blue-500": "#161B27",
+  "blue-600": "#121620",
+}
 
 const space = {
   0.5: "0.125rem",
@@ -62,8 +73,8 @@ const fontSizes = {
 
 const theme = {
   colors: {
-    ...defaultTheme.colors,
-    ...generateHexAlphaVariants(colors),
+      ...defaultTheme.colors,
+      ...colors
   },
   space,
   screens: {
@@ -236,4 +247,4 @@ const theme = {
   },
 };
 
-export default theme;
+export default theme

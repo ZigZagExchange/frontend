@@ -7,16 +7,17 @@ import {
 } from "lib/store/features/api/apiSlice";
 import Loader from "react-loader-spinner";
 import { userSelector } from "lib/store/features/auth/authSlice";
-import ethLogo from "assets/images/currency/ETH.svg";
-import api from "lib/api";
-import { MAX_ALLOWANCE } from "lib/api/constants";
-import { formatUSD } from "lib/utils";
-import cx from "classnames";
-import { BiError } from "react-icons/bi";
-import { MdSwapCalls } from "react-icons/md";
-import darkPlugHead from "assets/icons/dark-plug-head.png";
-import logo from "assets/images/logo.png";
-import BridgeSwapInput from "../BridgeSwapInput/BridgeSwapInput";
+import ethLogo from "assets/images/currency/ETH.svg"
+import api from 'lib/api';
+import { MAX_ALLOWANCE } from 'lib/api/constants';
+import { formatUSD } from 'lib/utils';
+import cx from 'classnames';
+import { BiError } from 'react-icons/bi';
+import { MdSwapCalls } from 'react-icons/md';
+import logo from 'assets/images/logo.png'
+import BridgeSwapInput from '../BridgeSwapInput/BridgeSwapInput';
+import ConnectWalletButton from "../../../atoms/ConnectWalletButton/ConnectWalletButton";
+import Pane from "../../../atoms/Pane/Pane";
 
 const defaultTransfer = {
   type: "deposit",
@@ -179,139 +180,94 @@ const Bridge = () => {
   return (
     <>
       <div className="bridge_box">
-        <div className="bridge_box_top">
-          <div className="bridge_coin_title">
-            <h5>FROM</h5>
-            {transfer.type === "withdraw"
-              ? zkSyncLayer2Header
-              : ethLayer1Header}
-          </div>
-          <BridgeSwapInput
-            bridgeFee={bridgeFee}
-            balances={balances}
-            decimals={decimals}
-            currencies={currencies}
-            value={swapDetails}
-            onChange={setSwapDetails}
-          />
-          <div className="bridge_coin_stats">
-            <div className="bridge_coin_stat">
-              <h5>Estimated value</h5>
-              <span>~${formatUSD(estimatedValue)}</span>
+          <Pane size={"md"} variant={"light"}>
+            <div className="bridge_coin_title">
+              <h5>FROM</h5>
+              {transfer.type === 'withdraw' ? zkSyncLayer2Header : ethLayer1Header}
             </div>
-            <div className="bridge_coin_stat">
-              <h5>Available balance</h5>
-              <span>
-                {balances[swapDetails.currency] &&
-                  balances[swapDetails.currency].valueReadable}
-                {` ${swapDetails.currency}`}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="bridge_box_bottom">
-          <div className="bridge_box_swap_wrapper">
-            <SwapButton onClick={switchTransferType} />
-            <h5>Switch</h5>
-          </div>
-
-          <div className="bridge_coin_stats">
-            <div className="bridge_coin_stat">
-              <div className="bridge_coin_details">
-                <div className="bridge_coin_title">
-                  <h5>TO</h5>
-                  {transfer.type !== "withdraw"
-                    ? zkSyncLayer2Header
-                    : ethLayer1Header}
-                </div>
+            <BridgeSwapInput bridgeFee={bridgeFee} balances={balances} currencies={currencies} value={swapDetails} onChange={setSwapDetails} />
+            <div className="bridge_coin_stats">
+              <div className="bridge_coin_stat">
+                <h5>Estimated value</h5>
+                <span>~${formatUSD(estimatedValue)}</span>
+              </div>
+              <div className="bridge_coin_stat">
+                <h5>Available balance</h5>
+                <span>
+                  {balances[swapDetails.currency] && balances[swapDetails.currency].valueReadable}
+                  {` ${swapDetails.currency}`}
+                </span>
               </div>
             </div>
-            <div className="bridge_coin_stat">
-              <h5>Available balance</h5>
-              <span>
-                {altBalances[swapDetails.currency] &&
-                  altBalances[swapDetails.currency].valueReadable}
-                {` ${swapDetails.currency}`}
-              </span>
+          </Pane>
+
+          <Pane size={"md"} borderRadius={"0 0 3xl 3xl"}>
+            <div className="bridge_box_swap_wrapper">
+              <SwapButton onClick={switchTransferType} />
+              <h5>Switch</h5>
             </div>
-          </div>
-          {transfer.type === "deposit" && user.address && !user.id && (
-            <div className="bridge_transfer_fee">
-              One-Time Activation Fee: {activationFee} {swapDetails.currency}{" "}
-              (~$15.00)
+
+            <div className="bridge_coin_stats">
+              <div className="bridge_coin_stat">
+                <div className="bridge_coin_details">
+                  <div className="bridge_coin_title">
+                    <h5>TO</h5>
+                    {transfer.type !== 'withdraw' ? zkSyncLayer2Header : ethLayer1Header}
+                  </div>
+                </div>
+              </div>
+              <div className="bridge_coin_stat">
+                <h5>Available balance</h5>
+                <span>
+                  {altBalances[swapDetails.currency] && altBalances[swapDetails.currency].valueReadable}
+                  {` ${swapDetails.currency}`}
+                </span>
+              </div>
             </div>
-          )}
-          {user.address ? (
-            user.id && (
-              <div className="bridge_transfer_fee">
-                Bridge Fee:{" "}
-                {typeof bridgeFee !== "number" ? (
-                  <div style={{ display: "inline-flex", margin: "0 5px" }}>
-                    <Loader
+            {transfer.type === 'deposit' && user.address && !user.id && <div className="bridge_transfer_fee">
+              One-Time Activation Fee: {activationFee} {swapDetails.currency} (~$15.00)
+            </div>}
+            {user.address ? (
+              user.id && <div className="bridge_transfer_fee">
+                Bridge Fee: {typeof bridgeFee !== 'number' ? (
+                  <div style={{ display: 'inline-flex', margin: '0 5px' }}>
+                      <Loader
                       type="TailSpin"
                       color="#444"
                       height={16}
                       width={16}
                     />
                   </div>
-                ) : (
-                  bridgeFee
-                )}{" "}
-                {swapDetails.currency}
+                ) : bridgeFee} {swapDetails.currency}
               </div>
-            )
-          ) : (
-            <div className="bridge_transfer_fee">
-              🔗 &nbsp;Please connect your wallet
-            </div>
-          )}
-          <div className="bridge_button">
-            {!user.address && (
-              <Button
-                className="bg_btn"
-                text="CONNECT WALLET"
-                img={darkPlugHead}
-                onClick={() => api.signIn(network)}
-              />
+            ) : (
+              <div className="bridge_transfer_fee">
+                🔗 &nbsp;Please connect your wallet
+              </div>
             )}
-            {user.address &&
-              balances[swapDetails.currency] &&
-              !hasAllowance && (
-                <Button
-                  loading={isApproving}
-                  className={cx("bg_btn", {
-                    zig_disabled:
-                      formErr.length > 0 || swapDetails.amount.length === 0,
-                  })}
-                  text="APPROVE"
-                  style={{ marginBottom: 10 }}
-                  onClick={approveSpend}
-                />
-              )}
-            {user.address && hasError && (
-              <Button
+            <div className="bridge_button">
+              {!user.address && <ConnectWalletButton/>}
+              {user.address && balances[swapDetails.currency] && !hasAllowance && <Button
+                loading={isApproving}
+                className={cx("bg_btn", { zig_disabled: formErr.length > 0 || swapDetails.amount.length === 0, })}
+                text="APPROVE"
+                style={{ marginBottom: 10 }}
+                onClick={approveSpend}
+              />}
+              {user.address && hasError && <Button
                 className="bg_btn zig_btn_disabled bg_err"
                 text={formErr}
                 icon={<BiError />}
-              />
-            )}
-            {user.address && !hasError && (
-              <Button
+              />}
+              {user.address && !hasError && <Button
                 loading={loading}
-                className={cx("bg_btn", {
-                  zig_disabled:
-                    bridgeFee === null ||
-                    !hasAllowance ||
-                    swapDetails.amount.length === 0,
-                })}
+                className={cx("bg_btn", { zig_disabled: bridgeFee === null || !hasAllowance || swapDetails.amount.length === 0 })}
                 text="TRANSFER"
                 icon={<MdSwapCalls />}
                 onClick={doTransfer}
-              />
-            )}
-          </div>
-        </div>
+              />}
+            </div>
+          </Pane>
       </div>
       {user.address ? (
         <div className="bridge_connected_as">

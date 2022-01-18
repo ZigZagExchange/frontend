@@ -21,4 +21,4 @@ function Provider({ children }) {
   );
 }
 
-export default Provider;
+export default Provider

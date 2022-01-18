@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 // import { ToastContainer, toast } from "react-toastify";
-import { DefaultTemplate, TradeChart, Tabs } from "components";
+import { DefaultTemplate, Footer, TradeChart } from "components";
 import "react-toastify/dist/ReactToastify.css";
-import { TradeOrdersTable } from "./TradeOrdersTable/TradeOrdersTable";
 import TradeHead from "components/pages/TradePage/TradeHead/TradeHead";
 import TradePriceTable from "components/pages/TradePage/TradePriceTable/TradePriceTable";
 import TradePriceBtcTable from "components/pages/TradePage/TradePriceBtcTable/TradePriceBtcTable";
@@ -19,15 +18,18 @@ import {
   marketSummarySelector,
   liquiditySelector,
   currentMarketSelector,
+  marketInfoSelector,
   setCurrentMarket,
   resetData,
 } from "lib/store/features/api/apiSlice";
 import { userSelector } from "lib/store/features/auth/authSlice";
 import "./style.css";
 import api from "lib/api";
+import {useLocation,useHistory} from "react-router-dom";
+import {getChainIdFromMarketChain, marketQueryParam} from "../ListPairPage/SuccessModal";
 
 const TradePage = () => {
-  const [marketDataTab, updateMarketDataTab] = useState("fills");
+  const [marketDataTab, updateMarketDataTab] = useState('fills')
   const user = useSelector(userSelector);
   const network = useSelector(networkSelector);
   const currentMarket = useSelector(currentMarketSelector);
@@ -38,34 +40,65 @@ const TradePage = () => {
   const lastPrices = useSelector(lastPricesSelector);
   const marketSummary = useSelector(marketSummarySelector);
   const liquidity = useSelector(liquiditySelector);
+  const marketInfo = useSelector(marketInfoSelector);
   const dispatch = useDispatch();
   const lastPriceTableData = [];
   const markets = [];
 
+  const { search } = useLocation()
+  const history = useHistory();
+
+  const updateMarketChain = (market) => {
+    dispatch(setCurrentMarket(market));
+  }
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(search);
+    const marketFromURL = urlParams.get(marketQueryParam)
+    const networkFromURL = urlParams.get("network");
+    const chainid = getChainIdFromMarketChain(networkFromURL)
+    console.log(chainid);
+    if (marketFromURL && currentMarket !== marketFromURL) {
+      updateMarketChain(marketFromURL)
+    }
+    if (chainid && network !== chainid) {
+      api.setAPIProvider(chainid)
+      api.signOut();
+    }
+  }, [])
+
+  // Update URL when market or network update
+  useEffect(() => {
+      let networkText;
+      if (network === 1) {
+          networkText = "zksync";
+      } else if (network === 1000) {
+          networkText = "zksync-rinkeby";
+      }
+      history.push(`/?market=${currentMarket}&network=${networkText}`);
+  }, [network, currentMarket])
+
   useEffect(() => {
     const sub = () => {
-      dispatch(resetData());
-      api.subscribeToMarket(currentMarket);
-    };
-
+      dispatch(resetData())
+      api.subscribeToMarket(currentMarket)
+    }
+    
     if (api.ws.readyState === 0) {
-      api.on("open", sub);
+      api.on('open', sub)
     } else {
-      sub();
+      sub()
     }
 
     return () => {
       if (api.ws.readyState !== 0) {
-        api.unsubscribeToMarket(currentMarket);
+        api.unsubscribeToMarket(currentMarket)
       } else {
-        api.off("open", sub);
+        api.off('open', sub)
       }
-    };
-  }, [network, currentMarket]);
+    }
+  }, [network, currentMarket])
 
-  const updateMarketChain = (market) => {
-    dispatch(setCurrentMarket(market));
-  };
 
   Object.keys(lastPrices).forEach((market) => {
     markets.push(market);
@@ -114,61 +147,59 @@ const TradePage = () => {
     }
   }
 
-  // Only display recent trades
-  // There's a bunch of user trades in this list that are too old to display
-  const fillData = [];
-  const maxFillId = Math.max(...Object.values(marketFills).map((f) => f[1]));
-  Object.values(marketFills)
-    .filter((fill) => fill[1] > maxFillId - 500)
-    .sort((a, b) => b[1] - a[1])
-    .forEach((fill) => {
-      if (api.isZksyncChain()) {
-        const fillWithoutFee = api.getFillDetailsWithoutFee(fill);
-        fillData.push({
-          td1: fillWithoutFee.price,
-          td2: fillWithoutFee.baseQuantity,
-          td3: fillWithoutFee.quoteQuantity,
-          side: fill[3],
+    // Only display recent trades
+    // There's a bunch of user trades in this list that are too old to display
+    const fillData = [];
+    const maxFillId = Math.max(...Object.values(marketFills).map(f => f[1]));
+    Object.values(marketFills)
+        .filter(fill => fill[1] > maxFillId - 500)
+        .sort((a,b) => b[1] - a[1])
+        .forEach((fill) => {
+            if (api.isZksyncChain()) {
+                const fillWithoutFee = api.getFillDetailsWithoutFee(fill);
+                fillData.push({
+                    td1: fillWithoutFee.price,
+                    td2: fillWithoutFee.baseQuantity,
+                    td3: fillWithoutFee.quoteQuantity,
+                    side: fill[3],
+                });
+            } else {
+                fillData.push({
+                    td1: fill[4],
+                    td2: fill[5],
+                    td3: fill[4] * fill[5],
+                    side: fill[3],
+                });
+            }
         });
-      } else {
-        fillData.push({
-          td1: fill[4],
-          td2: fill[5],
-          td3: fill[4] * fill[5],
-          side: fill[3],
-        });
-      }
-    });
 
   if (api.isZksyncChain()) {
     liquidity.forEach((liq) => {
-      const quantity = liq[0];
-      const spread = liq[1];
-      const side = liq[2];
-      if (side === "d" || side === "b") {
-        const bidPrice = marketSummary.price * (1 - spread);
+      const side = liq[0];
+      const price = liq[1];
+      const quantity = liq[2];
+      if (side === "b") {
         orderbookBids.push({
-          td1: bidPrice,
+          td1: price,
           td2: quantity,
-          td3: bidPrice * quantity,
+          td3: price * quantity,
           side: "b",
         });
       }
-      if (side === "d" || side === "s") {
-        const askPrice = marketSummary.price * (1 + spread);
+      if (side === "s") {
         orderbookAsks.push({
-          td1: askPrice,
+          td1: price,
           td2: quantity,
-          td3: askPrice * quantity,
+          td3: price * quantity,
           side: "s",
         });
       }
     });
   }
-
+  
   orderbookAsks.sort((a, b) => b.td1 - a.td1);
   orderbookBids.sort((a, b) => b.td1 - a.td1);
-
+  
   const askBins = [];
   for (let i in orderbookAsks) {
     const lastAskIndex = askBins.length - 1;
@@ -203,167 +234,134 @@ const TradePage = () => {
   }
 
   const activeOrderStatuses = ["o", "m", "b"];
-  const activeUserOrders = Object.values(userOrders).filter((order) =>
-    activeOrderStatuses.includes(order[9])
+  const activeUserOrders = Object.values(userOrders).filter(
+    (order) => activeOrderStatuses.includes(order[9])
   ).length;
 
   let tradingViewMarket = currentMarket;
-  const baseCurrency = currentMarket.split("-")[0];
-  const quoteCurrency = currentMarket.split("-")[1];
-  if (baseCurrency === "WBTC") tradingViewMarket = "BTC-" + quoteCurrency;
-  if (quoteCurrency === "WBTC") tradingViewMarket = baseCurrency + "-BTC";
+  if (marketInfo && marketInfo.baseAsset.symbol === "WBTC") tradingViewMarket = "BTC-" + marketInfo.quoteAsset.symbol;
+  if (marketInfo && marketInfo.quoteAsset.symbol === "WBTC") tradingViewMarket = marketInfo.baseAsset.symbol + "-BTC";
 
   return (
     <DefaultTemplate>
-      <div style={{ width: "100%" }}>
-        {/* Trade Head */}
-        <TradeHead
-          updateMarketChain={updateMarketChain}
-          marketSummary={marketSummary}
-          markets={markets}
-          currentMarket={currentMarket}
-        />
-      </div>
-      <div className="trade_grid_container">
-        <div className="trade_pairs_area hide_display_sm">
-          <TradePriceBtcTable
-            rowData={lastPriceTableData}
-            updateMarketChain={updateMarketChain}
-            currentMarket={currentMarket}
-          />
-        </div>
-        <div className="trade_spot_area hide_display_sm">
-          <SpotBox
-            lastPrice={marketSummary.price}
-            signInHandler={() => api.signIn(network)}
-            user={user}
-            currentMarket={currentMarket}
-            activeOrderCount={activeUserOrders}
-            liquidity={liquidity}
-          />
-        </div>
-        <div className="trade_priceTable_area hide_display_sm">
-          <div className="fluid">
-            <Tabs>
-              <div label="Decrease">
-                <div className="trade_tab_container">
-                  <TradePriceTable
-                    className="trade_table_asks"
-                    useGradient="true"
-                    priceTableData={askBins}
-                    currentMarket={currentMarket}
-                    scrollToBottom="true"
-                  />
-                </div>
+      <div className="trade_section">
+        <div className="trade_container">
+          <div className="col-12 col-xl-6 d-flex flex-column">
+            <div className="trade_left">
+              <div>
+                {/* Trade Head */}
+                <TradeHead
+                  updateMarketChain={updateMarketChain}
+                  marketSummary={marketSummary}
+                  markets={markets}
+                  currentMarket={currentMarket}
+                  marketInfo={marketInfo}
+                />
+                {/* Trade Chart */}
+                <TradeChart currentMarket={tradingViewMarket} marketInfo={marketInfo} />
               </div>
-              <div label="Increase">
-                <div className="trade_tab_container">
-                  <TradePriceHeadSecond lastPrice={marketSummary.price} />
-                  <TradePriceTable
-                    useGradient="true"
-                    currentMarket={currentMarket}
-                    priceTableData={bidBins}
-                  />
-                </div>
-              </div>
-            </Tabs>
-          </div>
-        </div>
-        <div className="trade_latestTrades_area hide_display_md">
-          <div className="trade_price_head_third">
-            <strong
-              className={
-                marketDataTab === "orders" ? "trade_price_active_tab" : ""
-              }
-              onClick={() => updateMarketDataTab("orders")}
-            >
-              Open Orders
-            </strong>
-            <strong
-              className={
-                marketDataTab === "fills" ? "trade_price_active_tab" : ""
-              }
-              onClick={() => updateMarketDataTab("fills")}
-            >
-              Latest Trades
-            </strong>
-          </div>
-          {/* Trade Price Table*/}
-          <div className="trade_tradeTab_container">
-            <TradePriceTable
-              className=""
-              value="up_value"
-              priceTableData={openOrdersLatestTradesData}
-              currentMarket={currentMarket}
-            />
-          </div>
-        </div>
-        <div className="trade_chart_area">
-          <TradeChart currentMarket={tradingViewMarket} />
-        </div>
-        <div className="trade_orders_area hide_display_sm">
-          <TradeOrdersTable
-            userFills={userFills}
-            userOrders={userOrders}
-            user={user}
-          />
-        </div>
-      </div>
-
-      <div className="show_display_sm">
-        <Tabs>
-          <div label="Orders">
-            <TradeOrdersTable
-              userFills={userFills}
-              userOrders={userOrders}
-              user={user}
-            />
-          </div>
-          <div label="Book">
-            <Tabs>
-              <div label="Decrease">
-                <div className="trade_tab_container">
-                  <TradePriceTable
-                    className="trade_table_asks"
-                    useGradient="true"
-                    priceTableData={askBins}
-                    currentMarket={currentMarket}
-                    scrollToBottom="true"
-                  />
-                </div>
-              </div>
-              <div label="Increase">
-                <div className="trade_tab_container">
-                  <TradePriceHeadSecond lastPrice={marketSummary.price} />
-                  <TradePriceTable
-                    useGradient="true"
-                    currentMarket={currentMarket}
-                    priceTableData={bidBins}
-                  />
-                </div>
-              </div>
-            </Tabs>
-          </div>
-          <div label="Spot">
+            </div>
             <SpotBox
               lastPrice={marketSummary.price}
-              signInHandler={() => api.signIn(network)}
               user={user}
               currentMarket={currentMarket}
               activeOrderCount={activeUserOrders}
               liquidity={liquidity}
+              marketInfo={marketInfo}
             />
+            <div className="d-block d-xl-none" style={{"width": "100%"}}>
+                <Footer
+                    userFills={userFills}
+                    userOrders={userOrders}
+                    user={user}
+                />
+            </div>
           </div>
-        </Tabs>
-      </div>
-      <div style={{ width: "100%" }}>
-        {/* Trade Head */}
-        <TradeHead
-          updateMarketChain={updateMarketChain}
-          marketSummary={marketSummary}
-          markets={markets}
-          currentMarket={currentMarket}
-        />
+          <div className="col-12 col-xl-6">
+            <div className="trade_right">
+              <div className="col-12 col-sm-12 col-md-12 col-lg-6">
+                <div className="trade_Price">
+                  {/* Trade Price Head */}
+                  {/* Trade Price Table*/}
+                  <TradePriceTable
+                    className="trade_table_asks"
+                    useGradient="true"
+                    priceTableData={askBins}
+                    currentMarket={currentMarket}
+                    scrollToBottom="true"
+                  />
+                </div>
+              </div>
+              <div className="col-12 col-sm-12 col-md-12 col-lg-6">
+                <div className="trade_price_btc">
+                  {/* <TradePriceBtcHead /> */}
+                  <TradePriceBtcTable
+                    rowData={lastPriceTableData}
+                    updateMarketChain={updateMarketChain}
+                    currentMarket={currentMarket}
+                  />
+                </div>
+              </div>
+              <div className="col-12 col-sm-12 col-md-12 col-lg-6">
+                <div className="trade_Price">
+                  {/* Trade Price Second Head */}
+                  <TradePriceHeadSecond
+                    lastPrice={marketSummary.price}
+                  />
+                  {/* Trade Price Table*/}
+                  <TradePriceTable
+                    className=""
+                    useGradient="true"
+                    currentMarket={currentMarket}
+                    priceTableData={bidBins}
+                  />
+                  {/* <TradeMarketActivites /> */}
+                </div>
+              </div>
+              <div className="col-12 col-sm-12 col-md-12 col-lg-6">
+                <div className="trade_Price trade_price2">
+                  {/* Trade Price Third Head */}
+                  <div className="trade_price_head_third">
+                    <strong
+                      className={
+                        marketDataTab === "orders"
+                          ? "trade_price_active_tab"
+                          : ""
+                      }
+                      onClick={() => updateMarketDataTab("orders")}
+                    >
+                      Open Orders
+                    </strong>
+                    <strong
+                      className={
+                        marketDataTab === "fills"
+                          ? "trade_price_active_tab"
+                          : ""
+                      }
+                      onClick={() => updateMarketDataTab("fills")}
+                    >
+                      Latest Trades
+                    </strong>
+                  </div>
+                  {/* Trade Price Table*/}
+                  <TradePriceTable
+                    className=""
+                    value="up_value"
+                    priceTableData={openOrdersLatestTradesData}
+                    currentMarket={currentMarket}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="d-none d-xl-block">
+            <Footer
+              userFills={userFills}
+              userOrders={userOrders}
+              user={user}
+            />
+        </div>
       </div>
     </DefaultTemplate>
   );
