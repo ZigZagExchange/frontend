@@ -106,7 +106,7 @@ export default function ListPairPage() {
   const onFormSubmit = async (formData, resetForm) => {
     return new Promise(async (resolve, reject) => {
       const toFile = {}
-      for (const [key, val] of Object.entries(formData)) {
+      for (const [key] of Object.entries(formData)) {
         toFile[key] = Number(formData[key])
       }
       const fileData = new TextEncoder().encode(jsonify(toFile))
