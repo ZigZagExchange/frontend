@@ -237,8 +237,8 @@ export default function ListPairPage() {
               <SelectInput
                 {...model(zigZagChainId, setZigZagChainId)}
                 name={"zigzagChainId"}
-                label={"Ethereum Network"}
-                items={[{name: "Mainnet", id: 1}, {name: "Rinkeby", id: 1000}]}
+                label={"Network"}
+                items={[{name: "zkSync - Mainnet", id: 1}, {name: "zkSync - Rinkeby", id: 1000}]}
                 validate={required}
               />
             </x.div>
@@ -246,7 +246,7 @@ export default function ListPairPage() {
             <x.div display={"flex"} alignItems={"center"} justifyContent={"space-between"} mb={4}>
               <x.div display={"flex"} alignItems={"center"}>
                 <RiErrorWarningLine size={18} color={"red"}/>
-                <x.div ml={1} fontSize={12} color={"blue-gray-400"}>Insufficient arweave allocation</x.div>
+                <x.div ml={1} fontSize={12} color={"blue-gray-400"}>Insufficient Arweave allocation</x.div>
               </x.div>
               <x.div color={"blue-gray-400"}>
                 {arweaveAllocationKB} kB

@@ -28,8 +28,8 @@ const AllocationModal = ({onClose, show, onSuccess, bytesToPurchase}) => {
 
   return <Modal title={"Purchase Arweave Allocation"} show={show} onClose={onClose}>
     <x.div fontSize={14}>
-      ZigZag enables permissionless pair listings by storing your pair's metadata on arweave.
-      You must purchase space on arweave first.
+      ZigZag enables permissionless pair listings by storing your pair's metadata on Arweave.
+      You must purchase space on Arweave first.
     </x.div>
     <Pane size={"xs"} my={8}>
       <x.div display={"flex"} justifyContent={"space-around"} alignItems={"center"}>
