@@ -26,7 +26,7 @@ import { userSelector } from "lib/store/features/auth/authSlice";
 import "./style.css";
 import api from "lib/api";
 import {useLocation} from "react-router-dom";
-import {idQueryParam} from "../ListPairPage/SuccessModal";
+import {marketQueryParam} from "../ListPairPage/SuccessModal";
 
 const TradePage = () => {
   const [marketDataTab, updateMarketDataTab] = useState('fills')
@@ -53,7 +53,7 @@ const TradePage = () => {
   const { search } = useLocation()
   useEffect(() => {
     const params = new URLSearchParams(search)
-    const marketFromURL = params.get(idQueryParam)
+    const marketFromURL = params.get(marketQueryParam)
     const networkFromURL = params.get("network");
     let chainid;
     if (networkFromURL === "zksync") {

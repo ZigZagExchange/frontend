@@ -285,6 +285,7 @@ export default function ListPairPage() {
         // txid={"-C60-kmz6VjDiWv_MsKzLXqNA_vC7c29sdaasOInaj8"}
         show={isSuccessModalOpen}
         // show={true}
+
         onClose={() => {
           setIsSuccessModalOpen(false);
           setTxId(null);

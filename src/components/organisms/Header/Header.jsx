@@ -18,7 +18,6 @@ import {Dev } from "../../../lib/helpers/env";
 export const Header = (props) => {
   // state to open or close the sidebar in mobile
   const [show, setShow] = useState(false)
-  // const [connecting, setConnecting] = useState(false)
   const user = useSelector(userSelector)
   const network = useSelector(networkSelector)
   const hasBridge = api.isImplemented('depositL2')

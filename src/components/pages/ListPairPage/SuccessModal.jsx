@@ -5,7 +5,7 @@ import {BsFillCheckCircleFill} from "react-icons/all";
 import {Link} from "react-router-dom";
 import styled from '@xstyled/styled-components'
 
-export const idQueryParam = "market"
+export const marketQueryParam = "market"
 
 const StyledLink = styled(Link)`
   color: blue-gray-400;
@@ -34,7 +34,7 @@ const SuccessModal = ({txid, show, onClose}) => {
       <StyledLink
         to={{
           pathname: '/',
-          search: `?${idQueryParam}=${txid}`
+          search: `?${marketQueryParam}=${txid}`
         }}
       >
         Trade your market
