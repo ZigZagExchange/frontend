@@ -5,6 +5,7 @@ import {Button} from "../Button";
 import darkPlugHead from "../../../assets/icons/dark-plug-head.png";
 import api from "../../../lib/api";
 import {useHistory, useLocation} from "react-router-dom";
+import {BsFillPlugFill} from "react-icons/all";
 
 const ConnectWalletButton = () => {
   const network = useSelector(networkSelector);
@@ -20,9 +21,11 @@ const ConnectWalletButton = () => {
 
   return <Button
     loading={isLoading}
-    className="bg_btn"
-    text="CONNECT WALLET"
-    img={darkPlugHead}
+    size={"sm"}
+    block
+    // className="bg_btn"
+    // text="CONNECT WALLET"
+    // img={darkPlugHead}
     onClick={() => {
       setIsLoading(true)
       api.signIn(network)
@@ -31,7 +34,10 @@ const ConnectWalletButton = () => {
         })
         .finally(() => setIsLoading(false))
     }}
-  />
+  >
+    <BsFillPlugFill size={18}/>
+    CONNECT WALLET
+  </Button>
 }
 
 

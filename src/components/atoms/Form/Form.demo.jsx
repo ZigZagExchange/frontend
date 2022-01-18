@@ -1,12 +1,13 @@
 import React, {useState} from "react"
 import Form from "./Form";
 import NumberInput from "./NumberInput";
-import Submit, {Button} from "./Submit";
+import Submit from "./Submit";
 import {jsonify} from "../../../lib/helpers/strings";
 import {min,max,required} from "./validation";
 import {x} from "@xstyled/styled-components";
 import SelectInput from "./SelectInput";
 import {model} from "./helpers";
+import {Button} from "../Button";
 
 const FormDemo = () => {
     const [number, setNumber] = useState(1)

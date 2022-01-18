@@ -3,6 +3,7 @@ import { x } from "@xstyled/styled-components"
 import {DefaultTemplate} from "../../templates/DefaultTemplate";
 import Pane from "../../atoms/Pane/Pane";
 import FormDemo from "../../atoms/Form/Form.demo";
+import ButtonDemo from "../../atoms/Button/Button.demo";
 
 const DSLPage = () => {
     return <DefaultTemplate>
@@ -19,6 +20,9 @@ const DSLPage = () => {
                 <x.span fontSize={24} mb={3} mt={5}>
                     DSL
                 </x.span>
+                <DSLItem title={"Button"}>
+                    <ButtonDemo />
+                </DSLItem>
                 <DSLItem title={"Form"}>
                     <FormDemo />
                 </DSLItem>
