@@ -54,10 +54,23 @@ const TradePage = () => {
   useEffect(() => {
     const params = new URLSearchParams(search)
     const marketFromURL = params.get(idQueryParam)
+    const networkFromURL = params.get("network");
+    let chainid;
+    if (networkFromURL === "zksync") {
+        chainid = 1;
+    }
+    else if (networkFromURL === "zksync-rinkeby") {
+        chainid = 1000;
+    }
+    console.log(chainid);
     if (marketFromURL && currentMarket !== marketFromURL) {
       updateMarketChain(marketFromURL)
     }
-  }, [])
+    if (chainid && network !== chainid) {
+      api.setAPIProvider(chainid)
+      api.signOut();
+    }
+  }, [search])
 
   useEffect(() => {
     const sub = () => {

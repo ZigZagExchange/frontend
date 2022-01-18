@@ -24,7 +24,6 @@ export const apiSlice = createSlice({
   },
   reducers: {
     _marketinfo(state, { payload }) {
-        console.log(payload);
         state.marketinfo = payload[0];
     },
     _fills(state, { payload }) {
