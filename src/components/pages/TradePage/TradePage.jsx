@@ -57,7 +57,6 @@ const TradePage = () => {
     const marketFromURL = urlParams.get(marketQueryParam)
     const networkFromURL = urlParams.get("network");
     const chainid = getChainIdFromMarketChain(networkFromURL)
-    console.log(chainid);
     if (marketFromURL && currentMarket !== marketFromURL) {
       updateMarketChain(marketFromURL)
     }

@@ -69,7 +69,6 @@ export default function ListPairPage() {
         setBaseAssetIdSymbolPreview(res.symbol)
         setIsBaseAssetIdInvalid(false)
       }).catch(e => {
-        console.log("debug:: error getting token info", e)
         setBaseAssetIdSymbolPreview(null)
         setIsBaseAssetIdInvalid(true)
       })
@@ -81,7 +80,6 @@ export default function ListPairPage() {
   function getQuoteInfo(quoteAssetId, chainId) {
     if (quoteAssetId && quoteAssetId !== "") {
       api.tokenInfo(quoteAssetId, chainId).then(res => {
-        console.log("debug:: quote res", res)
         setQuoteAssetIdSymbolPreview(res.symbol)
         setIsQuoteAssetIdInvalid(false)
       }).catch(e => {
@@ -107,8 +105,12 @@ export default function ListPairPage() {
 
   const onFormSubmit = async (formData, resetForm) => {
     return new Promise(async (resolve, reject) => {
-      const fileData = new TextEncoder().encode(jsonify(formData))
-      const file = new File([fileData], `${formData.baseAssetId}-${formData.quoteAssetId}.json`)
+      const toFile = {}
+      for (const [key] of Object.entries(formData)) {
+        toFile[key] = Number(formData[key])
+      }
+      const fileData = new TextEncoder().encode(jsonify(toFile))
+      const file = new File([fileData], `${toFile.baseAssetId}-${toFile.quoteAssetId}.json`)
 
       if (file.size > arweaveAllocation) {
         setFileToUpload(file)
@@ -187,7 +189,7 @@ export default function ListPairPage() {
               minSize: minSize,
               maxSize: maxSize,
               zigzagChainId: zigZagChainId,
-              pricePrecisionDecimal: "",
+              pricePrecisionDecimals: "",
             }}
             onSubmit={onFormSubmit}
           >
@@ -230,7 +232,7 @@ export default function ListPairPage() {
                 label={"Max Size"}
                 validate={[required, min(minSize)]}
               />
-              <NumberInput block name={"pricePrecisionDecimal"} label={"Price Precision Decimals"}
+              <NumberInput block name={"pricePrecisionDecimals"} label={"Price Precision Decimals"}
                            validate={[required, max(18), min(0)]}/>
               <SelectInput
                 {...model(zigZagChainId, setZigZagChainId)}
@@ -282,9 +284,7 @@ export default function ListPairPage() {
       />
       <SuccessModal
         txid={txid}
-        // txid={"-C60-kmz6VjDiWv_MsKzLXqNA_vC7c29sdaasOInaj8"}
         show={isSuccessModalOpen}
-        // show={true}
         onClose={() => {
           setIsSuccessModalOpen(false);
           setTxId(null);

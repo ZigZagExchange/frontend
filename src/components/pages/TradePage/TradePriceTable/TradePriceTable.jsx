@@ -11,7 +11,6 @@ const TradePriceTable = (props) => {
     const scrollToBottom = () => {
         if (props.scrollToBottom) {
             const tableDiv = document.getElementsByClassName(props.className);
-            console.log(tableDiv);
             if (tableDiv.length > 0) tableDiv[0].scrollTop = tableDiv[0].scrollHeight;
         }
     };

@@ -90,6 +90,7 @@ export class SpotForm extends React.Component {
 
         baseBalance = parseFloat(baseBalance);
         quoteBalance = parseFloat(quoteBalance);
+        console.log(price, this.getFirstAsk(), this.getFirstBid());
         if (this.props.side === "s" && isNaN(baseBalance)) {
             toast.error(`No ${marketInfo.baseAsset.symbol} balance`);
             return;
@@ -109,8 +110,8 @@ export class SpotForm extends React.Component {
             return;
         } else if (
             isNaN(price) ||
-            price > this.props.lastPrice * 1.2 ||
-            price < this.props.lastPrice * 0.8
+            price > this.getFirstAsk() * 1.2 ||
+            price < this.getFirstBid() * 0.8
         ) {
             toast.error("Price must be within 20% of spot");
             return;
