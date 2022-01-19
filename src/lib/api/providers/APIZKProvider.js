@@ -11,7 +11,8 @@ export default class APIZKProvider extends APIProvider {
     static SEEDS_STORAGE_KEY = '@ZZ/ZKSYNC_SEEDS'
     static VALID_SIDES = ['b', 's']
     
-    marketsCache = {}
+    marketInfo = {}
+    lastPrices = {}
     ethWallet = null
     syncWallet = null
     syncProvider = null
@@ -101,7 +102,7 @@ export default class APIZKProvider extends APIProvider {
     }
 
     submitOrder = async (market, side, price, amount, orderType) => {
-        const marketInfo = this.api._marketInfo;
+        const marketInfo = this.marketInfo[market];
         amount = parseFloat(amount).toFixed(marketInfo.baseAsset.decimals);
         price = parseFloat(price).toFixed(marketInfo.pricePrecisionDecimals);
         
@@ -156,12 +157,13 @@ export default class APIZKProvider extends APIProvider {
         const account = await this.getAccountState()
         const balances = {}
 
-        Object.keys(this.api.currencies).forEach(ticker => {
-            const currency = this.api.currencies[ticker]
+        this.getCurrencies().forEach(ticker => {
+            const currencyInfo = this.getCurrencyInfo(ticker);
             const balance = ((account && account.committed) ? (account.committed.balances[ticker] || 0) : 0)
+            if (!balance) return true;
             balances[ticker] = {
                 value: balance,
-                valueReadable: balance && (balance / (10 ** currency.decimals)),
+                valueReadable: (balance && currencyInfo && (balance / (10 ** currencyInfo.decimals))) || 0,
                 allowance: MAX_ALLOWANCE,
             }
         })
@@ -178,7 +180,8 @@ export default class APIZKProvider extends APIProvider {
     withdrawL2 = async (amountDecimals, token = 'ETH') => {
         let transfer
 
-        const amount = toBaseUnit(amountDecimals, this.api.currencies[token].decimals)
+        const currencyInfo = this.getCurrencyInfo(token);
+        const amount = toBaseUnit(amountDecimals, currencyInfo.decimals)
         
         try {
             transfer = await this.syncWallet.withdrawFromSyncToEthereum({
@@ -201,7 +204,8 @@ export default class APIZKProvider extends APIProvider {
     depositL2 = async (amountDecimals, token = 'ETH') => {
         let transfer
 
-        const amount = toBaseUnit(amountDecimals, this.api.currencies[token].decimals)
+        const currencyInfo = this.getCurrencyInfo(token);
+        const amount = toBaseUnit(amountDecimals, currencyInfo.decimals)
 
         try {
             transfer = await this.syncWallet.depositToSyncFromEthereum({
@@ -224,6 +228,7 @@ export default class APIZKProvider extends APIProvider {
     }
     
     withdrawL2Fee = async (token = 'ETH') => {
+        const currencyInfo = this.getCurrencyInfo(token);
         if (! this._tokenWithdrawFees[token]) {
             const fee = await this.syncProvider.getTransactionFee(
                 'Withdraw',
@@ -233,7 +238,7 @@ export default class APIZKProvider extends APIProvider {
     
             this._tokenWithdrawFees[token] = (
                 parseInt(fee.totalFee)
-                / 10 ** this.api.currencies[token].decimals
+                / 10 ** currencyInfo.decimals
             )
         }
 
@@ -364,5 +369,45 @@ export default class APIZKProvider extends APIProvider {
         } catch (e) {
             console.error("Could not get token info")
         }
+    }
+
+    cacheMarketInfoFromNetwork = async (pairs) => {
+        if (pairs.length === 0) return;
+        if (!this.network) return;
+        const pairText = pairs.join(',');
+        const url = `https://zigzag-markets.herokuapp.com/markets?id=${pairText}&chainid=${this.network}`;
+        const marketInfoArray = await fetch(url).then(r => r.json());
+        if (!(marketInfoArray instanceof Array)) return;
+        marketInfoArray.forEach(info => this.marketInfo[info.alias] = info);
+        return;
+    }
+
+    getPairs = () => {
+        return Object.keys(this.lastPrices);
+    }
+
+    getCurrencyInfo (currency) {
+        const pairs = this.getPairs();
+        for (let i=0; i < pairs.length; i++) {
+            const pair = pairs[i];
+            const baseCurrency = pair.split("-")[0];
+            const quoteCurrency = pair.split("-")[1];
+            if (baseCurrency === currency && this.marketInfo[pair]) {
+                return this.marketInfo[pair].baseAsset;
+            }
+            else if (quoteCurrency === currency && this.marketInfo[pair]) {
+                return this.marketInfo[pair].quoteAsset;
+            }
+        }
+        return null;
+    }
+
+    getCurrencies = () => {
+        const tickers = new Set();
+        for (let market in this.lastPrices) {
+            tickers.add(this.lastPrices[market][0].split("-")[0]);
+            tickers.add(this.lastPrices[market][0].split("-")[1]);
+        }
+        return [...tickers];
     }
 }

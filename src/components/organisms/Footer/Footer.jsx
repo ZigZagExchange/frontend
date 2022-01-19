@@ -207,20 +207,23 @@ export class Footer extends React.Component {
             let price = fill[4];
             let baseQuantity = fill[5];
             const fillstatus = fill[6];
-            const baseCurrency = fill[2].split("-")[0];
-            const quoteCurrency = fill[2].split("-")[1];
             const sidetext = fill[3] === "b" ? "buy" : "sell";
             const sideclassname = fill[3] === "b" ? "up_value" : "down_value";
             const txhash = fill[7];
             let feeText;
-            if (fillstatus === "r" || !api.isZksyncChain()) {
-              feeText = "0 " + baseCurrency;
+            feeText = "1 USDC";
+            const marketInfo = api.marketInfo[market];
+            if (!marketInfo) {
+                feeText = "1 USDC";
+            }
+            else if (fillstatus === "r" || !api.isZksyncChain()) {
+              feeText = "0 " + marketInfo.baseAsset.symbol;
             } else if (side === "s") {
               feeText =
-                api.currencies[baseCurrency].gasFee + " " + baseCurrency;
+                marketInfo.baseFee + " " + marketInfo.baseAsset.symbol;
             } else if (side === "b") {
               feeText =
-                api.currencies[quoteCurrency].gasFee + " " + quoteCurrency;
+                marketInfo.quoteFee + " " + marketInfo.quoteAsset.symbol;
             }
             const fillWithoutFee = api.getFillDetailsWithoutFee(fill);
             if (api.isZksyncChain()) {
@@ -301,7 +304,7 @@ export class Footer extends React.Component {
                 <td>{market}</td>
                 <td>{price.toPrecision(6) / 1}</td>
                 <td>
-                  {baseQuantity.toPrecision(6) / 1} {baseCurrency}
+                  {baseQuantity.toPrecision(6) / 1} {marketInfo && marketInfo.baseAsset.symbol}
                 </td>
                 <td className={sideclassname}>{sidetext}</td>
                 <td>{feeText}</td>

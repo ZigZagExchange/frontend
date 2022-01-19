@@ -13,6 +13,7 @@ const Input = ({
     onChange,
     hideValidation,
     children,
+    rightOfLabel,
     ...rest
 }) => {
     const validators = Array.isArray(validate) ? composeValidators(...validate) : validate
@@ -35,6 +36,7 @@ const Input = ({
             name={name}
             isRequired={isRequired}
             highlightRequired={meta.error === requiredError}
+            rightOfLabel={rightOfLabel}
           >
             {label}
           </Label>}
@@ -70,10 +72,13 @@ const FieldSet = ({name, children, ...rest}) => {
     </x.div>
 }
 
-const Label = ({name, isRequired, children, highlightRequired}) => {
-    return <x.label for={name} mb={1} fontSize={14} color={"blue-gray-500"}>
-      {isRequired && <x.span color={highlightRequired ? "red" : "blue-gray-500"} display={"inline-block"} mr={0.5}>*</x.span>}
-      {children}
+const Label = ({name, isRequired, children, highlightRequired, rightOfLabel}) => {
+    return <x.label for={name} mb={1} fontSize={14} color={"blue-gray-500"} display={"flex"} justifyContent={rightOfLabel ? "space-between" : "inherit"} alignItems={"center"}>
+      <x.div>
+        {isRequired && <x.span color={highlightRequired ? "red" : "blue-gray-500"} display={"inline-block"} mr={0.5}>*</x.span>}
+        {children}
+      </x.div>
+      {rightOfLabel && <x.div>{rightOfLabel}</x.div>}
     </x.label>
 }
 

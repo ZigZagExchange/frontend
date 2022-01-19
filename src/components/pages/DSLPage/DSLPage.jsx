@@ -3,6 +3,7 @@ import { x } from "@xstyled/styled-components"
 import {DefaultTemplate} from "../../templates/DefaultTemplate";
 import Pane from "../../atoms/Pane/Pane";
 import FormDemo from "../../atoms/Form/Form.demo";
+import TooltipDemo from "../../atoms/Tooltip/Tooltip.demo";
 
 const DSLPage = () => {
     return <DefaultTemplate>
@@ -19,16 +20,21 @@ const DSLPage = () => {
                 <x.span fontSize={24} mb={3} mt={5}>
                     DSL
                 </x.span>
+              <x.div spaceY={6}>
                 <DSLItem title={"Form"}>
-                    <FormDemo />
+                  <FormDemo/>
                 </DSLItem>
+                <DSLItem title={"Tooltip"}>
+                  <TooltipDemo/>
+                </DSLItem>
+              </x.div>
             </x.div>
         </div>
     </DefaultTemplate>
 }
 
 const DSLItem = ({title, children}) => {
-    return <Pane size={"sm"} variant={"light"} minW={96}>
+    return <Pane size={"sm"} variant={"light"} w={"lg"}>
         <x.div fontSize={18}>
             {title}
         </x.div>

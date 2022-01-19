@@ -9,7 +9,8 @@ const SelectInput = ({
   onChange,
   hideValidation,
   value,
-  items
+  items,
+  rightOfLabel
  }) => {
   return <Input
     name={name}
@@ -18,6 +19,7 @@ const SelectInput = ({
     value={value}
     onChange={onChange}
     hideValidation={hideValidation}
+    rightOfLabel={rightOfLabel}
     type={"select"}
     borderWidth={2}
     borderRadius={3}
