@@ -74,15 +74,11 @@ export const Header = (props) => {
                     {' '}<HiExternalLink />
                   </a>
                 </li>}
-                {hasBridge && <li>
-                  <a href="https://zigzag.banxa.com/" target="_blank" rel="noreferrer">
-                    Fiat
-                    {' '}<HiExternalLink />
-                  </a>
-                </li>}
-                <NavLink exact to="/list-pair" activeClassName="active_link">
-                  List
-                </NavLink>
+                <li>
+                  <NavLink exact to="/list-pair" activeClassName="active_link">
+                    List
+                  </NavLink>
+                </li>
                 <Dev>
                   <li>
                     <NavLink exact to="/pool" activeClassName="active_link">
@@ -155,13 +151,6 @@ export const Header = (props) => {
                   Docs
                   {' '}<HiExternalLink />
                 </a>
-              </li>}
-              {hasBridge && <li>
-                <a href="https://zigzag.banxa.com/" target="_blank" rel="noreferrer">
-                  Fiat
-                  {' '}<HiExternalLink />
-                </a>
-
               </li>}
               <Dev>
                 <li>
