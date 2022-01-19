@@ -200,11 +200,11 @@ const TradePage = () => {
   orderbookBids.sort((a, b) => b.td1 - a.td1);
   
   const askBins = [];
-  for (let i in orderbookAsks) {
+  for (let i = 0; i < orderbookAsks.length; i++) {
     const lastAskIndex = askBins.length - 1;
-    if (i === "0") {
+    if (i === 0) {
       askBins.push(orderbookAsks[i]);
-    } else if (orderbookAsks[i].td1 === askBins[lastAskIndex].td1) {
+    } else if (orderbookAsks[i].td1.toPrecision(6) === askBins[lastAskIndex].td1.toPrecision(6)) {
       askBins[lastAskIndex].td2 += orderbookAsks[i].td2;
       askBins[lastAskIndex].td3 += orderbookAsks[i].td3;
     } else {
@@ -217,7 +217,7 @@ const TradePage = () => {
     const lastBidIndex = bidBins.length - 1;
     if (i === "0") {
       bidBins.push(orderbookBids[i]);
-    } else if (orderbookBids[i].td1 === bidBins[lastBidIndex].td1) {
+    } else if (orderbookBids[i].td1.toPrecision(6) === bidBins[lastBidIndex].td1.toPrecision(6)) {
       bidBins[lastBidIndex].td2 += orderbookBids[i].td2;
       bidBins[lastBidIndex].td3 += orderbookBids[i].td3;
     } else {
