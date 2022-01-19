@@ -36,8 +36,6 @@ export default function ListPairPage() {
 
   const [baseAssetId, setBaseAssetId] = useState("")
   const [quoteAssetId, setQuoteAssetId] = useState("")
-  const [maxSize, setMaxSize] = useState("")
-  const [minSize, setMinSize] = useState("")
   const [zigZagChainId, setZigZagChainId] = useState(1)
 
   const [baseAssetIdSymbolPreview, setBaseAssetIdSymbolPreview] = useState(null)
@@ -186,8 +184,6 @@ export default function ListPairPage() {
               quoteAssetId: quoteAssetId,
               baseFee: "",
               quoteFee: "",
-              minSize: minSize,
-              maxSize: maxSize,
               zigzagChainId: zigZagChainId,
               pricePrecisionDecimals: "",
             }}
@@ -197,7 +193,7 @@ export default function ListPairPage() {
               <NumberInput
                 {...model(baseAssetId, setBaseAssetId)}
                 block
-                label={"Base Asset ID"}
+                label={"Base Asset Internal ID"}
                 name={"baseAssetId"}
                 validate={[
                   required,
@@ -208,7 +204,7 @@ export default function ListPairPage() {
               <NumberInput
                 {...model(quoteAssetId, setQuoteAssetId)}
                 block
-                label={"Quote Asset ID"}
+                label={"Quote Asset Internal ID"}
                 name={"quoteAssetId"}
                 validate={[
                   required,
@@ -218,20 +214,6 @@ export default function ListPairPage() {
               />
               <NumberInput block name={"baseFee"} label={"Base Fee"} validate={[required, min(0)]}/>
               <NumberInput block name={"quoteFee"} label={"Quote Fee"} validate={[required, min(0)]}/>
-              <NumberInput
-                block
-                {...model(minSize, setMinSize)}
-                name={"minSize"}
-                label={"Min Size"}
-                validate={[required, min(1e-18), max(maxSize)]}
-              />
-              <NumberInput
-                block
-                {...model(maxSize, setMaxSize)}
-                name={"maxSize"}
-                label={"Max Size"}
-                validate={[required, min(minSize)]}
-              />
               <NumberInput block name={"pricePrecisionDecimals"} label={"Price Precision Decimals"}
                            validate={[required, max(18), min(0)]}/>
               <SelectInput
@@ -252,13 +234,16 @@ export default function ListPairPage() {
                 {arweaveAllocationKB} kB
               </x.div>
             </x.div>}
-
+            <x.div mb={5} textAlign={"right"}>
+              <x.a color={{_: "blue-gray-500", hover: "teal-200"}} target={"_blank"} href={zigZagChainId === 1 ? "https://zkscan.io/explorer/tokens" : "https://rinkeby.zkscan.io/explorer/tokens"}>
+                View internal token ids
+              </x.a>
+            </x.div>
             <Dev>
               <x.div fontSize={12} color={"blue-gray-500"} mb={3} textAlign={"right"}>
                 arweave allocation: {arweaveAllocationKB} kB
               </x.div>
             </Dev>
-
             <Submit block mt={5}>{isAllocationInsufficient ? "PURCHASE ALLOCATION" : "LIST"}</Submit>
           </Form>
         </Pane>}
