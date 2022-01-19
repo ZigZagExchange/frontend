@@ -67,6 +67,7 @@
     "prompts": "2.4.0",
     "rc-dropdown": "^3.2.0",
     "rc-menu": "^9.0.14",
+    "rc-tooltip": "^5.1.1",
     "react": "^17.0.2",
     "react-app-polyfill": "^2.0.0",
     "react-bootstrap": "^2.0.0-beta.6",

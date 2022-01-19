@@ -3,7 +3,7 @@ import {useSelector} from 'react-redux';
 import {userSelector} from "lib/store/features/auth/authSlice";
 import api from 'lib/api';
 import {DefaultTemplate} from 'components';
-import {BsLink45Deg, RiErrorWarningLine} from "react-icons/all";
+import {AiOutlineQuestionCircle, BsLink45Deg, RiErrorWarningLine} from "react-icons/all";
 import 'bootstrap'
 import ConnectWalletButton from "../../atoms/ConnectWalletButton/ConnectWalletButton";
 import Pane from "../../atoms/Pane/Pane";
@@ -20,6 +20,7 @@ import {arweaveAllocationSelector} from "lib/store/features/api/apiSlice";
 import SelectInput from "../../atoms/Form/SelectInput";
 import {model} from "../../atoms/Form/helpers";
 import {debounce} from "lodash"
+import Tooltip from "../../atoms/Tooltip/Tooltip";
 
 export default function ListPairPage() {
   const user = useSelector(userSelector);
@@ -189,7 +190,7 @@ export default function ListPairPage() {
             }}
             onSubmit={onFormSubmit}
           >
-            <x.div display={"grid"} gridTemplateColumns={2} rowGap={3} columnGap={6} mb={5}>
+            <x.div display={"grid"} gridTemplateColumns={2} rowGap={5} columnGap={6} mb={5}>
               <NumberInput
                 {...model(baseAssetId, setBaseAssetId)}
                 block
@@ -200,6 +201,7 @@ export default function ListPairPage() {
                   min(0),
                   forceValidation(isBaseAssetIdInvalid, "invalid asset on zksync")
                 ]}
+                rightOfLabel={<TooltipHelper>Base internal zkSync token ID</TooltipHelper>}
               />
               <NumberInput
                 {...model(quoteAssetId, setQuoteAssetId)}
@@ -211,17 +213,36 @@ export default function ListPairPage() {
                   min(0),
                   forceValidation(isQuoteAssetIdInvalid, "invalid asset on zksync")
                 ]}
+                rightOfLabel={<TooltipHelper>Quote internal zkSync token ID</TooltipHelper>}
               />
-              <NumberInput block name={"baseFee"} label={"Base Fee"} validate={[required, min(0)]}/>
-              <NumberInput block name={"quoteFee"} label={"Quote Fee"} validate={[required, min(0)]}/>
-              <NumberInput block name={"pricePrecisionDecimals"} label={"Price Precision Decimals"}
-                           validate={[required, max(18), min(0)]}/>
+              <NumberInput
+                block
+                name={"baseFee"}
+                label={"Base Fee"}
+                validate={[required, min(0)]}
+                rightOfLabel={<TooltipHelper>Base fee to be taken</TooltipHelper>}
+              />
+              <NumberInput
+                block
+                name={"quoteFee"}
+                label={"Quote Fee"}
+                validate={[required, min(0)]}
+                rightOfLabel={<TooltipHelper>Quote fee to be taken</TooltipHelper>}
+              />
+              <NumberInput
+                block
+                name={"pricePrecisionDecimals"}
+                label={"Price Precision Decimals"}
+                validate={[required, max(18), min(0)]}
+                rightOfLabel={<TooltipHelper>Price precision decimals</TooltipHelper>}
+              />
               <SelectInput
                 {...model(zigZagChainId, setZigZagChainId)}
                 name={"zigzagChainId"}
                 label={"Network"}
                 items={[{name: "zkSync - Mainnet", id: 1}, {name: "zkSync - Rinkeby", id: 1000}]}
                 validate={required}
+                rightOfLabel={<TooltipHelper>zkSync network on which the pair will be listed</TooltipHelper>}
               />
             </x.div>
             {isAllocationInsufficient &&
@@ -279,4 +300,10 @@ export default function ListPairPage() {
   )
 }
 
-
+const TooltipHelper = ({children}) => {
+  return <Tooltip placement={"right"} label={children}>
+    <x.div display={"inline-flex"} color={"blue-gray-400"} ml={2} alignItems={"center"}>
+      <AiOutlineQuestionCircle size={14}/>
+    </x.div>
+  </Tooltip>
+}
