@@ -363,7 +363,6 @@ export default class API extends Emitter {
                     await contract.methods.allowance(account, netContract).call()
                 )
             }
-            console.log(currency, result);
             return result
         } catch (e) {
             console.log(e)
@@ -523,7 +522,7 @@ export default class API extends Emitter {
     }
 
     getCurrencyInfo (currency) {
-        return this.apiProvider.getCurrencyInfo();
+        return this.apiProvider.getCurrencyInfo(currency);
     }
 
     getImage(currency) {
