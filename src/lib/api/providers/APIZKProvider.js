@@ -180,7 +180,8 @@ export default class APIZKProvider extends APIProvider {
     withdrawL2 = async (amountDecimals, token = 'ETH') => {
         let transfer
 
-        const amount = toBaseUnit(amountDecimals, this.api.currencies[token].decimals)
+        const currencyInfo = this.getCurrencyInfo(token);
+        const amount = toBaseUnit(amountDecimals, currencyInfo.decimals)
         
         try {
             transfer = await this.syncWallet.withdrawFromSyncToEthereum({
@@ -203,7 +204,8 @@ export default class APIZKProvider extends APIProvider {
     depositL2 = async (amountDecimals, token = 'ETH') => {
         let transfer
 
-        const amount = toBaseUnit(amountDecimals, this.api.currencies[token].decimals)
+        const currencyInfo = this.getCurrencyInfo(token);
+        const amount = toBaseUnit(amountDecimals, currencyInfo.decimals)
 
         try {
             transfer = await this.syncWallet.depositToSyncFromEthereum({
@@ -226,6 +228,7 @@ export default class APIZKProvider extends APIProvider {
     }
     
     withdrawL2Fee = async (token = 'ETH') => {
+        const currencyInfo = this.getCurrencyInfo(token);
         if (! this._tokenWithdrawFees[token]) {
             const fee = await this.syncProvider.getTransactionFee(
                 'Withdraw',
@@ -235,7 +238,7 @@ export default class APIZKProvider extends APIProvider {
     
             this._tokenWithdrawFees[token] = (
                 parseInt(fee.totalFee)
-                / 10 ** this.api.currencies[token].decimals
+                / 10 ** currencyInfo.decimals
             )
         }
 
