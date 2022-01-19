@@ -9,6 +9,7 @@ import {userSelector} from "../../../lib/store/features/auth/authSlice";
 import Submit from "../../atoms/Form/Submit";
 import Form from "../../atoms/Form/Form";
 import {x} from "@xstyled/styled-components";
+import {toast} from "react-toastify";
 
 const AllocationModal = ({onClose, show, onSuccess, bytesToPurchase}) => {
   const user = useSelector(userSelector)
@@ -17,6 +18,7 @@ const AllocationModal = ({onClose, show, onSuccess, bytesToPurchase}) => {
   const fileSizeKB = bytesToPurchase / 1000
   const arweaveAllocationKB = arweaveAllocation / 1000
   const [KBtoPurchase, setKBToPurchase] = useState(null)
+  // const balanceData = useSelector(balancesSelector);
 
   const pricePerKB = 0.001
   useEffect(() => {
@@ -53,9 +55,14 @@ const AllocationModal = ({onClose, show, onSuccess, bytesToPurchase}) => {
     </Pane>
 
     <Form onSubmit={async () => {
-      const transaction = await api.purchaseArweaveBytes("USDC", bytesToPurchase)
-      await transaction.awaitReceipt()
-      onSuccess()
+      try {
+        const transaction = await api.purchaseArweaveBytes("USDC", bytesToPurchase)
+        await transaction.awaitReceipt()
+        onSuccess()
+      } catch (e) {
+        console.error(e)
+        toast.error('Transaction was rejected - please make sure you have a sufficient USDC balance')
+      }
     }}>
       <Submit block>PURCHASE</Submit>
     </Form>
