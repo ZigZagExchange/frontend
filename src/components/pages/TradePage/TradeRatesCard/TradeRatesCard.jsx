@@ -36,7 +36,7 @@ class TradeRatesCard extends React.Component {
                     >
                         <h2>24h Change</h2>
                         <p>
-                            {this.props.marketSummary.priceChange}{" "}
+                            {this.props.marketSummary.priceChange.toFixed(marketInfo.pricePrecisionDecimals)}{" "}
                             {percentChange}%
                         </p>
                     </div>
