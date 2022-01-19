@@ -161,7 +161,7 @@ export class SpotForm extends React.Component {
         if (!this.props.user.id) return 0;
 
         const marketInfo = this.props.marketInfo;
-        if (!this.marketInfo) return 0;
+        if (!this.props.marketInfo) return 0;
 
         if (this.props.side === "s") {
             const baseBalance = this.getBaseBalance() - marketInfo.baseFee;
@@ -171,10 +171,7 @@ export class SpotForm extends React.Component {
             const quoteBalance = this.getQuoteBalance();
             const amount = this.state.amount || 0;
             const total = amount * this.currentPrice();
-            return Math.round(
-                (total / (quoteBalance - marketInfo.quoteFee)) *
-                    100
-            );
+            return ((total / (quoteBalance - marketInfo.quoteFee)) * 100);
         }
     }
 
@@ -228,7 +225,7 @@ export class SpotForm extends React.Component {
             const decimals = marketInfo.baseAsset.decimals;
             let displayAmount = (baseBalance * val) / 100;
             displayAmount -= marketInfo.baseFee;
-            displayAmount = parseFloat(displayAmount.toFixed(decimals)).toPrecision(7);
+            displayAmount = parseFloat(displayAmount.toFixed(decimals)).toPrecision(5);
             if (displayAmount < 1e-5) {
                 newstate.amount = 0;
             } else {
@@ -236,12 +233,12 @@ export class SpotForm extends React.Component {
             }
         } else if (this.props.side === "b") {
             const quoteBalance = this.getQuoteBalance();
-            const decimals = marketInfo.baseFee;
+            const decimals = marketInfo.baseAsset.decimals;
             let quoteAmount =
                 ((quoteBalance - marketInfo.quoteFee) * val) /
                 100 /
                 this.currentPrice();
-            quoteAmount = parseFloat(quoteAmount.toFixed(decimals)).toPrecision(7);
+            quoteAmount = parseFloat(quoteAmount.toFixed(decimals)).toPrecision(5);
             if (quoteAmount < 1e-5) {
                 newstate.amount = 0;
             } else {
