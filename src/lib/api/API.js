@@ -21,9 +21,10 @@ export default class API extends Emitter {
     ethersProvider = null
     currencies = null
     websocketUrl = null
+    marketInfo = {}
+    lastprices = {}
     _signInProgress = null
     _profiles = {}
-    _marketInfo = null
     
     constructor({ infuraId, websocketUrl, networks, currencies, validMarkets }) {
         super()
@@ -154,7 +155,14 @@ export default class API extends Emitter {
 
         // Is there a better way to do this? Not sure. 
         if (msg.op === "marketinfo") {
-            this._marketInfo = msg.args[0];
+            const marketInfo = msg.args[0];
+            this.apiProvider.marketInfo[marketInfo.alias] = marketInfo;
+        }
+        if (msg.op === "lastprice") {
+            const lastprices = msg.args[0];
+            lastprices.forEach(l => this.apiProvider.lastPrices[l[0]] = l);
+            const noInfoPairs = lastprices.map(l => l[0]).filter(pair => !this.apiProvider.marketInfo[pair]);
+            this.apiProvider.cacheMarketInfoFromNetwork(noInfoPairs);
         }
     }
 
@@ -329,16 +337,17 @@ export default class API extends Emitter {
         const netContract = this.getNetworkContract()
         if (netContract) {
             const [account] = await this.web3.eth.getAccounts()
-            const { contractAddress } = this.currencies[currency].chain[this.apiProvider.network]
+            const currencyInfo = this.getCurrencyInfo(currency);
+            const { contractAddress } = currencyInfo.address;
             const contract = new this.web3.eth.Contract(erc20ContractABI, contractAddress)
             await contract.methods.approve(netContract, MAX_ALLOWANCE).send({ from: account })
         }
     }
 
     getBalanceOfCurrency = async (currency) => {
-        const { contractAddress } = this.currencies[currency].chain[this.apiProvider.network]
+        const currencyInfo = this.getCurrencyInfo(currency);
         let result = { balance: 0, allowance: MAX_ALLOWANCE }
-        if (!this.ethersProvider || !contractAddress) return result
+        if (!this.ethersProvider || !currencyInfo) return result
         
         try {
             const netContract = this.getNetworkContract()
@@ -347,13 +356,14 @@ export default class API extends Emitter {
                 result.balance = await this.web3.eth.getBalance(account)
                 return result
             }
-            const contract = new this.web3.eth.Contract(erc20ContractABI, contractAddress)
+            const contract = new this.web3.eth.Contract(erc20ContractABI, currencyInfo.address)
             result.balance = await contract.methods.balanceOf(account).call()
             if (netContract) {
                 result.allowance = ethers.BigNumber.from(
                     await contract.methods.allowance(account, netContract).call()
                 )
             }
+            console.log(currency, result);
             return result
         } catch (e) {
             console.log(e)
@@ -365,18 +375,21 @@ export default class API extends Emitter {
         const balances = {}
         
         const getBalance = async (ticker) => {
+            const currencyInfo = this.getCurrencyInfo(ticker);
             const { balance, allowance } = await this.getBalanceOfCurrency(ticker)
             balances[ticker] = {
                 value: balance,
                 allowance,
-                valueReadable: formatAmount(balance, this.currencies[ticker]),
+                valueReadable: "0",
+            }
+            if (currencyInfo) {
+                balances[ticker].valueReadable = formatAmount(balance, currencyInfo);
             }
 
             this.emit('balanceUpdate', 'wallet', { ...balances })
         }
 
-        const tickers = Object.keys(this.currencies)
-            .filter(ticker => this.currencies[ticker].chain[this.apiProvider.network])
+        const tickers = this.getCurrencies();
             
         await Promise.all(tickers.map(ticker => getBalance(ticker)))
 
@@ -394,16 +407,17 @@ export default class API extends Emitter {
         const baseQuantity = order[5]
         const quoteQuantity = order[4] * order[5]
         const remaining = isNaN(Number(order[11])) ? order[5] : order[11]
-        const [baseCurrency, quoteCurrency] = order[2].split('-')
+        const market = order[2];
+        const marketInfo = this.apiProvider.marketInfo[market];
         let baseQuantityWithoutFee, quoteQuantityWithoutFee, priceWithoutFee, remainingWithoutFee
         if (side === "s") {
-            const fee = this.currencies[baseCurrency].gasFee;
+            const fee = marketInfo.baseFee;
             baseQuantityWithoutFee = baseQuantity - fee;
             remainingWithoutFee = Math.max(0, remaining - fee);
             priceWithoutFee = quoteQuantity / baseQuantityWithoutFee;
             quoteQuantityWithoutFee = priceWithoutFee * baseQuantityWithoutFee;
         } else {
-            const fee = this.currencies[quoteCurrency].gasFee;
+            const fee = marketInfo.quoteFee;
             quoteQuantityWithoutFee = quoteQuantity - fee;
             priceWithoutFee = quoteQuantityWithoutFee / baseQuantity;
             baseQuantityWithoutFee = quoteQuantityWithoutFee / priceWithoutFee;
@@ -421,16 +435,23 @@ export default class API extends Emitter {
         const side = fill[3];
         const baseQuantity = fill[5];
         const quoteQuantity = fill[4] * fill[5];
-        const baseCurrency = fill[2].split("-")[0];
-        const quoteCurrency = fill[2].split("-")[1];
+        const market = fill[2];
         let baseQuantityWithoutFee, quoteQuantityWithoutFee, priceWithoutFee;
+        const marketInfo = this.apiProvider.marketInfo[market];
+        if (!marketInfo) {
+            return {
+                price: 1,
+                quoteQuantity: 1,
+                baseQuantity: 1,
+            };
+        }
         if (side === "s") {
-            const fee = this.currencies[baseCurrency].gasFee;
+            const fee = marketInfo.baseFee;
             baseQuantityWithoutFee = baseQuantity - fee;
             priceWithoutFee = quoteQuantity / baseQuantityWithoutFee;
             quoteQuantityWithoutFee = priceWithoutFee * baseQuantityWithoutFee;
         } else {
-            const fee = this.currencies[quoteCurrency].gasFee;
+            const fee = marketInfo.quoteFee;
             quoteQuantityWithoutFee = quoteQuantity - fee;
             priceWithoutFee = quoteQuantityWithoutFee / baseQuantity;
             baseQuantityWithoutFee = quoteQuantityWithoutFee / priceWithoutFee;
@@ -491,5 +512,25 @@ export default class API extends Emitter {
 
     tokenInfo = (tokenLike, chainId) => {
         return this.apiProvider.tokenInfo(tokenLike, chainId)
+    }
+
+    getCurrencies = () => {
+        return this.apiProvider.getCurrencies();
+    }
+
+    getPairs = () => {
+        return this.apiProvider.getPairs();
+    }
+
+    getCurrencyInfo (currency) {
+        return this.apiProvider.getCurrencyInfo();
+    }
+
+    getImage(currency) {
+        try {
+            return require(`assets/images/currency/${currency}.svg`)
+        } catch(e) {
+            return require(`assets/images/currency/WBTC.svg`)
+        }
     }
 }

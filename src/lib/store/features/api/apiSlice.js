@@ -78,15 +78,10 @@ export const apiSlice = createSlice({
         const market = update[0];
         const price = update[1];
         const change = update[2];
-        if (api.validMarkets[state.network].includes(market)) {
-          state.lastPrices[market] = {
-            price: update[1],
-            change: update[2],
-          };
-        }
-        else {
-          delete state.lastPrices[market];
-        }
+        state.lastPrices[market] = {
+          price: update[1],
+          change: update[2],
+        };
         if (update[0] === state.currentMarket) {
           state.marketSummary.price = price;
           state.marketSummary.priceChange = change;
