@@ -183,7 +183,7 @@ export default function ListPairPage() {
                   min(0),
                   forceValidation(isBaseAssetIdInvalid, "invalid asset on zksync")
                 ]}
-                rightOfLabel={<TooltipHelper>Base internal zkSync token ID</TooltipHelper>}
+                rightOfLabel={<TooltipHelper>zkSync token ID of the first asset appearing in the pair (BASE/QUOTE)</TooltipHelper>}
               />
               <NumberInput
                 block
@@ -195,7 +195,7 @@ export default function ListPairPage() {
                   min(0),
                   forceValidation(isQuoteAssetIdInvalid, "invalid asset on zksync")
                 ]}
-                rightOfLabel={<TooltipHelper>Quote internal zkSync token ID</TooltipHelper>}
+                rightOfLabel={<TooltipHelper>zkSync token ID of the second asset appearing in the pair (BASE/QUOTE)</TooltipHelper>}
               />
               <NumberInput
                 block
