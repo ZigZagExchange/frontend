@@ -2,10 +2,10 @@ import React, {useState} from "react";
 import {useSelector} from "react-redux";
 import {networkSelector} from "../../../lib/store/features/api/apiSlice";
 import {Button} from "../Button";
-import darkPlugHead from "../../../assets/icons/dark-plug-head.png";
 import api from "../../../lib/api";
 import {useHistory, useLocation} from "react-router-dom";
 import {BsFillPlugFill} from "react-icons/all";
+import API from "../../../lib/api/API";
 
 const ConnectWalletButton = () => {
   const network = useSelector(networkSelector);
@@ -20,12 +20,9 @@ const ConnectWalletButton = () => {
   }
 
   return <Button
-    loading={isLoading}
-    size={"sm"}
     block
-    // className="bg_btn"
-    // text="CONNECT WALLET"
-    // img={darkPlugHead}
+    size={"sm"}
+    loading={isLoading}
     onClick={() => {
       setIsLoading(true)
       api.signIn(network)

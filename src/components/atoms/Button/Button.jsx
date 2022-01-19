@@ -91,25 +91,25 @@ export const Button = ({
                        }) => {
   return <x.div position={"relative"} w={block ? "full" : "fit-content"}>
     {isLoading &&
-    <x.div
-      left={0}
-      top={0}
-      w={"full"}
-      h={"full"}
-      position={"absolute"}
-      display={"flex"}
-      justifyContent={"center"}
-      alignItems={"center"}
-      background={"rgba(0,0,0,0.6)"}
-      zIndex={2}
-    >
-      <Loader
-        type="TailSpin"
-        color="white"
-        height={24}
-        width={24}
-      />
-    </x.div>}
+      <x.div
+        left={0}
+        top={0}
+        w={"full"}
+        h={"full"}
+        position={"absolute"}
+        display={"flex"}
+        justifyContent={"center"}
+        alignItems={"center"}
+        background={"rgba(0,0,0,0.6)"}
+        zIndex={2}
+      >
+        <Loader
+          type="TailSpin"
+          color="white"
+          height={24}
+          width={24}
+        />
+      </x.div>}
     <x.button
       onClick={onClick}
       type={type}
