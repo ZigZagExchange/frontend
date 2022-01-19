@@ -174,9 +174,9 @@ export default function ListPairPage() {
           >
             <x.div display={"grid"} gridTemplateColumns={2} rowGap={5} columnGap={6} mb={5}>
               <NumberInput
-                {...model(baseAssetId, setBaseAssetId)}
                 block
-                label={"Base Asset Internal ID"}
+                {...model(baseAssetId, setBaseAssetId)}
+                label={<x.span>Base Asset <x.a color={{_: "blue-gray-500", hover: "teal-200"}} target={"_blank"} href={zigZagChainId === 1 ? "https://zkscan.io/explorer/tokens" : "https://rinkeby.zkscan.io/explorer/tokens"}>Internal ID</x.a></x.span>}
                 name={"baseAssetId"}
                 validate={[
                   required,
@@ -186,9 +186,9 @@ export default function ListPairPage() {
                 rightOfLabel={<TooltipHelper>Base internal zkSync token ID</TooltipHelper>}
               />
               <NumberInput
-                {...model(quoteAssetId, setQuoteAssetId)}
                 block
-                label={"Quote Asset Internal ID"}
+                {...model(quoteAssetId, setQuoteAssetId)}
+                label={<x.span>Quote Asset <x.a color={{_: "blue-gray-500", hover: "teal-200"}} target={"_blank"} href={zigZagChainId === 1 ? "https://zkscan.io/explorer/tokens" : "https://rinkeby.zkscan.io/explorer/tokens"}>Internal ID</x.a></x.span>}
                 name={"quoteAssetId"}
                 validate={[
                   required,
@@ -237,11 +237,6 @@ export default function ListPairPage() {
                 {arweaveAllocationKB} kB
               </x.div>
             </x.div>}
-            <x.div mb={5} textAlign={"right"}>
-              <x.a color={{_: "blue-gray-500", hover: "teal-200"}} target={"_blank"} href={zigZagChainId === 1 ? "https://zkscan.io/explorer/tokens" : "https://rinkeby.zkscan.io/explorer/tokens"}>
-                View internal token ids
-              </x.a>
-            </x.div>
             <Dev>
               <x.div fontSize={12} color={"blue-gray-500"} mb={3} textAlign={"right"}>
                 arweave allocation: {arweaveAllocationKB} kB
