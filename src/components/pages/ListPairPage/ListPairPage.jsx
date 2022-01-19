@@ -3,7 +3,7 @@ import {useSelector} from 'react-redux';
 import {userSelector} from "lib/store/features/auth/authSlice";
 import api from 'lib/api';
 import {DefaultTemplate} from 'components';
-import {AiOutlineQuestionCircle, BsLink45Deg, RiErrorWarningLine} from "react-icons/all";
+import {AiOutlineQuestionCircle, RiErrorWarningLine} from "react-icons/all";
 import 'bootstrap'
 import ConnectWalletButton from "../../atoms/ConnectWalletButton/ConnectWalletButton";
 import Pane from "../../atoms/Pane/Pane";
@@ -149,25 +149,7 @@ export default function ListPairPage() {
              alignItems={"center"}
              justifyContent={"center"}
       >
-        {!isUserLoggedIn && <Pane
-          size={"md"}
-          variant={"light"}
-          display={"flex"}
-          flexDirection={"column"}
-          alignItems={"center"}
-          justifyContent={"center"}
-        >
-          <BsLink45Deg size={30}/>
-          <h3>Connect wallet</h3>
-          <x.div mt={2}>
-            Connect your wallet to list new markets
-          </x.div>
-          <x.div mt={4}>
-            <ConnectWalletButton/>
-          </x.div>
-        </Pane>}
-
-        {isUserLoggedIn && <Pane size={"sm"} variant={"light"} maxWidth={"500px"} margin={"auto"}>
+        <Pane size={"sm"} variant={"light"} maxWidth={"500px"} margin={"auto"}>
           <x.div fontSize={28} mb={2}>List New Market</x.div>
           {(baseAssetId || quoteAssetId) &&
           <x.div display={"flex"} fontSize={35} justifyContent={"center"} my={4}>
@@ -234,7 +216,7 @@ export default function ListPairPage() {
                 name={"pricePrecisionDecimals"}
                 label={"Price Precision Decimals"}
                 validate={[required, max(18), min(0)]}
-                rightOfLabel={<TooltipHelper>Price precision decimals</TooltipHelper>}
+                rightOfLabel={<TooltipHelper>Number of decimal places</TooltipHelper>}
               />
               <SelectInput
                 {...model(zigZagChainId, setZigZagChainId)}
@@ -265,9 +247,10 @@ export default function ListPairPage() {
                 arweave allocation: {arweaveAllocationKB} kB
               </x.div>
             </Dev>
-            <Submit block mt={5}>{isAllocationInsufficient ? "PURCHASE ALLOCATION" : "LIST"}</Submit>
+            {!isUserLoggedIn && <ConnectWalletButton/>}
+            {isUserLoggedIn && <Submit block mt={5}>{isAllocationInsufficient ? "PURCHASE ALLOCATION" : "LIST"}</Submit>}
           </Form>
-        </Pane>}
+        </Pane>
       </x.div>
       <AllocationModal
         onClose={() => setIsAllocationModalOpen(false)}
@@ -302,7 +285,7 @@ export default function ListPairPage() {
 
 const TooltipHelper = ({children}) => {
   return <Tooltip placement={"right"} label={children}>
-    <x.div display={"inline-flex"} color={"blue-gray-400"} ml={2} alignItems={"center"}>
+    <x.div display={"inline-flex"} color={"blue-gray-600"} ml={2} alignItems={"center"}>
       <AiOutlineQuestionCircle size={14}/>
     </x.div>
   </Tooltip>

@@ -18,6 +18,7 @@ const AllocationModal = ({onClose, show, onSuccess, bytesToPurchase}) => {
   const fileSizeKB = bytesToPurchase / 1000
   const arweaveAllocationKB = arweaveAllocation / 1000
   const [KBtoPurchase, setKBToPurchase] = useState(null)
+  // const balanceData = useSelector(balancesSelector);
 
   const pricePerKB = 0.001
   useEffect(() => {
