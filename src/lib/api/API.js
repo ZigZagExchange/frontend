@@ -338,8 +338,7 @@ export default class API extends Emitter {
         if (netContract) {
             const [account] = await this.web3.eth.getAccounts()
             const currencyInfo = this.getCurrencyInfo(currency);
-            const { contractAddress } = currencyInfo.address;
-            const contract = new this.web3.eth.Contract(erc20ContractABI, contractAddress)
+            const contract = new this.web3.eth.Contract(erc20ContractABI, currencyInfo.address)
             await contract.methods.approve(netContract, MAX_ALLOWANCE).send({ from: account })
         }
     }
