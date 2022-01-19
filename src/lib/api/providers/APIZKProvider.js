@@ -118,7 +118,7 @@ export default class APIZKProvider extends APIProvider {
             tokenBuy = marketInfo.baseAssetId
             tokenRatio[marketInfo.baseAssetId] = amount;
             tokenRatio[marketInfo.quoteAssetId] = sellQuantityWithFee.toFixed(marketInfo.quoteAsset.decimals);
-            fullSellQuantity = (sellQuantityWithFee * 10**(marketInfo.quoteAsset.decimals)).toFixed(0);
+            fullSellQuantity = (sellQuantityWithFee * 10**(marketInfo.quoteAsset.decimals)).toLocaleString('fullwide', {useGrouping: false })
         } else if (side === 's') {
             sellQuantity = parseFloat(amount)
             sellQuantityWithFee = sellQuantity + marketInfo.baseFee;
@@ -126,7 +126,7 @@ export default class APIZKProvider extends APIProvider {
             tokenBuy = marketInfo.quoteAssetId;
             tokenRatio[marketInfo.baseAssetId] = sellQuantityWithFee.toFixed(marketInfo.baseAsset.decimals);
             tokenRatio[marketInfo.quoteAssetId] = (amount * price).toFixed(marketInfo.quoteAsset.decimals);
-            fullSellQuantity = (sellQuantityWithFee * 10**(marketInfo.baseAsset.decimals)).toFixed(0);
+            fullSellQuantity = (sellQuantityWithFee * 10**(marketInfo.baseAsset.decimals)).toLocaleString('fullwide', {useGrouping: false })
         }
         
         const now_unix = Date.now() / 1000 | 0

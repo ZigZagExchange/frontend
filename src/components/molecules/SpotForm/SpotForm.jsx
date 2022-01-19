@@ -90,7 +90,6 @@ export class SpotForm extends React.Component {
 
         baseBalance = parseFloat(baseBalance);
         quoteBalance = parseFloat(quoteBalance);
-        console.log(price, this.getFirstAsk(), this.getFirstBid());
         if (this.props.side === "s" && isNaN(baseBalance)) {
             toast.error(`No ${marketInfo.baseAsset.symbol} balance`);
             return;
