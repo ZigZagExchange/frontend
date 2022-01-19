@@ -200,7 +200,7 @@ export default function ListPairPage() {
               <NumberInput
                 block
                 name={"baseFee"}
-                label={baseAssetIdSymbolPreview ? `${baseAssetIdSymbolPreview} Swap Fee` : "Quote Swap Fee"}
+                label={baseAssetIdSymbolPreview ? `${baseAssetIdSymbolPreview} Swap Fee` : "Base Swap Fee"}
                 validate={[required, min(0)]}
                 rightOfLabel={<TooltipHelper>Swap fee collected by market makers</TooltipHelper>}
               />
