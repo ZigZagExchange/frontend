@@ -73,12 +73,12 @@ const AllocationModal = ({onClose, show, onSuccess, bytesToPurchase}) => {
 
     <Form onSubmit={async () => {
       try {
-        const transaction = await api.purchaseArweaveBytes("USDC", bytesToPurchase)
+        const transaction = await api.purchaseArweaveBytes(bytesToPurchase)
         await transaction.awaitReceipt()
         onSuccess()
       } catch (e) {
-        console.error(e)
-        toast.error('Transaction was rejected - please make sure you have a sufficient USDC balance')
+        console.error("Error purchasing arweave bytes", e)
+        toast.error('Transaction was rejected')
       }
     }}>
       <Submit block isDisabled={!isUSDCBalanceSufficient}>
