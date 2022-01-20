@@ -319,16 +319,6 @@ const TradePage = () => {
                   <div className="trade_price_head_third">
                     <strong
                       className={
-                        marketDataTab === "orders"
-                          ? "trade_price_active_tab"
-                          : ""
-                      }
-                      onClick={() => updateMarketDataTab("orders")}
-                    >
-                      Open Orders
-                    </strong>
-                    <strong
-                      className={
                         marketDataTab === "fills"
                           ? "trade_price_active_tab"
                           : ""
