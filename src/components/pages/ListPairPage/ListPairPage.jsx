@@ -279,7 +279,18 @@ export default function ListPairPage() {
                 name={"pricePrecisionDecimals"}
                 label={"Price Precision Decimals"}
                 validate={[required, max(18), min(0)]}
-                rightOfLabel={<TooltipHelper>Number of decimal places</TooltipHelper>}
+                rightOfLabel={<TooltipHelper>
+                  <x.div>
+                    Number of decimal places in the price of the asset pair.
+                  </x.div>
+
+                  <x.div display={"grid"} gridTemplateColumns={2} mt={2} gap={0}>
+                    <x.div>ex: ETH/USDC has '2'</x.div>
+                    <x.div>($3250.61)</x.div>
+                    <x.div>ex: ETH/WBTC has '6'</x.div>
+                    <x.div>(0.075225)</x.div>
+                  </x.div>
+                </TooltipHelper>}
               />
               <SelectInput
                 {...model(zigZagChainId, setZigZagChainId)}
