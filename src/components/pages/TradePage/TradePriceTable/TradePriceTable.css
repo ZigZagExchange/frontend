@@ -68,7 +68,6 @@
 
 .trade_price_table th {
     color: #94a2c9;
-    font-size: 1rem;
     font-weight: 400;
 }
 .trade_price_table th:nth-child(1),
