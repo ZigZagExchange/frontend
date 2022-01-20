@@ -361,10 +361,11 @@ export class Footer extends React.Component {
           const balancesContent = Object.keys(
             this.props.user.committed.balances
           ).map((token) => {
-            if (!api.currencies[token]) return "";
+            const currencyInfo = api.getCurrencyInfo(token);
+            if (!currencyInfo) return "";
             let balance = this.props.user.committed.balances[token];
             balance =
-              parseInt(balance) / Math.pow(10, api.currencies[token].decimals);
+              parseInt(balance) / Math.pow(10, currencyInfo.decimals);
             return (
               <tr>
                 <td>{token}</td>
