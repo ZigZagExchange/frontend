@@ -114,18 +114,18 @@ export default class APIZKProvider extends APIProvider {
         
         if (side === 'b') {
             sellQuantity = parseFloat(amount * price)
-            sellQuantityWithFee = sellQuantity + marketInfo.quoteFee;
+            sellQuantityWithFee = (sellQuantity + marketInfo.quoteFee).toFixed(marketInfo.quoteAsset.decimals);
             tokenSell = marketInfo.quoteAssetId;
             tokenBuy = marketInfo.baseAssetId
             tokenRatio[marketInfo.baseAssetId] = amount;
-            tokenRatio[marketInfo.quoteAssetId] = sellQuantityWithFee.toFixed(marketInfo.quoteAsset.decimals);
+            tokenRatio[marketInfo.quoteAssetId] = sellQuantityWithFee;
             fullSellQuantity = (sellQuantityWithFee * 10**(marketInfo.quoteAsset.decimals)).toLocaleString('fullwide', {useGrouping: false })
         } else if (side === 's') {
             sellQuantity = parseFloat(amount)
-            sellQuantityWithFee = sellQuantity + marketInfo.baseFee;
+            sellQuantityWithFee = (sellQuantity + marketInfo.baseFee).toFixed(marketInfo.baseAsset.decimals);
             tokenSell = marketInfo.baseAssetId;
             tokenBuy = marketInfo.quoteAssetId;
-            tokenRatio[marketInfo.baseAssetId] = sellQuantityWithFee.toFixed(marketInfo.baseAsset.decimals);
+            tokenRatio[marketInfo.baseAssetId] = sellQuantityWithFee;
             tokenRatio[marketInfo.quoteAssetId] = (amount * price).toFixed(marketInfo.quoteAsset.decimals);
             fullSellQuantity = (sellQuantityWithFee * 10**(marketInfo.baseAsset.decimals)).toLocaleString('fullwide', {useGrouping: false })
         }
