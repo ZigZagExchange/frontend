@@ -61,14 +61,31 @@ export default function ListPairPage() {
     return api.refreshArweaveAllocation(user.address)
   }
 
-  const renderFeeHint = (assetPrice, assetFee, symbol) => {
+
+  const getAmountForTargetNotional = (price) => {
+    const targetUSDFeeAmount = 1
+    return (targetUSDFeeAmount / price).toFixed(6)
+  }
+
+  const renderFeeHint = (assetPrice, assetFee, symbol, feeSetter) => {
     if (assetPrice) {
       const notional = (Number(assetPrice) * Number(assetFee)).toFixed(2)
       if (notional > 0) {
-        return <x.div pl={2} fontSize={12} color={"blue-gray-500"} mt={1}>
-          {assetFee} {symbol} = ${notional}
-        </x.div>
-      }
+        return <x.div pl={2} fontSize={12} color={"blue-gray-500"} mt={1} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
+          <x.div style={{wordBreak: "break-all"}}>
+            {assetFee} {symbol} = ${notional}
+          </x.div>
+          {notional > 1 && <x.div>
+            <Button
+              ml={1}
+              variant={"secondary"}
+              size={"xs"}
+              onClick={() => feeSetter(getAmountForTargetNotional(assetPrice))}>
+            set to $1
+            </Button>
+            <x.div/>
+        </x.div>}
+      </x.div>}
     }
     return null
   }
@@ -91,7 +108,7 @@ export default function ListPairPage() {
               throw Error(`${symbol} price came back as 0`)
             }
             setBasePrice(price)
-            setBaseFee((1 / price).toFixed(6))
+            setBaseFee(getAmountForTargetNotional(price))
           } catch (e) {
             setBaseFee("")
             setBasePrice(null)
@@ -124,7 +141,7 @@ export default function ListPairPage() {
               throw Error(`${symbol} price came back as 0`)
             }
             setQuotePrice(price)
-            setQuoteFee((1 / price).toFixed(6))
+            setQuoteFee(getAmountForTargetNotional(price))
           } catch (e) {
             setQuoteFee("")
             setQuotePrice(null)
@@ -261,7 +278,7 @@ export default function ListPairPage() {
                   validate={[required, min(0)]}
                   rightOfLabel={<TooltipHelper>Swap fee collected by market makers</TooltipHelper>}
                 />
-                {renderFeeHint(basePrice, baseFee, baseSymbol)}
+                {renderFeeHint(basePrice, baseFee, baseSymbol, setBaseFee)}
               </x.div>
               <x.div display={"flex"} flexDirection={"column"}>
                 <NumberInput
@@ -272,7 +289,7 @@ export default function ListPairPage() {
                   validate={[required, min(0)]}
                   rightOfLabel={<TooltipHelper>Swap fee collected by market makers</TooltipHelper>}
                 />
-                {renderFeeHint(quotePrice, quoteFee, quoteSymbol)}
+                {renderFeeHint(quotePrice, quoteFee, quoteSymbol, setQuoteFee)}
               </x.div>
               <NumberInput
                 block
