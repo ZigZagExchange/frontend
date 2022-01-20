@@ -184,10 +184,10 @@ export class SpotForm extends React.Component {
         }
 
         if (this.props.side === "b") {
-            return (this.getFirstAsk() * 1.0003).toFixed(marketInfo.pricePrecisionDecimals);
+            return (this.getFirstAsk() * 1.001).toFixed(marketInfo.pricePrecisionDecimals);
         }
         else if (this.props.side === "s") {
-            return (this.getFirstBid() * 0.9997).toFixed(marketInfo.pricePrecisionDecimals);
+            return (this.getFirstBid() * 0.999).toFixed(marketInfo.pricePrecisionDecimals);
         }
         return 0;
     }
