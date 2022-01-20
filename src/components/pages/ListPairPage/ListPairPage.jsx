@@ -11,12 +11,12 @@ import AllocationModal from "./AllocationModal";
 import {x} from "@xstyled/styled-components"
 import Form from "../../atoms/Form/Form";
 import NumberInput from "../../atoms/Form/NumberInput";
-import Submit from "../../atoms/Form/Submit";
+import Submit, {Button} from "../../atoms/Form/Submit";
 import {forceValidation, max, min, required} from "../../atoms/Form/validation";
 import {jsonify} from "../../../lib/helpers/strings";
 import {Dev} from "../../../lib/helpers/env";
 import SuccessModal from "./SuccessModal";
-import {arweaveAllocationSelector} from "lib/store/features/api/apiSlice";
+import {arweaveAllocationSelector, networkSelector} from "lib/store/features/api/apiSlice";
 import SelectInput from "../../atoms/Form/SelectInput";
 import {model} from "../../atoms/Form/helpers";
 import {debounce} from "lodash"
@@ -45,11 +45,12 @@ export default function ListPairPage() {
   const [isBaseAssetIdInvalid, setIsBaseAssetIdInvalid] = useState(false)
   const [isQuoteAssetIdInvalid, setIsQuoteAssetIdInvalid] = useState(false)
 
+  const network = useSelector(networkSelector);
+  const isUserConnectedToMainnet = network === 1
+
   // we purchase 500k bytes at once so the user does not have to
   // repeatedly repurchase space if wanting to list more than 1 market
   const bytesToPurchase = 500000
-
-  // TODO ** MUST BE CONNECTED TO MAINNET to view page **
 
   const refreshUserArweaveAllocation = () => {
     return api.refreshArweaveAllocation(user.address)
@@ -243,7 +244,8 @@ export default function ListPairPage() {
               </x.div>
             </Dev>
             {!isUserLoggedIn && <ConnectWalletButton/>}
-            {isUserLoggedIn && <Submit block mt={5}>{isAllocationInsufficient ? "PURCHASE ALLOCATION" : "LIST"}</Submit>}
+            {isUserLoggedIn && isUserConnectedToMainnet && <Submit block mt={5}>{isAllocationInsufficient ? "PURCHASE ALLOCATION" : "LIST"}</Submit>}
+            {isUserLoggedIn && !isUserConnectedToMainnet && <Button block isDisabled>Please connect to Mainnet</Button>}
           </Form>
         </Pane>
       </x.div>
