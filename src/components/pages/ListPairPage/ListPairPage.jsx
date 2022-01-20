@@ -67,7 +67,7 @@ export default function ListPairPage() {
       if (notional > 0) {
         return <x.div display={"flex"} justifyContent={"space-between"} fontSize={12} color={"blue-gray-500"} mt={1}>
           <x.span>${notional}</x.span>
-          <x.span ml={3}>({symbol} ~ ${assetPrice.toFixed(4)})</x.span>
+          <x.span ml={3}>(1 {symbol} ~ ${assetPrice.toFixed(4)})</x.span>
         </x.div>
       }
     }
@@ -97,9 +97,9 @@ export default function ListPairPage() {
             setBasePrice(null)
             console.error("error getting base price", e)
           }
+          setBaseSymbol(symbol)
+          setIsBaseAssetIdInvalid(false)
         }
-        setBaseSymbol(symbol)
-        setIsBaseAssetIdInvalid(false)
       } catch (e) {
         setBaseSymbol(null)
         setIsBaseAssetIdInvalid(true)
@@ -129,9 +129,9 @@ export default function ListPairPage() {
             setQuotePrice(null)
             console.error("error setting quote fee", e)
           }
+          setQuoteSymbol(symbol)
+          setIsQuoteAssetIdInvalid(false)
         }
-        setQuoteSymbol(symbol)
-        setIsQuoteAssetIdInvalid(false)
       } catch (e) {
         setQuoteSymbol(null)
         setIsQuoteAssetIdInvalid(true)
