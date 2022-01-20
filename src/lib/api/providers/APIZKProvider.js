@@ -354,20 +354,42 @@ export default class APIZKProvider extends APIProvider {
         return await this.ethWallet.signMessage(message);
     }
 
-    tokenInfo = async (tokenLike, chainId) => {
-        let baseUrl
-        if (chainId === "1" || chainId === 1) {
-            baseUrl = 'https://api.zksync.io/api/v0.2'
-        } else if (chainId === "1000" || chainId === 1000) {
-            baseUrl = 'https://rinkeby-api.zksync.io/api/v0.2'
+    getChainName = (chainId) => {
+        if (Number(chainId) === 1) {
+            return "mainnet"
+        } else if (Number(chainId) === 1000) {
+            return "rinkeby"
         } else {
-            throw Error("Unknown chain id")
+            throw Error("Chain ID not understood")
         }
+    }
+
+    getZkSyncBaseUrl = (chainId) => {
+        if (this.getChainName(chainId) === "mainnet") {
+            return "https://api.zksync.io/api/v0.2"
+        } else if (this.getChainName(chainId) === "rinkeby") {
+            return "https://rinkeby-api.zksync.io/api/v0.2"
+        } else {
+            throw Error("Uknown chain")
+        }
+    }
+
+
+    tokenInfo = async (tokenLike, chainId) => {
         try {
-            const res = await axios.get(baseUrl + `/tokens/${tokenLike}`)
+            const res = await axios.get(this.getZkSyncBaseUrl(chainId) + `/tokens/${tokenLike}`)
             return res.data.result
         } catch (e) {
-            console.error("Could not get token info")
+            console.error("Could not get token info", e)
+        }
+    }
+
+    tokenPrice = async (tokenLike, chainId) => {
+        try {
+            const res = await axios.get(this.getZkSyncBaseUrl(chainId) + `/tokens/${tokenLike}/priceIn/usd`)
+            return res.data.result
+        } catch (e) {
+            console.error("Could not get token price", e)
         }
     }
 

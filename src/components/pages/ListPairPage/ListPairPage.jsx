@@ -37,6 +37,8 @@ export default function ListPairPage() {
 
   const [baseAssetId, setBaseAssetId] = useState("")
   const [quoteAssetId, setQuoteAssetId] = useState("")
+  const [baseFee, setBaseFee] = useState("")
+  const [quoteFee, setQuoteFee] = useState("")
   const [zigZagChainId, setZigZagChainId] = useState(1)
 
   const [baseAssetIdSymbolPreview, setBaseAssetIdSymbolPreview] = useState(null)
@@ -62,30 +64,51 @@ export default function ListPairPage() {
     }
   }, []);
 
-
-  function getBaseInfo(baseAssetId, chainId) {
+  async function getBaseInfo(baseAssetId, chainId) {
     if (baseAssetId && baseAssetId !== "") {
-      api.tokenInfo(baseAssetId, chainId).then(res => {
-        setBaseAssetIdSymbolPreview(res.symbol)
+      try {
+        const {symbol} = await api.getTokenInfo(baseAssetId, chainId)
+        if (symbol) {
+          try {
+            const {price} = await api.getTokenPrice(baseAssetId, chainId)
+            setBaseFee((1 / Number(price)).toFixed(6))
+          } catch (e) {
+            setBaseFee("")
+            console.error("error getting base price", e)
+          }
+        }
+        setBaseAssetIdSymbolPreview(symbol)
         setIsBaseAssetIdInvalid(false)
-      }).catch(e => {
+      } catch (e) {
         setBaseAssetIdSymbolPreview(null)
         setIsBaseAssetIdInvalid(true)
-      })
+        setBaseFee("")
+      }
     } else {
       setBaseAssetIdSymbolPreview(null)
     }
   }
 
-  function getQuoteInfo(quoteAssetId, chainId) {
+  async function getQuoteInfo(quoteAssetId, chainId) {
     if (quoteAssetId && quoteAssetId !== "") {
-      api.tokenInfo(quoteAssetId, chainId).then(res => {
-        setQuoteAssetIdSymbolPreview(res.symbol)
+      try {
+        const {symbol} = await api.getTokenInfo(quoteAssetId, chainId)
+        if (symbol) {
+          try {
+            const {price} = await api.getTokenPrice(quoteAssetId, chainId)
+            setQuoteFee((1 / Number(price)).toFixed(6))
+          } catch (e) {
+            setQuoteFee("")
+            console.error("error setting quote fee", e)
+          }
+        }
+        setQuoteAssetIdSymbolPreview(symbol)
         setIsQuoteAssetIdInvalid(false)
-      }).catch(e => {
+      } catch (e) {
         setQuoteAssetIdSymbolPreview(null)
         setIsQuoteAssetIdInvalid(true)
-      })
+        setQuoteFee("")
+      }
     } else {
       setQuoteAssetIdSymbolPreview(null)
     }
@@ -166,8 +189,8 @@ export default function ListPairPage() {
             initialValues={{
               baseAssetId: baseAssetId,
               quoteAssetId: quoteAssetId,
-              baseFee: "",
-              quoteFee: "",
+              baseFee: baseFee,
+              quoteFee: quoteFee,
               zigzagChainId: zigZagChainId,
               pricePrecisionDecimals: "",
             }}
@@ -201,6 +224,7 @@ export default function ListPairPage() {
               <NumberInput
                 block
                 name={"baseFee"}
+                {...model(baseFee, setBaseFee)}
                 label={baseAssetIdSymbolPreview ? `${baseAssetIdSymbolPreview} Swap Fee` : "Base Swap Fee"}
                 validate={[required, min(0)]}
                 rightOfLabel={<TooltipHelper>Swap fee collected by market makers</TooltipHelper>}
@@ -208,6 +232,7 @@ export default function ListPairPage() {
               <NumberInput
                 block
                 name={"quoteFee"}
+                {...model(quoteFee, setQuoteFee)}
                 label={quoteAssetIdSymbolPreview ? `${quoteAssetIdSymbolPreview} Swap Fee` : "Quote Swap Fee"}
                 validate={[required, min(0)]}
                 rightOfLabel={<TooltipHelper>Swap fee collected by market makers</TooltipHelper>}
