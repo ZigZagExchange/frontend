@@ -63,7 +63,7 @@ export default function ListPairPage() {
 
   const renderFeeHint = (assetPrice, assetFee, symbol) => {
     if (assetPrice) {
-      const notional = (assetPrice * Number(assetFee)).toFixed(2)
+      const notional = (Number(assetPrice) * Number(assetFee)).toFixed(2)
       if (notional > 0) {
         return <x.div display={"flex"} justifyContent={"space-between"} fontSize={12} color={"blue-gray-500"} mt={1}>
           <x.span>${notional}</x.span>
