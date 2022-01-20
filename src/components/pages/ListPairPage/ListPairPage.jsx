@@ -65,9 +65,8 @@ export default function ListPairPage() {
     if (assetPrice) {
       const notional = (Number(assetPrice) * Number(assetFee)).toFixed(2)
       if (notional > 0) {
-        return <x.div display={"flex"} justifyContent={"space-between"} fontSize={12} color={"blue-gray-500"} mt={1}>
-          <x.span>${notional}</x.span>
-          <x.span ml={3}>(1 {symbol} ~ ${assetPrice.toFixed(4)})</x.span>
+        return <x.div fontSize={12} color={"blue-gray-500"} mt={1}>
+          {assetFee} {symbol} = ${notional}
         </x.div>
       }
     }
@@ -86,12 +85,13 @@ export default function ListPairPage() {
         const {symbol} = await api.getTokenInfo(baseAssetId, chainId)
         if (symbol) {
           try {
-            const {price} = await api.getTokenPrice(baseAssetId, chainId)
-            if (Number(price) === 0) {
+            const {price: apiPrice} = await api.getTokenPrice(baseAssetId, chainId)
+            const price = Number(apiPrice)
+            if (price === 0) {
               throw Error(`${symbol} price came back as 0`)
             }
-            setBasePrice(Number(price))
-            setBaseFee((1 / Number(price)).toFixed(6))
+            setBasePrice(price)
+            setBaseFee((1 / price).toFixed(6))
           } catch (e) {
             setBaseFee("")
             setBasePrice(null)
@@ -118,12 +118,13 @@ export default function ListPairPage() {
         const {symbol} = await api.getTokenInfo(quoteAssetId, chainId)
         if (symbol) {
           try {
-            const {price} = await api.getTokenPrice(quoteAssetId, chainId)
-            if (Number(price) === 0) {
+            const {price: apiPrice} = await api.getTokenPrice(quoteAssetId, chainId)
+            const price = Number(apiPrice)
+            if (price === 0) {
               throw Error(`${symbol} price came back as 0`)
             }
-            setQuotePrice(Number(price))
-            setQuoteFee((1 / Number(price)).toFixed(6))
+            setQuotePrice(price)
+            setQuoteFee((1 / price).toFixed(6))
           } catch (e) {
             setQuoteFee("")
             setQuotePrice(null)
