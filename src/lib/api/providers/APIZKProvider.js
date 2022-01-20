@@ -340,10 +340,10 @@ export default class APIZKProvider extends APIProvider {
 
     purchaseArweaveBytes = async (bytes) => {
         const feeToken = "USDC"
-        const feeDecimals = 6
+        const feeTokenDecimals = 6
         const BYTES_PER_DOLLAR = 10**6;
         const ARWEAVE_BRIDGE_ADDRESS = "0xCb7AcA0cdEa76c5bD5946714083c559E34627607";
-        const amount = (bytes / BYTES_PER_DOLLAR * 10**feeDecimals).toString();
+        const amount = (bytes / BYTES_PER_DOLLAR * 10**feeTokenDecimals).toString();
         return this.syncWallet.syncTransfer({
             to: ARWEAVE_BRIDGE_ADDRESS,
             token: feeToken,
