@@ -532,7 +532,7 @@ export default class API extends Emitter {
         try {
             return require(`assets/images/currency/${currency}.svg`)
         } catch(e) {
-            return require(`assets/images/currency/WBTC.svg`)
+            return require(`assets/images/currency/ZZ.webp`)
         }
     }
 }
