@@ -12,27 +12,12 @@ class TradePriceBtcTable extends React.Component {
                             <tr>
                                 <th>
                                     Pair
-                                    <img
-                                        className="ms-2"
-                                        src={updownIcon}
-                                        alt="..."
-                                    />
                                 </th>
                                 <th>
                                     Price
-                                    <img
-                                        className="ms-2"
-                                        src={updownIcon}
-                                        alt="..."
-                                    />
                                 </th>
                                 <th>
                                     Change
-                                    <img
-                                        className="ms-2"
-                                        src={updownIcon}
-                                        alt="..."
-                                    />
                                 </th>
                             </tr>
                         </thead>
