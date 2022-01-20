@@ -508,8 +508,12 @@ export default class API extends Emitter {
         return response;
     }
 
-    tokenInfo = (tokenLike, chainId) => {
+    getTokenInfo = (tokenLike, chainId) => {
         return this.apiProvider.tokenInfo(tokenLike, chainId)
+    }
+
+    getTokenPrice = (tokenLike, chainId) => {
+        return this.apiProvider.tokenPrice(tokenLike, chainId)
     }
 
     getCurrencies = () => {

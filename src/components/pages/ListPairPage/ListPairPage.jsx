@@ -11,12 +11,12 @@ import AllocationModal from "./AllocationModal";
 import {x} from "@xstyled/styled-components"
 import Form from "../../atoms/Form/Form";
 import NumberInput from "../../atoms/Form/NumberInput";
-import Submit from "../../atoms/Form/Submit";
+import Submit, {Button} from "../../atoms/Form/Submit";
 import {forceValidation, max, min, required} from "../../atoms/Form/validation";
 import {jsonify} from "../../../lib/helpers/strings";
 import {Dev} from "../../../lib/helpers/env";
 import SuccessModal from "./SuccessModal";
-import {arweaveAllocationSelector} from "lib/store/features/api/apiSlice";
+import {arweaveAllocationSelector, networkSelector} from "lib/store/features/api/apiSlice";
 import SelectInput from "../../atoms/Form/SelectInput";
 import {model} from "../../atoms/Form/helpers";
 import {debounce} from "lodash"
@@ -37,6 +37,8 @@ export default function ListPairPage() {
 
   const [baseAssetId, setBaseAssetId] = useState("")
   const [quoteAssetId, setQuoteAssetId] = useState("")
+  const [baseFee, setBaseFee] = useState("")
+  const [quoteFee, setQuoteFee] = useState("")
   const [zigZagChainId, setZigZagChainId] = useState(1)
 
   const [baseAssetIdSymbolPreview, setBaseAssetIdSymbolPreview] = useState(null)
@@ -45,11 +47,12 @@ export default function ListPairPage() {
   const [isBaseAssetIdInvalid, setIsBaseAssetIdInvalid] = useState(false)
   const [isQuoteAssetIdInvalid, setIsQuoteAssetIdInvalid] = useState(false)
 
+  const network = useSelector(networkSelector);
+  const isUserConnectedToMainnet = network === 1
+
   // we purchase 500k bytes at once so the user does not have to
   // repeatedly repurchase space if wanting to list more than 1 market
   const bytesToPurchase = 500000
-
-  // TODO ** MUST BE CONNECTED TO MAINNET to view page **
 
   const refreshUserArweaveAllocation = () => {
     return api.refreshArweaveAllocation(user.address)
@@ -61,30 +64,51 @@ export default function ListPairPage() {
     }
   }, []);
 
-
-  function getBaseInfo(baseAssetId, chainId) {
+  async function getBaseInfo(baseAssetId, chainId) {
     if (baseAssetId && baseAssetId !== "") {
-      api.tokenInfo(baseAssetId, chainId).then(res => {
-        setBaseAssetIdSymbolPreview(res.symbol)
+      try {
+        const {symbol} = await api.getTokenInfo(baseAssetId, chainId)
+        if (symbol) {
+          try {
+            const {price} = await api.getTokenPrice(baseAssetId, chainId)
+            setBaseFee((1 / Number(price)).toFixed(6))
+          } catch (e) {
+            setBaseFee("")
+            console.error("error getting base price", e)
+          }
+        }
+        setBaseAssetIdSymbolPreview(symbol)
         setIsBaseAssetIdInvalid(false)
-      }).catch(e => {
+      } catch (e) {
         setBaseAssetIdSymbolPreview(null)
         setIsBaseAssetIdInvalid(true)
-      })
+        setBaseFee("")
+      }
     } else {
       setBaseAssetIdSymbolPreview(null)
     }
   }
 
-  function getQuoteInfo(quoteAssetId, chainId) {
+  async function getQuoteInfo(quoteAssetId, chainId) {
     if (quoteAssetId && quoteAssetId !== "") {
-      api.tokenInfo(quoteAssetId, chainId).then(res => {
-        setQuoteAssetIdSymbolPreview(res.symbol)
+      try {
+        const {symbol} = await api.getTokenInfo(quoteAssetId, chainId)
+        if (symbol) {
+          try {
+            const {price} = await api.getTokenPrice(quoteAssetId, chainId)
+            setQuoteFee((1 / Number(price)).toFixed(6))
+          } catch (e) {
+            setQuoteFee("")
+            console.error("error setting quote fee", e)
+          }
+        }
+        setQuoteAssetIdSymbolPreview(symbol)
         setIsQuoteAssetIdInvalid(false)
-      }).catch(e => {
+      } catch (e) {
         setQuoteAssetIdSymbolPreview(null)
         setIsQuoteAssetIdInvalid(true)
-      })
+        setQuoteFee("")
+      }
     } else {
       setQuoteAssetIdSymbolPreview(null)
     }
@@ -165,8 +189,8 @@ export default function ListPairPage() {
             initialValues={{
               baseAssetId: baseAssetId,
               quoteAssetId: quoteAssetId,
-              baseFee: "",
-              quoteFee: "",
+              baseFee: baseFee,
+              quoteFee: quoteFee,
               zigzagChainId: zigZagChainId,
               pricePrecisionDecimals: "",
             }}
@@ -183,7 +207,7 @@ export default function ListPairPage() {
                   min(0),
                   forceValidation(isBaseAssetIdInvalid, "invalid asset on zksync")
                 ]}
-                rightOfLabel={<TooltipHelper>Base internal zkSync token ID</TooltipHelper>}
+                rightOfLabel={<TooltipHelper>zkSync token ID of the first asset appearing in the pair (BASE/QUOTE)</TooltipHelper>}
               />
               <NumberInput
                 block
@@ -195,11 +219,12 @@ export default function ListPairPage() {
                   min(0),
                   forceValidation(isQuoteAssetIdInvalid, "invalid asset on zksync")
                 ]}
-                rightOfLabel={<TooltipHelper>Quote internal zkSync token ID</TooltipHelper>}
+                rightOfLabel={<TooltipHelper>zkSync token ID of the second asset appearing in the pair (BASE/QUOTE)</TooltipHelper>}
               />
               <NumberInput
                 block
                 name={"baseFee"}
+                {...model(baseFee, setBaseFee)}
                 label={baseAssetIdSymbolPreview ? `${baseAssetIdSymbolPreview} Swap Fee` : "Base Swap Fee"}
                 validate={[required, min(0)]}
                 rightOfLabel={<TooltipHelper>Swap fee collected by market makers</TooltipHelper>}
@@ -207,6 +232,7 @@ export default function ListPairPage() {
               <NumberInput
                 block
                 name={"quoteFee"}
+                {...model(quoteFee, setQuoteFee)}
                 label={quoteAssetIdSymbolPreview ? `${quoteAssetIdSymbolPreview} Swap Fee` : "Quote Swap Fee"}
                 validate={[required, min(0)]}
                 rightOfLabel={<TooltipHelper>Swap fee collected by market makers</TooltipHelper>}
@@ -243,7 +269,8 @@ export default function ListPairPage() {
               </x.div>
             </Dev>
             {!isUserLoggedIn && <ConnectWalletButton/>}
-            {isUserLoggedIn && <Submit block mt={5}>{isAllocationInsufficient ? "PURCHASE ALLOCATION" : "LIST"}</Submit>}
+            {isUserLoggedIn && isUserConnectedToMainnet && <Submit block mt={5}>{isAllocationInsufficient ? "PURCHASE ALLOCATION" : "LIST"}</Submit>}
+            {isUserLoggedIn && !isUserConnectedToMainnet && <Button block isDisabled>Please connect to Mainnet</Button>}
           </Form>
         </Pane>
       </x.div>
