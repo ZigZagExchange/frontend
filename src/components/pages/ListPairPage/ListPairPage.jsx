@@ -41,11 +41,14 @@ export default function ListPairPage() {
   const [quoteFee, setQuoteFee] = useState("")
   const [zigZagChainId, setZigZagChainId] = useState(1)
 
-  const [baseAssetIdSymbolPreview, setBaseAssetIdSymbolPreview] = useState(null)
-  const [quoteAssetIdSymbolPreview, setQuoteAssetIdSymbolPreview] = useState(null)
+  const [baseSymbol, setBaseSymbol] = useState(null)
+  const [quoteSymbol, setQuoteSymbol] = useState(null)
 
   const [isBaseAssetIdInvalid, setIsBaseAssetIdInvalid] = useState(false)
   const [isQuoteAssetIdInvalid, setIsQuoteAssetIdInvalid] = useState(false)
+
+  const [basePrice, setBasePrice] = useState(null)
+  const [quotePrice, setQuotePrice] = useState(null)
 
   const network = useSelector(networkSelector);
   const isUserConnectedToMainnet = network === 1
@@ -56,6 +59,19 @@ export default function ListPairPage() {
 
   const refreshUserArweaveAllocation = () => {
     return api.refreshArweaveAllocation(user.address)
+  }
+
+  const renderFeeHint = (assetPrice, assetFee, symbol) => {
+    if (assetPrice) {
+      const notional = (assetPrice * Number(assetFee)).toFixed(2)
+      if (notional > 0) {
+        return <x.div display={"flex"} justifyContent={"space-between"} fontSize={12} color={"blue-gray-500"} mt={1}>
+          <x.span>${notional}</x.span>
+          <x.span ml={3}>({symbol} ~ ${assetPrice.toFixed(4)})</x.span>
+        </x.div>
+      }
+    }
+    return null
   }
 
   useEffect(() => {
@@ -71,21 +87,28 @@ export default function ListPairPage() {
         if (symbol) {
           try {
             const {price} = await api.getTokenPrice(baseAssetId, chainId)
+            if (Number(price) === 0) {
+              throw Error(`${symbol} price came back as 0`)
+            }
+            setBasePrice(Number(price))
             setBaseFee((1 / Number(price)).toFixed(6))
           } catch (e) {
             setBaseFee("")
+            setBasePrice(null)
             console.error("error getting base price", e)
           }
         }
-        setBaseAssetIdSymbolPreview(symbol)
+        setBaseSymbol(symbol)
         setIsBaseAssetIdInvalid(false)
       } catch (e) {
-        setBaseAssetIdSymbolPreview(null)
+        setBaseSymbol(null)
         setIsBaseAssetIdInvalid(true)
         setBaseFee("")
+        setBasePrice(null)
       }
     } else {
-      setBaseAssetIdSymbolPreview(null)
+      setBaseSymbol(null)
+      setBasePrice(null)
     }
   }
 
@@ -96,21 +119,28 @@ export default function ListPairPage() {
         if (symbol) {
           try {
             const {price} = await api.getTokenPrice(quoteAssetId, chainId)
+            if (Number(price) === 0) {
+              throw Error(`${symbol} price came back as 0`)
+            }
+            setQuotePrice(Number(price))
             setQuoteFee((1 / Number(price)).toFixed(6))
           } catch (e) {
             setQuoteFee("")
+            setQuotePrice(null)
             console.error("error setting quote fee", e)
           }
         }
-        setQuoteAssetIdSymbolPreview(symbol)
+        setQuoteSymbol(symbol)
         setIsQuoteAssetIdInvalid(false)
       } catch (e) {
-        setQuoteAssetIdSymbolPreview(null)
+        setQuoteSymbol(null)
         setIsQuoteAssetIdInvalid(true)
         setQuoteFee("")
+        setQuotePrice(null)
       }
     } else {
-      setQuoteAssetIdSymbolPreview(null)
+      setQuoteSymbol(null)
+      setQuotePrice(null)
     }
   }
 
@@ -177,12 +207,12 @@ export default function ListPairPage() {
           <x.div fontSize={28} mb={2}>List New Market</x.div>
           {(baseAssetId || quoteAssetId) &&
           <x.div display={"flex"} fontSize={35} justifyContent={"center"} my={4}>
-            <x.span color={baseAssetIdSymbolPreview ? "blue-gray-400" : "blue-gray-800"}>
-              {baseAssetIdSymbolPreview ? baseAssetIdSymbolPreview : "XXX"}
+            <x.span color={baseSymbol ? "blue-gray-400" : "blue-gray-800"}>
+              {baseSymbol ? baseSymbol : "XXX"}
             </x.span>
-            <x.span color={baseAssetIdSymbolPreview && quoteAssetIdSymbolPreview ? "blue-gray-400" : "blue-gray-800"}>/</x.span>
-            <x.span color={quoteAssetIdSymbolPreview ? "blue-gray-400" : "blue-gray-800"}>
-              {quoteAssetIdSymbolPreview ? quoteAssetIdSymbolPreview : "XXX"}
+            <x.span color={baseSymbol && quoteSymbol ? "blue-gray-400" : "blue-gray-800"}>/</x.span>
+            <x.span color={quoteSymbol ? "blue-gray-400" : "blue-gray-800"}>
+              {quoteSymbol ? quoteSymbol : "XXX"}
             </x.span>
           </x.div>}
           <Form
@@ -221,22 +251,28 @@ export default function ListPairPage() {
                 ]}
                 rightOfLabel={<TooltipHelper>zkSync token ID of the second asset appearing in the pair (BASE/QUOTE)</TooltipHelper>}
               />
-              <NumberInput
-                block
-                name={"baseFee"}
-                {...model(baseFee, setBaseFee)}
-                label={baseAssetIdSymbolPreview ? `${baseAssetIdSymbolPreview} Swap Fee` : "Base Swap Fee"}
-                validate={[required, min(0)]}
-                rightOfLabel={<TooltipHelper>Swap fee collected by market makers</TooltipHelper>}
-              />
-              <NumberInput
-                block
-                name={"quoteFee"}
-                {...model(quoteFee, setQuoteFee)}
-                label={quoteAssetIdSymbolPreview ? `${quoteAssetIdSymbolPreview} Swap Fee` : "Quote Swap Fee"}
-                validate={[required, min(0)]}
-                rightOfLabel={<TooltipHelper>Swap fee collected by market makers</TooltipHelper>}
-              />
+              <x.div display={"flex"} flexDirection={"column"}>
+                <NumberInput
+                  block
+                  name={"baseFee"}
+                  {...model(baseFee, setBaseFee)}
+                  label={baseSymbol ? `${baseSymbol} Swap Fee` : "Base Swap Fee"}
+                  validate={[required, min(0)]}
+                  rightOfLabel={<TooltipHelper>Swap fee collected by market makers</TooltipHelper>}
+                />
+                {renderFeeHint(basePrice, baseFee, baseSymbol)}
+              </x.div>
+              <x.div display={"flex"} flexDirection={"column"}>
+                <NumberInput
+                  block
+                  name={"quoteFee"}
+                  {...model(quoteFee, setQuoteFee)}
+                  label={quoteSymbol ? `${quoteSymbol} Swap Fee` : "Quote Swap Fee"}
+                  validate={[required, min(0)]}
+                  rightOfLabel={<TooltipHelper>Swap fee collected by market makers</TooltipHelper>}
+                />
+                {renderFeeHint(quotePrice, quoteFee, quoteSymbol)}
+              </x.div>
               <NumberInput
                 block
                 name={"pricePrecisionDecimals"}
