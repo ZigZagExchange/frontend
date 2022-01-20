@@ -360,7 +360,7 @@ export class Footer extends React.Component {
         if (this.props.user.committed) {
           const balancesContent = Object.keys(
             this.props.user.committed.balances
-          ).map((token) => {
+          ).sort().map((token) => {
             const currencyInfo = api.getCurrencyInfo(token);
             if (!currencyInfo) return "";
             let balance = this.props.user.committed.balances[token];
