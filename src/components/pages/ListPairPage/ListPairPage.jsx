@@ -65,7 +65,7 @@ export default function ListPairPage() {
     if (assetPrice) {
       const notional = (Number(assetPrice) * Number(assetFee)).toFixed(2)
       if (notional > 0) {
-        return <x.div fontSize={12} color={"blue-gray-500"} mt={1}>
+        return <x.div pl={2} fontSize={12} color={"blue-gray-500"} mt={1}>
           {assetFee} {symbol} = ${notional}
         </x.div>
       }
