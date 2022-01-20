@@ -3,10 +3,10 @@ import { x } from "@xstyled/styled-components";
 import {useFormikContext} from "formik";
 import Loader from "react-loader-spinner";
 
-const Submit = ({children, ...rest}) => {
+const Submit = ({children, isDisabled, ...rest}) => {
     const {errors, isSubmitting} = useFormikContext()
-    const isDisabled = Object.keys(errors).length !== 0
-    return <Button isDisabled={isDisabled} type={"submit"} isLoading={isSubmitting} {...rest}>
+    const hasErrors = Object.keys(errors).length !== 0
+    return <Button isDisabled={isDisabled || hasErrors} type={"submit"} isLoading={isSubmitting} {...rest}>
         {children ? children : "Submit"}
     </Button>
 }

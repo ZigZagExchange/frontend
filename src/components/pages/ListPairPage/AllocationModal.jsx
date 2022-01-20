@@ -1,5 +1,5 @@
 import {useSelector} from "react-redux";
-import {arweaveAllocationSelector} from "../../../lib/store/features/api/apiSlice";
+import {arweaveAllocationSelector, balancesSelector} from "../../../lib/store/features/api/apiSlice";
 import React, {useEffect, useState} from "react";
 import {Modal} from "../../atoms/Modal";
 import api from "../../../lib/api";
@@ -10,22 +10,40 @@ import Submit from "../../atoms/Form/Submit";
 import Form from "../../atoms/Form/Form";
 import {x} from "@xstyled/styled-components";
 import {toast} from "react-toastify";
+import {jsonify} from "../../../lib/helpers/strings";
 
 const AllocationModal = ({onClose, show, onSuccess, bytesToPurchase}) => {
   const user = useSelector(userSelector)
   const arweaveAllocation = Number(useSelector(arweaveAllocationSelector));
+  const balanceData = useSelector(balancesSelector);
+
+  const [totalPrice, setTotalPrice] = useState(null)
+  const [isUSDCBalanceSufficient, setIsUSDCBalanceSufficient] = useState(false)
+
+  const arweaveAllocationKB = arweaveAllocation / 1000
   const userHasExistingAllocation = arweaveAllocation !== 0
   const fileSizeKB = bytesToPurchase / 1000
-  const arweaveAllocationKB = arweaveAllocation / 1000
-  const [KBtoPurchase, setKBToPurchase] = useState(null)
-
   const pricePerKB = 0.001
+
+
   useEffect(() => {
     if (user.address) {
       api.refreshArweaveAllocation(user.address)
-      setKBToPurchase(Number(((bytesToPurchase - arweaveAllocation) / 1000) * pricePerKB).toPrecision(2))
+      const kbToPurchase = Number(((bytesToPurchase - arweaveAllocation) / 1000))
+      setTotalPrice((kbToPurchase * pricePerKB).toPrecision(2))
+      if (totalPrice) {
+        if (balanceData.wallet && balanceData.wallet.USDC) {
+          let usdcBalance = Number(balanceData.wallet.USDC.valueReadable)
+          if (totalPrice > usdcBalance) {
+            setIsUSDCBalanceSufficient(false)
+          } else {
+            setIsUSDCBalanceSufficient(true)
+          }
+        }
+      }
     }
-  }, [bytesToPurchase, user.address, arweaveAllocation])
+    //@TODO: remove jsonify here, add better dep
+  }, [bytesToPurchase, user.address, arweaveAllocation, jsonify(balanceData.wallet)])
 
   return <Modal title={"Purchase Arweave Allocation"} show={show} onClose={onClose}>
     <x.div fontSize={14}>
@@ -49,7 +67,7 @@ const AllocationModal = ({onClose, show, onSuccess, bytesToPurchase}) => {
         <FaTimes size={18}/>
         <AllocationItem label={"$/kB"}>${pricePerKB}</AllocationItem>
         <FaEquals size={18}/>
-        <AllocationItem label={"total price"}>~${KBtoPurchase}</AllocationItem>
+        <AllocationItem label={"total price"}>~${totalPrice}</AllocationItem>
       </x.div>
     </Pane>
 
@@ -63,7 +81,9 @@ const AllocationModal = ({onClose, show, onSuccess, bytesToPurchase}) => {
         toast.error('Transaction was rejected - please make sure you have a sufficient USDC balance')
       }
     }}>
-      <Submit block>PURCHASE</Submit>
+      <Submit block isDisabled={!isUSDCBalanceSufficient}>
+        {isUSDCBalanceSufficient ? "PURCHASE" : `INSUFFICIENT USDC WALLET BALANCE`}
+      </Submit>
     </Form>
   </Modal>
 }
