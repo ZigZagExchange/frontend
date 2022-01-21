@@ -332,7 +332,7 @@ export default class APIZKProvider extends APIProvider {
             const url = "https://zigzag-arweave-bridge.herokuapp.com/allocation/zksync?address=" + address;
             try {
                 const allocation = await fetch(url).then(r => r.json());
-                const bytes = allocation.remaining_bytes;
+                const bytes = Number(allocation.remaining_bytes);
                 this.api.emit('arweaveAllocationUpdate', bytes);
             } catch (e) {
                 console.error(e);
