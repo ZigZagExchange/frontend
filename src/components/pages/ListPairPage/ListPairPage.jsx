@@ -81,7 +81,7 @@ export default function ListPairPage() {
               variant={"secondary"}
               size={"xs"}
               onClick={() => feeSetter(getAmountForTargetNotional(assetPrice))}>
-            set to $1
+              set to $1
             </Button>
             <x.div/>
         </x.div>}

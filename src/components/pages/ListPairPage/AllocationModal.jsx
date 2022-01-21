@@ -25,23 +25,27 @@ const AllocationModal = ({onClose, show, onSuccess, bytesToPurchase}) => {
   const fileSizeKB = bytesToPurchase / 1000
   const pricePerKB = 0.001
 
-
   useEffect(() => {
     if (user.address) {
       api.refreshArweaveAllocation(user.address)
       const kbToPurchase = Number(((bytesToPurchase - arweaveAllocation) / 1000))
       setTotalPrice((kbToPurchase * pricePerKB).toPrecision(2))
       if (totalPrice) {
-        if (balanceData.wallet && balanceData.wallet.USDC) {
-          let usdcBalance = Number(balanceData.wallet.USDC.valueReadable)
-          if (totalPrice > usdcBalance) {
-            setIsUSDCBalanceSufficient(false)
-          } else {
-            setIsUSDCBalanceSufficient(true)
-          }
+        let usdcBalance = 0
+        const feeCurrency = "USDC"
+        const mainnetNetwork = api.networks.mainnet[0]
+        if (mainnetNetwork in balanceData && feeCurrency in balanceData[mainnetNetwork]) {
+          usdcBalance = Number(balanceData[mainnetNetwork][feeCurrency].valueReadable)
+        }
+
+        if (totalPrice > usdcBalance) {
+          setIsUSDCBalanceSufficient(false)
+        } else {
+          setIsUSDCBalanceSufficient(true)
         }
       }
     }
+
     //@TODO: remove jsonify here, add better dep
   }, [bytesToPurchase, user.address, arweaveAllocation, jsonify(balanceData.wallet)])
 
