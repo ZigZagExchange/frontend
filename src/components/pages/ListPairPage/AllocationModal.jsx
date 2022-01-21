@@ -17,13 +17,13 @@ const AllocationModal = ({onClose, show, onSuccess, bytesToPurchase}) => {
   const arweaveAllocation = Number(useSelector(arweaveAllocationSelector));
   const balanceData = useSelector(balancesSelector);
 
-  const [totalPrice, setTotalPrice] = useState(0.5)
-  const [isUSDCBalanceSufficient, setIsUSDCBalanceSufficient] = useState(false)
-
   const arweaveAllocationKB = arweaveAllocation / 1000
   const userHasExistingAllocation = arweaveAllocation !== 0
   const fileSizeKB = bytesToPurchase / 1000
   const pricePerKB = 0.001
+
+  const [totalPrice, setTotalPrice] = useState(fileSizeKB * pricePerKB)
+  const [isUSDCBalanceSufficient, setIsUSDCBalanceSufficient] = useState(false)
 
   useEffect(() => {
     if (user.address) {
