@@ -25,6 +25,8 @@ const AllocationModal = ({onClose, show, onSuccess, bytesToPurchase}) => {
   const [totalPrice, setTotalPrice] = useState(fileSizeKB * pricePerKB)
   const [isUSDCBalanceSufficient, setIsUSDCBalanceSufficient] = useState(false)
 
+  useEffect(() => api.getBalances(), [])
+
   useEffect(() => {
     if (user.address) {
       api.refreshArweaveAllocation(user.address)
