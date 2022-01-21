@@ -21,6 +21,7 @@ import SelectInput from "../../atoms/Form/SelectInput";
 import {model} from "../../atoms/Form/helpers";
 import {debounce} from "lodash"
 import Tooltip from "../../atoms/Tooltip/Tooltip";
+import {sleep} from "../../../lib/helpers/utils";
 
 export default function ListPairPage() {
   const user = useSelector(userSelector);
@@ -364,15 +365,12 @@ export default function ListPairPage() {
         onClose={() => setIsAllocationModalOpen(false)}
         show={isAllocationModalOpen}
         bytesToPurchase={bytesToPurchase}
-        onSuccess={() => {
+        onSuccess={async () => {
           // API cache needs a bit of time to update. Arweave bridge runs on a 5 second loop
           // we timeout here so we make sure we get fresh data
-          setTimeout(async () => {
-            await refreshUserArweaveAllocation()
-            if (isArweaveAllocationSufficient) {
-              setFileToUpload(null)
-            }
-          }, 1 * 5000)
+          await sleep(5000)
+          await refreshUserArweaveAllocation()
+          setFileToUpload(null)
           setIsAllocationModalOpen(false)
         }}
       />

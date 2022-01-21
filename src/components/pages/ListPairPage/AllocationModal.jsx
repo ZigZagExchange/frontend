@@ -11,6 +11,7 @@ import Form from "../../atoms/Form/Form";
 import {x} from "@xstyled/styled-components";
 import {toast} from "react-toastify";
 import {jsonify} from "../../../lib/helpers/strings";
+import {sleep} from "../../../lib/helpers/utils";
 
 const AllocationModal = ({onClose, show, onSuccess, bytesToPurchase}) => {
   const user = useSelector(userSelector)
@@ -26,6 +27,7 @@ const AllocationModal = ({onClose, show, onSuccess, bytesToPurchase}) => {
   const [isUSDCBalanceSufficient, setIsUSDCBalanceSufficient] = useState(false)
 
   useEffect(() => api.getBalances(), [])
+
 
   useEffect(() => {
     if (user.address) {
@@ -81,7 +83,7 @@ const AllocationModal = ({onClose, show, onSuccess, bytesToPurchase}) => {
       try {
         const transaction = await api.purchaseArweaveBytes(bytesToPurchase)
         await transaction.awaitReceipt()
-        onSuccess()
+        await onSuccess()
       } catch (e) {
         console.error("Error purchasing arweave bytes", e)
         toast.error('Transaction was rejected')
