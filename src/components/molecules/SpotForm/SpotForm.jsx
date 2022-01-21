@@ -86,7 +86,13 @@ export class SpotForm extends React.Component {
             baseBalance = 0;
             quoteBalance = 0;
         }
-        const price = this.currentPrice();
+        let price = this.currentPrice();
+        if (this.props.side === "b") {
+            price = (price * 1.001).toFixed(marketInfo.pricePrecisionDecimals);
+        }
+        else if (this.props.side === "s") {
+            price = (price * 0.999).toFixed(marketInfo.pricePrecisionDecimals);
+        }
 
         baseBalance = parseFloat(baseBalance);
         quoteBalance = parseFloat(quoteBalance);
@@ -184,10 +190,10 @@ export class SpotForm extends React.Component {
         }
 
         if (this.props.side === "b") {
-            return (this.getFirstAsk() * 1.001).toFixed(marketInfo.pricePrecisionDecimals);
+            return (this.getFirstAsk()).toFixed(marketInfo.pricePrecisionDecimals);
         }
         else if (this.props.side === "s") {
-            return (this.getFirstBid() * 0.999).toFixed(marketInfo.pricePrecisionDecimals);
+            return (this.getFirstBid()).toFixed(marketInfo.pricePrecisionDecimals);
         }
         return 0;
     }
