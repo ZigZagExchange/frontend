@@ -29,7 +29,7 @@ const AllocationModal = ({onClose, show, onSuccess, bytesToPurchase}) => {
     if (user.address) {
       api.refreshArweaveAllocation(user.address)
       const kbToPurchase = Number(((bytesToPurchase - arweaveAllocation) / 1000))
-      setTotalPrice((kbToPurchase * pricePerKB).toPrecision(2))
+      setTotalPrice((kbToPurchase * pricePerKB))
       if (totalPrice) {
         let usdcBalance = 0
         const feeCurrency = "USDC"
@@ -71,7 +71,7 @@ const AllocationModal = ({onClose, show, onSuccess, bytesToPurchase}) => {
         <FaTimes size={18}/>
         <AllocationItem label={"$/kB"}>${pricePerKB}</AllocationItem>
         <FaEquals size={18}/>
-        <AllocationItem label={"total price"}>~${totalPrice}</AllocationItem>
+        <AllocationItem label={"total price"}>~${totalPrice.toPrecision(2)}</AllocationItem>
       </x.div>
     </Pane>
 
