@@ -49,7 +49,7 @@ const AllocationModal = ({onClose, show, onSuccess, bytesToPurchase}) => {
     }
 
     //@TODO: remove jsonify here, add better dep
-  }, [bytesToPurchase, user.address, arweaveAllocation, jsonify(balanceData.wallet)])
+  }, [bytesToPurchase, user.address, arweaveAllocation, jsonify(balanceData)])
 
   return <Modal title={"Purchase Arweave Allocation"} show={show} onClose={onClose}>
     <x.div fontSize={14}>

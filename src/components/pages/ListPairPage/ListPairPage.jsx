@@ -33,7 +33,6 @@ export default function ListPairPage() {
   const [fileToUpload, setFileToUpload] = useState(null)
   const [isAllocationModalOpen, setIsAllocationModalOpen] = useState(false)
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
-  const [isAllocationInsufficient, setIsAllocationInsufficient] = useState(false)
 
   const [baseAssetId, setBaseAssetId] = useState("")
   const [quoteAssetId, setQuoteAssetId] = useState("")
@@ -56,6 +55,7 @@ export default function ListPairPage() {
   // we purchase 500k bytes at once so the user does not have to
   // repeatedly repurchase space if wanting to list more than 1 market
   const bytesToPurchase = 500000
+  const isAllocationSufficient = fileToUpload ? fileToUpload.size < arweaveAllocation : false
 
   const refreshUserArweaveAllocation = () => {
     return api.refreshArweaveAllocation(user.address)
@@ -91,6 +91,7 @@ export default function ListPairPage() {
 
   useEffect(() => {
     refreshUserArweaveAllocation()
+    setIsAllocationModalOpen(false)
   }, [user.address]);
 
   async function getBaseInfo(baseAssetId, chainId) {
@@ -182,7 +183,6 @@ export default function ListPairPage() {
 
       if (file.size > arweaveAllocation) {
         setFileToUpload(file)
-        setIsAllocationInsufficient(true)
         setIsAllocationModalOpen(true)
         reject()
         return
@@ -315,7 +315,7 @@ export default function ListPairPage() {
                 rightOfLabel={<TooltipHelper>zkSync network on which the pair will be listed</TooltipHelper>}
               />
             </x.div>
-            {isAllocationInsufficient &&
+            {isAllocationSufficient &&
             <x.div display={"flex"} alignItems={"center"} justifyContent={"space-between"} mb={4}>
               <x.div display={"flex"} alignItems={"center"}>
                 <RiErrorWarningLine size={18} color={"red"}/>
@@ -331,7 +331,7 @@ export default function ListPairPage() {
               </x.div>
             </Dev>
             {!isUserLoggedIn && <ConnectWalletButton/>}
-            {isUserLoggedIn && isUserConnectedToMainnet && <Submit block mt={5}>{isAllocationInsufficient ? "PURCHASE ALLOCATION" : "LIST"}</Submit>}
+            {isUserLoggedIn && isUserConnectedToMainnet && <Submit block mt={5}>{isAllocationSufficient ? "PURCHASE ALLOCATION" : "LIST"}</Submit>}
             {isUserLoggedIn && !isUserConnectedToMainnet && <Button block isDisabled>Please connect to Mainnet</Button>}
           </Form>
         </Pane>
@@ -345,10 +345,7 @@ export default function ListPairPage() {
           // we timeout here so we make sure we get fresh data
           setTimeout(async () => {
             await refreshUserArweaveAllocation()
-            if (fileToUpload.size > arweaveAllocation) {
-              setIsAllocationInsufficient(true)
-            } else {
-              setIsAllocationInsufficient(false)
+            if (isAllocationSufficient) {
               setFileToUpload(null)
             }
           }, 1 * 5000)
