@@ -194,6 +194,7 @@ export default function ListPairPage() {
         setTxId(response.arweave_txid);
 
         setIsSuccessModalOpen(true);
+        setHasAttemptedSubmit(false)
         resetForm()
       } catch (e) {
         reject(e)
