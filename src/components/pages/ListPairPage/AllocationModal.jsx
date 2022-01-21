@@ -17,7 +17,7 @@ const AllocationModal = ({onClose, show, onSuccess, bytesToPurchase}) => {
   const arweaveAllocation = Number(useSelector(arweaveAllocationSelector));
   const balanceData = useSelector(balancesSelector);
 
-  const [totalPrice, setTotalPrice] = useState(null)
+  const [totalPrice, setTotalPrice] = useState(0.5)
   const [isUSDCBalanceSufficient, setIsUSDCBalanceSufficient] = useState(false)
 
   const arweaveAllocationKB = arweaveAllocation / 1000
