@@ -61,7 +61,6 @@ export default function ListPairPage() {
     return api.refreshArweaveAllocation(user.address)
   }
 
-
   const getAmountForTargetNotional = (price) => {
     const targetUSDFeeAmount = 1
     return (targetUSDFeeAmount / price).toFixed(6)
@@ -91,10 +90,8 @@ export default function ListPairPage() {
   }
 
   useEffect(() => {
-    if (user.address) {
-      refreshUserArweaveAllocation()
-    }
-  }, []);
+    refreshUserArweaveAllocation()
+  }, [user.address]);
 
   async function getBaseInfo(baseAssetId, chainId) {
     if (baseAssetId && baseAssetId !== "") {
