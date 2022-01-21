@@ -18,12 +18,15 @@ import {
   marketSummarySelector,
   liquiditySelector,
   currentMarketSelector,
+  marketInfoSelector,
   setCurrentMarket,
   resetData,
 } from "lib/store/features/api/apiSlice";
 import { userSelector } from "lib/store/features/auth/authSlice";
 import "./style.css";
 import api from "lib/api";
+import {useLocation,useHistory} from "react-router-dom";
+import {getChainIdFromMarketChain, marketQueryParam} from "../ListPairPage/SuccessModal";
 
 const TradePage = () => {
   const [marketDataTab, updateMarketDataTab] = useState('fills')
@@ -37,9 +40,42 @@ const TradePage = () => {
   const lastPrices = useSelector(lastPricesSelector);
   const marketSummary = useSelector(marketSummarySelector);
   const liquidity = useSelector(liquiditySelector);
+  const marketInfo = useSelector(marketInfoSelector);
   const dispatch = useDispatch();
   const lastPriceTableData = [];
   const markets = [];
+
+  const { search } = useLocation()
+  const history = useHistory();
+
+  const updateMarketChain = (market) => {
+    dispatch(setCurrentMarket(market));
+  }
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(search);
+    const marketFromURL = urlParams.get(marketQueryParam)
+    const networkFromURL = urlParams.get("network");
+    const chainid = getChainIdFromMarketChain(networkFromURL)
+    if (marketFromURL && currentMarket !== marketFromURL) {
+      updateMarketChain(marketFromURL)
+    }
+    if (chainid && network !== chainid) {
+      api.setAPIProvider(chainid)
+      api.signOut();
+    }
+  }, [])
+
+  // Update URL when market or network update
+  useEffect(() => {
+      let networkText;
+      if (network === 1) {
+          networkText = "zksync";
+      } else if (network === 1000) {
+          networkText = "zksync-rinkeby";
+      }
+      history.push(`/?market=${currentMarket}&network=${networkText}`);
+  }, [network, currentMarket])
 
   useEffect(() => {
     const sub = () => {
@@ -62,9 +98,6 @@ const TradePage = () => {
     }
   }, [network, currentMarket])
 
-  const updateMarketChain = (market) => {
-    dispatch(setCurrentMarket(market));
-  }
 
   Object.keys(lastPrices).forEach((market) => {
     markets.push(market);
@@ -141,24 +174,22 @@ const TradePage = () => {
 
   if (api.isZksyncChain()) {
     liquidity.forEach((liq) => {
-      const quantity = liq[0];
-      const spread = liq[1];
-      const side = liq[2];
-      if (side === "d" || side === "b") {
-        const bidPrice = marketSummary.price * (1 - spread);
+      const side = liq[0];
+      const price = liq[1];
+      const quantity = liq[2];
+      if (side === "b") {
         orderbookBids.push({
-          td1: bidPrice,
+          td1: price,
           td2: quantity,
-          td3: bidPrice * quantity,
+          td3: price * quantity,
           side: "b",
         });
       }
-      if (side === "d" || side === "s") {
-        const askPrice = marketSummary.price * (1 + spread);
+      if (side === "s") {
         orderbookAsks.push({
-          td1: askPrice,
+          td1: price,
           td2: quantity,
-          td3: askPrice * quantity,
+          td3: price * quantity,
           side: "s",
         });
       }
@@ -169,11 +200,11 @@ const TradePage = () => {
   orderbookBids.sort((a, b) => b.td1 - a.td1);
   
   const askBins = [];
-  for (let i in orderbookAsks) {
+  for (let i = 0; i < orderbookAsks.length; i++) {
     const lastAskIndex = askBins.length - 1;
-    if (i === "0") {
+    if (i === 0) {
       askBins.push(orderbookAsks[i]);
-    } else if (orderbookAsks[i].td1 === askBins[lastAskIndex].td1) {
+    } else if (orderbookAsks[i].td1.toPrecision(6) === askBins[lastAskIndex].td1.toPrecision(6)) {
       askBins[lastAskIndex].td2 += orderbookAsks[i].td2;
       askBins[lastAskIndex].td3 += orderbookAsks[i].td3;
     } else {
@@ -186,7 +217,7 @@ const TradePage = () => {
     const lastBidIndex = bidBins.length - 1;
     if (i === "0") {
       bidBins.push(orderbookBids[i]);
-    } else if (orderbookBids[i].td1 === bidBins[lastBidIndex].td1) {
+    } else if (orderbookBids[i].td1.toPrecision(6) === bidBins[lastBidIndex].td1.toPrecision(6)) {
       bidBins[lastBidIndex].td2 += orderbookBids[i].td2;
       bidBins[lastBidIndex].td3 += orderbookBids[i].td3;
     } else {
@@ -206,17 +237,11 @@ const TradePage = () => {
     (order) => activeOrderStatuses.includes(order[9])
   ).length;
 
-  let tradingViewMarket = currentMarket;
-  const baseCurrency = currentMarket.split("-")[0];
-  const quoteCurrency = currentMarket.split("-")[1];
-  if (baseCurrency === "WBTC") tradingViewMarket = "BTC-" + quoteCurrency;
-  if (quoteCurrency === "WBTC") tradingViewMarket = baseCurrency + "-BTC";
-
   return (
     <DefaultTemplate>
       <div className="trade_section">
         <div className="trade_container">
-          <div className="col-12 col-xl-6 d-flex flex-column">
+          <div className="col-12 col-lg-6 d-flex flex-column">
             <div className="trade_left">
               <div>
                 {/* Trade Head */}
@@ -225,18 +250,19 @@ const TradePage = () => {
                   marketSummary={marketSummary}
                   markets={markets}
                   currentMarket={currentMarket}
+                  marketInfo={marketInfo}
                 />
                 {/* Trade Chart */}
-                <TradeChart currentMarket={tradingViewMarket} />
+                <TradeChart marketInfo={marketInfo} />
               </div>
             </div>
             <SpotBox
               lastPrice={marketSummary.price}
-              signInHandler={() => api.signIn(network)}
               user={user}
               currentMarket={currentMarket}
               activeOrderCount={activeUserOrders}
               liquidity={liquidity}
+              marketInfo={marketInfo}
             />
             <div className="d-block d-xl-none" style={{"width": "100%"}}>
                 <Footer
@@ -246,7 +272,7 @@ const TradePage = () => {
                 />
             </div>
           </div>
-          <div className="col-12 col-xl-6">
+          <div className="col-12 col-lg-6">
             <div className="trade_right">
               <div className="col-12 col-sm-12 col-md-12 col-lg-6">
                 <div className="trade_Price">
@@ -291,16 +317,6 @@ const TradePage = () => {
                 <div className="trade_Price trade_price2">
                   {/* Trade Price Third Head */}
                   <div className="trade_price_head_third">
-                    <strong
-                      className={
-                        marketDataTab === "orders"
-                          ? "trade_price_active_tab"
-                          : ""
-                      }
-                      onClick={() => updateMarketDataTab("orders")}
-                    >
-                      Open Orders
-                    </strong>
                     <strong
                       className={
                         marketDataTab === "fills"

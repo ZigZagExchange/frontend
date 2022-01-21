@@ -24,6 +24,7 @@ class SpotBox extends React.Component {
     }
 
   render() {
+      const marketInfo = this.props.marketInfo;
       return (
         <>
           <div className="spot_box">
@@ -32,7 +33,9 @@ class SpotBox extends React.Component {
                 <h2>SPOT</h2>
               </div>
               <div className="sh_r">
-                Gas fee: $1 / trade
+                 Sell Fee: {marketInfo && marketInfo.baseFee} {marketInfo && marketInfo.baseAsset.symbol}
+                 <br/>
+                 Buy Fee: {marketInfo && marketInfo.quoteFee} {marketInfo && marketInfo.quoteAsset.symbol}
               </div>
             </div>
             <div className="spot_tabs">
@@ -45,22 +48,22 @@ class SpotBox extends React.Component {
               <SpotForm
                 side="b"
                 lastPrice={this.props.lastPrice}
-                signInHandler={this.props.signInHandler}
                 user={this.props.user}
                 currentMarket={this.props.currentMarket}
                 orderType={this.state.orderType}
                 activeOrderCount={this.props.activeOrderCount}
                 liquidity={this.props.liquidity}
+                marketInfo={marketInfo}
               />
               <SpotForm
                 side="s"
                 lastPrice={this.props.lastPrice}
-                signInHandler={this.props.signInHandler}
                 user={this.props.user}
                 currentMarket={this.props.currentMarket}
                 orderType={this.state.orderType}
                 activeOrderCount={this.props.activeOrderCount}
                 liquidity={this.props.liquidity}
+                marketInfo={marketInfo}
               />
             </div>
           </div>

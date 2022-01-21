@@ -6,10 +6,13 @@ import { toBaseUnit } from 'lib/utils'
 import APIProvider from './APIProvider'
 import { MAX_ALLOWANCE } from '../constants'
 import axios from 'axios';
+
 export default class APIZKProvider extends APIProvider {
     static SEEDS_STORAGE_KEY = '@ZZ/ZKSYNC_SEEDS'
     static VALID_SIDES = ['b', 's']
     
+    marketInfo = {}
+    lastPrices = {}
     ethWallet = null
     syncWallet = null
     syncProvider = null
@@ -98,47 +101,35 @@ export default class APIZKProvider extends APIProvider {
         return signingKey;
     }
 
-    submitOrder = async (product, side, price, amount, orderType) => {
-        amount = parseFloat(amount)
-        const currencies = product.split('-')
-        const baseCurrency = currencies[0]
-        const quoteCurrency = currencies[1]
-
-        if (baseCurrency === 'USDC' || baseCurrency === 'USDT') {
-            amount = parseFloat(amount).toFixed(7).slice(0, -1)
-        }
-
-        price = parseFloat(price).toPrecision(8)
+    submitOrder = async (market, side, price, amount, orderType) => {
+        const marketInfo = this.marketInfo[market];
+        amount = parseFloat(amount).toFixed(marketInfo.baseAsset.decimals);
+        price = parseFloat(price).toFixed(marketInfo.pricePrecisionDecimals);
         
         if (!APIZKProvider.VALID_SIDES.includes(side)) {
             throw new Error('Invalid side')
         }
         
-        let tokenBuy, tokenSell, sellQuantity, buyQuantity, sellQuantityWithFee
+        let tokenBuy, tokenSell, sellQuantity, sellQuantityWithFee, tokenRatio = {}, fullSellQuantity;
         
         if (side === 'b') {
-            [tokenBuy, tokenSell] = currencies
-            buyQuantity = amount
             sellQuantity = parseFloat(amount * price)
+            sellQuantityWithFee = (sellQuantity + marketInfo.quoteFee).toFixed(marketInfo.quoteAsset.decimals);
+            tokenSell = marketInfo.quoteAssetId;
+            tokenBuy = marketInfo.baseAssetId
+            tokenRatio[marketInfo.baseAssetId] = amount;
+            tokenRatio[marketInfo.quoteAssetId] = sellQuantityWithFee;
+            fullSellQuantity = (sellQuantityWithFee * 10**(marketInfo.quoteAsset.decimals)).toLocaleString('fullwide', {useGrouping: false })
         } else if (side === 's') {
-            [tokenSell, tokenBuy] = currencies
-            buyQuantity = amount * price
             sellQuantity = parseFloat(amount)
-        }
-
-        sellQuantityWithFee = sellQuantity + this.api.currencies[tokenSell].gasFee
-        let priceWithFee = 0
-        
-        if (side === 'b') {
-            priceWithFee = parseFloat((sellQuantityWithFee / buyQuantity).toPrecision(6))
-        }
-        else if (side === 's') {
-            priceWithFee = parseFloat((buyQuantity / sellQuantityWithFee).toPrecision(6))
+            sellQuantityWithFee = (sellQuantity + marketInfo.baseFee).toFixed(marketInfo.baseAsset.decimals);
+            tokenSell = marketInfo.baseAssetId;
+            tokenBuy = marketInfo.quoteAssetId;
+            tokenRatio[marketInfo.baseAssetId] = sellQuantityWithFee;
+            tokenRatio[marketInfo.quoteAssetId] = (amount * price).toFixed(marketInfo.quoteAsset.decimals);
+            fullSellQuantity = (sellQuantityWithFee * 10**(marketInfo.baseAsset.decimals)).toLocaleString('fullwide', {useGrouping: false })
         }
         
-        const tokenRatio = {}
-        tokenRatio[baseCurrency] = 1
-        tokenRatio[quoteCurrency] = priceWithFee.toString()
         const now_unix = Date.now() / 1000 | 0
         const two_minute_expiry = now_unix + 120
         const one_day_expiry = now_unix + 24*3600;
@@ -148,19 +139,16 @@ export default class APIZKProvider extends APIProvider {
         } else {
             validUntil = two_minute_expiry;
         }
-        const parsedSellQuantity = this.syncProvider.tokenSet.parseToken(
-            tokenSell,
-            sellQuantityWithFee.toFixed(this.api.currencies[tokenSell].decimals)
-        );
-        const packedSellQuantity = zksync.utils.closestPackableTransactionAmount(parsedSellQuantity);
+        const sellQuantityBN = ethers.BigNumber.from(fullSellQuantity);
+        const packedSellQuantity = zksync.utils.closestPackableTransactionAmount(sellQuantityBN);
         const order = await this.syncWallet.getOrder({
             tokenSell,
             tokenBuy,
-            amount: packedSellQuantity,
+            amount: packedSellQuantity.toString(),
             ratio: zksync.utils.tokenRatio(tokenRatio),
             validUntil
         })
-        this.api.send('submitorder', [this.network, order])
+        this.api.send('submitorder2', [this.network, market, order])
 
         return order
     }
@@ -169,12 +157,13 @@ export default class APIZKProvider extends APIProvider {
         const account = await this.getAccountState()
         const balances = {}
 
-        Object.keys(this.api.currencies).forEach(ticker => {
-            const currency = this.api.currencies[ticker]
+        this.getCurrencies().forEach(ticker => {
+            const currencyInfo = this.getCurrencyInfo(ticker);
             const balance = ((account && account.committed) ? (account.committed.balances[ticker] || 0) : 0)
+            if (!balance) return true;
             balances[ticker] = {
                 value: balance,
-                valueReadable: balance && (balance / (10 ** currency.decimals)),
+                valueReadable: (balance && currencyInfo && (balance / (10 ** currencyInfo.decimals))) || 0,
                 allowance: MAX_ALLOWANCE,
             }
         })
@@ -191,7 +180,8 @@ export default class APIZKProvider extends APIProvider {
     withdrawL2 = async (amountDecimals, token = 'ETH') => {
         let transfer
 
-        const amount = toBaseUnit(amountDecimals, this.api.currencies[token].decimals)
+        const currencyInfo = this.getCurrencyInfo(token);
+        const amount = toBaseUnit(amountDecimals, currencyInfo.decimals)
         
         try {
             transfer = await this.syncWallet.withdrawFromSyncToEthereum({
@@ -214,7 +204,8 @@ export default class APIZKProvider extends APIProvider {
     depositL2 = async (amountDecimals, token = 'ETH') => {
         let transfer
 
-        const amount = toBaseUnit(amountDecimals, this.api.currencies[token].decimals)
+        const currencyInfo = this.getCurrencyInfo(token);
+        const amount = toBaseUnit(amountDecimals, currencyInfo.decimals)
 
         try {
             transfer = await this.syncWallet.depositToSyncFromEthereum({
@@ -237,6 +228,7 @@ export default class APIZKProvider extends APIProvider {
     }
     
     withdrawL2Fee = async (token = 'ETH') => {
+        const currencyInfo = this.getCurrencyInfo(token);
         if (! this._tokenWithdrawFees[token]) {
             const fee = await this.syncProvider.getTransactionFee(
                 'Withdraw',
@@ -246,7 +238,7 @@ export default class APIZKProvider extends APIProvider {
     
             this._tokenWithdrawFees[token] = (
                 parseInt(fee.totalFee)
-                / 10 ** this.api.currencies[token].decimals
+                / 10 ** currencyInfo.decimals
             )
         }
 
@@ -333,5 +325,112 @@ export default class APIZKProvider extends APIProvider {
         const ethSignatureType = await zksync.utils.getEthSignatureType(ethSigner.provider, message, signature, address);
         const seed = ethers.utils.arrayify(signature);
         return { seed, ethSignatureType };
+    }
+
+    refreshArweaveAllocation = async (address) => {
+        const url = "https://zigzag-arweave-bridge.herokuapp.com/allocation/zksync?address=" + address;
+        try {
+            const allocation = await fetch(url).then(r => r.json());
+            const bytes = allocation.remaining_bytes;
+            this.api.emit('arweaveAllocationUpdate', bytes);
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    purchaseArweaveBytes = async (bytes) => {
+        const feeToken = "USDC"
+        const feeTokenDecimals = 6
+        const BYTES_PER_DOLLAR = 10**6;
+        const ARWEAVE_BRIDGE_ADDRESS = "0xCb7AcA0cdEa76c5bD5946714083c559E34627607";
+        const amount = (bytes / BYTES_PER_DOLLAR * 10**feeTokenDecimals).toString();
+        return this.syncWallet.syncTransfer({
+            to: ARWEAVE_BRIDGE_ADDRESS,
+            token: feeToken,
+            amount,
+        });
+    }
+
+    signMessage = async (message) => {
+        return await this.ethWallet.signMessage(message);
+    }
+
+    getChainName = (chainId) => {
+        if (Number(chainId) === 1) {
+            return "mainnet"
+        } else if (Number(chainId) === 1000) {
+            return "rinkeby"
+        } else {
+            throw Error("Chain ID not understood")
+        }
+    }
+
+    getZkSyncBaseUrl = (chainId) => {
+        if (this.getChainName(chainId) === "mainnet") {
+            return "https://api.zksync.io/api/v0.2"
+        } else if (this.getChainName(chainId) === "rinkeby") {
+            return "https://rinkeby-api.zksync.io/api/v0.2"
+        } else {
+            throw Error("Uknown chain")
+        }
+    }
+
+
+    tokenInfo = async (tokenLike, chainId) => {
+        try {
+            const res = await axios.get(this.getZkSyncBaseUrl(chainId) + `/tokens/${tokenLike}`)
+            return res.data.result
+        } catch (e) {
+            console.error("Could not get token info", e)
+        }
+    }
+
+    tokenPrice = async (tokenLike, chainId) => {
+        try {
+            const res = await axios.get(this.getZkSyncBaseUrl(chainId) + `/tokens/${tokenLike}/priceIn/usd`)
+            return res.data.result
+        } catch (e) {
+            console.error("Could not get token price", e)
+        }
+    }
+
+    cacheMarketInfoFromNetwork = async (pairs) => {
+        if (pairs.length === 0) return;
+        if (!this.network) return;
+        const pairText = pairs.join(',');
+        const url = `https://zigzag-markets.herokuapp.com/markets?id=${pairText}&chainid=${this.network}`;
+        const marketInfoArray = await fetch(url).then(r => r.json());
+        if (!(marketInfoArray instanceof Array)) return;
+        marketInfoArray.forEach(info => this.marketInfo[info.alias] = info);
+        return;
+    }
+
+    getPairs = () => {
+        return Object.keys(this.lastPrices);
+    }
+
+    getCurrencyInfo (currency) {
+        const pairs = this.getPairs();
+        for (let i=0; i < pairs.length; i++) {
+            const pair = pairs[i];
+            const baseCurrency = pair.split("-")[0];
+            const quoteCurrency = pair.split("-")[1];
+            if (baseCurrency === currency && this.marketInfo[pair]) {
+                return this.marketInfo[pair].baseAsset;
+            }
+            else if (quoteCurrency === currency && this.marketInfo[pair]) {
+                return this.marketInfo[pair].quoteAsset;
+            }
+        }
+        return null;
+    }
+
+    getCurrencies = () => {
+        const tickers = new Set();
+        for (let market in this.lastPrices) {
+            tickers.add(this.lastPrices[market][0].split("-")[0]);
+            tickers.add(this.lastPrices[market][0].split("-")[1]);
+        }
+        return [...tickers];
     }
 }

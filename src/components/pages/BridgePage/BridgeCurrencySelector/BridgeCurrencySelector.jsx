@@ -123,19 +123,14 @@ const BridgeCurrencyOptions = styled.ul`
 `
 
 const BridgeCurrencySelector = ({ onChange, currencies, balances = {}, value }) => {
-  const [tickers, setTickers] = useState([]);
   const [showingOptions, setShowingOptions] = useState(false);
   const network = useSelector(networkSelector);
   const user = useSelector(userSelector);
   const coinEstimator = useCoinEstimator();
+  const tickers = api.getCurrencies();
 
   useEffect(() => {
-    const tickers = (currencies || Object.keys(api.currencies)).filter((c) => {
-      return api.currencies[c].chain[network];
-    }).sort();
-
-    setTickers(tickers);
-    onChange(api.currencies["ETH"] ? "ETH" : tickers[0]);
+    onChange(api.marketInfo["ETH"] ? "ETH" : tickers[0]);
   }, [user.id, network, currencies]);
 
   const hideOptions = (e) => {
@@ -163,7 +158,8 @@ const BridgeCurrencySelector = ({ onChange, currencies, balances = {}, value }) 
     return null;
   }
 
-  const currency = api.currencies[value];
+  const currency = api.getCurrencyInfo(value);
+  const image = api.getImage(value);
 
   const selectOption = ticker => (e) => {
     if (e) e.preventDefault()
@@ -174,7 +170,7 @@ const BridgeCurrencySelector = ({ onChange, currencies, balances = {}, value }) 
     <BridgeCurrencyWrapper>
       <StyledBridgeCurrencySelector onClick={toggleOptions}>
         <div className="currencyIcon">
-          <img src={currency.image.default} alt={currency.name} />
+          <img src={image && image.default} alt={currency && currency.symbol} />
         </div>
         <div className="currencyName">
           {value}
@@ -186,7 +182,7 @@ const BridgeCurrencySelector = ({ onChange, currencies, balances = {}, value }) 
           ticker === value ? null :
           <li key={key} onClick={selectOption(ticker)} tabIndex="0" className="currencyOption">
             <div className="currencyIcon">
-              <img src={api.currencies[ticker].image.default} alt={currency.name} />
+              <img src={api.getImage(ticker) && api.getImage(ticker).default} alt={currency && currency.symbol} />
             </div>
             <div className="currencyName">
               {ticker}

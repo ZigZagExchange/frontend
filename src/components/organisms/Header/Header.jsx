@@ -1,29 +1,25 @@
 import { useSelector } from 'react-redux'
-import { useHistory, useLocation } from 'react-router-dom'
 import { BiChevronDown } from 'react-icons/bi'
 import { FaDiscord, FaTelegramPlane, FaTwitter } from 'react-icons/fa'
 import { GoGlobe } from 'react-icons/go'
 import { HiExternalLink } from 'react-icons/hi'
 import React, { useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import { Button, Dropdown, AccountDropdown, Menu, MenuItem } from 'components'
+import { Dropdown, AccountDropdown, Menu, MenuItem } from 'components'
 import { userSelector } from 'lib/store/features/auth/authSlice'
 import { networkSelector } from 'lib/store/features/api/apiSlice'
 import api from 'lib/api'
 import logo from 'assets/images/logo.png'
 import menu from 'assets/icons/menu.png'
-import darkPlugHead from 'assets/icons/dark-plug-head.png'
 import './Header.css'
+import ConnectWalletButton from "../../atoms/ConnectWalletButton/ConnectWalletButton";
+import {Dev } from "../../../lib/helpers/env";
 
 export const Header = (props) => {
   // state to open or close the sidebar in mobile
   const [show, setShow] = useState(false)
-  const [connecting, setConnecting] = useState(false)
   const user = useSelector(userSelector)
   const network = useSelector(networkSelector)
-  const history = useHistory()
-  const location = useLocation()
-
   const hasBridge = api.isImplemented('depositL2')
 
   const handleMenu = ({ key }) => {
@@ -41,18 +37,6 @@ export const Header = (props) => {
       <MenuItem key="signOut">Disconnect</MenuItem>
     </Menu>
   )
-
-  const connect = () => {
-    setConnecting(true)
-    api.signIn(network)
-      .then(state => {
-        if (!state.id && !/^\/bridge(\/.*)?/.test(location.pathname)) {
-          history.push('/bridge')
-        }
-        setConnecting(false)
-      })
-      .catch(() => setConnecting(false))
-  }
 
   return (
     <>
@@ -90,17 +74,23 @@ export const Header = (props) => {
                     {' '}<HiExternalLink />
                   </a>
                 </li>}
-                {hasBridge && <li>
-                  <a href="https://zigzag.banxa.com/" target="_blank" rel="noreferrer">
-                    Fiat
-                    {' '}<HiExternalLink />
-                  </a>
-                </li>}
-                {process.env.NODE_ENV === 'development' && <li>
-                  <NavLink exact to="/pool" activeClassName="active_link">
-                    Pool
+                <li>
+                  <NavLink exact to="/list-pair" activeClassName="active_link">
+                    List
                   </NavLink>
-                </li>}
+                </li>
+                <Dev>
+                  <li>
+                    <NavLink exact to="/pool" activeClassName="active_link">
+                      Pool
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink exact to="/dsl" activeClassName="active-link">
+                      DSL
+                    </NavLink>
+                  </li>
+                </Dev>
               </ul>
             </div>
             <div className="head_right">
@@ -113,9 +103,7 @@ export const Header = (props) => {
                     </button>
                   </Dropdown>
                 ) : (
-                  <Button loading={connecting} className="bg_btn" onClick={connect}>
-                    <img src={darkPlugHead} alt="..." /> CONNECT WALLET
-                  </Button>
+                  <ConnectWalletButton/>
                 )}
               </div>
               <div className="eu_text">
@@ -153,23 +141,29 @@ export const Header = (props) => {
                   Bridge
                 </NavLink>
               </li>}
+              <li>
+                <NavLink exact to="/list-pair" activeClassName="active_link">
+                  List
+                </NavLink>
+              </li>
               {hasBridge && <li>
                 <a href="https://docs.zigzag.exchange/" target="_blank" rel="noreferrer">
                   Docs
                   {' '}<HiExternalLink />
                 </a>
               </li>}
-              {hasBridge && <li>
-                <a href="https://zigzag.banxa.com/" target="_blank" rel="noreferrer">
-                  Fiat
-                  {' '}<HiExternalLink />
-                </a>
-              </li>}
-              {process.env.NODE_ENV === 'development' && <li>
-                <NavLink exact to="/pool" activeClassName="active_link">
-                  Pool
-                </NavLink>
-              </li>}
+              <Dev>
+                <li>
+                  <NavLink exact to="/pool" activeClassName="active_link">
+                    Pool
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink exact to="/dsl" activeClassName="active_link">
+                    DSL
+                  </NavLink>
+                </li>
+              </Dev>
             </ul>
           </div>
           <div className="head_left head_left_socials">
@@ -206,15 +200,9 @@ export const Header = (props) => {
               </label>
             <div className="head_account_area">
               {user.id && user.address ? (
-                <AccountDropdown />
+                <AccountDropdown/>
               ) : (
-                <Button
-                  className="bg_btn"
-                  loading={connecting}
-                  text="CONNECT WALLET"
-                  img={darkPlugHead}
-                  onClick={connect}
-                />
+                <ConnectWalletButton/>
               )}
             </div>
           </div>

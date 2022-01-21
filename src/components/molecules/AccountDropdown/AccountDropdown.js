@@ -197,7 +197,6 @@ const LoaderContainer = styled.div`
 
 export const AccountDropdown = () => {
     const user = useSelector(userSelector)
-    const [tickers, setTickers] = useState([]);
     const network = useSelector(networkSelector);
     const balanceData = useSelector(balancesSelector);
     const [show, setShow] = useState(false)
@@ -209,14 +208,7 @@ export const AccountDropdown = () => {
         ? balanceData.wallet
         : balanceData[network])
 
-    useEffect(() => {
-        const tickers = Object.keys(api.currencies).filter((c) => {
-            return api.currencies[c].chain[network];
-        }).sort();
-
-        setTickers(tickers);
-    }, [user.id, network]);
-
+    const tickers = api.getCurrencies().sort();
 
     useEffect(() => {
         const hideDisplay = () => setShow(false)
@@ -269,7 +261,7 @@ export const AccountDropdown = () => {
                             }
                             return (
                                 <CurrencyListItem key={key}>
-                                    <img className="currency-icon" src={api.currencies[ticker].image.default} alt={ticker} />
+                                    <img className="currency-icon" src={api.getImage(ticker) && api.getImage(ticker).default} alt={ticker} />
                                     <div>
                                         <strong>{wallet[ticker].valueReadable} {ticker}</strong>
                                         <small>${formatUSD(coinEstimator(ticker) * wallet[ticker].valueReadable)}</small>

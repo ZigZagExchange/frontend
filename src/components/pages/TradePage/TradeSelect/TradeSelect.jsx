@@ -1,17 +1,20 @@
 import React from "react";
-// css
 import "./TradeSelect.css";
 
-const TradeSelect = (props) => {
+const TradeSelect = ({currentMarket, updateMarketChain, markets}) => {
+  const options = [...markets]
+  if (!options.includes(currentMarket)) {
+    options.push(currentMarket)
+  }
   return (
     <>
       <div className="tl_select">
         <div>
           <select 
-            value={props.currentMarket}
-            onChange={(e) => props.updateMarketChain(e.target.value)}
+            value={currentMarket}
+            onChange={(e) => updateMarketChain(e.target.value)}
           >
-            {props.markets.map(market =>
+            {options.map(market =>
                 <option key={market} value={market}>{market.replace('-', '/')}</option>
             )}
           </select>

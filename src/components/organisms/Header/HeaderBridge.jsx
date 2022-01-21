@@ -54,10 +54,12 @@ export const HeaderBridge = (props) => {
                   )}
               </li>
               <li>
-                <a href="https://docs.zigzag.exchange/" target="_blank" rel="noreferrer">Docs</a>
+                <NavLink exact to="/list-pair" activeClassName="active_link">
+                  List
+                </NavLink>
               </li>
               <li>
-                <a href="https://zigzag.banxa.com/" target="_blank" rel="noreferrer">Fiat</a>
+                <a href="https://docs.zigzag.exchange/" target="_blank" rel="noreferrer">Docs</a>
               </li>
             </ul>
             <label htmlFor="networkSelector" className="eu_text">

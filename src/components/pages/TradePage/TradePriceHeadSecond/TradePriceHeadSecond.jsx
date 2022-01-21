@@ -11,7 +11,6 @@ const TradePriceHeadSecond = (props) => {
                     <img src={upArrow} alt="..." />
                 </div>
                 <span>${props.lastPrice}</span>
-                <span>More</span>
             </div>
         </>
     );
