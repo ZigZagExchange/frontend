@@ -28,12 +28,14 @@ export default function ListPairPage() {
 
   const arweaveAllocation = useSelector(arweaveAllocationSelector);
   const arweaveAllocationKB = Number(arweaveAllocation) / 1000
+  const [isArweaveAllocationSufficient, setIsArweaveAllocationSufficient] = useState(false)
+
+  const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false)
 
   const [txid, setTxId] = useState("");
   const [fileToUpload, setFileToUpload] = useState(null)
   const [isAllocationModalOpen, setIsAllocationModalOpen] = useState(false)
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
-  const [isAllocationInsufficient, setIsAllocationInsufficient] = useState(false)
 
   const [baseAssetId, setBaseAssetId] = useState("")
   const [quoteAssetId, setQuoteAssetId] = useState("")
@@ -61,7 +63,6 @@ export default function ListPairPage() {
     return api.refreshArweaveAllocation(user.address)
   }
 
-
   const getAmountForTargetNotional = (price) => {
     const targetUSDFeeAmount = 1
     return (targetUSDFeeAmount / price).toFixed(6)
@@ -81,7 +82,7 @@ export default function ListPairPage() {
               variant={"secondary"}
               size={"xs"}
               onClick={() => feeSetter(getAmountForTargetNotional(assetPrice))}>
-            set to $1
+              set to $1
             </Button>
             <x.div/>
         </x.div>}
@@ -89,12 +90,6 @@ export default function ListPairPage() {
     }
     return null
   }
-
-  useEffect(() => {
-    if (user.address) {
-      refreshUserArweaveAllocation()
-    }
-  }, []);
 
   async function getBaseInfo(baseAssetId, chainId) {
     if (baseAssetId && baseAssetId !== "") {
@@ -185,8 +180,8 @@ export default function ListPairPage() {
 
       if (file.size > arweaveAllocation) {
         setFileToUpload(file)
-        setIsAllocationInsufficient(true)
         setIsAllocationModalOpen(true)
+        setHasAttemptedSubmit(true)
         reject()
         return
       }
@@ -199,6 +194,7 @@ export default function ListPairPage() {
         setTxId(response.arweave_txid);
 
         setIsSuccessModalOpen(true);
+        setHasAttemptedSubmit(false)
         resetForm()
       } catch (e) {
         reject(e)
@@ -208,6 +204,21 @@ export default function ListPairPage() {
       resolve()
     })
   }
+
+  useEffect(() => {
+    refreshUserArweaveAllocation()
+    setHasAttemptedSubmit(false)
+  }, [user.address])
+
+  useEffect(() => {
+    if (fileToUpload) {
+      if (fileToUpload.size <= arweaveAllocation) {
+        setIsArweaveAllocationSufficient(true)
+      } else {
+        setIsArweaveAllocationSufficient(false)
+      }
+    }
+  }, [arweaveAllocation])
 
   return (
     <DefaultTemplate>
@@ -318,7 +329,7 @@ export default function ListPairPage() {
                 rightOfLabel={<TooltipHelper>zkSync network on which the pair will be listed</TooltipHelper>}
               />
             </x.div>
-            {isAllocationInsufficient &&
+            {(fileToUpload && !isArweaveAllocationSufficient) &&
             <x.div display={"flex"} alignItems={"center"} justifyContent={"space-between"} mb={4}>
               <x.div display={"flex"} alignItems={"center"}>
                 <RiErrorWarningLine size={18} color={"red"}/>
@@ -333,9 +344,19 @@ export default function ListPairPage() {
                 arweave allocation: {arweaveAllocationKB} kB
               </x.div>
             </Dev>
-            {!isUserLoggedIn && <ConnectWalletButton/>}
-            {isUserLoggedIn && isUserConnectedToMainnet && <Submit block mt={5}>{isAllocationInsufficient ? "PURCHASE ALLOCATION" : "LIST"}</Submit>}
-            {isUserLoggedIn && !isUserConnectedToMainnet && <Button block isDisabled>Please connect to Mainnet</Button>}
+            {(() => {
+              if (!isUserLoggedIn) {
+                return <ConnectWalletButton/>
+              } else {
+                if (isUserConnectedToMainnet) {
+                  return <Submit block mt={5}>
+                    {!isArweaveAllocationSufficient && hasAttemptedSubmit ? "PURCHASE ALLOCATION" : "LIST"}
+                  </Submit>
+                } else {
+                  <Button block isDisabled>Please connect to Mainnet</Button>
+                }
+              }
+            })()}
           </Form>
         </Pane>
       </x.div>
@@ -348,10 +369,7 @@ export default function ListPairPage() {
           // we timeout here so we make sure we get fresh data
           setTimeout(async () => {
             await refreshUserArweaveAllocation()
-            if (fileToUpload.size > arweaveAllocation) {
-              setIsAllocationInsufficient(true)
-            } else {
-              setIsAllocationInsufficient(false)
+            if (isArweaveAllocationSufficient) {
               setFileToUpload(null)
             }
           }, 1 * 5000)

@@ -17,33 +17,39 @@ const AllocationModal = ({onClose, show, onSuccess, bytesToPurchase}) => {
   const arweaveAllocation = Number(useSelector(arweaveAllocationSelector));
   const balanceData = useSelector(balancesSelector);
 
-  const [totalPrice, setTotalPrice] = useState(null)
-  const [isUSDCBalanceSufficient, setIsUSDCBalanceSufficient] = useState(false)
-
   const arweaveAllocationKB = arweaveAllocation / 1000
   const userHasExistingAllocation = arweaveAllocation !== 0
   const fileSizeKB = bytesToPurchase / 1000
   const pricePerKB = 0.001
 
+  const [totalPrice, setTotalPrice] = useState(fileSizeKB * pricePerKB)
+  const [isUSDCBalanceSufficient, setIsUSDCBalanceSufficient] = useState(false)
+
+  useEffect(() => api.getBalances(), [])
 
   useEffect(() => {
     if (user.address) {
       api.refreshArweaveAllocation(user.address)
       const kbToPurchase = Number(((bytesToPurchase - arweaveAllocation) / 1000))
-      setTotalPrice((kbToPurchase * pricePerKB).toPrecision(2))
+      setTotalPrice((kbToPurchase * pricePerKB))
       if (totalPrice) {
-        if (balanceData.wallet && balanceData.wallet.USDC) {
-          let usdcBalance = Number(balanceData.wallet.USDC.valueReadable)
-          if (totalPrice > usdcBalance) {
-            setIsUSDCBalanceSufficient(false)
-          } else {
-            setIsUSDCBalanceSufficient(true)
-          }
+        let usdcBalance = 0
+        const feeCurrency = "USDC"
+        const mainnetNetwork = api.networks.mainnet[0]
+        if (mainnetNetwork in balanceData && feeCurrency in balanceData[mainnetNetwork]) {
+          usdcBalance = Number(balanceData[mainnetNetwork][feeCurrency].valueReadable)
+        }
+
+        if (totalPrice > usdcBalance) {
+          setIsUSDCBalanceSufficient(false)
+        } else {
+          setIsUSDCBalanceSufficient(true)
         }
       }
     }
+
     //@TODO: remove jsonify here, add better dep
-  }, [bytesToPurchase, user.address, arweaveAllocation, jsonify(balanceData.wallet)])
+  }, [bytesToPurchase, user.address, arweaveAllocation, jsonify(balanceData)])
 
   return <Modal title={"Purchase Arweave Allocation"} show={show} onClose={onClose}>
     <x.div fontSize={14}>
@@ -67,7 +73,7 @@ const AllocationModal = ({onClose, show, onSuccess, bytesToPurchase}) => {
         <FaTimes size={18}/>
         <AllocationItem label={"$/kB"}>${pricePerKB}</AllocationItem>
         <FaEquals size={18}/>
-        <AllocationItem label={"total price"}>~${totalPrice}</AllocationItem>
+        <AllocationItem label={"total price"}>~${totalPrice.toPrecision(2)}</AllocationItem>
       </x.div>
     </Pane>
 
