@@ -22,6 +22,8 @@ import {model} from "../../atoms/Form/helpers";
 import {debounce} from "lodash"
 import Tooltip from "../../atoms/Tooltip/Tooltip";
 import {sleep} from "../../../lib/helpers/utils";
+import {HiExternalLink} from "react-icons/hi";
+import ExternalLink from "./ExternalLink";
 
 export default function ListPairPage() {
   const user = useSelector(userSelector);
@@ -234,7 +236,17 @@ export default function ListPairPage() {
              justifyContent={"center"}
       >
         <Pane size={"sm"} variant={"light"} maxWidth={"500px"} margin={"auto"}>
-          <x.div fontSize={28} mb={2}>List New Market</x.div>
+          <x.div display={"flex"} justifyContent={"space-between"} mb={4}>
+            <x.div fontSize={28} mb={2}>List New Market</x.div>
+            <x.div fontSize={12} color={"blue-gray-400"} textAlign={"center"}>
+              <x.div>No Internal ID?</x.div>
+              <x.div>
+                <ExternalLink href={"https://zkscan.io/explorer/tokens"}>
+                  List your token on zkSync <HiExternalLink />
+                </ExternalLink>
+              </x.div>
+            </x.div>
+          </x.div>
           {(baseAssetId || quoteAssetId) &&
           <x.div display={"flex"} fontSize={35} justifyContent={"center"} my={4}>
             <x.span color={baseSymbol ? "blue-gray-400" : "blue-gray-800"}>

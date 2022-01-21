@@ -11,7 +11,6 @@ import Form from "../../atoms/Form/Form";
 import {x} from "@xstyled/styled-components";
 import {toast} from "react-toastify";
 import {jsonify} from "../../../lib/helpers/strings";
-import {sleep} from "../../../lib/helpers/utils";
 
 const AllocationModal = ({onClose, show, onSuccess, bytesToPurchase}) => {
   const user = useSelector(userSelector)
