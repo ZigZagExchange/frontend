@@ -486,8 +486,8 @@ export default class API extends Emitter {
         return this.apiProvider.refreshArweaveAllocation(address);
     }
 
-    purchaseArweaveBytes = (currency, bytes) => {
-        return this.apiProvider.purchaseArweaveBytes(currency, bytes);
+    purchaseArweaveBytes = (bytes) => {
+        return this.apiProvider.purchaseArweaveBytes(bytes);
     }
 
     signMessage = async (message) => {

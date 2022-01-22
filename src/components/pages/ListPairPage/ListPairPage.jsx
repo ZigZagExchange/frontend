@@ -21,6 +21,9 @@ import SelectInput from "../../atoms/Form/SelectInput";
 import {model} from "../../atoms/Form/helpers";
 import {debounce} from "lodash"
 import Tooltip from "../../atoms/Tooltip/Tooltip";
+import {sleep} from "../../../lib/helpers/utils";
+import {HiExternalLink} from "react-icons/hi";
+import ExternalLink from "./ExternalLink";
 
 export default function ListPairPage() {
   const user = useSelector(userSelector);
@@ -28,12 +31,14 @@ export default function ListPairPage() {
 
   const arweaveAllocation = useSelector(arweaveAllocationSelector);
   const arweaveAllocationKB = Number(arweaveAllocation) / 1000
+  const [isArweaveAllocationSufficient, setIsArweaveAllocationSufficient] = useState(false)
+
+  const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false)
 
   const [txid, setTxId] = useState("");
   const [fileToUpload, setFileToUpload] = useState(null)
   const [isAllocationModalOpen, setIsAllocationModalOpen] = useState(false)
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
-  const [isAllocationInsufficient, setIsAllocationInsufficient] = useState(false)
 
   const [baseAssetId, setBaseAssetId] = useState("")
   const [quoteAssetId, setQuoteAssetId] = useState("")
@@ -41,11 +46,14 @@ export default function ListPairPage() {
   const [quoteFee, setQuoteFee] = useState("")
   const [zigZagChainId, setZigZagChainId] = useState(1)
 
-  const [baseAssetIdSymbolPreview, setBaseAssetIdSymbolPreview] = useState(null)
-  const [quoteAssetIdSymbolPreview, setQuoteAssetIdSymbolPreview] = useState(null)
+  const [baseSymbol, setBaseSymbol] = useState(null)
+  const [quoteSymbol, setQuoteSymbol] = useState(null)
 
   const [isBaseAssetIdInvalid, setIsBaseAssetIdInvalid] = useState(false)
   const [isQuoteAssetIdInvalid, setIsQuoteAssetIdInvalid] = useState(false)
+
+  const [basePrice, setBasePrice] = useState(null)
+  const [quotePrice, setQuotePrice] = useState(null)
 
   const network = useSelector(networkSelector);
   const isUserConnectedToMainnet = network === 1
@@ -58,11 +66,33 @@ export default function ListPairPage() {
     return api.refreshArweaveAllocation(user.address)
   }
 
-  useEffect(() => {
-    if (user.address) {
-      refreshUserArweaveAllocation()
+  const getAmountForTargetNotional = (price) => {
+    const targetUSDFeeAmount = 1
+    return (targetUSDFeeAmount / price).toFixed(6)
+  }
+
+  const renderFeeHint = (assetPrice, assetFee, symbol, feeSetter) => {
+    if (assetPrice) {
+      const notional = (Number(assetPrice) * Number(assetFee)).toFixed(2)
+      if (notional > 0) {
+        return <x.div pl={2} fontSize={12} color={"blue-gray-500"} mt={1} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
+          <x.div style={{wordBreak: "break-all"}}>
+            {assetFee} {symbol} = ${notional}
+          </x.div>
+          {notional > 1 && <x.div>
+            <Button
+              ml={1}
+              variant={"secondary"}
+              size={"xs"}
+              onClick={() => feeSetter(getAmountForTargetNotional(assetPrice))}>
+              set to $1
+            </Button>
+            <x.div/>
+        </x.div>}
+      </x.div>}
     }
-  }, []);
+    return null
+  }
 
   async function getBaseInfo(baseAssetId, chainId) {
     if (baseAssetId && baseAssetId !== "") {
@@ -70,22 +100,30 @@ export default function ListPairPage() {
         const {symbol} = await api.getTokenInfo(baseAssetId, chainId)
         if (symbol) {
           try {
-            const {price} = await api.getTokenPrice(baseAssetId, chainId)
-            setBaseFee((1 / Number(price)).toFixed(6))
+            const {price: apiPrice} = await api.getTokenPrice(baseAssetId, chainId)
+            const price = Number(apiPrice)
+            if (price === 0) {
+              throw Error(`${symbol} price came back as 0`)
+            }
+            setBasePrice(price)
+            setBaseFee(getAmountForTargetNotional(price))
           } catch (e) {
             setBaseFee("")
+            setBasePrice(null)
             console.error("error getting base price", e)
           }
+          setBaseSymbol(symbol)
+          setIsBaseAssetIdInvalid(false)
         }
-        setBaseAssetIdSymbolPreview(symbol)
-        setIsBaseAssetIdInvalid(false)
       } catch (e) {
-        setBaseAssetIdSymbolPreview(null)
+        setBaseSymbol(null)
         setIsBaseAssetIdInvalid(true)
         setBaseFee("")
+        setBasePrice(null)
       }
     } else {
-      setBaseAssetIdSymbolPreview(null)
+      setBaseSymbol(null)
+      setBasePrice(null)
     }
   }
 
@@ -95,22 +133,30 @@ export default function ListPairPage() {
         const {symbol} = await api.getTokenInfo(quoteAssetId, chainId)
         if (symbol) {
           try {
-            const {price} = await api.getTokenPrice(quoteAssetId, chainId)
-            setQuoteFee((1 / Number(price)).toFixed(6))
+            const {price: apiPrice} = await api.getTokenPrice(quoteAssetId, chainId)
+            const price = Number(apiPrice)
+            if (price === 0) {
+              throw Error(`${symbol} price came back as 0`)
+            }
+            setQuotePrice(price)
+            setQuoteFee(getAmountForTargetNotional(price))
           } catch (e) {
             setQuoteFee("")
+            setQuotePrice(null)
             console.error("error setting quote fee", e)
           }
+          setQuoteSymbol(symbol)
+          setIsQuoteAssetIdInvalid(false)
         }
-        setQuoteAssetIdSymbolPreview(symbol)
-        setIsQuoteAssetIdInvalid(false)
       } catch (e) {
-        setQuoteAssetIdSymbolPreview(null)
+        setQuoteSymbol(null)
         setIsQuoteAssetIdInvalid(true)
         setQuoteFee("")
+        setQuotePrice(null)
       }
     } else {
-      setQuoteAssetIdSymbolPreview(null)
+      setQuoteSymbol(null)
+      setQuotePrice(null)
     }
   }
 
@@ -137,8 +183,8 @@ export default function ListPairPage() {
 
       if (file.size > arweaveAllocation) {
         setFileToUpload(file)
-        setIsAllocationInsufficient(true)
         setIsAllocationModalOpen(true)
+        setHasAttemptedSubmit(true)
         reject()
         return
       }
@@ -151,6 +197,7 @@ export default function ListPairPage() {
         setTxId(response.arweave_txid);
 
         setIsSuccessModalOpen(true);
+        setHasAttemptedSubmit(false)
         resetForm()
       } catch (e) {
         reject(e)
@@ -160,6 +207,21 @@ export default function ListPairPage() {
       resolve()
     })
   }
+
+  useEffect(() => {
+    refreshUserArweaveAllocation()
+    setHasAttemptedSubmit(false)
+  }, [user.address])
+
+  useEffect(() => {
+    if (fileToUpload) {
+      if (fileToUpload.size <= arweaveAllocation) {
+        setIsArweaveAllocationSufficient(true)
+      } else {
+        setIsArweaveAllocationSufficient(false)
+      }
+    }
+  }, [arweaveAllocation])
 
   return (
     <DefaultTemplate>
@@ -174,15 +236,25 @@ export default function ListPairPage() {
              justifyContent={"center"}
       >
         <Pane size={"sm"} variant={"light"} maxWidth={"500px"} margin={"auto"}>
-          <x.div fontSize={28} mb={2}>List New Market</x.div>
+          <x.div display={"flex"} justifyContent={"space-between"} mb={4}>
+            <x.div fontSize={28} mb={2}>List New Market</x.div>
+            <x.div fontSize={12} color={"blue-gray-400"} textAlign={"center"}>
+              <x.div>No Internal ID?</x.div>
+              <x.div>
+                <ExternalLink href={"https://zkscan.io/explorer/tokens"}>
+                  List your token on zkSync <HiExternalLink />
+                </ExternalLink>
+              </x.div>
+            </x.div>
+          </x.div>
           {(baseAssetId || quoteAssetId) &&
           <x.div display={"flex"} fontSize={35} justifyContent={"center"} my={4}>
-            <x.span color={baseAssetIdSymbolPreview ? "blue-gray-400" : "blue-gray-800"}>
-              {baseAssetIdSymbolPreview ? baseAssetIdSymbolPreview : "XXX"}
+            <x.span color={baseSymbol ? "blue-gray-400" : "blue-gray-800"}>
+              {baseSymbol ? baseSymbol : "XXX"}
             </x.span>
-            <x.span color={baseAssetIdSymbolPreview && quoteAssetIdSymbolPreview ? "blue-gray-400" : "blue-gray-800"}>/</x.span>
-            <x.span color={quoteAssetIdSymbolPreview ? "blue-gray-400" : "blue-gray-800"}>
-              {quoteAssetIdSymbolPreview ? quoteAssetIdSymbolPreview : "XXX"}
+            <x.span color={baseSymbol && quoteSymbol ? "blue-gray-400" : "blue-gray-800"}>/</x.span>
+            <x.span color={quoteSymbol ? "blue-gray-400" : "blue-gray-800"}>
+              {quoteSymbol ? quoteSymbol : "XXX"}
             </x.span>
           </x.div>}
           <Form
@@ -221,28 +293,45 @@ export default function ListPairPage() {
                 ]}
                 rightOfLabel={<TooltipHelper>zkSync token ID of the second asset appearing in the pair (BASE/QUOTE)</TooltipHelper>}
               />
-              <NumberInput
-                block
-                name={"baseFee"}
-                {...model(baseFee, setBaseFee)}
-                label={baseAssetIdSymbolPreview ? `${baseAssetIdSymbolPreview} Swap Fee` : "Base Swap Fee"}
-                validate={[required, min(0)]}
-                rightOfLabel={<TooltipHelper>Swap fee collected by market makers</TooltipHelper>}
-              />
-              <NumberInput
-                block
-                name={"quoteFee"}
-                {...model(quoteFee, setQuoteFee)}
-                label={quoteAssetIdSymbolPreview ? `${quoteAssetIdSymbolPreview} Swap Fee` : "Quote Swap Fee"}
-                validate={[required, min(0)]}
-                rightOfLabel={<TooltipHelper>Swap fee collected by market makers</TooltipHelper>}
-              />
+              <x.div display={"flex"} flexDirection={"column"}>
+                <NumberInput
+                  block
+                  name={"baseFee"}
+                  {...model(baseFee, setBaseFee)}
+                  label={baseSymbol ? `${baseSymbol} Swap Fee` : "Base Swap Fee"}
+                  validate={[required, min(0)]}
+                  rightOfLabel={<TooltipHelper>Swap fee collected by market makers</TooltipHelper>}
+                />
+                {renderFeeHint(basePrice, baseFee, baseSymbol, setBaseFee)}
+              </x.div>
+              <x.div display={"flex"} flexDirection={"column"}>
+                <NumberInput
+                  block
+                  name={"quoteFee"}
+                  {...model(quoteFee, setQuoteFee)}
+                  label={quoteSymbol ? `${quoteSymbol} Swap Fee` : "Quote Swap Fee"}
+                  validate={[required, min(0)]}
+                  rightOfLabel={<TooltipHelper>Swap fee collected by market makers</TooltipHelper>}
+                />
+                {renderFeeHint(quotePrice, quoteFee, quoteSymbol, setQuoteFee)}
+              </x.div>
               <NumberInput
                 block
                 name={"pricePrecisionDecimals"}
                 label={"Price Precision Decimals"}
                 validate={[required, max(18), min(0)]}
-                rightOfLabel={<TooltipHelper>Number of decimal places</TooltipHelper>}
+                rightOfLabel={<TooltipHelper>
+                  <x.div>
+                    Number of decimal places in the price of the asset pair.
+                  </x.div>
+
+                  <x.div display={"grid"} gridTemplateColumns={2} mt={2} gap={0}>
+                    <x.div>ex: ETH/USDC has '2'</x.div>
+                    <x.div>($3250.61)</x.div>
+                    <x.div>ex: ETH/WBTC has '6'</x.div>
+                    <x.div>(0.075225)</x.div>
+                  </x.div>
+                </TooltipHelper>}
               />
               <SelectInput
                 {...model(zigZagChainId, setZigZagChainId)}
@@ -253,7 +342,7 @@ export default function ListPairPage() {
                 rightOfLabel={<TooltipHelper>zkSync network on which the pair will be listed</TooltipHelper>}
               />
             </x.div>
-            {isAllocationInsufficient &&
+            {(fileToUpload && !isArweaveAllocationSufficient) &&
             <x.div display={"flex"} alignItems={"center"} justifyContent={"space-between"} mb={4}>
               <x.div display={"flex"} alignItems={"center"}>
                 <RiErrorWarningLine size={18} color={"red"}/>
@@ -268,9 +357,19 @@ export default function ListPairPage() {
                 arweave allocation: {arweaveAllocationKB} kB
               </x.div>
             </Dev>
-            {!isUserLoggedIn && <ConnectWalletButton/>}
-            {isUserLoggedIn && isUserConnectedToMainnet && <Submit block mt={5}>{isAllocationInsufficient ? "PURCHASE ALLOCATION" : "LIST"}</Submit>}
-            {isUserLoggedIn && !isUserConnectedToMainnet && <Button block isDisabled>Please connect to Mainnet</Button>}
+            {(() => {
+              if (!isUserLoggedIn) {
+                return <ConnectWalletButton/>
+              } else {
+                if (isUserConnectedToMainnet) {
+                  return <Submit block mt={5}>
+                    {!isArweaveAllocationSufficient && hasAttemptedSubmit ? "PURCHASE ALLOCATION" : "LIST"}
+                  </Submit>
+                } else {
+                  <Button block isDisabled>Please connect to Mainnet</Button>
+                }
+              }
+            })()}
           </Form>
         </Pane>
       </x.div>
@@ -278,18 +377,12 @@ export default function ListPairPage() {
         onClose={() => setIsAllocationModalOpen(false)}
         show={isAllocationModalOpen}
         bytesToPurchase={bytesToPurchase}
-        onSuccess={() => {
+        onSuccess={async () => {
           // API cache needs a bit of time to update. Arweave bridge runs on a 5 second loop
           // we timeout here so we make sure we get fresh data
-          setTimeout(async () => {
-            await refreshUserArweaveAllocation()
-            if (fileToUpload.size > arweaveAllocation) {
-              setIsAllocationInsufficient(true)
-            } else {
-              setIsAllocationInsufficient(false)
-              setFileToUpload(null)
-            }
-          }, 1 * 5000)
+          await sleep(5000)
+          await refreshUserArweaveAllocation()
+          setFileToUpload(null)
           setIsAllocationModalOpen(false)
         }}
       />

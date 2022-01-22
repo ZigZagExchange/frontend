@@ -13,8 +13,8 @@ const Submit = ({children, isDisabled, ...rest}) => {
 
 const sizes = {
     xs: {
-      px: 1.5,
-      py: 1,
+      px: 1,
+      py: 0.5,
       borderRadius: 2,
       fontSize: 12
     },
