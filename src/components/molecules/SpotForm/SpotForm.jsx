@@ -58,6 +58,44 @@ export class SpotForm extends React.Component {
         );
     }
 
+    getLadderPrice() {
+        const marketInfo = this.props.marketInfo;
+        if (!marketInfo) return 0;
+
+        let amount = this.state.amount;
+        const side = this.props.side;
+        if (!amount) amount = 0;
+
+        let price, unfilled = amount;
+        if (side === 'b') {
+            const asks = this.props.liquidity.filter(l => l[0] === "s");
+            asks.sort((a,b) => a[1] - b[1]);
+            for (let i=0; i < asks.length; i++) {
+                if (asks[i][2] >= unfilled || i === asks.length - 1) {
+                    price = asks[i][1];
+                    break;
+                } else {
+                    unfilled -= asks[i][2];
+                }
+            }
+        }
+        else if (side === 's') {
+            const bids = this.props.liquidity.filter(l => l[0] === "b");
+            bids.sort((a,b) => b[1] - a[1]);
+            for (let i=0; i < bids.length; i++) {
+                if (bids[i][2] >= unfilled || i === bids.length - 1) {
+                    price = bids[i][1];
+                    break;
+                } else {
+                    unfilled -= bids[i][2];
+                }
+                console.log(unfilled);
+            }
+        }
+        if (!price) return 0;
+        return price.toFixed(marketInfo.pricePrecisionDecimals);
+    }
+
     async buySellHandler(e) {
         let amount;
         if (typeof this.state.amount === "string") {
@@ -86,7 +124,15 @@ export class SpotForm extends React.Component {
             baseBalance = 0;
             quoteBalance = 0;
         }
-        const price = this.currentPrice();
+
+        let price = this.currentPrice();
+        if (this.props.orderType === 'market') {
+            if (this.props.side === 'b') {
+                price *= 1.0005;
+            } else if (this.props.side === 's') {
+                price *= 0.9995;
+            }
+        }
 
         baseBalance = parseFloat(baseBalance);
         quoteBalance = parseFloat(quoteBalance);
@@ -115,10 +161,10 @@ export class SpotForm extends React.Component {
             toast.error("Price must be within 20% of spot");
             return;
         } else if (
-            (this.props.side === 'b' && price > this.getFirstAsk() * 1.005) ||
+            (this.props.side === 'b' && price > this.getFirstAsk() * 1.05) ||
             (this.props.side === 's' && price < this.getFirstBid() * 0.995)
         ) {
-            toast.error("Limit orders cannot exceed 0.5% beyond spot");
+            toast.error("Limit orders cannot exceed 5% beyond spot");
             return;
         }
 
@@ -182,14 +228,9 @@ export class SpotForm extends React.Component {
         if (this.props.orderType === "limit" && this.state.price) {
             return this.state.price;
         }
-
-        if (this.props.side === "b") {
-            return (this.getFirstAsk() * 1.001).toFixed(marketInfo.pricePrecisionDecimals);
+        else {
+            return this.getLadderPrice();
         }
-        else if (this.props.side === "s") {
-            return (this.getFirstBid() * 0.999).toFixed(marketInfo.pricePrecisionDecimals);
-        }
-        return 0;
     }
 
     getFirstAsk() {

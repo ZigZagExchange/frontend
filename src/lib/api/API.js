@@ -156,6 +156,7 @@ export default class API extends Emitter {
         // Is there a better way to do this? Not sure. 
         if (msg.op === "marketinfo") {
             const marketInfo = msg.args[0];
+            if (!marketInfo) return;
             this.apiProvider.marketInfo[marketInfo.alias] = marketInfo;
         }
         if (msg.op === "lastprice") {

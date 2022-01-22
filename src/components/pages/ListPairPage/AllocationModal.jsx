@@ -27,6 +27,7 @@ const AllocationModal = ({onClose, show, onSuccess, bytesToPurchase}) => {
 
   useEffect(() => api.getBalances(), [])
 
+
   useEffect(() => {
     if (user.address) {
       api.refreshArweaveAllocation(user.address)
@@ -81,7 +82,7 @@ const AllocationModal = ({onClose, show, onSuccess, bytesToPurchase}) => {
       try {
         const transaction = await api.purchaseArweaveBytes(bytesToPurchase)
         await transaction.awaitReceipt()
-        onSuccess()
+        await onSuccess()
       } catch (e) {
         console.error("Error purchasing arweave bytes", e)
         toast.error('Transaction was rejected')
