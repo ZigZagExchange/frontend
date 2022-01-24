@@ -179,10 +179,12 @@ export default function ListPairPage() {
     return new Promise(async (resolve, reject) => {
       const toFile = {}
       for (const [key] of Object.entries(formData)) {
-        if (key !== "tradingViewChart") {
-          toFile[key] = Number(formData[key])
+        if (key === "tradingViewChart") {
+          if (formData[key] !== "") {
+            toFile[key] = formData[key]
+          }
         } else {
-          toFile[key] = formData[key]
+          toFile[key] = Number(formData[key])
         }
       }
       const fileData = new TextEncoder().encode(jsonify(toFile))
