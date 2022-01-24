@@ -3,14 +3,15 @@ import TradingViewWidget, { Themes } from "react-tradingview-widget";
 import "./TradeChart.css";
 import {useSelector} from "react-redux";
 import {marketInfoSelector} from "../../../../lib/store/features/api/apiSlice";
+import {TRADING_VIEW_CHART_KEY} from "../../../pages/ListPairPage/ListPairPage";
 
 export const TradeChart = () => {
   const marketInfo = useSelector(marketInfoSelector);
 
   let symbol = "";
   if (marketInfo) {
-    if ("tradingViewChart" in marketInfo) {
-      symbol = marketInfo.tradingViewChart
+    if (TRADING_VIEW_CHART_KEY in marketInfo) {
+      symbol = marketInfo[TRADING_VIEW_CHART_KEY]
     } else {
       symbol = marketInfo.baseAsset.symbol + marketInfo.quoteAsset.symbol;
     }

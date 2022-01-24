@@ -26,6 +26,8 @@ import {HiExternalLink} from "react-icons/hi";
 import ExternalLink from "./ExternalLink";
 import TextInput from "../../atoms/Form/TextInput";
 
+export const TRADING_VIEW_CHART_KEY = "tradingViewChart"
+
 export default function ListPairPage() {
   const user = useSelector(userSelector);
   const isUserLoggedIn = user.id !== null && user.id !== undefined
@@ -274,7 +276,7 @@ export default function ListPairPage() {
               quoteFee: quoteFee,
               zigzagChainId: zigZagChainId,
               pricePrecisionDecimals: "",
-              tradingViewChart: ""
+              [TRADING_VIEW_CHART_KEY]: ""
             }}
             onSubmit={onFormSubmit}
           >
@@ -363,9 +365,10 @@ export default function ListPairPage() {
               </x.div>
               {showAdvancedSettings && <>
               <x.div h={"2px"} w={"full"} bg={"blue-gray-800"} borderRadius={10} my={4}/>
-              <x.div display={"grid"} gridTemplateColumns={2}>
+              <x.div display={"grid"} gridTemplateColumns={2} columnGap={6}>
                 <TextInput
-                  name={"tradingViewChart"}
+                  block
+                  name={TRADING_VIEW_CHART_KEY}
                   label={"Default Chart Ticker"}
                   rightOfLabel={<TooltipHelper>
                     <x.div>
