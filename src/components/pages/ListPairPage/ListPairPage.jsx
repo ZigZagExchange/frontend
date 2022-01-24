@@ -24,6 +24,7 @@ import Tooltip from "../../atoms/Tooltip/Tooltip";
 import {sleep} from "../../../lib/helpers/utils";
 import {HiExternalLink} from "react-icons/hi";
 import ExternalLink from "./ExternalLink";
+import TextInput from "../../atoms/Form/TextInput";
 
 export default function ListPairPage() {
   const user = useSelector(userSelector);
@@ -54,6 +55,8 @@ export default function ListPairPage() {
 
   const [basePrice, setBasePrice] = useState(null)
   const [quotePrice, setQuotePrice] = useState(null)
+
+  const [showAdvancedSettings, setShowAdvancedSettings] = useState(false)
 
   const network = useSelector(networkSelector);
   const isUserConnectedToMainnet = network === 1
@@ -176,7 +179,11 @@ export default function ListPairPage() {
     return new Promise(async (resolve, reject) => {
       const toFile = {}
       for (const [key] of Object.entries(formData)) {
-        toFile[key] = Number(formData[key])
+        if (key !== "tradingViewChart") {
+          toFile[key] = Number(formData[key])
+        } else {
+          toFile[key] = formData[key]
+        }
       }
       const fileData = new TextEncoder().encode(jsonify(toFile))
       const file = new File([fileData], `${toFile.baseAssetId}-${toFile.quoteAssetId}.json`)
@@ -265,6 +272,7 @@ export default function ListPairPage() {
               quoteFee: quoteFee,
               zigzagChainId: zigZagChainId,
               pricePrecisionDecimals: "",
+              tradingViewChart: ""
             }}
             onSubmit={onFormSubmit}
           >
@@ -342,6 +350,20 @@ export default function ListPairPage() {
                 rightOfLabel={<TooltipHelper>zkSync network on which the pair will be listed</TooltipHelper>}
               />
             </x.div>
+            <x.div display={"flex"} alignItems={"center"} justifyContent={"flex-end"}>
+              <x.div fontSize={12} mr={2} color={"blue-gray-400"}>advanced settings</x.div>
+              <Button
+                size={"xs"}
+                variant={"secondary"}
+                onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}>{showAdvancedSettings ? "-" : "+"}</Button>
+            </x.div>
+            {showAdvancedSettings && <x.div>
+              <TextInput
+                name={"tradingViewChart"}
+                label={"Custom Trading View Ticker"}
+                rightOfLabel={<TooltipHelper>Custom chart to be seen in trading view</TooltipHelper>}
+              />
+            </x.div>}
             {(fileToUpload && !isArweaveAllocationSufficient) &&
             <x.div display={"flex"} alignItems={"center"} justifyContent={"space-between"} mb={4}>
               <x.div display={"flex"} alignItems={"center"}>

@@ -1,5 +1,6 @@
 import React from "react";
 import Input from "./Input";
+import BaseInputStyle from "./BaseInput.style";
 
 const NumberInput = ({
      name,
@@ -22,15 +23,8 @@ const NumberInput = ({
       hideValidation={hideValidation}
       rightOfLabel={rightOfLabel}
       type={"number"}
-      p={2}
-      border={"2px solid"}
-      borderColor={{_: "blue-gray-800", hover: "blue-gray-500", focus: "blue-gray-400"}}
-      outline={{focus: "none"}}
-      background={"none"}
-      color={"white"}
-      borderRadius={4}
-      fontSize={18}
       w={block ? "100%" : "inherit"}
+      {...BaseInputStyle}
     />
 }
 
