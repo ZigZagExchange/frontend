@@ -181,7 +181,7 @@ export default function ListPairPage() {
     return new Promise(async (resolve, reject) => {
       const toFile = {}
       for (const [key] of Object.entries(formData)) {
-        if (key === "tradingViewChart") {
+        if (key === TRADING_VIEW_CHART_KEY) {
           if (formData[key] !== "") {
             toFile[key] = formData[key]
           }
