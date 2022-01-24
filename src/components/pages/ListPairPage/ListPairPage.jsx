@@ -24,6 +24,9 @@ import Tooltip from "../../atoms/Tooltip/Tooltip";
 import {sleep} from "../../../lib/helpers/utils";
 import {HiExternalLink} from "react-icons/hi";
 import ExternalLink from "./ExternalLink";
+import TextInput from "../../atoms/Form/TextInput";
+
+export const TRADING_VIEW_CHART_KEY = "tradingViewChart"
 
 export default function ListPairPage() {
   const user = useSelector(userSelector);
@@ -54,6 +57,8 @@ export default function ListPairPage() {
 
   const [basePrice, setBasePrice] = useState(null)
   const [quotePrice, setQuotePrice] = useState(null)
+
+  const [showAdvancedSettings, setShowAdvancedSettings] = useState(false)
 
   const network = useSelector(networkSelector);
   const isUserConnectedToMainnet = network === 1
@@ -176,7 +181,13 @@ export default function ListPairPage() {
     return new Promise(async (resolve, reject) => {
       const toFile = {}
       for (const [key] of Object.entries(formData)) {
-        toFile[key] = Number(formData[key])
+        if (key === TRADING_VIEW_CHART_KEY) {
+          if (formData[key] !== "") {
+            toFile[key] = formData[key]
+          }
+        } else {
+          toFile[key] = Number(formData[key])
+        }
       }
       const fileData = new TextEncoder().encode(jsonify(toFile))
       const file = new File([fileData], `${toFile.baseAssetId}-${toFile.quoteAssetId}.json`)
@@ -265,6 +276,7 @@ export default function ListPairPage() {
               quoteFee: quoteFee,
               zigzagChainId: zigZagChainId,
               pricePrecisionDecimals: "",
+              [TRADING_VIEW_CHART_KEY]: ""
             }}
             onSubmit={onFormSubmit}
           >
@@ -342,6 +354,35 @@ export default function ListPairPage() {
                 rightOfLabel={<TooltipHelper>zkSync network on which the pair will be listed</TooltipHelper>}
               />
             </x.div>
+
+            <x.div mb={4}>
+              <x.div display={"flex"} alignItems={"center"} justifyContent={"flex-end"}>
+                <x.div fontSize={12} mr={2} color={"blue-gray-400"}>advanced settings</x.div>
+                <Button
+                  size={"xs"}
+                  variant={"secondary"}
+                  onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}>{showAdvancedSettings ? "-" : "+"}</Button>
+              </x.div>
+              {showAdvancedSettings && <>
+              <x.div h={"2px"} w={"full"} bg={"blue-gray-800"} borderRadius={10} my={4}/>
+              <x.div display={"grid"} gridTemplateColumns={2} columnGap={6}>
+                <TextInput
+                  block
+                  name={TRADING_VIEW_CHART_KEY}
+                  label={"Default Chart Ticker"}
+                  rightOfLabel={<TooltipHelper>
+                    <x.div>
+                      Default TradingView chart to be seen on the trade page
+                    </x.div>
+                    <x.div mt={2}>
+                      (ex: show COINBASE:BTCUSD for WBTC-USD)
+                    </x.div>
+                  </TooltipHelper>}
+                />
+              </x.div>
+              </>}
+            </x.div>
+
             {(fileToUpload && !isArweaveAllocationSufficient) &&
             <x.div display={"flex"} alignItems={"center"} justifyContent={"space-between"} mb={4}>
               <x.div display={"flex"} alignItems={"center"}>
@@ -352,11 +393,13 @@ export default function ListPairPage() {
                 {arweaveAllocationKB} kB
               </x.div>
             </x.div>}
+
             <Dev>
               <x.div fontSize={12} color={"blue-gray-500"} mb={3} textAlign={"right"}>
                 arweave allocation: {arweaveAllocationKB} kB
               </x.div>
             </Dev>
+
             {(() => {
               if (!isUserLoggedIn) {
                 return <ConnectWalletButton/>
