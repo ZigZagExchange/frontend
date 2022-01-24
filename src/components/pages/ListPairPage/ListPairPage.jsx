@@ -364,10 +364,10 @@ export default function ListPairPage() {
               <x.div display={"grid"} gridTemplateColumns={2}>
                 <TextInput
                   name={"tradingViewChart"}
-                  label={"Default Trading View Ticker"}
+                  label={"Default Chart Ticker"}
                   rightOfLabel={<TooltipHelper>
                     <x.div>
-                      Default trading view chart
+                      Default TradingView chart to be seen on the trade page
                     </x.div>
                     <x.div mt={2}>
                       (ex: show COINBASE:BTCUSD for WBTC-USD)
