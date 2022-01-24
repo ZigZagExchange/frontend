@@ -26,7 +26,7 @@ import { userSelector } from "lib/store/features/auth/authSlice";
 import "./style.css";
 import api from "lib/api";
 import {useLocation,useHistory} from "react-router-dom";
-import {getChainIdFromMarketChain, marketQueryParam} from "../ListPairPage/SuccessModal";
+import {getChainIdFromMarketChain, marketQueryParam, networkQueryParam} from "../ListPairPage/SuccessModal";
 
 const TradePage = () => {
   const [marketDataTab, updateMarketDataTab] = useState('fills')
@@ -55,7 +55,7 @@ const TradePage = () => {
   useEffect(() => {
     const urlParams = new URLSearchParams(search);
     const marketFromURL = urlParams.get(marketQueryParam)
-    const networkFromURL = urlParams.get("network");
+    const networkFromURL = urlParams.get(networkQueryParam);
     const chainid = getChainIdFromMarketChain(networkFromURL)
     if (marketFromURL && currentMarket !== marketFromURL) {
       updateMarketChain(marketFromURL)
