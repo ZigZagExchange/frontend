@@ -1,6 +1,5 @@
 import Web3 from 'web3'
 import { createIcon } from '@download/blockies'
-import { toast } from 'react-toastify'
 import Web3Modal from 'web3modal'
 import Emitter from 'tiny-emitter'
 import { ethers } from 'ethers'
@@ -144,7 +143,11 @@ export default class API extends Emitter {
     }
     
     _socketClose = () => {
-        toast.error("Connection to server closed. Please refresh page");
+        console.warn("Websocket dropped. Restarting");
+        this.ws = null;
+        setTimeout(() => {
+            this.start();
+        }, 3000);
         this.emit('close')
     }
 
@@ -178,10 +181,6 @@ export default class API extends Emitter {
 
     stop = () => {
         if (!this.ws) return
-        this.ws.removeEventListener('open', this._socketOpen)
-        this.ws.removeEventListener('close', this._socketClose)
-        this.ws.removeEventListener('message', this._socketMsg)
-        this._socketClose()
         this.ws.close()
         this.emit('stop')
     }

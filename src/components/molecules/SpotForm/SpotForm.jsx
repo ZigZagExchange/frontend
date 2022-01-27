@@ -126,6 +126,10 @@ export class SpotForm extends React.Component {
         }
 
         let price = this.currentPrice();
+        if (!price) {
+            toast.error("No price available");
+            return;
+        }
         if (this.props.orderType === 'market') {
             if (this.props.side === 'b') {
                 price *= 1.0005;
