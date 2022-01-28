@@ -202,6 +202,7 @@ export default class APIZKProvider extends APIProvider {
         }
     }
 
+    // @TODO: implement
     fastWithdrawL2 = async (amountDecimals, token) => {
       const eligibleTokens = ["ETH", "FRAX"]
       if (!eligibleTokens.includes(token)) {
@@ -209,7 +210,6 @@ export default class APIZKProvider extends APIProvider {
       }
 
       const fastWithdrawAddress = "0xcc9557f04633d82fb6a1741dcec96986cd8689ae"
-
 
     }
 

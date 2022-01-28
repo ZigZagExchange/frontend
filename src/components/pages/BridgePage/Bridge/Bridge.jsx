@@ -44,11 +44,12 @@ const Bridge = () => {
   const currencyValue = coinEstimator(swapDetails.currency)
   const activationFee = parseFloat((user.address && !user.id ? (15 / currencyValue) : 0).toFixed(5))
   const estimatedValue = (+swapDetails.amount * coinEstimator(swapDetails.currency) || 0)
+  const [fastWithdrawCurrencyMaxes, setFastWithdrawCurrencyMaxes] = useState()
 
   let walletBalances = balanceData.wallet || {}
   let zkBalances = balanceData[network] || {}
 
-
+  // @TODO this needs to tied to api
   const fastWithdrawTokens = [
     "ETH",
     "FRAX"
@@ -61,7 +62,9 @@ const Bridge = () => {
 
   useEffect(() => {
     if (user.address) {
-      api.getFastWithdrawAccountBalances().then(res => console.log("debug:: res", res))
+      api.getFastWithdrawAccountBalances().then(maxes => {
+        setFastWithdrawCurrencyMaxes(maxes)
+      })
     }
   }, [user.address])
 
@@ -79,6 +82,7 @@ const Bridge = () => {
       const bals = transfer.type === 'deposit' ? walletBalances : zkBalances
       const detailBalance = parseFloat(bals[details.currency] && bals[details.currency].valueReadable) || 0
       const input = parseFloat(details.amount) || 0
+
       if (input > 0) {
         if (input < 0.001) {
           setFormErr('Must be at least 0.001')
@@ -86,6 +90,13 @@ const Bridge = () => {
           setFormErr(`Must be more than ${activationFee} ${swapDetails.currency}`)
         } else if (input > (detailBalance - parseFloat(bridgeFee))) {
           setFormErr('Insufficient balance')
+        } else if (isFastWithdraw) {
+          if (swapDetails.currency in fastWithdrawCurrencyMaxes) {
+            const maxAmount = fastWithdrawCurrencyMaxes[swapDetails.currency]
+            if (input > maxAmount) {
+              setFormErr(`Max ${swapDetails.currency} fast withdraw: ${maxAmount.toPrecision(4)}`)
+            }
+          }
         } else {
           setFormErr('')
         }

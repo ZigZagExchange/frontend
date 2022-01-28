@@ -4,10 +4,17 @@ import Pane from "../Pane/Pane";
 import 'rc-tooltip/assets/bootstrap.css';
 import "./Tooltip.css";
 
+
 const TooltipOverlay = ({children}) => {
-  return <Pane fontSize={12} size={"xs"} variant={"light"} bg={"blue-600"} display={"inline-block"} color={"blue-gray-400"}>
-    {children}
-  </Pane>
+  return <Pane
+      fontSize={12}
+      size={"xs"}
+      bg={"#0b0e15"}
+      display={"inline-block"}
+      color={"blue-gray-400"}
+    >
+      {children}
+    </Pane>
 }
 
 const Tooltip = ({placement, label, children}) => {
