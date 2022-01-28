@@ -535,4 +535,43 @@ export default class API extends Emitter {
             return require(`assets/images/currency/ZZ.webp`)
         }
     }
+
+    async getFastWithdrawAccountBalances() {
+      console.log("debug:: ethers provider", this.ethersProvider)
+      if (this.ethersProvider) {
+        const address = "0xCC9557F04633d82Fb6A1741dcec96986cD8689AE"
+        const fraxContractAddress = "0x853d955aCEf822Db058eb8505911ED77F175b99e"
+        const balance = await this.ethersProvider.getBalance(address)
+
+        // const theOnlyABIWeNeed = [
+        //   {
+        //     "constant": true,
+        //     "inputs": [
+        //       {
+        //         "name": "_owner",
+        //         "type": "address"
+        //       }
+        //     ],
+        //     "name": "balanceOf",
+        //     "outputs": [
+        //       {
+        //         "name": "balance",
+        //         "type": "uint256"
+        //       }
+        //     ],
+        //     "payable": false,
+        //     "type": "function"
+        //   }
+        // ]
+        //
+        // const fraxContract = new ethers.Contract(fraxContractAddress, theOnlyABIWeNeed)
+        // const fraxBalance = await fraxContract.balanceOf(address)
+        return {
+          ETH: balance.toNumber(),
+          // FRAX: fraxBalance.toNumber()
+        }
+      } else {
+        return {}
+      }
+    }
 }

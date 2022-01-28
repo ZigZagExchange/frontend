@@ -4,6 +4,7 @@ import {DefaultTemplate} from "../../templates/DefaultTemplate";
 import Pane from "../../atoms/Pane/Pane";
 import FormDemo from "../../atoms/Form/Form.demo";
 import TooltipDemo from "../../atoms/Tooltip/Tooltip.demo";
+import ToggleDemo from "../../atoms/Toggle/Toggle.demo";
 
 const DSLPage = () => {
     return <DefaultTemplate>
@@ -26,6 +27,9 @@ const DSLPage = () => {
                 </DSLItem>
                 <DSLItem title={"Tooltip"}>
                   <TooltipDemo/>
+                </DSLItem>
+                <DSLItem title={"Toggle"}>
+                  <ToggleDemo/>
                 </DSLItem>
               </x.div>
             </x.div>

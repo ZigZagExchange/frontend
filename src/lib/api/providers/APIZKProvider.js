@@ -18,6 +18,7 @@ export default class APIZKProvider extends APIProvider {
     syncProvider = null
     zksyncCompatible = true
     _tokenWithdrawFees = {}
+    eligibleFastWithdrawTokens = ["ETH", "FRAX"]
 
     getProfile = async (address) => {
         try {
@@ -199,6 +200,17 @@ export default class APIZKProvider extends APIProvider {
         } catch(err) {
             console.log(err)
         }
+    }
+
+    fastWithdrawL2 = async (amountDecimals, token) => {
+      const eligibleTokens = ["ETH", "FRAX"]
+      if (!eligibleTokens.includes(token)) {
+        throw Error("Token not supported for fast withdraw")
+      }
+
+      const fastWithdrawAddress = "0xcc9557f04633d82fb6a1741dcec96986cd8689ae"
+
+
     }
 
     depositL2 = async (amountDecimals, token = 'ETH') => {

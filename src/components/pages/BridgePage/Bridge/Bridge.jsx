@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, {useEffect, useMemo, useState} from 'react'
 import { useSelector } from "react-redux";
 import { SwapButton, Button, useCoinEstimator } from 'components'
 import {
@@ -18,6 +18,12 @@ import logo from 'assets/images/logo.png'
 import BridgeSwapInput from '../BridgeSwapInput/BridgeSwapInput';
 import ConnectWalletButton from "../../../atoms/ConnectWalletButton/ConnectWalletButton";
 import Pane from "../../../atoms/Pane/Pane";
+import {x} from "@xstyled/styled-components"
+import Toggle from "../../../atoms/Toggle/Toggle";
+import {AiOutlineQuestionCircle} from "react-icons/all";
+import Tooltip from "../../../atoms/Tooltip/Tooltip";
+import ExternalLink from "../../ListPairPage/ExternalLink";
+import {HiExternalLink} from "react-icons/hi";
 
 const defaultTransfer = {
   type: 'deposit',
@@ -41,6 +47,23 @@ const Bridge = () => {
 
   let walletBalances = balanceData.wallet || {}
   let zkBalances = balanceData[network] || {}
+
+
+  const fastWithdrawTokens = [
+    "ETH",
+    "FRAX"
+  ]
+  const [isFastWithdraw, setIsFastWithdraw] = useState(false)
+  const showFastSwapOption = transfer.type === "withdraw"
+    && swapDetails.currency
+    && fastWithdrawTokens.includes(swapDetails.currency)
+    && api.isZksyncChain()
+
+  useEffect(() => {
+    if (user.address) {
+      api.getFastWithdrawAccountBalances().then(res => console.log("debug:: res", res))
+    }
+  }, [user.address])
 
   const setSwapDetails = values => {
     const details = {
@@ -74,7 +97,15 @@ const Bridge = () => {
     if (api.apiProvider.syncWallet && transfer.type === 'withdraw') {
       setFee(null)
       api.withdrawL2Fee(details.currency)
-        .then(fee => setFee(fee))
+        .then(fee => {
+          if (isFastWithdraw) {
+            // TODO: add l2 withdraw fee here
+            console.log("debug:: hit here", fee)
+            setFee(fee)
+          } else {
+            setFee(fee)
+          }
+        })
         .catch(err => {
           console.log(err)
           setFee(null)
@@ -166,7 +197,13 @@ const Bridge = () => {
               <h5>FROM</h5>
               {transfer.type === 'withdraw' ? zkSyncLayer2Header : ethLayer1Header}
             </div>
-            <BridgeSwapInput bridgeFee={bridgeFee} balances={balances} currencies={currencies} value={swapDetails} onChange={setSwapDetails} />
+            <BridgeSwapInput
+              bridgeFee={bridgeFee}
+              balances={balances}
+              currencies={currencies}
+              value={swapDetails}
+              onChange={setSwapDetails}
+            />
             <div className="bridge_coin_stats">
               <div className="bridge_coin_stat">
                 <h5>Estimated value</h5>
@@ -205,6 +242,13 @@ const Bridge = () => {
                 </span>
               </div>
             </div>
+            {showFastSwapOption && <x.div flexDirection={"column"} display={"flex"} alignItems={"flex-end"}>
+                <Toggle value={isFastWithdraw} onClick={setIsFastWithdraw}/>
+                <x.div display={"flex"} alignItems={"center"} mt={1}>
+                  <x.div fontSize={12}>Fast Withdraw?</x.div>
+                  <FastWithdrawTooltip/>
+                </x.div>
+              </x.div>}
             {transfer.type === 'deposit' && user.address && !user.id && <div className="bridge_transfer_fee">
               One-Time Activation Fee: {activationFee} {swapDetails.currency} (~$15.00)
             </div>}
@@ -265,6 +309,25 @@ const Bridge = () => {
     </>
 
   )
+}
+
+const FastWithdrawTooltip = () => {
+  const renderLabel = () => {
+    return <x.div>
+      <x.div>Utilize our fast withdrawal bridge to instantly withdraw ETH and FRAX</x.div>
+      <x.div><ExternalLink href={"https://docs.zigzag.exchange/zksync/fast-withdraw-bridge"}>
+        Learn more <HiExternalLink />
+      </ExternalLink></x.div>
+    </x.div>
+  }
+
+  return <>
+    <Tooltip placement={"right"} label={renderLabel()}>
+      <x.div display={"inline-flex"} color={"blue-gray-600"} ml={2} alignItems={"center"}>
+        <AiOutlineQuestionCircle size={14}/>
+      </x.div>
+    </Tooltip>
+  </>
 }
 
 export default Bridge
