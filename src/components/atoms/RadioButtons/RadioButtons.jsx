@@ -18,7 +18,7 @@ const RadioButtons = ({
 const ControlledRadios = ({items, value, onChange, name, horizontal}) => {
   return <>
     {items.map(item => <x.div>
-      <x.div mb={1}>{item.name}</x.div>
+      <Label label={item.name}/>
       <Radio
         name={name}
         id={item.id}
@@ -37,10 +37,14 @@ const ControlledRadios = ({items, value, onChange, name, horizontal}) => {
 const UncontrolledRadios = ({items, name, horizontal}) => {
   return <>
     {items.map(item => <x.div>
-      <x.div mb={0.5}>{item.name}</x.div>
+      <Label label={item.name}/>
       <Radio name={name} id={item.id} value={item.value}/>
     </x.div>)}
   </>
+}
+
+const Label = ({label}) => {
+  return <x.div fontSize={12} mb={1}>{label}</x.div>
 }
 
 const Radio = ({name, id, value, ...rest}) => {
@@ -55,9 +59,13 @@ const Radio = ({name, id, value, ...rest}) => {
     h={4}
     borderWidth={"2px"}
     borderStyle={"solid"}
-    borderColor={"blue-300"}
+    // TODO: decide on styling here
+    borderColor={{_: "blue-300", checked: "blue-300"}}
     borderRadius={"full"}
-    bg={{_: "inherit", checked: "white"}}
+    gradientFrom={{checked: 'blue-100'}}
+    gradientVia={{checked: 'blue-200'}}
+    gradientTo={{checked: 'teal-100'}}
+    backgroundImage={{checked: 'gradient-to-r', disabled: "none"}}
     {...rest}
   />
 }

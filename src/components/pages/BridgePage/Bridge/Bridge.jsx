@@ -24,6 +24,7 @@ import {AiOutlineQuestionCircle} from "react-icons/all";
 import Tooltip from "../../../atoms/Tooltip/Tooltip";
 import ExternalLink from "../../ListPairPage/ExternalLink";
 import {HiExternalLink} from "react-icons/hi";
+import RadioButtons from "../../../atoms/RadioButtons/RadioButtons";
 
 const defaultTransfer = {
   type: 'deposit',
@@ -54,7 +55,8 @@ const Bridge = () => {
     "ETH",
     "FRAX"
   ]
-  const [isFastWithdraw, setIsFastWithdraw] = useState(false)
+  const [withdrawSpeed, setWithdrawSpeed] = useState("fast")
+  const isFastWithdraw = withdrawSpeed === "fast"
   const showFastSwapOption = transfer.type === "withdraw"
     && swapDetails.currency
     && fastWithdrawTokens.includes(swapDetails.currency)
@@ -67,6 +69,11 @@ const Bridge = () => {
       })
     }
   }, [user.address])
+
+  useEffect(() => {
+    setSwapDetails({})
+  }, [withdrawSpeed])
+
 
   const setSwapDetails = values => {
     const details = {
@@ -107,20 +114,24 @@ const Bridge = () => {
 
     if (api.apiProvider.syncWallet && transfer.type === 'withdraw') {
       setFee(null)
-      api.withdrawL2Fee(details.currency)
-        .then(fee => {
-          if (isFastWithdraw) {
-            // TODO: add l2 withdraw fee here
-            console.log("debug:: hit here", fee)
+
+      if (isFastWithdraw) {
+        api.withdrawL2FeeFast(details.currency)
+          .then(res => setFee(res))
+          .catch(e => {
+            console.error(e)
+            setFee(null)
+          })
+      } else {
+        api.withdrawL2Fee(details.currency)
+          .then(fee => {
             setFee(fee)
-          } else {
-            setFee(fee)
-          }
-        })
-        .catch(err => {
-          console.log(err)
-          setFee(null)
-        })  
+          })
+          .catch(err => {
+            console.log(err)
+            setFee(null)
+          })
+      }
     } else {
       setFee(0)
     }
@@ -254,11 +265,17 @@ const Bridge = () => {
               </div>
             </div>
             {showFastSwapOption && <x.div flexDirection={"column"} display={"flex"} alignItems={"flex-end"}>
-                <Toggle value={isFastWithdraw} onClick={setIsFastWithdraw}/>
-                <x.div display={"flex"} alignItems={"center"} mt={1}>
-                  <x.div fontSize={12}>Fast Withdraw?</x.div>
-                  <FastWithdrawTooltip/>
-                </x.div>
+                <RadioButtons
+                  horizontal
+                  value={withdrawSpeed}
+                  onChange={setWithdrawSpeed}
+                  name={"withdrawSpeed"}
+                  items={[{id: "fast", name: "Fast"}, {id: "slow", name: "Slow"}]}
+                />
+              <x.div display={"flex"}>
+                <x.div fontSize={12} color={"blue-gray-500"}>Withdraw speed</x.div>
+                <FastWithdrawTooltip/>
+              </x.div>
               </x.div>}
             {transfer.type === 'deposit' && user.address && !user.id && <div className="bridge_transfer_fee">
               One-Time Activation Fee: {activationFee} {swapDetails.currency} (~$15.00)

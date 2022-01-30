@@ -319,6 +319,10 @@ export default class API extends Emitter {
         return this.apiProvider.withdrawL2Fee(token)
     }
 
+    withdrawL2FeeFast = async (token) => {
+      return this.apiProvider.withdrawL2FeeFast(token)
+    }
+
     cancelAllOrders = async () => {
         const { id: userId } = await this.getAccountState()
         await this.send('cancelall', [this.apiProvider.network, userId])

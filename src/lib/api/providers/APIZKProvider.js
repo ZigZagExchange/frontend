@@ -257,6 +257,18 @@ export default class APIZKProvider extends APIProvider {
         return this._tokenWithdrawFees[token]
     }
 
+    withdrawL2FeeFast = async (token) => {
+      if (this.api.ethersProvider) {
+        const minGasForETHTransfer = 21000
+        const gasPrice = await this.api.ethersProvider.getGasPrice()
+        const totalCost = gasPrice.mul(minGasForETHTransfer)
+        const ethersFormatted = ethers.utils.formatEther(totalCost)
+        return Number(ethersFormatted) * 1.5
+      } else {
+        throw Error("Ethers provider not found")
+      }
+    }
+
     signIn = async () => {
         try {
             this.syncProvider = await zksync.getDefaultProvider(
