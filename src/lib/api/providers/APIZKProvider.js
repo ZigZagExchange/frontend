@@ -69,6 +69,12 @@ export default class APIZKProvider extends APIProvider {
         return receipt
     }
 
+    handleFastBridgeReceipt = (_receipt, amount, token, type) => {
+      const receipt = this.handleBridgeReceipt(_receipt, amount, token, type)
+      receipt.isFastWithdraw = true
+      return receipt
+    }
+
     changePubKey = async () => {
         if (this.network === 1) {
             toast.info('You need to sign a one-time transaction to activate your zksync account. The fee for this tx will be ~0.003 ETH (~$15)')
@@ -214,7 +220,7 @@ export default class APIZKProvider extends APIProvider {
         amount
       })
       await transfer.awaitReceipt()
-      this.api.emit('bridgeReceipt', this.handleBridgeReceipt(transfer, amountDecimals, token, 'withdraw'))
+      this.api.emit('bridgeReceipt', this.handleFastBridgeReceipt(transfer, amountDecimals, token, 'withdraw'))
       return transfer
     }
 
@@ -282,6 +288,7 @@ export default class APIZKProvider extends APIProvider {
           // const gasEstimation = await fraxContract.estimateGas.transfer(this._fastWithdrawContractAddress, 0)
           // console.log("debug:: FRAX withdraw fee", gasEstimation)
           // return gasEstimation
+
           const gasForETHTransfer = 21000
           const gasPrice = await this.api.ethersProvider.getGasPrice()
           const totalCost = gasPrice.mul(gasForETHTransfer)

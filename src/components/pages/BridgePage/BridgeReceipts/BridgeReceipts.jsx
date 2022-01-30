@@ -7,6 +7,8 @@ const BridgeReceipts = () => {
     const receipts = useSelector(bridgeReceiptsSelector)
     const dispatch = useDispatch()
 
+  console.log("debug:: receipts", receipts)
+
     return (
         <div className="bridge_box bridge_box_receipts">
             <h6 className="bridge_box_receipt_head">
@@ -19,7 +21,7 @@ const BridgeReceipts = () => {
                     <div onClick={() => window.open(r.txUrl)} key={r.txId} className="bridge_box_transaction">
                         <div className="bridge_contain">
                             <div className={`bridge_box_transaction_txType_${r.type}`}>
-                                {r.type}
+                              {r.type} {r.isFastWithdraw && "(FAST)"}
                             </div>
                             <div className="bridge_box_transaction_amount">
                                 {r.amount}
