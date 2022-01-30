@@ -18,6 +18,11 @@ p {
 body {
     height: 100vh;
     font-size: 0.9rem;
+    background-color: #171c28;
+}
+
+article {
+    margin-top: 0px
 }
 
 html {

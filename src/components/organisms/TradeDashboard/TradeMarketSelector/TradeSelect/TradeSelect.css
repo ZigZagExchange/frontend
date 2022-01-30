@@ -1,8 +1,8 @@
 .tl_select {
-    width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    margin-right: 1rem;
 }
 
 .tl_select div:nth-child(1) {
@@ -14,7 +14,7 @@
 
 .tl_select select {
     width: 100%;
-    background-image: url("../../../../assets/icons/select-arrow.png");
+    background-image: url("../../../../../assets/icons/select-arrow.png");
     color: #94a2c9;
     border: none;
     display: flex;

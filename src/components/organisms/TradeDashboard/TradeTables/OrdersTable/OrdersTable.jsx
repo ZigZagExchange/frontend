@@ -1,9 +1,9 @@
 import React from "react";
-import "./Footer.css";
+import "./OrdersTable.css";
 import loadingGif from "assets/icons/loading.svg";
 import api from "lib/api";
 
-export class Footer extends React.Component {
+export class OrdersTable extends React.Component {
   constructor(props) {
     super(props);
     this.state = { tab: "orders" };

@@ -1,5 +1,4 @@
 .spot_form {
-    width: 48%;
     color: white;
 }
 
@@ -50,10 +49,6 @@
 
 .spf_input_box .spf_desc_text {
     color: #94a2c9;
-}
-
-.spf_input_box span {
-    /* font-size: 0.8rem; */
 }
 
 .spf_range {

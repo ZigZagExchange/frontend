@@ -1,11 +1,12 @@
 import { useSelector } from 'react-redux'
+import { useHistory, useLocation } from 'react-router-dom'
 import { BiChevronDown } from 'react-icons/bi'
 import { FaDiscord, FaTelegramPlane, FaTwitter } from 'react-icons/fa'
 import { GoGlobe } from 'react-icons/go'
 import { HiExternalLink } from 'react-icons/hi'
 import React, { useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import { Dropdown, AccountDropdown, Menu, MenuItem } from 'components'
+import { Button, Dropdown, AccountDropdown, Menu, MenuItem } from 'components'
 import { userSelector } from 'lib/store/features/auth/authSlice'
 import { networkSelector } from 'lib/store/features/api/apiSlice'
 import api from 'lib/api'
@@ -18,9 +19,12 @@ import {Dev } from "../../../lib/helpers/env";
 export const Header = (props) => {
   // state to open or close the sidebar in mobile
   const [show, setShow] = useState(false)
+  const [connecting, setConnecting] = useState(false);
   const user = useSelector(userSelector)
   const network = useSelector(networkSelector)
   const hasBridge = api.isImplemented('depositL2')
+  const history = useHistory();
+  const location = useLocation();
 
   const handleMenu = ({ key }) => {
     switch (key) {
@@ -38,11 +42,24 @@ export const Header = (props) => {
     </Menu>
   )
 
+  const connect = () => {
+    setConnecting(true);
+    api
+      .signIn(network)
+      .then((state) => {
+        if (!state.id && !/^\/bridge(\/.*)?/.test(location.pathname)) {
+          history.push("/bridge");
+        }
+        setConnecting(false);
+      })
+      .catch(() => setConnecting(false));
+  };
+
   return (
     <>
       <header>
-        <div className="mobile_header mb_h">
-          <img src={logo} alt="logo" />
+        <div className="mobile_header main_header mb_h">
+          <img src={logo} alt="logo"  height="30"/>
           {/* open sidebar function */}
           <img
             onClick={() => {
@@ -127,9 +144,9 @@ export const Header = (props) => {
         ) : null}
 
         {/* desktop header */}
-        <div className="head_wrapper_desktop dex_h">
+        <div className="main_header head_wrapper_desktop dex_h">
           <div className="head_left">
-            <a href="http://info.zigzag.exchange" rel="noreferrer"><img src={logo} alt="logo" /></a>
+            <a href="http://info.zigzag.exchange" rel="noreferrer"><img src={logo} alt="logo" height="30"/></a>
             <ul>
               <li>
                 <NavLink exact to="/" activeClassName="active_link">
@@ -166,21 +183,20 @@ export const Header = (props) => {
               </Dev>
             </ul>
           </div>
-          <div className="head_left head_left_socials">
-          <ul>
-            <li className="head_social_link">
-              <a target="_blank" rel="noreferrer" href="https://discord.gg/zigzag"><FaDiscord /></a>
-            </li>
-            <li className="head_social_link"> 
-              <a target="_blank" rel="noreferrer" href="https://twitter.com/ZigZagExchange"><FaTwitter /></a>
-            </li>  
-            <li className="head_social_link">
-              <a target="_blank" rel="noreferrer" href="https://t.me/zigzagexchange"><FaTelegramPlane /></a> 
-            </li>  
-            </ul>
-                  
-                </div>
           <div className="head_right">
+            <div className="head_left head_left_socials">
+              <ul>
+                <li className="head_social_link">
+                  <a target="_blank" rel="noreferrer" href="https://discord.gg/zigzag"><FaDiscord /></a>
+                </li>
+                <li className="head_social_link"> 
+                  <a target="_blank" rel="noreferrer" href="https://twitter.com/ZigZagExchange"><FaTwitter /></a>
+                </li>  
+                <li className="head_social_link">
+                  <a target="_blank" rel="noreferrer" href="https://t.me/zigzagexchange"><FaTelegramPlane /></a> 
+                </li>  
+              </ul>
+            </div>
             <label htmlFor="networkSelector" className="eu_text">
                 <GoGlobe className="eu_network" />
                 <select
@@ -202,7 +218,12 @@ export const Header = (props) => {
               {user.id && user.address ? (
                 <AccountDropdown/>
               ) : (
-                <ConnectWalletButton/>
+                <Button
+                  className="bg_btn zig_btn_sm"
+                  loading={connecting}
+                  text="CONNECT WALLET"
+                  onClick={connect}
+                />
               )}
             </div>
           </div>

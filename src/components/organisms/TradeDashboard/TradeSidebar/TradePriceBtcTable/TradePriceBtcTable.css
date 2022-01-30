@@ -1,32 +1,27 @@
 .trade_price_btc_table {
-  width: 100%;
-  padding-top: 20px;
-  height: 430px;
+  height: calc(100vh - 499px);
+  min-height: 200px;
+  overflow: auto;
 }
 
-.trade_price_btc_table table {
-    overflow: auto;
-    width: 100%;
-}
-
-.trade_price_btc_table table::-webkit-scrollbar {
+.trade_price_btc_table::-webkit-scrollbar {
     width: 5px;
     position: relative;
     z-index: 20;
 }
 
-.trade_price_btc_table table::-webkit-scrollbar-track {
-    border-radius: 5px;
+.trade_price_btc_table::-webkit-scrollbar-track {
+    border-radius: 0px;
     background: hsla(0, 0%, 100%, 0.15);
     height: 23px;
 }
 
-.trade_price_btc_table table::-webkit-scrollbar-thumb {
-    border-radius: 5px;
+.trade_price_btc_table::-webkit-scrollbar-thumb {
+    border-radius: 0px;
     background: hsla(0, 0%, 100%, 0.4);
 }
 
-.trade_price_btc_table table::-webkit-scrollbar-thumb:window-inactive {
+.trade_price_btc_table::-webkit-scrollbar-thumb:window-inactive {
     background: #fff;
 }
 
@@ -40,7 +35,7 @@
     color: #94a2c9;
     font-weight: 400;
     text-align: center;
-    padding: 0 20px;
+    padding: 5px 20px;
 }
 
 .trade_price_btc_table table th:nth-child(1) {
