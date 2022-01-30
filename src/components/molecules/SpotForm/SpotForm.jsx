@@ -132,9 +132,9 @@ export class SpotForm extends React.Component {
         }
         if (this.props.orderType === 'market') {
             if (this.props.side === 'b') {
-                price *= 1.0005;
+                price *= 1.0008;
             } else if (this.props.side === 's') {
-                price *= 0.9995;
+                price *= 0.9992;
             }
         }
 
@@ -166,7 +166,7 @@ export class SpotForm extends React.Component {
             return;
         } else if (
             (this.props.side === 'b' && price > this.getFirstAsk() * 1.05) ||
-            (this.props.side === 's' && price < this.getFirstBid() * 0.995)
+            (this.props.side === 's' && price < this.getFirstBid() * 0.95)
         ) {
             toast.error("Limit orders cannot exceed 5% beyond spot");
             return;

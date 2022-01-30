@@ -170,12 +170,17 @@ export default class API extends Emitter {
         }
     }
 
+    _socketError = (e) => {
+        console.warn("Zigzag websocket connection failed");
+    }
+
     start = () => {
         if (this.ws) this.stop()
         this.ws = new WebSocket(this.websocketUrl)
         this.ws.addEventListener('open', this._socketOpen)
         this.ws.addEventListener('close', this._socketClose)
         this.ws.addEventListener('message', this._socketMsg)
+        this.ws.addEventListener('error', this._socketError)
         this.emit('start')
     }
 
@@ -193,6 +198,7 @@ export default class API extends Emitter {
     }
 
     send = (op, args) => {
+        if (!this.ws) return;
         return this.ws.send(JSON.stringify({ op, args }))
     }
 
@@ -413,13 +419,13 @@ export default class API extends Emitter {
         const marketInfo = this.apiProvider.marketInfo[market];
         let baseQuantityWithoutFee, quoteQuantityWithoutFee, priceWithoutFee, remainingWithoutFee
         if (side === "s") {
-            const fee = marketInfo.baseFee;
+            const fee = marketInfo ? marketInfo.baseFee : 0;
             baseQuantityWithoutFee = baseQuantity - fee;
             remainingWithoutFee = Math.max(0, remaining - fee);
             priceWithoutFee = quoteQuantity / baseQuantityWithoutFee;
             quoteQuantityWithoutFee = priceWithoutFee * baseQuantityWithoutFee;
         } else {
-            const fee = marketInfo.quoteFee;
+            const fee = marketInfo ? marketInfo.quoteFee: 0;
             quoteQuantityWithoutFee = quoteQuantity - fee;
             priceWithoutFee = quoteQuantityWithoutFee / baseQuantity;
             baseQuantityWithoutFee = quoteQuantityWithoutFee / priceWithoutFee;
