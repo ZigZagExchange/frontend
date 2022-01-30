@@ -340,7 +340,7 @@ const Bridge = () => {
 const FastWithdrawTooltip = () => {
   const renderLabel = () => {
     return <x.div>
-      <x.div>Utilize our fast withdrawal bridge to instantly withdraw ETH and FRAX</x.div>
+      <x.div>Utilize our fast withdrawal bridge receive ETH and FRAX within a few minutes.</x.div>
       <x.div><ExternalLink href={"https://docs.zigzag.exchange/zksync/fast-withdraw-bridge"}>
         Learn more <HiExternalLink />
       </ExternalLink></x.div>
