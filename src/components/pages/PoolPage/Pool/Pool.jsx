@@ -29,13 +29,8 @@ const Pool = () => {
     <>
         <div className="pool_databox_container">
             <div className="pool_databox">
-                <h3 className="pool_databox_title">TOTAL STAKED</h3>
-                <h1 className="pool_databox_number">$999,999</h1>
-            </div>
-            <div className="pool_databox">
-                <h3 className="pool_databox_title">YOUR REWARDS</h3>
-                <h1 className="pool_databox_number">$999,999</h1>
-                <a href="#claim" className="pool_badge databox_link">Claim All</a>
+                <h3 className="pool_databox_title">MAMMOTH LP BALANCE</h3>
+                <h1 className="pool_databox_number">999,999</h1>
             </div>
         </div>
 

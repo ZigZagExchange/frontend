@@ -3,12 +3,14 @@
     align-items: center;
     justify-content: space-between;
     margin-right: 1rem;
+    min-width: 150px;
 }
 
 .tl_select div:nth-child(1) {
-    border: 1px solid #94a2c9;
+    border: 1px solid #272c39;
+    border-radius: 20px;
     width: 240px;
-    background-color: transparent;
+    background-color: #131722;
     padding: 6px 15px;
 }
 

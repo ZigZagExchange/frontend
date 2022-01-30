@@ -63,12 +63,6 @@ html {
 
 }
 
-@media screen and (min-width: 1800px) {
-    html {
-        font-size: 18px;
-    }
-}
-
 /* WalletConnect customization */
 .walletconnect-modal__base div:nth-child(3) {
     overflow-y: scroll;

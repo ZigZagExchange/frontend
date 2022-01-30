@@ -15,7 +15,7 @@
 }
 
 
-@media screen and (max-width: 1280px) {
+@media screen and (max-width: 1426px) {
     .footer table {
         border: 0;
     }
@@ -67,6 +67,26 @@
     display: flex;
     flex-direction: column;
     overflow: auto;
+}
+.footer::-webkit-scrollbar {
+    width: 5px;
+    position: relative;
+    z-index: 20;
+}
+
+.footer::-webkit-scrollbar-track {
+    border-radius: 0px;
+    background: hsla(0, 0%, 100%, 0.15);
+    height: 23px;
+}
+
+.footer::-webkit-scrollbar-thumb {
+    border-radius: 0px;
+    background: hsla(0, 0%, 100%, 0.4);
+}
+
+.footer::-webkit-scrollbar-thumb:window-inactive {
+    background: #fff;
 }
 
 .footer_container {
@@ -140,7 +160,7 @@
 }
 .footer_orders table tbody td,
 .footer_orders table thead th {
-    padding: 5px 15px;
+    padding: 5px 0;
     color: white;
 }
 .cancel_order_link {

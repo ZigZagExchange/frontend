@@ -1,5 +1,7 @@
 /* tl_rates */
-
+.tl_rates .hide_mobile{
+    display: none;
+}
 .tl_rates {
     width: 100%;
     display: flex;
@@ -82,8 +84,5 @@
 @media screen and (max-width: 674px) {
     .tl_rates {
         flex-wrap: wrap;
-    }
-    .rates_box {
-        margin-bottom: 15px;
     }
 }

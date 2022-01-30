@@ -44,6 +44,18 @@ const TradeGrid = styled.article`
         'sidebar footer footer'; 
     min-height: calc(100vh - 48px);
     gap: 1px;
+    
+    @media screen and (max-width: 991px) {
+      grid-template-rows: 50px 300px 3fr 3fr 3fr 50px;
+      grid-template-columns: 100%;
+      grid-template-areas:
+        'marketSelector'
+        'chart'
+        'sidebar'
+        'books'
+        'tables'
+        'footer'; 
+    }
 
     > div, > aside, > header, > footer, > section, > main {
         background: ${p => p.theme.colors.zzDarkest};
