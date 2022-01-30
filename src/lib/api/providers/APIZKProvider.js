@@ -18,6 +18,7 @@ export default class APIZKProvider extends APIProvider {
     syncProvider = null
     zksyncCompatible = true
     _tokenWithdrawFees = {}
+    _fastWithdrawContractAddress = "0xCC9557F04633d82Fb6A1741dcec96986cD8689AE"
     eligibleFastWithdrawTokens = ["ETH", "FRAX"]
 
     getProfile = async (address) => {
@@ -179,13 +180,11 @@ export default class APIZKProvider extends APIProvider {
     }
 
     withdrawL2 = async (amountDecimals, token = 'ETH') => {
-        let transfer
-
         const currencyInfo = this.getCurrencyInfo(token);
         const amount = toBaseUnit(amountDecimals, currencyInfo.decimals)
         
         try {
-            transfer = await this.syncWallet.withdrawFromSyncToEthereum({
+            const transfer = await this.syncWallet.withdrawFromSyncToEthereum({
                 token,
                 ethAddress: await this.ethWallet.getAddress(),
                 amount,
@@ -202,15 +201,20 @@ export default class APIZKProvider extends APIProvider {
         }
     }
 
-    // @TODO: implement
-    fastWithdrawL2 = async (amountDecimals, token) => {
-      const eligibleTokens = ["ETH", "FRAX"]
-      if (!eligibleTokens.includes(token)) {
+    withdrawL2Fast = async (amountDecimals, token) => {
+      if (!this.eligibleFastWithdrawTokens.includes(token)) {
         throw Error("Token not supported for fast withdraw")
       }
 
-      const fastWithdrawAddress = "0xcc9557f04633d82fb6a1741dcec96986cd8689ae"
-
+      const amount = toBaseUnit(amountDecimals, this.getCurrencyInfo(token).decimals)
+      const transfer = await this.syncWallet.syncTransfer({
+        to: this._fastWithdrawContractAddress,
+        token,
+        amount
+      })
+      await transfer.awaitReceipt()
+      this.api.emit('bridgeReceipt', this.handleBridgeReceipt(transfer, amountDecimals, token, 'withdraw'))
+      return transfer
     }
 
     depositL2 = async (amountDecimals, token = 'ETH') => {
@@ -263,7 +267,7 @@ export default class APIZKProvider extends APIProvider {
         const gasPrice = await this.api.ethersProvider.getGasPrice()
         const totalCost = gasPrice.mul(minGasForETHTransfer)
         const ethersFormatted = ethers.utils.formatEther(totalCost)
-        return Number(ethersFormatted) * 1.5
+        return Number((Number(ethersFormatted) * 1.5).toPrecision(3))
       } else {
         throw Error("Ethers provider not found")
       }
@@ -402,7 +406,6 @@ export default class APIZKProvider extends APIProvider {
             throw Error("Uknown chain")
         }
     }
-
 
     tokenInfo = async (tokenLike, chainId) => {
         try {

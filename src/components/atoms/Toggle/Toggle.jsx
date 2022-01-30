@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {x} from "@xstyled/styled-components"
 
 const sizesTrack = {

@@ -24,7 +24,7 @@ export default class API extends Emitter {
     lastprices = {}
     _signInProgress = null
     _profiles = {}
-    
+
     constructor({ infuraId, websocketUrl, networks, currencies, validMarkets }) {
         super()
         
@@ -317,6 +317,10 @@ export default class API extends Emitter {
         return this.apiProvider.withdrawL2(amount, token)
     }
 
+    withdrawL2Fast = (amount, token) => {
+      return this.apiProvider.withdrawL2Fast(amount, token)
+    }
+
     depositL2Fee = async (token) => {
         return this.apiProvider.depositL2Fee(token)
     }
@@ -546,42 +550,35 @@ export default class API extends Emitter {
         }
     }
 
+    get _fraxContractAddress() {
+      if (this.apiProvider.network === 1) {
+        return "0x853d955aCEf822Db058eb8505911ED77F175b99e"
+      } else if (this.apiProvider.network === 1000) {
+        return "0x6426e27d8c6fDCd1e0c165d0D58c7eC0ef51f3a7"
+      } else {
+        throw Error("No FRAX address for specified network")
+      }
+    }
+
     async getFastWithdrawAccountBalances() {
       if (this.ethersProvider) {
-        const address = "0xCC9557F04633d82Fb6A1741dcec96986cD8689AE"
-        const fraxContractAddress = "0x853d955aCEf822Db058eb8505911ED77F175b99e"
-        const balance = await this.ethersProvider.getBalance(address)
+        const maxETH = await this.ethersProvider.getBalance(this.apiProvider._fastWithdrawContractAddress)
 
-        const theOnlyABIWeNeed = [
-          {
-            "constant": true,
-            "inputs": [
-              {
-                "name": "_owner",
-                "type": "address"
-              }
-            ],
-            "name": "balanceOf",
-            "outputs": [
-              {
-                "name": "balance",
-                "type": "uint256"
-              }
-            ],
-            "payable": false,
-            "type": "function"
-          }
-        ]
+        console.log("debug:: frax address", this._fraxContractAddress)
 
-        const fraxContract = new ethers.Contract(fraxContractAddress, theOnlyABIWeNeed, this.ethersProvider)
-        const fraxBalance = await fraxContract.balanceOf(address)
-
+        const fraxContract = new ethers.Contract(this._fraxContractAddress, erc20ContractABI, this.ethersProvider)
+        let maxFRAX = 0
+        try {
+          maxFRAX = await fraxContract.balanceOf(this.apiProvider._fastWithdrawContractAddress)
+        } catch (e) {
+          console.error(e)
+        }
         return {
-          ETH: Number(utils.formatEther(balance)),
-          FRAX: Number(utils.formatEther(fraxBalance))
+          ETH: Number(utils.formatEther(maxETH)),
+          FRAX: Number(utils.formatEther(maxFRAX))
         }
       } else {
-        console.log("debug:: ethers provider not there")
+        console.error("Ethers provider null or undefined")
         return {}
       }
     }

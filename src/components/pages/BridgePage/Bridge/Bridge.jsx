@@ -19,7 +19,6 @@ import BridgeSwapInput from '../BridgeSwapInput/BridgeSwapInput';
 import ConnectWalletButton from "../../../atoms/ConnectWalletButton/ConnectWalletButton";
 import Pane from "../../../atoms/Pane/Pane";
 import {x} from "@xstyled/styled-components"
-import Toggle from "../../../atoms/Toggle/Toggle";
 import {AiOutlineQuestionCircle} from "react-icons/all";
 import Tooltip from "../../../atoms/Tooltip/Tooltip";
 import ExternalLink from "../../ListPairPage/ExternalLink";
@@ -50,16 +49,11 @@ const Bridge = () => {
   let walletBalances = balanceData.wallet || {}
   let zkBalances = balanceData[network] || {}
 
-  // @TODO this needs to tied to api
-  const fastWithdrawTokens = [
-    "ETH",
-    "FRAX"
-  ]
   const [withdrawSpeed, setWithdrawSpeed] = useState("fast")
   const isFastWithdraw = withdrawSpeed === "fast"
   const showFastSwapOption = transfer.type === "withdraw"
     && swapDetails.currency
-    && fastWithdrawTokens.includes(swapDetails.currency)
+    && api.apiProvider.eligibleFastWithdrawTokens.includes(swapDetails.currency)
     && api.isZksyncChain()
 
   useEffect(() => {
@@ -197,7 +191,11 @@ const Bridge = () => {
     if (transfer.type === 'deposit') {
       deferredXfer = api.depositL2(`${swapDetails.amount}`, swapDetails.currency)
     } else {
-      deferredXfer = api.withdrawL2(`${swapDetails.amount}`, swapDetails.currency)
+      if (isFastWithdraw) {
+        deferredXfer = api.withdrawL2Fast(`${swapDetails.amount}`, swapDetails.currency)
+      } else {
+        deferredXfer = api.withdrawL2(`${swapDetails.amount}`, swapDetails.currency)
+      }
     }
 
     deferredXfer
