@@ -83,20 +83,20 @@ const TradePage = () => {
       api.subscribeToMarket(currentMarket)
     }
     
-    if (api.ws.readyState === 0) {
+    if (api.ws && api.ws.readyState === 0) {
       api.on('open', sub)
     } else {
       sub()
     }
 
     return () => {
-      if (api.ws.readyState !== 0) {
+      if (api.ws && api.ws.readyState !== 0) {
         api.unsubscribeToMarket(currentMarket)
       } else {
         api.off('open', sub)
       }
     }
-  }, [network, currentMarket])
+  }, [network, currentMarket, api.ws])
 
 
   Object.keys(lastPrices).forEach((market) => {
