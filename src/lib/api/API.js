@@ -562,9 +562,12 @@ export default class API extends Emitter {
 
     async getFastWithdrawAccountBalances() {
       if (this.ethersProvider) {
-        const maxETH = await this.ethersProvider.getBalance(this.apiProvider._fastWithdrawContractAddress)
-
-        console.log("debug:: frax address", this._fraxContractAddress)
+        let maxETH = 0
+        try {
+          maxETH = await this.ethersProvider.getBalance(this.apiProvider._fastWithdrawContractAddress)
+        } catch (e) {
+          console.error(e)
+        }
 
         const fraxContract = new ethers.Contract(this._fraxContractAddress, erc20ContractABI, this.ethersProvider)
         let maxFRAX = 0
@@ -573,6 +576,7 @@ export default class API extends Emitter {
         } catch (e) {
           console.error(e)
         }
+
         return {
           ETH: Number(utils.formatEther(maxETH)),
           FRAX: Number(utils.formatEther(maxFRAX))
