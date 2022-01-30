@@ -3,69 +3,70 @@
     margin: 0;
     padding: 0;
     width: 100%;
-  }
-  
-  .footer table caption {
+}
+
+.footer table caption {
     font-size: 1.5em;
     margin: .5em 0 .75em;
-  }
-  
-  .footer table tr {
-    padding: .35em;
-  }
+}
 
-  
-  @media screen and (max-width: 1050px) {
+.footer table tr {
+    padding: .35em;
+}
+
+
+@media screen and (max-width: 1280px) {
     .footer table {
-      border: 0;
+        border: 0;
     }
-  
+
     .footer table caption {
-      font-size: 1.3em;
+        font-size: 1.3em;
     }
-    
+
     .footer table thead {
-      border: none;
-      clip: rect(0 0 0 0);
-      height: 1px;
-      margin: -1px;
-      overflow: hidden;
-      padding: 0;
-      position: absolute;
-      width: 1px;
+        border: none;
+        clip: rect(0 0 0 0);
+        height: 1px;
+        margin: -1px;
+        overflow: hidden;
+        padding: 0;
+        position: absolute;
+        width: 1px;
     }
-    
+
     .footer table tr {
+        margin-top: .625em;
         border: 1px solid #272c39;
-      background-color: rgba(0,0,0,0.3);
-      display: block;
-      margin-bottom: .625em;
-      
+        background-color: rgba(0,0,0,0.3);
+        display: block;
+        margin-bottom: .625em;
     }
-    
+
     .footer table td {
-      border-bottom: 1px solid rgba(148, 162, 201, 0.4);
-      display: block;
-      font-size: .8em;
-      text-align: right;
+        border-bottom: 1px solid #272c39;
+        display: block;
+        font-size: .8em;
+        text-align: right;
     }
-    
+
     .footer table td::before {
-      content: attr(data-label);
-      float: left;
-      font-weight: bold;
-      text-transform: uppercase;
+        content: attr(data-label);
+        float: left;
+        font-weight: bold;
+        text-transform: uppercase;
     }
-    
+
     .footer table td:last-child {
-      border-bottom: 0;
+        border-bottom: 0;
     }
-  }
+}
   
 .footer {
     width: 100%;
     display: flex;
     flex-direction: column;
+    overflow: auto;
 }
 
 .footer_container {
@@ -132,8 +133,7 @@
 
 .footer_orders {
     flex: 1;
-    max-height: 200px;
-    overflow-y: scroll;
+    height: 1px;
 }
 .footer_orders table {
     width: 100%;

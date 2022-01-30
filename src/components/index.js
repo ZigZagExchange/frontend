@@ -28,7 +28,6 @@ export * from 'components/molecules/Tabs'
 
 // Organisms
 export * from 'components/organisms/Header'
-export * from 'components/organisms/Footer'
 export * from 'components/organisms/TradeDashboard'
 
 // Templates
