@@ -174,7 +174,7 @@ const ListPairForm = ({
           block
           name={"pricePrecisionDecimals"}
           label={"Price Precision Decimals"}
-          validate={[required, max(18), min(0)]}
+          validate={[required, max(10), min(0)]}
           rightOfLabel={<TooltipHelper>
             <x.div>
               Number of decimal places in the price of the asset pair.
