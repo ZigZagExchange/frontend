@@ -415,13 +415,13 @@ export default class API extends Emitter {
         const marketInfo = this.apiProvider.marketInfo[market];
         let baseQuantityWithoutFee, quoteQuantityWithoutFee, priceWithoutFee, remainingWithoutFee
         if (side === "s") {
-            const fee = marketInfo.baseFee;
+            const fee = marketInfo ? marketInfo.baseFee : 0;
             baseQuantityWithoutFee = baseQuantity - fee;
             remainingWithoutFee = Math.max(0, remaining - fee);
             priceWithoutFee = quoteQuantity / baseQuantityWithoutFee;
             quoteQuantityWithoutFee = priceWithoutFee * baseQuantityWithoutFee;
         } else {
-            const fee = marketInfo.quoteFee;
+            const fee = marketInfo ? marketInfo.quoteFee: 0;
             quoteQuantityWithoutFee = quoteQuantity - fee;
             priceWithoutFee = quoteQuantityWithoutFee / baseQuantity;
             baseQuantityWithoutFee = quoteQuantityWithoutFee / priceWithoutFee;
