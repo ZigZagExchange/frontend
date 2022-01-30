@@ -1,5 +1,5 @@
 import React from "react";
-import {x} from "@xstyled/styled-components"
+import styled, {x} from "@xstyled/styled-components"
 
 const RadioButtons = ({
   value,
@@ -47,27 +47,42 @@ const Label = ({label}) => {
   return <x.div fontSize={12} mb={1}>{label}</x.div>
 }
 
+const StyledRadio = styled.input`
+  appearance: none;
+  cursor: pointer;
+  width: 5;
+  height: 5;
+  border-width: 2px;
+  border-style: solid;
+  border-color: blue-gray-400;
+  border-radius: full;
+  display: grid;
+  place-content: center;
+  
+  &::before {
+    content: "";
+    width: 3;
+    height: 3;
+    border-radius: 50%;
+    transform: scale(0);
+    transition: 120ms transform ease-in-out;
+    background: linear-gradient(to right, #09aaf5, #05cfe9, #02f1de);
+  }
+  
+  &:checked::before {
+    transform: scale(1);
+  }
+`
+
 const Radio = ({name, id, value, ...rest}) => {
-  return <x.input
+  return <StyledRadio
     value={value}
     id={id}
     name={name}
     type={"radio"}
-    appearance={"none"}
-    cursor={"pointer"}
-    w={4}
-    h={4}
-    borderWidth={"2px"}
-    borderStyle={"solid"}
-    // TODO: decide on styling here
-    borderColor={{_: "blue-300", checked: "blue-300"}}
-    borderRadius={"full"}
-    gradientFrom={{checked: 'blue-100'}}
-    gradientVia={{checked: 'blue-200'}}
-    gradientTo={{checked: 'teal-100'}}
-    backgroundImage={{checked: 'gradient-to-r', disabled: "none"}}
     {...rest}
   />
 }
+
 
 export default RadioButtons

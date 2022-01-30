@@ -6,6 +6,7 @@ import { toBaseUnit } from 'lib/utils'
 import APIProvider from './APIProvider'
 import { MAX_ALLOWANCE } from '../constants'
 import axios from 'axios';
+import erc20ContractABI from "../../contracts/ERC20.json";
 
 export default class APIZKProvider extends APIProvider {
     static SEEDS_STORAGE_KEY = '@ZZ/ZKSYNC_SEEDS'
@@ -261,13 +262,32 @@ export default class APIZKProvider extends APIProvider {
         return this._tokenWithdrawFees[token]
     }
 
-    withdrawL2FeeFast = async (token) => {
+    withdrawL2FeeFast = async (token, amount) => {
       if (this.api.ethersProvider) {
-        const minGasForETHTransfer = 21000
-        const gasPrice = await this.api.ethersProvider.getGasPrice()
-        const totalCost = gasPrice.mul(minGasForETHTransfer)
-        const ethersFormatted = ethers.utils.formatEther(totalCost)
-        return Number((Number(ethersFormatted) * 1.5).toPrecision(3))
+        if (!this.eligibleFastWithdrawTokens.includes(token)) {
+          throw Error("Token not eligible for fast withdraw")
+        }
+        if (token === "ETH") {
+          const gasForETHTransfer = 21000
+          const gasPrice = await this.api.ethersProvider.getGasPrice()
+          const totalCost = gasPrice.mul(gasForETHTransfer)
+          const ethersFormatted = ethers.utils.formatEther(totalCost)
+          return Number((Number(ethersFormatted) * 1.5).toPrecision(3))
+        } else if (token === "FRAX") {
+          // TODO: how does the fee process work for FRAX? the notional value of the ETH for the tx fee?
+
+          // const fraxContract = new ethers.Contract(this.api._fraxContractAddress, erc20ContractABI, this.api.ethersProvider)
+          // const amountAtoms = amount * (10 ** this.getCurrencyInfo(token).decimals)
+          // const myAddress = await this.ethWallet.getAddress()
+          // const gasEstimation = await fraxContract.estimateGas.transfer(this._fastWithdrawContractAddress, 0)
+          // console.log("debug:: FRAX withdraw fee", gasEstimation)
+          // return gasEstimation
+          const gasForETHTransfer = 21000
+          const gasPrice = await this.api.ethersProvider.getGasPrice()
+          const totalCost = gasPrice.mul(gasForETHTransfer)
+          const ethersFormatted = ethers.utils.formatEther(totalCost)
+          return Number((Number(ethersFormatted) * 1.5).toPrecision(3))
+        }
       } else {
         throw Error("Ethers provider not found")
       }

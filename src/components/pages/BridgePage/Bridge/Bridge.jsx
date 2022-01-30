@@ -110,7 +110,7 @@ const Bridge = () => {
       setFee(null)
 
       if (isFastWithdraw) {
-        api.withdrawL2FeeFast(details.currency)
+        api.withdrawL2FeeFast(details.currency, details.amount)
           .then(res => setFee(res))
           .catch(e => {
             console.error(e)
@@ -270,7 +270,7 @@ const Bridge = () => {
                   name={"withdrawSpeed"}
                   items={[{id: "fast", name: "Fast"}, {id: "slow", name: "Slow"}]}
                 />
-              <x.div display={"flex"}>
+              <x.div display={"flex"} mt={2}>
                 <x.div fontSize={12} color={"blue-gray-500"}>Withdraw speed</x.div>
                 <FastWithdrawTooltip/>
               </x.div>
