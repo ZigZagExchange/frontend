@@ -170,12 +170,17 @@ export default class API extends Emitter {
         }
     }
 
+    _socketError = (e) => {
+        console.warn("Zigzag websocket connection failed");
+    }
+
     start = () => {
         if (this.ws) this.stop()
         this.ws = new WebSocket(this.websocketUrl)
         this.ws.addEventListener('open', this._socketOpen)
         this.ws.addEventListener('close', this._socketClose)
         this.ws.addEventListener('message', this._socketMsg)
+        this.ws.addEventListener('error', this._socketError)
         this.emit('start')
     }
 
@@ -193,6 +198,7 @@ export default class API extends Emitter {
     }
 
     send = (op, args) => {
+        if (!this.ws) return;
         return this.ws.send(JSON.stringify({ op, args }))
     }
 
