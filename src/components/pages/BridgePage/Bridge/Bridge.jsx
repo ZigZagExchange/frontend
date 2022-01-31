@@ -36,6 +36,7 @@ const Bridge = () => {
   const [isApproving, setApproving] = useState(false);
   const [formErr, setFormErr] = useState('')
   const [bridgeFee, setBridgeFee] = useState(null)
+  const [zigZagFee, setZigZagFee] = useState(null)
   const network = useSelector(networkSelector);
   const [transfer, setTransfer] = useState(defaultTransfer);
   const [swapDetails, _setSwapDetails] = useState(() => ({ amount: '', currency: 'ETH' }));
@@ -66,6 +67,9 @@ const Bridge = () => {
 
   useEffect(() => {
     setSwapDetails({})
+    if (withdrawSpeed === "slow") {
+      setZigZagFee(null)
+    }
   }, [withdrawSpeed])
 
 
@@ -110,11 +114,17 @@ const Bridge = () => {
       setFee(null)
 
       if (isFastWithdraw) {
-        api.withdrawL2FeeFast(details.currency, details.amount)
+        api.withdrawL2FeeFast(details.currency)
           .then(res => setFee(res))
           .catch(e => {
             console.error(e)
             setFee(null)
+          })
+        api.withdrawL2ZZFeeFast(details.currency)
+          .then(res => setZigZagFee(res))
+          .catch(e => {
+            console.error(e)
+            setZigZagFee(null)
           })
       } else {
         api.withdrawL2Fee(details.currency)
@@ -280,9 +290,10 @@ const Bridge = () => {
             </div>}
             {user.address ? (
               user.id && <div className="bridge_transfer_fee">
-                Bridge Fee: {typeof bridgeFee !== 'number' ? (
+                <div className="bridge_transfer_fee">
+                  {isFastWithdraw ? "Gas Fee" : "zkSync Withdraw Fee"}: {typeof bridgeFee !== 'number' ? (
                   <div style={{ display: 'inline-flex', margin: '0 5px' }}>
-                      <Loader
+                    <Loader
                       type="TailSpin"
                       color="#444"
                       height={16}
@@ -290,6 +301,10 @@ const Bridge = () => {
                     />
                   </div>
                 ) : bridgeFee} {swapDetails.currency}
+                </div>
+                {zigZagFee && <div>
+                  ZigZag Fee: {zigZagFee} {swapDetails.currency}
+                </div>}
               </div>
             ) : (
               <div className="bridge_transfer_fee">

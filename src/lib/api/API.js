@@ -329,8 +329,12 @@ export default class API extends Emitter {
         return this.apiProvider.withdrawL2Fee(token)
     }
 
-    withdrawL2FeeFast = async (token, amount) => {
-      return this.apiProvider.withdrawL2FeeFast(token, amount)
+    withdrawL2FeeFast = async (token) => {
+      return this.apiProvider.withdrawL2FeeFast(token)
+    }
+
+    withdrawL2ZZFeeFast = async (token) => {
+        return this.apiProvider.withdrawL2ZZFeeFast(token)
     }
 
     cancelAllOrders = async () => {

@@ -248,7 +248,9 @@ export default class APIZKProvider extends APIProvider {
     depositL2Fee = async (token = 'ETH') => {
         return 0
     }
-    
+
+
+
     withdrawL2Fee = async (token = 'ETH') => {
         const currencyInfo = this.getCurrencyInfo(token);
         if (! this._tokenWithdrawFees[token]) {
@@ -267,7 +269,26 @@ export default class APIZKProvider extends APIProvider {
         return this._tokenWithdrawFees[token]
     }
 
-    withdrawL2FeeFast = async (token, amount) => {
+    withdrawL2FeeFast = async (token) => {
+      /*
+      * Returns the gas fee associated with an L2 Fast withdraw
+      * The user cannot withdraw more than their balance - this amount
+      * */
+      const currencyInfo = this.getCurrencyInfo(token)
+      const fee = await this.syncProvider.getTransactionFee(
+        'Transfer',
+        this._fastWithdrawContractAddress,
+        token
+      )
+      return parseInt(fee.totalFee) / 10 ** currencyInfo.decimals
+    }
+
+    withdrawL2ZZFeeFast = async (token) => {
+      /*
+      * Returns the fee taken by ZigZag when sending on L1. If token is FRAX,
+      * the notional amount of FRAX will be taken
+      * */
+
       const getNumberFormatted = (weiBigNumber) => {
         return Number(Number(ethers.utils.formatEther(weiBigNumber)).toPrecision(4))
       }
