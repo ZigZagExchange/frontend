@@ -6,7 +6,6 @@ import { toBaseUnit } from 'lib/utils'
 import APIProvider from './APIProvider'
 import { MAX_ALLOWANCE } from '../constants'
 import axios from 'axios';
-import erc20ContractABI from "../../contracts/ERC20.json";
 
 export default class APIZKProvider extends APIProvider {
     static SEEDS_STORAGE_KEY = '@ZZ/ZKSYNC_SEEDS'
@@ -269,31 +268,24 @@ export default class APIZKProvider extends APIProvider {
     }
 
     withdrawL2FeeFast = async (token, amount) => {
+      const getNumberFormatted = (weiBigNumber) => {
+        return Number(Number(ethers.utils.formatEther(weiBigNumber)).toPrecision(4))
+      }
+
       if (this.api.ethersProvider) {
         if (!this.eligibleFastWithdrawTokens.includes(token)) {
           throw Error("Token not eligible for fast withdraw")
         }
+        const feeData = await this.api.ethersProvider.getFeeData()
+        const bridgeFee = feeData.maxFeePerGas.mul(21000)
+
         if (token === "ETH") {
-          const gasForETHTransfer = 21000
-          const gasPrice = await this.api.ethersProvider.getGasPrice()
-          const totalCost = gasPrice.mul(gasForETHTransfer)
-          const ethersFormatted = ethers.utils.formatEther(totalCost)
-          return Number((Number(ethersFormatted) * 1.5).toPrecision(3))
+          return getNumberFormatted(bridgeFee)
         } else if (token === "FRAX") {
-          // TODO: how does the fee process work for FRAX? the notional value of the ETH for the tx fee?
-
-          // const fraxContract = new ethers.Contract(this.api._fraxContractAddress, erc20ContractABI, this.api.ethersProvider)
-          // const amountAtoms = amount * (10 ** this.getCurrencyInfo(token).decimals)
-          // const myAddress = await this.ethWallet.getAddress()
-          // const gasEstimation = await fraxContract.estimateGas.transfer(this._fastWithdrawContractAddress, 0)
-          // console.log("debug:: FRAX withdraw fee", gasEstimation)
-          // return gasEstimation
-
-          const gasForETHTransfer = 21000
-          const gasPrice = await this.api.ethersProvider.getGasPrice()
-          const totalCost = gasPrice.mul(gasForETHTransfer)
-          const ethersFormatted = ethers.utils.formatEther(totalCost)
-          return Number((Number(ethersFormatted) * 1.5).toPrecision(3))
+          const priceInfo = await this.tokenPrice("ETH")
+          const currencyInfo = this.getCurrencyInfo(token)
+          const stableFee = (bridgeFee.toString() / 1e18 * priceInfo.price * 10**currencyInfo.decimals * 50000 / 21000).toFixed(0);
+          return getNumberFormatted(stableFee)
         }
       } else {
         throw Error("Ethers provider not found")
@@ -434,7 +426,7 @@ export default class APIZKProvider extends APIProvider {
         }
     }
 
-    tokenInfo = async (tokenLike, chainId) => {
+    tokenInfo = async (tokenLike, chainId = 1) => {
         try {
             const res = await axios.get(this.getZkSyncBaseUrl(chainId) + `/tokens/${tokenLike}`)
             return res.data.result
@@ -443,7 +435,7 @@ export default class APIZKProvider extends APIProvider {
         }
     }
 
-    tokenPrice = async (tokenLike, chainId) => {
+    tokenPrice = async (tokenLike, chainId = 1) => {
         try {
             const res = await axios.get(this.getZkSyncBaseUrl(chainId) + `/tokens/${tokenLike}/priceIn/usd`)
             return res.data.result

@@ -542,7 +542,7 @@ export default class API extends Emitter {
         return this.apiProvider.getCurrencyInfo(currency);
     }
 
-    getImage(currency) {
+    getCurrencyLogo(currency) {
         try {
             return require(`assets/images/currency/${currency}.svg`)
         } catch(e) {
