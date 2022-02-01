@@ -296,8 +296,10 @@ export default class APIZKProvider extends APIProvider {
       * the notional amount of the ETH tx fee will be taken in FRAX
       * */
 
-      const getNumberFormatted = (weiBigNumber) => {
-        return Number(Number(ethers.utils.formatEther(weiBigNumber)).toPrecision(4))
+      const currencyInfo = this.getCurrencyInfo(token)
+
+      const getNumberFormatted = (atoms) => {
+        return parseInt(atoms) / 10 ** currencyInfo.decimals
       }
 
       if (this.api.ethersProvider) {
