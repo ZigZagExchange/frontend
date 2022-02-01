@@ -6,9 +6,6 @@ import { formatDistance } from 'date-fns'
 const BridgeReceipts = () => {
     const receipts = useSelector(bridgeReceiptsSelector)
     const dispatch = useDispatch()
-
-  console.log("debug:: receipts", receipts)
-
     return (
         <div className="bridge_box bridge_box_receipts">
             <h6 className="bridge_box_receipt_head">
