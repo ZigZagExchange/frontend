@@ -10,7 +10,7 @@ import axios from 'axios';
 export default class APIZKProvider extends APIProvider {
     static SEEDS_STORAGE_KEY = '@ZZ/ZKSYNC_SEEDS'
     static VALID_SIDES = ['b', 's']
-    
+
     marketInfo = {}
     lastPrices = {}
     ethWallet = null
@@ -40,7 +40,7 @@ export default class APIZKProvider extends APIProvider {
             if (profile.image) {
                 profile.image = `https://gateway.ipfs.io/ipfs/${profile.image}`
             }
-            
+
             return profile
         } catch (err) {
             if (!err.response) {
@@ -54,7 +54,7 @@ export default class APIZKProvider extends APIProvider {
     handleBridgeReceipt = (_receipt, amount, token, type) => {
         let receipt = { date: +(new Date()), network: this.network, amount, token, type }
         const subdomain = this.network === 1 ? '' : 'rinkeby.'
-        
+
         if (!_receipt) {
             return receipt
         } if (_receipt.ethTx) {
@@ -64,7 +64,7 @@ export default class APIZKProvider extends APIProvider {
             receipt.txId = _receipt.txHash.split(':')[1]
             receipt.txUrl = `https://${subdomain}zkscan.io/explorer/transactions/${receipt.txId}`
         }
-        
+
         return receipt
     }
 
@@ -113,13 +113,13 @@ export default class APIZKProvider extends APIProvider {
         const marketInfo = this.marketInfo[market];
         amount = parseFloat(amount).toFixed(marketInfo.baseAsset.decimals);
         price = parseFloat(price).toFixed(marketInfo.pricePrecisionDecimals);
-        
+
         if (!APIZKProvider.VALID_SIDES.includes(side)) {
             throw new Error('Invalid side')
         }
-        
+
         let tokenBuy, tokenSell, sellQuantity, sellQuantityWithFee, tokenRatio = {}, fullSellQuantity;
-        
+
         if (side === 'b') {
             sellQuantity = parseFloat(amount * price)
             sellQuantityWithFee = (sellQuantity + marketInfo.quoteFee).toFixed(marketInfo.quoteAsset.decimals);
@@ -137,7 +137,7 @@ export default class APIZKProvider extends APIProvider {
             tokenRatio[marketInfo.quoteAssetId] = (amount * price).toFixed(marketInfo.quoteAsset.decimals);
             fullSellQuantity = (sellQuantityWithFee * 10**(marketInfo.baseAsset.decimals)).toLocaleString('fullwide', {useGrouping: false })
         }
-        
+
         const now_unix = Date.now() / 1000 | 0
         const two_minute_expiry = now_unix + 120
         const one_day_expiry = now_unix + 24*3600;
@@ -188,7 +188,7 @@ export default class APIZKProvider extends APIProvider {
     withdrawL2 = async (amountDecimals, token = 'ETH') => {
         const currencyInfo = this.getCurrencyInfo(token);
         const amount = toBaseUnit(amountDecimals, currencyInfo.decimals)
-        
+
         try {
             const transfer = await this.syncWallet.withdrawFromSyncToEthereum({
                 token,
@@ -244,12 +244,10 @@ export default class APIZKProvider extends APIProvider {
             console.log(err)
         }
     }
-    
+
     depositL2Fee = async (token = 'ETH') => {
         return 0
     }
-
-
 
     withdrawL2Fee = async (token = 'ETH') => {
         const currencyInfo = this.getCurrencyInfo(token);
@@ -259,7 +257,7 @@ export default class APIZKProvider extends APIProvider {
                 [this.syncWallet.address()],
                 token,
             )
-    
+
             this._tokenWithdrawFees[token] = (
                 parseInt(fee.totalFee)
                 / 10 ** currencyInfo.decimals
@@ -326,10 +324,10 @@ export default class APIZKProvider extends APIProvider {
             this.ethWallet = this.api.ethersProvider.getSigner()
             const { seed, ethSignatureType } = await this.getSeed(this.ethWallet);
             const syncSigner = await zksync.Signer.fromSeed(seed);
-            this.syncWallet = await zksync.Wallet.fromEthSigner(this.ethWallet, this.syncProvider, syncSigner, undefined, ethSignatureType)        
+            this.syncWallet = await zksync.Wallet.fromEthSigner(this.ethWallet, this.syncProvider, syncSigner, undefined, ethSignatureType)
         } catch (err) {
             console.log(err)
-            throw err            
+            throw err
         }
 
         const accountState = await this.api.getAccountState()
@@ -362,7 +360,7 @@ export default class APIZKProvider extends APIProvider {
     getSeed = async (ethSigner) => {
         const seedKey = await this.getSeedKey(ethSigner)
         let seeds = this.getSeeds(ethSigner)
-        
+
         if (!seeds[seedKey]) {
             seeds[seedKey] = await this.genSeed(ethSigner)
             seeds[seedKey].seed = seeds[seedKey].seed.toString().split(',').map(x => +x)
@@ -371,7 +369,7 @@ export default class APIZKProvider extends APIProvider {
                 JSON.stringify(seeds),
             )
         }
-        
+
         seeds[seedKey].seed = Uint8Array.from(seeds[seedKey].seed)
         return seeds[seedKey]
     }
