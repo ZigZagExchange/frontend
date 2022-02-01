@@ -564,7 +564,7 @@ export default class API extends Emitter {
       }
     }
 
-    async getFastWithdrawAccountBalances() {
+    async getFastL2WithdrawLiquidity() {
       if (this.ethersProvider) {
         let maxETH = 0
         try {

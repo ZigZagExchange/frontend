@@ -59,7 +59,7 @@ const Bridge = () => {
 
   useEffect(() => {
     if (user.address) {
-      api.getFastWithdrawAccountBalances().then(maxes => {
+      api.getFastL2WithdrawLiquidity().then(maxes => {
         setFastWithdrawCurrencyMaxes(maxes)
       })
     }

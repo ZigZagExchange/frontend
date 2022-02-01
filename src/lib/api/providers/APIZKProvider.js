@@ -297,7 +297,7 @@ export default class APIZKProvider extends APIProvider {
       * */
 
       const currencyInfo = this.getCurrencyInfo(token)
-      
+
       const getNumberFormatted = (atoms) => {
         return parseInt(atoms) / 10 ** currencyInfo.decimals
       }
