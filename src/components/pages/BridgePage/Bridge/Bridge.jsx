@@ -112,6 +112,7 @@ const Bridge = () => {
 
     if (api.apiProvider.syncWallet && transfer.type === 'withdraw') {
       setFee(null)
+      setZigZagFee(null)
 
       if (isFastWithdraw) {
         api.withdrawL2FeeFast(details.currency)
@@ -120,12 +121,17 @@ const Bridge = () => {
             console.error(e)
             setFee(null)
           })
-        api.withdrawL2ZZFeeFast(details.currency)
-          .then(res => setZigZagFee(res))
-          .catch(e => {
-            console.error(e)
-            setZigZagFee(null)
-          })
+
+        if (details.amount !== "") {
+          api.withdrawL2ZZFeeFast(details.currency)
+            .then(res => setZigZagFee(res))
+            .catch(e => {
+              console.error(e)
+              setZigZagFee(null)
+            })
+        } else {
+          setZigZagFee(null)
+        }
       } else {
         api.withdrawL2Fee(details.currency)
           .then(fee => {
@@ -138,6 +144,7 @@ const Bridge = () => {
       }
     } else {
       setFee(0)
+      setZigZagFee(null)
     }
   }
 
@@ -302,9 +309,14 @@ const Bridge = () => {
                   </div>
                 ) : bridgeFee} {swapDetails.currency}
                 </div>
-                {zigZagFee && <div>
-                  ZigZag Fee: {zigZagFee} {swapDetails.currency}
-                </div>}
+                {zigZagFee && <>
+                  <div>
+                    ZigZag Fee: {zigZagFee} {swapDetails.currency}
+                  </div>
+                  <x.div color={"blue-gray-300"}>
+                    You'll receive: ~{Number(swapDetails.amount - zigZagFee).toPrecision(4)} {swapDetails.currency} on L1
+                  </x.div>
+                </>}
               </div>
             ) : (
               <div className="bridge_transfer_fee">
@@ -323,7 +335,7 @@ const Bridge = () => {
               {user.address && hasError && <Button
                 className="bg_btn zig_btn_disabled bg_err"
                 text={formErr}
-                icon={<BiError />}
+                icon={<BiError/>}
               />}
               {user.address && !hasError && <Button
                 loading={loading}
