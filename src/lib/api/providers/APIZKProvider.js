@@ -272,7 +272,6 @@ export default class APIZKProvider extends APIProvider {
     withdrawL2FeeFast = async (token) => {
       /*
       * Returns the gas fee associated with an L2 Fast withdraw
-      * The user cannot withdraw more than their balance - this amount
       * */
       const currencyInfo = this.getCurrencyInfo(token)
       const fee = await this.syncProvider.getTransactionFee(
@@ -285,8 +284,8 @@ export default class APIZKProvider extends APIProvider {
 
     withdrawL2ZZFeeFast = async (token) => {
       /*
-      * Returns the fee taken by ZigZag when sending on L1. If token is FRAX,
-      * the notional amount of FRAX will be taken
+      * Returns the fee taken by ZigZag when sending on L1. If the token is FRAX,
+      * the notional amount of the ETH tx fee will be taken in FRAX
       * */
 
       const getNumberFormatted = (weiBigNumber) => {
