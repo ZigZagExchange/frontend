@@ -297,7 +297,7 @@ export default class APIZKProvider extends APIProvider {
       * */
 
       const currencyInfo = this.getCurrencyInfo(token)
-
+      
       const getNumberFormatted = (atoms) => {
         return parseInt(atoms) / 10 ** currencyInfo.decimals
       }
@@ -313,7 +313,6 @@ export default class APIZKProvider extends APIProvider {
           return getNumberFormatted(bridgeFee)
         } else if (token === "FRAX") {
           const priceInfo = await this.tokenPrice("ETH")
-          const currencyInfo = this.getCurrencyInfo(token)
           const stableFee = (bridgeFee.toString() / 1e18 * priceInfo.price * 10**currencyInfo.decimals * 50000 / 21000).toFixed(0);
           return getNumberFormatted(stableFee)
         }
