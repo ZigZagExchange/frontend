@@ -6,6 +6,8 @@ import { toBaseUnit } from 'lib/utils'
 import APIProvider from './APIProvider'
 import { MAX_ALLOWANCE } from '../constants'
 import axios from 'axios';
+import {isTransactionAmountPackable} from "zksync/build/utils";
+import {closestPackableTransactionAmount} from "zksync";
 
 export default class APIZKProvider extends APIProvider {
     static SEEDS_STORAGE_KEY = '@ZZ/ZKSYNC_SEEDS'
@@ -212,7 +214,15 @@ export default class APIZKProvider extends APIProvider {
         throw Error("Token not supported for fast withdraw")
       }
 
-      const amount = toBaseUnit(amountDecimals, this.getCurrencyInfo(token).decimals)
+      const currencyInfo = this.getCurrencyInfo(token)
+      let amount = toBaseUnit(amountDecimals, currencyInfo.decimals)
+
+      // if amount is not packable
+      const isPackable = isTransactionAmountPackable(amount)
+      if (!isPackable) {
+        amount = closestPackableTransactionAmount(amount)
+      }
+
       const transfer = await this.syncWallet.syncTransfer({
         to: this._fastWithdrawContractAddress,
         token,
