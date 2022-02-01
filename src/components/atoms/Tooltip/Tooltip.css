@@ -7,17 +7,17 @@
 }
 
 .rc-tooltip-placement-bottom > .rc-tooltip-content > .rc-tooltip-arrow {
-    border-bottom-color: #121620!important;
+    border-bottom-color: #0b0e15!important;
 }
 
 .rc-tooltip-placement-top > .rc-tooltip-content > .rc-tooltip-arrow {
-    border-top-color: #121620!important;
+    border-top-color: #0b0e15!important;
 }
 
 .rc-tooltip-placement-left > .rc-tooltip-content > .rc-tooltip-arrow {
-    border-left-color: #121620!important;
+    border-left-color: #0b0e15!important;
 }
 
 .rc-tooltip-placement-right > .rc-tooltip-content > .rc-tooltip-arrow {
-    border-right-color: #121620!important;
+    border-right-color: #0b0e15!important;
 }

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, {useEffect, useMemo, useState} from 'react'
 import { useSelector } from "react-redux";
 import { SwapButton, Button, useCoinEstimator } from 'components'
 import {
@@ -18,6 +18,12 @@ import logo from 'assets/images/logo.png'
 import BridgeSwapInput from '../BridgeSwapInput/BridgeSwapInput';
 import ConnectWalletButton from "../../../atoms/ConnectWalletButton/ConnectWalletButton";
 import Pane from "../../../atoms/Pane/Pane";
+import {x} from "@xstyled/styled-components"
+import {AiOutlineQuestionCircle} from "react-icons/all";
+import Tooltip from "../../../atoms/Tooltip/Tooltip";
+import ExternalLink from "../../ListPairPage/ExternalLink";
+import {HiExternalLink} from "react-icons/hi";
+import RadioButtons from "../../../atoms/RadioButtons/RadioButtons";
 
 const defaultTransfer = {
   type: 'deposit',
@@ -30,6 +36,7 @@ const Bridge = () => {
   const [isApproving, setApproving] = useState(false);
   const [formErr, setFormErr] = useState('')
   const [bridgeFee, setBridgeFee] = useState(null)
+  const [zigZagFee, setZigZagFee] = useState(null)
   const network = useSelector(networkSelector);
   const [transfer, setTransfer] = useState(defaultTransfer);
   const [swapDetails, _setSwapDetails] = useState(() => ({ amount: '', currency: 'ETH' }));
@@ -38,9 +45,33 @@ const Bridge = () => {
   const currencyValue = coinEstimator(swapDetails.currency)
   const activationFee = parseFloat((user.address && !user.id ? (15 / currencyValue) : 0).toFixed(5))
   const estimatedValue = (+swapDetails.amount * coinEstimator(swapDetails.currency) || 0)
+  const [fastWithdrawCurrencyMaxes, setFastWithdrawCurrencyMaxes] = useState()
 
   let walletBalances = balanceData.wallet || {}
   let zkBalances = balanceData[network] || {}
+
+  const [withdrawSpeed, setWithdrawSpeed] = useState("fast")
+  const isFastWithdraw = withdrawSpeed === "fast"
+  const showFastSwapOption = transfer.type === "withdraw"
+    && swapDetails.currency
+    && api.apiProvider.eligibleFastWithdrawTokens.includes(swapDetails.currency)
+    && api.isZksyncChain()
+
+  useEffect(() => {
+    if (user.address) {
+      api.getL2FastWithdrawLiquidity().then(maxes => {
+        setFastWithdrawCurrencyMaxes(maxes)
+      })
+    }
+  }, [user.address])
+
+  useEffect(() => {
+    setSwapDetails({})
+    if (withdrawSpeed === "slow") {
+      setZigZagFee(null)
+    }
+  }, [withdrawSpeed])
+
 
   const setSwapDetails = values => {
     const details = {
@@ -56,6 +87,7 @@ const Bridge = () => {
       const bals = transfer.type === 'deposit' ? walletBalances : zkBalances
       const detailBalance = parseFloat(bals[details.currency] && bals[details.currency].valueReadable) || 0
       const input = parseFloat(details.amount) || 0
+
       if (input > 0) {
         if (input < 0.001) {
           setFormErr('Must be at least 0.001')
@@ -63,6 +95,13 @@ const Bridge = () => {
           setFormErr(`Must be more than ${activationFee} ${swapDetails.currency}`)
         } else if (input > (detailBalance - parseFloat(bridgeFee))) {
           setFormErr('Insufficient balance')
+        } else if (isFastWithdraw) {
+          if (swapDetails.currency in fastWithdrawCurrencyMaxes) {
+            const maxAmount = fastWithdrawCurrencyMaxes[swapDetails.currency]
+            if (input > maxAmount) {
+              setFormErr(`Max ${swapDetails.currency} fast withdraw: ${maxAmount.toPrecision(4)}`)
+            }
+          }
         } else {
           setFormErr('')
         }
@@ -73,14 +112,39 @@ const Bridge = () => {
 
     if (api.apiProvider.syncWallet && transfer.type === 'withdraw') {
       setFee(null)
-      api.withdrawL2Fee(details.currency)
-        .then(fee => setFee(fee))
-        .catch(err => {
-          console.log(err)
-          setFee(null)
-        })  
+      setZigZagFee(null)
+
+      if (isFastWithdraw) {
+        api.withdrawL2FeeFast(details.currency)
+          .then(res => setFee(res))
+          .catch(e => {
+            console.error(e)
+            setFee(null)
+          })
+
+        if (details.amount !== "") {
+          api.withdrawL2ZZFeeFast(details.currency)
+            .then(res => setZigZagFee(res))
+            .catch(e => {
+              console.error(e)
+              setZigZagFee(null)
+            })
+        } else {
+          setZigZagFee(null)
+        }
+      } else {
+        api.withdrawL2Fee(details.currency)
+          .then(fee => {
+            setFee(fee)
+          })
+          .catch(err => {
+            console.log(err)
+            setFee(null)
+          })
+      }
     } else {
       setFee(0)
+      setZigZagFee(null)
     }
   }
 
@@ -144,7 +208,11 @@ const Bridge = () => {
     if (transfer.type === 'deposit') {
       deferredXfer = api.depositL2(`${swapDetails.amount}`, swapDetails.currency)
     } else {
-      deferredXfer = api.withdrawL2(`${swapDetails.amount}`, swapDetails.currency)
+      if (isFastWithdraw) {
+        deferredXfer = api.withdrawL2Fast(`${swapDetails.amount}`, swapDetails.currency)
+      } else {
+        deferredXfer = api.withdrawL2(`${swapDetails.amount}`, swapDetails.currency)
+      }
     }
 
     deferredXfer
@@ -166,7 +234,13 @@ const Bridge = () => {
               <h5>FROM</h5>
               {transfer.type === 'withdraw' ? zkSyncLayer2Header : ethLayer1Header}
             </div>
-            <BridgeSwapInput bridgeFee={bridgeFee} balances={balances} currencies={currencies} value={swapDetails} onChange={setSwapDetails} />
+            <BridgeSwapInput
+              bridgeFee={bridgeFee}
+              balances={balances}
+              currencies={currencies}
+              value={swapDetails}
+              onChange={setSwapDetails}
+            />
             <div className="bridge_coin_stats">
               <div className="bridge_coin_stat">
                 <h5>Estimated value</h5>
@@ -205,14 +279,28 @@ const Bridge = () => {
                 </span>
               </div>
             </div>
+            {showFastSwapOption && <x.div flexDirection={"column"} display={"flex"} alignItems={"flex-end"}>
+                <RadioButtons
+                  horizontal
+                  value={withdrawSpeed}
+                  onChange={setWithdrawSpeed}
+                  name={"withdrawSpeed"}
+                  items={[{id: "fast", name: "Fast"}, {id: "slow", name: "Slow"}]}
+                />
+              <x.div display={"flex"} mt={2}>
+                <x.div fontSize={12} color={"blue-gray-500"}>Withdraw speed</x.div>
+                <FastWithdrawTooltip/>
+              </x.div>
+              </x.div>}
             {transfer.type === 'deposit' && user.address && !user.id && <div className="bridge_transfer_fee">
               One-Time Activation Fee: {activationFee} {swapDetails.currency} (~$15.00)
             </div>}
             {user.address ? (
               user.id && <div className="bridge_transfer_fee">
-                Bridge Fee: {typeof bridgeFee !== 'number' ? (
+                <div className="bridge_transfer_fee">
+                  {isFastWithdraw ? "Gas Fee" : "zkSync Withdraw Fee"}: {typeof bridgeFee !== 'number' ? (
                   <div style={{ display: 'inline-flex', margin: '0 5px' }}>
-                      <Loader
+                    <Loader
                       type="TailSpin"
                       color="#444"
                       height={16}
@@ -220,6 +308,15 @@ const Bridge = () => {
                     />
                   </div>
                 ) : bridgeFee} {swapDetails.currency}
+                </div>
+                {zigZagFee && <>
+                  <div>
+                    ZigZag Fee: {zigZagFee.toPrecision(4)} {swapDetails.currency}
+                  </div>
+                  <x.div color={"blue-gray-300"}>
+                    You'll receive: ~{Number(swapDetails.amount - zigZagFee).toPrecision(4)} {swapDetails.currency} on L1
+                  </x.div>
+                </>}
               </div>
             ) : (
               <div className="bridge_transfer_fee">
@@ -238,7 +335,7 @@ const Bridge = () => {
               {user.address && hasError && <Button
                 className="bg_btn zig_btn_disabled bg_err"
                 text={formErr}
-                icon={<BiError />}
+                icon={<BiError/>}
               />}
               {user.address && !hasError && <Button
                 loading={loading}
@@ -265,6 +362,25 @@ const Bridge = () => {
     </>
 
   )
+}
+
+const FastWithdrawTooltip = () => {
+  const renderLabel = () => {
+    return <x.div>
+      <x.div>Utilize our fast withdrawal bridge receive ETH and FRAX within a few minutes.</x.div>
+      <x.div><ExternalLink href={"https://docs.zigzag.exchange/zksync/fast-withdraw-bridge"}>
+        Learn more <HiExternalLink />
+      </ExternalLink></x.div>
+    </x.div>
+  }
+
+  return <>
+    <Tooltip placement={"right"} label={renderLabel()}>
+      <x.div display={"inline-flex"} color={"blue-gray-600"} ml={2} alignItems={"center"}>
+        <AiOutlineQuestionCircle size={14}/>
+      </x.div>
+    </Tooltip>
+  </>
 }
 
 export default Bridge

@@ -7,11 +7,12 @@ import {min,max,required} from "./validation";
 import {x} from "@xstyled/styled-components";
 import SelectInput from "./SelectInput";
 import {model} from "./helpers";
+import TextInput from "./TextInput";
 
 const FormDemo = () => {
     const [number, setNumber] = useState(1)
     const [select, setSelect] = useState("ETH")
-
+    const [text, setText] = useState("")
   return <>
     <Form
       initialValues={{
@@ -74,6 +75,30 @@ const FormDemo = () => {
               }
             }}>
               Change Controlled
+            </Button>
+          </x.div>
+        </x.div>
+      </x.div>
+
+      <x.div mt={8}>
+        <TextInput
+          label={"Text Input"}
+          name={"textMe"}
+          block
+        />
+        <x.div row>
+          <x.div col>
+            <TextInput
+              label={"Controlled Text Input"}
+              name={"controlledTextInput"}
+              {...model(text, setText)}
+            />
+          </x.div>
+          <x.div col display={"flex"} alignItems={"center"} justifyContent={"center"}>
+            <Button variant={"secondary"} onClick={() => {
+              setText((Math.random() + 1).toString(36).substring(7))
+            }}>
+              Set Controlled
             </Button>
           </x.div>
         </x.div>
