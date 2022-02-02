@@ -71,6 +71,8 @@ const BridgeCurrencyOptions = styled.ul`
   pointer-events: none;
   transform: rotate(180deg) translateY(20px);
   cursor: pointer;
+  max-height: 400px;
+  overflow-y: scroll;
 
   ${p => p.show && css`
     opacity: 1;
