@@ -19,7 +19,7 @@ const DropdownDisplay = styled.div`
     margin-top: 10px;
     width: 360px;
     height: 400px;
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 1);
     backdrop-filter: blur(4px);
     top: 100%;
     right: 0;
@@ -166,6 +166,7 @@ const DropdownFooter = styled.div`
     border-bottom-left-radius: 8px;
     overflow: hidden;
     width: 100%;
+    flex-shrink: 0;
 `
 
 const SignOutButton = styled.div`
@@ -207,6 +208,8 @@ export const AccountDropdown = () => {
     const wallet = (selectedLayer === 1
         ? balanceData.wallet
         : balanceData[network])
+
+    console.log("debug:: wallet", wallet)
 
     const tickers = api.getCurrencies().sort();
 
@@ -261,7 +264,7 @@ export const AccountDropdown = () => {
                             }
                             return (
                                 <CurrencyListItem key={key}>
-                                    <img className="currency-icon" src={api.getCurrencyLogo(ticker)} alt={ticker} />
+                                    <img className="currency-icon" src={api.getCurrencyLogo(ticker).default} alt={ticker} />
                                     <div>
                                         <strong>{wallet[ticker].valueReadable} {ticker}</strong>
                                         <small>${formatUSD(coinEstimator(ticker) * wallet[ticker].valueReadable)}</small>
