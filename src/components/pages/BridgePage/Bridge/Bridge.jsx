@@ -51,7 +51,7 @@ const Bridge = () => {
   let zkBalances = balanceData[network] || {}
 
   const [withdrawSpeed, setWithdrawSpeed] = useState("fast")
-  const isFastWithdraw = withdrawSpeed === "fast"
+  const isFastWithdraw = withdrawSpeed === "fast" && transfer.type === "withdraw"
   const showFastSwapOption = transfer.type === "withdraw"
     && swapDetails.currency
     && api.apiProvider.eligibleFastWithdrawTokens.includes(swapDetails.currency)
@@ -99,7 +99,7 @@ const Bridge = () => {
           if (swapDetails.currency in fastWithdrawCurrencyMaxes) {
             const maxAmount = fastWithdrawCurrencyMaxes[swapDetails.currency]
             if (input > maxAmount) {
-              setFormErr(`Max ${swapDetails.currency} fast withdraw: ${maxAmount.toPrecision(4)}`)
+              setFormErr(`Max ${swapDetails.currency} liquidity for fast withdraw: ${maxAmount.toPrecision(4)}`)
             }
           }
         } else {
