@@ -56,8 +56,9 @@ const StyledRadio = styled.input`
   border-style: solid;
   border-color: blue-gray-400;
   border-radius: full;
-  display: grid;
-  place-content: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   
   &::before {
     content: "";
