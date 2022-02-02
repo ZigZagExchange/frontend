@@ -225,14 +225,24 @@ export const AccountDropdown = () => {
         }
     }
 
-  const filterSmallBalances = (currency) => {
-    const balance = wallet[currency].valueReadable
-    if (balance) {
-      return Number(balance) > 0
-    } else {
-      return 0
+    const filterSmallBalances = (currency) => {
+      const balance = wallet[currency].valueReadable
+      if (balance) {
+        return Number(balance) > 0
+      } else {
+        return 0
+      }
     }
-  }
+
+    const sortByNotional = (cur1, cur2) => {
+      const notionalCur1 = coinEstimator(cur1) * wallet[cur1].valueReadable
+      const notionalCur2 = coinEstimator(cur2) * wallet[cur2].valueReadable
+      if (notionalCur1 > notionalCur2) {
+        return -1
+      } else if (notionalCur1 < notionalCur2) {
+        return 1
+      } else return 0
+    }
 
     return (
         <DropdownContainer onKeyDown={handleKeys} onClick={e => e.stopPropagation()} show={show} tabIndex="0">
@@ -264,15 +274,18 @@ export const AccountDropdown = () => {
                             />
                         </LoaderContainer>}
                     {wallet &&  <CurrencyList>
-                      {Object.keys(wallet).filter(filterSmallBalances).map((ticker, key) => {
-                        return <CurrencyListItem key={key}>
-                          <img className="currency-icon" src={api.getCurrencyLogo(ticker).default} alt={ticker} />
-                          <div>
-                            <strong>{wallet[ticker].valueReadable} {ticker}</strong>
-                            <small>${formatUSD(coinEstimator(ticker) * wallet[ticker].valueReadable)}</small>
-                          </div>
-                        </CurrencyListItem>
-                      })}
+                      {Object.keys(wallet)
+                        .filter(filterSmallBalances)
+                        .sort(sortByNotional)
+                        .map((ticker, key) => {
+                          return <CurrencyListItem key={key}>
+                            <img className="currency-icon" src={api.getCurrencyLogo(ticker).default} alt={ticker} />
+                            <div>
+                              <strong>{wallet[ticker].valueReadable} {ticker}</strong>
+                              <small>${formatUSD(coinEstimator(ticker) * wallet[ticker].valueReadable)}</small>
+                            </div>
+                          </CurrencyListItem>
+                        })}
                     </CurrencyList>}
                 </DropdownContent>
                 <DropdownFooter>
