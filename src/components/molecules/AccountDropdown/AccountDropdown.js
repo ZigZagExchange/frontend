@@ -209,9 +209,6 @@ export const AccountDropdown = () => {
         ? balanceData.wallet
         : balanceData[network])
 
-    console.log("debug:: wallet", wallet)
-
-    const tickers = api.getCurrencies().sort();
 
     useEffect(() => {
         const hideDisplay = () => setShow(false)
@@ -227,6 +224,15 @@ export const AccountDropdown = () => {
             setShow(!show)
         }
     }
+
+  const filterSmallBalances = (currency) => {
+    const balance = wallet[currency].valueReadable
+    if (balance) {
+      return Number(balance) > 0
+    } else {
+      return 0
+    }
+  }
 
     return (
         <DropdownContainer onKeyDown={handleKeys} onClick={e => e.stopPropagation()} show={show} tabIndex="0">
@@ -257,21 +263,16 @@ export const AccountDropdown = () => {
                                 width={24}
                             />
                         </LoaderContainer>}
-                    {wallet && <CurrencyList>
-                        {tickers.map((ticker, key) => {
-                            if (!wallet[ticker] || wallet[ticker].value === 0) {
-                                return null
-                            }
-                            return (
-                                <CurrencyListItem key={key}>
-                                    <img className="currency-icon" src={api.getCurrencyLogo(ticker).default} alt={ticker} />
-                                    <div>
-                                        <strong>{wallet[ticker].valueReadable} {ticker}</strong>
-                                        <small>${formatUSD(coinEstimator(ticker) * wallet[ticker].valueReadable)}</small>
-                                    </div>
-                                </CurrencyListItem>
-                            )
-                        })}
+                    {wallet &&  <CurrencyList>
+                      {Object.keys(wallet).filter(filterSmallBalances).map((ticker, key) => {
+                        return <CurrencyListItem key={key}>
+                          <img className="currency-icon" src={api.getCurrencyLogo(ticker).default} alt={ticker} />
+                          <div>
+                            <strong>{wallet[ticker].valueReadable} {ticker}</strong>
+                            <small>${formatUSD(coinEstimator(ticker) * wallet[ticker].valueReadable)}</small>
+                          </div>
+                        </CurrencyListItem>
+                      })}
                     </CurrencyList>}
                 </DropdownContent>
                 <DropdownFooter>
