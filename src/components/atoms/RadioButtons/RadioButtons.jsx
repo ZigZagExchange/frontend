@@ -17,7 +17,7 @@ const RadioButtons = ({
 
 const ControlledRadios = ({items, value, onChange, name}) => {
   return <>
-    {items.map(item => <x.div key={`controlled-radio-${item.id}`}>
+    {items.map(item => <x.div display={"flex"} flexDirection={"column"} alignItems={"center"} key={`controlled-radio-${item.id}`}>
       <Label label={item.name}/>
       <Radio
         name={name}
@@ -36,7 +36,7 @@ const ControlledRadios = ({items, value, onChange, name}) => {
 
 const UncontrolledRadios = ({items, name}) => {
   return <>
-    {items.map(item => <x.div key={`uncontrolled-radio-${item.id}`}>
+    {items.map(item => <x.div display={"flex"} flexDirection={"column"} alignItems={"center"} key={`uncontrolled-radio-${item.id}`}>
       <Label label={item.name}/>
       <Radio name={name} id={item.id} value={item.value}/>
     </x.div>)}
