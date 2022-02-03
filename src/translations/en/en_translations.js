@@ -1,50 +1,48 @@
-export const TRANSLATIONS_ZH = {
+export const EN_TRANSLATIONS_EN = {
 
     welcome: "Welcome",
     
     // Header
-
-    trade: "贸易",
-    bridge :"桥",
-    list: "列表",
-    docs: "文件",
-    pool: "流动池",
+    trade: "Trade",
+    bridge: "Bridge",
+    list: "List",
+    docs: "Docs",
+    pool: "Pool",
     dsl: "DSL",
     zksync_mainnet: "zkSync - Mainnet",
     zksync_rinkeby: "zkSync - Rinkeby",
-    connect_wallet: "连接钱包",
-
+    connect_wallet: "Connect Wallet",
 
     // Footer
-    market: "市场",
-    price: "价格",
-    quantity: "数量",
-    side: "边",
-    fee: "费用",
-    order_status: "订单状态",
-    remaining: "其余的",
-    expiry: "到期",
-    action: "行动",
-    buy: "收购",
-    buy_c: "收购",
-    sell: "卖",
-    sell_c: "卖",
-    rejected: "拒绝",
-    partial_fill: "部分填充",
-    partial_match: "部分匹配",
-    filled: "填充",
-    open: "未结",
-    canceled: "取消",
-    expired: "已到期",
-    pending: "待",
-    cancel: "取消",
-    matched: "匹配",
-    orders: "订单",
-    fills: "填写",
-    balances: "结余",
+    market: "Market",
+    price: "Price",
+    quantity: "Quantity",
+    side: "Side",
+    fee: "Fee",
+    order_status: "Order Status",
+    remaining: "Remaining",
+    expiry: "Expiry",
+    action: "Action",
+    buy: "Buy",
+    buy_c: "BUY",
+    sell: "Sell",
+    sell_c: "SELL",
+    rejected: "Rejected",
+    partial_fill: "Partial Fill",
+    partial_match: "Partial Match",
+    filled: "Filled",
+    open: "Open",
+    canceled: "Canceled",
+    expired: "Expired",
+    pending: "Pending",
+    cancel: "Cancel",
+    matched: "Matched",
+    orders: "Orders",
+    fills: "Fills",
+    balances: "Balances",
     token: "Token",
     balance: "Balance",
-    view_account_on_explorer: "View Account on Explorer",
+    view_account_on_explorers: "View Account on Explorer",
 
     // SpotForm
     amount_is_not_a_number: "Amount is not a number",
@@ -59,39 +57,38 @@ export const TRANSLATIONS_ZH = {
     price_must_be_within_20_of_spot: "Price must be within 20% of spot",
     limit_orders_cannot_exceed_5_beyond_spot: "Limit orders cannot exceed 5% beyond spot",
     order_pending_sign_or_cancel_to_continue: "Order pending. Sign or Cancel to continue...",
-    avbl: "可用的",
-    amount: "数量",
+    avbl: "Avbl",
+    amount: "Amount",
 
     // SpotBox
-    spot_c: "现货价格",
-    sell_fee: "销售费用:",
-    buy_fee: "购买费:",
-    limit: "限制",
+    spot_c: "SPOT",
+    sell_fee: "Sell Fee:",
+    buy_fee: "Buy Fee:",
+    limit: "Limit",
 
     // TradePriceTable
     total: "Total",
 
     // TradeRatesCard
-    twenty_four_hour_change: "24小时变化",
-    twenty_four_hour_high: "24小时高",
-    twenty_four_hour_low: "24小时低",
-    twenty_four_hour_volume: "24 小时音量",
-    pair: "交易对",
-    change: "改变",
+    twenty_four_hour_change: "24 Hour Change",
+    twenty_four_hour_high: "24 Hour High",
+    twenty_four_hour_low: "24 Hour Low",
+    twenty_four_hour_volume: "24 Hour Volume",
+    pair: "Pair",
+    change: "Change",
     
     // TradePage
-    latest_trades: "最新交易",
-
+    latest_trades: "Latest Trades",
 
     // Bridge
-    ethereum: "以太坊",
-    ethereum_l1: "以太坊 L1",
+    ethereum: "Ethereum",
+    ethereum_l1: "Ethereum L1",
     zksync: "zkSync",
     zksync_l2: "zkSync L2",
     l1: "L1",
     l2: "L2",
-    from_c: "从",
-    estimated_value: "估计的价值",
+    from_c: "FROM",
+    estimated_value: "Estimated Value",
     available_balance: "Available balance",
     switch: "Switch",
     to_c: "TO",
@@ -118,10 +115,10 @@ export const TRANSLATIONS_ZH = {
     view_tx: "View TX",
 
     // BridgeReceipts:
-    receipts: "收据",
+    receipts: "Receipts",
     clear_all: "Clear All",
     no_bridge_receipts_yet: "No bridge receipts yet.",
-    max: "整体",
+    max: "Max",
 
     // ListPairPage
     purchase_arweave_allocation: "Purchase Arweave Allocation",
@@ -166,4 +163,4 @@ export const TRANSLATIONS_ZH = {
     alts_c: "ALTS",
     zones_c: "ZONES",
     market_making_click_to_fill: "Market Making - Click to Fill",
-};
+};  
