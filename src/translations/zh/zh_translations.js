@@ -95,7 +95,7 @@ export const ZH_TRANSLATIONS_ZH = {
     withdraw_speed: "退出速度",
     one_time_activation_fee: "一次性激活费",
     zigzag_fee: "ZigZag 费用",
-    youll_receive:"你会收到",
+    youll_receive: "你会收到",
     on_l1: "在 L1",
     please_connect_your_wallet: "请连接你的钱包",
     approve_c: "同意",

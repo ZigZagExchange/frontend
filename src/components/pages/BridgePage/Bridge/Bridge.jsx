@@ -296,7 +296,7 @@ const Bridge = () => {
               </x.div>
               </x.div>}
             {transfer.type === 'deposit' && user.address && !user.id && <div className="bridge_transfer_fee">
-                  {t("one_time_activation_fee")} {activationFee} {swapDetails.currency} (~$15.00)
+                  {t("one_time_activation_fee")}: {activationFee} {swapDetails.currency} (~$15.00)
             </div>}
             {user.address ? (
               user.id && <div className="bridge_transfer_fee">
@@ -314,10 +314,10 @@ const Bridge = () => {
                 </div>
                 {zigZagFee && <>
                   <div>
-                  {t("zigzag_fee")} {zigZagFee.toPrecision(4)} {swapDetails.currency}
+                  {t("zigzag_fee")}: {zigZagFee.toPrecision(4)} {swapDetails.currency}
                   </div>
                   <x.div color={"blue-gray-300"}>
-                  {t("youll_recieve")}{t("youll_recieve")} ~{Number(swapDetails.amount - zigZagFee).toPrecision(4)} {swapDetails.currency} {t("on_l1")}
+                    {t("youll_recieve")}: ~{Number(swapDetails.amount - zigZagFee).toPrecision(4)} {swapDetails.currency} {t("on_l1")}
                   </x.div>
                 </>}
               </div>

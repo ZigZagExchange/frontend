@@ -51,7 +51,7 @@ const Pool = () => {
 
                 <Modal title="Deposit Tokens" onClose={() => setShow(false)} show={show}>
                     <div className="pool_modal_tip_box">
-                        <strong>{t("tip")}</strong> {t("when_you_add_liquidity_text")}
+                        <strong>{t("tip")}:</strong> {t("when_you_add_liquidity_text")}
                     </div>
                     <PoolModalInput currency="USDC" balance="2299"/>
                     <PoolModalInput currency="USDT" balance="8303"/>

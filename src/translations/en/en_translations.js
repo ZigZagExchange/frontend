@@ -62,8 +62,8 @@ export const EN_TRANSLATIONS_EN = {
 
     // SpotBox
     spot_c: "SPOT",
-    sell_fee: "Sell Fee:",
-    buy_fee: "Buy Fee:",
+    sell_fee: "Sell Fee",
+    buy_fee: "Buy Fee",
     limit: "Limit",
 
     // TradePriceTable
@@ -93,9 +93,9 @@ export const EN_TRANSLATIONS_EN = {
     switch: "Switch",
     to_c: "TO",
     withdraw_speed: "Withdraw speed",
-    one_time_activation_fee: "One-Time Activation Fee:",
-    zigzag_fee: "ZigZag Fee:",
-    youll_receive:"You'll recieve:",
+    one_time_activation_fee: "One-Time Activation Fee",
+    zigzag_fee: "ZigZag Fee",
+    youll_receive: "You'll recieve",
     on_l1: "on L1",
     please_connect_your_wallet: "Please connect your wallet",
     approve_c: "APPROVE",
@@ -140,7 +140,7 @@ export const EN_TRANSLATIONS_EN = {
     on: "on",
     view_your_market: "View your market",
     trade_your_market: "Trade your market",
-    arwaeve_tx: "Arweave tx:",
+    arwaeve_tx: "Arweave tx",
 
     // Pool
     withdraw_token: "Withdraw Tokens",
@@ -149,7 +149,7 @@ export const EN_TRANSLATIONS_EN = {
     claim_all: "Claim All",
     mammoth_pool: "Mammoth Pool",
     deposit_c: "DEPOSIT",
-    tip: "Tip:",
+    tip: "Tip",
     when_you_add_liquidity_text: "When you add liquidity, you will receive pool tokens representing your position. These tokens automatically earn fees proportional to your share of the pool, and can be redeemed at any time.",
     staked_c: "STAKED",
     tvl_c: "TVL",

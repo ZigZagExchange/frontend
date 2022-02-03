@@ -96,7 +96,7 @@ const SuccessModal = ({txid, show, onClose}) => {
       </StyledLink>
     </x.div>
     <x.div fontSize={12} textAlign={"center"} color={"blue-gray-600"} mb={3}>
-      {t("arweave_tx")} {txid}
+      {t("arweave_tx")}: {txid}
     </x.div>
   </Modal>
 }
