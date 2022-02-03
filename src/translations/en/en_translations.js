@@ -103,7 +103,8 @@ export const EN_TRANSLATIONS_EN = {
     connected_as: "Connected as",
     disconnected: "Disconnected",
     disconnect: "Disconnect",
-    utilize_our_fast_withdrawal_bridge: "Utilize our fast withdrawal bridge receive ETH and FRAX within a few minutes.",
+    fast_receive_bridge: "Fast: receive ETH and FRAX within a few minutes through ZigZag Fast Withdrawal bridge.",
+    normal_receive_bridge: "Normal: use zkSync bridge and receive funds after a few hours.",
     learn_more: "Learn more",
 
     // FormDemo
