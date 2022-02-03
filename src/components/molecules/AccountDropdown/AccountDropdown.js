@@ -261,7 +261,7 @@ export const AccountDropdown = () => {
                             }
                             return (
                                 <CurrencyListItem key={key}>
-                                    <img className="currency-icon" src={api.getImage(ticker) && api.getImage(ticker).default} alt={ticker} />
+                                    <img className="currency-icon" src={api.getCurrencyLogo(ticker) && api.getCurrencyLogo(ticker).default} alt={ticker} />
                                     <div>
                                         <strong>{wallet[ticker].valueReadable} {ticker}</strong>
                                         <small>${formatUSD(coinEstimator(ticker) * wallet[ticker].valueReadable)}</small>
