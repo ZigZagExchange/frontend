@@ -122,7 +122,7 @@ export const EN_TRANSLATIONS_EN = {
 
     // ListPairPage
     purchase_arweave_allocation: "Purchase Arweave Allocation",
-    zigzag_enables_permissionless_pair_listings: "ZigZag enables permissionless pair listings by storing your pair's metadate on Arweave. \n You must purchase space on Arewave first.",
+    zigzag_enables_permissionless_pair_listings: "ZigZag enables permissionless pair listings by storing your pair's metadate on Arweave. \n You must purchase space on Arweave first.",
     file_size: "file size",
     kb: "kB",
     purchase_c: "PURCHASE",
@@ -159,7 +159,6 @@ export const EN_TRANSLATIONS_EN = {
 
     // TradePage - Announcements
     announcements_c: "ANNOUNCEMENTS",
-    zigzag_launches_on_zksync: "zigzag_launches_on",
     alts_c: "ALTS",
     zones_c: "ZONES",
     market_making_click_to_fill: "Market Making - Click to Fill",
