@@ -1,4 +1,6 @@
 import React from 'react';
+import { Translation } from 'react-i18next';
+import "../../../translations/i18n";
 import { toast } from 'react-toastify';
 import api from 'lib/api';
 import { RangeSlider } from 'components';
@@ -307,6 +309,7 @@ export class SpotForm extends React.Component {
     }
 
     render() {
+
         const marketInfo = this.props.marketInfo;
 
         let price = this.currentPrice();
@@ -339,28 +342,31 @@ export class SpotForm extends React.Component {
             );
 
         let buySellBtnClass, buttonText;
+        
         if (this.props.side === "b") {
             buySellBtnClass = "bg_btn buy_btn";
-            buttonText = "BUY";
+            buttonText =<p>BUY</p>
         } else if (this.props.side === "s") {
             buySellBtnClass = "bg_btn sell_btn";
-            buttonText = "SELL";
+            buttonText = <p>SELL</p>
         }
 
       return (
+        <Translation>
+        {(t, { i18n }) => (
         <>
           <form className="spot_form">
             <div className="spf_head">
-              <span>Avbl</span>
+            <p>{t('avbl')}</p>
               {balanceHtml}
             </div>
             <div className="spf_input_box">
-              <span className="spf_desc_text">Price</span>
+              <span className="spf_desc_text">{t('price')}</span>
               <input type="text" value={!isNaN(price) ? price : ''} onChange={this.updatePrice.bind(this)} disabled={this.priceIsDisabled()}  />
               <span className={this.priceIsDisabled() ? "text-disabled" : ""}>{marketInfo && marketInfo.quoteAsset.symbol}</span>
             </div>
             <div className="spf_input_box">
-              <span className="spf_desc_text">Amount</span>
+              <span className="spf_desc_text">{t('amount')}</span>
               <input type="text" value={this.state.amount} placeholder="0.00" onChange={this.updateAmount.bind(this)}/>
               <span>{marketInfo && marketInfo.baseAsset.symbol}</span>
             </div>
@@ -385,6 +391,8 @@ export class SpotForm extends React.Component {
             )}
           </form>
         </>
+        )}
+      </Translation>
       );
   }
 };

@@ -1,4 +1,6 @@
 import React, {useState} from "react";
+import { useTranslation } from "react-i18next";
+import "../../../translations/i18n";
 import {useSelector} from "react-redux";
 import {networkSelector} from "../../../lib/store/features/api/apiSlice";
 import {Button} from "../Button";
@@ -11,6 +13,7 @@ const ConnectWalletButton = () => {
   const [isLoading, setIsLoading] = useState(false)
   const history = useHistory()
   const location = useLocation()
+  const { t } = useTranslation();
 
   const pushToBridgeMaybe = (state) => {
     if (!state.id && !/^\/bridge(\/.*)?/.test(location.pathname)) {
@@ -21,7 +24,7 @@ const ConnectWalletButton = () => {
   return <Button
     loading={isLoading}
     className="bg_btn"
-    text="CONNECT WALLET"
+    text={t("connect_wallet")}
     img={darkPlugHead}
     onClick={() => {
       setIsLoading(true)

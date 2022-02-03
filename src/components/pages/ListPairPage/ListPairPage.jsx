@@ -1,4 +1,6 @@
 import React, {useState, useEffect} from "react";
+import { useTranslation } from "react-i18next";
+import "../../../translations/i18n";
 import {useSelector} from 'react-redux';
 import {userSelector} from "lib/store/features/auth/authSlice";
 import api from 'lib/api';
@@ -21,6 +23,7 @@ import ListPairForm from "./ListPairForm";
 
 export const TRADING_VIEW_CHART_KEY = "tradingViewChart"
 
+
 export default function ListPairPage() {
   const user = useSelector(userSelector);
   const isUserLoggedIn = user.id !== null && user.id !== undefined
@@ -42,7 +45,7 @@ export default function ListPairPage() {
   // we purchase 500k bytes at once so the user does not have to
   // repeatedly repurchase space if wanting to list more than 1 market
   const bytesToPurchase = 500000
-
+  const { t } = useTranslation();
   const refreshUserArweaveAllocation = () => {
     return api.refreshArweaveAllocation(user.address)
   }
@@ -119,12 +122,12 @@ export default function ListPairPage() {
       >
         <Pane size={"sm"} variant={"light"} maxWidth={"500px"} margin={"auto"}>
           <x.div display={"flex"} justifyContent={"space-between"} mb={4}>
-            <x.div fontSize={28} mb={2}>List New Market</x.div>
+            <x.div fontSize={28} mb={2}>{t("list_new_market")}</x.div>
             <x.div fontSize={12} color={"blue-gray-400"} textAlign={"center"}>
-              <x.div>No Internal ID?</x.div>
+              <x.div>{t("no_internal_id")}</x.div>
               <x.div>
                 <ExternalLink href={"https://zkscan.io/explorer/tokens"}>
-                  List your token on zkSync <HiExternalLink />
+                  {t("list_your_token")} <HiExternalLink />
                 </ExternalLink>
               </x.div>
             </x.div>
@@ -135,16 +138,16 @@ export default function ListPairPage() {
             <x.div display={"flex"} alignItems={"center"} justifyContent={"space-between"} mb={4}>
               <x.div display={"flex"} alignItems={"center"}>
                 <RiErrorWarningLine size={18} color={"red"}/>
-                <x.div ml={1} fontSize={12} color={"blue-gray-400"}>Insufficient Arweave allocation</x.div>
+                <x.div ml={1} fontSize={12} color={"blue-gray-400"}>{t("insufficient_arweave_allocation")}</x.div>
               </x.div>
               <x.div color={"blue-gray-400"}>
-                {arweaveAllocationKB} kB
+                {arweaveAllocationKB} {t("kb")}
               </x.div>
             </x.div>}
 
             <Dev>
               <x.div fontSize={12} color={"blue-gray-500"} mb={3} textAlign={"right"}>
-                arweave allocation: {arweaveAllocationKB} kB
+                {t("arweave_allocation")} {arweaveAllocationKB} {t("kb")}
               </x.div>
             </Dev>
 
@@ -154,10 +157,10 @@ export default function ListPairPage() {
               } else {
                 if (isUserConnectedToMainnet) {
                   return <Submit block mt={5}>
-                    {!isArweaveAllocationSufficient && hasAttemptedSubmit ? "PURCHASE ALLOCATION" : "LIST"}
+                    {!isArweaveAllocationSufficient && hasAttemptedSubmit ? t("purchase_allocation_c") : t("list_c")}
                   </Submit>
                 } else {
-                  return <Button block isDisabled>Please connect to Mainnet</Button>
+                  return <Button block isDisabled>{t("please_connect_to_mainnet")}</Button>
                 }
               }
             })()}

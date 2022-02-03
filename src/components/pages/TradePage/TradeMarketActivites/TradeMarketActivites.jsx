@@ -29,3 +29,5 @@ const TradeMarketActivites = () => {
 };
 
 export default TradeMarketActivites;
+
+// left uninternationalised since it is not in use - please refer to other files on how to internationalise.

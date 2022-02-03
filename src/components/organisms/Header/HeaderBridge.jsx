@@ -1,5 +1,7 @@
 import { useSelector } from 'react-redux'
 import React, { useMemo } from 'react'
+import { useTranslation } from "react-i18next";
+import "../../../translations/i18n";
 import { BiChevronDown } from 'react-icons/bi'
 import { GoGlobe } from 'react-icons/go'
 import { NavLink } from 'react-router-dom'
@@ -11,6 +13,7 @@ import './Header.css'
 export const HeaderBridge = (props) => {
   // state to open or close the sidebar in mobile
   const network = useSelector(networkSelector)
+  const { t } = useTranslation();
 
   const [, bridgeLink] = useMemo(() => {
     switch (network) {
@@ -38,28 +41,28 @@ export const HeaderBridge = (props) => {
             <ul>
               <li>
                 <NavLink exact to="/" activeClassName="active_link">
-                  Trade
+                  {t("trade")}
                 </NavLink>
               </li>
               <li>
                 {bridgeLink
                   ? (
                     <NavLink exact to={bridgeLink || ""} activeClassName="active_link">
-                      Bridge
+                      {t("bridge")}
                     </NavLink>
                   )
                   : (
                     // eslint-disable-next-line
-                    <a rel="noreferrer">Bridge</a>
+                    <a rel="noreferrer">{t("bridge")}</a>
                   )}
               </li>
               <li>
                 <NavLink exact to="/list-pair" activeClassName="active_link">
-                  List
+                  {t("list")}
                 </NavLink>
               </li>
               <li>
-                <a href="https://docs.zigzag.exchange/" target="_blank" rel="noreferrer">Docs</a>
+                <a href="https://docs.zigzag.exchange/" target="_blank" rel="noreferrer">{t("docs")}</a>
               </li>
             </ul>
             <label htmlFor="networkSelector" className="eu_text">

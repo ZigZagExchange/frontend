@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { Translation } from "react-i18next";
+import "../../../translations/i18n";
 import { useSelector, useDispatch } from "react-redux";
 // import { ToastContainer, toast } from "react-toastify";
 import { DefaultTemplate, Footer, TradeChart } from "components";
@@ -238,6 +240,8 @@ const TradePage = () => {
   ).length;
 
   return (
+    <Translation>
+    {(t, { i18n }) => (
     <DefaultTemplate>
       <div className="trade_section">
         <div className="trade_container">
@@ -325,7 +329,7 @@ const TradePage = () => {
                       }
                       onClick={() => updateMarketDataTab("fills")}
                     >
-                      Latest Trades
+                      {t('latest_trades')}
                     </strong>
                   </div>
                   {/* Trade Price Table*/}
@@ -349,6 +353,8 @@ const TradePage = () => {
         </div>
       </div>
     </DefaultTemplate>
+    )}
+    </Translation>
   );
 };
 export default TradePage;

@@ -1,4 +1,6 @@
 import { useSelector } from 'react-redux'
+import { useTranslation } from "react-i18next";
+import "../../../translations/i18n";
 import React, { useState, useEffect } from 'react'
 import { IoMdLogOut } from 'react-icons/io'
 import { AiOutlineCaretDown } from 'react-icons/ai'
@@ -203,6 +205,8 @@ export const AccountDropdown = () => {
     const [selectedLayer, setSelectedLayer] = useState(2)
     const coinEstimator = useCoinEstimator();
     const { profile } = user
+    const { t } = useTranslation();
+
 
     const wallet = (selectedLayer === 1
         ? balanceData.wallet
@@ -234,13 +238,13 @@ export const AccountDropdown = () => {
             </DropdownButton>
             <DropdownDisplay>
                 <DropdownHeader>
-                    <h3>Your Wallet</h3>
+                    <h3>{t("your_wallet")}</h3>
                     <WalletToggle>
                         <WalletToggleItem onClick={() => setSelectedLayer(1)} show={selectedLayer === 1}>
-                            L1
+                            {t("l1")}
                         </WalletToggleItem>
                         <WalletToggleItem onClick={() => setSelectedLayer(2)} show={selectedLayer === 2}>
-                            L2
+                            {t("l2")}
                         </WalletToggleItem>
                     </WalletToggle>
                 </DropdownHeader>
@@ -274,7 +278,7 @@ export const AccountDropdown = () => {
                 <DropdownFooter>
                     <SignOutButton onClick={() => api.signOut()}>
                         <IoMdLogOut style={{ position: 'relative', top: -1 }} />
-                        {' '}Disconnect
+                        {' '}{t("disconnect")}
                     </SignOutButton>
                 </DropdownFooter>
             </DropdownDisplay>

@@ -1,4 +1,6 @@
 import React from "react";
+import { Translation } from 'react-i18next';
+import "../../../translations/i18n";
 import "./Footer.css";
 import loadingGif from "assets/icons/loading.svg";
 import api from "lib/api";
@@ -24,17 +26,19 @@ export class Footer extends React.Component {
 
   renderOrderTable(orders) {
     return (
+      <Translation>
+        {(t, { i18n }) => (
       <table>
         <thead>
           <tr>
-            <th>Market</th>
-            <th>Price</th>
-            <th>Quantity</th>
-            <th>Remaining</th>
-            <th>Side</th>
-            <th>Expiry</th>
-            <th>Order Status</th>
-            <th>Action</th>
+            <th>{t('market')}</th>
+            <th>{t('price')}</th>
+            <th>{t('quantity')}</th>
+            <th>{t('remaining')}</th>
+            <th>{t('side')}</th>
+            <th>{t('expiry')}</th>
+            <th>{t('order_status')}</th>
+            <th>{t('action')}</th>
           </tr>
         </thead>
         <tbody>
@@ -74,21 +78,21 @@ export class Footer extends React.Component {
             let statusText, statusClass;
             switch (order[9]) {
               case "r":
-                statusText = "rejected";
+                statusText = <span>{t('rejected')}</span>;
                 statusClass = "rejected";
                 break;
               case "pf":
-                statusText = "partial fill";
+                statusText = <span>{t('partial_fill')}</span>;
                 statusClass = "filled";
                 break;
               case "f":
-                statusText = "filled";
+                statusText = <span>{t('filled')}</span>;
                 statusClass = "filled";
                 break;
               case "pm":
                 statusText = (
                   <span>
-                    partial match
+                    <span>{t('partial_match')}</span>
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -125,15 +129,15 @@ export class Footer extends React.Component {
                 statusClass = "committing";
                 break;
               case "o":
-                statusText = "open";
+                statusText = <span>{t('open')}</span>;;
                 statusClass = "open";
                 break;
               case "c":
-                statusText = "canceled";
+                statusText = <span>{t('canceled')}</span>;
                 statusClass = "canceled";
                 break;
               case "e":
-                statusText = "expired";
+                statusText = <span>{t('expired')}</span>;
                 statusClass = "expired";
                 break;
               default:
@@ -159,7 +163,7 @@ export class Footer extends React.Component {
                       className="cancel_order_link"
                       onClick={() => api.cancelOrder(orderId)}
                     >
-                      Cancel
+                      {t('cancel')}
                     </span>
                   ) : (
                     ""
@@ -170,6 +174,8 @@ export class Footer extends React.Component {
           })}
         </tbody>
       </table>
+        )}
+      </Translation>
     );
   }
 
@@ -187,16 +193,18 @@ export class Footer extends React.Component {
         baseExplorerUrl = "https://zkscan.io/explorer/transactions/";
     }
     return (
+      <Translation>
+        {(t, { i18n }) => (
       <table>
         <thead>
           <tr>
-            <th>Market</th>
-            <th>Price</th>
-            <th>Quantity</th>
-            <th>Side</th>
-            <th>Fee</th>
-            <th>Order Status</th>
-            <th>Action</th>
+            <th>{t('market')}</th>
+            <th>{t('price')}</th>
+            <th>{t('quantity')}</th>
+            <th>{t('side')}</th>
+            <th>{t('fee')}</th>
+            <th>{t('order_status')}</th>
+            <th>{t('action')}</th>
           </tr>
         </thead>
         <tbody>
@@ -233,21 +241,21 @@ export class Footer extends React.Component {
             let statusText, statusClass;
             switch (fillstatus) {
               case "r":
-                statusText = "rejected";
+                statusText = <span>{t('rejected')}</span>
                 statusClass = "rejected";
                 break;
               case "pf":
-                statusText = "partial fill";
+                statusText = <span>{t('partial_fill')}</span>;
                 statusClass = "filled";
                 break;
               case "f":
-                statusText = "filled";
+                statusText = <span>{t('filled')}</span>;
                 statusClass = "filled";
                 break;
               case "pm":
                 statusText = (
                   <span>
-                    partial match
+                    {t('partial_match')}
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -260,7 +268,7 @@ export class Footer extends React.Component {
               case "m":
                 statusText = (
                   <span>
-                    matched{" "}
+                    {t('matched')}{" "}
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -284,49 +292,51 @@ export class Footer extends React.Component {
                 statusClass = "committing";
                 break;
               case "o":
-                statusText = "open";
+                statusText = <span>{t('open')}</span>;
                 statusClass = "open";
                 break;
               case "c":
-                statusText = "canceled";
+                statusText = <span>{t('canceled')}</span>;
                 statusClass = "canceled";
                 break;
               case "e":
-                statusText = "expired";
+                statusText = <span>{t('expired')}</span>;
                 statusClass = "expired";
                 break;
               default:
                 break;
             }
 
-            return (
-              <tr key={fillid}>
-                <td>{market}</td>
-                <td>{price.toPrecision(6) / 1}</td>
-                <td>
-                  {baseQuantity.toPrecision(6) / 1} {marketInfo && marketInfo.baseAsset.symbol}
-                </td>
-                <td className={sideclassname}>{sidetext}</td>
-                <td>{feeText}</td>
-                <td className={statusClass}>{statusText}</td>
-                <td>
-                  {txhash ? (
-                    <a
-                      href={baseExplorerUrl + txhash}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      View Tx
-                    </a>
-                  ) : (
-                    ""
-                  )}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+          return (
+            <tr key={fillid}>
+              <td>{market}</td>
+              <td>{price.toPrecision(6) / 1}</td>
+              <td>
+                {baseQuantity.toPrecision(6) / 1} {marketInfo && marketInfo.baseAsset.symbol}
+              </td>
+              <td className={sideclassname}>{sidetext}</td>
+              <td>{feeText}</td>
+              <td className={statusClass}>{statusText}</td>
+              <td>
+                {txhash ? (
+                  <a
+                    href={baseExplorerUrl + txhash}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {t('view_tx')}
+                  </a>
+                ) : (
+                  ""
+                )}
+              </td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  )}
+</Translation>
     );
   }
 
@@ -374,29 +384,37 @@ export class Footer extends React.Component {
             );
           });
           footerContent = (
+            <Translation>
+            {(t, { i18n }) => (
             <div>
               <table className="balances_table">
                 <thead>
                   <tr>
-                    <th>Token</th>
-                    <th>Balance</th>
+                    <th>{t('token')}</th>
+                    <th>{t('balance')}</th>
                   </tr>
                 </thead>
                 <tbody>{balancesContent}</tbody>
               </table>
 
               <a href={explorerLink} target="_blank" rel="noreferrer">
-                View Account on Explorer
+                {t('view_on_explorer')}
               </a>
             </div>
+             )}
+        </Translation>
           );
         } else {
           footerContent = (
+            <Translation>
+            {(t, { i18n }) => (
             <div>
               <a href={explorerLink} target="_blank" rel="noreferrer">
-                View Account on Explorer
+                {t('view_on_explorer')}
               </a>
             </div>
+            )}
+            </Translation>
           );
         }
         classNameBalances = "selected";
@@ -406,6 +424,8 @@ export class Footer extends React.Component {
     }
 
     return (
+      <Translation>
+        {(t, { i18n }) => (
       <>
         <div className="footer">
           <div className="footer_container">
@@ -416,19 +436,19 @@ export class Footer extends React.Component {
                   className={classNameOrders}
                   onClick={() => this.setTab("orders")}
                 >
-                  Orders ({this.getUserOrders().length})
+                  {t('orders')} ({this.getUserOrders().length})
                 </strong>
                 <strong
                   className={classNameFills}
                   onClick={() => this.setTab("fills")}
                 >
-                  Fills ({this.getFills().length})
+                  {t('fills')} ({this.getFills().length})
                 </strong>
                 <strong
                   className={classNameBalances}
                   onClick={() => this.setTab("balances")}
                 >
-                  Balances
+                  {t('balances')}
                 </strong>
               </div>
             </div>
@@ -436,6 +456,8 @@ export class Footer extends React.Component {
           </div>
         </div>
       </>
+      )}
+      </Translation>
     );
   }
 }

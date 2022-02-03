@@ -1,6 +1,8 @@
 import {useSelector} from "react-redux";
 import {arweaveAllocationSelector, balancesSelector} from "../../../lib/store/features/api/apiSlice";
 import React, {useEffect, useState} from "react";
+import { useTranslation } from "react-i18next";
+import "../../../translations/i18n";
 import {Modal} from "../../atoms/Modal";
 import api from "../../../lib/api";
 import Pane from "../../atoms/Pane/Pane";
@@ -24,6 +26,8 @@ const AllocationModal = ({onClose, show, onSuccess, bytesToPurchase}) => {
 
   const [totalPrice, setTotalPrice] = useState(fileSizeKB * pricePerKB)
   const [isUSDCBalanceSufficient, setIsUSDCBalanceSufficient] = useState(false)
+
+  const { t } = useTranslation();
 
   useEffect(() => api.getBalances(), [])
 
@@ -52,10 +56,9 @@ const AllocationModal = ({onClose, show, onSuccess, bytesToPurchase}) => {
     //@TODO: remove jsonify here, add better dep
   }, [bytesToPurchase, user.address, arweaveAllocation, jsonify(balanceData)])
 
-  return <Modal title={"Purchase Arweave Allocation"} show={show} onClose={onClose}>
+  return <Modal title={t("purchase_arweave_allocation")} show={show} onClose={onClose}>
     <x.div fontSize={14}>
-      ZigZag enables permissionless pair listings by storing your pair's metadata on Arweave.
-      You must purchase space on Arweave first.
+      {t("zigzag_enables_permissionless_pair_listings")}
     </x.div>
     <Pane size={"xs"} my={8}>
       <x.div display={"flex"} justifyContent={"space-around"} alignItems={"center"}>
@@ -69,7 +72,7 @@ const AllocationModal = ({onClose, show, onSuccess, bytesToPurchase}) => {
               </AllocationItem>
               <x.div fontSize={28} ml={3}>)</x.div>
             </x.div>
-            : <AllocationItem label={"file size"}>{fileSizeKB} kB</AllocationItem>
+            : <AllocationItem label={t("file_size")}>{fileSizeKB} kB</AllocationItem>
         }
         <FaTimes size={18}/>
         <AllocationItem label={"$/kB"}>${pricePerKB}</AllocationItem>
@@ -89,7 +92,7 @@ const AllocationModal = ({onClose, show, onSuccess, bytesToPurchase}) => {
       }
     }}>
       <Submit block isDisabled={!isUSDCBalanceSufficient}>
-        {isUSDCBalanceSufficient ? "PURCHASE" : `INSUFFICIENT USDC WALLET BALANCE`}
+        {isUSDCBalanceSufficient ? t("purchase_c"): t('insufficient_usdc_wallet_balance')}
       </Submit>
     </Form>
   </Modal>

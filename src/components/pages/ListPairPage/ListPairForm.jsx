@@ -1,4 +1,6 @@
 import React, {useCallback, useEffect, useState} from "react";
+import { Translation } from "react-i18next";
+import "../../../translations/i18n";
 import {x} from "@xstyled/styled-components"
 import NumberInput from "../../atoms/Form/NumberInput";
 import {model} from "../../atoms/Form/helpers";
@@ -17,7 +19,6 @@ const getAmountForTargetNotional = (price) => {
   const targetUSDFeeAmount = 1
   return (targetUSDFeeAmount / price).toFixed(6)
 }
-
 const renderFeeHint = (assetPrice, assetFee, symbol, feeSetter) => {
   if (assetPrice) {
     const notional = (Number(assetPrice) * Number(assetFee)).toFixed(2)
@@ -27,16 +28,21 @@ const renderFeeHint = (assetPrice, assetFee, symbol, feeSetter) => {
           {assetFee} {symbol} = ${notional}
         </x.div>
         {notional > 1 && <x.div>
+        <Translation>
+            {(t, { i18n }) => (
           <Button
             ml={1}
             variant={"secondary"}
             size={"xs"}
             onClick={() => feeSetter(getAmountForTargetNotional(assetPrice))}>
-            set to $1
+            {t("file_size")}
           </Button>
+          )}
+      </Translation>
           <x.div/>
         </x.div>}
       </x.div>}
+
   }
   return null
 }

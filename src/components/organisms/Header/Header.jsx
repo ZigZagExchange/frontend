@@ -4,6 +4,8 @@ import { FaDiscord, FaTelegramPlane, FaTwitter } from 'react-icons/fa'
 import { GoGlobe } from 'react-icons/go'
 import { HiExternalLink } from 'react-icons/hi'
 import React, { useState } from 'react'
+import { useTranslation } from "react-i18next";
+import "../../../translations/i18n";
 import { NavLink } from 'react-router-dom'
 import { Dropdown, AccountDropdown, Menu, MenuItem } from 'components'
 import { userSelector } from 'lib/store/features/auth/authSlice'
@@ -21,6 +23,7 @@ export const Header = (props) => {
   const user = useSelector(userSelector)
   const network = useSelector(networkSelector)
   const hasBridge = api.isImplemented('depositL2')
+  const { t } = useTranslation();
 
   const handleMenu = ({ key }) => {
     switch (key) {
@@ -60,34 +63,34 @@ export const Header = (props) => {
               <ul>
                 <li>
                   <NavLink exact to="/" activeClassName="active_link">
-                    Trade
+                    {t("trade")}
                   </NavLink>
                 </li>
                 {hasBridge && <li>
                   <NavLink exact to="/bridge" activeClassName="active_link">
-                    Bridge
+                    {t("bridge")}
                   </NavLink>
                 </li>}
                 {hasBridge && <li>
                   <a href="https://docs.zigzag.exchange/" target="_blank" rel="noreferrer">
-                    Docs
+                    {t("docs")}
                     {' '}<HiExternalLink />
                   </a>
                 </li>}
                 <li>
                   <NavLink exact to="/list-pair" activeClassName="active_link">
-                    List
+                    {t("list")}
                   </NavLink>
                 </li>
                 <Dev>
                   <li>
                     <NavLink exact to="/pool" activeClassName="active_link">
-                      Pool
+                      {t("trade")}
                     </NavLink>
                   </li>
                   <li>
                     <NavLink exact to="/dsl" activeClassName="active-link">
-                      DSL
+                      {t("dsl")}
                     </NavLink>
                   </li>
                 </Dev>
@@ -133,34 +136,34 @@ export const Header = (props) => {
             <ul>
               <li>
                 <NavLink exact to="/" activeClassName="active_link">
-                  Trade
+                  {t("trade")}
                 </NavLink>
               </li>
               {hasBridge && <li>
                 <NavLink exact to="/bridge" activeClassName="active_link">
-                  Bridge
+                  {t("bridge")}
                 </NavLink>
               </li>}
               <li>
                 <NavLink exact to="/list-pair" activeClassName="active_link">
-                  List
+                  {t("list")}
                 </NavLink>
               </li>
               {hasBridge && <li>
                 <a href="https://docs.zigzag.exchange/" target="_blank" rel="noreferrer">
-                  Docs
+                  {t("docs")}
                   {' '}<HiExternalLink />
                 </a>
               </li>}
               <Dev>
                 <li>
                   <NavLink exact to="/pool" activeClassName="active_link">
-                    Pool
+                    {t("pool")}
                   </NavLink>
                 </li>
                 <li>
                   <NavLink exact to="/dsl" activeClassName="active_link">
-                    DSL
+                    {t("dsl")}
                   </NavLink>
                 </li>
               </Dev>
