@@ -1,4 +1,6 @@
 import React, {useEffect, useMemo, useState} from 'react'
+import { useTranslation } from "react-i18next";
+import "../../../../translations/i18n";
 import { useSelector } from "react-redux";
 import { SwapButton, Button, useCoinEstimator } from 'components'
 import {
@@ -46,6 +48,7 @@ const Bridge = () => {
   const activationFee = parseFloat((user.address && !user.id ? (15 / currencyValue) : 0).toFixed(5))
   const estimatedValue = (+swapDetails.amount * coinEstimator(swapDetails.currency) || 0)
   const [fastWithdrawCurrencyMaxes, setFastWithdrawCurrencyMaxes] = useState()
+  const { t } = useTranslation();
 
   let walletBalances = balanceData.wallet || {}
   let zkBalances = balanceData[network] || {}
@@ -90,7 +93,7 @@ const Bridge = () => {
 
       if (input > 0) {
         if (input < 0.001) {
-          setFormErr('Must be at least 0.001')
+          setFormErr ('Must be at least 0.001')
         } else if (input <= activationFee) {
           setFormErr(`Must be more than ${activationFee} ${swapDetails.currency}`)
         } else if (input > (detailBalance - parseFloat(bridgeFee))) {
@@ -168,7 +171,7 @@ const Bridge = () => {
           src={ethLogo}
         />
       </div>
-      <div className="bridge_coin_name">Ethereum L1</div>
+      <div className="bridge_coin_name">{t("ethereum_l1")}</div>
     </div>
   )
 
@@ -177,7 +180,7 @@ const Bridge = () => {
       <div className="bridge_coin_image">
         <img alt="Logo" src={logo} />
       </div>
-      <div className="bridge_coin_name">zkSync L2</div>
+      <div className="bridge_coin_name">{t("zksync_l2")}</div>
     </div>
   )
 
@@ -231,7 +234,7 @@ const Bridge = () => {
       <div className="bridge_box">
           <Pane size={"md"} variant={"light"}>
             <div className="bridge_coin_title">
-              <h5>FROM</h5>
+              <h5>{t("from_c")}</h5>
               {transfer.type === 'withdraw' ? zkSyncLayer2Header : ethLayer1Header}
             </div>
             <BridgeSwapInput
@@ -243,11 +246,11 @@ const Bridge = () => {
             />
             <div className="bridge_coin_stats">
               <div className="bridge_coin_stat">
-                <h5>Estimated value</h5>
+                <h5>{t("estimated_value")}</h5>
                 <span>~${formatUSD(estimatedValue)}</span>
               </div>
               <div className="bridge_coin_stat">
-                <h5>Available balance</h5>
+                <h5>{t("available_balance")}</h5>
                 <span>
                   {balances[swapDetails.currency] && balances[swapDetails.currency].valueReadable}
                   {` ${swapDetails.currency}`}
@@ -259,20 +262,20 @@ const Bridge = () => {
           <Pane size={"md"} borderRadius={"0 0 3xl 3xl"}>
             <div className="bridge_box_swap_wrapper">
               <SwapButton onClick={switchTransferType} />
-              <h5>Switch</h5>
+              <h5>{t("switch")}</h5>
             </div>
 
             <div className="bridge_coin_stats">
               <div className="bridge_coin_stat">
                 <div className="bridge_coin_details">
                   <div className="bridge_coin_title">
-                    <h5>TO</h5>
+                    <h5>{t("to_c")}</h5>
                     {transfer.type !== 'withdraw' ? zkSyncLayer2Header : ethLayer1Header}
                   </div>
                 </div>
               </div>
               <div className="bridge_coin_stat">
-                <h5>Available balance</h5>
+                <h5>{t("available_balance")}</h5>
                 <span>
                   {altBalances[swapDetails.currency] && altBalances[swapDetails.currency].valueReadable}
                   {` ${swapDetails.currency}`}
@@ -288,12 +291,12 @@ const Bridge = () => {
                   items={[{id: "fast", name: "Fast"}, {id: "normal", name: "Normal"}]}
                 />
               <x.div display={"flex"} mt={2}>
-                <x.div fontSize={12} color={"blue-gray-500"}>Withdraw speed</x.div>
+                <x.div fontSize={12} color={"blue-gray-500"}>{t("withdraw_speed")}</x.div>
                 <FastWithdrawTooltip/>
               </x.div>
               </x.div>}
             {transfer.type === 'deposit' && user.address && !user.id && <div className="bridge_transfer_fee">
-              One-Time Activation Fee: {activationFee} {swapDetails.currency} (~$15.00)
+                  {t("one_time_activation_fee")}: {activationFee} {swapDetails.currency} (~$15.00)
             </div>}
             {user.address ? (
               user.id && <div className="bridge_transfer_fee">
@@ -311,16 +314,16 @@ const Bridge = () => {
                 </div>
                 {zigZagFee && <>
                   <div>
-                    ZigZag Fee: {zigZagFee.toPrecision(4)} {swapDetails.currency}
+                  {t("zigzag_fee")}: {zigZagFee.toPrecision(4)} {swapDetails.currency}
                   </div>
                   <x.div color={"blue-gray-300"}>
-                    You'll receive: ~{Number(swapDetails.amount - zigZagFee).toPrecision(4)} {swapDetails.currency} on L1
+                    {t("youll_recieve")}: ~{Number(swapDetails.amount - zigZagFee).toPrecision(4)} {swapDetails.currency} {t("on_l1")}
                   </x.div>
                 </>}
               </div>
             ) : (
               <div className="bridge_transfer_fee">
-                🔗 &nbsp;Please connect your wallet
+                🔗 &nbsp;{t("please_connect_your_wallet")}
               </div>
             )}
             <div className="bridge_button">
@@ -328,7 +331,7 @@ const Bridge = () => {
               {user.address && balances[swapDetails.currency] && !hasAllowance && <Button
                 loading={isApproving}
                 className={cx("bg_btn", { zig_disabled: formErr.length > 0 || swapDetails.amount.length === 0, })}
-                text="APPROVE"
+                text={t("approve_c")}
                 style={{ marginBottom: 10 }}
                 onClick={approveSpend}
               />}
@@ -340,7 +343,7 @@ const Bridge = () => {
               {user.address && !hasError && <Button
                 loading={loading}
                 className={cx("bg_btn", { zig_disabled: bridgeFee === null || !hasAllowance || swapDetails.amount.length === 0 })}
-                text="TRANSFER"
+                text={t("transfer_c")}
                 icon={<MdSwapCalls />}
                 onClick={doTransfer}
               />}
@@ -350,13 +353,13 @@ const Bridge = () => {
       {user.address ? (
         <div className="bridge_connected_as">
           <span className="bridge_bubble_connected" />
-          {' '}Connected as {`${user.address.substr(0, 6)}...${user.address.substr(-5)}`}
+          {' '}{t("connected_as")} {`${user.address.substr(0, 6)}...${user.address.substr(-5)}`}
           <span onClick={disconnect} className="bridge_disconnect">{' • '}<a href="#disconnect">Disconnect</a></span>
         </div>
       ) : (
         <div className="bridge_connected_as">
           <span className="bridge_bubble_disconnected" />
-          Disconnected
+          {t("disconnected")}
         </div>
       )}
     </>
@@ -365,16 +368,17 @@ const Bridge = () => {
 }
 
 const FastWithdrawTooltip = () => {
+  const { t } = useTranslation();
   const renderLabel = () => {
     return <x.div>
       <x.div mb={2}>
-        Fast: receive ETH and FRAX within a few minutes through ZigZag Fast Withdrawal bridge.
+        {t("fast_receive_bridge")}
       </x.div>
       <x.div mb={2}>
-        Normal: use zkSync bridge and receive funds after a few hours.
+        {t("normal_receive_bridge")}
       </x.div>
       <x.div><ExternalLink href={"https://docs.zigzag.exchange/zksync/fast-withdraw-bridge"}>
-        Learn more <HiExternalLink />
+      {t("learn_more")} <HiExternalLink />
       </ExternalLink></x.div>
     </x.div>
   }

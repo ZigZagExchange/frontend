@@ -1,4 +1,6 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
+import "../../../../translations/i18n";
 import styled from "@xstyled/styled-components";
 import api from "lib/api";
 
@@ -64,7 +66,8 @@ const BalanceText = styled.div`
 `
 
 const PoolModalInput = (props) => {
-  
+const { t } = useTranslation();
+
 
   return (
     <>
@@ -74,10 +77,10 @@ const PoolModalInput = (props) => {
       </div>
       <input placeholder="0.00" type="text" />
       <a className="maxLink" href="#max">
-        Max
+        {t("max")}
       </a>
     </InputContainer>
-    <BalanceText>Balance: {props.balance}</BalanceText>
+    <BalanceText>{t("balance")}: {props.balance}</BalanceText>
     </>
   );
 };

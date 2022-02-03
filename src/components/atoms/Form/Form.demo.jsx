@@ -1,4 +1,6 @@
 import React, {useState} from "react"
+import { useTranslation } from "react-i18next";
+import "../../../translations/i18n";
 import Form from "./Form";
 import NumberInput from "./NumberInput";
 import Submit, {Button} from "./Submit";
@@ -13,6 +15,7 @@ const FormDemo = () => {
     const [number, setNumber] = useState(1)
     const [select, setSelect] = useState("ETH")
     const [text, setText] = useState("")
+    const { t } = useTranslation();
   return <>
     <Form
       initialValues={{
@@ -44,7 +47,7 @@ const FormDemo = () => {
           </x.div>
           <x.div col display={"flex"} alignItems={"center"} justifyContent={"center"}>
             <Button variant={"secondary"} onClick={() => setNumber(number + 1)}>
-              Change Controlled
+              {t("change_controlled")}
             </Button>
           </x.div>
         </x.div>
@@ -74,7 +77,7 @@ const FormDemo = () => {
                 setSelect("ETH")
               }
             }}>
-              Change Controlled
+              {t("change_controlled")}
             </Button>
           </x.div>
         </x.div>
@@ -98,7 +101,7 @@ const FormDemo = () => {
             <Button variant={"secondary"} onClick={() => {
               setText((Math.random() + 1).toString(36).substring(7))
             }}>
-              Set Controlled
+              {t("set_controlled")}
             </Button>
           </x.div>
         </x.div>

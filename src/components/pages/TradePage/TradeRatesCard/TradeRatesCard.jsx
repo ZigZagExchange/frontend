@@ -1,4 +1,6 @@
 import React from "react";
+import { Translation } from "react-i18next";
+import "../../../../translations/i18n";
 // css
 import "./TradeRatesCard.css";
 
@@ -17,6 +19,8 @@ class TradeRatesCard extends React.Component {
         ).toFixed(2);
 
         return (
+            <Translation>
+            {(t, { i18n }) => (
             <>
                 <div className="tl_rates">
                     <div className="rates_box rb_text_1">
@@ -34,7 +38,7 @@ class TradeRatesCard extends React.Component {
                           : "rates_box rb_text_3_up_value"
                       }
                     >
-                        <h2>24h Change</h2>
+                        <h2>{t('twenty_four_hour_change')}</h2>
                         <p>
                             {this.props.marketSummary.priceChange && marketInfo &&
                                 (this.props.marketSummary.priceChange / 1).toFixed(marketInfo.pricePrecisionDecimals)}{" "}
@@ -42,23 +46,25 @@ class TradeRatesCard extends React.Component {
                         </p>
                     </div>
                     <div className="rates_box rb_text_4">
-                        <h2>24h High</h2>
+                        <h2>{t('twenty_four_hour_high')}</h2>
                         <p>{this.props.marketSummary["24hi"]}</p>
                     </div>
                     <div className="rates_box rb_text_4">
-                        <h2>24hLow</h2>
+                        <h2>{t('twenty_four_hour_low')}</h2>
                         <p>{this.props.marketSummary["24lo"]}</p>
                     </div>
                     <div className="rates_box rb_text_4">
-                        <h2>24h Volume({marketInfo && marketInfo.baseAsset.symbol})</h2>
+                        <h2>{t('twenty_four_hour_volume')}({marketInfo && marketInfo.baseAsset.symbol})</h2>
                         <p>{this.props.marketSummary.baseVolume}</p>
                     </div>
                     <div className="rates_box rb_text_4">
-                        <h2>24h Volume({marketInfo && marketInfo.quoteAsset.symbol})</h2>
+                        <h2>{t('twenty_four_hour_volume')}({marketInfo && marketInfo.quoteAsset.symbol})</h2>
                         <p>{this.props.marketSummary.quoteVolume}</p>
                     </div>
                 </div>
             </>
+        )}
+        </Translation>
         );
     }
 }

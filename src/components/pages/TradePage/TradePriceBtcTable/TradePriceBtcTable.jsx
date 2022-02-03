@@ -1,22 +1,26 @@
 import React from "react";
+import { Translation } from "react-i18next";
+import "../../../../translations/i18n";
 import "./TradePriceBtcTable.css";
 
 class TradePriceBtcTable extends React.Component {
     render() {
         return (
+            <Translation>
+            {(t, { i18n }) => (
             <>
                 <div className="trade_price_btc_table">
                     <table>
                         <thead>
                             <tr>
                                 <th>
-                                    Pair
+                                    {t('pair')}
                                 </th>
                                 <th>
-                                    Price
+                                    {t('price')}
                                 </th>
                                 <th>
-                                    Change
+                                    {t('change')}
                                 </th>
                             </tr>
                         </thead>
@@ -63,6 +67,8 @@ class TradePriceBtcTable extends React.Component {
                     </table>
                 </div>
             </>
+            )}
+        </Translation>
         );
     }
 }

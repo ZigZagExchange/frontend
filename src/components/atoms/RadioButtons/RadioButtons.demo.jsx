@@ -1,10 +1,13 @@
 import React, {useState} from "react";
+import { useTranslation } from "react-i18next";
+import "../../../translations/i18n";
 import RadioButtons from "./RadioButtons";
 import {x} from "@xstyled/styled-components"
 import {Button} from "../Form/Submit";
 
 const RadioButtonsDemo = () => {
   const [value, setValue] = useState("three")
+  const { t } = useTranslation();
 
   return <x.div>
     <x.div>
@@ -24,7 +27,7 @@ const RadioButtonsDemo = () => {
         />
       </x.div>
       <x.div col>
-        <Button variant={"secondary"} onClick={() => setValue(value === "three" ? "four" : "three")}>Change Controlled</Button>
+        <Button variant={"secondary"} onClick={() => setValue(value === "three" ? "four" : "three")}>{t("change_controlled")}</Button>
       </x.div>
     </x.div>
   </x.div>

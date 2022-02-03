@@ -1,4 +1,6 @@
 import React from 'react'
+import { useTranslation } from "react-i18next";
+import "../../../../translations/i18n";
 import { useSelector, useDispatch } from 'react-redux'
 import { bridgeReceiptsSelector, clearBridgeReceipts } from 'lib/store/features/api/apiSlice'
 import { formatDistance } from 'date-fns'
@@ -6,14 +8,15 @@ import { formatDistance } from 'date-fns'
 const BridgeReceipts = () => {
     const receipts = useSelector(bridgeReceiptsSelector)
     const dispatch = useDispatch()
+    const { t } = useTranslation();
     return (
         <div className="bridge_box bridge_box_receipts">
             <h6 className="bridge_box_receipt_head">
-                {receipts.length} receipts
-                {' '}(<span onClick={() => dispatch(clearBridgeReceipts())} className="bridge_link">Clear All</span>)
+                {receipts.length} {t("receipts")}
+                {' '}(<span onClick={() => dispatch(clearBridgeReceipts())} className="bridge_link">{t("clear_all")}</span>)
             </h6>
             <div className="bridge_box_transactions">
-                {receipts.length === 0 && <h5 style={{ padding: 26 }}>No bridge receipts yet.</h5>}
+                {receipts.length === 0 && <h5 style={{ padding: 26 }}>{t("no_bridge_receipts_yet")}</h5>}
                 {receipts.map((r) => (
                     <div onClick={() => window.open(r.txUrl)} key={r.txId} className="bridge_box_transaction">
                         <div className="bridge_contain">

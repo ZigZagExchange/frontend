@@ -1,6 +1,8 @@
 import React, { useCallback } from "react";
 import styled from "@xstyled/styled-components";
 import BridgeCurrencySelector from "../BridgeCurrencySelector/BridgeCurrencySelector";
+import { Translation } from "react-i18next";
+import "../../../../translations/i18n";
 
 const BridgeInputBox = styled.div`
   display: flex;
@@ -53,7 +55,6 @@ const BridgeInputBox = styled.div`
 const BridgeSwapInput = ({ value = {}, onChange, bridgeFee, currencies, balances = {}, className }) => {
   const setCurrency = useCallback(currency => onChange({ currency, amount: '' }), [onChange])
   const setAmount = useCallback(e => onChange({ amount: e.target.value.replace(/[^0-9.]/g,'') }), [onChange])
-  
   let maxBalance = parseFloat((balances[value.currency] && balances[value.currency].valueReadable) || 0)
   maxBalance -= parseFloat(bridgeFee)
 
@@ -64,15 +65,19 @@ const BridgeSwapInput = ({ value = {}, onChange, bridgeFee, currencies, balances
   }
 
   return (
+    <Translation>
+    {(t, { i18n }) => (
     <BridgeInputBox>
       <div className="currencySelector">
         <BridgeCurrencySelector currencies={currencies} balances={balances} onChange={setCurrency} value={value.currency} />
       </div>
       <input onChange={setAmount} value={value.amount} className={className} placeholder="0.00" type="text" />
       <a className="maxLink" href="#max" onClick={setMax}>
-        Max
+        {t('max')}
       </a>
     </BridgeInputBox>
+    )}
+    </Translation>
   );
 };
 

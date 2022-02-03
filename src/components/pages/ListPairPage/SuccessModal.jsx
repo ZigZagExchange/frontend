@@ -1,4 +1,6 @@
 import React, {useEffect, useState} from "react";
+import { useTranslation } from "react-i18next";
+import "../../../translations/i18n";
 import {Modal} from "../../atoms/Modal";
 import {x} from "@xstyled/styled-components"
 import {BsFillCheckCircleFill} from "react-icons/all";
@@ -45,6 +47,7 @@ const SuccessModal = ({txid, show, onClose}) => {
   const [baseAsset, setBaseAsset] = useState()
   const [quoteAsset, setQuoteAsset] = useState()
   const [alias, setAlias] = useState()
+  const { t } = useTranslation();
 
   const viewMarketURL = `https://zigzag-markets.herokuapp.com/markets?id=${txid}`
 
@@ -67,11 +70,11 @@ const SuccessModal = ({txid, show, onClose}) => {
       <BsFillCheckCircleFill size={55} color={"teal-200"}/>
       <x.div mb={3} display={"flex"} justifyContent={"center"} alignItems={"center"} flexDirection={"column"}>
         <x.div fontSize={32}>
-          Market Listed
+          {t("market_listed")}
         </x.div>
         {alias
           ? <x.div fontSize={18} color={"blue-gray-500"}>
-            {alias} on {pairNetwork}
+            {alias} {t("on")} {pairNetwork}
           </x.div>
           : <Loader
           type={"TailSpin"}
@@ -82,18 +85,18 @@ const SuccessModal = ({txid, show, onClose}) => {
       </x.div>
     </x.div>
     <x.div w={"full"} display={"flex"} flexDirection={"column"} alignItems={"center"} mb={6} fontSize={14}>
-      <ExternalLink href={viewMarketURL}>View your market</ExternalLink>
+      <ExternalLink href={viewMarketURL}>{t("view_your_market")}</ExternalLink>
       <StyledLink
         to={{
           pathname: '/',
           search: `?${marketQueryParam}=${baseAsset}-${quoteAsset}&${networkQueryParam}=${pairNetwork}`
         }}
       >
-        Trade your market
+        {t("trade_your_market")}
       </StyledLink>
     </x.div>
     <x.div fontSize={12} textAlign={"center"} color={"blue-gray-600"} mb={3}>
-      arweave tx: {txid}
+      {t("arweave_tx")}: {txid}
     </x.div>
   </Modal>
 }

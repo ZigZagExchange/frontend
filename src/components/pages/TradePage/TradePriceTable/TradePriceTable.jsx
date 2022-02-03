@@ -1,4 +1,6 @@
 import React, { useEffect } from "react";
+import { Translation } from 'react-i18next';
+import "../../../../translations/i18n";
 import { useSelector } from "react-redux";
 // css
 import "./TradePriceTable.css";
@@ -27,13 +29,15 @@ const TradePriceTable = (props) => {
     else onClickRow = () => null;
 
     return (
+      <Translation>
+      {(t, { i18n }) => (
       <>
         <table className={`trade_price_table ${props.className}`}>
           <thead>
             <tr>
-              <th>Price</th>
-              <th>Amount</th>
-              <th>Total ({marketInfo && marketInfo.quoteAsset.symbol})</th>
+              <th>{t('price')}</th>
+              <th>{t('amount')}</th>
+              <th>{t('market')}({marketInfo && marketInfo.quoteAsset.symbol})</th>
             </tr>
           </thead>
           <tbody>
@@ -63,7 +67,9 @@ const TradePriceTable = (props) => {
             })}
           </tbody>
         </table>
-      </>
+        </>
+        )}
+        </Translation>
     );
 }
 

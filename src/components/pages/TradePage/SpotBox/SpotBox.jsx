@@ -1,4 +1,7 @@
 import React from "react";
+import { Translation } from "react-i18next";
+import "../../../../translations/i18n";
+
 //import { toast } from "react-toastify";
 // css
 import "./SpotBox.css";
@@ -26,22 +29,27 @@ class SpotBox extends React.Component {
   render() {
       const marketInfo = this.props.marketInfo;
       return (
-        <>
+        <Translation>
+           {(t, { i18n }) => (
           <div className="spot_box">
             <div className="spot_head">
               <div className="sh_l">
-                <h2>SPOT</h2>
+                <h2>{t('spot_c')}</h2>
               </div>
               <div className="sh_r">
-                 Sell Fee: {marketInfo && marketInfo.baseFee} {marketInfo && marketInfo.baseAsset.symbol}
+                {t('sell_fee')}: {marketInfo && marketInfo.baseFee} {marketInfo && marketInfo.baseAsset.symbol}
                  <br/>
-                 Buy Fee: {marketInfo && marketInfo.quoteFee} {marketInfo && marketInfo.quoteAsset.symbol}
+                 {t('buy_fee')}: {marketInfo && marketInfo.quoteFee} {marketInfo && marketInfo.quoteAsset.symbol}
               </div>
             </div>
             <div className="spot_tabs">
               <div className="st_l">
-                <h2 className={this.orderTypeTabClassName("limit")} onClick={() => this.updateOrderType("limit")}>Limit</h2>
-                <h2 className={this.orderTypeTabClassName("market")} onClick={() => this.updateOrderType("market")}>Market</h2>
+                <h2 className={this.orderTypeTabClassName("limit")} onClick={() => this.updateOrderType("limit")}>
+                  {t('limit')}
+                </h2>
+                <h2 className={this.orderTypeTabClassName("market")} onClick={() => this.updateOrderType("market")}>
+                  {t('market')}
+                </h2>
               </div>
             </div>
             <div className="spot_bottom">
@@ -67,7 +75,8 @@ class SpotBox extends React.Component {
               />
             </div>
           </div>
-        </>
+          )}
+        </Translation>
       );
   }
 
