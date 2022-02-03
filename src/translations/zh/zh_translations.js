@@ -103,8 +103,8 @@ export const ZH_TRANSLATIONS_ZH = {
     connected_as: "连接为",
     disconnected: "断开连接",
     disconnect: "断开",
-    fast_receive_bridge: "Fast: receive ETH and FRAX within a few minutes through ZigZag Fast Withdrawal bridge.", // todo
-    normal_receive_bridge: "Normal: use zkSync bridge and receive funds after a few hours.", // todo
+    fast_receive_bridge: "快速：通过 ZigZag 快速取款区块链桥在几分钟内收到 ETH 和 FRAX.",
+    normal_receive_bridge: "使用 zkSync 桥并在几个小时后收到资金。",
     learn_more: "学习更多",
 
     // FormDemo
