@@ -1,3 +1,7 @@
+.trade_price_btc_table table{
+    width: 100%;
+}
+
 .trade_price_btc_table {
   height: calc(100vh - 499px);
   min-height: 200px;

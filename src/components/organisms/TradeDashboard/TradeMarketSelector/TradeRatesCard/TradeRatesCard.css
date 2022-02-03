@@ -1,7 +1,4 @@
 /* tl_rates */
-.tl_rates .hide_mobile{
-    display: none;
-}
 .tl_rates {
     width: 100%;
     display: flex;
@@ -53,11 +50,21 @@
 .rb_text_4 p {
     color: white;
 }
+@media screen and (max-width: 991px) {
+    .tl_rates .hide_sm{
+        display: none;
+    }
+}
 
 @media screen and (max-width: 1348px) {
     .trade_left {
         overflow: auto;
     }
+
+    .tl_rates .hide_md{
+        display: none;
+    }
+    
     .trade_left::-webkit-scrollbar {
         width: 5px;
         height: 5px;
