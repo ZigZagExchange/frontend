@@ -230,23 +230,28 @@ export const apiSlice = createSlice({
         </a>
       }
 
-      toast.success(
-        <>
+      const renderToastContent = () => {
+        return <>
           Successfully
           {' '}{type === 'deposit' ? 'deposited' : 'withdrew'}
           {' '}{amount} {token}
           {' '}{type === 'deposit' ? 'in your zkSync wallet' : `into your Ethereum wallet. ${isFastWithdraw ? 'Fast withdrawals should be confirmed within a few minutes' : 'Withdraws can take up to 7 hours to complete'}`}.
           <br /><br />
           <a href={txUrl}
-            style={{ color: 'white', textDecoration: 'underline', fontWeight: 'bold' }}
-            target="_blank"
-            rel="noreferrer">
-              View transaction
+             style={{ color: 'white', textDecoration: 'underline', fontWeight: 'bold' }}
+             target="_blank"
+             rel="noreferrer">
+            View transaction
           </a>{' • '}
 
           {!isFastWithdraw && renderBridgeLink("Bridge FAQ","https://zksync.io/faq/faq.html#how-long-are-withdrawal-times")}
           {isFastWithdraw && renderBridgeLink("Fast Bridge FAQ", "https://docs.zigzag.exchange/zksync/fast-withdraw-bridge")}
         </>
+      }
+
+      toast.success(
+        renderToastContent(),
+        {closeOnClick: false}
       )
 
       state.bridgeReceipts.unshift(payload)
