@@ -70,7 +70,7 @@ const Bridge = () => {
 
   useEffect(() => {
     setSwapDetails({})
-    if (withdrawSpeed === "slow") {
+    if (withdrawSpeed === "normal") {
       setZigZagFee(null)
     }
   }, [withdrawSpeed])
@@ -288,7 +288,7 @@ const Bridge = () => {
                   value={withdrawSpeed}
                   onChange={setWithdrawSpeed}
                   name={"withdrawSpeed"}
-                  items={[{id: "fast", name: "Fast"}, {id: "slow", name: "Slow"}]}
+                  items={[{id: "fast", name: "Fast"}, {id: "normal", name: "Normal"}]}
                 />
               <x.div display={"flex"} mt={2}>
                 <x.div fontSize={12} color={"blue-gray-500"}>{t("withdraw_speed")}</x.div>
@@ -371,7 +371,12 @@ const FastWithdrawTooltip = () => {
   const { t } = useTranslation();
   const renderLabel = () => {
     return <x.div>
-      <x.div>{t("utilize_our_fast_withdrawal_bridge")}</x.div>
+      <x.div mb={2}>
+        Fast: receive ETH and FRAX within a few minutes through ZigZag Fast Withdrawal bridge.
+      </x.div>
+      <x.div mb={2}>
+        Normal: use zkSync bridge and receive funds after a few hours.
+      </x.div>
       <x.div><ExternalLink href={"https://docs.zigzag.exchange/zksync/fast-withdraw-bridge"}>
       {t("learn_more")} <HiExternalLink />
       </ExternalLink></x.div>
@@ -381,7 +386,7 @@ const FastWithdrawTooltip = () => {
   return <>
     <Tooltip placement={"right"} label={renderLabel()}>
       <x.div display={"inline-flex"} color={"blue-gray-600"} ml={2} alignItems={"center"}>
-        <AiOutlineQuestionCircle size={14}/>
+        <AiOutlineQuestionCircle size={16}/>
       </x.div>
     </Tooltip>
   </>
