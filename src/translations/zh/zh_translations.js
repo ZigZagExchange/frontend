@@ -142,6 +142,20 @@ export const ZH_TRANSLATIONS_ZH = {
     view_your_market: "查看您的市场",
     trade_your_market: "交易你的市场",
     arwaeve_tx: "Arweave 交易",
+    zksync_token_id_of_the_first: "配对中出现的第一个资产的 zkSync 代币 ID", // review
+    zksync_token_id_of_the_second: "对中出现的第二个资产的 zkSync 代币 ID", 
+    swap_fee_collected_by_market_makers: "做市商收取的掉期费",
+    swap_fee: "兑换费",
+    base_swap_fee: "基础兑换费",
+    quote_swap_fee: "报价交换费",
+    number_of_decimals: "资产对价格的小数位数",
+    zksync_network_on_which_pair_will_be_listed: "将在其中列出该对的 zkSync 网络",
+    base_asset: "基础资产 ",
+    quote_asset: "报价资产 ",
+    internal_id: "内部标识 ",
+    advanced_settings: "高级设置",
+    default_tradingview_chart_on_tradepage: "交易页面上显示的默认 TradingView 图表",
+    default_chart_ticker: "默认图表标签", // end review
 
     // Pool
     withdraw_token: "提取代币",

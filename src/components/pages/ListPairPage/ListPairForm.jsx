@@ -111,6 +111,7 @@ const ListPairForm = ({
   }, [quoteAssetId, zigZagChainId])
 
   return <x.div>
+
     <PairPreview
       baseAssetId={baseAssetId}
       quoteAssetId={quoteAssetId}
@@ -129,39 +130,41 @@ const ListPairForm = ({
       }}
       onSubmit={onSubmit}
     >
+      <Translation>
+      {(t, { i18n }) => (
       <x.div display={"grid"} gridTemplateColumns={2} rowGap={5} columnGap={6} mb={5}>
         <NumberInput
           block
           {...model(baseAssetId, setBaseAssetId)}
-          label={<x.span>Base Asset <x.a color={{_: "blue-gray-500", hover: "teal-200"}} target={"_blank"} href={zigZagChainId === 1 ? "https://zkscan.io/explorer/tokens" : "https://rinkeby.zkscan.io/explorer/tokens"}>Internal ID</x.a></x.span>}
+          label={<x.span>{t('base_asset')}<x.a color={{_: "blue-gray-500", hover: "teal-200"}} target={"_blank"} href={zigZagChainId === 1 ? "https://zkscan.io/explorer/tokens" : "https://rinkeby.zkscan.io/explorer/tokens"}>{t('internal_id')}</x.a></x.span>}
           name={"baseAssetId"}
           validate={[
             required,
             min(0),
             forceValidation(isBaseAssetIdInvalid, "invalid asset on zksync")
           ]}
-          rightOfLabel={<TooltipHelper>zkSync token ID of the first asset appearing in the pair (BASE/QUOTE)</TooltipHelper>}
+          rightOfLabel={<TooltipHelper>{t('zksync_token_id_of_the_first')} (BASE/QUOTE)</TooltipHelper>}
         />
         <NumberInput
           block
           {...model(quoteAssetId, setQuoteAssetId)}
-          label={<x.span>Quote Asset <x.a color={{_: "blue-gray-500", hover: "teal-200"}} target={"_blank"} href={zigZagChainId === 1 ? "https://zkscan.io/explorer/tokens" : "https://rinkeby.zkscan.io/explorer/tokens"}>Internal ID</x.a></x.span>}
+          label={<x.span>{t('quote_asset')} <x.a color={{_: "blue-gray-500", hover: "teal-200"}} target={"_blank"} href={zigZagChainId === 1 ? "https://zkscan.io/explorer/tokens" : "https://rinkeby.zkscan.io/explorer/tokens"}>{t('internal_id')}</x.a></x.span>}
           name={"quoteAssetId"}
           validate={[
             required,
             min(0),
             forceValidation(isQuoteAssetIdInvalid, "invalid asset on zksync")
           ]}
-          rightOfLabel={<TooltipHelper>zkSync token ID of the second asset appearing in the pair (BASE/QUOTE)</TooltipHelper>}
+          rightOfLabel={<TooltipHelper>{t('zk_sync_token_id_of_the_second')} (BASE/QUOTE)</TooltipHelper>}
         />
         <x.div display={"flex"} flexDirection={"column"}>
           <NumberInput
             block
             name={"baseFee"}
             {...model(baseFee, setBaseFee)}
-            label={baseSymbol ? `${baseSymbol} Swap Fee` : "Base Swap Fee"}
+            label={baseSymbol ? `${baseSymbol} Swap Fee` : t('base_swap_fee')}
             validate={[required, min(0)]}
-            rightOfLabel={<TooltipHelper>Swap fee collected by market makers</TooltipHelper>}
+            rightOfLabel={<TooltipHelper>{t('swap_fee_collected_by_market_makers')}</TooltipHelper>}
           />
           {renderFeeHint(basePrice, baseFee, baseSymbol, setBaseFee)}
         </x.div>
@@ -170,9 +173,9 @@ const ListPairForm = ({
             block
             name={"quoteFee"}
             {...model(quoteFee, setQuoteFee)}
-            label={quoteSymbol ? `${quoteSymbol} Swap Fee` : "Quote Swap Fee"}
+            label={quoteSymbol ? `${quoteSymbol} Swap Fee` : t('quote_swap_fee')}
             validate={[required, min(0)]}
-            rightOfLabel={<TooltipHelper>Swap fee collected by market makers</TooltipHelper>}
+            rightOfLabel={<TooltipHelper>{t('swap_fee_collected_by_market_makers')}</TooltipHelper>}
           />
           {renderFeeHint(quotePrice, quoteFee, quoteSymbol, setQuoteFee)}
         </x.div>
@@ -183,7 +186,7 @@ const ListPairForm = ({
           validate={[required, max(10), min(0)]}
           rightOfLabel={<TooltipHelper>
             <x.div>
-              Number of decimal places in the price of the asset pair.
+              {t('number_of_decimals')}
             </x.div>
 
             <x.div display={"grid"} gridTemplateColumns={2} mt={2} gap={0}>
@@ -200,13 +203,17 @@ const ListPairForm = ({
           label={"Network"}
           items={[{name: "zkSync - Mainnet", id: 1}, {name: "zkSync - Rinkeby", id: 1000}]}
           validate={required}
-          rightOfLabel={<TooltipHelper>zkSync network on which the pair will be listed</TooltipHelper>}
+          rightOfLabel={<TooltipHelper>{t('zksync_network_on_which_pair_will_be_listed')}</TooltipHelper>}
         />
       </x.div>
+          )}
+        </Translation>
 
+      <Translation>
+      {(t, { i18n }) => (
       <x.div mb={4}>
         <x.div display={"flex"} alignItems={"center"} justifyContent={"flex-end"}>
-          <x.div fontSize={12} mr={2} color={"blue-gray-400"}>advanced settings</x.div>
+          <x.div fontSize={12} mr={2} color={"blue-gray-400"}>{t('advanced_settings')}</x.div>
           <Button
             size={"xs"}
             variant={"secondary"}
@@ -218,10 +225,10 @@ const ListPairForm = ({
             <TextInput
               block
               name={TRADING_VIEW_CHART_KEY}
-              label={"Default Chart Ticker"}
+              label={t('default_chart_ticker')}
               rightOfLabel={<TooltipHelper>
                 <x.div>
-                  Default TradingView chart to be seen on the trade page
+                  {t('default_tradingview_chart_on_tradepage')}
                 </x.div>
                 <x.div mt={2}>
                   (ex: show COINBASE:BTCUSD for WBTC-USD)
@@ -231,6 +238,8 @@ const ListPairForm = ({
           </x.div>
         </>}
       </x.div>
+      )}
+        </Translation>
       {children}
     </Form>
   </x.div>
