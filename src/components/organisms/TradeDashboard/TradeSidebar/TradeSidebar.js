@@ -15,6 +15,7 @@ export default function TradeSidebar(props) {
             <TradePriceBtcTable
                 rowData={props.lastPriceTableData}
                 updateMarketChain={props.updateMarketChain}
+                markets={props.markets}
                 currentMarket={props.currentMarket}
             />
             <div style={{flex: 1}}>
