@@ -28,7 +28,7 @@ class TradePriceBtcTable extends React.Component {
 
             //if found query, push it to found pairs
             if(pair_name.includes(value.toUpperCase())){
-                console.log(row);
+                //console.log(row);
                 foundPairs.push(row);
             }
         });

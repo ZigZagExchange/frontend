@@ -6,12 +6,9 @@ export default function SearchBox(props){
 
 
     function handleChange (e) {
-      console.log('handle change called', e.target.value)
-
-      setSearch(e.target.value);
-      //do search
-      props.searchPair(e.target.value);
-
+        //do search
+        setSearch(e.target.value);
+        props.searchPair(e.target.value);
     }
 
     return (
