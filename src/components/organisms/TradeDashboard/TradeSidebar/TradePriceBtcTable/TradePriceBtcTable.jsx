@@ -51,16 +51,20 @@ class TradePriceBtcTable extends React.Component {
             switch (category_name){
                 case "ETH":
                     this.searchPair("ETH");
+                    break;
                 case "WBTC":
                     this.searchPair("BTC");
+                    break;
                 case "STABLES":
                     var foundPairs = getStables(this.props.rowData);
                     console.log(foundPairs);
                     this.setState({
                         foundPairs: foundPairs
                     });
+                    break;
                 case "FAVOURITES":
                     console.log("unsupported")
+                    break;
                 default:
                     console.log("unsupported")            
             }
