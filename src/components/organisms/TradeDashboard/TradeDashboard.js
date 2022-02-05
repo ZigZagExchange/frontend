@@ -284,6 +284,7 @@ export function TradeDashboard() {
                 <TradeSidebar 
                     lastPriceTableData={lastPriceTableData}
                     updateMarketChain={updateMarketChain}
+                    markets={markets}
                     currentMarket={currentMarket}
                     lastPrice={marketSummary.price}
                     user={user}
