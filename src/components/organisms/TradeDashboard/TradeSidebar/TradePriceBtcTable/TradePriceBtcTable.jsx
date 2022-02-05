@@ -110,7 +110,7 @@ class TradePriceBtcTable extends React.Component {
                 />
                 <div className="trade_price_btc_table">
 
-                    { this.state.foundPairs.length != 0 ? ( 
+                    { this.state.foundPairs.length !== 0 ? ( 
                             this.renderPairs(this.state.foundPairs)
                     ) : ( 
                             this.renderPairs(this.props.rowData)
