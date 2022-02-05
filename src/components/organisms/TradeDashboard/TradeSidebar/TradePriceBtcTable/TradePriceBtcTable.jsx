@@ -1,6 +1,4 @@
 import React from "react";
-import { BsBookmarkStar } from "react-icons/bs";
-import CategorizeBox from "../CategorizeBox/CategorizeBox";
 import SearchBox from "../SearchBox/SearchBox";
 
 import "./TradePriceBtcTable.css";
