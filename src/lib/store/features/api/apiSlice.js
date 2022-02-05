@@ -24,7 +24,7 @@ export const apiSlice = createSlice({
   },
   reducers: {
     _marketinfo(state, { payload }) {
-        console.log("marketinfo payload: ", payload);
+        ///console.log("marketinfo payload: ", payload);
         state.marketinfo = payload[0];
     },
     _fills(state, { payload }) {
@@ -73,7 +73,7 @@ export const apiSlice = createSlice({
         baseVolume: payload[5],
         quoteVolume: payload[6],
 
-        category: "ETH"
+        category: "ETH" //somehow categories need to be added here, hardcoded for now
       }
     },
     _lastprice(state, { payload }) {
