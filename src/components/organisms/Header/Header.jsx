@@ -107,6 +107,11 @@ export const Header = (props) => {
                       DSL
                     </NavLink>
                   </li>
+                  <li>
+                    <NavLink exact to="/swap" activeClassName="active-link">
+                      Swap
+                    </NavLink>
+                  </li>
                 </Dev>
               </ul>
             </div>
@@ -178,6 +183,11 @@ export const Header = (props) => {
                 <li>
                   <NavLink exact to="/dsl" activeClassName="active_link">
                     DSL
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink exact to="/swap" activeClassName="active-link">
+                    Swap
                   </NavLink>
                 </li>
               </Dev>

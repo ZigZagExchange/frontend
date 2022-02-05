@@ -5,6 +5,7 @@
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -49,6 +50,29 @@
   background: rgba(0, 0, 0, 0.3);
   border-radius: 0 0 6px 6px;
   font-size: 0.8rem;
+  max-height: 400px;
+  overflow: auto;
+}
+
+.zig_modal_body::-webkit-scrollbar {
+  width: 5px;
+  position: relative;
+  z-index: 20;
+}
+
+.zig_modal_body::-webkit-scrollbar-track {
+  border-radius: 0px;
+  background: hsla(0, 0%, 100%, 0.15);
+  height: 23px;
+}
+
+.zig_modal_body::-webkit-scrollbar-thumb {
+  border-radius: 0px;
+  background: hsla(0, 0%, 100%, 0.4);
+}
+
+.zig_modal_body::-webkit-scrollbar-thumb:window-inactive {
+  background: #fff;
 }
 
 .zig_modal_title {

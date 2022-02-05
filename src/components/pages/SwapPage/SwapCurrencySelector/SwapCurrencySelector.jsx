@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { networkSelector } from "lib/store/features/api/apiSlice";
 import { userSelector } from "lib/store/features/auth/authSlice";
-import styled from "@xstyled/styled-components";
+import styled, { css } from "@xstyled/styled-components";
 import { FiChevronDown } from 'react-icons/fi';
-import { useCoinEstimator, Modal } from "components";
+import { useCoinEstimator } from "components";
 import { formatUSD } from "lib/utils";
 import api from "lib/api";
 
-const StyledBridgeCurrencySelector = styled.div`
+const StyledSwapCurrencySelector = styled.div`
   height: 46px;
   padding: 0 10px;
   background: #fff;
@@ -33,7 +33,7 @@ const StyledBridgeCurrencySelector = styled.div`
   }
 `;
 
-const BridgeCurrencyWrapper = styled.div`
+const SwapCurrencyWrapper = styled.div`
   position: relative;
 
   .currencyIcon > img {
@@ -56,19 +56,27 @@ const BridgeCurrencyWrapper = styled.div`
   }
 `
 
-const BridgeCurrencyOptions = styled.ul`
-  width: 100%;
-  overflow: auto;
+const SwapCurrencyOptions = styled.ul`
+  position: absolute;
+  top: 120%;
+  left: 0;
+  z-index: 2;
+  width: 260px;
+  box-shadow: 0 2px 7px 3px rgba(0, 0, 0, 0.2);
+  background: #fff;
   padding: 0;
-  font-size: 16px;
-  
-  & img{
-    width: 28px;
-    height: 28px;
-    object-fit: contain;
-    margin-right: 13px;
-  }
+  list-style-type: none;
+  border-radius: 15px;
+  opacity: 0;
+  pointer-events: none;
+  transform: rotate(180deg) translateY(20px);
+  cursor: pointer;
 
+  ${p => p.show && css`
+    opacity: 1;
+    pointer-events: all;
+    transform: rotate(0deg) translateY(0);
+  `}
 
   .currencyBalance {
     line-height: 1.1;
@@ -80,7 +88,7 @@ const BridgeCurrencyOptions = styled.ul`
       font-weight: 600;
       font-family: 'Iceland', sans-serif;
       font-size: 18px;
-      color: #69f;
+      color: #226;
     }
 
     small {
@@ -93,18 +101,28 @@ const BridgeCurrencyOptions = styled.ul`
     padding: 13px;
     flex-direction: row;
     align-items: center;
-    background: rgba(0,0,0,0.2);
-    border-radius: 10px;
-    margin-bottom: 10px;
+
+    &:first-child {
+      border-top-left-radius: 15px;
+      border-top-right-radius: 15px;
+    }
+
+    &:last-child {
+      border-bottom-left-radius: 15px;
+      border-bottom-right-radius: 15px;
+    }
 
     &:hover {
-      background: rgba(0,0,0,0.3);
+      background: #eee;
+    }
+
+    &:active, &:focus {
+      background: #def;
     }
   }
 `
 
-const BridgeCurrencySelector = ({ onChange, currencies, balances = {}, value }) => {
-  const [show, setShow] = useState(false);
+const SwapCurrencySelector = ({ onChange, currencies, balances = {}, value }) => {
   const [showingOptions, setShowingOptions] = useState(false);
   const network = useSelector(networkSelector);
   const user = useSelector(userSelector);
@@ -118,6 +136,12 @@ const BridgeCurrencySelector = ({ onChange, currencies, balances = {}, value }) 
   const hideOptions = (e) => {
     if (e) e.preventDefault()
     setShowingOptions(false);
+  }
+
+  const toggleOptions = (e) => {
+    if (e) e.preventDefault()
+    e.stopPropagation()
+    setShowingOptions(!showingOptions)
   }
 
   useEffect(() => {
@@ -143,8 +167,8 @@ const BridgeCurrencySelector = ({ onChange, currencies, balances = {}, value }) 
   }
 
   return (
-    <BridgeCurrencyWrapper>
-      <StyledBridgeCurrencySelector onClick={() => setShow(true)}>
+    <SwapCurrencyWrapper>
+      <StyledSwapCurrencySelector onClick={toggleOptions}>
         <div className="currencyIcon">
           <img src={image && image.default} alt={currency && currency.symbol} />
         </div>
@@ -152,9 +176,8 @@ const BridgeCurrencySelector = ({ onChange, currencies, balances = {}, value }) 
           {value}
           <FiChevronDown />
         </div>
-      </StyledBridgeCurrencySelector>
-      <Modal title="Select a token to Bridge" onClose={() => setShow(false)} show={show}>
-      <BridgeCurrencyOptions onClick={() => setShow(false)}>
+      </StyledSwapCurrencySelector>
+      <SwapCurrencyOptions onClick={hideOptions} show={showingOptions}>
         {tickers.map((ticker, key) => (
           ticker === value ? null :
           <li key={key} onClick={selectOption(ticker)} tabIndex="0" className="currencyOption">
@@ -171,10 +194,9 @@ const BridgeCurrencySelector = ({ onChange, currencies, balances = {}, value }) 
               </div>)}
           </li>
         ))}
-      </BridgeCurrencyOptions>
-      </Modal>
-    </BridgeCurrencyWrapper>
+      </SwapCurrencyOptions>
+    </SwapCurrencyWrapper>
   );
 };
 
-export default BridgeCurrencySelector;
+export default SwapCurrencySelector;
