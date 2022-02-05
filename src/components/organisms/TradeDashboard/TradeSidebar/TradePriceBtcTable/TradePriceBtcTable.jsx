@@ -48,25 +48,21 @@ class TradePriceBtcTable extends React.Component {
         this.props.rowData.forEach(row => {
             var pair_category = row.td1;
 
-            //search for eth
-            if(category_name == "ETH"){
-                this.searchPair("ETH");
-            }
-            //search for BTC
-            if(category_name == "WBTC"){
-                this.searchPair("BTC");
-            }
-            //search for stablecoins only
-            if(category_name == "STABLE"){
-                var foundPairs = getStables(this.props.rowData);
-                console.log(foundPairs);
-                this.setState({
-                    foundPairs: foundPairs
-                });
-            }
-            if(category_name == "FAVOURITES"){
-                console.log("unsupported")
-
+            switch (category_name){
+                case "ETH":
+                    this.searchPair("ETH");
+                case "WBTC":
+                    this.searchPair("BTC");
+                case "STABLES":
+                    var foundPairs = getStables(this.props.rowData);
+                    console.log(foundPairs);
+                    this.setState({
+                        foundPairs: foundPairs
+                    });
+                case "FAVOURITES":
+                    console.log("unsupported")
+                default:
+                    console.log("unsupported")            
             }
         });
 
