@@ -1,8 +1,12 @@
 import React from "react";
-import SearchBox from "../SearchBox/SearchBox";
 
 import "./TradePriceBtcTable.css";
 
+import CategorizeBox from "../CategorizeBox/CategorizeBox";
+import SearchBox from "../SearchBox/SearchBox";
+
+import {fetchFavourites} from '../../../../../lib/helpers/storage/favourites'
+import {getStables} from '../../../../../lib/helpers/categories/index.js'
 class TradePriceBtcTable extends React.Component {
 
     constructor(props){
@@ -15,6 +19,7 @@ class TradePriceBtcTable extends React.Component {
         }
 
         this.searchPair = this.searchPair.bind(this);
+        this.categorizePairs = this.categorizePairs.bind(this);
         this.renderPairs = this.renderPairs.bind(this);
     }
 
@@ -38,8 +43,49 @@ class TradePriceBtcTable extends React.Component {
 
     }
 
+    categorizePairs(category_name){
+
+        this.props.rowData.forEach(row => {
+            var pair_category = row.td1;
+            console.log("category:",  pair_category)
+
+
+            //search for eth
+            if(category_name == "ETH"){
+                this.searchPair("ETH");
+            }
+            if(category_name == "WBTC"){
+                this.searchPair("BTC");
+            }
+            if(category_name == "STABLE"){
+                console.log("unsupported")
+                var foundPairs = getStables(this.props.rowData);
+                console.log(foundPairs);
+                this.setState({
+                    foundPairs: foundPairs
+                });
+            }
+            if(category_name == "FAVOURITES"){
+                console.log("unsupported")
+
+            }
+            /*
+            //if found query, push it to found pairs
+            if(pair_name.includes(value.toUpperCase())){
+                //console.log(row);
+                foundPairs.push(row);
+            }*/
+        });
+
+ 
+
+
+    }
+
     //render given pairs
     renderPairs(pairs){
+        //console.log(pairs);
+        //console.log("favourites:", fetchFavourites());
 
         const shown_pairs = pairs.map((d, i) => {
             return (
@@ -103,14 +149,20 @@ class TradePriceBtcTable extends React.Component {
     }
 
     render() {
+        
         return (
             <>
+                <CategorizeBox 
+                    categories={["ETH", "WBTC", "STABLE", "FAVOURITES"]}
+                    categorizePairs={this.categorizePairs}
+                    />
+
                 <SearchBox 
                     searchPair={this.searchPair}
                 />
                 <div className="trade_price_btc_table">
 
-                    { this.state.foundPairs.length != 0 ? ( 
+                    { this.state.foundPairs.length !== 0 ? ( 
                             this.renderPairs(this.state.foundPairs)
                     ) : ( 
                             this.renderPairs(this.props.rowData)

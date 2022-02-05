@@ -20,7 +20,7 @@ class TradeRatesCard extends React.Component {
             <>
                 <div className="tl_rates">
                     <div className="rates_box rb_text_1">
-                        <strong>{marketDisplay}</strong>
+                        <strong>{marketDisplay} AAAAA</strong>
                         <p>{marketInfo && marketInfo.baseAsset.symbol}</p>
                     </div>
                     <div className="rates_box rb_text_2">

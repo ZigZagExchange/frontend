@@ -44,6 +44,7 @@ class SpotBox extends React.Component {
                 <h2 className={this.orderTypeTabClassName("market")} onClick={() => this.updateOrderType("market")}>Market</h2>
               </div>
             </div>
+            
             <div className="spot_bottom">
             <Tabs>
               <div label="Buy">
@@ -72,6 +73,8 @@ class SpotBox extends React.Component {
               </div>
             </Tabs>
             </div>
+
+
           </div>
         </>
       );

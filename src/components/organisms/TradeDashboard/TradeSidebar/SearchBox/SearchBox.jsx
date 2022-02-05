@@ -13,7 +13,6 @@ export default function SearchBox(props){
 
     return (
         <>
-
             <div className="tl_head m-2">
                 <input placeholder="Search..."  type="text"
                     value={searchValue} 
