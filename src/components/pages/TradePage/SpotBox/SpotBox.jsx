@@ -1,10 +1,10 @@
 import React from "react";
-//import { toast } from "react-toastify";
-// css
 import "./SpotBox.css";
-// assets
 import { SpotForm } from "components";
-//import api from "lib/api";
+import {x} from "@xstyled/styled-components"
+import Tooltip from "../../../atoms/Tooltip/Tooltip";
+import {AiOutlineQuestionCircle} from "react-icons/all";
+import ExternalLink from "../../ListPairPage/ExternalLink";
 
 class SpotBox extends React.Component {
     constructor(props) {
@@ -32,11 +32,32 @@ class SpotBox extends React.Component {
               <div className="sh_l">
                 <h2>SPOT</h2>
               </div>
-              <div className="sh_r">
-                 Sell Fee: {marketInfo && marketInfo.baseFee} {marketInfo && marketInfo.baseAsset.symbol}
-                 <br/>
-                 Buy Fee: {marketInfo && marketInfo.quoteFee} {marketInfo && marketInfo.quoteAsset.symbol}
-              </div>
+              <x.div display={"flex"} alignItems={"center"} mt={3} mr={3}>
+                <x.div mr={3}>
+                  <Tooltip>
+                    <Tooltip placement={"right"} label={<x.div>
+                      zkSync's network swap fees hover around $1 and are covered by the market maker, but paid by the trader
+                    </x.div>}>
+                      <x.div display={"inline-flex"} color={"blue-gray-600"} ml={2} alignItems={"center"}>
+                        <AiOutlineQuestionCircle size={16}/>
+                      </x.div>
+                    </Tooltip>
+                  </Tooltip>
+                </x.div>
+                <x.div color={"white"}>
+                  <x.div textAlign={"right"}>
+                    Sell Fee: {marketInfo && marketInfo.baseFee} {marketInfo && marketInfo.baseAsset.symbol}
+                  </x.div>
+                  <x.div>
+                    <x.div>
+                      Fee to cover zkSync's network <ExternalLink href={"https://l2fees.info"}>swap fees</ExternalLink> (gas)
+                    </x.div>
+                    <x.div textAlign={"right"}>
+                      Buy Fee: {marketInfo && marketInfo.quoteFee} {marketInfo && marketInfo.quoteAsset.symbol}
+                    </x.div>
+                  </x.div>
+                </x.div>
+              </x.div>
             </div>
             <div className="spot_tabs">
               <div className="st_l">

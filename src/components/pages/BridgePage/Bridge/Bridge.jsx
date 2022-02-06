@@ -95,11 +95,15 @@ const Bridge = () => {
           setFormErr(`Must be more than ${activationFee} ${swapDetails.currency}`)
         } else if (input > (detailBalance - parseFloat(bridgeFee))) {
           setFormErr('Insufficient balance')
+        } else if (input - bridgeFee < 0) {
+          setFormErr("Amount too small")
         } else if (isFastWithdraw) {
           if (swapDetails.currency in fastWithdrawCurrencyMaxes) {
             const maxAmount = fastWithdrawCurrencyMaxes[swapDetails.currency]
             if (input > maxAmount) {
               setFormErr(`Max ${swapDetails.currency} liquidity for fast withdraw: ${maxAmount.toPrecision(4)}`)
+            } else if (input - (bridgeFee + zigZagFee) < 0) {
+              setFormErr("Amount too small")
             }
           }
         } else {
@@ -368,7 +372,7 @@ const FastWithdrawTooltip = () => {
   const renderLabel = () => {
     return <x.div>
       <x.div mb={2}>
-        Fast: receive ETH and FRAX within a few minutes through ZigZag Fast Withdrawal bridge.
+        Fast: receive ETH and FRAX within a few minutes through ZigZag's Fast Withdrawal bridge.
       </x.div>
       <x.div mb={2}>
         Normal: use zkSync bridge and receive funds after a few hours.
