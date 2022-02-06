@@ -91,7 +91,6 @@ export class SpotForm extends React.Component {
                 } else {
                     unfilled -= bids[i][2];
                 }
-                console.log(unfilled);
             }
         }
         if (!price) return 0;
@@ -233,12 +232,10 @@ export class SpotForm extends React.Component {
 
         if (this.props.orderType === "limit" && this.state.price) {
 
-            console.log("statePrice: ", this.state.price);
             return this.state.price;
         }
         else {
             var ladderPrice =  this.getLadderPrice();
-            console.log("ladderPrice: ", ladderPrice);
             return ladderPrice;
         }
     }
@@ -317,7 +314,6 @@ export class SpotForm extends React.Component {
 
         let price = this.currentPrice();
         if (price === 0) price = "";
-        console.log("price: ", price);
 
         let baseBalance, quoteBalance;
         if (this.props.user.id) {
@@ -353,8 +349,6 @@ export class SpotForm extends React.Component {
             buySellBtnClass = "bg_btn sell_btn";
             buttonText = "SELL";
         }
-
-      console.log(this.state.amount);
 
       return (
         <>
