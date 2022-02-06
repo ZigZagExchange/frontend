@@ -1,6 +1,6 @@
 import get from 'lodash/get'
 import * as zksync from 'zksync'
-import {BigNumber, ethers, utils} from 'ethers';
+import {ethers} from 'ethers';
 import { toast } from 'react-toastify'
 import { toBaseUnit } from 'lib/utils'
 import APIProvider from './APIProvider'
