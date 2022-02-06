@@ -138,7 +138,7 @@ export function TradeDashboard() {
       const price = lastPrices[market].price;
       const change = lastPrices[market].change;
       const pctchange = ((change / price) * 100).toFixed(2);
-      lastPriceTableData.push({ td1: market, td2: price, td3: pctchange });
+      lastPriceTableData.push({ td1: market, td2: price, td3: pctchange, category: 'ETH' });
     });
   
     const openOrdersData = [];
@@ -270,6 +270,8 @@ export function TradeDashboard() {
     const activeUserOrders = Object.values(userOrders).filter(
       (order) => activeOrderStatuses.includes(order[9])
     ).length;
+
+    //console.log("market: ", marketSummary);
     return (
         <TradeContainer>
             <TradeGrid>
