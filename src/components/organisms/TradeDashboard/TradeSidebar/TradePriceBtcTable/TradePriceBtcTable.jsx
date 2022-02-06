@@ -39,7 +39,6 @@ class TradePriceBtcTable extends React.Component {
 
             //if found query, push it to found pairs
             if(pair_name.includes(value.toUpperCase())){
-                //console.log(row);
                 foundPairs.push(row);
             }
         });
@@ -62,7 +61,6 @@ class TradePriceBtcTable extends React.Component {
                 case "STABLES":
                     //look for pairs against stables.
                     var foundPairs = getStables(this.props.rowData);
-                    console.log(foundPairs);
                     this.setState({
                         foundPairs: foundPairs
                     });
@@ -78,7 +76,6 @@ class TradePriceBtcTable extends React.Component {
                 
                             //if found query, push it to found pairs
                             if(pair_name.includes(value.toUpperCase())){
-                                //console.log(row);
                                 foundPairs.push(row);
                             }
                         });
@@ -101,7 +98,6 @@ class TradePriceBtcTable extends React.Component {
     }
 
     favouritePair(pair){
-        console.log(pair);
         var isFavourited = fetchFavourites().includes(pair.td1);
 
         if(!isFavourited){
@@ -113,8 +109,6 @@ class TradePriceBtcTable extends React.Component {
 
     //render given pairs
     renderPairs(pairs){
-        //console.log(pairs);
-        //console.log("favourites:", fetchFavourites());
 
         const shown_pairs = pairs.map((d, i) => {
             var selected = this.props.currentMarket === d.td1; //if current market selected

@@ -10,12 +10,10 @@ export function addFavourite(item){
 
     try {
         var favs_json = storage.getItem('favourites') || '[]';
-        console.log("add: ", favs_json);
         var favourites = JSON.parse(favs_json);
 
         if(!favourites.includes(item.td1)){
             favourites.push(item.td1);
-            console.log("favs: ", favourites);
 
             storage.setItem('favourites', JSON.stringify(favourites));    
         }
@@ -34,12 +32,10 @@ export function removeFavourite(item){
 
     try {
         var favs_json = storage.getItem('favourites') || '[]';
-        console.log("remove: ", favs_json);
         var favourites = JSON.parse(favs_json);
 
         if(favourites.includes(item.td1)){
             favourites.pop(item.td1);
-            console.log("favs: ", favourites);
 
             storage.setItem('favourites', JSON.stringify(favourites));    
         }
