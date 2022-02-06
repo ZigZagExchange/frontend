@@ -315,7 +315,7 @@ const Bridge = () => {
                 </div>
                 {zigZagFee && <>
                   <div>
-                    ZigZag Fee: {zigZagFee.toPrecision(4)} {swapDetails.currency}
+                    Bridge Fee: {zigZagFee.toPrecision(4)} {swapDetails.currency}
                   </div>
                   <x.div color={"blue-gray-300"}>
                     You'll receive: ~{Number(swapDetails.amount - zigZagFee).toPrecision(4)} {swapDetails.currency} on L1

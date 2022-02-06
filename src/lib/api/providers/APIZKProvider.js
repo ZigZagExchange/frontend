@@ -1,6 +1,6 @@
 import get from 'lodash/get'
 import * as zksync from 'zksync'
-import { ethers } from 'ethers';
+import {BigNumber, ethers, utils} from 'ethers';
 import { toast } from 'react-toastify'
 import { toBaseUnit } from 'lib/utils'
 import APIProvider from './APIProvider'
@@ -264,7 +264,7 @@ export default class APIZKProvider extends APIProvider {
         if (! this._tokenWithdrawFees[token]) {
             const fee = await this.syncProvider.getTransactionFee(
                 'Withdraw',
-                [this.syncWallet.address()],
+                this.syncWallet.address(),
                 token,
             )
 
@@ -272,6 +272,7 @@ export default class APIZKProvider extends APIProvider {
                 parseInt(fee.totalFee)
                 / 10 ** currencyInfo.decimals
             )
+            console.log(parseInt(fee.totalFee) / 10 ** currencyInfo.decimals)
         }
 
         return this._tokenWithdrawFees[token]
@@ -279,7 +280,7 @@ export default class APIZKProvider extends APIProvider {
 
     withdrawL2FeeFast = async (token) => {
       /*
-      * Returns the gas fee associated with an L2 Fast withdraw
+      * Returns the gas fee associated with an L2 Fast withdraw (just a transfer on zkSync)
       * */
       const currencyInfo = this.getCurrencyInfo(token)
       const fee = await this.syncProvider.getTransactionFee(

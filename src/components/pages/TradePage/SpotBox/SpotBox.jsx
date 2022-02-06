@@ -32,29 +32,36 @@ class SpotBox extends React.Component {
               <div className="sh_l">
                 <h2>SPOT</h2>
               </div>
-              <x.div display={"flex"} alignItems={"center"} mt={3} mr={3}>
-                <x.div mr={3}>
-                  <Tooltip>
-                    <Tooltip placement={"right"} label={<x.div>
-                      zkSync's network swap fees hover around $1 and are covered by the market maker, but paid by the trader
-                    </x.div>}>
-                      <x.div display={"inline-flex"} color={"blue-gray-600"} ml={2} alignItems={"center"}>
-                        <AiOutlineQuestionCircle size={16}/>
-                      </x.div>
-                    </Tooltip>
-                  </Tooltip>
-                </x.div>
-                <x.div color={"white"}>
-                  <x.div textAlign={"right"}>
-                    Sell Fee: {marketInfo && marketInfo.baseFee} {marketInfo && marketInfo.baseAsset.symbol}
-                  </x.div>
+              <x.div mt={3} mr={3} color={"white"}>
+                <x.div display={"flex"} justifyContent={"flex-end"} alignItems={"center"}>
                   <x.div>
-                    <x.div>
-                      Fee to cover zkSync's network <ExternalLink href={"https://l2fees.info"}>swap fees</ExternalLink> (gas)
+                    <x.div textAlign={"right"}>
+                      Sell Fee: {marketInfo && marketInfo.baseFee} {marketInfo && marketInfo.baseAsset.symbol}
                     </x.div>
                     <x.div textAlign={"right"}>
                       Buy Fee: {marketInfo && marketInfo.quoteFee} {marketInfo && marketInfo.quoteAsset.symbol}
                     </x.div>
+                  </x.div>
+                </x.div>
+                <x.div fontSize={12} color={"blue-gray-400"} mt={2} display={"flex"} alignItems={"center"}>
+                  <x.div mr={2} display={"flex"} alignItems={"center"}>
+                    <Tooltip>
+                      <Tooltip placement={"left"} label={<x.div>
+                        <x.div>
+                          zkSync's network swap fees hover around $1 and are
+                        </x.div>
+                        <x.div>
+                          covered by the market maker, but paid by the trader
+                        </x.div>
+                      </x.div>}>
+                        <x.div display={"inline-flex"} color={"blue-gray-600"} ml={2} alignItems={"center"}>
+                          <AiOutlineQuestionCircle size={16}/>
+                        </x.div>
+                      </Tooltip>
+                    </Tooltip>
+                  </x.div>
+                  <x.div>
+                    These fees cover zkSync's <ExternalLink href={"https://l2fees.info"}>swap fees</ExternalLink>
                   </x.div>
                 </x.div>
               </x.div>
