@@ -350,10 +350,16 @@ export class SpotForm extends React.Component {
       return (
         <>
           <form className="spot_form">
-            <div className="spf_head">
+          <div className="spf_head">
               <span>Avbl</span>
               {balanceHtml}
             </div>
+
+            <div className="spf_head">
+              <span>Market Price</span>
+              <strong>{this.props.marketSummary.price}</strong>
+            </div>
+
             <div className="spf_input_box">
               <span className="spf_desc_text">Price</span>
               <input type="text" value={!isNaN(price) ? price : ''} onChange={this.updatePrice.bind(this)} disabled={this.priceIsDisabled()}  />

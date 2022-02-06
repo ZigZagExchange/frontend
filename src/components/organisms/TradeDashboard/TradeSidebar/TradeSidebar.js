@@ -22,9 +22,12 @@ export default function TradeSidebar(props) {
                 <SpotBox
                     lastPrice={props.lastPrice}
                     user={props.user}
-                    currentMarket={props.currentMarket}
                     activeOrderCount={props.activeOrderCount}
                     liquidity={props.liquidity}
+
+                    currentMarket={props.currentMarket}
+                    marketSummary={props.marketSummary}
+
                     marketInfo={props.marketInfo}
                 />
             </div>
