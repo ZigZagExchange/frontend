@@ -7,6 +7,8 @@ import SearchBox from "../SearchBox/SearchBox";
 
 import {fetchFavourites} from '../../../../../lib/helpers/storage/favourites'
 import {getStables} from '../../../../../lib/helpers/categories/index.js'
+
+
 class TradePriceBtcTable extends React.Component {
 
     constructor(props){
@@ -44,18 +46,13 @@ class TradePriceBtcTable extends React.Component {
     }
 
     categorizePairs(category_name){
+        category_name = category_name.toUpperCase();
 
         this.props.rowData.forEach(row => {
-            var pair_category = row.td1;
 
             switch (category_name){
-                case "ETH":
-                    this.searchPair("ETH");
-                    break;
-                case "WBTC":
-                    this.searchPair("BTC");
-                    break;
                 case "STABLES":
+                    //look for pairs against stables.
                     var foundPairs = getStables(this.props.rowData);
                     console.log(foundPairs);
                     this.setState({
@@ -64,9 +61,17 @@ class TradePriceBtcTable extends React.Component {
                     break;
                 case "FAVOURITES":
                     console.log("unsupported")
+                    //set favourites from localstorage
+                    var favourites = fetchFavourites();
+                    console.log("favs:" , favourites)
+                    this.setState({
+                        foundPairs: favourites
+                    });
+
                     break;
                 default:
-                    console.log("unsupported")            
+                    //search for custom category
+                    this.searchPair(category_name);
             }
         });
 

@@ -138,7 +138,7 @@ export function TradeDashboard() {
       const price = lastPrices[market].price;
       const change = lastPrices[market].change;
       const pctchange = ((change / price) * 100).toFixed(2);
-      lastPriceTableData.push({ td1: market, td2: price, td3: pctchange, category: 'ETH' });
+      lastPriceTableData.push({ td1: market, td2: price, td3: pctchange});
     });
   
     const openOrdersData = [];
