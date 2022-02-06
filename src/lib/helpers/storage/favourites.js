@@ -6,18 +6,47 @@ export function fetchFavourites(){
 }
 
 //add item to favourites and return complete list, or empty list on failure.
-export function add(item){
+export function addFavourite(item){
 
     try {
-        var favs_json = storage.getItem('favourites');
+        var favs_json = storage.getItem('favourites') || '[]';
+        console.log("add: ", favs_json);
         var favourites = JSON.parse(favs_json);
-    
-        favourites.push(item);
-    
-        storage.setItem('favourites', JSON.stringify(favourites));
 
+        if(!favourites.includes(item.td1)){
+            favourites.push(item.td1);
+            console.log("favs: ", favourites);
+
+            storage.setItem('favourites', JSON.stringify(favourites));    
+        }
+       
         return favourites;
-    } catch {
+    } catch (e){
+        console.log(e);
+        return []
+    }
+    
+}
+
+
+//remove item from favourites and return complete list, or empty list on failure.
+export function removeFavourite(item){
+
+    try {
+        var favs_json = storage.getItem('favourites') || '[]';
+        console.log("remove: ", favs_json);
+        var favourites = JSON.parse(favs_json);
+
+        if(favourites.includes(item.td1)){
+            favourites.pop(item.td1);
+            console.log("favs: ", favourites);
+
+            storage.setItem('favourites', JSON.stringify(favourites));    
+        }
+       
+        return favourites;
+    } catch (e){
+        console.log(e);
         return []
     }
     

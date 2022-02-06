@@ -5,8 +5,11 @@ import "./TradePriceBtcTable.css";
 import CategorizeBox from "../CategorizeBox/CategorizeBox";
 import SearchBox from "../SearchBox/SearchBox";
 
-import {fetchFavourites} from '../../../../../lib/helpers/storage/favourites'
+
 import {getStables} from '../../../../../lib/helpers/categories/index.js'
+import {addFavourite, removeFavourite, fetchFavourites} from '../../../../../lib/helpers/storage/favourites'
+
+import { BsBookmarkHeart, BsBookmarkHeartFill } from "react-icons/bs";
 
 
 class TradePriceBtcTable extends React.Component {
@@ -22,6 +25,9 @@ class TradePriceBtcTable extends React.Component {
 
         this.searchPair = this.searchPair.bind(this);
         this.categorizePairs = this.categorizePairs.bind(this);
+
+        this.favouritePair = this.favouritePair.bind(this);
+
         this.renderPairs = this.renderPairs.bind(this);
     }
 
@@ -51,6 +57,8 @@ class TradePriceBtcTable extends React.Component {
         this.props.rowData.forEach(row => {
 
             switch (category_name){
+                case "ALL":
+                    this.setState({foundPairs: []});
                 case "STABLES":
                     //look for pairs against stables.
                     var foundPairs = getStables(this.props.rowData);
@@ -60,12 +68,24 @@ class TradePriceBtcTable extends React.Component {
                     });
                     break;
                 case "FAVOURITES":
-                    console.log("unsupported")
                     //set favourites from localstorage
                     var favourites = fetchFavourites();
-                    console.log("favs:" , favourites)
+                    var foundPairs = [];
+
+                    favourites.forEach(value => {
+                        this.props.rowData.forEach(row => {
+                            var pair_name = row.td1;
+                
+                            //if found query, push it to found pairs
+                            if(pair_name.includes(value.toUpperCase())){
+                                //console.log(row);
+                                foundPairs.push(row);
+                            }
+                        });
+                    })
+                  
                     this.setState({
-                        foundPairs: favourites
+                        foundPairs: foundPairs
                     });
 
                     break;
@@ -80,25 +100,46 @@ class TradePriceBtcTable extends React.Component {
 
     }
 
+    favouritePair(pair){
+        console.log(pair);
+        var isFavourited = fetchFavourites().includes(pair.td1);
+
+        if(!isFavourited){
+            addFavourite(pair);
+        } else {
+            removeFavourite(pair);
+        }
+    }
+
     //render given pairs
     renderPairs(pairs){
         //console.log(pairs);
         //console.log("favourites:", fetchFavourites());
 
         const shown_pairs = pairs.map((d, i) => {
+            var selected = this.props.currentMarket === d.td1; //if current market selected
+            var isFavourited = fetchFavourites().includes(d.td1); //if contains, isFavourited
+
             return (
                 <tr
                     key={i}
-                    onClick={(e) =>
-                        this.props.updateMarketChain(d.td1)
-                    }
-                    className={
-                        this.props.currentMarket === d.td1
-                            ? "selected"
-                            : ""
-                    }
+                    onClick={(e) => {
+                        if(selected) return;
+                        this.props.updateMarketChain(d.td1);
+                    }}
+                    className={ selected ? "selected" : "" }
                 >
                     <td>
+                        
+                            <span onClick={(e) => {
+                                this.favouritePair(d);
+                            } }>
+                                { isFavourited
+                                    ? <BsBookmarkHeartFill/> 
+                                    : < BsBookmarkHeart/>
+                                }
+                            </span>
+
                         {d.td1.replace("-", "/")}
                         <span>{d.span}</span>
                     </td>

@@ -5,3 +5,7 @@
     justify-content: space-between;
     padding: 20px;
 }
+
+.selected_tab {
+    color: rgb(139, 139, 238); /* needs updating*/
+}
