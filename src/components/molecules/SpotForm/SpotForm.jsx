@@ -338,6 +338,10 @@ export class SpotForm extends React.Component {
                 </strong>
             );
 
+            const marketpriceHtml = (
+                <strong>{this.props.marketSummary.price}</strong>
+             );
+
         let buySellBtnClass, buttonText;
         if (this.props.side === "b") {
             buySellBtnClass = "bg_btn buy_btn";
@@ -350,10 +354,15 @@ export class SpotForm extends React.Component {
       return (
         <>
           <form className="spot_form">
-            <div className="spf_head">
+          <div className="spf_head">
               <span>Avbl</span>
               {balanceHtml}
             </div>
+            <div className="spf_head">
+              <span>Market</span>
+              {marketpriceHtml}
+            </div>
+
             <div className="spf_input_box">
               <span className="spf_desc_text">Price</span>
               <input type="text" value={!isNaN(price) ? price : ''} onChange={this.updatePrice.bind(this)} disabled={this.priceIsDisabled()}  />

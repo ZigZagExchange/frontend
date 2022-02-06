@@ -64,13 +64,24 @@ const BalanceText = styled.div`
 `
 
 const PoolModalInput = (props) => {
-  
+  var currencies = api.getCurrencies(); //list of currencies
+
+  //if currencies is null, change this 'error catch' how you'd like.
+  if(!currencies){
+    return (
+      <div className="error">
+        <strong>Failed to fetch currency list!</strong>
+      </div>
+    )
+  }
+
+  var coin_logo = api.getCurrencyLogo(props.currency).default
 
   return (
     <>
     <InputContainer>
       <div className="leftGroup">
-        <img src={api.currencies[props.currency].image.default} alt={props.currency.name}  className="pool_token_image"/> {props.currency}
+        <img src={coin_logo} alt={props.currency}  className="pool_token_image"/> {props.currency}
       </div>
       <input placeholder="0.00" type="text" />
       <a className="maxLink" href="#max">
