@@ -289,10 +289,13 @@ export function TradeDashboard() {
                     markets={markets}
                     currentMarket={currentMarket}
                     lastPrice={marketSummary.price}
+                    
                     user={user}
                     activeOrderCount={activeUserOrders}
                     liquidity={liquidity}
+
                     marketInfo={marketInfo}
+                    marketSummary={marketSummary}
                 />
                 <TradeBooks
                     currentMarket={currentMarket}
