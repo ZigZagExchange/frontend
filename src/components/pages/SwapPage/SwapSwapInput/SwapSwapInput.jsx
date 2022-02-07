@@ -6,7 +6,7 @@ const SwapInputBox = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  background: #fadede;
+  background: #fff;
   border-radius: 24px;
   border: none;
   position: relative;

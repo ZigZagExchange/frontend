@@ -1,6 +1,5 @@
-import React, { useState} from "react";
+import React, { useState } from "react";
 import "./CategorizeBox.css";
-
 
 export default function CategorizeBox(props) {
     const categories = props.categories;
@@ -15,20 +14,14 @@ export default function CategorizeBox(props) {
 
     return (
         <>
-            <div className="tl_head m-2">
+            <div className="categorize_tabs">
                 { categories.map((category_name, index) => {
                     return (
-                        <div key={index} className="rates_box" 
+                        <div key={index} className="categorize_tab"
                         onClick={() => changeCategory(category_name)}>
-                            <div>
-                                <span className={selected === category_name ? "selected_tab": ""}>
-                                    {category_name}
-                                </span>
-                                                            
-                                { (index + 1 ) !== (categories.length) ? (
-                                        <> /</>
-                                    ) : (<></>)}
-                            </div>
+                            <span className={selected === category_name ? "categorize_selected_tab": ""}>
+                                {category_name}
+                            </span>
                         </div>
                     );
                 })}

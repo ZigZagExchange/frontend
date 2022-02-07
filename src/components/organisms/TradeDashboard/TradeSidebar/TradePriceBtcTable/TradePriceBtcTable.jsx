@@ -188,9 +188,10 @@ class TradePriceBtcTable extends React.Component {
             <>
                 <SearchBox 
                     searchPair={this.searchPair}
+                    className="pairs_searchbox"
                 />
                 <CategorizeBox 
-                    categories={["ALL", "ETH", "WBTC", "STABLE", "FAVOURITES"]}
+                    categories={["ALL", "ETH", "WBTC", "STABLES", "FAVOURITES"]}
                     categorizePairs={this.categorizePairs}
                 />
                 <div className="trade_price_btc_table">

@@ -35,7 +35,7 @@ export function removeFavourite(item){
         var favourites = JSON.parse(favs_json);
 
         if(favourites.includes(item.td1)){
-            favourites.pop(item.td1);
+            favourites = favourites.filter(e => e !== item.td1);
 
             storage.setItem('favourites', JSON.stringify(favourites));    
         }

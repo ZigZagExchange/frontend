@@ -62,6 +62,7 @@ const BridgeCurrencyOptions = styled.ul`
   overflow: auto;
   padding: 0;
   font-size: 16px;
+  cursor: pointer;
   
   & img{
     width: 28px;
@@ -180,7 +181,7 @@ const BridgeCurrencySelector = ({ onChange, currencies, balances = {}, value }) 
         </div>
       </StyledBridgeCurrencySelector>
       <Modal title="Select a token to Bridge" onClose={() => setShow(false)} show={show}>
-        <SearchBox searchPair={searchPair}/>
+        <SearchBox searchPair={searchPair} className="bridge_searchbox"/>
       <BridgeCurrencyOptions onClick={() => setShow(false)}>
         {availableTickers.map((ticker, key) => (
           ticker === value ? null :

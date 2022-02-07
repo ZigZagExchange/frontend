@@ -354,7 +354,7 @@ export class SpotForm extends React.Component {
         <>
           <form className="spot_form">
           <div className="spf_head">
-              <span>Avbl</span>
+              <span>Available</span>
               {balanceHtml}
             </div>
 

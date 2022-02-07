@@ -11,5 +11,21 @@
 }
 
 .pairs_searchbox input::placeholder{
-    color: #08aff3;
+    color: #aeaebf;
+}
+
+.bridge_searchbox input{
+    padding: 13px;
+    width: 100%;
+    border: none;
+    outline: none;
+    color: #fff;
+    border-radius: 10px;
+    background-color: rgba(0,0,0,0.4);
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+
+.bridge_searchbox input::placeholder{
+    color: #aeaebf;
 }
