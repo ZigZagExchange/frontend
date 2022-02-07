@@ -186,7 +186,7 @@ class TradePriceBtcTable extends React.Component {
         return (
             <>
                 <CategorizeBox 
-                    categories={["ETH", "WBTC", "STABLE", "FAVOURITES"]}
+                    categories={["ALL", "ETH", "WBTC", "STABLE", "FAVOURITES"]}
                     categorizePairs={this.categorizePairs}
                     />
 
