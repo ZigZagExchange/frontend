@@ -4,10 +4,13 @@ import {DefaultTemplate} from "../../templates/DefaultTemplate";
 import Pane from "../../atoms/Pane/Pane";
 import FormDemo from "../../atoms/Form/Form.demo";
 import TooltipDemo from "../../atoms/Tooltip/Tooltip.demo";
+import RadioButtonsDemo from "../../atoms/RadioButtons/RadioButtons.demo";
+import {Button} from "../../atoms/Form/Submit";
+import {toast} from "react-toastify";
 
 const DSLPage = () => {
     return <DefaultTemplate>
-        <div style={{height: "calc(100vh - 80px)"}}>
+        <div style={{minHeight: "calc(100vh - 80px)"}}>
             <x.div
                 h={"100%"}
                 padding={2}
@@ -26,6 +29,15 @@ const DSLPage = () => {
                 </DSLItem>
                 <DSLItem title={"Tooltip"}>
                   <TooltipDemo/>
+                </DSLItem>
+                <DSLItem title={"Radio Buttons"}>
+                  <RadioButtonsDemo/>
+                </DSLItem>
+                <DSLItem title={"Toast"}>
+                  <Button variant={"secondary"} onClick={() => toast.success(
+                    "🍞🍞🍞",
+                    {closeOnClick: false}
+                  )}>Success</Button>
                 </DSLItem>
               </x.div>
             </x.div>

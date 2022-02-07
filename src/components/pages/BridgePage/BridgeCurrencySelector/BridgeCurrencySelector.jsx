@@ -71,6 +71,8 @@ const BridgeCurrencyOptions = styled.ul`
   pointer-events: none;
   transform: rotate(180deg) translateY(20px);
   cursor: pointer;
+  max-height: 400px;
+  overflow-y: scroll;
 
   ${p => p.show && css`
     opacity: 1;
@@ -159,7 +161,7 @@ const BridgeCurrencySelector = ({ onChange, currencies, balances = {}, value }) 
   }
 
   const currency = api.getCurrencyInfo(value);
-  const image = api.getImage(value);
+  const image = api.getCurrencyLogo(value);
 
   const selectOption = ticker => (e) => {
     if (e) e.preventDefault()
@@ -182,7 +184,7 @@ const BridgeCurrencySelector = ({ onChange, currencies, balances = {}, value }) 
           ticker === value ? null :
           <li key={key} onClick={selectOption(ticker)} tabIndex="0" className="currencyOption">
             <div className="currencyIcon">
-              <img src={api.getImage(ticker) && api.getImage(ticker).default} alt={currency && currency.symbol} />
+              <img src={api.getCurrencyLogo(ticker) && api.getCurrencyLogo(ticker).default} alt={currency && currency.symbol} />
             </div>
             <div className="currencyName">
               {ticker}

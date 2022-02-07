@@ -1,30 +1,23 @@
-import React, {useState, useEffect, useCallback} from "react";
+import React, {useState, useEffect} from "react";
 import {useSelector} from 'react-redux';
 import {userSelector} from "lib/store/features/auth/authSlice";
 import api from 'lib/api';
 import {DefaultTemplate} from 'components';
-import {AiOutlineQuestionCircle, RiErrorWarningLine} from "react-icons/all";
+import {RiErrorWarningLine} from "react-icons/all";
 import 'bootstrap'
 import ConnectWalletButton from "../../atoms/ConnectWalletButton/ConnectWalletButton";
 import Pane from "../../atoms/Pane/Pane";
 import AllocationModal from "./AllocationModal";
 import {x} from "@xstyled/styled-components"
-import Form from "../../atoms/Form/Form";
-import NumberInput from "../../atoms/Form/NumberInput";
 import Submit, {Button} from "../../atoms/Form/Submit";
-import {forceValidation, max, min, required} from "../../atoms/Form/validation";
 import {jsonify} from "../../../lib/helpers/strings";
 import {Dev} from "../../../lib/helpers/env";
 import SuccessModal from "./SuccessModal";
 import {arweaveAllocationSelector, networkSelector} from "lib/store/features/api/apiSlice";
-import SelectInput from "../../atoms/Form/SelectInput";
-import {model} from "../../atoms/Form/helpers";
-import {debounce} from "lodash"
-import Tooltip from "../../atoms/Tooltip/Tooltip";
 import {sleep} from "../../../lib/helpers/utils";
 import {HiExternalLink} from "react-icons/hi";
 import ExternalLink from "./ExternalLink";
-import TextInput from "../../atoms/Form/TextInput";
+import ListPairForm from "./ListPairForm";
 
 export const TRADING_VIEW_CHART_KEY = "tradingViewChart"
 
@@ -43,23 +36,6 @@ export default function ListPairPage() {
   const [isAllocationModalOpen, setIsAllocationModalOpen] = useState(false)
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
 
-  const [baseAssetId, setBaseAssetId] = useState("")
-  const [quoteAssetId, setQuoteAssetId] = useState("")
-  const [baseFee, setBaseFee] = useState("")
-  const [quoteFee, setQuoteFee] = useState("")
-  const [zigZagChainId, setZigZagChainId] = useState(1)
-
-  const [baseSymbol, setBaseSymbol] = useState(null)
-  const [quoteSymbol, setQuoteSymbol] = useState(null)
-
-  const [isBaseAssetIdInvalid, setIsBaseAssetIdInvalid] = useState(false)
-  const [isQuoteAssetIdInvalid, setIsQuoteAssetIdInvalid] = useState(false)
-
-  const [basePrice, setBasePrice] = useState(null)
-  const [quotePrice, setQuotePrice] = useState(null)
-
-  const [showAdvancedSettings, setShowAdvancedSettings] = useState(false)
-
   const network = useSelector(networkSelector);
   const isUserConnectedToMainnet = network === 1
 
@@ -70,111 +46,6 @@ export default function ListPairPage() {
   const refreshUserArweaveAllocation = () => {
     return api.refreshArweaveAllocation(user.address)
   }
-
-  const getAmountForTargetNotional = (price) => {
-    const targetUSDFeeAmount = 1
-    return (targetUSDFeeAmount / price).toFixed(6)
-  }
-
-  const renderFeeHint = (assetPrice, assetFee, symbol, feeSetter) => {
-    if (assetPrice) {
-      const notional = (Number(assetPrice) * Number(assetFee)).toFixed(2)
-      if (notional > 0) {
-        return <x.div pl={2} fontSize={12} color={"blue-gray-500"} mt={1} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
-          <x.div style={{wordBreak: "break-all"}}>
-            {assetFee} {symbol} = ${notional}
-          </x.div>
-          {notional > 1 && <x.div>
-            <Button
-              ml={1}
-              variant={"secondary"}
-              size={"xs"}
-              onClick={() => feeSetter(getAmountForTargetNotional(assetPrice))}>
-              set to $1
-            </Button>
-            <x.div/>
-        </x.div>}
-      </x.div>}
-    }
-    return null
-  }
-
-  async function getBaseInfo(baseAssetId, chainId) {
-    if (baseAssetId && baseAssetId !== "") {
-      try {
-        const {symbol} = await api.getTokenInfo(baseAssetId, chainId)
-        if (symbol) {
-          try {
-            const {price: apiPrice} = await api.getTokenPrice(baseAssetId, chainId)
-            const price = Number(apiPrice)
-            if (price === 0) {
-              throw Error(`${symbol} price came back as 0`)
-            }
-            setBasePrice(price)
-            setBaseFee(getAmountForTargetNotional(price))
-          } catch (e) {
-            setBaseFee("")
-            setBasePrice(null)
-            console.error("error getting base price", e)
-          }
-          setBaseSymbol(symbol)
-          setIsBaseAssetIdInvalid(false)
-        }
-      } catch (e) {
-        setBaseSymbol(null)
-        setIsBaseAssetIdInvalid(true)
-        setBaseFee("")
-        setBasePrice(null)
-      }
-    } else {
-      setBaseSymbol(null)
-      setBasePrice(null)
-    }
-  }
-
-  async function getQuoteInfo(quoteAssetId, chainId) {
-    if (quoteAssetId && quoteAssetId !== "") {
-      try {
-        const {symbol} = await api.getTokenInfo(quoteAssetId, chainId)
-        if (symbol) {
-          try {
-            const {price: apiPrice} = await api.getTokenPrice(quoteAssetId, chainId)
-            const price = Number(apiPrice)
-            if (price === 0) {
-              throw Error(`${symbol} price came back as 0`)
-            }
-            setQuotePrice(price)
-            setQuoteFee(getAmountForTargetNotional(price))
-          } catch (e) {
-            setQuoteFee("")
-            setQuotePrice(null)
-            console.error("error setting quote fee", e)
-          }
-          setQuoteSymbol(symbol)
-          setIsQuoteAssetIdInvalid(false)
-        }
-      } catch (e) {
-        setQuoteSymbol(null)
-        setIsQuoteAssetIdInvalid(true)
-        setQuoteFee("")
-        setQuotePrice(null)
-      }
-    } else {
-      setQuoteSymbol(null)
-      setQuotePrice(null)
-    }
-  }
-
-  const queryBaseTokenInfo = useCallback(debounce(getBaseInfo, 500), [])
-  useEffect(() => {
-    queryBaseTokenInfo(baseAssetId, zigZagChainId)
-  }, [baseAssetId, zigZagChainId])
-
-
-  const queryQuoteTokenInfo = useCallback(debounce(getQuoteInfo, 500), [])
-  useEffect(() => {
-    queryQuoteTokenInfo(quoteAssetId, zigZagChainId)
-  }, [quoteAssetId, zigZagChainId])
 
 
   const onFormSubmit = async (formData, resetForm) => {
@@ -258,131 +129,8 @@ export default function ListPairPage() {
               </x.div>
             </x.div>
           </x.div>
-          {(baseAssetId || quoteAssetId) &&
-          <x.div display={"flex"} fontSize={35} justifyContent={"center"} my={4}>
-            <x.span color={baseSymbol ? "blue-gray-400" : "blue-gray-800"}>
-              {baseSymbol ? baseSymbol : "XXX"}
-            </x.span>
-            <x.span color={baseSymbol && quoteSymbol ? "blue-gray-400" : "blue-gray-800"}>/</x.span>
-            <x.span color={quoteSymbol ? "blue-gray-400" : "blue-gray-800"}>
-              {quoteSymbol ? quoteSymbol : "XXX"}
-            </x.span>
-          </x.div>}
-          <Form
-            initialValues={{
-              baseAssetId: baseAssetId,
-              quoteAssetId: quoteAssetId,
-              baseFee: baseFee,
-              quoteFee: quoteFee,
-              zigzagChainId: zigZagChainId,
-              pricePrecisionDecimals: "",
-              [TRADING_VIEW_CHART_KEY]: ""
-            }}
-            onSubmit={onFormSubmit}
-          >
-            <x.div display={"grid"} gridTemplateColumns={2} rowGap={5} columnGap={6} mb={5}>
-              <NumberInput
-                block
-                {...model(baseAssetId, setBaseAssetId)}
-                label={<x.span>Base Asset <x.a color={{_: "blue-gray-500", hover: "teal-200"}} target={"_blank"} href={zigZagChainId === 1 ? "https://zkscan.io/explorer/tokens" : "https://rinkeby.zkscan.io/explorer/tokens"}>Internal ID</x.a></x.span>}
-                name={"baseAssetId"}
-                validate={[
-                  required,
-                  min(0),
-                  forceValidation(isBaseAssetIdInvalid, "invalid asset on zksync")
-                ]}
-                rightOfLabel={<TooltipHelper>zkSync token ID of the first asset appearing in the pair (BASE/QUOTE)</TooltipHelper>}
-              />
-              <NumberInput
-                block
-                {...model(quoteAssetId, setQuoteAssetId)}
-                label={<x.span>Quote Asset <x.a color={{_: "blue-gray-500", hover: "teal-200"}} target={"_blank"} href={zigZagChainId === 1 ? "https://zkscan.io/explorer/tokens" : "https://rinkeby.zkscan.io/explorer/tokens"}>Internal ID</x.a></x.span>}
-                name={"quoteAssetId"}
-                validate={[
-                  required,
-                  min(0),
-                  forceValidation(isQuoteAssetIdInvalid, "invalid asset on zksync")
-                ]}
-                rightOfLabel={<TooltipHelper>zkSync token ID of the second asset appearing in the pair (BASE/QUOTE)</TooltipHelper>}
-              />
-              <x.div display={"flex"} flexDirection={"column"}>
-                <NumberInput
-                  block
-                  name={"baseFee"}
-                  {...model(baseFee, setBaseFee)}
-                  label={baseSymbol ? `${baseSymbol} Swap Fee` : "Base Swap Fee"}
-                  validate={[required, min(0)]}
-                  rightOfLabel={<TooltipHelper>Swap fee collected by market makers</TooltipHelper>}
-                />
-                {renderFeeHint(basePrice, baseFee, baseSymbol, setBaseFee)}
-              </x.div>
-              <x.div display={"flex"} flexDirection={"column"}>
-                <NumberInput
-                  block
-                  name={"quoteFee"}
-                  {...model(quoteFee, setQuoteFee)}
-                  label={quoteSymbol ? `${quoteSymbol} Swap Fee` : "Quote Swap Fee"}
-                  validate={[required, min(0)]}
-                  rightOfLabel={<TooltipHelper>Swap fee collected by market makers</TooltipHelper>}
-                />
-                {renderFeeHint(quotePrice, quoteFee, quoteSymbol, setQuoteFee)}
-              </x.div>
-              <NumberInput
-                block
-                name={"pricePrecisionDecimals"}
-                label={"Price Precision Decimals"}
-                validate={[required, max(18), min(0)]}
-                rightOfLabel={<TooltipHelper>
-                  <x.div>
-                    Number of decimal places in the price of the asset pair.
-                  </x.div>
 
-                  <x.div display={"grid"} gridTemplateColumns={2} mt={2} gap={0}>
-                    <x.div>ex: ETH/USDC has '2'</x.div>
-                    <x.div>($3250.61)</x.div>
-                    <x.div>ex: ETH/WBTC has '6'</x.div>
-                    <x.div>(0.075225)</x.div>
-                  </x.div>
-                </TooltipHelper>}
-              />
-              <SelectInput
-                {...model(zigZagChainId, setZigZagChainId)}
-                name={"zigzagChainId"}
-                label={"Network"}
-                items={[{name: "zkSync - Mainnet", id: 1}, {name: "zkSync - Rinkeby", id: 1000}]}
-                validate={required}
-                rightOfLabel={<TooltipHelper>zkSync network on which the pair will be listed</TooltipHelper>}
-              />
-            </x.div>
-
-            <x.div mb={4}>
-              <x.div display={"flex"} alignItems={"center"} justifyContent={"flex-end"}>
-                <x.div fontSize={12} mr={2} color={"blue-gray-400"}>advanced settings</x.div>
-                <Button
-                  size={"xs"}
-                  variant={"secondary"}
-                  onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}>{showAdvancedSettings ? "-" : "+"}</Button>
-              </x.div>
-              {showAdvancedSettings && <>
-              <x.div h={"2px"} w={"full"} bg={"blue-gray-800"} borderRadius={10} my={4}/>
-              <x.div display={"grid"} gridTemplateColumns={2} columnGap={6}>
-                <TextInput
-                  block
-                  name={TRADING_VIEW_CHART_KEY}
-                  label={"Default Chart Ticker"}
-                  rightOfLabel={<TooltipHelper>
-                    <x.div>
-                      Default TradingView chart to be seen on the trade page
-                    </x.div>
-                    <x.div mt={2}>
-                      (ex: show COINBASE:BTCUSD for WBTC-USD)
-                    </x.div>
-                  </TooltipHelper>}
-                />
-              </x.div>
-              </>}
-            </x.div>
-
+          <ListPairForm onSubmit={onFormSubmit}>
             {(fileToUpload && !isArweaveAllocationSufficient) &&
             <x.div display={"flex"} alignItems={"center"} justifyContent={"space-between"} mb={4}>
               <x.div display={"flex"} alignItems={"center"}>
@@ -409,11 +157,11 @@ export default function ListPairPage() {
                     {!isArweaveAllocationSufficient && hasAttemptedSubmit ? "PURCHASE ALLOCATION" : "LIST"}
                   </Submit>
                 } else {
-                  <Button block isDisabled>Please connect to Mainnet</Button>
+                  return <Button block isDisabled>Please connect to Mainnet</Button>
                 }
               }
             })()}
-          </Form>
+          </ListPairForm>
         </Pane>
       </x.div>
       <AllocationModal
@@ -439,12 +187,4 @@ export default function ListPairPage() {
       />
     </DefaultTemplate>
   )
-}
-
-const TooltipHelper = ({children}) => {
-  return <Tooltip placement={"right"} label={children}>
-    <x.div display={"inline-flex"} color={"blue-gray-600"} ml={2} alignItems={"center"}>
-      <AiOutlineQuestionCircle size={14}/>
-    </x.div>
-  </Tooltip>
 }

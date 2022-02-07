@@ -2,7 +2,7 @@ import Web3 from 'web3'
 import { createIcon } from '@download/blockies'
 import Web3Modal from 'web3modal'
 import Emitter from 'tiny-emitter'
-import { ethers } from 'ethers'
+import { ethers, utils } from 'ethers'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { getENSName } from 'lib/ens'
 import { formatAmount } from 'lib/utils'
@@ -24,7 +24,7 @@ export default class API extends Emitter {
     lastprices = {}
     _signInProgress = null
     _profiles = {}
-    
+
     constructor({ infuraId, websocketUrl, networks, currencies, validMarkets }) {
         super()
         
@@ -317,12 +317,24 @@ export default class API extends Emitter {
         return this.apiProvider.withdrawL2(amount, token)
     }
 
+    withdrawL2Fast = (amount, token) => {
+      return this.apiProvider.withdrawL2Fast(amount, token)
+    }
+
     depositL2Fee = async (token) => {
         return this.apiProvider.depositL2Fee(token)
     }
 
     withdrawL2Fee = async (token) => {
         return this.apiProvider.withdrawL2Fee(token)
+    }
+
+    withdrawL2FeeFast = async (token) => {
+      return this.apiProvider.withdrawL2FeeFast(token)
+    }
+
+    withdrawL2ZZFeeFast = async (token) => {
+        return this.apiProvider.withdrawL2ZZFeeFast(token)
     }
 
     cancelAllOrders = async () => {
@@ -534,11 +546,48 @@ export default class API extends Emitter {
         return this.apiProvider.getCurrencyInfo(currency);
     }
 
-    getImage(currency) {
+    getCurrencyLogo(currency) {
         try {
             return require(`assets/images/currency/${currency}.svg`)
         } catch(e) {
             return require(`assets/images/currency/ZZ.webp`)
         }
+    }
+
+    get _fraxContractAddress() {
+      if (this.apiProvider.network === 1) {
+        return "0x853d955aCEf822Db058eb8505911ED77F175b99e"
+      } else if (this.apiProvider.network === 1000) {
+        return "0x6426e27d8c6fDCd1e0c165d0D58c7eC0ef51f3a7"
+      } else {
+        throw Error("No FRAX address for specified network")
+      }
+    }
+
+    async getL2FastWithdrawLiquidity() {
+      if (this.ethersProvider) {
+        let maxETH = 0
+        try {
+          maxETH = await this.ethersProvider.getBalance(this.apiProvider._fastWithdrawContractAddress)
+        } catch (e) {
+          console.error(e)
+        }
+
+        const fraxContract = new ethers.Contract(this._fraxContractAddress, erc20ContractABI, this.ethersProvider)
+        let maxFRAX = 0
+        try {
+          maxFRAX = await fraxContract.balanceOf(this.apiProvider._fastWithdrawContractAddress)
+        } catch (e) {
+          console.error(e)
+        }
+
+        return {
+          ETH: Number(utils.formatEther(maxETH)),
+          FRAX: Number(utils.formatEther(maxFRAX))
+        }
+      } else {
+        console.error("Ethers provider null or undefined")
+        return {}
+      }
     }
 }
