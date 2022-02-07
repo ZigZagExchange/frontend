@@ -21,6 +21,7 @@ class TradePriceBtcTable extends React.Component {
         this.state = {
             foundPairs: [],
             pairs: props.rowData,
+            favourites: []
         }
 
         this.searchPair = this.searchPair.bind(this);
@@ -100,11 +101,17 @@ class TradePriceBtcTable extends React.Component {
     favouritePair(pair){
         var isFavourited = fetchFavourites().includes(pair.td1);
 
+        var favourites = [];
         if(!isFavourited){
-            addFavourite(pair);
+            favourites = addFavourite(pair.td1);
         } else {
-            removeFavourite(pair);
+            favourites = removeFavourite(pair.td1);
         }
+
+        console.log(favourites);
+        this.setState({
+            favourites: favourites
+        })
     }
 
     //render given pairs
@@ -112,7 +119,7 @@ class TradePriceBtcTable extends React.Component {
 
         const shown_pairs = pairs.map((d, i) => {
             var selected = this.props.currentMarket === d.td1; //if current market selected
-            var isFavourited = fetchFavourites().includes(d.td1); //if contains, isFavourited
+            var isFavourited = this.state.favourites.includes(d.td1); //if contains, isFavourited
 
             return (
                 <tr
@@ -179,6 +186,11 @@ class TradePriceBtcTable extends React.Component {
                     </tbody>
                 </table>
         );
+    }
+
+    componentDidMount(){
+        var favourites = fetchFavourites();
+        this.setState({favourites: favourites});
     }
 
     render() {

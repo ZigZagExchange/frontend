@@ -1,3 +1,4 @@
+import { removeItemAll } from '../utils';
 import storage from './index';
 
 //get favourites from local storage.
@@ -12,12 +13,14 @@ export function addFavourite(item){
         var favs_json = storage.getItem('favourites') || '[]';
         var favourites = JSON.parse(favs_json);
 
-        if(!favourites.includes(item.td1)){
-            favourites.push(item.td1);
+        console.log(favourites);
+
+        if(!favourites.includes(item)){
+            favourites.push(item);
 
             storage.setItem('favourites', JSON.stringify(favourites));    
         }
-       
+        console.log(favourites);
         return favourites;
     } catch (e){
         console.log(e);
@@ -34,12 +37,15 @@ export function removeFavourite(item){
         var favs_json = storage.getItem('favourites') || '[]';
         var favourites = JSON.parse(favs_json);
 
-        if(favourites.includes(item.td1)){
-            favourites.pop(item.td1);
+        console.log(favourites);
 
-            storage.setItem('favourites', JSON.stringify(favourites));    
-        }
+        favourites = favourites.filter(e => e !== item);
+        console.log("remoevd: ", favourites);
+        storage.setItem('favourites', JSON.stringify(favourites));    
+        
        
+        console.log(favourites);
+
         return favourites;
     } catch (e){
         console.log(e);
