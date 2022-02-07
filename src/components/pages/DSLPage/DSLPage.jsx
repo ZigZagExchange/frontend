@@ -5,6 +5,8 @@ import Pane from "../../atoms/Pane/Pane";
 import FormDemo from "../../atoms/Form/Form.demo";
 import TooltipDemo from "../../atoms/Tooltip/Tooltip.demo";
 import RadioButtonsDemo from "../../atoms/RadioButtons/RadioButtons.demo";
+import {Button} from "../../atoms/Form/Submit";
+import {toast} from "react-toastify";
 
 const DSLPage = () => {
     return <DefaultTemplate>
@@ -30,6 +32,12 @@ const DSLPage = () => {
                 </DSLItem>
                 <DSLItem title={"Radio Buttons"}>
                   <RadioButtonsDemo/>
+                </DSLItem>
+                <DSLItem title={"Toast"}>
+                  <Button variant={"secondary"} onClick={() => toast.success(
+                    "🍞🍞🍞",
+                    {closeOnClick: false}
+                  )}>Success</Button>
                 </DSLItem>
               </x.div>
             </x.div>
