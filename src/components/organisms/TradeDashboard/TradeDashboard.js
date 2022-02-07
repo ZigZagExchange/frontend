@@ -288,23 +288,24 @@ export function TradeDashboard() {
                     markets={markets}
                     currentMarket={currentMarket}
                     lastPrice={marketSummary.price}
-                    
                     user={user}
                     activeOrderCount={activeUserOrders}
                     liquidity={liquidity}
-
                     marketInfo={marketInfo}
                     marketSummary={marketSummary}
                 />
+                {/* TradePriceTable, TradePriceHeadSecond */}
                 <TradeBooks
                     currentMarket={currentMarket}
                     priceTableData={askBins}
                     lastPrice={marketSummary.price}
                     bidBins={bidBins}
                 />
+                {/* TradeChartArea */}
                 <TradeChartArea
                     marketInfo={marketInfo}
                 />
+                {/* OrdersTable */}
                 <TradeTables 
                     userFills={userFills}
                     userOrders={userOrders}

@@ -12,12 +12,11 @@ export function addFavourite(item){
         var favs_json = storage.getItem('favourites') || '[]';
         var favourites = JSON.parse(favs_json);
 
-        if(!favourites.includes(item.td1)){
-            favourites.push(item.td1);
+        if(!favourites.includes(item)){
+            favourites.push(item);
 
             storage.setItem('favourites', JSON.stringify(favourites));    
         }
-       
         return favourites;
     } catch (e){
         console.log(e);
@@ -33,13 +32,9 @@ export function removeFavourite(item){
     try {
         var favs_json = storage.getItem('favourites') || '[]';
         var favourites = JSON.parse(favs_json);
+        favourites = favourites.filter(e => e !== item);
+        storage.setItem('favourites', JSON.stringify(favourites));    
 
-        if(favourites.includes(item.td1)){
-            favourites = favourites.filter(e => e !== item.td1);
-
-            storage.setItem('favourites', JSON.stringify(favourites));    
-        }
-       
         return favourites;
     } catch (e){
         console.log(e);
