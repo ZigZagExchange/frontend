@@ -63,7 +63,7 @@ const BridgeCurrencyOptions = styled.ul`
   padding: 0;
   font-size: 16px;
   cursor: pointer;
-  
+
   & img{
     width: 28px;
     height: 28px;
@@ -95,12 +95,12 @@ const BridgeCurrencyOptions = styled.ul`
     padding: 13px;
     flex-direction: row;
     align-items: center;
-    background: rgba(0,0,0,0.2);
+    background: rgba(0,0,0,0.3);
     border-radius: 10px;
     margin-bottom: 10px;
 
     &:hover {
-      background: rgba(0,0,0,0.3);
+      background: rgba(0,0,0,0.4);
     }
   }
 `

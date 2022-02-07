@@ -1,16 +1,10 @@
 import React from "react";
-
 import "./TradePriceBtcTable.css";
-
 import CategorizeBox from "../CategorizeBox/CategorizeBox";
 import SearchBox from "../SearchBox/SearchBox";
-
-
 import {getStables} from '../../../../../lib/helpers/categories/index.js'
 import {addFavourite, removeFavourite, fetchFavourites} from '../../../../../lib/helpers/storage/favourites'
-
 import { BsStar, BsStarFill } from "react-icons/bs";
-
 
 class TradePriceBtcTable extends React.Component {
 
