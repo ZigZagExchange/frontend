@@ -70,6 +70,7 @@ export class SpotForm extends React.Component {
         if (!amount) amount = 0;
 
         let price, unfilled = amount;
+        console.log(this.props.liquidity);
         if (side === 'b') {
             const asks = this.props.liquidity.filter(l => l[0] === "s");
             asks.sort((a,b) => a[1] - b[1]);
