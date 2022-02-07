@@ -382,8 +382,8 @@ export class SpotForm extends React.Component {
                         <span>Total</span>
                         <strong>
                             {this.props.orderType === "limit" 
-                                ? <>{(this.state.price * this.state.amount).toPrecision(8)} {marketInfo && marketInfo.quoteAsset.symbol}</>
-                                : <>{this.props.marketSummary.price * this.state.amount} {marketInfo && marketInfo.quoteAsset.symbol}</>
+                                ? <>{(this.state.price * this.state.amount).toPrecision(6)}  {marketInfo && marketInfo.quoteAsset.symbol}</>
+                                : <>{(this.props.marketSummary.price * this.state.amount).toPrecision(6)} {marketInfo && marketInfo.quoteAsset.symbol}</>
                             }
                         </strong>
                     </div>
