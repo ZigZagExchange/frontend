@@ -10,7 +10,7 @@ export class SpotForm extends React.Component {
         super(props);
         this.state = {
             userHasEditedPrice: false,
-            price: null,
+            price: props.marketSummary.price,
             amount: "",
             orderButtonDisabled: false,
             maxSizeSelected: false,
@@ -25,6 +25,8 @@ export class SpotForm extends React.Component {
             FRAX: 1,
             FXS: 0.1,
         };
+
+        this.updatePrice = this.updatePrice.bind(this);
     }
     
     updatePrice(e) {
@@ -205,6 +207,7 @@ export class SpotForm extends React.Component {
     }
 
     priceIsDisabled() {
+        console.log(this.props.orderType,  this.props.orderType === "market");
         return this.props.orderType === "market";
     }
 
@@ -350,6 +353,21 @@ export class SpotForm extends React.Component {
             buttonText = "SELL";
         }
 
+        console.log(this.props.orderType === 'market');
+        //set market price on market
+        if(this.props.orderType === 'market'){
+            
+            console.log("set market price")
+            if(this.state.userHasEditedPrice){
+                this.setState({
+                    price: this.props.marketSummary.price,
+                    userHasEditedPrice: false
+                });
+            }
+        }
+
+        console.log(this.state.price);
+
       return (
         <>
           <form className="spot_form">
@@ -359,14 +377,19 @@ export class SpotForm extends React.Component {
             </div>
 
             <div className="spf_input_box">
-              <span className="spf_desc_text">Price</span>
-              <input type="text" value={ this.priceIsDisabled() ? this.props.marketSummary.price : !isNaN(price) ? price : ''} onChange={this.updatePrice.bind(this)} disabled={this.priceIsDisabled()}  />
-              <span className={this.priceIsDisabled() ? "text-disabled" : ""}>{marketInfo && marketInfo.quoteAsset.symbol}</span>
+                <span className="spf_desc_text">Price</span>
+                    <input type="text"  
+                       defaultValue={this.priceIsDisabled() ? this.state.price : this.state.price} 
+                       value={this.priceIsDisabled() ? this.state.price : null} 
+                       
+                       onChange={(e) => this.updatePrice(e)} disabled={this.priceIsDisabled()}  
+                    />
+                <span className={this.priceIsDisabled() ? "text-disabled" : ""}>{marketInfo && marketInfo.quoteAsset.symbol}</span>
             </div>
             <div className="spf_input_box">
-              <span className="spf_desc_text">Amount</span>
-              <input type="text" value={this.state.amount} placeholder="0.00" onChange={this.updateAmount.bind(this)}/>
-              <span>{marketInfo && marketInfo.baseAsset.symbol}</span>
+                <span className="spf_desc_text">Amount</span>
+                    <input type="text" value={this.state.amount} placeholder="0.00" onChange={this.updateAmount.bind(this)}/>
+                <span>{marketInfo && marketInfo.baseAsset.symbol}</span>
             </div>
             <div className="spf_range">
               <RangeSlider value={this.amountPercentOfMax()} onChange={this.rangeSliderHandler.bind(this)} />
@@ -376,10 +399,7 @@ export class SpotForm extends React.Component {
                     <div className="spf_head">
                         <span>Total</span>
                         <strong>
-                            {this.props.orderType === "limit" 
-                                ? <>{(this.state.price * this.state.amount).toPrecision(6)}  {marketInfo && marketInfo.quoteAsset.symbol}</>
-                                : <>{(this.props.marketSummary.price * this.state.amount).toPrecision(6)} {marketInfo && marketInfo.quoteAsset.symbol}</>
-                            }
+                            { (this.state.price * this.state.amount).toPrecision(6)}  {marketInfo && marketInfo.quoteAsset.symbol}
                         </strong>
                     </div>
                     <div className="spf_btn">
