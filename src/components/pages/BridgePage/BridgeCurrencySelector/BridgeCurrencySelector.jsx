@@ -7,6 +7,7 @@ import { FiChevronDown } from 'react-icons/fi';
 import { useCoinEstimator, Modal } from "components";
 import { formatUSD } from "lib/utils";
 import api from "lib/api";
+import SearchBox from "components/organisms/TradeDashboard/TradeSidebar/SearchBox/SearchBox";
 
 const StyledBridgeCurrencySelector = styled.div`
   height: 46px;
@@ -111,6 +112,9 @@ const BridgeCurrencySelector = ({ onChange, currencies, balances = {}, value }) 
   const coinEstimator = useCoinEstimator();
   const tickers = api.getCurrencies();
 
+  var [availableTickers, setTickers] = useState(tickers);
+
+
   useEffect(() => {
     onChange(api.marketInfo["ETH"] ? "ETH" : tickers[0]);
   }, [user.id, network, currencies]);
@@ -137,6 +141,28 @@ const BridgeCurrencySelector = ({ onChange, currencies, balances = {}, value }) 
   const currency = api.getCurrencyInfo(value);
   const image = api.getCurrencyLogo(value);
 
+  function searchPair(value){
+    value = value.toUpperCase();
+
+    if(value != ""){
+      var foundPairs = []
+
+      //search tickers
+      tickers.forEach( ticker => {
+        if(ticker.includes(value)) {
+          foundPairs.push(ticker);
+        }
+      });
+
+      //set tickers
+      setTickers(foundPairs);
+    }else {
+      //reset
+      setTickers(api.getCurrencies());
+    }
+
+  }
+
   const selectOption = ticker => (e) => {
     if (e) e.preventDefault()
     onChange(ticker)
@@ -154,8 +180,9 @@ const BridgeCurrencySelector = ({ onChange, currencies, balances = {}, value }) 
         </div>
       </StyledBridgeCurrencySelector>
       <Modal title="Select a token to Bridge" onClose={() => setShow(false)} show={show}>
+        <SearchBox searchPair={searchPair}/>
       <BridgeCurrencyOptions onClick={() => setShow(false)}>
-        {tickers.map((ticker, key) => (
+        {availableTickers.map((ticker, key) => (
           ticker === value ? null :
           <li key={key} onClick={selectOption(ticker)} tabIndex="0" className="currencyOption">
             <div className="currencyIcon">
