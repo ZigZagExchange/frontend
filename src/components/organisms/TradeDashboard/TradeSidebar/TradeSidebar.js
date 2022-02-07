@@ -29,6 +29,7 @@ export default function TradeSidebar(props) {
                     marketSummary={props.marketSummary}
 
                     marketInfo={props.marketInfo}
+                    marketSummary={props.marketSummary}
                 />
             </div>
         </StyledTradeSidebar>

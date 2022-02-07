@@ -56,10 +56,8 @@ class SpotBox extends React.Component {
                   activeOrderCount={this.props.activeOrderCount}
                   liquidity={this.props.liquidity}
                   
-                  currentMarket={this.props.currentMarket}
-                  marketSummary={this.props.marketSummary}
-
                   marketInfo={marketInfo}
+                  marketSummary={this.props.marketSummary}
                 />
               </div>
               <div label="Sell">
@@ -67,14 +65,14 @@ class SpotBox extends React.Component {
                   side="s"
                   lastPrice={this.props.lastPrice}
                   user={this.props.user}
+                  currentMarket={this.props.currentMarket}
+
                   orderType={this.state.orderType}
                   activeOrderCount={this.props.activeOrderCount}
                   liquidity={this.props.liquidity}
 
-                  currentMarket={this.props.currentMarket}
-                  marketSummary={this.props.marketSummary}
-
                   marketInfo={marketInfo}
+                  marketSummary={this.props.marketSummary}
 
                 />
               </div>
