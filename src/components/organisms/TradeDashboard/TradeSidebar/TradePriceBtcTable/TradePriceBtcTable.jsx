@@ -9,7 +9,7 @@ import SearchBox from "../SearchBox/SearchBox";
 import {getStables} from '../../../../../lib/helpers/categories/index.js'
 import {addFavourite, removeFavourite, fetchFavourites} from '../../../../../lib/helpers/storage/favourites'
 
-import { BsBookmarkHeart, BsBookmarkHeartFill } from "react-icons/bs";
+import { BsStar, BsStarFill } from "react-icons/bs";
 
 
 class TradePriceBtcTable extends React.Component {
@@ -58,6 +58,7 @@ class TradePriceBtcTable extends React.Component {
             switch (category_name){
                 case "ALL":
                     this.setState({foundPairs: []});
+                    break;
                 case "STABLES":
                     //look for pairs against stables.
                     var foundPairs = getStables(this.props.rowData);
@@ -129,8 +130,8 @@ class TradePriceBtcTable extends React.Component {
                                 this.favouritePair(d);
                             } }>
                                 { isFavourited
-                                    ? <BsBookmarkHeartFill/> 
-                                    : < BsBookmarkHeart/>
+                                    ? <BsStarFill /> 
+                                    : <BsStar />
                                 }
                             </span>
 

@@ -144,7 +144,7 @@ const BridgeCurrencySelector = ({ onChange, currencies, balances = {}, value }) 
   function searchPair(value){
     value = value.toUpperCase();
 
-    if(value != ""){
+    if(value !== ""){
       var foundPairs = []
 
       //search tickers

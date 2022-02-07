@@ -24,12 +24,9 @@ export default function TradeSidebar(props) {
                     user={props.user}
                     activeOrderCount={props.activeOrderCount}
                     liquidity={props.liquidity}
-
                     currentMarket={props.currentMarket}
                     marketSummary={props.marketSummary}
-
                     marketInfo={props.marketInfo}
-                    marketSummary={props.marketSummary}
                 />
             </div>
         </StyledTradeSidebar>
