@@ -271,7 +271,6 @@ export function TradeDashboard() {
       (order) => activeOrderStatuses.includes(order[9])
     ).length;
 
-    //console.log("market: ", marketSummary);
     return (
         <TradeContainer>
             <TradeGrid>
