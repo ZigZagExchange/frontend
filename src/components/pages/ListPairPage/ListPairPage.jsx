@@ -111,7 +111,7 @@ export default function ListPairPage() {
              backgroundColor={"blue-400"}
              w={"full"}
              h={"full"}
-             style={{minHeight: "calc(100vh - 80px)"}}
+             style={{minHeight: "calc(100vh - 48px)"}}
              color={"white"}
              display={"flex"}
              alignItems={"center"}

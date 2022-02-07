@@ -24,10 +24,11 @@ export * from 'components/atoms/Modal'
 export * from 'components/molecules/Chart'
 export * from 'components/molecules/SpotForm'
 export * from 'components/molecules/AccountDropdown'
+export * from 'components/molecules/Tabs'
 
 // Organisms
 export * from 'components/organisms/Header'
-export * from 'components/organisms/Footer'
+export * from 'components/organisms/TradeDashboard'
 
 // Templates
 export * from 'components/templates/DefaultTemplate'

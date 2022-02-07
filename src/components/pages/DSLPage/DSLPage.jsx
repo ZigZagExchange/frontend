@@ -10,7 +10,7 @@ import {toast} from "react-toastify";
 
 const DSLPage = () => {
     return <DefaultTemplate>
-        <div style={{minHeight: "calc(100vh - 80px)"}}>
+        <div style={{minHeight: "calc(100vh - 48px)"}}>
             <x.div
                 h={"100%"}
                 padding={2}

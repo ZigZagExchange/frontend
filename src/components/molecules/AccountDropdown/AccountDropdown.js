@@ -34,7 +34,7 @@ const DropdownButton = styled.div`
     display: flex;
     flex-direction: row;
     align-items: center;
-    height: 78px;
+    height: 47px;
     transition: all 0.12s ease-in-out;
     color: rgba(255, 255, 255, 0.4);
     background: rgba(0, 0, 0, 0.5);

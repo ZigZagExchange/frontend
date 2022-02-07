@@ -64,6 +64,7 @@ export class SpotForm extends React.Component {
 
         let amount = this.state.amount;
         const side = this.props.side;
+
         if (!amount) amount = 0;
 
         let price, unfilled = amount;
@@ -81,6 +82,7 @@ export class SpotForm extends React.Component {
         }
         else if (side === 's') {
             const bids = this.props.liquidity.filter(l => l[0] === "b");
+
             bids.sort((a,b) => b[1] - a[1]);
             for (let i=0; i < bids.length; i++) {
                 if (bids[i][2] >= unfilled || i === bids.length - 1) {
@@ -89,7 +91,6 @@ export class SpotForm extends React.Component {
                 } else {
                     unfilled -= bids[i][2];
                 }
-                console.log(unfilled);
             }
         }
         if (!price) return 0;
@@ -230,10 +231,12 @@ export class SpotForm extends React.Component {
         if (!marketInfo) return 0;
 
         if (this.props.orderType === "limit" && this.state.price) {
+
             return this.state.price;
         }
         else {
-            return this.getLadderPrice();
+            var ladderPrice =  this.getLadderPrice();
+            return ladderPrice;
         }
     }
 
@@ -350,13 +353,14 @@ export class SpotForm extends React.Component {
       return (
         <>
           <form className="spot_form">
-            <div className="spf_head">
-              <span>Avbl</span>
+          <div className="spf_head">
+              <span>Available</span>
               {balanceHtml}
             </div>
+
             <div className="spf_input_box">
               <span className="spf_desc_text">Price</span>
-              <input type="text" value={!isNaN(price) ? price : ''} onChange={this.updatePrice.bind(this)} disabled={this.priceIsDisabled()}  />
+              <input type="text" value={ this.priceIsDisabled() ? this.props.marketSummary.price : !isNaN(price) ? price : ''} onChange={this.updatePrice.bind(this)} disabled={this.priceIsDisabled()}  />
               <span className={this.priceIsDisabled() ? "text-disabled" : ""}>{marketInfo && marketInfo.quoteAsset.symbol}</span>
             </div>
             <div className="spf_input_box">
@@ -367,17 +371,28 @@ export class SpotForm extends React.Component {
             <div className="spf_range">
               <RangeSlider value={this.amountPercentOfMax()} onChange={this.rangeSliderHandler.bind(this)} />
             </div>
-            {this.props.user.id ? (
-              <div className="spf_btn">
-                <button
-                  type="button"
-                  className={buySellBtnClass}
-                  onClick={this.buySellHandler.bind(this)}
-                  disabled={this.state.orderButtonDisabled}
-                >
-                  {buttonText}
-                </button>
-              </div>
+            {this.props.user.id ? (                
+                <div class="">
+                    <div className="spf_head">
+                        <span>Total</span>
+                        <strong>
+                            {this.props.orderType === "limit" 
+                                ? <>{(this.state.price * this.state.amount).toPrecision(6)}  {marketInfo && marketInfo.quoteAsset.symbol}</>
+                                : <>{(this.props.marketSummary.price * this.state.amount).toPrecision(6)} {marketInfo && marketInfo.quoteAsset.symbol}</>
+                            }
+                        </strong>
+                    </div>
+                    <div className="spf_btn">
+                        <button
+                            type="button"
+                            className={buySellBtnClass}
+                            onClick={this.buySellHandler.bind(this)}
+                            disabled={this.state.orderButtonDisabled}
+                            >
+                            {buttonText}
+                        </button>
+                    </div>
+                </div>
             ) : (
               <div className="spf_btn">
                 <ConnectWalletButton/>
