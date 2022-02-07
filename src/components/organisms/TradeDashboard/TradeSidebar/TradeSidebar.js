@@ -15,15 +15,17 @@ export default function TradeSidebar(props) {
             <TradePriceBtcTable
                 rowData={props.lastPriceTableData}
                 updateMarketChain={props.updateMarketChain}
+                markets={props.markets}
                 currentMarket={props.currentMarket}
             />
             <div style={{flex: 1}}>
                 <SpotBox
                     lastPrice={props.lastPrice}
                     user={props.user}
-                    currentMarket={props.currentMarket}
                     activeOrderCount={props.activeOrderCount}
                     liquidity={props.liquidity}
+                    currentMarket={props.currentMarket}
+                    marketSummary={props.marketSummary}
                     marketInfo={props.marketInfo}
                 />
             </div>

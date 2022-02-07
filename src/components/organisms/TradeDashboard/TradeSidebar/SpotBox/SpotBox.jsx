@@ -44,18 +44,20 @@ class SpotBox extends React.Component {
                 <h2 className={this.orderTypeTabClassName("market")} onClick={() => this.updateOrderType("market")}>Market</h2>
               </div>
             </div>
+            
             <div className="spot_bottom">
-            <Tabs>
+            <Tabs className="spotOptions">
               <div label="Buy">
                 <SpotForm
                   side="b"
                   lastPrice={this.props.lastPrice}
                   user={this.props.user}
-                  currentMarket={this.props.currentMarket}
                   orderType={this.state.orderType}
                   activeOrderCount={this.props.activeOrderCount}
                   liquidity={this.props.liquidity}
+                  
                   marketInfo={marketInfo}
+                  marketSummary={this.props.marketSummary}
                 />
               </div>
               <div label="Sell">
@@ -64,14 +66,20 @@ class SpotBox extends React.Component {
                   lastPrice={this.props.lastPrice}
                   user={this.props.user}
                   currentMarket={this.props.currentMarket}
+
                   orderType={this.state.orderType}
                   activeOrderCount={this.props.activeOrderCount}
                   liquidity={this.props.liquidity}
+
                   marketInfo={marketInfo}
+                  marketSummary={this.props.marketSummary}
+
                 />
               </div>
             </Tabs>
             </div>
+
+
           </div>
         </>
       );

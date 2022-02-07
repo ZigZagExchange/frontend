@@ -1,7 +1,6 @@
 .spot_box {
-    border-radius: 5px;
     width: 100%;
-    height: 400px;
+    height: 100%;
     background-color: #172435;
     overflow: auto;
 }

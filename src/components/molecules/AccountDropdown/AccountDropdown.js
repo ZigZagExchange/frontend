@@ -19,7 +19,7 @@ const DropdownDisplay = styled.div`
     margin-top: 10px;
     width: 360px;
     height: 400px;
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 1);
     backdrop-filter: blur(4px);
     top: 100%;
     right: 0;
@@ -166,6 +166,7 @@ const DropdownFooter = styled.div`
     border-bottom-left-radius: 8px;
     overflow: hidden;
     width: 100%;
+    flex-shrink: 0;
 `
 
 const SignOutButton = styled.div`
@@ -208,7 +209,6 @@ export const AccountDropdown = () => {
         ? balanceData.wallet
         : balanceData[network])
 
-    const tickers = api.getCurrencies().sort();
 
     useEffect(() => {
         const hideDisplay = () => setShow(false)
@@ -223,6 +223,25 @@ export const AccountDropdown = () => {
             e.preventDefault()
             setShow(!show)
         }
+    }
+
+    const filterSmallBalances = (currency) => {
+      const balance = wallet[currency].valueReadable
+      if (balance) {
+        return Number(balance) > 0
+      } else {
+        return 0
+      }
+    }
+
+    const sortByNotional = (cur1, cur2) => {
+      const notionalCur1 = coinEstimator(cur1) * wallet[cur1].valueReadable
+      const notionalCur2 = coinEstimator(cur2) * wallet[cur2].valueReadable
+      if (notionalCur1 > notionalCur2) {
+        return -1
+      } else if (notionalCur1 < notionalCur2) {
+        return 1
+      } else return 0
     }
 
     return (
@@ -254,20 +273,18 @@ export const AccountDropdown = () => {
                                 width={24}
                             />
                         </LoaderContainer>}
-                    {wallet && <CurrencyList>
-                        {tickers.map((ticker, key) => {
-                            if (!wallet[ticker] || wallet[ticker].value === 0) {
-                                return null
-                            }
-                            return (
-                                <CurrencyListItem key={key}>
-                                    <img className="currency-icon" src={api.getCurrencyLogo(ticker) && api.getCurrencyLogo(ticker).default} alt={ticker} />
-                                    <div>
-                                        <strong>{wallet[ticker].valueReadable} {ticker}</strong>
-                                        <small>${formatUSD(coinEstimator(ticker) * wallet[ticker].valueReadable)}</small>
-                                    </div>
-                                </CurrencyListItem>
-                            )
+                    {wallet &&  <CurrencyList>
+                      {Object.keys(wallet)
+                        .filter(filterSmallBalances)
+                        .sort(sortByNotional)
+                        .map((ticker, key) => {
+                          return <CurrencyListItem key={key}>
+                            <img className="currency-icon" src={api.getCurrencyLogo(ticker).default} alt={ticker} />
+                            <div>
+                              <strong>{wallet[ticker].valueReadable} {ticker}</strong>
+                              <small>${formatUSD(coinEstimator(ticker) * wallet[ticker].valueReadable)}</small>
+                            </div>
+                          </CurrencyListItem>
                         })}
                     </CurrencyList>}
                 </DropdownContent>

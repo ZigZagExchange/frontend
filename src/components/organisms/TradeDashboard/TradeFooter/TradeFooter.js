@@ -15,10 +15,10 @@ export default function TradeFooter() {
     return (
         <StyledTradeFooter>
             <div>
-                Operational Status
+                
             </div>
             <div>
-                Powered By STARKWARE
+                Powered By zkSync
             </div>
         </StyledTradeFooter>
     )

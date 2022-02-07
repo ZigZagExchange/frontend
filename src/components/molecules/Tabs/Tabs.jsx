@@ -28,26 +28,28 @@ export class Tabs extends React.Component {
     } = this;
 
     return (
-      <div className="tabs">
-        <div className="tab-list">
-          {children.map((child) => {
-            const { label } = child.props;
+      <div className={this.props.className}>
+        <div className="tabs">
+          <div className="tab-list">
+            {children.map((child) => {
+              const { label } = child.props;
 
-            return (
-              <Tab
-                activeTab={activeTab}
-                key={label}
-                label={label}
-                onClick={onClickTabItem}
-              />
-            );
-          })}
-        </div>
-        <div className="tab-content">
-          {children.map((child) => {
-            if (child.props.label !== activeTab) return undefined;
-            return child.props.children;
-          })}
+              return (
+                <Tab
+                  activeTab={activeTab}
+                  key={label}
+                  label={label}
+                  onClick={onClickTabItem}
+                />
+              );
+            })}
+          </div>
+          <div className="tab-content">
+            {children.map((child) => {
+              if (child.props.label !== activeTab) return undefined;
+              return child.props.children;
+            })}
+          </div>
         </div>
       </div>
     );

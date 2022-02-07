@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import styled from '@xstyled/styled-components'
 import TradeSidebar from './TradeSidebar/TradeSidebar'
@@ -13,7 +13,6 @@ import {
   userOrdersSelector,
   userFillsSelector,
   allOrdersSelector,
-  marketFillsSelector,
   lastPricesSelector,
   marketSummarySelector,
   liquiditySelector,
@@ -63,14 +62,12 @@ const TradeGrid = styled.article`
 `
 
 export function TradeDashboard() {
-    const [marketDataTab, updateMarketDataTab] = useState('fills')
     const user = useSelector(userSelector);
     const network = useSelector(networkSelector);
     const currentMarket = useSelector(currentMarketSelector);
     const userOrders = useSelector(userOrdersSelector);
     const userFills = useSelector(userFillsSelector);
     const allOrders = useSelector(allOrdersSelector);
-    const marketFills = useSelector(marketFillsSelector);
     const lastPrices = useSelector(lastPricesSelector);
     const marketSummary = useSelector(marketSummarySelector);
     const liquidity = useSelector(liquiditySelector);
@@ -138,10 +135,10 @@ export function TradeDashboard() {
       const price = lastPrices[market].price;
       const change = lastPrices[market].change;
       const pctchange = ((change / price) * 100).toFixed(2);
-      lastPriceTableData.push({ td1: market, td2: price, td3: pctchange });
+      lastPriceTableData.push({ td1: market, td2: price, td3: pctchange});
     });
   
-    const openOrdersData = [];
+    
     const orderbookBids = [];
     const orderbookAsks = [];
   
@@ -179,32 +176,6 @@ export function TradeDashboard() {
         orderbookAsks.push(orderRow);
       }
     }
-  
-      // Only display recent trades
-      // There's a bunch of user trades in this list that are too old to display
-      const fillData = [];
-      const maxFillId = Math.max(...Object.values(marketFills).map(f => f[1]));
-      Object.values(marketFills)
-          .filter(fill => fill[1] > maxFillId - 500)
-          .sort((a,b) => b[1] - a[1])
-          .forEach((fill) => {
-              if (api.isZksyncChain()) {
-                  const fillWithoutFee = api.getFillDetailsWithoutFee(fill);
-                  fillData.push({
-                      td1: fillWithoutFee.price,
-                      td2: fillWithoutFee.baseQuantity,
-                      td3: fillWithoutFee.quoteQuantity,
-                      side: fill[3],
-                  });
-              } else {
-                  fillData.push({
-                      td1: fill[4],
-                      td2: fill[5],
-                      td3: fill[4] * fill[5],
-                      side: fill[3],
-                  });
-              }
-          });
   
     if (api.isZksyncChain()) {
       liquidity.forEach((liq) => {
@@ -259,17 +230,13 @@ export function TradeDashboard() {
       }
     }
   
-    let openOrdersLatestTradesData;
-    if (marketDataTab === "orders") {
-      openOrdersLatestTradesData = openOrdersData;
-    } else if (marketDataTab === "fills") {
-      openOrdersLatestTradesData = fillData;
-    }
+    
   
     const activeOrderStatuses = ["o", "m", "b"];
     const activeUserOrders = Object.values(userOrders).filter(
       (order) => activeOrderStatuses.includes(order[9])
     ).length;
+
     return (
         <TradeContainer>
             <TradeGrid>
@@ -284,22 +251,27 @@ export function TradeDashboard() {
                 <TradeSidebar 
                     lastPriceTableData={lastPriceTableData}
                     updateMarketChain={updateMarketChain}
+                    markets={markets}
                     currentMarket={currentMarket}
                     lastPrice={marketSummary.price}
                     user={user}
                     activeOrderCount={activeUserOrders}
                     liquidity={liquidity}
                     marketInfo={marketInfo}
+                    marketSummary={marketSummary}
                 />
+                {/* TradePriceTable, TradePriceHeadSecond */}
                 <TradeBooks
                     currentMarket={currentMarket}
                     priceTableData={askBins}
                     lastPrice={marketSummary.price}
                     bidBins={bidBins}
                 />
+                {/* TradeChartArea */}
                 <TradeChartArea
                     marketInfo={marketInfo}
                 />
+                {/* OrdersTable */}
                 <TradeTables 
                     userFills={userFills}
                     userOrders={userOrders}

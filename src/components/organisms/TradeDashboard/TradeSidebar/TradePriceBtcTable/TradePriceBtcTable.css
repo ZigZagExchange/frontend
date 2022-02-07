@@ -1,9 +1,17 @@
 .trade_price_btc_table table{
     width: 100%;
+    font-size: 12px;
+}
+
+.trade_price_btc_table svg{
+    height: 14px;
+    width: 14px;
+    margin-right: 5px;
+    margin-top: -5px;
 }
 
 .trade_price_btc_table {
-  height: calc(100vh - 499px);
+  height: calc(100vh - 571px);
   min-height: 200px;
   overflow: auto;
 }
@@ -38,7 +46,6 @@
 .trade_price_btc_table table th {
     color: #94a2c9;
     font-weight: 400;
-    text-align: center;
     padding: 5px 20px;
 }
 
