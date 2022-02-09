@@ -304,6 +304,10 @@ export class SpotForm extends React.Component {
         ) {
             this.rangeSliderHandler(null, 100);
         }
+
+        if (this.props.currentMarket !== prevProps.currentMarket) {
+            this.setState((state) => ({...state, price: "", amount: ""}));
+        }
     }
 
     render() {
@@ -351,7 +355,7 @@ export class SpotForm extends React.Component {
         <>
           <form className="spot_form">
             <div className="spf_head">
-              <span>Avbl</span>
+              <span>Available balance</span>
               {balanceHtml}
             </div>
             <div className="spf_input_box">
