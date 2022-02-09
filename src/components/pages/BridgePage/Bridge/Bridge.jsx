@@ -309,7 +309,7 @@ const Bridge = () => {
             {user.address ? (
               user.id && <div className="bridge_transfer_fee">
                 <div className="bridge_transfer_fee">
-                  {isFastWithdraw ? "Gas Fee" : "zkSync Withdraw Fee"}: {typeof bridgeFee !== 'number' ? (
+                  {isFastWithdraw ? "zkSync Withdraw Fee" : "Gas Fee"}: {typeof bridgeFee !== 'number' ? (
                   <div style={{ display: 'inline-flex', margin: '0 5px' }}>
                     <Loader
                       type="TailSpin"
