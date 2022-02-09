@@ -24,6 +24,7 @@ const ControlledRadios = ({items, value, onChange, name}) => {
         id={item.id}
         value={item.value}
         checked={value === item.id}
+        disabled={item.disabled}
         onChange={(e) => {
           if (onChange) {
             onChange(item.id)
@@ -38,7 +39,7 @@ const UncontrolledRadios = ({items, name}) => {
   return <>
     {items.map(item => <x.div display={"flex"} flexDirection={"column"} alignItems={"center"} key={`uncontrolled-radio-${item.id}`}>
       <Label label={item.name}/>
-      <Radio name={name} id={item.id} value={item.value}/>
+      <Radio name={name} id={item.id} value={item.value} disabled={item.disabled}/>
     </x.div>)}
   </>
 }
@@ -73,13 +74,19 @@ const StyledRadio = styled.input`
   &:checked::before {
     transform: scale(1);
   }
+  
+  &:disabled {
+    border-color: #232528;
+    cursor: inherit;
+  }
 `
 
-const Radio = ({name, id, value, ...rest}) => {
+const Radio = ({name, id, value, disabled, ...rest}) => {
   return <StyledRadio
     value={value}
     id={id}
     name={name}
+    disabled={disabled}
     type={"radio"}
     {...rest}
   />

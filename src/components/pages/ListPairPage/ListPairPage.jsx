@@ -119,7 +119,7 @@ export default function ListPairPage() {
       >
         <Pane size={"sm"} variant={"light"} maxWidth={"500px"} margin={"auto"}>
           <x.div display={"flex"} justifyContent={"space-between"} mb={4}>
-            <x.div fontSize={28} mb={2}>List New Market</x.div>
+            <x.div fontSize={28} mb={2}>List New Pair</x.div>
             <x.div fontSize={12} color={"blue-gray-400"} textAlign={"center"}>
               <x.div>No Internal ID?</x.div>
               <x.div>

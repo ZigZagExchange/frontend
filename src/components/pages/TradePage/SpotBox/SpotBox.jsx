@@ -1,10 +1,10 @@
 import React from "react";
-//import { toast } from "react-toastify";
-// css
 import "./SpotBox.css";
-// assets
 import { SpotForm } from "components";
-//import api from "lib/api";
+import {x} from "@xstyled/styled-components"
+import Tooltip from "../../../atoms/Tooltip/Tooltip";
+import {AiOutlineQuestionCircle} from "react-icons/all";
+import ExternalLink from "../../ListPairPage/ExternalLink";
 
 class SpotBox extends React.Component {
     constructor(props) {
@@ -32,11 +32,39 @@ class SpotBox extends React.Component {
               <div className="sh_l">
                 <h2>SPOT</h2>
               </div>
-              <div className="sh_r">
-                 Sell Fee: {marketInfo && marketInfo.baseFee.toPrecision(4)} {marketInfo && marketInfo.baseAsset.symbol}
-                 <br/>
-                 Buy Fee: {marketInfo && marketInfo.quoteFee.toPrecision(4)} {marketInfo && marketInfo.quoteAsset.symbol}
-              </div>
+              <x.div mt={3} mr={3} color={"white"}>
+                <x.div display={"flex"} justifyContent={"flex-end"} alignItems={"center"}>
+                  <x.div>
+                    <x.div textAlign={"right"}>
+                      Sell Fee: {marketInfo && marketInfo.baseFee.toPrecision(4)} {marketInfo && marketInfo.baseAsset.symbol}
+                    </x.div>
+                    <x.div textAlign={"right"}>
+                      Buy Fee: {marketInfo && marketInfo.quoteFee.toPrecision(4)} {marketInfo && marketInfo.quoteAsset.symbol}
+                    </x.div>
+                  </x.div>
+                </x.div>
+                <x.div fontSize={12} color={"blue-gray-400"} mt={2} display={"flex"} alignItems={"center"}>
+                  <x.div mr={2} display={"flex"} alignItems={"center"}>
+                    <Tooltip>
+                      <Tooltip placement={"left"} label={<x.div>
+                        <x.div>
+                          zkSync's network swap fees are dynamic and sit around ~$0.50
+                        </x.div>
+                        <x.div>
+                          covered by the market maker, but paid by the trader
+                        </x.div>
+                      </x.div>}>
+                        <x.div display={"inline-flex"} color={"blue-gray-600"} ml={2} alignItems={"center"}>
+                          <AiOutlineQuestionCircle size={16}/>
+                        </x.div>
+                      </Tooltip>
+                    </Tooltip>
+                  </x.div>
+                  <x.div>
+                    These fees cover zkSync's <ExternalLink href={"https://l2fees.info"}>swap fees</ExternalLink>
+                  </x.div>
+                </x.div>
+              </x.div>
             </div>
             <div className="spot_tabs">
               <div className="st_l">
