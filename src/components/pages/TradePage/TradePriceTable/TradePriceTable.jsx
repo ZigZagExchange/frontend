@@ -49,8 +49,8 @@ const TradePriceTable = (props) => {
                 rowStyle = {};
               }
               const price = typeof d.td1 === "number" ? d.td1.toPrecision(6) : d.td1;
-              const amount = Number(typeof d.td2 === "number" ? d.td2.toPrecision(6) : d.td2);
-              const total = Math.round(typeof d.td3 === "number" ? d.td3.toPrecision(6) : d.td3);
+              const amount = typeof d.td2 === "number" ? d.td2.toPrecision(6) : d.td2;
+              const total = typeof d.td3 === "number" ? d.td3.toPrecision(6) : d.td3;
               return (
                 <tr key={i} style={rowStyle} onClick={() => onClickRow(d)}>
                   <td className={d.side === "b" ? "up_value" : "down_value"}>
