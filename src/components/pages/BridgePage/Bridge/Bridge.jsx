@@ -51,7 +51,11 @@ const Bridge = () => {
   let zkBalances = balanceData[network] || {}
 
   const [withdrawSpeed, setWithdrawSpeed] = useState("fast")
-  const isFastWithdraw = withdrawSpeed === "fast" && transfer.type === "withdraw"
+  const isFastWithdraw = (
+    withdrawSpeed === "fast"
+    && transfer.type === "withdraw"
+    && api.apiProvider.eligibleFastWithdrawTokens.includes(swapDetails.currency))
+
   const showFastSwapOption = transfer.type === "withdraw"
     && swapDetails.currency
     && api.apiProvider.eligibleFastWithdrawTokens.includes(swapDetails.currency)
@@ -72,6 +76,13 @@ const Bridge = () => {
     }
   }, [withdrawSpeed])
 
+  useEffect(() => {
+    if (!api.apiProvider.eligibleFastWithdrawTokens.includes(swapDetails.currency)) {
+      setWithdrawSpeed("normal")
+    } else {
+      setWithdrawSpeed("fast")
+    }
+  }, [swapDetails.currency])
 
   const setSwapDetails = values => {
     const details = {
@@ -80,6 +91,7 @@ const Bridge = () => {
     };
 
     _setSwapDetails(details);
+
 
     const setFee = bridgeFee => {
       setBridgeFee(bridgeFee)
