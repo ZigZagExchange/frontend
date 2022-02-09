@@ -272,7 +272,6 @@ export default class APIZKProvider extends APIProvider {
                 parseInt(fee.totalFee)
                 / 10 ** currencyInfo.decimals
             )
-            console.log(parseInt(fee.totalFee) / 10 ** currencyInfo.decimals)
         }
 
         return this._tokenWithdrawFees[token]
