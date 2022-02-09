@@ -291,13 +291,13 @@ const Bridge = () => {
               </div>
             </div>
             <x.div flexDirection={"column"} display={"flex"} alignItems={"flex-end"}>
-                <RadioButtons
+              {transfer.type === "withdraw" && <RadioButtons
                   horizontal
                   value={withdrawSpeed}
                   onChange={setWithdrawSpeed}
                   name={"withdrawSpeed"}
                   items={[{id: "fast", name: "Fast", disabled: !api.apiProvider.eligibleFastWithdrawTokens.includes(swapDetails.currency)}, {id: "normal", name: "Normal"}]}
-                />
+                />}
               <x.div display={"flex"} mt={2}>
                 <x.div fontSize={12} color={"blue-gray-500"}>Withdraw speed</x.div>
                 <FastWithdrawTooltip/>
