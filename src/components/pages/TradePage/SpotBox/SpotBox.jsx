@@ -36,10 +36,10 @@ class SpotBox extends React.Component {
                 <x.div display={"flex"} justifyContent={"flex-end"} alignItems={"center"}>
                   <x.div>
                     <x.div textAlign={"right"}>
-                      Sell Fee: {marketInfo && marketInfo.baseFee} {marketInfo && marketInfo.baseAsset.symbol}
+                      Sell Fee: {marketInfo && marketInfo.baseFee.toPrecision(4)} {marketInfo && marketInfo.baseAsset.symbol}
                     </x.div>
                     <x.div textAlign={"right"}>
-                      Buy Fee: {marketInfo && marketInfo.quoteFee} {marketInfo && marketInfo.quoteAsset.symbol}
+                      Buy Fee: {marketInfo && marketInfo.quoteFee.toPrecision(4)} {marketInfo && marketInfo.quoteAsset.symbol}
                     </x.div>
                   </x.div>
                 </x.div>
@@ -48,7 +48,7 @@ class SpotBox extends React.Component {
                     <Tooltip>
                       <Tooltip placement={"left"} label={<x.div>
                         <x.div>
-                          zkSync's network swap fees hover around $1 and are
+                          zkSync's network swap fees are dynamic and sit around ~$0.50
                         </x.div>
                         <x.div>
                           covered by the market maker, but paid by the trader

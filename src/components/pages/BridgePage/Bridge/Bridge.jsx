@@ -56,11 +56,6 @@ const Bridge = () => {
     && transfer.type === "withdraw"
     && api.apiProvider.eligibleFastWithdrawTokens.includes(swapDetails.currency))
 
-  const showFastSwapOption = transfer.type === "withdraw"
-    && swapDetails.currency
-    && api.apiProvider.eligibleFastWithdrawTokens.includes(swapDetails.currency)
-    && api.isZksyncChain()
-
   useEffect(() => {
     if (user.address) {
       api.getL2FastWithdrawLiquidity().then(maxes => {
@@ -295,19 +290,19 @@ const Bridge = () => {
                 </span>
               </div>
             </div>
-            {showFastSwapOption && <x.div flexDirection={"column"} display={"flex"} alignItems={"flex-end"}>
+            <x.div flexDirection={"column"} display={"flex"} alignItems={"flex-end"}>
                 <RadioButtons
                   horizontal
                   value={withdrawSpeed}
                   onChange={setWithdrawSpeed}
                   name={"withdrawSpeed"}
-                  items={[{id: "fast", name: "Fast"}, {id: "normal", name: "Normal"}]}
+                  items={[{id: "fast", name: "Fast", disabled: !api.apiProvider.eligibleFastWithdrawTokens.includes(swapDetails.currency)}, {id: "normal", name: "Normal"}]}
                 />
               <x.div display={"flex"} mt={2}>
                 <x.div fontSize={12} color={"blue-gray-500"}>Withdraw speed</x.div>
                 <FastWithdrawTooltip/>
               </x.div>
-              </x.div>}
+              </x.div>
             {transfer.type === 'deposit' && user.address && !user.id && <div className="bridge_transfer_fee">
               One-Time Activation Fee: {activationFee} {swapDetails.currency} (~$15.00)
             </div>}
