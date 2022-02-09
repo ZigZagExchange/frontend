@@ -71,6 +71,11 @@ const Bridge = () => {
     }
   }, [withdrawSpeed])
 
+  // recalc swap details
+  useEffect(() => {
+    setSwapDetails({})
+  }, [transfer.type])
+
   useEffect(() => {
     if (!api.apiProvider.eligibleFastWithdrawTokens.includes(swapDetails.currency)) {
       setWithdrawSpeed("normal")
