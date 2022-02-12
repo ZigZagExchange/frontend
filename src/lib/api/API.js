@@ -201,9 +201,6 @@ export default class API extends Emitter {
     }
 
     refreshNetwork = async () => {
-        this.stop();
-        this.start();
-
         if (!window.ethereum) return
         let ethereumChainId
 
