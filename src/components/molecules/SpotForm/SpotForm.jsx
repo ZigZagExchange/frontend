@@ -89,7 +89,6 @@ export class SpotForm extends React.Component {
                 } else {
                     unfilled -= bids[i][2];
                 }
-                console.log(unfilled);
             }
         }
         if (!price) return 0;
@@ -132,9 +131,9 @@ export class SpotForm extends React.Component {
         }
         if (this.props.orderType === 'market') {
             if (this.props.side === 'b') {
-                price *= 1.0008;
+                price *= 1.0015;
             } else if (this.props.side === 's') {
-                price *= 0.9992;
+                price *= 0.9985;
             }
         }
 
@@ -159,16 +158,16 @@ export class SpotForm extends React.Component {
             return;
         } else if (
             isNaN(price) ||
-            price > this.getFirstAsk() * 1.2 ||
-            price < this.getFirstBid() * 0.8
+            price > this.getFirstAsk() * 2 ||
+            price < this.getFirstBid() * 0.5
         ) {
-            toast.error("Price must be within 20% of spot");
+            toast.error("Price must be within 50% of spot");
             return;
         } else if (
-            (this.props.side === 'b' && price > this.getFirstAsk() * 1.05) ||
-            (this.props.side === 's' && price < this.getFirstBid() * 0.95)
+            (this.props.side === 'b' && price > this.getFirstAsk() * 1.2) ||
+            (this.props.side === 's' && price < this.getFirstBid() * 0.8)
         ) {
-            toast.error("Limit orders cannot exceed 5% beyond spot");
+            toast.error("Limit orders cannot exceed 20% beyond spot");
             return;
         }
 
