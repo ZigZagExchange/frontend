@@ -131,9 +131,9 @@ export class SpotForm extends React.Component {
         }
         if (this.props.orderType === 'market') {
             if (this.props.side === 'b') {
-                price *= 1.0008;
+                price *= 1.0015;
             } else if (this.props.side === 's') {
-                price *= 0.9992;
+                price *= 0.9985;
             }
         }
 
