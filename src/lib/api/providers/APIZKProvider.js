@@ -21,7 +21,7 @@ export default class APIZKProvider extends APIProvider {
     zksyncCompatible = true
     _tokenWithdrawFees = {}
     _fastWithdrawContractAddress = "0xCC9557F04633d82Fb6A1741dcec96986cD8689AE"
-    eligibleFastWithdrawTokens = ["ETH", "FRAX"]
+    eligibleFastWithdrawTokens = ["ETH", "FRAX", "UST"]
 
     getProfile = async (address) => {
         try {
@@ -217,7 +217,6 @@ export default class APIZKProvider extends APIProvider {
       const currencyInfo = this.getCurrencyInfo(token)
       let amount = toBaseUnit(amountDecimals, currencyInfo.decimals)
 
-      // if amount is not packable
       const isPackable = isTransactionAmountPackable(amount)
       if (!isPackable) {
         amount = closestPackableTransactionAmount(amount)
@@ -311,13 +310,13 @@ export default class APIZKProvider extends APIProvider {
 
         if (token === "ETH") {
           return getNumberFormatted(bridgeFee)
-        } else if (token === "FRAX") {
+        } else if (["FRAX", "UST"].includes(token)) {
           const priceInfo = await this.tokenPrice("ETH")
           const stableFee = (bridgeFee.toString() / 1e18 * priceInfo.price * 10**currencyInfo.decimals * 50000 / 21000).toFixed(0);
           return getNumberFormatted(stableFee)
         }
       } else {
-        throw Error("Ethers provider not found")
+        throw new Error("Ethers provider not found")
       }
     }
 
