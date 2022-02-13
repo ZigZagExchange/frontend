@@ -92,6 +92,16 @@ export default class API extends Emitter {
             })
         }
 
+        // Change WebSocket if necessary
+        if (this.ws) {
+            const oldUrl = new URL(this.ws.url);
+            const newUrl = new URL(this.apiProvider.websocketUrl);
+            if (oldUrl.host !== newUrl.host) {
+                // Stopping the WebSocket will trigger an auto-restart in 3 seconds
+                this.stop();
+            }
+        }
+
         this.getAccountState()
             .catch(err => {
                 console.log('Failed to switch providers', err)
