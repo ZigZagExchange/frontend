@@ -6,6 +6,7 @@ import {Link} from "react-router-dom";
 import styled from '@xstyled/styled-components'
 import axios from "axios";
 import Loader from "react-loader-spinner";
+import ExternalLink from "./ExternalLink";
 
 
 export const marketQueryParam = "market"
@@ -40,9 +41,6 @@ const StyledLink = styled(Link)`
 `
 
 const SuccessModal = ({txid, show, onClose}) => {
-  // test tx
-  // {"arweave_txid":"-C60-kmz6VjDiWv_MsKzLXqNA_vC7c29sdaasOInaj8","remaining_bytes":499610}
-
   const [pairNetwork, setPairNetwork] = useState()
   const [baseAsset, setBaseAsset] = useState()
   const [quoteAsset, setQuoteAsset] = useState()
@@ -84,9 +82,7 @@ const SuccessModal = ({txid, show, onClose}) => {
       </x.div>
     </x.div>
     <x.div w={"full"} display={"flex"} flexDirection={"column"} alignItems={"center"} mb={6} fontSize={14}>
-      <x.a href={viewMarketURL} target={"_blank"} mb={2} color={{_: "blue-gray-400", hover: "blue-100"}}>
-        View your market
-      </x.a>
+      <ExternalLink href={viewMarketURL}>View your market</ExternalLink>
       <StyledLink
         to={{
           pathname: '/',

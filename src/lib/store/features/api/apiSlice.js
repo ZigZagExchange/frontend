@@ -219,28 +219,39 @@ export const apiSlice = createSlice({
     },
     addBridgeReceipt(state, { payload }) {
       if (!payload || !payload.txId) return
-      const { amount, token, txUrl, type } = payload
+      const { amount, token, txUrl, type, isFastWithdraw } = payload
 
-      toast.success(
-        <>
+      const renderBridgeLink = (text, link) => {
+        return <a href={link}
+                  style={{ color: 'white', textDecoration: 'underline', fontWeight: 'bold' }}
+                  target="_blank"
+                  rel="noreferrer">
+          {text}
+        </a>
+      }
+
+      const renderToastContent = () => {
+        return <>
           Successfully
           {' '}{type === 'deposit' ? 'deposited' : 'withdrew'}
           {' '}{amount} {token}
-          {' '}{type === 'deposit' ? 'in your zkSync wallet' : 'into your Ethereum wallet. Withdraws can take up to 7 hours to complete'}.
+          {' '}{type === 'deposit' ? 'in your zkSync wallet' : `into your Ethereum wallet. ${isFastWithdraw ? 'Fast withdrawals should be confirmed within a few minutes' : 'Withdraws can take up to 7 hours to complete'}`}.
           <br /><br />
           <a href={txUrl}
-            style={{ color: 'white', textDecoration: 'underline', fontWeight: 'bold' }}
-            target="_blank"
-            rel="noreferrer">
-              View transaction
+             style={{ color: 'white', textDecoration: 'underline', fontWeight: 'bold' }}
+             target="_blank"
+             rel="noreferrer">
+            View transaction
           </a>{' • '}
-          <a href="https://zksync.io/faq/faq.html#how-long-are-withdrawal-times"
-            style={{ color: 'white', textDecoration: 'underline', fontWeight: 'bold' }}
-            target="_blank"
-            rel="noreferrer">
-              Bridge FAQ
-          </a>
+
+          {!isFastWithdraw && renderBridgeLink("Bridge FAQ","https://zksync.io/faq/faq.html#how-long-are-withdrawal-times")}
+          {isFastWithdraw && renderBridgeLink("Fast Bridge FAQ", "https://docs.zigzag.exchange/zksync/fast-withdraw-bridge")}
         </>
+      }
+
+      toast.success(
+        renderToastContent(),
+        {closeOnClick: false}
       )
 
       state.bridgeReceipts.unshift(payload)
@@ -256,13 +267,16 @@ export const apiSlice = createSlice({
         state.userOrders = {};
         state.userFills = {};
     },
+    clearLastPrices(state) {
+        state.lastPrices = {};
+    },
     setArweaveAllocation(state, { payload }) {
         state.arweaveAllocation = payload;
     }
   },
 })
 
-export const { setNetwork, clearBridgeReceipts, setBalances, setUserId, addBridgeReceipt, setCurrentMarket, resetData, clearUserOrders, setArweaveAllocation } = apiSlice.actions
+export const { setNetwork, clearBridgeReceipts, setBalances, setUserId, addBridgeReceipt, setCurrentMarket, resetData, clearUserOrders, clearLastPrices, setArweaveAllocation } = apiSlice.actions
 
 export const networkSelector = state => state.api.network
 export const userOrdersSelector = state => state.api.userOrders

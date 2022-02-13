@@ -4,7 +4,7 @@ import createSagaMiddleware from 'redux-saga'
 import { persistStore, persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 import authReducer, { signIn, signOut, updateAccountState } from 'lib/store/features/auth/authSlice'
-import apiReducer, { handleMessage, setBalances, addBridgeReceipt, setNetwork, clearUserOrders, setArweaveAllocation } from 'lib/store/features/api/apiSlice'
+import apiReducer, { handleMessage, setBalances, addBridgeReceipt, setNetwork, clearUserOrders, clearLastPrices, setArweaveAllocation } from 'lib/store/features/api/apiSlice'
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2'
 import api from 'lib/api'
 import sagas from './sagas'
@@ -76,6 +76,7 @@ api.on('signOut', (accountState) => {
 })
 
 api.on('providerChange', (network) => {
+    store.dispatch(clearLastPrices())
     store.dispatch(setNetwork(network))
 })
 

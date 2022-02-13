@@ -20,5 +20,9 @@ export default class APIProvider {
     constructor(api, network) {
         this.api = api
         this.network = network
+        this.websocketUrl = process.env.REACT_APP_ZIGZAG_WS;
+        if (network === 1000 && process.env.REACT_APP_ZIGZAG_WS_RINKEBY) {
+            this.websocketUrl = process.env.REACT_APP_ZIGZAG_WS_RINKEBY;
+        }
     }
 }

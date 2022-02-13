@@ -1,9 +1,8 @@
 import Web3 from 'web3'
 import { createIcon } from '@download/blockies'
-import { toast } from 'react-toastify'
 import Web3Modal from 'web3modal'
 import Emitter from 'tiny-emitter'
-import { ethers } from 'ethers'
+import { ethers, utils } from 'ethers'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { getENSName } from 'lib/ens'
 import { formatAmount } from 'lib/utils'
@@ -20,13 +19,12 @@ export default class API extends Emitter {
     apiProvider = null
     ethersProvider = null
     currencies = null
-    websocketUrl = null
     marketInfo = {}
     lastprices = {}
     _signInProgress = null
     _profiles = {}
-    
-    constructor({ infuraId, websocketUrl, networks, currencies, validMarkets }) {
+
+    constructor({ infuraId, networks, currencies, validMarkets }) {
         super()
         
         if (networks) {
@@ -40,7 +38,6 @@ export default class API extends Emitter {
         }
         
         this.infuraId = infuraId
-        this.websocketUrl = websocketUrl
         this.currencies = currencies
         this.validMarkets = validMarkets
 
@@ -72,6 +69,16 @@ export default class API extends Emitter {
 
         const apiProvider = this.getAPIProvider(network) 
         this.apiProvider = apiProvider
+
+        // Change WebSocket if necessary
+        if (this.ws) {
+            const oldUrl = new URL(this.ws.url);
+            const newUrl = new URL(this.apiProvider.websocketUrl);
+            if (oldUrl.host !== newUrl.host) {
+                // Stopping the WebSocket will trigger an auto-restart in 3 seconds
+                this.stop();
+            }
+        }
         
         if (this.isZksyncChain()) {
             this.web3 = new Web3(
@@ -144,7 +151,11 @@ export default class API extends Emitter {
     }
     
     _socketClose = () => {
-        toast.error("Connection to server closed. Please refresh page");
+        console.warn("Websocket dropped. Restarting");
+        this.ws = null;
+        setTimeout(() => {
+            this.start();
+        }, 3000);
         this.emit('close')
     }
 
@@ -156,6 +167,7 @@ export default class API extends Emitter {
         // Is there a better way to do this? Not sure. 
         if (msg.op === "marketinfo") {
             const marketInfo = msg.args[0];
+            if (!marketInfo) return;
             this.apiProvider.marketInfo[marketInfo.alias] = marketInfo;
         }
         if (msg.op === "lastprice") {
@@ -166,21 +178,22 @@ export default class API extends Emitter {
         }
     }
 
+    _socketError = (e) => {
+        console.warn("Zigzag websocket connection failed");
+    }
+
     start = () => {
         if (this.ws) this.stop()
-        this.ws = new WebSocket(this.websocketUrl)
+        this.ws = new WebSocket(this.apiProvider.websocketUrl)
         this.ws.addEventListener('open', this._socketOpen)
         this.ws.addEventListener('close', this._socketClose)
         this.ws.addEventListener('message', this._socketMsg)
+        this.ws.addEventListener('error', this._socketError)
         this.emit('start')
     }
 
     stop = () => {
         if (!this.ws) return
-        this.ws.removeEventListener('open', this._socketOpen)
-        this.ws.removeEventListener('close', this._socketClose)
-        this.ws.removeEventListener('message', this._socketMsg)
-        this._socketClose()
         this.ws.close()
         this.emit('stop')
     }
@@ -193,6 +206,7 @@ export default class API extends Emitter {
     }
 
     send = (op, args) => {
+        if (!this.ws) return;
         return this.ws.send(JSON.stringify({ op, args }))
     }
 
@@ -311,12 +325,24 @@ export default class API extends Emitter {
         return this.apiProvider.withdrawL2(amount, token)
     }
 
+    withdrawL2Fast = (amount, token) => {
+      return this.apiProvider.withdrawL2Fast(amount, token)
+    }
+
     depositL2Fee = async (token) => {
         return this.apiProvider.depositL2Fee(token)
     }
 
     withdrawL2Fee = async (token) => {
         return this.apiProvider.withdrawL2Fee(token)
+    }
+
+    withdrawL2FeeFast = async (token) => {
+      return this.apiProvider.withdrawL2FeeFast(token)
+    }
+
+    withdrawL2ZZFeeFast = async (token) => {
+        return this.apiProvider.withdrawL2ZZFeeFast(token)
     }
 
     cancelAllOrders = async () => {
@@ -409,13 +435,13 @@ export default class API extends Emitter {
         const marketInfo = this.apiProvider.marketInfo[market];
         let baseQuantityWithoutFee, quoteQuantityWithoutFee, priceWithoutFee, remainingWithoutFee
         if (side === "s") {
-            const fee = marketInfo.baseFee;
+            const fee = marketInfo ? marketInfo.baseFee : 0;
             baseQuantityWithoutFee = baseQuantity - fee;
             remainingWithoutFee = Math.max(0, remaining - fee);
             priceWithoutFee = quoteQuantity / baseQuantityWithoutFee;
             quoteQuantityWithoutFee = priceWithoutFee * baseQuantityWithoutFee;
         } else {
-            const fee = marketInfo.quoteFee;
+            const fee = marketInfo ? marketInfo.quoteFee: 0;
             quoteQuantityWithoutFee = quoteQuantity - fee;
             priceWithoutFee = quoteQuantityWithoutFee / baseQuantity;
             baseQuantityWithoutFee = quoteQuantityWithoutFee / priceWithoutFee;
@@ -528,11 +554,48 @@ export default class API extends Emitter {
         return this.apiProvider.getCurrencyInfo(currency);
     }
 
-    getImage(currency) {
+    getCurrencyLogo(currency) {
         try {
             return require(`assets/images/currency/${currency}.svg`)
         } catch(e) {
             return require(`assets/images/currency/ZZ.webp`)
         }
+    }
+
+    get _fraxContractAddress() {
+      if (this.apiProvider.network === 1) {
+        return "0x853d955aCEf822Db058eb8505911ED77F175b99e"
+      } else if (this.apiProvider.network === 1000) {
+        return "0x6426e27d8c6fDCd1e0c165d0D58c7eC0ef51f3a7"
+      } else {
+        throw Error("No FRAX address for specified network")
+      }
+    }
+
+    async getL2FastWithdrawLiquidity() {
+      if (this.ethersProvider) {
+        let maxETH = 0
+        try {
+          maxETH = await this.ethersProvider.getBalance(this.apiProvider._fastWithdrawContractAddress)
+        } catch (e) {
+          console.error(e)
+        }
+
+        const fraxContract = new ethers.Contract(this._fraxContractAddress, erc20ContractABI, this.ethersProvider)
+        let maxFRAX = 0
+        try {
+          maxFRAX = await fraxContract.balanceOf(this.apiProvider._fastWithdrawContractAddress)
+        } catch (e) {
+          console.error(e)
+        }
+
+        return {
+          ETH: Number(utils.formatEther(maxETH)),
+          FRAX: Number(utils.formatEther(maxFRAX))
+        }
+      } else {
+        console.error("Ethers provider null or undefined")
+        return {}
+      }
     }
 }

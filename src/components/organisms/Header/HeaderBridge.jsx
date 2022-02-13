@@ -55,7 +55,7 @@ export const HeaderBridge = (props) => {
               </li>
               <li>
                 <NavLink exact to="/list-pair" activeClassName="active_link">
-                  List
+                  List Pair
                 </NavLink>
               </li>
               <li>

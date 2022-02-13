@@ -76,7 +76,7 @@ export const Header = (props) => {
                 </li>}
                 <li>
                   <NavLink exact to="/list-pair" activeClassName="active_link">
-                    List
+                    List Pair
                   </NavLink>
                 </li>
                 <Dev>
@@ -143,7 +143,7 @@ export const Header = (props) => {
               </li>}
               <li>
                 <NavLink exact to="/list-pair" activeClassName="active_link">
-                  List
+                  List Pair
                 </NavLink>
               </li>
               {hasBridge && <li>
