@@ -57,7 +57,7 @@ const TradePriceTable = (props) => {
                   <td className={d.side === "b" ? "up_value" : "down_value"}>
                     {price}
                   </td>
-                  <td>{amount}</td>
+                  <td>{numStringToSymbol(amount, 2)}</td>
                   <td>{numStringToSymbol(total, 2)}</td>
                 </tr>
               );
