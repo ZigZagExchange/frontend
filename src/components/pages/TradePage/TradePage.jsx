@@ -151,7 +151,7 @@ const TradePage = () => {
     const fillData = [];
     const maxFillId = Math.max(...Object.values(marketFills).map(f => f[1]));
     Object.values(marketFills)
-        .filter(fill => fill[1] > maxFillId - 500)
+        .filter(fill => (fill[1] > maxFillId - 500) && fill[6] !== 'r')
         .sort((a,b) => b[1] - a[1])
         .forEach((fill) => {
             if (api.isZksyncChain()) {
