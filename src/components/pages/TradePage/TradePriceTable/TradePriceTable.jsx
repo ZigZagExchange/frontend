@@ -5,6 +5,7 @@ import "./TradePriceTable.css";
 import {
   marketInfoSelector,
 } from "lib/store/features/api/apiSlice";
+import { numStringToSymbol } from "lib/utils";
 
 const TradePriceTable = (props) => {
     const marketInfo = useSelector(marketInfoSelector);
@@ -57,7 +58,7 @@ const TradePriceTable = (props) => {
                     {price}
                   </td>
                   <td>{amount}</td>
-                  <td>{total}</td>
+                  <td>{numStringToSymbol(total, 2)}</td>
                 </tr>
               );
             })}
