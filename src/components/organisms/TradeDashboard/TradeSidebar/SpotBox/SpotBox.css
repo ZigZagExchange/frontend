@@ -35,8 +35,8 @@
 }
 
 .sh_l {
-    width: 120px;
-    height: 45px;
+    width: 100%;
+    height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -44,10 +44,11 @@
     border-top: 3px solid #08aff3;
 }
 
-.sh_l h2 {
-    font-size: 1.2rem;
+.sh_l .title {
+    font-size: 1rem;
     color: white;
     font-weight: 700;
+    margin-right: 20px;
 }
 
 .sh_r {
@@ -82,11 +83,9 @@
 }
 
 .spot_tabs {
-    width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px;
 }
 
 .spot_tabs .st_l,

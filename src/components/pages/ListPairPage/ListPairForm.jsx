@@ -1,5 +1,6 @@
 import React, {useCallback, useEffect, useState} from "react";
 import {x} from "@xstyled/styled-components"
+import { Tooltip } from "components";
 import NumberInput from "../../atoms/Form/NumberInput";
 import {model} from "../../atoms/Form/helpers";
 import {forceValidation, max, min, required} from "../../atoms/Form/validation";
@@ -10,7 +11,6 @@ import {AiOutlineQuestionCircle} from "react-icons/all";
 import Form from "../../atoms/Form/Form";
 import {TRADING_VIEW_CHART_KEY} from "./ListPairPage";
 import api from "../../../lib/api";
-import Tooltip from "../../atoms/Tooltip/Tooltip";
 import {debounce} from "lodash";
 
 const getAmountForTargetNotional = (price) => {

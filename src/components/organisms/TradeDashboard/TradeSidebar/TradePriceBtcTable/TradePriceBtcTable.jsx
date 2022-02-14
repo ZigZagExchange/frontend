@@ -6,6 +6,8 @@ import {getStables} from '../../../../../lib/helpers/categories/index.js'
 import {addFavourite, removeFavourite, fetchFavourites} from '../../../../../lib/helpers/storage/favourites'
 import { BsStar, BsStarFill } from "react-icons/bs";
 
+import arrowsImg from "../../../../../assets/icons/up-down-arrow.png"
+
 class TradePriceBtcTable extends React.Component {
 
     constructor(props){
@@ -14,8 +16,11 @@ class TradePriceBtcTable extends React.Component {
 
         this.state = {
             foundPairs: [],
-            pairs: props.rowData,
-            favourites: []
+            pairs: [],
+            favourites: [],
+
+            changeSorted: false,
+            priceSorted: false
         }
 
         this.searchPair = this.searchPair.bind(this);
@@ -23,7 +28,17 @@ class TradePriceBtcTable extends React.Component {
 
         this.favouritePair = this.favouritePair.bind(this);
 
+        this.toggleChangeSorting = this.toggleChangeSorting.bind(this);
+        this.togglePriceSorting = this.togglePriceSorting.bind(this);
+
         this.renderPairs = this.renderPairs.bind(this);
+    }
+
+
+    componentDidUpdate(){
+        if(this.state.pairs.length === 0 && this.props.rowData.length !== 0){
+            this.setState({pairs: this.props.rowData});
+        }
     }
 
     searchPair(value){
@@ -47,46 +62,45 @@ class TradePriceBtcTable extends React.Component {
 
     categorizePairs(category_name){
         category_name = category_name.toUpperCase();
+        var foundPairs = [];
 
-        this.props.rowData.forEach(row => {
+        switch (category_name){
+            case "ALL":
+                this.setState({foundPairs: [], pairs: this.props.rowData});
+                break;
+            case "STABLES":
+                //look for pairs against stables.
+                foundPairs = getStables(this.props.rowData);
+                this.setState({
+                    foundPairs: foundPairs
+                });
+                break;
+            case "FAVOURITES":
+                //set favourites from localstorage
+                var favourites = fetchFavourites();
+                foundPairs = [];
 
-            switch (category_name){
-                case "ALL":
-                    this.setState({foundPairs: []});
-                    break;
-                case "STABLES":
-                    //look for pairs against stables.
-                    var foundPairs = getStables(this.props.rowData);
-                    this.setState({
-                        foundPairs: foundPairs
+                favourites.forEach(value => {
+                    this.props.rowData.forEach(row => {
+                        var pair_name = row.td1;
+            
+                        //if found query, push it to found pairs
+                        if(pair_name.includes(value.toUpperCase())){
+                            foundPairs.push(row);
+                        }
                     });
-                    break;
-                case "FAVOURITES":
-                    //set favourites from localstorage
-                    var favourites = fetchFavourites();
-                    var foundPairs = [];
-
-                    favourites.forEach(value => {
-                        this.props.rowData.forEach(row => {
-                            var pair_name = row.td1;
+                })
                 
-                            //if found query, push it to found pairs
-                            if(pair_name.includes(value.toUpperCase())){
-                                foundPairs.push(row);
-                            }
-                        });
-                    })
-                  
-                    this.setState({
-                        foundPairs: foundPairs
-                    });
+                this.setState({
+                    foundPairs: foundPairs
+                });
 
-                    break;
-                default:
-                    //search for custom category
-                    this.searchPair(category_name);
-            }
-        });
+                break;
+            default:
+                //search for custom category
+                this.searchPair(category_name);
+        }
+
 
  
 
@@ -103,11 +117,45 @@ class TradePriceBtcTable extends React.Component {
             favourites = removeFavourite(pair.td1);
         }
 
-        console.log(favourites);
         this.setState({
             favourites: favourites
         })
     }
+
+
+    toggleChangeSorting(){
+        
+        var toggled = !this.state.changeSorted;
+        var rowData = this.props.rowData;
+        
+        rowData.sort(function compareFn(firstEl, secondEl){
+            if(toggled){
+                return parseInt(firstEl.td2) - parseInt(secondEl.td2);
+            } else {
+                return parseInt(firstEl.td2) + parseInt(secondEl.td2);
+            }
+            
+        });
+        this.setState({pairs: rowData, changeSorted: toggled, priceSorted: false});
+    }
+
+    togglePriceSorting(){
+        
+        var toggled = !this.state.priceSorted;
+        var rowData = this.props.rowData;
+
+        rowData.sort(function compareFn(firstEl, secondEl){
+            if(toggled){
+                return parseInt(firstEl.td3) - parseInt(secondEl.td3);
+            } else {
+                return parseInt(firstEl.td3) + parseInt(secondEl.td3);
+            }
+            
+        });
+        this.setState({pairs: rowData, priceSorted: toggled, changeSorted: false});
+    }
+
+
 
     //render given pairs
     renderPairs(pairs){
@@ -168,11 +216,20 @@ class TradePriceBtcTable extends React.Component {
                             <th>
                                 Pair
                             </th>
-                            <th>
+                            <th onClick={() => this.togglePriceSorting()}>
+
+                                <img src={arrowsImg}
+                                   alt="toggle-price"
+                                />
                                 Price
+
                             </th>
-                            <th>
-                                Change
+                            <th onClick={() => this.toggleChangeSorting()}>
+                                <img src={arrowsImg} 
+                                    alt="toggle-change"
+                                />
+
+                                Change 
                             </th>
                         </tr>
                     </thead>
@@ -205,7 +262,7 @@ class TradePriceBtcTable extends React.Component {
                     { this.state.foundPairs.length !== 0 ? ( 
                             this.renderPairs(this.state.foundPairs)
                     ) : ( 
-                            this.renderPairs(this.props.rowData)
+                            this.renderPairs(this.state.pairs)
                     )}
 
                 </div>

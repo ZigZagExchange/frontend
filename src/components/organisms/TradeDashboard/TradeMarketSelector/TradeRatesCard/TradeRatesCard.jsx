@@ -3,11 +3,42 @@ import React from "react";
 import "./TradeRatesCard.css";
 
 class TradeRatesCard extends React.Component {
+    constructor(props){
+        super(props);
+        this.props = props;
+
+        this.state = {
+            marketInfo: null,
+        };
+    }
+
+    componentDidUpdate(){
+        console.log("update state");
+        if(this.props.marketInfo && this.props.marketInfo !== this.state.marketInfo){
+            
+            console.log("updating state");
+            var marketInfo = this.props.marketInfo;
+            
+            //add ticker name
+            var state = { 
+                marketInfo: marketInfo, 
+            };
+
+            this.setState(state);
+        }
+    }
+
+    componentDidMount(){
+        //get token name
+
+    }
+
     render() {
-        const marketInfo = this.props.marketInfo;
+        var marketInfo = this.state.marketInfo;
 
         let marketDisplay = "--/--";
-        if (marketInfo) {
+        if (this.state.marketInfo) {
+            marketInfo = this.state.marketInfo;
             marketDisplay = `${marketInfo.baseAsset.symbol}/${marketInfo.quoteAsset.symbol}`;
         }
         const percentChange = (
@@ -21,7 +52,7 @@ class TradeRatesCard extends React.Component {
                 <div className="tl_rates">
                     <div className="rates_box rb_text_1">
                         <strong>{marketDisplay}</strong>
-                        <p>{marketInfo && marketInfo.baseAsset.symbol}</p>
+                        <p>{marketInfo && marketInfo.baseAsset.symbol} { marketInfo && '-' + marketInfo.baseAssetName}</p>
                     </div>
                     <div className="rates_box rb_text_2">
                         <h1>{this.props.marketSummary.price}</h1>

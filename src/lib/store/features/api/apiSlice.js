@@ -268,13 +268,16 @@ export const apiSlice = createSlice({
         state.userOrders = {};
         state.userFills = {};
     },
+    clearLastPrices(state) {
+        state.lastPrices = {};
+    },
     setArweaveAllocation(state, { payload }) {
         state.arweaveAllocation = payload;
     }
   },
 })
 
-export const { setNetwork, clearBridgeReceipts, setBalances, setUserId, addBridgeReceipt, setCurrentMarket, resetData, clearUserOrders, setArweaveAllocation } = apiSlice.actions
+export const { setNetwork, clearBridgeReceipts, setBalances, setUserId, addBridgeReceipt, setCurrentMarket, resetData, clearUserOrders, clearLastPrices, setArweaveAllocation } = apiSlice.actions
 
 export const networkSelector = state => state.api.network
 export const userOrdersSelector = state => state.api.userOrders
