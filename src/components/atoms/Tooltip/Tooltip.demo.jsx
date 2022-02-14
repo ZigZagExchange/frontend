@@ -1,6 +1,6 @@
 import React from "react";
 import {x} from "@xstyled/styled-components";
-import Tooltip from "./Tooltip";
+import { Tooltip } from "components";
 
 const TooltipDemo = () => {
   return <x.div>
