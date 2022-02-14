@@ -1,4 +1,3 @@
-import { tokenToName } from "lib/helpers/utils";
 import React from "react";
 // css
 import "./TradeRatesCard.css";
@@ -24,7 +23,7 @@ class TradeRatesCard extends React.Component {
             var state = { 
                 marketInfo: marketInfo, 
             };
-            
+
             this.setState(state);
         }
     }
