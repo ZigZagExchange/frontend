@@ -60,7 +60,7 @@ class SpotBox extends React.Component {
                 />
                 <x.div className="spf_head" mt={"5px"} mb={"10px"}>
                   <span>Buy Fee:</span> 
-                  <strong>{marketInfo && marketInfo.quoteFee.toPrecision(4)} {marketInfo && marketInfo.quoteAsset.symbol}</strong>
+                  <x.strong color={"#fff"}>{marketInfo && marketInfo.quoteFee.toPrecision(4)} {marketInfo && marketInfo.quoteAsset.symbol}</x.strong>
                 </x.div>
               </div>
               <div label="Sell">
@@ -81,7 +81,7 @@ class SpotBox extends React.Component {
                 />
                 <x.div className="spf_head" mt={"5px"} mb={"10px"}>
                   <span>Sell Fee</span>
-                  <strong>{marketInfo && marketInfo.baseFee.toPrecision(4)} {marketInfo && marketInfo.baseAsset.symbol}</strong>
+                  <x.strong color={"#fff"}>{marketInfo && marketInfo.baseFee.toPrecision(4)} {marketInfo && marketInfo.baseAsset.symbol}</x.strong>
                 </x.div>
               </div>
             </Tabs>
