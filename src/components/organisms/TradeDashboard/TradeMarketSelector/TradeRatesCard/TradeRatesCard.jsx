@@ -35,7 +35,6 @@ class TradeRatesCard extends React.Component {
 
     render() {
         var marketInfo = this.state.marketInfo;
-        var ticker_name = this.state.ticker_name;
 
         let marketDisplay = "--/--";
         if (this.state.marketInfo) {
