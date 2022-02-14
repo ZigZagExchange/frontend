@@ -10,7 +10,7 @@ export class SpotForm extends React.Component {
         super(props);
         this.state = {
             userHasEditedPrice: false,
-            price: null,
+            price: "",
             amount: "",
             orderButtonDisabled: false,
             maxSizeSelected: false,
@@ -311,6 +311,7 @@ export class SpotForm extends React.Component {
 
     render() {
         const marketInfo = this.props.marketInfo;
+        
 
         let price = this.currentPrice();
         if (price === 0) price = "";
@@ -360,7 +361,7 @@ export class SpotForm extends React.Component {
 
             <div className="spf_input_box">
               <span className="spf_desc_text">Price</span>
-              <input type="text" value={ this.priceIsDisabled() ? this.props.marketSummary.price : !isNaN(price) ? price : ''} onChange={this.updatePrice.bind(this)} disabled={this.priceIsDisabled()}  />
+              <input type="text" value={ this.priceIsDisabled() ? this.props.marketSummary && this.props.marketSummary.price : !isNaN(price) ? price : ''} onChange={this.updatePrice.bind(this)} disabled={this.priceIsDisabled()}  />
               <span className={this.priceIsDisabled() ? "text-disabled" : ""}>{marketInfo && marketInfo.quoteAsset.symbol}</span>
             </div>
             <div className="spf_input_box">
