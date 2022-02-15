@@ -130,9 +130,12 @@ class TradePriceBtcTable extends React.Component {
         
         rowData.sort(function compareFn(firstEl, secondEl){
             if(toggled){
-                return parseInt(firstEl.td2) - parseInt(secondEl.td2);
+                return parseInt(firstEl.td3) - parseInt(secondEl.td3);
             } else {
-                return parseInt(firstEl.td2) + parseInt(secondEl.td2);
+                //reverse
+
+                console.log(firstEl.td3);
+                return parseInt(secondEl.td3) - parseInt(firstEl.td3);
             }
             
         });
@@ -146,9 +149,12 @@ class TradePriceBtcTable extends React.Component {
 
         rowData.sort(function compareFn(firstEl, secondEl){
             if(toggled){
-                return parseInt(firstEl.td3) - parseInt(secondEl.td3);
+
+                console.log(firstEl.td2);
+                return parseInt(firstEl.td2) - parseInt(secondEl.td2);
             } else {
-                return parseInt(firstEl.td3) + parseInt(secondEl.td3);
+                console.log(firstEl.td2);
+                return  parseInt(secondEl.td2) - parseInt(firstEl.td2);
             }
             
         });
