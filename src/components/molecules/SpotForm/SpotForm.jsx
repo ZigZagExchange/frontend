@@ -334,11 +334,11 @@ export class SpotForm extends React.Component {
         const balanceHtml =
             this.props.side === "b" ? (
                 <strong>
-                    {quoteBalance.toPrecision(8)} {marketInfo && marketInfo.quoteAsset.symbol}
+                    {quoteBalance.toPrecision(8)} {marketInfo && marketInfo.quoteAsset?.symbol}
                 </strong>
             ) : (
                 <strong>
-                    {baseBalance.toPrecision(8)} {marketInfo && marketInfo.baseAsset.symbol}
+                    {baseBalance.toPrecision(8)} {marketInfo && marketInfo.baseAsset?.symbol}
                 </strong>
             );
 
@@ -361,7 +361,7 @@ export class SpotForm extends React.Component {
 
             <div className="spf_input_box">
               <span className="spf_desc_text">Price</span>
-              <input type="text" value={ this.priceIsDisabled() ? this.props.marketSummary && this.props.marketSummary.price : !isNaN(price) ? price : ''} onChange={this.updatePrice.bind(this)} disabled={this.priceIsDisabled()}  />
+              <input type="text" value={ this.priceIsDisabled() ? this.props.marketSummary && this.props.marketSummary?.price : !isNaN(price) ? '' : price} onChange={this.updatePrice.bind(this)} disabled={this.priceIsDisabled()}  />
               <span className={this.priceIsDisabled() ? "text-disabled" : ""}>{marketInfo && marketInfo.quoteAsset.symbol}</span>
             </div>
             <div className="spf_input_box">

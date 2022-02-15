@@ -33,9 +33,9 @@ class SpotBox extends React.Component {
                 <h2>SPOT</h2>
               </div>
               <div className="sh_r">
-                 Sell Fee: {marketInfo && marketInfo.baseFee} {marketInfo && marketInfo.baseAsset.symbol}
+                 Sell Fee: {marketInfo && marketInfo.baseFee.toPrecision(8)} {marketInfo && marketInfo.baseAsset?.symbol}
                  <br/>
-                 Buy Fee: {marketInfo && marketInfo.quoteFee} {marketInfo && marketInfo.quoteAsset.symbol}
+                 Buy Fee: {marketInfo && marketInfo.quoteFee.toPrecision(8)} {marketInfo && marketInfo.quoteAsset?.symbol}
               </div>
             </div>
             <div className="spot_tabs">
