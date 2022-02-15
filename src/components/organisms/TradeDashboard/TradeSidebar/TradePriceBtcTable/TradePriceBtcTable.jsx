@@ -44,6 +44,9 @@ class TradePriceBtcTable extends React.Component {
     searchPair(value){
         var foundPairs = [];
 
+        //
+        //search all, if you'd prefer to search the current category just set this to use `state.pairs` instead
+        //
         this.props.rowData.forEach(row => {
             var pair_name = row.td1;
 
@@ -55,7 +58,7 @@ class TradePriceBtcTable extends React.Component {
 
         //update found pairs
         this.setState({
-            foundPairs: foundPairs
+            pairs: foundPairs
         });
 
     }
@@ -66,13 +69,13 @@ class TradePriceBtcTable extends React.Component {
 
         switch (category_name){
             case "ALL":
-                this.setState({foundPairs: [], pairs: this.props.rowData});
+                this.setState({pairs: this.props.rowData});
                 break;
             case "STABLES":
                 //look for pairs against stables.
                 foundPairs = getStables(this.props.rowData);
                 this.setState({
-                    foundPairs: foundPairs
+                    pairs: foundPairs
                 });
                 break;
             case "FAVOURITES":
@@ -92,7 +95,7 @@ class TradePriceBtcTable extends React.Component {
                 })
                 
                 this.setState({
-                    foundPairs: foundPairs
+                    pairs: foundPairs
                 });
 
                 break;
@@ -126,39 +129,36 @@ class TradePriceBtcTable extends React.Component {
     toggleChangeSorting(){
         
         var toggled = !this.state.changeSorted;
-        var rowData = this.props.rowData;
+
+        var sorted_pairs = this.state.foundPairs.length !== 0 ? this.state.foundPairs : this.state.pairs;
         
-        rowData.sort(function compareFn(firstEl, secondEl){
+        sorted_pairs.sort(function compareFn(firstEl, secondEl){
             if(toggled){
                 return parseInt(firstEl.td3) - parseInt(secondEl.td3);
             } else {
                 //reverse
-
-                console.log(firstEl.td3);
                 return parseInt(secondEl.td3) - parseInt(firstEl.td3);
             }
             
         });
-        this.setState({pairs: rowData, changeSorted: toggled, priceSorted: false});
+        this.setState({pairs: sorted_pairs, changeSorted: toggled, priceSorted: false});
     }
 
     togglePriceSorting(){
         
         var toggled = !this.state.priceSorted;
-        var rowData = this.props.rowData;
+        var sorted_pairs = this.state.pairs;
 
-        rowData.sort(function compareFn(firstEl, secondEl){
+        sorted_pairs.sort(function compareFn(firstEl, secondEl){
             if(toggled){
-
-                console.log(firstEl.td2);
                 return parseInt(firstEl.td2) - parseInt(secondEl.td2);
             } else {
-                console.log(firstEl.td2);
+                //reverse
                 return  parseInt(secondEl.td2) - parseInt(firstEl.td2);
             }
             
         });
-        this.setState({pairs: rowData, priceSorted: toggled, changeSorted: false});
+        this.setState({pairs: sorted_pairs, priceSorted: toggled, changeSorted: false});
     }
 
 
@@ -264,13 +264,7 @@ class TradePriceBtcTable extends React.Component {
                     categorizePairs={this.categorizePairs}
                 />
                 <div className="trade_price_btc_table">
-
-                    { this.state.foundPairs.length !== 0 ? ( 
-                            this.renderPairs(this.state.foundPairs)
-                    ) : ( 
-                            this.renderPairs(this.state.pairs)
-                    )}
-
+                    {this.renderPairs(this.state.pairs)}
                 </div>
             </>
         );
