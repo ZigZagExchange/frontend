@@ -8,6 +8,8 @@ import { getENSName } from 'lib/ens'
 import { formatAmount } from 'lib/utils'
 import erc20ContractABI from 'lib/contracts/ERC20.json'
 import { MAX_ALLOWANCE } from './constants'
+import APIZKProvider from './providers/APIZKProvider'
+import APIZKArgentProvider from './providers/APIZKArgentProvider'
 
 const chainMap = {
     '0x1': 1,
@@ -19,6 +21,8 @@ export default class API extends Emitter {
     apiProvider = null
     ethersProvider = null
     currencies = null
+    websocketUrl = null
+    isArgent = false
     marketInfo = {}
     lastprices = {}
     _signInProgress = null
@@ -56,7 +60,11 @@ export default class API extends Emitter {
     }
 
     getAPIProvider = (network) => {
-        return this.networks[this.getNetworkName(network)][1]
+        const provider = this.networks[this.getNetworkName(network)][1]
+        if (provider === APIZKProvider && this.isArgent) {
+            return APIZKArgentProvider
+        }
+        return provider
     }
 
     setAPIProvider = (network) => {
@@ -96,6 +104,23 @@ export default class API extends Emitter {
                         package: WalletConnectProvider,
                         options: {
                             infuraId: this.infuraId,
+                        }
+                    },
+                    "custom-argent": {
+                        display: {
+                            logo: "https://images.prismic.io/argentwebsite/313db37e-055d-42ee-9476-a92bda64e61d_logo.svg?auto=format%2Ccompress&fit=max&q=50",
+                            name: "Argent zkSync Provider",
+                            description: "Connect to your Argent zkSync account"
+                        },
+                        package: WalletConnectProvider,
+                        options: {
+                            infuraId: this.infuraId,
+                        },
+                        connector: async (ProviderPackage, options) => {
+                            const provider = new ProviderPackage(options);
+                            await provider.enable();
+                            this.isArgent = true;
+                            return provider;
                         }
                     }
                 }
@@ -288,6 +313,7 @@ export default class API extends Emitter {
         this.web3 = null
         this.web3Modal = null
         this.ethersProvider = null
+        this.isArgent = false
         this.setAPIProvider(this.apiProvider.network)
         this.emit('balanceUpdate', 'wallet', {})
         this.emit('balanceUpdate', this.apiProvider.network, {})
