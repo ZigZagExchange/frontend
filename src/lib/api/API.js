@@ -114,6 +114,7 @@ export default class API extends Emitter {
             }
 
             profile.name = `${address.substr(0, 6)}…${address.substr(-6)}`
+            console.log("debug:: get profile address", address)
             Object.assign(
                 profile,
                 ...(await Promise.all([
@@ -586,12 +587,13 @@ export default class API extends Emitter {
         for (const currency of this.apiProvider.eligibleFastWithdrawTokens) {
           let max = 0
           if (currency === "ETH") {
-            max = await this.ethersProvider.getBalance(this.apiProvider._fastWithdrawContractAddress)
+            max = await this.ethersProvider.getBalance(this.apiProvider.fastWithdrawContractAddress)
           } else {
             const contract = new ethers.Contract(this.fastWithdrawTokenAddresses[currency], erc20ContractABI, this.ethersProvider)
-            max = await contract.balanceOf(this.apiProvider._fastWithdrawContractAddress)
+            max = await contract.balanceOf(this.apiProvider.fastWithdrawContractAddress)
           }
-          currencyMaxes[currency] = Number(utils.formatEther(max))
+          const currencyInfo = this.getCurrencyInfo(currency)
+          currencyMaxes[currency] = max / 10 ** currencyInfo.decimals;
         }
         return currencyMaxes
       } else {

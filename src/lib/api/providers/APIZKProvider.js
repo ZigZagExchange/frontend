@@ -23,7 +23,6 @@ export default class APIZKProvider extends APIProvider {
     eligibleFastWithdrawTokens = ["ETH", "FRAX", "UST"]
     _tokenWithdrawFees = {}
     _tokenInfo = {}
-    _backupFeeToken = "ETH"
 
 
   getProfile = async (address) => {
@@ -258,16 +257,22 @@ export default class APIZKProvider extends APIProvider {
     }
 
     depositL2Fee = async (token = 'ETH') => {
+        // TODO: implement
         return 0
     }
 
-    withdrawL2Fee = async (token = 'ETH') => {
-      const tokenInfo = await this.getTokenInfo(token);
-      let feeToken = token
+    getWithdrawFeeToken = async (tokenToWithdraw) => {
+      const backupFeeToken = "FRAX"
+      const tokenInfo = await this.getTokenInfo(tokenToWithdraw);
+      let feeToken = tokenToWithdraw
       if (!tokenInfo.enabledForFees) {
-        feeToken = this._backupFeeToken
+        feeToken = backupFeeToken
       }
+      return feeToken
+    }
 
+    withdrawL2Fee = async (token = 'ETH') => {
+      const feeToken = await this.getWithdrawFeeToken(token)
       const currencyInfo = this.getCurrencyInfo(feeToken);
       if (!this._tokenWithdrawFees[token]) {
           const fee = await this.syncProvider.getTransactionFee(
@@ -289,25 +294,24 @@ export default class APIZKProvider extends APIProvider {
       /*
       * Returns the gas fee associated with an L2 Fast withdraw (just a transfer on zkSync)
       * */
-      console.log("debug:: querying fast fee", token)
-      const currencyInfo = this.getCurrencyInfo(token)
+      const feeToken = await this.getWithdrawFeeToken(token)
+      const currencyInfo = this.getCurrencyInfo(feeToken)
       const fee = await this.syncProvider.getTransactionFee(
         'Transfer',
         this.fastWithdrawContractAddress,
-        token
+        feeToken
       )
-      console.log("debug:: fast fee", fee)
-      return parseInt(fee.totalFee) / 10 ** currencyInfo.decimals
+      const amount = parseInt(fee.totalFee) / 10 ** currencyInfo.decimals
+      return {amount, feeToken}
     }
 
     withdrawL2ZZFeeFast = async (token) => {
       /*
       * Returns the fee taken by ZigZag when sending on L1. If the token is not ETH,
-      * the notional amount of the ETH tx fee will be taken in the currency
+      * the notional amount of the ETH tx fee will be taken in the currency being bridged
       * */
 
       const currencyInfo = this.getCurrencyInfo(token)
-
       const getNumberFormatted = (atoms) => {
         return parseInt(atoms) / 10 ** currencyInfo.decimals
       }

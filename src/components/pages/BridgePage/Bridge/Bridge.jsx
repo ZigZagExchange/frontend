@@ -61,10 +61,12 @@ const Bridge = () => {
   const altBalances = transfer.type === 'deposit' ? zkBalances : walletBalances
   const hasAllowance = balances[swapDetails.currency] && balances[swapDetails.currency].allowance.gte(MAX_ALLOWANCE.div(3))
   const hasError = formErr && formErr.length > 0
+  const isSwapAmountEmpty = swapDetails.amount === ""
 
   useEffect(() => {
     if (user.address) {
       api.getL2FastWithdrawLiquidity().then(maxes => {
+        console.log("debug:: maxes", maxes)
         setFastWithdrawCurrencyMaxes(maxes)
       })
     }
@@ -91,63 +93,77 @@ const Bridge = () => {
     }
   }, [swapDetails.currency])
 
-  const validateInput = (inputValue, detailBalance) => {
-    // TODO: validate amounts based on the fee currency
-    // - check fee currency balance. if not sufficient, throw error
+  const validateInput = (inputValue, swapCurrency) => {
+    // TODO: any more validation here?
 
+    const bals = transfer.type === 'deposit' ? walletBalances : zkBalances
+    const detailBalance = parseFloat(bals[swapCurrency] && bals[swapCurrency].valueReadable) || 0
 
     if (inputValue > 0) {
       if (inputValue < 0.001) {
         setFormErr('Must be at least 0.001')
+        return false
       } else if (inputValue <= activationFee) {
         setFormErr(`Must be more than ${activationFee} ${swapDetails.currency}`)
+        return false
       } else if (inputValue > (detailBalance - parseFloat(bridgeFee))) {
         setFormErr('Insufficient balance')
+        return false
       } else if (inputValue - bridgeFee < 0) {
         setFormErr("Amount too small")
+        return false
       } else if (isFastWithdraw) {
         if (swapDetails.currency in fastWithdrawCurrencyMaxes) {
           const maxAmount = fastWithdrawCurrencyMaxes[swapDetails.currency]
           if (inputValue > maxAmount) {
             setFormErr(`Max ${swapDetails.currency} liquidity for fast withdraw: ${maxAmount.toPrecision(4)}`)
+            return false
           } else if (inputValue - (bridgeFee + zigZagFee) < 0) {
             setFormErr("Amount too small")
+            return false
           }
         }
-      } else {
-        setFormErr('')
       }
-    } else {
-      setFormErr('')
     }
+    return true
+  }
+
+  const validateFees = (bridgeFee, feeToken) => {
+    const bals = transfer.type === 'deposit' ? walletBalances : zkBalances
+    const feeTokenBalance = parseFloat(bals[feeToken] && bals[feeToken].valueReadable) || 0
+
+    console.log("debug:: feeToken - bridgeFee", feeToken, bridgeFee, feeTokenBalance)
+
+    if (bridgeFee > feeTokenBalance) {
+      setFormErr("Not enough balance to pay for fees")
+      return false
+    }
+    return true
   }
 
   const setFastWithdrawFees = (setFee, details) => {
-    // TODO: set fee currency here
-    api.withdrawL2FeeFast(details.currency)
-      .then(res => setFee(res))
-      .catch(e => {
-        console.error(e)
-        setFee(null)
-      })
+      api.withdrawL2FeeFast(details.currency)
+        .then(({amount, feeToken}) => {
+          setFee(amount, feeToken)
+        })
+        .catch(e => {
+          console.error(e)
+          setBridgeFeeToken(null)
+          setFee(null)
+        })
 
-    if (details.amount !== "") {
       api.withdrawL2ZZFeeFast(details.currency)
         .then(res => setZigZagFee(res))
         .catch(e => {
-          console.error(e)
-          setZigZagFee(null)
+            console.error(e)
+            setZigZagFee(null)
         })
-    } else {
-      setZigZagFee(null)
-    }
   }
 
   const setNormalWithdrawFees = (setFee, details) => {
     api.withdrawL2Fee(details.currency)
       .then(({feeToken, amount}) => {
-        setBridgeFeeToken(feeToken)
-        setFee(amount)
+        setFee(amount, feeToken)
       })
       .catch(err => {
         console.log(err)
@@ -156,10 +172,11 @@ const Bridge = () => {
       })
   }
 
-  const setDepositFee = (setFee) => {
-    // TODO: implement
-    setFee(0)
-    setZigZagFee(null)
+  const setDepositFee = (setFee, details) => {
+      api.depositL2Fee(details.currency).then(res => {
+          setFee(res)
+          setZigZagFee(null)
+      })
   }
 
   const setSwapDetails = values => {
@@ -170,12 +187,15 @@ const Bridge = () => {
 
     _setSwapDetails(details);
 
-    const setFee = bridgeFee => {
+    const setFee = (bridgeFee, feeToken) => {
       setBridgeFee(bridgeFee)
-      const bals = transfer.type === 'deposit' ? walletBalances : zkBalances
-      const detailBalance = parseFloat(bals[details.currency] && bals[details.currency].valueReadable) || 0
+      setBridgeFeeToken(feeToken)
       const input = parseFloat(details.amount) || 0
-      validateInput(input, detailBalance)
+      const isInputValid = validateInput(input, details.currency, feeToken)
+      const isFeesValid = validateFees(bridgeFee, feeToken)
+      if (isFeesValid && isInputValid) {
+        setFormErr("")
+      }
     }
 
     setFee(null)
@@ -190,7 +210,7 @@ const Bridge = () => {
         }
       }
     } else {
-      setDepositFee(setFee)
+      setDepositFee(setFee, details)
     }
   }
 
@@ -198,6 +218,7 @@ const Bridge = () => {
     if (e) e.preventDefault()
     transfer.type = transfer.type === 'deposit' ? 'withdraw' : 'deposit'
     setTransfer(transfer)
+    setBridgeFeeToken("ETH")
     setSwapDetails({})
   }
 
@@ -236,7 +257,7 @@ const Bridge = () => {
     }
 
     deferredXfer
-      .then(state => {
+      .then(() => {
         setTimeout(() => api.getAccountState(), 1000)
         setLoading(false)
       })
@@ -323,36 +344,33 @@ const Bridge = () => {
           {transfer.type === 'deposit' && user.address && !user.id && <div className="bridge_transfer_fee">
             One-Time Activation Fee: {activationFee} {swapDetails.currency} (~$15.00)
           </div>}
-          {user.address ? (
-            user.id && <div className="bridge_transfer_fee">
-              {bridgeFeeToken && <x.div fontSize={16} color={"white"}>{bridgeFeeToken}</x.div>}
-
-              {!isFastWithdraw && transfer.type === "withdraw" && <div className="bridge_transfer_fee">
-                zkSync Withdraw Fee {typeof bridgeFee !== 'number' ? (
-                <div style={{display: 'inline-flex', margin: '0 5px'}}>
-                  <Loader
-                    type="TailSpin"
-                    color="#444"
-                    height={16}
-                    width={16}
-                  />
-                </div>
-              ) : bridgeFee} {swapDetails.currency}
+          {user.address && user.id && !isSwapAmountEmpty && <div className="bridge_transfer_fee">
+            {bridgeFeeToken && <x.div fontSize={16} color={"white"}>{bridgeFeeToken}</x.div>}
+            {transfer.type === "withdraw" && <x.div>
+              {bridgeFee && <>L2 gas fee: {bridgeFee} {bridgeFeeToken}</>}
+              {!bridgeFee && <div style={{display: 'inline-flex', margin: '0 5px'}}>
+                <Loader
+                  type="TailSpin"
+                  color="#444"
+                  height={16}
+                  width={16}
+                />
               </div>}
-              {zigZagFee && <>
+              {isFastWithdraw && zigZagFee && <x.div>
                 <div>
                   Bridge Fee: {zigZagFee.toPrecision(4)} {swapDetails.currency}
                 </div>
                 <x.div color={"blue-gray-300"}>
                   You'll receive: ~{Number(swapDetails.amount - zigZagFee).toPrecision(4)} {swapDetails.currency} on L1
                 </x.div>
-              </>}
-            </div>
-          ) : (
-            <div className="bridge_transfer_fee">
-              🔗 &nbsp;Please connect your wallet
-            </div>
-          )}
+              </x.div>}
+            </x.div>}
+          </div>}
+
+          {!user.address && <div className="bridge_transfer_fee">
+            🔗 &nbsp;Please connect your wallet
+          </div>}
+
           <div className="bridge_button">
             {!user.address && <ConnectWalletButton/>}
 
