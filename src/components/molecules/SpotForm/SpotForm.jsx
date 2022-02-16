@@ -156,9 +156,7 @@ export class SpotForm extends React.Component {
                 `Minimum order size is ${this.MINIMUM_AMOUNTS[marketInfo.baseAsset.symbol]} ${marketInfo.baseAsset.symbol}`
             );
             return;
-        } else if (
-            isNaN(price) ||
-        ) {
+        } else if ( isNaN(price) ) {
             toast.error("Price undefined");
             return;
         } else if (
