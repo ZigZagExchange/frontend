@@ -19,11 +19,14 @@ export default class APIZKProvider extends APIProvider {
     syncWallet = null
     syncProvider = null
     zksyncCompatible = true
-    _tokenWithdrawFees = {}
-    _fastWithdrawContractAddress = "0xCC9557F04633d82Fb6A1741dcec96986cD8689AE"
+    fastWithdrawContractAddress = "0xCC9557F04633d82Fb6A1741dcec96986cD8689AE"
     eligibleFastWithdrawTokens = ["ETH", "FRAX", "UST"]
+    _tokenWithdrawFees = {}
+    _tokenInfo = {}
+    _backupFeeToken = "ETH"
 
-    getProfile = async (address) => {
+
+  getProfile = async (address) => {
         try {
             const { data } = await axios.get(`https://ipfs.3box.io/profile?address=${address}`)
             const profile = {
@@ -223,7 +226,7 @@ export default class APIZKProvider extends APIProvider {
       }
 
       const transfer = await this.syncWallet.syncTransfer({
-        to: this._fastWithdrawContractAddress,
+        to: this.fastWithdrawContractAddress,
         token,
         amount
       })
@@ -259,20 +262,26 @@ export default class APIZKProvider extends APIProvider {
     }
 
     withdrawL2Fee = async (token = 'ETH') => {
-        const currencyInfo = this.getCurrencyInfo(token);
-        if (! this._tokenWithdrawFees[token]) {
-            const fee = await this.syncProvider.getTransactionFee(
-                'Withdraw',
-                this.syncWallet.address(),
-                token,
-            )
+      const tokenInfo = await this.getTokenInfo(token);
+      let feeToken = token
+      if (!tokenInfo.enabledForFees) {
+        feeToken = this._backupFeeToken
+      }
 
-            this._tokenWithdrawFees[token] = (
-                parseInt(fee.totalFee)
-                / 10 ** currencyInfo.decimals
-            )
+      const currencyInfo = this.getCurrencyInfo(feeToken);
+      if (!this._tokenWithdrawFees[token]) {
+          const fee = await this.syncProvider.getTransactionFee(
+              'Withdraw',
+              this.syncWallet.address(),
+              feeToken,
+          )
+          const amount = (
+            parseInt(fee.totalFee)
+            / 10 ** currencyInfo.decimals
+          )
+          this._tokenWithdrawFees[token] = {amount, feeToken}
+          console.log("debug:: querying normal fee", this._tokenWithdrawFees[token])
         }
-
         return this._tokenWithdrawFees[token]
     }
 
@@ -280,19 +289,21 @@ export default class APIZKProvider extends APIProvider {
       /*
       * Returns the gas fee associated with an L2 Fast withdraw (just a transfer on zkSync)
       * */
+      console.log("debug:: querying fast fee", token)
       const currencyInfo = this.getCurrencyInfo(token)
       const fee = await this.syncProvider.getTransactionFee(
         'Transfer',
-        this._fastWithdrawContractAddress,
+        this.fastWithdrawContractAddress,
         token
       )
+      console.log("debug:: fast fee", fee)
       return parseInt(fee.totalFee) / 10 ** currencyInfo.decimals
     }
 
     withdrawL2ZZFeeFast = async (token) => {
       /*
-      * Returns the fee taken by ZigZag when sending on L1. If the token is FRAX,
-      * the notional amount of the ETH tx fee will be taken in FRAX
+      * Returns the fee taken by ZigZag when sending on L1. If the token is not ETH,
+      * the notional amount of the ETH tx fee will be taken in the currency
       * */
 
       const currencyInfo = this.getCurrencyInfo(token)
@@ -454,13 +465,26 @@ export default class APIZKProvider extends APIProvider {
         }
     }
 
-    tokenInfo = async (tokenLike, chainId = 1) => {
-        try {
-            const res = await axios.get(this.getZkSyncBaseUrl(chainId) + `/tokens/${tokenLike}`)
-            return res.data.result
-        } catch (e) {
-            console.error("Could not get token info", e)
+    /*
+    * Gets token info from zkSync REST API
+    * @param  {String} tokenLike:            Symbol or Internal ID
+    * @param  {Number or String} _chainId:   Network ID to query (1 for mainnet, 1000 for rinkeby)
+    * @return {Object}                       {address: string, decimals: number, enabledForFees: bool, id: number, symbol: string}
+    * */
+    getTokenInfo = async (tokenLike, _chainId = this.network) => {
+      const chainId = _chainId.toString()
+      const returnFromCache = this._tokenInfo[chainId] && this._tokenInfo[chainId][tokenLike]
+      try {
+        if (returnFromCache) {
+          return this._tokenInfo[chainId][tokenLike]
+        } else {
+          const res = await axios.get(this.getZkSyncBaseUrl(chainId) + `/tokens/${tokenLike}`)
+          this._tokenInfo[chainId] = {...this._tokenInfo[chainId], [tokenLike]: res.data.result}
+          return this._tokenInfo[chainId][tokenLike]
         }
+      } catch (e) {
+          console.error("Could not get token info", e)
+      }
     }
 
     tokenPrice = async (tokenLike, chainId = 1) => {

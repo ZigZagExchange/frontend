@@ -525,7 +525,7 @@ export default class API extends Emitter {
     }
 
     getTokenInfo = (tokenLike, chainId) => {
-        return this.apiProvider.tokenInfo(tokenLike, chainId)
+        return this.apiProvider.getTokenInfo(tokenLike, chainId)
     }
 
     getTokenPrice = (tokenLike, chainId) => {
@@ -562,27 +562,38 @@ export default class API extends Emitter {
       }
     }
 
+    get fastWithdrawTokenAddresses() {
+      if (this.apiProvider.network === 1) {
+        return {
+          FRAX: "0x853d955aCEf822Db058eb8505911ED77F175b99e",
+          UST: "0xa693b19d2931d498c5b318df961919bb4aee87a5"
+        }
+      } else if (this.apiProvider.network === 1000) {
+        return {
+          // these are just tokens on rinkeby with the correct tickers.
+          // neither are actually on rinkeby.
+          FRAX: "0x6426e27d8c6fDCd1e0c165d0D58c7eC0ef51f3a7",
+          UST: "0x2fd4e2b5340b7a29feb6ce737bc82bc4b3eefdb4"
+        }
+      } else {
+        throw Error("Network unknown")
+      }
+    }
+
     async getL2FastWithdrawLiquidity() {
       if (this.ethersProvider) {
-        let maxETH = 0
-        try {
-          maxETH = await this.ethersProvider.getBalance(this.apiProvider._fastWithdrawContractAddress)
-        } catch (e) {
-          console.error(e)
+        const currencyMaxes = {}
+        for (const currency of this.apiProvider.eligibleFastWithdrawTokens) {
+          let max = 0
+          if (currency === "ETH") {
+            max = await this.ethersProvider.getBalance(this.apiProvider._fastWithdrawContractAddress)
+          } else {
+            const contract = new ethers.Contract(this.fastWithdrawTokenAddresses[currency], erc20ContractABI, this.ethersProvider)
+            max = await contract.balanceOf(this.apiProvider._fastWithdrawContractAddress)
+          }
+          currencyMaxes[currency] = Number(utils.formatEther(max))
         }
-
-        const fraxContract = new ethers.Contract(this._fraxContractAddress, erc20ContractABI, this.ethersProvider)
-        let maxFRAX = 0
-        try {
-          maxFRAX = await fraxContract.balanceOf(this.apiProvider._fastWithdrawContractAddress)
-        } catch (e) {
-          console.error(e)
-        }
-
-        return {
-          ETH: Number(utils.formatEther(maxETH)),
-          FRAX: Number(utils.formatEther(maxFRAX))
-        }
+        return currencyMaxes
       } else {
         console.error("Ethers provider null or undefined")
         return {}

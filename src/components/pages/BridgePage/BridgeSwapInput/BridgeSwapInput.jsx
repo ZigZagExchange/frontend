@@ -58,6 +58,9 @@ const BridgeSwapInput = ({ value = {}, onChange, bridgeFee, currencies, balances
   maxBalance -= parseFloat(bridgeFee)
 
   const setMax = () => {
+    // TODO: max needs to be conditional on the fee currency
+    // - if fee currency *is not* the selected currency, then max can be full balance
+    // - if fee currency *is* the selected currency, then max is balance - l2 gas fee
     if(maxBalance > 0){
       onChange({ amount: (maxBalance || '') })
     }
