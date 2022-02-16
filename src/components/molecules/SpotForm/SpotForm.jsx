@@ -158,10 +158,8 @@ export class SpotForm extends React.Component {
             return;
         } else if (
             isNaN(price) ||
-            price > this.getFirstAsk() * 2 ||
-            price < this.getFirstBid() * 0.5
         ) {
-            toast.error("Price must be within 50% of spot");
+            toast.error("Price undefined");
             return;
         } else if (
             (this.props.side === 'b' && price > this.getFirstAsk() * 1.2) ||
