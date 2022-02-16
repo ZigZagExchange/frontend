@@ -8,8 +8,6 @@ import { getENSName } from 'lib/ens'
 import { formatAmount } from 'lib/utils'
 import erc20ContractABI from 'lib/contracts/ERC20.json'
 import { MAX_ALLOWANCE } from './constants'
-import APIZKProvider from './providers/APIZKProvider'
-import APIZKArgentProvider from './providers/APIZKArgentProvider'
 
 const chainMap = {
     '0x1': 1,
@@ -21,7 +19,6 @@ export default class API extends Emitter {
     apiProvider = null
     ethersProvider = null
     currencies = null
-    websocketUrl = null
     isArgent = false
     marketInfo = {}
     lastprices = {}
@@ -60,11 +57,7 @@ export default class API extends Emitter {
     }
 
     getAPIProvider = (network) => {
-        const provider = this.networks[this.getNetworkName(network)][1]
-        if (provider === APIZKProvider && this.isArgent) {
-            return APIZKArgentProvider
-        }
-        return provider
+        return this.networks[this.getNetworkName(network)][1]
     }
 
     setAPIProvider = (network) => {
