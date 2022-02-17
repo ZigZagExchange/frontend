@@ -16,6 +16,8 @@ class TradePriceBtcTable extends React.Component {
         this.state = {
             foundPairs: [],
             pairs: [],
+
+            categorySelected: "ALL",
             favourites: [],
 
             changeSorted: false,
@@ -67,6 +69,8 @@ class TradePriceBtcTable extends React.Component {
         category_name = category_name.toUpperCase();
         var foundPairs = [];
 
+        this.setState({categorySelected: category_name});
+
         switch (category_name){
             case "ALL":
                 this.setState({pairs: this.props.rowData});
@@ -102,6 +106,8 @@ class TradePriceBtcTable extends React.Component {
             default:
                 //search for custom category
                 this.searchPair(category_name);
+
+            return this.state.pairs;
         }
 
 
@@ -129,7 +135,6 @@ class TradePriceBtcTable extends React.Component {
     toggleChangeSorting(){
         
         var toggled = !this.state.changeSorted;
-
         var sorted_pairs = this.state.pairs;
         
         sorted_pairs.sort(function compareFn(firstEl, secondEl){
@@ -168,7 +173,10 @@ class TradePriceBtcTable extends React.Component {
 
 
     resetSorting(){
-        this.setState({pairs: this.props.rowData, priceSorted: false, changeSorted: false});
+        var category = this.state.categorySelected;
+        this.categorizePairs(category);
+        
+        this.setState({priceSorted: false, changeSorted: false});
     }
 
     //render given pairs
