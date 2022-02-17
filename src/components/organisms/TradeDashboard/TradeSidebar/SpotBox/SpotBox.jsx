@@ -32,18 +32,13 @@ class SpotBox extends React.Component {
           
             <div className="spot_head">
               <div className="sh_l">
-                <h2>SPOT</h2>
-              </div>
-              <div className="sh_r">
-                 Sell Fee: {marketInfo && marketInfo.baseFee.toPrecision(8)} {marketInfo && marketInfo.baseAsset?.symbol}
-                 <br/>
-                 Buy Fee: {marketInfo && marketInfo.quoteFee.toPrecision(8)} {marketInfo && marketInfo.quoteAsset?.symbol}
-              </div>
-            </div>
-            <div className="spot_tabs">
-              <div className="st_l">
-                <h2 className={this.orderTypeTabClassName("limit")} onClick={() => this.updateOrderType("limit")}>Limit</h2>
-                <h2 className={this.orderTypeTabClassName("market")} onClick={() => this.updateOrderType("market")}>Market</h2>
+                <h2 class="title">SPOT</h2>
+                <div className="spot_tabs">
+                  <div className="st_l">
+                    <h2 className={this.orderTypeTabClassName("limit")} onClick={() => this.updateOrderType("limit")}>Limit</h2>
+                    <h2 className={this.orderTypeTabClassName("market")} onClick={() => this.updateOrderType("market")}>Market</h2>
+                  </div>
+                </div>
               </div>
             </div>
             

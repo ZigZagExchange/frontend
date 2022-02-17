@@ -179,7 +179,7 @@ class TradePriceBtcTable extends React.Component {
             if(toggled){
                 return parseInt(firstEl.td2) - parseInt(secondEl.td2);
             } else {
-                return  parseInt(secondEl.td2) - parseInt(firstEl.td2);
+                return parseInt(secondEl.td2) - parseInt(firstEl.td2);
             }
             
         });
