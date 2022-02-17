@@ -23,8 +23,8 @@ import {
 } from "lib/store/features/api/apiSlice";
 import { userSelector } from "lib/store/features/auth/authSlice";
 import api from "lib/api";
-import {useLocation,useHistory} from "react-router-dom";
-import {getChainIdFromMarketChain, marketQueryParam} from "../../pages/ListPairPage/SuccessModal";
+import { useLocation, useHistory } from "react-router-dom";
+import { getChainIdFromMarketChain, marketQueryParam } from "../../pages/ListPairPage/SuccessModal";
 
 const TradeContainer = styled.div`
     color: #aeaebf;
@@ -35,7 +35,7 @@ const TradeContainer = styled.div`
 const TradeGrid = styled.article`
     display: grid;
     grid-template-rows: 50px 4fr 3fr 50px;
-    grid-template-columns: 300px 300px 1fr;
+    grid-template-columns: 325px 300px 1fr;
     grid-template-areas:
         'marketSelector marketSelector marketSelector'
         'sidebar books chart'

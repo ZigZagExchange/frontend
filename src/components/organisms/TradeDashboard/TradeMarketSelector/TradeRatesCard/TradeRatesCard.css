@@ -12,6 +12,18 @@
     margin-right: 10px;
 }
 
+.rates_box_label {
+    display: inline-flex;
+    height: 20px;
+    background: rgba(0,0,0,0.3);
+    color: rgb(102, 153, 255);
+    border-radius: 5px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 5px;
+    border: 1px solid rgba(102, 153, 255, 0.4);
+}
+
 .rates_box h2 {
     font-size: 0.8rem;
     color: #94a2c9;
