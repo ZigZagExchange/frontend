@@ -171,8 +171,8 @@ class TradePriceBtcTable extends React.Component {
     }
 
     togglePriceSorting(){
-        
         var toggled = !this.state.priceSorted;
+        
         var sorted_pairs = this.state.pairs;
 
         sorted_pairs.sort(function compareFn(firstEl, secondEl){
@@ -262,7 +262,7 @@ class TradePriceBtcTable extends React.Component {
                 <table>
                     <thead>
                         <tr>
-                            <th>
+                            <th onClick={() => this.resetSorting()}>
                                 Pair
                             </th>
                             <th onClick={() => this.togglePriceSorting()}>
