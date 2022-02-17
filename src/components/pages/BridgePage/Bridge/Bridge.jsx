@@ -1,6 +1,6 @@
 import React, {useEffect, useMemo, useState} from 'react'
 import { useSelector } from "react-redux";
-import { SwapButton, Button, useCoinEstimator } from 'components'
+import { SwapButton, Button, useCoinEstimator, Tooltip } from 'components'
 import {
   networkSelector,
   balancesSelector,
@@ -20,7 +20,6 @@ import ConnectWalletButton from "../../../atoms/ConnectWalletButton/ConnectWalle
 import Pane from "../../../atoms/Pane/Pane";
 import {x} from "@xstyled/styled-components"
 import {AiOutlineQuestionCircle} from "react-icons/all";
-import Tooltip from "../../../atoms/Tooltip/Tooltip";
 import ExternalLink from "../../ListPairPage/ExternalLink";
 import {HiExternalLink} from "react-icons/hi";
 import RadioButtons from "../../../atoms/RadioButtons/RadioButtons";
@@ -51,11 +50,10 @@ const Bridge = () => {
   let zkBalances = balanceData[network] || {}
 
   const [withdrawSpeed, setWithdrawSpeed] = useState("fast")
-  const isFastWithdraw = withdrawSpeed === "fast" && transfer.type === "withdraw"
-  const showFastSwapOption = transfer.type === "withdraw"
-    && swapDetails.currency
-    && api.apiProvider.eligibleFastWithdrawTokens.includes(swapDetails.currency)
-    && api.isZksyncChain()
+  const isFastWithdraw = (
+    withdrawSpeed === "fast"
+    && transfer.type === "withdraw"
+    && api.apiProvider.eligibleFastWithdrawTokens.includes(swapDetails.currency))
 
   useEffect(() => {
     if (user.address) {
@@ -72,6 +70,18 @@ const Bridge = () => {
     }
   }, [withdrawSpeed])
 
+  // recalc swap details
+  useEffect(() => {
+    setSwapDetails({})
+  }, [transfer.type])
+
+  useEffect(() => {
+    if (!api.apiProvider.eligibleFastWithdrawTokens.includes(swapDetails.currency)) {
+      setWithdrawSpeed("normal")
+    } else {
+      setWithdrawSpeed("fast")
+    }
+  }, [swapDetails.currency])
 
   const setSwapDetails = values => {
     const details = {
@@ -80,6 +90,7 @@ const Bridge = () => {
     };
 
     _setSwapDetails(details);
+
 
     const setFee = bridgeFee => {
       setBridgeFee(bridgeFee)
@@ -95,11 +106,15 @@ const Bridge = () => {
           setFormErr(`Must be more than ${activationFee} ${swapDetails.currency}`)
         } else if (input > (detailBalance - parseFloat(bridgeFee))) {
           setFormErr('Insufficient balance')
+        } else if (input - bridgeFee < 0) {
+          setFormErr("Amount too small")
         } else if (isFastWithdraw) {
           if (swapDetails.currency in fastWithdrawCurrencyMaxes) {
             const maxAmount = fastWithdrawCurrencyMaxes[swapDetails.currency]
             if (input > maxAmount) {
               setFormErr(`Max ${swapDetails.currency} liquidity for fast withdraw: ${maxAmount.toPrecision(4)}`)
+            } else if (input - (bridgeFee + zigZagFee) < 0) {
+              setFormErr("Amount too small")
             }
           }
         } else {
@@ -279,26 +294,28 @@ const Bridge = () => {
                 </span>
               </div>
             </div>
-            {showFastSwapOption && <x.div flexDirection={"column"} display={"flex"} alignItems={"flex-end"}>
-                <RadioButtons
+            <x.div flexDirection={"column"} display={"flex"} alignItems={"flex-end"}>
+              {transfer.type === "withdraw" && <>
+              <RadioButtons
                   horizontal
                   value={withdrawSpeed}
                   onChange={setWithdrawSpeed}
                   name={"withdrawSpeed"}
-                  items={[{id: "fast", name: "Fast"}, {id: "normal", name: "Normal"}]}
+                  items={[{id: "fast", name: "Fast", disabled: !api.apiProvider.eligibleFastWithdrawTokens.includes(swapDetails.currency)}, {id: "normal", name: "Normal"}]}
                 />
-              <x.div display={"flex"} mt={2}>
-                <x.div fontSize={12} color={"blue-gray-500"}>Withdraw speed</x.div>
-                <FastWithdrawTooltip/>
+                <x.div display={"flex"} mt={2}>
+                  <x.div fontSize={12} color={"blue-gray-500"}>Withdraw speed</x.div>
+                  <FastWithdrawTooltip/>
+                </x.div>
+              </>}
               </x.div>
-              </x.div>}
             {transfer.type === 'deposit' && user.address && !user.id && <div className="bridge_transfer_fee">
               One-Time Activation Fee: {activationFee} {swapDetails.currency} (~$15.00)
             </div>}
             {user.address ? (
               user.id && <div className="bridge_transfer_fee">
-                <div className="bridge_transfer_fee">
-                  {isFastWithdraw ? "Gas Fee" : "zkSync Withdraw Fee"}: {typeof bridgeFee !== 'number' ? (
+                {!isFastWithdraw && transfer.type === "withdraw" && <div className="bridge_transfer_fee">
+                  zkSync Withdraw Fee {typeof bridgeFee !== 'number' ? (
                   <div style={{ display: 'inline-flex', margin: '0 5px' }}>
                     <Loader
                       type="TailSpin"
@@ -308,10 +325,10 @@ const Bridge = () => {
                     />
                   </div>
                 ) : bridgeFee} {swapDetails.currency}
-                </div>
+                </div>}
                 {zigZagFee && <>
                   <div>
-                    ZigZag Fee: {zigZagFee.toPrecision(4)} {swapDetails.currency}
+                    Bridge Fee: {zigZagFee.toPrecision(4)} {swapDetails.currency}
                   </div>
                   <x.div color={"blue-gray-300"}>
                     You'll receive: ~{Number(swapDetails.amount - zigZagFee).toPrecision(4)} {swapDetails.currency} on L1
@@ -368,7 +385,7 @@ const FastWithdrawTooltip = () => {
   const renderLabel = () => {
     return <x.div>
       <x.div mb={2}>
-        Fast: receive ETH and FRAX within a few minutes through ZigZag Fast Withdrawal bridge.
+        Fast: receive ETH and FRAX within a few minutes through ZigZag's Fast Withdrawal bridge.
       </x.div>
       <x.div mb={2}>
         Normal: use zkSync bridge and receive funds after a few hours.

@@ -17,7 +17,7 @@ const TooltipOverlay = ({children}) => {
     </Pane>
 }
 
-const Tooltip = ({placement, label, children}) => {
+export const Tooltip = ({placement, label, children}) => {
   return <RCTooltip
     trigger={['hover']}
     placement={placement}
@@ -27,5 +27,3 @@ const Tooltip = ({placement, label, children}) => {
     {children}
   </RCTooltip>
 }
-
-export default Tooltip;
