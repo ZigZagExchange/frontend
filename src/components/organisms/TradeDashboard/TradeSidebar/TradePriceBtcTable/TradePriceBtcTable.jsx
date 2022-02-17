@@ -5,9 +5,7 @@ import SearchBox from "../SearchBox/SearchBox";
 import {getStables} from '../../../../../lib/helpers/categories/index.js'
 import {addFavourite, removeFavourite, fetchFavourites} from '../../../../../lib/helpers/storage/favourites'
 import { BsStar, BsStarFill } from "react-icons/bs";
-
-import arrowsImg from "../../../../../assets/icons/up-down-arrow.png"
-import { FaSortDown, FaSortUp } from "react-icons/fa";
+import { FaSort, FaSortDown, FaSortUp } from "react-icons/fa";
 
 class TradePriceBtcTable extends React.Component {
 
@@ -18,6 +16,8 @@ class TradePriceBtcTable extends React.Component {
         this.state = {
             foundPairs: [],
             pairs: [],
+
+            categorySelected: "ALL",
             favourites: [],
 
             changeSorted: false,
@@ -31,6 +31,7 @@ class TradePriceBtcTable extends React.Component {
 
         this.toggleChangeSorting = this.toggleChangeSorting.bind(this);
         this.togglePriceSorting = this.togglePriceSorting.bind(this);
+        this.resetSorting = this.resetSorting.bind(this);
 
         this.renderPairs = this.renderPairs.bind(this);
     }
@@ -68,6 +69,8 @@ class TradePriceBtcTable extends React.Component {
         category_name = category_name.toUpperCase();
         var foundPairs = [];
 
+        this.setState({categorySelected: category_name});
+
         switch (category_name){
             case "ALL":
                 this.setState({pairs: this.props.rowData});
@@ -103,6 +106,8 @@ class TradePriceBtcTable extends React.Component {
             default:
                 //search for custom category
                 this.searchPair(category_name);
+
+            return this.state.pairs;
         }
 
 
@@ -130,7 +135,6 @@ class TradePriceBtcTable extends React.Component {
     toggleChangeSorting(){
         
         var toggled = !this.state.changeSorted;
-
         var sorted_pairs = this.state.pairs;
         
         sorted_pairs.sort(function compareFn(firstEl, secondEl){
@@ -167,6 +171,13 @@ class TradePriceBtcTable extends React.Component {
     }
 
 
+
+    resetSorting(){
+        var category = this.state.categorySelected;
+        this.categorizePairs(category);
+        
+        this.setState({priceSorted: false, changeSorted: false});
+    }
 
     //render given pairs
     renderPairs(pairs){
@@ -228,7 +239,6 @@ class TradePriceBtcTable extends React.Component {
                                 Pair
                             </th>
                             <th onClick={() => this.togglePriceSorting()}>
-
                                 { this.state.priceSorted ? <FaSortDown/> : <FaSortUp/>}
                                 Price
 
@@ -263,6 +273,9 @@ class TradePriceBtcTable extends React.Component {
                     categories={["ALL", "ETH", "WBTC", "STABLES", "FAVOURITES"]}
                     categorizePairs={this.categorizePairs}
                 />
+
+                <FaSort onClick={this.resetSorting}/>
+                
                 <div className="trade_price_btc_table">
                     {this.renderPairs(this.state.pairs)}
                 </div>
