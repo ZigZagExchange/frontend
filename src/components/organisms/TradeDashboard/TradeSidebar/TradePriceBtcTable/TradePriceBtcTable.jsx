@@ -147,7 +147,7 @@ class TradePriceBtcTable extends React.Component {
 
     toggleChangeSorting(){
         
-        var toggled = !this.state.changeSorted;
+        var toggled = !this.state.changeDirection;
         var sorted_pairs = this.state.pairs;
         
         sorted_pairs.sort(function compareFn(firstEl, secondEl){
@@ -171,7 +171,7 @@ class TradePriceBtcTable extends React.Component {
     }
 
     togglePriceSorting(){
-        var toggled = !this.state.priceSorted;
+        var toggled = !this.state.priceDirection;
         
         var sorted_pairs = this.state.pairs;
 
@@ -185,7 +185,7 @@ class TradePriceBtcTable extends React.Component {
         });
         this.setState({
             pairs: sorted_pairs, 
-            priceSorted: true,  priceDirection: !this.state.priceDirection,
+            priceSorted: true,  priceDirection: toggled,
             changeSorted: false, changeDirection: false
         });
     }
