@@ -50,7 +50,7 @@ const BridgeInputBox = styled.div`
   }
 `;
 
-const BridgeSwapInput = ({ value = {}, onChange, bridgeFee, currencies, balances = {}, className }) => {
+const BridgeSwapInput = ({ value = {}, onChange, bridgeFee, balances = {}, className }) => {
   const setCurrency = useCallback(currency => onChange({ currency, amount: '' }), [onChange])
   const setAmount = useCallback(e => onChange({ amount: e.target.value.replace(/[^0-9.]/g,'') }), [onChange])
   
@@ -69,7 +69,7 @@ const BridgeSwapInput = ({ value = {}, onChange, bridgeFee, currencies, balances
   return (
     <BridgeInputBox>
       <div className="currencySelector">
-        <BridgeCurrencySelector currencies={currencies} balances={balances} onChange={setCurrency} value={value.currency} />
+        <BridgeCurrencySelector balances={balances} onChange={setCurrency} value={value.currency} />
       </div>
       <input onChange={setAmount} value={value.amount} className={className} placeholder="0.00" type="text" />
       <a className="maxLink" href="#max" onClick={setMax}>

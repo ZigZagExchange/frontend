@@ -262,7 +262,7 @@ export default class APIZKProvider extends APIProvider {
     }
 
     getWithdrawFeeToken = async (tokenToWithdraw) => {
-      const backupFeeToken = "FRAX"
+      const backupFeeToken = "ETH"
       const tokenInfo = await this.getTokenInfo(tokenToWithdraw);
       let feeToken = tokenToWithdraw
       if (!tokenInfo.enabledForFees) {

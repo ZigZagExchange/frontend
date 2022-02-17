@@ -7,23 +7,20 @@ import {
 } from "lib/store/features/api/apiSlice"
 import Loader from "react-loader-spinner"
 import {userSelector} from "lib/store/features/auth/authSlice";
-import ethLogo from "assets/images/currency/ETH.svg"
 import api from 'lib/api';
 import {MAX_ALLOWANCE} from 'lib/api/constants';
 import {formatUSD} from 'lib/utils';
 import cx from 'classnames';
 import {BiError} from 'react-icons/bi';
 import {MdSwapCalls} from 'react-icons/md';
-import logo from 'assets/images/logo.png'
 import BridgeSwapInput from '../BridgeSwapInput/BridgeSwapInput';
 import ConnectWalletButton from "../../../atoms/ConnectWalletButton/ConnectWalletButton";
 import Pane from "../../../atoms/Pane/Pane";
 import {x} from "@xstyled/styled-components"
-import {AiOutlineQuestionCircle} from "react-icons/all";
-import Tooltip from "../../../atoms/Tooltip/Tooltip";
-import ExternalLink from "../../ListPairPage/ExternalLink";
-import {HiExternalLink} from "react-icons/hi";
 import RadioButtons from "../../../atoms/RadioButtons/RadioButtons";
+import L2Header from "./L2Header";
+import L1Header from "./L1Header";
+import FastWithdrawTooltip from "./FastWithdrawTooltip";
 
 const defaultTransfer = {
   type: 'deposit',
@@ -41,7 +38,8 @@ const Bridge = () => {
   const network = useSelector(networkSelector);
   const [transfer, setTransfer] = useState(defaultTransfer);
   const [swapDetails, _setSwapDetails] = useState(() => ({amount: '', currency: 'ETH'}));
-  const currencies = useMemo(() => null, [transfer.type])
+  // const currencies = useMemo(() => null, [transfer.type])
+  const currencies = null
   const coinEstimator = useCoinEstimator()
   const currencyValue = coinEstimator(swapDetails.currency)
   const activationFee = parseFloat((user.address && !user.id ? (15 / currencyValue) : 0).toFixed(5))
@@ -63,10 +61,11 @@ const Bridge = () => {
   const hasError = formErr && formErr.length > 0
   const isSwapAmountEmpty = swapDetails.amount === ""
 
+  console.log("debug:: currencies", currencies)
+
   useEffect(() => {
     if (user.address) {
       api.getL2FastWithdrawLiquidity().then(maxes => {
-        console.log("debug:: maxes", maxes)
         setFastWithdrawCurrencyMaxes(maxes)
       })
     }
@@ -79,12 +78,6 @@ const Bridge = () => {
     }
   }, [withdrawSpeed])
 
-  // recalc swap details
-  useEffect(() => {
-    setSwapDetails({})
-  }, [transfer.type])
-
-  // default withdraw speed to fast for eligible tokens
   useEffect(() => {
     if (!api.apiProvider.eligibleFastWithdrawTokens.includes(swapDetails.currency)) {
       setWithdrawSpeed("normal")
@@ -92,6 +85,12 @@ const Bridge = () => {
       setWithdrawSpeed("fast")
     }
   }, [swapDetails.currency])
+
+  useEffect(() => {
+    // since setSwapDetails uses state, instead of recalculating
+    // swap details in switchTransferType we recalculate as an effect here.
+    setSwapDetails({})
+  }, [transfer.type])
 
   const validateInput = (inputValue, swapCurrency) => {
     // TODO: any more validation here?
@@ -142,22 +141,22 @@ const Bridge = () => {
   }
 
   const setFastWithdrawFees = (setFee, details) => {
-      api.withdrawL2FeeFast(details.currency)
-        .then(({amount, feeToken}) => {
-          setFee(amount, feeToken)
-        })
-        .catch(e => {
-          console.error(e)
-          setBridgeFeeToken(null)
-          setFee(null)
-        })
+    api.withdrawL2FeeFast(details.currency)
+      .then(({amount, feeToken}) => {
+        setFee(amount, feeToken)
+      })
+      .catch(e => {
+        console.error(e)
+        setBridgeFeeToken(null)
+        setFee(null)
+      })
 
-      api.withdrawL2ZZFeeFast(details.currency)
-        .then(res => setZigZagFee(res))
-        .catch(e => {
-            console.error(e)
-            setZigZagFee(null)
-        })
+    api.withdrawL2ZZFeeFast(details.currency)
+      .then(res => setZigZagFee(res))
+      .catch(e => {
+          console.error(e)
+          setZigZagFee(null)
+      })
   }
 
   const setNormalWithdrawFees = (setFee, details) => {
@@ -198,6 +197,7 @@ const Bridge = () => {
       }
     }
 
+    // TODO: does this need to be there
     setFee(null)
     setZigZagFee(null)
 
@@ -215,11 +215,14 @@ const Bridge = () => {
   }
 
   const switchTransferType = e => {
+    console.log("debug:: start")
     if (e) e.preventDefault()
     transfer.type = transfer.type === 'deposit' ? 'withdraw' : 'deposit'
     setTransfer(transfer)
-    setBridgeFeeToken("ETH")
-    setSwapDetails({})
+
+    // TODO: why set to ETH everytime?
+    // setBridgeFeeToken("ETH")
+    console.log("debug:: end")
   }
 
   const disconnect = () => {
@@ -259,10 +262,11 @@ const Bridge = () => {
     deferredXfer
       .then(() => {
         setTimeout(() => api.getAccountState(), 1000)
-        setLoading(false)
       })
       .catch(e => {
-        console.log(e.message)
+        console.error(e.message)
+      })
+      .finally(() => {
         setLoading(false)
       })
   }
@@ -415,51 +419,6 @@ const Bridge = () => {
     </>
 
   )
-}
-
-const L1Header = () => {
-  return <div className="bridge_coin_details">
-    <div className="bridge_coin_image" style={{background: '#fff'}}>
-      <img
-        alt="Ethereum logo"
-        src={ethLogo}
-      />
-    </div>
-    <div className="bridge_coin_name">Ethereum L1</div>
-  </div>
-}
-
-const L2Header = () => {
-  return <div className="bridge_coin_details">
-    <div className="bridge_coin_image">
-      <img alt="Logo" src={logo}/>
-    </div>
-    <div className="bridge_coin_name">zkSync L2</div>
-  </div>
-}
-
-const FastWithdrawTooltip = () => {
-  const renderLabel = () => {
-    return <x.div>
-      <x.div mb={2}>
-        Fast: receive ETH and FRAX within a few minutes through ZigZag's Fast Withdrawal bridge.
-      </x.div>
-      <x.div mb={2}>
-        Normal: use zkSync bridge and receive funds after a few hours.
-      </x.div>
-      <x.div><ExternalLink href={"https://docs.zigzag.exchange/zksync/fast-withdraw-bridge"}>
-        Learn more <HiExternalLink/>
-      </ExternalLink></x.div>
-    </x.div>
-  }
-
-  return <>
-    <Tooltip placement={"right"} label={renderLabel()}>
-      <x.div display={"inline-flex"} color={"blue-gray-600"} ml={2} alignItems={"center"}>
-        <AiOutlineQuestionCircle size={16}/>
-      </x.div>
-    </Tooltip>
-  </>
 }
 
 export default Bridge

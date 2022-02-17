@@ -124,7 +124,7 @@ const BridgeCurrencyOptions = styled.ul`
   }
 `
 
-const BridgeCurrencySelector = ({ onChange, currencies, balances = {}, value }) => {
+const BridgeCurrencySelector = ({ onChange, balances = {}, value }) => {
   const [showingOptions, setShowingOptions] = useState(false);
   const network = useSelector(networkSelector);
   const user = useSelector(userSelector);
@@ -133,7 +133,7 @@ const BridgeCurrencySelector = ({ onChange, currencies, balances = {}, value }) 
 
   useEffect(() => {
     onChange(api.marketInfo["ETH"] ? "ETH" : tickers[0]);
-  }, [user.id, network, currencies]);
+  }, [user.id, network]);
 
   const hideOptions = (e) => {
     if (e) e.preventDefault()

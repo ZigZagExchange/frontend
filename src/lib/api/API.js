@@ -553,16 +553,6 @@ export default class API extends Emitter {
         }
     }
 
-    get _fraxContractAddress() {
-      if (this.apiProvider.network === 1) {
-        return "0x853d955aCEf822Db058eb8505911ED77F175b99e"
-      } else if (this.apiProvider.network === 1000) {
-        return "0x6426e27d8c6fDCd1e0c165d0D58c7eC0ef51f3a7"
-      } else {
-        throw Error("No FRAX address for specified network")
-      }
-    }
-
     get fastWithdrawTokenAddresses() {
       if (this.apiProvider.network === 1) {
         return {
