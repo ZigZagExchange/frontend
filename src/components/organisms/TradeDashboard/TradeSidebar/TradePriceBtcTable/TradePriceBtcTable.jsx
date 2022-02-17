@@ -228,17 +228,13 @@ class TradePriceBtcTable extends React.Component {
                             </th>
                             <th onClick={() => this.togglePriceSorting()}>
 
-                                <img src={arrowsImg}
-                                   alt="toggle-price"
-                                />
+                                { this.state.priceSorted ? <FaSortDown/> : <FaSortUp/>}
                                 Price
 
                             </th>
                             <th onClick={() => this.toggleChangeSorting()}>
-                                <span><img src={arrowsImg} 
-                                    alt="toggle-change"
-                                />
-                                Change</span>
+                                { this.state.changeSorted ? <FaSortDown/> : <FaSortUp/>}
+                                Change
                             </th>
                         </tr>
                     </thead>
