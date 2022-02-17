@@ -189,51 +189,6 @@ export default class APIZKProvider extends APIProvider {
             : {}
     }
 
-    withdrawL2 = async (amountDecimals, token = 'ETH') => {
-        const currencyInfo = this.getCurrencyInfo(token);
-        const amount = toBaseUnit(amountDecimals, currencyInfo.decimals)
-
-        try {
-            const transfer = await this.syncWallet.withdrawFromSyncToEthereum({
-                token,
-                ethAddress: await this.ethWallet.getAddress(),
-                amount,
-            })
-
-            await transfer.awaitReceipt()
-
-            this.api.emit('bridgeReceipt',
-                this.handleBridgeReceipt(transfer, amountDecimals, token, 'withdraw')
-            )
-            return transfer
-        } catch(err) {
-            console.log(err)
-        }
-    }
-
-    withdrawL2Fast = async (amountDecimals, token) => {
-      if (!this.eligibleFastWithdrawTokens.includes(token)) {
-        throw Error("Token not supported for fast withdraw")
-      }
-
-      const currencyInfo = this.getCurrencyInfo(token)
-      let amount = toBaseUnit(amountDecimals, currencyInfo.decimals)
-
-      const isPackable = isTransactionAmountPackable(amount)
-      if (!isPackable) {
-        amount = closestPackableTransactionAmount(amount)
-      }
-
-      const transfer = await this.syncWallet.syncTransfer({
-        to: this.fastWithdrawContractAddress,
-        token,
-        amount
-      })
-      await transfer.awaitReceipt()
-      this.api.emit('bridgeReceipt', this.handleFastBridgeReceipt(transfer, amountDecimals, token, 'withdraw'))
-      return transfer
-    }
-
     depositL2 = async (amountDecimals, token = 'ETH') => {
         let transfer
 
@@ -261,14 +216,70 @@ export default class APIZKProvider extends APIProvider {
         return 0
     }
 
+    withdrawL2 = async (amountDecimals, token = 'ETH') => {
+      const currencyInfo = this.getCurrencyInfo(token);
+      const amount = toBaseUnit(amountDecimals, currencyInfo.decimals)
+
+      try {
+        const transfer = await this.syncWallet.withdrawFromSyncToEthereum({
+          token,
+          ethAddress: await this.ethWallet.getAddress(),
+          amount,
+        })
+
+        await transfer.awaitReceipt()
+
+        this.api.emit('bridgeReceipt',
+          this.handleBridgeReceipt(transfer, amountDecimals, token, 'withdraw')
+        )
+        return transfer
+      } catch(err) {
+        console.log(err)
+      }
+    }
+
+    withdrawL2Fast = async (amountDecimals, token) => {
+      if (!this.eligibleFastWithdrawTokens.includes(token)) {
+        throw Error("Token not supported for fast withdraw")
+      }
+
+      const currencyInfo = this.getCurrencyInfo(token)
+      const amountToFormat = Number(amountDecimals).toPrecision(currencyInfo.decimals)
+      let amount = toBaseUnit(amountToFormat, currencyInfo.decimals)
+
+      const isPackable = isTransactionAmountPackable(amount)
+      if (!isPackable) {
+        amount = closestPackableTransactionAmount(amount)
+      }
+      const feeToken = await this.getWithdrawFeeToken(token)
+
+      if (feeToken !== token) {
+        const batchBuilder = this.syncWallet.batchBuilder();
+        const transferTx = {
+          to: this.fastWithdrawContractAddress,
+          token: token,
+          amount: amount,
+          fee: 0
+        }
+        batchBuilder.addTransfer(transferTx)
+        const batch = await batchBuilder.build(feeToken)
+        const hashes = await this.syncProvider.submitTxsBatch(batch.txs, batch.signature)
+        this.api.emit('bridgeReceipt', this.handleFastBridgeReceipt({txHash: hashes[0]}, amountDecimals, token, 'withdraw'))
+      } else {
+        const transfer = await this.syncWallet.syncTransfer({
+          to: this.fastWithdrawContractAddress,
+          token,
+          amount
+        })
+        await transfer.awaitReceipt()
+        this.api.emit('bridgeReceipt', this.handleFastBridgeReceipt(transfer, amountDecimals, token, 'withdraw'))
+      }
+    }
+
     getWithdrawFeeToken = async (tokenToWithdraw) => {
       const backupFeeToken = "ETH"
       const tokenInfo = await this.getTokenInfo(tokenToWithdraw);
-      let feeToken = tokenToWithdraw
-      if (!tokenInfo.enabledForFees) {
-        feeToken = backupFeeToken
-      }
-      return feeToken
+      return tokenInfo.enabledForFees ? tokenToWithdraw : backupFeeToken
     }
 
     withdrawL2Fee = async (token = 'ETH') => {
@@ -292,16 +303,31 @@ export default class APIZKProvider extends APIProvider {
 
     withdrawL2FeeFast = async (token) => {
       /*
-      * Returns the gas fee associated with an L2 Fast withdraw (just a transfer on zkSync)
+      * Returns the gas for the fast withdraw
       * */
       const feeToken = await this.getWithdrawFeeToken(token)
-      const currencyInfo = this.getCurrencyInfo(feeToken)
-      const fee = await this.syncProvider.getTransactionFee(
-        'Transfer',
-        this.fastWithdrawContractAddress,
-        feeToken
-      )
-      const amount = parseInt(fee.totalFee) / 10 ** currencyInfo.decimals
+      const feeCurrencyInfo = this.getCurrencyInfo(feeToken)
+      let totalFee
+
+      if (feeToken !== token) {
+        // paying for tx fees with different tokens requires us to
+        // send batch transactions. we estimate those fees here.
+        const fee = await this.syncProvider.getTransactionsBatchFee(
+          ['Transfer', 'Transfer'],
+          [this.fastWithdrawContractAddress, this.syncWallet.address()],
+          feeToken
+        );
+        totalFee = fee.toNumber()
+      } else {
+        const fee = await this.syncProvider.getTransactionFee(
+          'Transfer',
+          this.fastWithdrawContractAddress,
+          token
+        )
+        totalFee = fee.totalFee
+      }
+
+      const amount = parseInt(totalFee) / 10 ** feeCurrencyInfo.decimals
       return {amount, feeToken}
     }
 

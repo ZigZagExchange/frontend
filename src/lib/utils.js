@@ -48,5 +48,5 @@ export function toBaseUnit(value, decimals) {
   
     whole = BigNumber.from(whole);
     fraction = BigNumber.from(fraction);    
-    return BigNumber.from(whole.mul(base).add(fraction).toString(10));
+    return BigNumber.from(whole.mul(base).add(fraction).toString());
   }

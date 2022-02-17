@@ -86,40 +86,49 @@ const Bridge = () => {
     // since setSwapDetails uses state, instead of recalculating
     // swap details in switchTransferType we recalculate as an effect here.
     setSwapDetails({})
-    console.log("debug:: effect called")
   }, [transfer.type])
 
   const validateInput = (inputValue, swapCurrency) => {
-    // TODO: any more validation here?
-
     const bals = transfer.type === 'deposit' ? walletBalances : zkBalances
     const detailBalance = parseFloat(bals[swapCurrency] && bals[swapCurrency].valueReadable) || 0
+    let error = null
 
     if (inputValue > 0) {
       if (inputValue < 0.001) {
-        setFormErr('Must be at least 0.001')
-        return false
+        error = "Must be at least 0.001"
       } else if (inputValue <= activationFee) {
-        setFormErr(`Must be more than ${activationFee} ${swapDetails.currency}`)
-        return false
-      } else if (inputValue > (detailBalance - parseFloat(bridgeFee))) {
-        setFormErr('Insufficient balance')
-        return false
+        error = `Must be more than ${activationFee} ${swapCurrency}`
       } else if (inputValue - bridgeFee < 0) {
-        setFormErr("Amount too small")
-        return false
+        error = "Amount too small"
+      } else if (inputValue > detailBalance) {
+        error = "Insufficient balance"
       } else if (isFastWithdraw) {
+        if (inputValue - zigZagFee < 0) {
+          error = "Amount too small"
+        }
+
         if (swapDetails.currency in fastWithdrawCurrencyMaxes) {
-          const maxAmount = fastWithdrawCurrencyMaxes[swapDetails.currency]
+          const maxAmount = fastWithdrawCurrencyMaxes[swapCurrency]
           if (inputValue > maxAmount) {
-            setFormErr(`Max ${swapDetails.currency} liquidity for fast withdraw: ${maxAmount.toPrecision(4)}`)
-            return false
+            error = `Max ${swapCurrency} liquidity for fast withdraw: ${maxAmount.toPrecision(4)}`
           } else if (inputValue - (bridgeFee + zigZagFee) < 0) {
-            setFormErr("Amount too small")
-            return false
+            error = "Amount too small"
           }
         }
       }
+
+      if (bridgeFeeToken === swapCurrency) {
+        if (inputValue - (detailBalance - bridgeFee) < 0) {
+          error = "Insufficient balance for fees"
+        }
+      }
+    } else {
+      error = "Please input a value"
+    }
+
+    if (error) {
+      setFormErr(error)
+      return false
     }
     return true
   }
@@ -127,8 +136,6 @@ const Bridge = () => {
   const validateFees = (bridgeFee, feeToken) => {
     const bals = transfer.type === 'deposit' ? walletBalances : zkBalances
     const feeTokenBalance = parseFloat(bals[feeToken] && bals[feeToken].valueReadable) || 0
-
-    console.log("debug:: feeToken - bridgeFee", feeToken, bridgeFee, feeTokenBalance)
 
     if (bridgeFee > feeTokenBalance) {
       setFormErr("Not enough balance to pay for fees")
@@ -194,7 +201,6 @@ const Bridge = () => {
       }
     }
 
-    // TODO: does this need to be there
     setFee(null)
     setZigZagFee(null)
 
@@ -215,11 +221,6 @@ const Bridge = () => {
     e.preventDefault()
     const type = transfer.type === "deposit" ? "withdraw" : "deposit"
     setTransfer({type})
-  }
-
-  const disconnect = () => {
-    api.signOut()
-      .catch(err => console.log(err))
   }
 
   const approveSpend = (e) => {
@@ -256,7 +257,7 @@ const Bridge = () => {
         setTimeout(() => api.getAccountState(), 1000)
       })
       .catch(e => {
-        console.error(e.message)
+        console.error("error sending transaction::", e)
       })
       .finally(() => {
         setLoading(false)
@@ -276,6 +277,7 @@ const Bridge = () => {
             balances={balances}
             value={swapDetails}
             onChange={setSwapDetails}
+            feeCurrency={bridgeFeeToken}
           />
           <div className="bridge_coin_stats">
             <div className="bridge_coin_stat">
@@ -340,7 +342,6 @@ const Bridge = () => {
             One-Time Activation Fee: {activationFee} {swapDetails.currency} (~$15.00)
           </div>}
           {user.address && user.id && !isSwapAmountEmpty && <div className="bridge_transfer_fee">
-            {bridgeFeeToken && <x.div fontSize={16} color={"white"}>{bridgeFeeToken}</x.div>}
             {transfer.type === "withdraw" && <x.div>
               {bridgeFee && <>L2 gas fee: {bridgeFee} {bridgeFeeToken}</>}
               {!bridgeFee && <div style={{display: 'inline-flex', margin: '0 5px'}}>
@@ -351,12 +352,16 @@ const Bridge = () => {
                   width={16}
                 />
               </div>}
-              {isFastWithdraw && zigZagFee && <x.div>
-                <div>
+
+              {transfer.type === "withdraw" && <x.div>
+                {isFastWithdraw && zigZagFee && <div>
                   Bridge Fee: {zigZagFee.toPrecision(4)} {swapDetails.currency}
-                </div>
+                </div>}
                 <x.div color={"blue-gray-300"}>
-                  You'll receive: ~{Number(swapDetails.amount - zigZagFee).toPrecision(4)} {swapDetails.currency} on L1
+                  You'll receive: ~{isFastWithdraw && zigZagFee
+                  ? Number(swapDetails.amount - zigZagFee).toPrecision(4)
+                  : Number(swapDetails.amount).toPrecision(4)}
+                  {" " + swapDetails.currency} on L1
                 </x.div>
               </x.div>}
             </x.div>}
@@ -399,7 +404,9 @@ const Bridge = () => {
         <div className="bridge_connected_as">
           <span className="bridge_bubble_connected"/>
           {' '}Connected as {`${user.address.substr(0, 6)}...${user.address.substr(-5)}`}
-          <span onClick={disconnect} className="bridge_disconnect">{' • '}<a href="#disconnect">Disconnect</a></span>
+          <span onClick={() => api.signOut().catch(err => console.log(err))} className="bridge_disconnect">
+            {' • '}<a href="#disconnect">Disconnect</a>
+          </span>
         </div>
       ) : (
         <div className="bridge_connected_as">

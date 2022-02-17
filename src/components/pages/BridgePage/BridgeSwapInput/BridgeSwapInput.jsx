@@ -50,20 +50,17 @@ const BridgeInputBox = styled.div`
   }
 `;
 
-const BridgeSwapInput = ({ value = {}, onChange, bridgeFee, balances = {}, className }) => {
+const BridgeSwapInput = ({ value = {}, onChange, bridgeFee, balances = {}, feeCurrency }) => {
   const setCurrency = useCallback(currency => onChange({ currency, amount: '' }), [onChange])
   const setAmount = useCallback(e => onChange({ amount: e.target.value.replace(/[^0-9.]/g,'') }), [onChange])
-  
-  let maxBalance = parseFloat((balances[value.currency] && balances[value.currency].valueReadable) || 0)
-  maxBalance -= parseFloat(bridgeFee)
 
   const setMax = () => {
-    // TODO: max needs to be conditional on the fee currency
-    // - if fee currency *is not* the selected currency, then max can be full balance
-    // - if fee currency *is* the selected currency, then max is balance - l2 gas fee
-    if(maxBalance > 0){
-      onChange({ amount: (maxBalance || '') })
+    let max = parseFloat((balances[value.currency] && balances[value.currency].valueReadable) || 0)
+    if (feeCurrency === value.currency) {
+      max -= parseFloat(bridgeFee)
     }
+
+    onChange({amount: max})
   }
 
   return (
@@ -71,7 +68,7 @@ const BridgeSwapInput = ({ value = {}, onChange, bridgeFee, balances = {}, class
       <div className="currencySelector">
         <BridgeCurrencySelector balances={balances} onChange={setCurrency} value={value.currency} />
       </div>
-      <input onChange={setAmount} value={value.amount} className={className} placeholder="0.00" type="text" />
+      <input onChange={setAmount} value={value.amount} placeholder="0.00" type="text" />
       <a className="maxLink" href="#max" onClick={setMax}>
         Max
       </a>
