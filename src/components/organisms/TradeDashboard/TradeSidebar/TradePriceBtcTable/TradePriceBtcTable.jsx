@@ -21,7 +21,10 @@ class TradePriceBtcTable extends React.Component {
             favourites: [],
 
             changeSorted: false,
-            priceSorted: false
+            changeDirection: false,
+
+            priceSorted: false,
+            priceDirection: false
         }
 
         this.searchPair = this.searchPair.bind(this);
@@ -60,7 +63,11 @@ class TradePriceBtcTable extends React.Component {
 
         //update found pairs
         this.setState({
-            pairs: foundPairs
+            pairs: foundPairs,
+
+            //reset sorting
+            priceSorted: false, priceDirection: false, 
+            changeSorted: false, changeDirection: false
         });
 
     }
@@ -69,7 +76,13 @@ class TradePriceBtcTable extends React.Component {
         category_name = category_name.toUpperCase();
         var foundPairs = [];
 
-        this.setState({categorySelected: category_name});
+        this.setState({
+            categorySelected: category_name, 
+            
+            //reset sorting
+            priceSorted: false, priceDirection: false, 
+            changeSorted: false, changeDirection: false
+        });
 
         switch (category_name){
             case "ALL":
@@ -134,7 +147,7 @@ class TradePriceBtcTable extends React.Component {
 
     toggleChangeSorting(){
         
-        var toggled = !this.state.changeSorted;
+        var toggled = !this.state.changeDirection;
         var sorted_pairs = this.state.pairs;
         
         sorted_pairs.sort(function compareFn(firstEl, secondEl){
@@ -148,26 +161,33 @@ class TradePriceBtcTable extends React.Component {
             }
             
         });
-        this.setState({pairs: sorted_pairs, changeSorted: toggled, priceSorted: false});
+        this.setState({
+            pairs: sorted_pairs, 
+            
+
+            priceSorted: false,  priceDirection: false,
+            changeSorted: true, changeDirection: !this.state.changeDirection
+        });
     }
 
     togglePriceSorting(){
+        var toggled = !this.state.priceDirection;
         
-        var toggled = !this.state.priceSorted;
         var sorted_pairs = this.state.pairs;
 
         sorted_pairs.sort(function compareFn(firstEl, secondEl){
             if(toggled){
-//                console.log(firstEl.td2, secondEl.td2)
                 return parseInt(firstEl.td2) - parseInt(secondEl.td2);
             } else {
-                //reverse
-                //console.log(secondEl.td2, firstEl.td2)
                 return  parseInt(secondEl.td2) - parseInt(firstEl.td2);
             }
             
         });
-        this.setState({pairs: sorted_pairs, priceSorted: toggled, changeSorted: false});
+        this.setState({
+            pairs: sorted_pairs, 
+            priceSorted: true,  priceDirection: toggled,
+            changeSorted: false, changeDirection: false
+        });
     }
 
 
@@ -176,11 +196,18 @@ class TradePriceBtcTable extends React.Component {
         var category = this.state.categorySelected;
         this.categorizePairs(category);
         
-        this.setState({priceSorted: false, changeSorted: false});
+        this.setState({priceSorted: false, priceDirection: false, changeSorted: false, changeDirection: false});
     }
 
     //render given pairs
     renderPairs(pairs){
+
+        var changeSorted = this.state.changeSorted;
+        var priceSorted = this.state.priceSorted;
+
+        var changeDirection = this.state.changeDirection;
+        var priceDirection = this.state.priceDirection;
+        
 
         const shown_pairs = pairs.map((d, i) => {
             var selected = this.props.currentMarket === d.td1; //if current market selected
@@ -235,16 +262,16 @@ class TradePriceBtcTable extends React.Component {
                 <table>
                     <thead>
                         <tr>
-                            <th>
+                            <th onClick={() => this.resetSorting()}>
                                 Pair
                             </th>
                             <th onClick={() => this.togglePriceSorting()}>
-                                { this.state.priceSorted ? <FaSortDown/> : <FaSortUp/>}
+                                { priceSorted ? (priceDirection ? <FaSortDown/> : <FaSortUp/>) : <FaSort/>}
                                 Price
 
                             </th>
                             <th onClick={() => this.toggleChangeSorting()}>
-                                { this.state.changeSorted ? <FaSortDown/> : <FaSortUp/>}
+                                { changeSorted ? (changeDirection ? <FaSortDown/> : <FaSortUp/>) : <FaSort/>}
                                 Change
                             </th>
                         </tr>
@@ -274,8 +301,6 @@ class TradePriceBtcTable extends React.Component {
                     categorizePairs={this.categorizePairs}
                 />
 
-                <FaSort onClick={this.resetSorting}/>
-                
                 <div className="trade_price_btc_table">
                     {this.renderPairs(this.state.pairs)}
                 </div>
