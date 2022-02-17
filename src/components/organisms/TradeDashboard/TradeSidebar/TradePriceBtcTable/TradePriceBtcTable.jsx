@@ -63,7 +63,11 @@ class TradePriceBtcTable extends React.Component {
 
         //update found pairs
         this.setState({
-            pairs: foundPairs
+            pairs: foundPairs,
+
+            //reset sorting
+            priceSorted: false, priceDirection: false, 
+            changeSorted: false, changeDirection: false
         });
 
     }
@@ -72,7 +76,13 @@ class TradePriceBtcTable extends React.Component {
         category_name = category_name.toUpperCase();
         var foundPairs = [];
 
-        this.setState({categorySelected: category_name});
+        this.setState({
+            categorySelected: category_name, 
+            
+            //reset sorting
+            priceSorted: false, priceDirection: false, 
+            changeSorted: false, changeDirection: false
+        });
 
         switch (category_name){
             case "ALL":
