@@ -102,8 +102,8 @@ export default class API extends Emitter {
                     "custom-argent": {
                         display: {
                             logo: "https://images.prismic.io/argentwebsite/313db37e-055d-42ee-9476-a92bda64e61d_logo.svg?auto=format%2Ccompress&fit=max&q=50",
-                            name: "Argent zkSync Provider",
-                            description: "Connect to your Argent zkSync account"
+                            name: "Argent zkSync",
+                            description: "Connect to your Argent zkSync wallet"
                         },
                         package: WalletConnectProvider,
                         options: {
