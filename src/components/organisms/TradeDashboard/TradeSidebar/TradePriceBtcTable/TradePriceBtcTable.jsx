@@ -130,13 +130,15 @@ class TradePriceBtcTable extends React.Component {
         
         var toggled = !this.state.changeSorted;
 
-        var sorted_pairs = this.state.foundPairs.length !== 0 ? this.state.foundPairs : this.state.pairs;
+        var sorted_pairs = this.state.pairs;
         
         sorted_pairs.sort(function compareFn(firstEl, secondEl){
             if(toggled){
+                //console.log(firstEl.td3, secondEl.td3, (parseInt(secondEl.td3) - parseInt(firstEl.td3)))
                 return parseInt(firstEl.td3) - parseInt(secondEl.td3);
             } else {
                 //reverse
+                //console.log(secondEl.td3, firstEl.td3, (parseInt(secondEl.td3) - parseInt(firstEl.td3)))
                 return parseInt(secondEl.td3) - parseInt(firstEl.td3);
             }
             
@@ -151,9 +153,11 @@ class TradePriceBtcTable extends React.Component {
 
         sorted_pairs.sort(function compareFn(firstEl, secondEl){
             if(toggled){
+//                console.log(firstEl.td2, secondEl.td2)
                 return parseInt(firstEl.td2) - parseInt(secondEl.td2);
             } else {
                 //reverse
+                //console.log(secondEl.td2, firstEl.td2)
                 return  parseInt(secondEl.td2) - parseInt(firstEl.td2);
             }
             
@@ -231,11 +235,10 @@ class TradePriceBtcTable extends React.Component {
 
                             </th>
                             <th onClick={() => this.toggleChangeSorting()}>
-                                <img src={arrowsImg} 
+                                <span><img src={arrowsImg} 
                                     alt="toggle-change"
                                 />
-
-                                Change 
+                                Change</span>
                             </th>
                         </tr>
                     </thead>
