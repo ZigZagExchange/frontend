@@ -7,6 +7,7 @@ import {addFavourite, removeFavourite, fetchFavourites} from '../../../../../lib
 import { BsStar, BsStarFill } from "react-icons/bs";
 
 import arrowsImg from "../../../../../assets/icons/up-down-arrow.png"
+import { FaSortDown, FaSortUp } from "react-icons/fa";
 
 class TradePriceBtcTable extends React.Component {
 
