@@ -180,6 +180,9 @@ export default class API extends Emitter {
     _socketMsg = (e) => {
         if (!e.data && e.data.length <= 0) return
         const msg = JSON.parse(e.data)
+        if (msg.op === "error") {
+            console.error("websocket error:", msg)
+        }
         this.emit('message', msg.op, msg.args)
 
         // Is there a better way to do this? Not sure. 
