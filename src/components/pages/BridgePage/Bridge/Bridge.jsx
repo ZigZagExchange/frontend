@@ -38,8 +38,6 @@ const Bridge = () => {
   const network = useSelector(networkSelector);
   const [transfer, setTransfer] = useState(defaultTransfer);
   const [swapDetails, _setSwapDetails] = useState(() => ({amount: '', currency: 'ETH'}));
-  // const currencies = useMemo(() => null, [transfer.type])
-  const currencies = null
   const coinEstimator = useCoinEstimator()
   const currencyValue = coinEstimator(swapDetails.currency)
   const activationFee = parseFloat((user.address && !user.id ? (15 / currencyValue) : 0).toFixed(5))
@@ -60,8 +58,6 @@ const Bridge = () => {
   const hasAllowance = balances[swapDetails.currency] && balances[swapDetails.currency].allowance.gte(MAX_ALLOWANCE.div(3))
   const hasError = formErr && formErr.length > 0
   const isSwapAmountEmpty = swapDetails.amount === ""
-
-  console.log("debug:: currencies", currencies)
 
   useEffect(() => {
     if (user.address) {
@@ -90,6 +86,7 @@ const Bridge = () => {
     // since setSwapDetails uses state, instead of recalculating
     // swap details in switchTransferType we recalculate as an effect here.
     setSwapDetails({})
+    console.log("debug:: effect called")
   }, [transfer.type])
 
   const validateInput = (inputValue, swapCurrency) => {
@@ -173,8 +170,8 @@ const Bridge = () => {
 
   const setDepositFee = (setFee, details) => {
       api.depositL2Fee(details.currency).then(res => {
-          setFee(res)
-          setZigZagFee(null)
+        setFee(res)
+        setZigZagFee(null)
       })
   }
 
@@ -215,14 +212,9 @@ const Bridge = () => {
   }
 
   const switchTransferType = e => {
-    console.log("debug:: start")
-    if (e) e.preventDefault()
-    transfer.type = transfer.type === 'deposit' ? 'withdraw' : 'deposit'
-    setTransfer(transfer)
-
-    // TODO: why set to ETH everytime?
-    // setBridgeFeeToken("ETH")
-    console.log("debug:: end")
+    e.preventDefault()
+    const type = transfer.type === "deposit" ? "withdraw" : "deposit"
+    setTransfer({type})
   }
 
   const disconnect = () => {
@@ -282,7 +274,6 @@ const Bridge = () => {
           <BridgeSwapInput
             bridgeFee={bridgeFee}
             balances={balances}
-            currencies={currencies}
             value={swapDetails}
             onChange={setSwapDetails}
           />
