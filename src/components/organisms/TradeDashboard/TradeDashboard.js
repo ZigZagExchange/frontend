@@ -46,7 +46,7 @@ const TradeGrid = styled.article`
     gap: 1px;
     
     @media screen and (max-width: 991px) {
-      grid-template-rows: 50px 300px 3fr 2fr 2fr 50px;
+      grid-template-rows: 50px 300px auto 2fr 2fr 50px;
       grid-template-columns: 100%;
       grid-template-areas:
         'marketSelector'
