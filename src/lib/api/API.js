@@ -114,7 +114,6 @@ export default class API extends Emitter {
             }
 
             profile.name = `${address.substr(0, 6)}…${address.substr(-6)}`
-            console.log("debug:: get profile address", address)
             Object.assign(
                 profile,
                 ...(await Promise.all([

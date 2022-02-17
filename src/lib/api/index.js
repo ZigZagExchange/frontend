@@ -1,6 +1,6 @@
 import API from './API'
 // import APIStarknetProvider from './providers/APIStarknetProvider'
-import APIZKProvider from './providers/APIZKProvider'
+import APIZKProvider from './providers/APIZKProvider/APIZKProvider'
 
 const api = new API({
     infuraId: process.env.REACT_APP_INFURA_ID,

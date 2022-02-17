@@ -3,11 +3,12 @@ import * as zksync from 'zksync'
 import {ethers} from 'ethers';
 import { toast } from 'react-toastify'
 import { toBaseUnit } from 'lib/utils'
-import APIProvider from './APIProvider'
-import { MAX_ALLOWANCE } from '../constants'
+import APIProvider from '../APIProvider'
+import { MAX_ALLOWANCE } from '../../constants'
 import axios from 'axios';
 import {isTransactionAmountPackable} from "zksync/build/utils";
 import {closestPackableTransactionAmount} from "zksync";
+import BatchTransferService from "./BatchTransferService";
 
 export default class APIZKProvider extends APIProvider {
     static SEEDS_STORAGE_KEY = '@ZZ/ZKSYNC_SEEDS'
@@ -18,6 +19,7 @@ export default class APIZKProvider extends APIProvider {
     ethWallet = null
     syncWallet = null
     syncProvider = null
+    batchTransferService = null
     zksyncCompatible = true
     fastWithdrawContractAddress = "0xCC9557F04633d82Fb6A1741dcec96986cD8689AE"
     eligibleFastWithdrawTokens = ["ETH", "FRAX", "UST"]
@@ -219,23 +221,30 @@ export default class APIZKProvider extends APIProvider {
     withdrawL2 = async (amountDecimals, token = 'ETH') => {
       const currencyInfo = this.getCurrencyInfo(token);
       const amount = toBaseUnit(amountDecimals, currencyInfo.decimals)
+      let transfer
 
-      try {
-        const transfer = await this.syncWallet.withdrawFromSyncToEthereum({
+      const feeToken = await this.getWithdrawFeeToken(token)
+      if (feeToken !== token) {
+        const hashes = await this.batchTransferService.sendWithdraw({
+            ethAddress: await this.ethWallet.getAddress(),
+            token: token,
+            amount: amount,
+            fee: 0
+          },
+          feeToken)
+        transfer = {txHash: hashes[0]}
+
+      } else {
+        transfer = await this.syncWallet.withdrawFromSyncToEthereum({
           token,
           ethAddress: await this.ethWallet.getAddress(),
           amount,
         })
-
         await transfer.awaitReceipt()
-
-        this.api.emit('bridgeReceipt',
-          this.handleBridgeReceipt(transfer, amountDecimals, token, 'withdraw')
-        )
-        return transfer
-      } catch(err) {
-        console.log(err)
       }
+
+      this.api.emit('bridgeReceipt', transfer, amountDecimals, token, 'withdraw')
+      return transfer
     }
 
     withdrawL2Fast = async (amountDecimals, token) => {
@@ -254,16 +263,13 @@ export default class APIZKProvider extends APIProvider {
       const feeToken = await this.getWithdrawFeeToken(token)
 
       if (feeToken !== token) {
-        const batchBuilder = this.syncWallet.batchBuilder();
-        const transferTx = {
-          to: this.fastWithdrawContractAddress,
-          token: token,
-          amount: amount,
-          fee: 0
-        }
-        batchBuilder.addTransfer(transferTx)
-        const batch = await batchBuilder.build(feeToken)
-        const hashes = await this.syncProvider.submitTxsBatch(batch.txs, batch.signature)
+        const hashes = await this.batchTransferService.sendTransfer({
+            to: this.fastWithdrawContractAddress,
+            token: token,
+            amount: amount,
+            fee: 0
+          },
+          "ETH")
         this.api.emit('bridgeReceipt', this.handleFastBridgeReceipt({txHash: hashes[0]}, amountDecimals, token, 'withdraw'))
       } else {
         const transfer = await this.syncWallet.syncTransfer({
@@ -296,7 +302,6 @@ export default class APIZKProvider extends APIProvider {
             / 10 ** currencyInfo.decimals
           )
           this._tokenWithdrawFees[token] = {amount, feeToken}
-          console.log("debug:: querying normal fee", this._tokenWithdrawFees[token])
         }
         return this._tokenWithdrawFees[token]
     }
@@ -381,7 +386,9 @@ export default class APIZKProvider extends APIProvider {
             throw err
         }
 
-        const accountState = await this.api.getAccountState()
+      this.batchTransferService = new BatchTransferService(this.syncProvider, this.syncWallet)
+
+      const accountState = await this.api.getAccountState()
         if (!accountState.id) {
             if (!/^\/bridge(\/.*)?$/.test(window.location.pathname)) {
                 toast.error("Account not found. Please use the bridge to deposit funds before trying again.");
