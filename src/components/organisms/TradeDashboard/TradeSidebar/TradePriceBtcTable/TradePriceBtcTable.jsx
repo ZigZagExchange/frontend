@@ -5,9 +5,7 @@ import SearchBox from "../SearchBox/SearchBox";
 import {getStables} from '../../../../../lib/helpers/categories/index.js'
 import {addFavourite, removeFavourite, fetchFavourites} from '../../../../../lib/helpers/storage/favourites'
 import { BsStar, BsStarFill } from "react-icons/bs";
-
-import arrowsImg from "../../../../../assets/icons/up-down-arrow.png"
-import { FaSortDown, FaSortUp } from "react-icons/fa";
+import { FaSort, FaSortDown, FaSortUp } from "react-icons/fa";
 
 class TradePriceBtcTable extends React.Component {
 
@@ -31,6 +29,7 @@ class TradePriceBtcTable extends React.Component {
 
         this.toggleChangeSorting = this.toggleChangeSorting.bind(this);
         this.togglePriceSorting = this.togglePriceSorting.bind(this);
+        this.resetSorting = this.resetSorting.bind(this);
 
         this.renderPairs = this.renderPairs.bind(this);
     }
@@ -168,6 +167,10 @@ class TradePriceBtcTable extends React.Component {
 
 
 
+    resetSorting(){
+        this.setState({pairs: this.props.rowData, priceSorted: false, changeSorted: false});
+    }
+
     //render given pairs
     renderPairs(pairs){
 
@@ -228,7 +231,6 @@ class TradePriceBtcTable extends React.Component {
                                 Pair
                             </th>
                             <th onClick={() => this.togglePriceSorting()}>
-
                                 { this.state.priceSorted ? <FaSortDown/> : <FaSortUp/>}
                                 Price
 
@@ -263,6 +265,9 @@ class TradePriceBtcTable extends React.Component {
                     categories={["ALL", "ETH", "WBTC", "STABLES", "FAVOURITES"]}
                     categorizePairs={this.categorizePairs}
                 />
+
+                <FaSort onClick={this.resetSorting}/>
+                
                 <div className="trade_price_btc_table">
                     {this.renderPairs(this.state.pairs)}
                 </div>
