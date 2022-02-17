@@ -13,10 +13,8 @@ class TradeRatesCard extends React.Component {
     }
 
     componentDidUpdate(){
-        console.log("update state");
         if(this.props.marketInfo && this.props.marketInfo !== this.state.marketInfo){
             
-            console.log("updating state");
             var marketInfo = this.props.marketInfo;
             
             //add ticker name
@@ -52,7 +50,7 @@ class TradeRatesCard extends React.Component {
                 <div className="tl_rates">
                     <div className="rates_box rb_text_1">
                         <strong>{marketDisplay}</strong>
-                        <p>{marketInfo && marketInfo.baseAsset.symbol} { marketInfo && '-' + marketInfo.baseAssetName}</p>
+                        <p>{marketInfo && marketInfo.baseAsset.symbol} { marketInfo?.baseAsset && '-' + marketInfo.baseAsset.name}</p>
                     </div>
                     <div className="rates_box rb_text_2">
                         <h1>{this.props.marketSummary.price}</h1>
