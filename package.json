@@ -11,6 +11,8 @@
     "@pmmmwh/react-refresh-webpack-plugin": "0.4.3",
     "@reduxjs/toolkit": "^1.6.2",
     "@self.id/web": "^0.2.0",
+    "@sentry/react": "^6.17.9",
+    "@sentry/tracing": "^6.17.9",
     "@svgr/webpack": "5.5.0",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
