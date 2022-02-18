@@ -311,8 +311,8 @@ export default class API extends Emitter {
         return this.apiProvider.depositL2(amount, token)
     }
 
-    withdrawL2 = async (amount, token) => {
-        return this.apiProvider.withdrawL2(amount, token)
+    withdrawL2Normal = async (amount, token) => {
+        return this.apiProvider.withdrawL2Normal(amount, token)
     }
 
     withdrawL2Fast = (amount, token) => {
@@ -323,16 +323,16 @@ export default class API extends Emitter {
         return this.apiProvider.depositL2Fee(token)
     }
 
-    withdrawL2Fee = async (token) => {
-        return this.apiProvider.withdrawL2Fee(token)
+    withdrawL2GasFee = async (token) => {
+        return this.apiProvider.withdrawL2GasFee(token)
     }
 
-    withdrawL2FeeFast = async (token) => {
-      return this.apiProvider.withdrawL2FeeFast(token)
+    withdrawL2FastGasFee = async (token) => {
+      return this.apiProvider.withdrawL2FastGasFee(token)
     }
 
-    withdrawL2ZZFeeFast = async (token) => {
-        return this.apiProvider.withdrawL2ZZFeeFast(token)
+    withdrawL2FastBridgeFee = async (token) => {
+        return this.apiProvider.withdrawL2FastBridgeFee(token)
     }
 
     cancelAllOrders = async () => {

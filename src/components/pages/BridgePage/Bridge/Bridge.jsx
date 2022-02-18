@@ -33,7 +33,7 @@ const Bridge = () => {
   const [isApproving, setApproving] = useState(false);
   const [formErr, setFormErr] = useState('')
   const [L2Fee, setL2Fee] = useState(null)
-  const [bridgeFeeToken, setBridgeFeeToken] = useState(null)
+  const [L2FeeToken, setL2FeeToken] = useState(null)
   const [L1Fee, setL1Fee] = useState(null)
   const network = useSelector(networkSelector);
   const [transfer, setTransfer] = useState(defaultTransfer);
@@ -94,9 +94,7 @@ const Bridge = () => {
     let error = null
 
     if (inputValue > 0) {
-      if (inputValue < 0.001) {
-        error = "Must be at least 0.001"
-      } else if (inputValue <= activationFee) {
+      if (inputValue <= activationFee) {
         error = `Must be more than ${activationFee} ${swapCurrency}`
       } else if (inputValue - L2Fee < 0) {
         error = "Amount too small"
@@ -117,8 +115,8 @@ const Bridge = () => {
         }
       }
 
-      if (bridgeFeeToken === swapCurrency) {
-        if (inputValue - (detailBalance - L2Fee) < 0) {
+      if (L2FeeToken === swapCurrency) {
+        if (detailBalance - (inputValue + L2Fee) < 0) {
           error = "Insufficient balance for fees"
         }
       }
@@ -143,17 +141,17 @@ const Bridge = () => {
   }
 
   const setFastWithdrawFees = (setFee, details) => {
-    api.withdrawL2FeeFast(details.currency)
+    api.withdrawL2FastGasFee(details.currency)
       .then(({amount, feeToken}) => {
         setFee(amount, feeToken)
       })
       .catch(e => {
         console.error(e)
-        setBridgeFeeToken(null)
+        setL2FeeToken(null)
         setFee(null)
       })
 
-    api.withdrawL2ZZFeeFast(details.currency)
+    api.withdrawL2FastBridgeFee(details.currency)
       .then(res => setL1Fee(res))
       .catch(e => {
           console.error(e)
@@ -162,13 +160,13 @@ const Bridge = () => {
   }
 
   const setNormalWithdrawFees = (setFee, details) => {
-    api.withdrawL2Fee(details.currency)
+    api.withdrawL2GasFee(details.currency)
       .then(({feeToken, amount}) => {
         setFee(amount, feeToken)
       })
       .catch(err => {
         console.log(err)
-        setBridgeFeeToken(null)
+        setL2FeeToken(null)
         setFee(null)
       })
   }
@@ -190,7 +188,7 @@ const Bridge = () => {
 
     const setFee = (bridgeFee, feeToken) => {
       setL2Fee(bridgeFee)
-      setBridgeFeeToken(feeToken)
+      setL2FeeToken(feeToken)
       const input = parseFloat(details.amount) || 0
       const isInputValid = validateInput(input, details.currency, feeToken)
       const isFeesValid = validateFees(bridgeFee, feeToken)
@@ -275,7 +273,7 @@ const Bridge = () => {
             balances={balances}
             value={swapDetails}
             onChange={setSwapDetails}
-            feeCurrency={bridgeFeeToken}
+            feeCurrency={L2FeeToken}
           />
           <div className="bridge_coin_stats">
             <div className="bridge_coin_stat">
@@ -341,7 +339,7 @@ const Bridge = () => {
           </div>}
           {user.address && user.id && !isSwapAmountEmpty && <div className="bridge_transfer_fee">
             {transfer.type === "withdraw" && <x.div>
-              {L2Fee && <>L2 gas fee: {L2Fee} {bridgeFeeToken}</>}
+              {L2Fee && <>L2 gas fee: {L2Fee} {L2FeeToken}</>}
               {!L2Fee && <div style={{display: 'inline-flex', margin: '0 5px'}}>
                 <Loader
                   type="TailSpin"

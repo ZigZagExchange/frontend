@@ -234,7 +234,7 @@ export default class APIZKProvider extends APIProvider {
       return {amountTransferred, transfer}
     }
 
-    withdrawL2 = async (amountDecimals, token) => {
+    withdrawL2Normal = async (amountDecimals, token) => {
 
       const onDiffFeeToken = async (amount, feeToken) => {
         const hashes = await this.batchTransferService.sendWithdraw({
@@ -366,7 +366,7 @@ export default class APIZKProvider extends APIProvider {
       return tokenInfo.enabledForFees ? tokenToWithdraw : backupFeeToken
     }
 
-    withdrawL2Fee = async (token = 'ETH') => {
+    withdrawL2GasFee = async (token = 'ETH') => {
       const feeToken = await this.getWithdrawFeeToken(token)
       const currencyInfo = this.getCurrencyInfo(feeToken);
       if (!this._tokenWithdrawFees[token]) {
@@ -384,7 +384,7 @@ export default class APIZKProvider extends APIProvider {
         return this._tokenWithdrawFees[token]
     }
 
-    withdrawL2FeeFast = async (token) => {
+    withdrawL2FastGasFee = async (token) => {
       /*
       * Returns the gas for the fast withdraw
       * */
@@ -414,7 +414,7 @@ export default class APIZKProvider extends APIProvider {
       return {amount, feeToken}
     }
 
-    withdrawL2ZZFeeFast = async (token) => {
+    withdrawL2FastBridgeFee = async (token) => {
       /*
       * Returns the fee taken by ZigZag when sending on L1. If the token is not ETH,
       * the notional amount of the ETH tx fee will be taken in the currency being bridged
