@@ -42,7 +42,7 @@ const Bridge = () => {
   const currencyValue = coinEstimator(swapDetails.currency)
   const activationFee = parseFloat((user.address && !user.id ? (15 / currencyValue) : 0).toFixed(5))
   const estimatedValue = (+swapDetails.amount * coinEstimator(swapDetails.currency) || 0)
-  const [fastWithdrawCurrencyMaxes, setFastWithdrawCurrencyMaxes] = useState()
+  const [fastWithdrawCurrencyMaxes, setFastWithdrawCurrencyMaxes] = useState({})
 
   let walletBalances = balanceData.wallet || {}
   let zkBalances = balanceData[network] || {}
@@ -89,8 +89,11 @@ const Bridge = () => {
   }, [transfer.type])
 
   const validateInput = (inputValue, swapCurrency) => {
+    // TODO: decimal precicision validation
+
     const bals = transfer.type === 'deposit' ? walletBalances : zkBalances
-    const detailBalance = parseFloat(bals[swapCurrency] && bals[swapCurrency].valueReadable) || 0
+    const getCurrencyBalance = (cur) => parseFloat(bals[cur] && bals[cur].valueReadable) || 0
+    const detailBalance = getCurrencyBalance(swapCurrency)
     let error = null
 
     if (inputValue > 0) {
@@ -117,6 +120,11 @@ const Bridge = () => {
 
       if (L2FeeToken === swapCurrency) {
         if (detailBalance - (inputValue + L2Fee) < 0) {
+          error = "Insufficient balance for fees"
+        }
+      } else {
+        const feeCurrencyBalance = getCurrencyBalance(L2FeeToken)
+        if (feeCurrencyBalance - L2Fee < 0) {
           error = "Insufficient balance for fees"
         }
       }
@@ -244,7 +252,7 @@ const Bridge = () => {
       if (isFastWithdraw) {
         deferredXfer = api.withdrawL2Fast(`${swapDetails.amount}`, swapDetails.currency)
       } else {
-        deferredXfer = api.withdrawL2(`${swapDetails.amount}`, swapDetails.currency)
+        deferredXfer = api.withdrawL2Normal(`${swapDetails.amount}`, swapDetails.currency)
       }
     }
 

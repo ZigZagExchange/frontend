@@ -1,4 +1,4 @@
-import { BigNumber } from 'ethers'
+import {BigNumber} from 'ethers'
 import isString from 'lodash/isString'
 
 export function formatUSD(floatNum) {
@@ -48,5 +48,9 @@ export function toBaseUnit(value, decimals) {
   
     whole = BigNumber.from(whole);
     fraction = BigNumber.from(fraction);    
-    return BigNumber.from(whole.mul(base).add(fraction).toString());
+    return BigNumber.from(whole.mul(base).add(fraction).toString(10));
   }
+
+export function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
