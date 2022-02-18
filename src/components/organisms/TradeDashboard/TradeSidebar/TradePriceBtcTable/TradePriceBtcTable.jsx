@@ -5,7 +5,13 @@ import SearchBox from "../SearchBox/SearchBox";
 import {getStables} from '../../../../../lib/helpers/categories/index.js'
 import {addFavourite, removeFavourite, fetchFavourites} from '../../../../../lib/helpers/storage/favourites'
 import { BsStar, BsStarFill } from "react-icons/bs";
+<<<<<<< HEAD
 import { FaSort, FaSortDown, FaSortUp } from "react-icons/fa";
+=======
+
+import arrowsImg from "../../../../../assets/icons/up-down-arrow.png"
+import { FaSortDown, FaSortUp } from "react-icons/fa";
+>>>>>>> revamp
 
 class TradePriceBtcTable extends React.Component {
 

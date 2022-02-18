@@ -15,7 +15,7 @@ export default function SearchBox(props){
         <>
 
             <div className={props.className}>
-                <input placeholder="Search Pairs..."  type="text"
+                <input placeholder="Search..."  type="text"
                     value={searchValue} 
                     onChange={handleChange} 
                 />

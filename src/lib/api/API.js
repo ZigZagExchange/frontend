@@ -19,13 +19,12 @@ export default class API extends Emitter {
     apiProvider = null
     ethersProvider = null
     currencies = null
-    websocketUrl = null
     marketInfo = {}
     lastprices = {}
     _signInProgress = null
     _profiles = {}
 
-    constructor({ infuraId, websocketUrl, networks, currencies, validMarkets }) {
+    constructor({ infuraId, networks, currencies, validMarkets }) {
         super()
         
         if (networks) {
@@ -39,7 +38,6 @@ export default class API extends Emitter {
         }
         
         this.infuraId = infuraId
-        this.websocketUrl = websocketUrl
         this.currencies = currencies
         this.validMarkets = validMarkets
 
@@ -71,6 +69,16 @@ export default class API extends Emitter {
 
         const apiProvider = this.getAPIProvider(network) 
         this.apiProvider = apiProvider
+
+        // Change WebSocket if necessary
+        if (this.ws) {
+            const oldUrl = new URL(this.ws.url);
+            const newUrl = new URL(this.apiProvider.websocketUrl);
+            if (oldUrl.host !== newUrl.host) {
+                // Stopping the WebSocket will trigger an auto-restart in 3 seconds
+                this.stop();
+            }
+        }
         
         if (this.isZksyncChain()) {
             this.web3 = new Web3(
@@ -176,7 +184,7 @@ export default class API extends Emitter {
 
     start = () => {
         if (this.ws) this.stop()
-        this.ws = new WebSocket(this.websocketUrl)
+        this.ws = new WebSocket(this.apiProvider.websocketUrl)
         this.ws.addEventListener('open', this._socketOpen)
         this.ws.addEventListener('close', this._socketClose)
         this.ws.addEventListener('message', this._socketMsg)

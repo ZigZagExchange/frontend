@@ -133,9 +133,9 @@ export class SpotForm extends React.Component {
         }
         if (this.props.orderType === 'market') {
             if (this.props.side === 'b') {
-                price *= 1.0008;
+                price *= 1.0015;
             } else if (this.props.side === 's') {
-                price *= 0.9992;
+                price *= 0.9985;
             }
         }
 
@@ -160,16 +160,16 @@ export class SpotForm extends React.Component {
             return;
         } else if (
             isNaN(price) ||
-            price > this.getFirstAsk() * 1.2 ||
-            price < this.getFirstBid() * 0.8
+            price > this.getFirstAsk() * 2 ||
+            price < this.getFirstBid() * 0.5
         ) {
-            toast.error("Price must be within 20% of spot");
+            toast.error("Price must be within 50% of spot");
             return;
         } else if (
-            (this.props.side === 'b' && price > this.getFirstAsk() * 1.05) ||
-            (this.props.side === 's' && price < this.getFirstBid() * 0.95)
+            (this.props.side === 'b' && price > this.getFirstAsk() * 1.2) ||
+            (this.props.side === 's' && price < this.getFirstBid() * 0.8)
         ) {
-            toast.error("Limit orders cannot exceed 5% beyond spot");
+            toast.error("Limit orders cannot exceed 20% beyond spot");
             return;
         }
 
@@ -263,7 +263,10 @@ export class SpotForm extends React.Component {
         if (val === 100) {
             newstate.maxSizeSelected = true;
             if (this.props.side === "b") {
-                val = 99.9;
+                val = 99.8;
+            }
+            if (this.props.side === "s") {
+                val = 99.999;
             }
         } else {
             newstate.maxSizeSelected = false;
@@ -307,6 +310,11 @@ export class SpotForm extends React.Component {
         ) {
             this.rangeSliderHandler(null, 100);
         }
+
+        if (this.props.currentMarket !== prevProps.currentMarket) {
+            this.setState((state) => ({...state, price: "", amount: ""}));
+        }
+        console.log(this.currentPrice(), this.props.marketSummary);
     }
 
     render() {
@@ -354,14 +362,14 @@ export class SpotForm extends React.Component {
       return (
         <>
           <form className="spot_form">
-          <div className="spf_head">
-              <span>Available</span>
+            <div className="spf_head">
+              <span>Available balance</span>
               {balanceHtml}
             </div>
 
             <div className="spf_input_box">
               <span className="spf_desc_text">Price</span>
-              <input type="text" value={ this.priceIsDisabled() ? this.props.marketSummary && this.props.marketSummary?.price : !isNaN(price) ? '' : price} onChange={this.updatePrice.bind(this)} disabled={this.priceIsDisabled()}  />
+              <input type="text" value={ parseInt(price).toPrecision(4) } onChange={this.updatePrice.bind(this)} disabled={this.priceIsDisabled()}  />
               <span className={this.priceIsDisabled() ? "text-disabled" : ""}>{marketInfo && marketInfo.quoteAsset.symbol}</span>
             </div>
             <div className="spf_input_box">
