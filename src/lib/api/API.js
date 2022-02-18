@@ -585,13 +585,20 @@ export default class API extends Emitter {
         const currencyMaxes = {}
         for (const currency of this.apiProvider.eligibleFastWithdrawTokens) {
           let max = 0
-          if (currency === "ETH") {
-            max = await this.ethersProvider.getBalance(this.apiProvider.fastWithdrawContractAddress)
-          } else {
-            const contract = new ethers.Contract(this.fastWithdrawTokenAddresses[currency], erc20ContractABI, this.ethersProvider)
-            max = await contract.balanceOf(this.apiProvider.fastWithdrawContractAddress)
+          try {
+            if (currency === "ETH") {
+              max = await this.ethersProvider.getBalance(this.apiProvider.fastWithdrawContractAddress)
+            } else {
+              const contract = new ethers.Contract(this.fastWithdrawTokenAddresses[currency], erc20ContractABI, this.ethersProvider)
+              max = await contract.balanceOf(this.apiProvider.fastWithdrawContractAddress)
+            }
+          } catch (e) {
+            console.error(e)
           }
           const currencyInfo = this.getCurrencyInfo(currency)
+          if (!currencyInfo) {
+            return {}
+          }
           currencyMaxes[currency] = max / 10 ** currencyInfo.decimals;
         }
         return currencyMaxes
