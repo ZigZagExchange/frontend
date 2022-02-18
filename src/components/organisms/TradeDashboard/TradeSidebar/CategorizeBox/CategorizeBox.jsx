@@ -4,7 +4,7 @@ import "./CategorizeBox.css";
 export default function CategorizeBox(props) {
     const categories = props.categories;
 
-    var [selected, setCategory] = useState('');
+    var [selected, setCategory] = useState('ALL');
 
     function changeCategory(category_name){
         //console.log("category selected: ", category_name)
