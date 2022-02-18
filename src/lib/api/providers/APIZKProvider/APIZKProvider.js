@@ -6,7 +6,6 @@ import { toBaseUnit } from 'lib/utils'
 import APIProvider from '../APIProvider'
 import { MAX_ALLOWANCE } from '../../constants'
 import axios from 'axios';
-import {isTransactionAmountPackable} from "zksync/build/utils";
 import {closestPackableTransactionAmount} from "zksync";
 import BatchTransferService from "./BatchTransferService";
 
@@ -218,13 +217,26 @@ export default class APIZKProvider extends APIProvider {
         return 0
     }
 
-    withdrawL2 = async (amountDecimals, token = 'ETH') => {
-      const currencyInfo = this.getCurrencyInfo(token);
-      const amount = toBaseUnit(amountDecimals, currencyInfo.decimals)
+    createWithdraw = async (amountDecimals, token, onSameFeeToken, onDiffFeeToken) => {
       let transfer
 
+      const currencyInfo = this.getCurrencyInfo(token);
+      const amountToFormat = Number(amountDecimals).toPrecision(currencyInfo.decimals)
+      const amount = toBaseUnit(amountToFormat, currencyInfo.decimals)
+      const packableAmount = closestPackableTransactionAmount(amount)
       const feeToken = await this.getWithdrawFeeToken(token)
-      if (feeToken !== token) {
+      if (feeToken === token) {
+        transfer = await onSameFeeToken(packableAmount)
+      } else {
+        transfer = await onDiffFeeToken(packableAmount, feeToken)
+      }
+      const amountTransferred = packableAmount.toNumber() / 10 ** currencyInfo.decimals
+      return {amountTransferred, transfer}
+    }
+
+    withdrawL2 = async (amountDecimals, token) => {
+
+      const onDiffFeeToken = async (amount, feeToken) => {
         const hashes = await this.batchTransferService.sendWithdraw({
             ethAddress: await this.ethWallet.getAddress(),
             token: token,
@@ -232,55 +244,121 @@ export default class APIZKProvider extends APIProvider {
             fee: 0
           },
           feeToken)
-        transfer = {txHash: hashes[0]}
+        return {txHash: hashes[0]}
+      }
 
-      } else {
-        transfer = await this.syncWallet.withdrawFromSyncToEthereum({
+      const onSameFeeToken = async (amount) => {
+        const transfer = await this.syncWallet.withdrawFromSyncToEthereum({
           token,
           ethAddress: await this.ethWallet.getAddress(),
           amount,
         })
         await transfer.awaitReceipt()
+        return transfer
       }
 
-      this.api.emit('bridgeReceipt', transfer, amountDecimals, token, 'withdraw')
+      const {transfer, amountTransferred} = await this.createWithdraw(amountDecimals, token, onSameFeeToken, onDiffFeeToken)
+      this.api.emit('bridgeReceipt', this.handleBridgeReceipt(transfer, amountTransferred, token, 'withdraw'))
       return transfer
     }
 
-    withdrawL2Fast = async (amountDecimals, token) => {
-      if (!this.eligibleFastWithdrawTokens.includes(token)) {
-        throw Error("Token not supported for fast withdraw")
-      }
-
-      const currencyInfo = this.getCurrencyInfo(token)
-      const amountToFormat = Number(amountDecimals).toPrecision(currencyInfo.decimals)
-      let amount = toBaseUnit(amountToFormat, currencyInfo.decimals)
-
-      const isPackable = isTransactionAmountPackable(amount)
-      if (!isPackable) {
-        amount = closestPackableTransactionAmount(amount)
-      }
-      const feeToken = await this.getWithdrawFeeToken(token)
-
-      if (feeToken !== token) {
-        const hashes = await this.batchTransferService.sendTransfer({
-            to: this.fastWithdrawContractAddress,
-            token: token,
-            amount: amount,
-            fee: 0
-          },
-          "ETH")
-        this.api.emit('bridgeReceipt', this.handleFastBridgeReceipt({txHash: hashes[0]}, amountDecimals, token, 'withdraw'))
-      } else {
-        const transfer = await this.syncWallet.syncTransfer({
-          to: this.fastWithdrawContractAddress,
-          token,
-          amount
-        })
-        await transfer.awaitReceipt()
-        this.api.emit('bridgeReceipt', this.handleFastBridgeReceipt(transfer, amountDecimals, token, 'withdraw'))
-      }
+  withdrawL2Fast = async (amountDecimals, token) => {
+    if (!this.eligibleFastWithdrawTokens.includes(token)) {
+      throw Error("Token not supported for fast withdraw")
     }
+
+    const onDiffFeeToken = async (amount, feeToken) => {
+      const hashes = await this.batchTransferService.sendTransfer({
+          to: this.fastWithdrawContractAddress,
+          token: token,
+          amount: amount,
+          fee: 0
+        },
+        feeToken)
+        return {txHash: hashes[0]}
+    }
+
+    const onSameFeeToken = async (amount) => {
+      const transfer = await this.syncWallet.syncTransfer({
+        to: this.fastWithdrawContractAddress,
+        token,
+        amount
+      })
+      await transfer.awaitReceipt()
+      return transfer
+    }
+
+    const {transfer, amountTransferred} = await this.createWithdraw(amountDecimals, token, onSameFeeToken, onDiffFeeToken)
+    this.api.emit('bridgeReceipt', this.handleFastBridgeReceipt(transfer, amountTransferred, token, 'withdraw'))
+  }
+
+    // withdrawL2 = async (amountDecimals, token = 'ETH') => {
+    //   let transfer
+    //
+    //   const currencyInfo = this.getCurrencyInfo(token);
+    //   const amountToFormat = Number(amountDecimals).toPrecision(currencyInfo.decimals)
+    //   const amount = toBaseUnit(amountToFormat, currencyInfo.decimals)
+    //
+    //   const feeToken = await this.getWithdrawFeeToken(token)
+    //   if (feeToken !== token) {
+    //     const hashes = await this.batchTransferService.sendWithdraw({
+    //         ethAddress: await this.ethWallet.getAddress(),
+    //         token: token,
+    //         amount: amount,
+    //         fee: 0
+    //       },
+    //       feeToken)
+    //     transfer = {txHash: hashes[0]}
+    //
+    //   } else {
+    //     transfer = await this.syncWallet.withdrawFromSyncToEthereum({
+    //       token,
+    //       ethAddress: await this.ethWallet.getAddress(),
+    //       amount,
+    //     })
+    //     await transfer.awaitReceipt()
+    //   }
+    //
+    //   const amountTransferred = amount.toNumber() / 10 ** currencyInfo.decimals
+    //   this.api.emit('bridgeReceipt', transfer, amountTransferred, token, 'withdraw')
+    //   return transfer
+    // }
+
+    // withdrawL2Fast = async (amountDecimals, token) => {
+    //   if (!this.eligibleFastWithdrawTokens.includes(token)) {
+    //     throw Error("Token not supported for fast withdraw")
+    //   }
+    //
+    //   let transfer
+    //
+    //   const currencyInfo = this.getCurrencyInfo(token)
+    //   const amountToFormat = Number(amountDecimals).toPrecision(currencyInfo.decimals)
+    //   const amount = toBaseUnit(amountToFormat, currencyInfo.decimals)
+    //   const packableAmount = closestPackableTransactionAmount(amount)
+    //
+    //   const feeToken = await this.getWithdrawFeeToken(token)
+    //   if (feeToken !== token) {
+    //     const hashes = await this.batchTransferService.sendTransfer({
+    //         to: this.fastWithdrawContractAddress,
+    //         token: token,
+    //         amount: packableAmount,
+    //         fee: 0
+    //       },
+    //       "ETH")
+    //     transfer = {txHash: hashes[0]}
+    //   } else {
+    //     const transfer = await this.syncWallet.syncTransfer({
+    //       to: this.fastWithdrawContractAddress,
+    //       token,
+    //       packableAmount
+    //     })
+    //     await transfer.awaitReceipt()
+    //   }
+    //
+    //   const amountTransferred = packableAmount.toNumber() / 10 ** currencyInfo.decimals
+    //   this.api.emit('bridgeReceipt', this.handleFastBridgeReceipt(transfer, amountTransferred, token, 'withdraw'))
+    //   return transfer
+    // }
 
     getWithdrawFeeToken = async (tokenToWithdraw) => {
       const backupFeeToken = "ETH"

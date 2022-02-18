@@ -1,5 +1,5 @@
 
-class batchTransferService {
+class BatchTransferService {
 
   syncProvider = null;
   syncWallet = null;
@@ -32,4 +32,4 @@ class batchTransferService {
   }
 }
 
-export default batchTransferService
+export default BatchTransferService
