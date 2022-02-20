@@ -1,4 +1,4 @@
-import { BigNumber } from 'ethers'
+import {BigNumber} from 'ethers'
 import isString from 'lodash/isString'
 
 export function formatUSD(floatNum) {
@@ -58,7 +58,12 @@ export function numStringToSymbol(str, decimals) {
   ]
 
   const item = lookup.find(item => str >= item.value);
-  
+
   if (!item) return str;
   return (str / item.value).toFixed(decimals) + item.symbol;
+}
+
+
+export function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
