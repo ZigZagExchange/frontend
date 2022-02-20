@@ -3,11 +3,23 @@
     font-size: 12px;
 }
 
-.trade_price_btc_table svg{
+.trade_price_btc_table thead {
+    transition: opacity 0.2s ease-in-out;
+    user-select: none;
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+.trade_price_btc_table thead:hover,
+.trade_price_btc_table thead:focus {
+    opacity: 1;
+}
+
+.trade_price_btc_table th svg {
     height: 14px;
     width: 14px;
     margin-right: 5px;
-    margin-top: -5px;
+    margin-top: -6px;
 }
 
 .trade_price_btc_table {

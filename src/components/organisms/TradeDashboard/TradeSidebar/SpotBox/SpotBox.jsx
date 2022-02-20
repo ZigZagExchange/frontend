@@ -32,7 +32,7 @@ class SpotBox extends React.Component {
           
             <div className="spot_head">
               <div className="sh_l">
-                <h2 class="title">SPOT</h2>
+                <h2 className="title">SPOT</h2>
                 <div className="spot_tabs">
                   <div className="st_l">
                     <h2 className={this.orderTypeTabClassName("limit")} onClick={() => this.updateOrderType("limit")}>Limit</h2>

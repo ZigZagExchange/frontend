@@ -376,7 +376,7 @@ export class SpotForm extends React.Component {
               <RangeSlider value={this.amountPercentOfMax()} onChange={this.rangeSliderHandler.bind(this)} />
             </div>
             {this.props.user.id ? (                
-                <div class="">
+                <div className="">
                     <div className="spf_head">
                         <span>Total</span>
                         <strong>
