@@ -89,8 +89,6 @@ const Bridge = () => {
   }, [transfer.type])
 
   const validateInput = (inputValue, swapCurrency) => {
-    // TODO: decimal precicision validation
-
     const bals = transfer.type === 'deposit' ? walletBalances : zkBalances
     const getCurrencyBalance = (cur) => parseFloat(bals[cur] && bals[cur].valueReadable) || 0
     const detailBalance = getCurrencyBalance(swapCurrency)
