@@ -45,13 +45,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgb(19,23,34);
+  background-color: rgb(19, 23, 34);
   padding-left: 0;
   height: 40px;
   box-sizing: border-box;
   width: 100%;
   gap: 5px;
-  border-bottom: 1px solid rgb(39,44,57);
+  border-bottom: 1px solid rgb(39, 44, 57);
   font-weight: 600;
 }
 
@@ -78,5 +78,5 @@
 }
 
 .bookOptions .tab-content {
-  height: calc(100vh - 190px)
+  height: calc(100vh - 190px);
 }

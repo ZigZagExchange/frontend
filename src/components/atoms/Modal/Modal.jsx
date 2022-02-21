@@ -4,18 +4,18 @@ import { CSSTransition } from "react-transition-group";
 import "./Modal.css";
 
 export const Modal = (props) => {
-  const closeOnEscapeKeyDown = e => {
+  const closeOnEscapeKeyDown = (e) => {
     if ((e.charCode || e.keyCode) === 27) {
-      props.onClose()
+      props.onClose();
     }
-  }
+  };
 
   useEffect(() => {
     document.body.addEventListener("keydown", closeOnEscapeKeyDown);
     return function cleanup() {
       document.body.removeEventListener("keydown", closeOnEscapeKeyDown);
-    }
-  }, [])
+    };
+  }, []);
 
   return ReactDOM.createPortal(
     <CSSTransition
@@ -24,7 +24,7 @@ export const Modal = (props) => {
       timeout={{ enter: 0, exit: 300 }}
     >
       <div className="zig_modal" onClick={props.onClose}>
-        <div className="zig_modal_content" onClick={e => e.stopPropagation()}>
+        <div className="zig_modal_content" onClick={(e) => e.stopPropagation()}>
           <div className="zig_modal_header">
             <h4 className="zig_modal_title">{props.title}</h4>
           </div>
@@ -33,5 +33,5 @@ export const Modal = (props) => {
       </div>
     </CSSTransition>,
     document.getElementById("root")
-  )
-}
+  );
+};

@@ -1,25 +1,25 @@
-.trade_price_btc_table table{
-    width: 100%;
-    font-size: 12px;
+.trade_price_btc_table table {
+  width: 100%;
+  font-size: 12px;
 }
 
 .trade_price_btc_table thead {
-    transition: opacity 0.2s ease-in-out;
-    user-select: none;
-    cursor: pointer;
-    opacity: 0.8;
+  transition: opacity 0.2s ease-in-out;
+  user-select: none;
+  cursor: pointer;
+  opacity: 0.8;
 }
 
 .trade_price_btc_table thead:hover,
 .trade_price_btc_table thead:focus {
-    opacity: 1;
+  opacity: 1;
 }
 
 .trade_price_btc_table th svg {
-    height: 14px;
-    width: 14px;
-    margin-right: 5px;
-    margin-top: -6px;
+  height: 14px;
+  width: 14px;
+  margin-right: 5px;
+  margin-top: -6px;
 }
 
 .trade_price_btc_table {
@@ -29,48 +29,53 @@
 }
 
 .trade_price_btc_table::-webkit-scrollbar {
-    width: 5px;
-    position: relative;
-    z-index: 20;
+  width: 5px;
+  position: relative;
+  z-index: 20;
 }
 
 .trade_price_btc_table::-webkit-scrollbar-track {
-    border-radius: 0px;
-    background: hsla(0, 0%, 100%, 0.15);
-    height: 23px;
+  border-radius: 0px;
+  background: hsla(0, 0%, 100%, 0.15);
+  height: 23px;
 }
 
 .trade_price_btc_table::-webkit-scrollbar-thumb {
-    border-radius: 0px;
-    background: hsla(0, 0%, 100%, 0.4);
+  border-radius: 0px;
+  background: hsla(0, 0%, 100%, 0.4);
 }
 
 .trade_price_btc_table::-webkit-scrollbar-thumb:window-inactive {
-    background: #fff;
+  background: #fff;
+}
+
+.trade_price_btc_table tbody > tr > td .favourite-icon svg {
+  vertical-align: text-top;
+  margin-right: 6px;
 }
 
 .trade_price_btc_table thead {
-    position: sticky;
-    top: 0;
-    background-color: #171c28;
+  position: sticky;
+  top: 0;
+  background-color: #171c28;
 }
 
 .trade_price_btc_table table th {
-    color: #94a2c9;
-    font-weight: 400;
-    padding: 5px 20px;
+  color: #94a2c9;
+  font-weight: 400;
+  padding: 5px 20px;
 }
 
 .trade_price_btc_table table th:nth-child(1) {
-    text-align: start;
+  text-align: start;
 }
 
 .trade_price_btc_table table tbody tr.selected {
-    background-color: #232833;
+  background-color: #232833;
 }
 
 .trade_price_btc_table table tbody tr {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .trade_price_btc_table table td {
@@ -81,22 +86,22 @@
 }
 
 .trade_price_btc_table table td span {
-    color: #94a2c9;
+  color: #94a2c9;
 }
 
 .trade_price_btc_table table td:nth-child(1) {
-    text-align: start;
-    color: white;
+  text-align: start;
+  color: white;
 }
 
 @media screen and (max-width: 991px) {
-    .trade_price_btc_table table th {
-        padding: 0 20px;
-    }
+  .trade_price_btc_table table th {
+    padding: 0 20px;
+  }
 }
 
 @media screen and (max-width: 421px) {
-    .trade_price_btc_table table tbody {
-        font-size: 0.8rem;
-    }
+  .trade_price_btc_table table tbody {
+    font-size: 0.8rem;
+  }
 }

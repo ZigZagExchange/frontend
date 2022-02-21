@@ -1,1 +1,1 @@
-export * from './TradeDashboard'
+export * from "./TradeDashboard";

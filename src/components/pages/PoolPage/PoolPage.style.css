@@ -79,12 +79,12 @@
 
 .pool_box_top h4 {
   font-size: 18px;
-  color: rgba(255,255,255,1);
+  color: rgba(255, 255, 255, 1);
   margin-left: 10px;
 }
 
 .pool_box_top h4 span {
-  color: rgba(255,255,255,0.5);
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .pool_liquidity_container {
@@ -105,7 +105,7 @@
 
 .pool_liquidity_container::-webkit-scrollbar-thumb {
   background-color: #222737;
-  border: 1px solid rgba(255,255,255,0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 10px;
 }
 
@@ -127,13 +127,13 @@
   margin-bottom: 10px;
 }
 
-.pool_modal_tip_box{
-  background:rgba(0, 0, 0, 0.4);
+.pool_modal_tip_box {
+  background: rgba(0, 0, 0, 0.4);
   border-radius: 6px;
   width: 100%;
   padding: 10px;
   margin-bottom: 10px;
-  color: #636EA8;
+  color: #636ea8;
 }
 
 .pool_liquidity_box_top h4 {
@@ -142,17 +142,17 @@
   align-items: center;
   justify-content: flex-start;
   font-weight: bold;
-  color: #E3E9FF;
+  color: #e3e9ff;
   font-size: 18px;
 }
 
-.pool_liquidity_box th{
+.pool_liquidity_box th {
   font-weight: 400;
   font-size: 0.7rem;
 }
 
-.pool_liquidity_box td{
-  color: #E3E9FF;
+.pool_liquidity_box td {
+  color: #e3e9ff;
   font-size: 0.8rem;
 }
 
@@ -166,15 +166,15 @@
   padding: 12px;
   font-weight: bold;
   background: rgba(0, 0, 0, 0.4);
-  color: #62D2AD;
+  color: #62d2ad;
   margin-left: 10px;
   font-family: monospace;
   border-radius: 6px;
 }
 
 .pool_badge.success {
-  background: #3C7E58;
-  color: #9CF5B5;
+  background: #3c7e58;
+  color: #9cf5b5;
 }
 
 .pool_badge.databox_link {
@@ -186,8 +186,8 @@
   text-decoration: none;
 }
 
-.pool_badge.databox_link:hover{
-  background:rgba(0, 0, 0, 0.6);
+.pool_badge.databox_link:hover {
+  background: rgba(0, 0, 0, 0.6);
   color: #08aff3;
 }
 
@@ -204,14 +204,14 @@
   flex: 1;
 }
 
-.pool_databox_title{
+.pool_databox_title {
   font-weight: bold;
   font-size: 0.7rem;
   letter-spacing: 2px;
   color: #8390b5;
 }
 
-.pool_databox_number{
+.pool_databox_number {
   color: #cedafb;
   font-size: 1.75rem;
   margin: 5px 0;
