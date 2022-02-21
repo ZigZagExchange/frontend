@@ -1,7 +1,7 @@
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 h1,
@@ -12,58 +12,57 @@ h5,
 h6,
 ul,
 p {
-    margin: 0;
+  margin: 0;
 }
 
 body {
-    height: 100vh;
-    font-size: 0.9rem;
-    background-color: #171c28;
+  height: 100vh;
+  font-size: 0.9rem;
+  background-color: #171c28;
 }
 
 article {
-    margin-top: 0px
+  margin-top: 0px;
 }
 
 html {
-    font-size: 16px;
+  font-size: 16px;
 }
 
 .up_value {
-    color: #3fe199 !important;
+  color: #3fe199 !important;
 }
 
 .down_value {
-    color: #c4384e !important;
+  color: #c4384e !important;
 }
 
 .trade_price_active_tab {
-    color: #08aff3 !important;
+  color: #08aff3 !important;
 }
 
 .zig-dropdown .rc-dropdown-menu > .rc-dropdown-menu-item {
-    font-size: 18px;
-    padding: 15px;
-    cursor: pointer;
+  font-size: 18px;
+  padding: 15px;
+  cursor: pointer;
 }
 
 .zig-dropdown .rc-dropdown-menu > .rc-dropdown-menu-item:hover,
 .zig-dropdown .rc-dropdown-menu > .rc-dropdown-menu-item-active,
 .zig-dropdown .rc-dropdown-menu > .rc-dropdown-menu-item-selected {
-    background-color: #c0cff8;
-    color: #43f;
+  background-color: #c0cff8;
+  color: #43f;
 }
 
 @font-face {
-    font-family: 'Iceland';
-    src: url('./assets/fonts/Iceland.woff2') format('woff2'),
-         url('./assets/fonts/Iceland.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-
+  font-family: "Iceland";
+  src: url("./assets/fonts/Iceland.woff2") format("woff2"),
+    url("./assets/fonts/Iceland.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
 }
 
 /* WalletConnect customization */
 .walletconnect-modal__base div:nth-child(3) {
-    overflow-y: scroll;
+  overflow-y: scroll;
 }

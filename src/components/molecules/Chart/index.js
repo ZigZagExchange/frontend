@@ -1,1 +1,1 @@
-export * from './TradeChart/TradeChart'
+export * from "./TradeChart/TradeChart";

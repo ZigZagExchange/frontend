@@ -11,21 +11,23 @@ const TextInput = ({
   value,
   onChange,
   hideValidation,
-  rightOfLabel
-                   }) => {
-  return <Input
-    name={name}
-    placeholder={placeholder}
-    validate={validate}
-    label={label}
-    value={value}
-    onChange={onChange}
-    hideValidation={hideValidation}
-    rightOfLabel={rightOfLabel}
-    type={"text"}
-    w={block ? "100%" : "inherit"}
-    {...BaseInputStyle}
-  />
-}
+  rightOfLabel,
+}) => {
+  return (
+    <Input
+      name={name}
+      placeholder={placeholder}
+      validate={validate}
+      label={label}
+      value={value}
+      onChange={onChange}
+      hideValidation={hideValidation}
+      rightOfLabel={rightOfLabel}
+      type={"text"}
+      w={block ? "100%" : "inherit"}
+      {...BaseInputStyle}
+    />
+  );
+};
 
-export default TextInput
+export default TextInput;

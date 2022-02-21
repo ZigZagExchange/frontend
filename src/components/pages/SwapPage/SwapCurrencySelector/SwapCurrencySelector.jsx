@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { networkSelector } from "lib/store/features/api/apiSlice";
 import { userSelector } from "lib/store/features/auth/authSlice";
 import styled from "@xstyled/styled-components";
-import { FiChevronDown } from 'react-icons/fi';
+import { FiChevronDown } from "react-icons/fi";
 import { useCoinEstimator, Modal } from "components";
 import { formatUSD } from "lib/utils";
 import api from "lib/api";
@@ -23,7 +23,7 @@ const StyledSwapCurrencySelector = styled.div`
   user-select: none;
 
   &:hover {
-    border-color: #7B8AB6;
+    border-color: #7b8ab6;
   }
 
   select {
@@ -55,7 +55,7 @@ const SwapCurrencyWrapper = styled.div`
       margin-left: 5px;
     }
   }
-`
+`;
 
 const SwapCurrencyOptions = styled.ul`
   width: 100%;
@@ -63,14 +63,13 @@ const SwapCurrencyOptions = styled.ul`
   padding: 0;
   font-size: 16px;
   cursor: pointer;
-  
-  & img{
+
+  & img {
     width: 28px;
     height: 28px;
     object-fit: contain;
     margin-right: 13px;
   }
-
 
   .currencyBalance {
     line-height: 1.1;
@@ -80,7 +79,7 @@ const SwapCurrencyOptions = styled.ul`
     strong {
       display: block;
       font-weight: 600;
-      font-family: 'Iceland', sans-serif;
+      font-family: "Iceland", sans-serif;
       font-size: 18px;
       color: #69f;
     }
@@ -95,17 +94,22 @@ const SwapCurrencyOptions = styled.ul`
     padding: 13px;
     flex-direction: row;
     align-items: center;
-    background: rgba(0,0,0,0.2);
+    background: rgba(0, 0, 0, 0.2);
     border-radius: 10px;
     margin-bottom: 10px;
 
     &:hover {
-      background: rgba(0,0,0,0.3);
+      background: rgba(0, 0, 0, 0.3);
     }
   }
-`
+`;
 
-const SwapCurrencySelector = ({ onChange, currencies, balances = {}, value }) => {
+const SwapCurrencySelector = ({
+  onChange,
+  currencies,
+  balances = {},
+  value,
+}) => {
   const [show, setShow] = useState(false);
   const [showingOptions, setShowingOptions] = useState(false);
   const network = useSelector(networkSelector);
@@ -115,25 +119,24 @@ const SwapCurrencySelector = ({ onChange, currencies, balances = {}, value }) =>
 
   var [availableTickers, setTickers] = useState(tickers);
 
-
   useEffect(() => {
     onChange(api.marketInfo["ETH"] ? "ETH" : tickers[0]);
   }, [user.id, network, currencies]);
 
   const hideOptions = (e) => {
-    if (e) e.preventDefault()
+    if (e) e.preventDefault();
     setShowingOptions(false);
-  }
+  };
 
   useEffect(() => {
     if (showingOptions) {
-      window.addEventListener('click', hideOptions, false)
+      window.addEventListener("click", hideOptions, false);
     }
 
     return () => {
-      window.removeEventListener('click', hideOptions)
-    }
-  }, [showingOptions])
+      window.removeEventListener("click", hideOptions);
+    };
+  }, [showingOptions]);
 
   if (!value) {
     return null;
@@ -142,32 +145,31 @@ const SwapCurrencySelector = ({ onChange, currencies, balances = {}, value }) =>
   const currency = api.getCurrencyInfo(value);
   const image = api.getCurrencyLogo(value);
 
-  function searchPair(value){
+  function searchPair(value) {
     value = value.toUpperCase();
 
-    if(value !== ""){
-      var foundPairs = []
+    if (value !== "") {
+      var foundPairs = [];
 
       //search tickers
-      tickers.forEach( ticker => {
-        if(ticker.includes(value)) {
+      tickers.forEach((ticker) => {
+        if (ticker.includes(value)) {
           foundPairs.push(ticker);
         }
       });
 
       //set tickers
       setTickers(foundPairs);
-    }else {
+    } else {
       //reset
       setTickers(api.getCurrencies());
     }
-
   }
 
-  const selectOption = ticker => (e) => {
-    if (e) e.preventDefault()
-    onChange(ticker)
-  }
+  const selectOption = (ticker) => (e) => {
+    if (e) e.preventDefault();
+    onChange(ticker);
+  };
 
   return (
     <SwapCurrencyWrapper>
@@ -180,26 +182,46 @@ const SwapCurrencySelector = ({ onChange, currencies, balances = {}, value }) =>
           <FiChevronDown />
         </div>
       </StyledSwapCurrencySelector>
-      <Modal title="Select a token to Swap" onClose={() => setShow(false)} show={show}>
-        <SearchBox searchPair={searchPair} className="bridge_searchbox"/>
-      <SwapCurrencyOptions onClick={() => setShow(false)}>
-        {availableTickers.map((ticker, key) => (
-          ticker === value ? null :
-          <li key={key} onClick={selectOption(ticker)} tabIndex="0" className="currencyOption">
-            <div className="currencyIcon">
-              <img src={api.getCurrencyLogo(ticker) && api.getCurrencyLogo(ticker).default} alt={currency && currency.symbol} />
-            </div>
-            <div className="currencyName">
-              {ticker}
-            </div>
-            {balances[ticker] && (
-              <div className="currencyBalance">
-                <strong>{balances[ticker].valueReadable}</strong>
-                <small>${formatUSD(coinEstimator(ticker) * balances[ticker].valueReadable)}</small>
-              </div>)}
-          </li>
-        ))}
-      </SwapCurrencyOptions>
+      <Modal
+        title="Select a token to Swap"
+        onClose={() => setShow(false)}
+        show={show}
+      >
+        <SearchBox searchPair={searchPair} className="bridge_searchbox" />
+        <SwapCurrencyOptions onClick={() => setShow(false)}>
+          {availableTickers.map((ticker, key) =>
+            ticker === value ? null : (
+              <li
+                key={key}
+                onClick={selectOption(ticker)}
+                tabIndex="0"
+                className="currencyOption"
+              >
+                <div className="currencyIcon">
+                  <img
+                    src={
+                      api.getCurrencyLogo(ticker) &&
+                      api.getCurrencyLogo(ticker).default
+                    }
+                    alt={currency && currency.symbol}
+                  />
+                </div>
+                <div className="currencyName">{ticker}</div>
+                {balances[ticker] && (
+                  <div className="currencyBalance">
+                    <strong>{balances[ticker].valueReadable}</strong>
+                    <small>
+                      $
+                      {formatUSD(
+                        coinEstimator(ticker) * balances[ticker].valueReadable
+                      )}
+                    </small>
+                  </div>
+                )}
+              </li>
+            )
+          )}
+        </SwapCurrencyOptions>
       </Modal>
     </SwapCurrencyWrapper>
   );

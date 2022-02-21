@@ -8,92 +8,96 @@
 }
 
 .trade_price_table::-webkit-scrollbar {
-    width: 5px;
-    position: relative;
-    z-index: 20;
+  width: 5px;
+  position: relative;
+  z-index: 20;
 }
 
 .trade_price_table::-webkit-scrollbar-track {
-    border-radius: 0px;
-    background: hsla(0, 0%, 100%, 0.15);
-    height: 23px;
+  border-radius: 0px;
+  background: hsla(0, 0%, 100%, 0.15);
+  height: 23px;
 }
 
 .trade_price_table::-webkit-scrollbar-thumb {
-    border-radius: 0px;
-    background: hsla(0, 0%, 100%, 0.4);
+  border-radius: 0px;
+  background: hsla(0, 0%, 100%, 0.4);
 }
 
 .trade_price_table::-webkit-scrollbar-thumb:window-inactive {
-    background: #fff;
+  background: #fff;
 }
 
 .trade_price_table tbody {
-    width: 100%;
-    display: table;
-    background-position: top right;
-    background-size: 70% 100%;
-    background-repeat: no-repeat;
-    margin-top: 0.7rem;
+  width: 100%;
+  display: table;
+  background-position: top right;
+  background-size: 70% 100%;
+  background-repeat: no-repeat;
+  margin-top: 0;
 }
 
 .tpt_1 {
-    margin-top: 20px;
+  margin-top: 20px;
 }
 
 .tpt_2 {
-    height: 480px;
+  height: 480px;
 }
 
 .tpt_3 tbody {
-    background-image: unset;
+  background-image: unset;
 }
 
 .tpt_3 {
-    height: 75%;
+  height: 75%;
 }
 
 .tpt_3 tbody tr {
-    cursor: pointer;
+  cursor: pointer;
 }
 .tpt_3 tbody tr:hover {
-    background-color: #a9a9a936;
+  background-color: #a9a9a936;
 }
 
 .trade_price_table thead {
-    position: sticky;
-    top: 0;
-    display: table;
-    width: 100%;
-    background-color: #171c28;
+  position: sticky;
+  top: 0;
+  display: table;
+  width: 100%;
+  background-color: #171c28;
 }
 
 .trade_price_table th {
-    color: #94a2c9;
-    font-weight: 400;
+  font-size: 12px;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(102, 153, 255, 0.2);
+  color: #94a2c9;
+  font-weight: 400;
+  padding: 6px;
 }
 .trade_price_table th:nth-child(1),
 .trade_price_table td:nth-child(1) {
-    width:30%;
-    text-align: start;
+  width: 30%;
+  text-align: start;
 }
 .trade_price_table th:nth-child(2),
 .trade_price_table td:nth-child(2) {
-    width:40%;
-    text-align: center;
+  width: 40%;
+  text-align: center;
 }
 .trade_price_table th:nth-child(3),
 .trade_price_table td:nth-child(3) {
-    width:30%;
-    text-align: right;
+  width: 30%;
+  text-align: right;
 }
 
 .tpt_1 td:nth-child(1) {
-    color: #c4384e;
+  color: #c4384e;
 }
 
 .tpt_2 td:nth-child(1) {
-    color: #3fe199;
+  color: #3fe199;
 }
 
 .trade_price_table td {
@@ -101,19 +105,19 @@
 }
 
 @media screen and (min-width: 1800px) {
-    .trade_price_table {
-        width: 100%;
-    }
+  .trade_price_table {
+    width: 100%;
+  }
 }
 
 @media screen and (max-width: 991px) {
-    .trade_price_table {
-        width: 100%;
-    }
+  .trade_price_table {
+    width: 100%;
+  }
 }
 
 @media screen and (max-width: 768px) {
-    .tpt_3 {
-        height: 350px;
-    }
+  .tpt_3 {
+    height: 350px;
+  }
 }

@@ -16,7 +16,7 @@ const BridgeInputBox = styled.div`
 
   input,
   input:focus {
-    font-family: 'Iceland', sans-serif;
+    font-family: "Iceland", sans-serif;
     width: calc(100% - 148px);
     height: 70px;
     background: transparent;
@@ -50,25 +50,51 @@ const BridgeInputBox = styled.div`
   }
 `;
 
-const BridgeSwapInput = ({ value = {}, onChange, bridgeFee, currencies, balances = {}, className }) => {
-  const setCurrency = useCallback(currency => onChange({ currency, amount: '' }), [onChange])
-  const setAmount = useCallback(e => onChange({ amount: e.target.value.replace(/[^0-9.]/g,'') }), [onChange])
-  
-  let maxBalance = parseFloat((balances[value.currency] && balances[value.currency].valueReadable) || 0)
-  maxBalance -= parseFloat(bridgeFee)
+const BridgeSwapInput = ({
+  value = {},
+  onChange,
+  bridgeFee,
+  currencies,
+  balances = {},
+  className,
+}) => {
+  const setCurrency = useCallback(
+    (currency) => onChange({ currency, amount: "" }),
+    [onChange]
+  );
+  const setAmount = useCallback(
+    (e) => onChange({ amount: e.target.value.replace(/[^0-9.]/g, "") }),
+    [onChange]
+  );
+
+  let maxBalance = parseFloat(
+    (balances[value.currency] && balances[value.currency].valueReadable) || 0
+  );
+  maxBalance -= parseFloat(bridgeFee);
 
   const setMax = () => {
-    if(maxBalance > 0){
-      onChange({ amount: (maxBalance || '') })
+    if (maxBalance > 0) {
+      onChange({ amount: maxBalance || "" });
     }
-  }
+  };
 
   return (
     <BridgeInputBox>
       <div className="currencySelector">
-        <BridgeCurrencySelector currencies={currencies} balances={balances} onChange={setCurrency} value={value.currency} />
+        <BridgeCurrencySelector
+          currencies={currencies}
+          balances={balances}
+          onChange={setCurrency}
+          value={value.currency}
+        />
       </div>
-      <input onChange={setAmount} value={value.amount} className={className} placeholder="0.00" type="text" />
+      <input
+        onChange={setAmount}
+        value={value.amount}
+        className={className}
+        placeholder="0.00"
+        type="text"
+      />
       <a className="maxLink" href="#max" onClick={setMax}>
         Max
       </a>

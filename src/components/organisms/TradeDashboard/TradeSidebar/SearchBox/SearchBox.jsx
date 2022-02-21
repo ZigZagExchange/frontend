@@ -1,25 +1,25 @@
 import React, { useState } from "react";
 import "./SearchBox.css";
 
-export default function SearchBox(props){
-    const [searchValue, setSearch] = useState('');
+export default function SearchBox(props) {
+  const [searchValue, setSearch] = useState("");
 
+  function handleChange(e) {
+    //do search
+    setSearch(e.target.value);
+    props.searchPair(e.target.value);
+  }
 
-    function handleChange (e) {
-        //do search
-        setSearch(e.target.value);
-        props.searchPair(e.target.value);
-    }
-
-    return (
-        <>
-
-            <div className={props.className}>
-                <input placeholder="Search..."  type="text"
-                    value={searchValue} 
-                    onChange={handleChange} 
-                />
-            </div>
-        </>
-    );
+  return (
+    <>
+      <div className={props.className}>
+        <input
+          placeholder="Search..."
+          type="text"
+          value={searchValue}
+          onChange={handleChange}
+        />
+      </div>
+    </>
+  );
 }
