@@ -34,8 +34,8 @@
   /* active */
   transition: all 0.2s ease;
   opacity: 1;
-  color: #2962ff;
-  border: 1px solid #2962ff;
+  color: rgb(102, 153, 255);
+  border: 1px solid rgb(102, 153, 255);
   background: rgba(41, 98, 255, 0.2);
 }
 
@@ -68,13 +68,15 @@
   border-radius: 10px;
   cursor: pointer;
   transition: all 0.2s ease;
+  font-size: 12px;
+  text-transform: uppercase;
 }
 
 .booksOptions .tab-list-active {
   /* active */
   transition: all 0.2s ease;
   opacity: 1;
-  color: #2962ff;
+  color: rgb(102, 153, 255);
 }
 
 .bookOptions .tab-content {
