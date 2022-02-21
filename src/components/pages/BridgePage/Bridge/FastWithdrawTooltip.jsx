@@ -1,7 +1,7 @@
 import {x} from "@xstyled/styled-components";
 import ExternalLink from "../../ListPairPage/ExternalLink";
 import {HiExternalLink} from "react-icons/hi";
-import Tooltip from "../../../atoms/Tooltip/Tooltip";
+import {Tooltip} from "components";
 import {AiOutlineQuestionCircle} from "react-icons/all";
 import React from "react";
 

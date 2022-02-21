@@ -1,10 +1,6 @@
 import API from "./API";
 // import APIStarknetProvider from './providers/APIStarknetProvider'
-<<<<<<< HEAD
-import APIZKProvider from "./providers/APIZKProvider";
-=======
 import APIZKProvider from './providers/APIZKProvider/APIZKProvider'
->>>>>>> 908b0b93f469d573ee049cf8eef2e5d168be01e6
 
 const api = new API({
   infuraId: process.env.REACT_APP_INFURA_ID,
