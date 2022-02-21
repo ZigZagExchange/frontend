@@ -41,7 +41,7 @@ class SpotBox extends React.Component {
                 </div>
               </div>
             </div>
-            
+
             <div className="spot_bottom">
                   
             <Tabs className="spotOptions">
