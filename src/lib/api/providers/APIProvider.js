@@ -7,6 +7,7 @@ const notImplemented = function (method) {
 };
 
 export default class APIProvider {
+<<<<<<< HEAD
   // Methods required to be implemented
   signIn = notImplemented("signIn");
   signOut = notImplemented("signOut");
@@ -18,6 +19,21 @@ export default class APIProvider {
   withdrawL2Fee = notImplemented("withdrawL2Fee");
   getBalances = notImplemented("getBalances");
   getProfile = notImplemented("getProfile");
+=======
+    // Methods required to be implemented
+    signIn                  = notImplemented('signIn')
+    signOut                 = notImplemented('signOut')
+    getAccountState         = notImplemented('getAccountState')
+    submitOrder             = notImplemented('submitOrder')
+    depositL2               = notImplemented('depositL2')
+    withdrawL2Normal        = notImplemented('withdrawL2Normal')
+    withdrawL2Fast          = notImplemented('withdrawL2Fast')
+    depositL2Fee            = notImplemented('depositL2Fee')
+    withdrawL2GasFee        = notImplemented('withdrawL2GasFee')
+    withdrawL2FastBridgeFee = notImplemented('withdrawL2FastBridgeFee')
+    getBalances             = notImplemented('getBalances')
+    getProfile              = notImplemented('getProfile')
+>>>>>>> 908b0b93f469d573ee049cf8eef2e5d168be01e6
 
   constructor(api, network) {
     this.api = api;

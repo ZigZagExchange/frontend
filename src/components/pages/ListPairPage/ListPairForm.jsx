@@ -18,63 +18,22 @@ import { TRADING_VIEW_CHART_KEY } from "./ListPairPage";
 import api from "../../../lib/api";
 import { debounce } from "lodash";
 
-const getAmountForTargetNotional = (price) => {
-  const targetUSDFeeAmount = 1;
-  return (targetUSDFeeAmount / price).toFixed(6);
-};
-
-const renderFeeHint = (assetPrice, assetFee, symbol, feeSetter) => {
-  if (assetPrice) {
-    const notional = (Number(assetPrice) * Number(assetFee)).toFixed(2);
-    if (notional > 0) {
-      return (
-        <x.div
-          pl={2}
-          fontSize={12}
-          color={"blue-gray-500"}
-          mt={1}
-          display={"flex"}
-          alignItems={"center"}
-          justifyContent={"space-between"}
-        >
-          <x.div style={{ wordBreak: "break-all" }}>
-            {assetFee} {symbol} = ${notional}
-          </x.div>
-          {notional > 1 && (
-            <x.div>
-              <Button
-                ml={1}
-                variant={"secondary"}
-                size={"xs"}
-                onClick={() =>
-                  feeSetter(getAmountForTargetNotional(assetPrice))
-                }
-              >
-                set to $1
-              </Button>
-              <x.div />
-            </x.div>
-          )}
-        </x.div>
-      );
-    }
-  }
-  return null;
-};
-
-const ListPairForm = ({ onSubmit, children }) => {
-  const [baseAssetId, setBaseAssetId] = useState("");
-  const [quoteAssetId, setQuoteAssetId] = useState("");
-  const [baseFee, setBaseFee] = useState("");
-  const [quoteFee, setQuoteFee] = useState("");
-  const [basePrice, setBasePrice] = useState(null);
-  const [quotePrice, setQuotePrice] = useState(null);
-  const [baseSymbol, setBaseSymbol] = useState(null);
-  const [quoteSymbol, setQuoteSymbol] = useState(null);
-  const [isBaseAssetIdInvalid, setIsBaseAssetIdInvalid] = useState(false);
-  const [isQuoteAssetIdInvalid, setIsQuoteAssetIdInvalid] = useState(false);
-  const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
-  const [zigZagChainId, setZigZagChainId] = useState(1);
+const ListPairForm = ({
+  onSubmit,
+  children
+}) => {
+  const [baseAssetId, setBaseAssetId] = useState("")
+  const [quoteAssetId, setQuoteAssetId] = useState("")
+  const [baseFee, setBaseFee] = useState("")
+  const [quoteFee, setQuoteFee] = useState("")
+  const [basePrice, setBasePrice] = useState(null)
+  const [quotePrice, setQuotePrice] = useState(null)
+  const [baseSymbol, setBaseSymbol] = useState(null)
+  const [quoteSymbol, setQuoteSymbol] = useState(null)
+  const [isBaseAssetIdInvalid, setIsBaseAssetIdInvalid] = useState(false)
+  const [isQuoteAssetIdInvalid, setIsQuoteAssetIdInvalid] = useState(false)
+  const [showAdvancedSettings, setShowAdvancedSettings] = useState(false)
+  const [zigZagChainId, setZigZagChainId] = useState(1)
 
   const getTokenInfo = async (
     assetId,
@@ -401,4 +360,32 @@ const TooltipHelper = ({ children }) => {
   );
 };
 
-export default ListPairForm;
+const getAmountForTargetNotional = (price) => {
+  const targetUSDFeeAmount = 1
+  return (targetUSDFeeAmount / price).toFixed(6)
+}
+
+const renderFeeHint = (assetPrice, assetFee, symbol, feeSetter) => {
+  if (assetPrice) {
+    const notional = (Number(assetPrice) * Number(assetFee)).toFixed(2)
+    if (notional > 0) {
+      return <x.div pl={2} fontSize={12} color={"blue-gray-500"} mt={1} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
+        <x.div style={{wordBreak: "break-all"}}>
+          {assetFee} {symbol} = ${notional}
+        </x.div>
+        {notional > 1 && <x.div>
+          <Button
+            ml={1}
+            variant={"secondary"}
+            size={"xs"}
+            onClick={() => feeSetter(getAmountForTargetNotional(assetPrice))}>
+            set to $1
+          </Button>
+          <x.div/>
+        </x.div>}
+      </x.div>}
+  }
+  return null
+}
+
+export default ListPairForm

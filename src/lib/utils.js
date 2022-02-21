@@ -1,5 +1,5 @@
-import { BigNumber } from "ethers";
-import isString from "lodash/isString";
+import { BigNumber } from 'ethers'
+import isString from 'lodash/isString'
 
 export function formatUSD(floatNum) {
   const num = parseFloat(floatNum || 0)
@@ -71,4 +71,9 @@ export function numStringToSymbol(str, decimals) {
 
   if (!item) return str;
   return (str / item.value).toFixed(decimals) + item.symbol;
+}
+
+
+export function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }

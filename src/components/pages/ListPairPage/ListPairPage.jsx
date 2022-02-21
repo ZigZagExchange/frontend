@@ -13,14 +13,11 @@ import Submit, { Button } from "../../atoms/Form/Submit";
 import { jsonify } from "../../../lib/helpers/strings";
 import { Dev } from "../../../lib/helpers/env";
 import SuccessModal from "./SuccessModal";
-import {
-  arweaveAllocationSelector,
-  networkSelector,
-} from "lib/store/features/api/apiSlice";
-import { sleep } from "../../../lib/helpers/utils";
-import { HiExternalLink } from "react-icons/hi";
+import {arweaveAllocationSelector, networkSelector} from "lib/store/features/api/apiSlice";
+import {HiExternalLink} from "react-icons/hi";
 import ExternalLink from "./ExternalLink";
 import ListPairForm from "./ListPairForm";
+import {sleep} from "../../../lib/utils";
 
 export const TRADING_VIEW_CHART_KEY = "tradingViewChart";
 
