@@ -52,6 +52,7 @@ const SpotBox = ({
                 side="b"
                 lastPrice={lastPrice}
                 user={user}
+                currentMarket={currentMarket}
                 orderType={orderType}
                 activeOrderCount={activeOrderCount}
                 liquidity={liquidity}
