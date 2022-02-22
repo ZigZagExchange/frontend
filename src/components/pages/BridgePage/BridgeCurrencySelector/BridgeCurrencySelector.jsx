@@ -106,7 +106,6 @@ const BridgeCurrencyOptions = styled.ul`
 
 const BridgeCurrencySelector = ({
   onChange,
-  currencies,
   balances = {},
   value,
 }) => {
@@ -127,6 +126,10 @@ const BridgeCurrencySelector = ({
     if (e) e.preventDefault();
     setShowingOptions(false);
   };
+
+  const resetTickers = () => {
+    setTickers(api.getCurrencies())
+  }
 
   useEffect(() => {
     if (showingOptions) {
@@ -161,14 +164,17 @@ const BridgeCurrencySelector = ({
       //set tickers
       setTickers(foundPairs);
     } else {
-      //reset
-      setTickers(api.getCurrencies());
+      resetTickers()
     }
   }
 
   const selectOption = (ticker) => (e) => {
     if (e) e.preventDefault();
     onChange(ticker);
+    setShow(false)
+    setTimeout(() => {
+      resetTickers()
+    }, 500)
   };
 
   return (
@@ -184,11 +190,14 @@ const BridgeCurrencySelector = ({
       </StyledBridgeCurrencySelector>
       <Modal
         title="Select a token to Bridge"
-        onClose={() => setShow(false)}
+        onClose={() => {
+          setShow(false)
+          resetTickers()
+        }}
         show={show}
       >
         <SearchBox searchPair={searchPair} className="bridge_searchbox" />
-        <BridgeCurrencyOptions onClick={() => setShow(false)}>
+        <BridgeCurrencyOptions>
           {availableTickers.map((ticker, key) =>
             ticker === value ? null : (
               <li
