@@ -373,9 +373,7 @@ export class SpotForm extends React.Component {
               value={
                 this.priceIsDisabled()
                   ? this.props.marketSummary && this.props.marketSummary?.price
-                  : !isNaN(price)
-                  ? ""
-                  : price
+                  : this.state.userHasEditedPrice ? this.state.price : this.currentPrice()
               }
               onChange={this.updatePrice.bind(this)}
               disabled={this.priceIsDisabled()}
