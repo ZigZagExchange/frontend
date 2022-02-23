@@ -23,8 +23,8 @@ import L1Header from "./L1Header";
 import FastWithdrawTooltip from "./FastWithdrawTooltip";
 
 const defaultTransfer = {
-  type: 'deposit',
-}
+  type: "deposit",
+};
 
 const Bridge = () => {
   const user = useSelector(userSelector);
@@ -61,26 +61,28 @@ const Bridge = () => {
 
   useEffect(() => {
     if (user.address) {
-      api.getL2FastWithdrawLiquidity().then(maxes => {
-        setFastWithdrawCurrencyMaxes(maxes)
-      })
+      api.getL2FastWithdrawLiquidity().then((maxes) => {
+        setFastWithdrawCurrencyMaxes(maxes);
+      });
     }
-  }, [user.address])
+  }, [user.address]);
 
   useEffect(() => {
-    setSwapDetails({})
+    setSwapDetails({});
     if (withdrawSpeed === "normal") {
       setL1Fee(null)
     }
-  }, [withdrawSpeed])
+  }, [withdrawSpeed]);
 
   useEffect(() => {
-    if (!api.apiProvider.eligibleFastWithdrawTokens.includes(swapDetails.currency)) {
-      setWithdrawSpeed("normal")
+    if (
+      !api.apiProvider.eligibleFastWithdrawTokens.includes(swapDetails.currency)
+    ) {
+      setWithdrawSpeed("normal");
     } else {
-      setWithdrawSpeed("fast")
+      setWithdrawSpeed("fast");
     }
-  }, [swapDetails.currency])
+  }, [swapDetails.currency]);
 
   useEffect(() => {
     // since setSwapDetails uses state, instead of recalculating
@@ -201,7 +203,7 @@ const Bridge = () => {
       if (isFeesValid && isInputValid) {
         setFormErr("")
       }
-    }
+    };
 
     setFee(null)
     setL1Fee(null)
@@ -217,7 +219,7 @@ const Bridge = () => {
     } else {
       setDepositFee(setFee, details)
     }
-  }
+  };
 
   const switchTransferType = e => {
     e.preventDefault()
@@ -226,29 +228,36 @@ const Bridge = () => {
   }
 
   const approveSpend = (e) => {
-    if (e) e.preventDefault()
-    setApproving(true)
-    api.approveSpendOfCurrency(swapDetails.currency)
+    if (e) e.preventDefault();
+    setApproving(true);
+    api
+      .approveSpendOfCurrency(swapDetails.currency)
       .then(() => {
-        setApproving(false)
+        setApproving(false);
       })
-      .catch(err => {
-        console.log(err)
-        setApproving(false)
-      })
-  }
+      .catch((err) => {
+        console.log(err);
+        setApproving(false);
+      });
+  };
 
-  const doTransfer = e => {
-    e.preventDefault()
-    let deferredXfer
+  const doTransfer = (e) => {
+    e.preventDefault();
+    let deferredXfer;
 
-    setLoading(true)
+    setLoading(true);
 
-    if (transfer.type === 'deposit') {
-      deferredXfer = api.depositL2(`${swapDetails.amount}`, swapDetails.currency)
+    if (transfer.type === "deposit") {
+      deferredXfer = api.depositL2(
+        `${swapDetails.amount}`,
+        swapDetails.currency
+      );
     } else {
       if (isFastWithdraw) {
-        deferredXfer = api.withdrawL2Fast(`${swapDetails.amount}`, swapDetails.currency)
+        deferredXfer = api.withdrawL2Fast(
+          `${swapDetails.amount}`,
+          swapDetails.currency
+        );
       } else {
         deferredXfer = api.withdrawL2Normal(`${swapDetails.amount}`, swapDetails.currency)
       }
@@ -417,8 +426,7 @@ const Bridge = () => {
         </div>
       )}
     </>
-
-  )
-}
+  );
+};
 
 export default Bridge

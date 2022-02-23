@@ -17,17 +17,19 @@
 .bg_btn {
   display: flex;
   align-items: center;
-  transition: all 2s linear;
+  transition: all 0.1s linear;
   height: 42px;
   padding: 4px 30px;
-  background: linear-gradient(to right, #09aaf5, #05cfe9, #62D2AD);
-  border: none;
-  border-radius: 5px;
+  font-weight: bold;
+  background: #09aaf5;
+  border: 0;
+  border-radius: 4px;
   width: 100%;
   justify-content: center;
   position: relative;
   color: white;
-  font-size: 0.9rem;
+  font-size: 14px;
+  line-height: 1.5;
   outline: none;
 }
 
@@ -44,13 +46,27 @@
 }
 
 .zig_btn {
+  box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.01);
   text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.35);
 }
 
+.zig_btn:hover {
+  box-shadow: 0 0 1px 2px rgba(255, 255, 255, 0.3) inset,
+    0 0 8px 1px rgba(120, 255, 255, 0.4);
+}
+
+.zig_btn:active {
+  transition: none;
+  background-color: #087fcf;
+  box-shadow: -2px -2px 4px 1px rgba(0, 0, 0, 0.2) inset,
+    0 1px 0 1px rgba(255, 255, 255, 0.2) inset;
+}
+
 .zig_btn_sm {
-  padding: 0;
+  font-size: 12px;
+  padding: 0 10px;
   width: auto;
-  height: 34px;
+  height: 27px;
 }
 
 .zig_btn_disabled {

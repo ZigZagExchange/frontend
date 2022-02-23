@@ -16,7 +16,7 @@ const BridgeInputBox = styled.div`
 
   input,
   input:focus {
-    font-family: 'Iceland', sans-serif;
+    font-family: "Iceland", sans-serif;
     width: calc(100% - 148px);
     height: 70px;
     background: transparent;

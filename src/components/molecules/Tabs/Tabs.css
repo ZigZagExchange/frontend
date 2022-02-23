@@ -1,0 +1,84 @@
+.spotOptions .tab-list {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  padding-left: 0;
+  height: 48px;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 5px;
+  border-radius: 13px;
+  gap: 5px;
+  font-weight: 600;
+  margin-top: -5px;
+  margin-bottom: 5px;
+}
+
+.spotOptions .tab-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.3;
+  color: white;
+  border: 1px solid transparent;
+  list-style: none;
+  height: 100%;
+  flex: 1;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.spotOptions .tab-list-active {
+  /* active */
+  transition: all 0.2s ease;
+  opacity: 1;
+  color: rgb(102, 153, 255);
+  border: 1px solid rgb(102, 153, 255);
+  background: rgba(41, 98, 255, 0.2);
+}
+
+/* Books & Orders */
+
+.booksOptions .tab-list {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgb(19, 23, 34);
+  padding-left: 0;
+  height: 40px;
+  box-sizing: border-box;
+  width: 100%;
+  gap: 5px;
+  border-bottom: 1px solid rgb(39, 44, 57);
+  font-weight: 600;
+}
+
+.booksOptions .tab-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.3;
+  color: white;
+  border: 1px solid transparent;
+  list-style: none;
+  height: 100%;
+  flex: 1;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.booksOptions .tab-list-active {
+  /* active */
+  transition: all 0.2s ease;
+  opacity: 1;
+  color: rgb(102, 153, 255);
+}
+
+.bookOptions .tab-content {
+  height: calc(100vh - 190px);
+}
