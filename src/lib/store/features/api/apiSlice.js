@@ -24,7 +24,12 @@ export const apiSlice = createSlice({
   },
   reducers: {
     _marketinfo(state, { payload }) {
-      state.marketinfo = payload[0];
+      if (payload[0].error) {
+          toast.error("Bad market");
+      }
+      else {
+          state.marketinfo = payload[0];
+      }
     },
     _fills(state, { payload }) {
       payload[0].forEach((fill) => {
