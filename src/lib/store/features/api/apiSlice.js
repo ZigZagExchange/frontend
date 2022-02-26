@@ -97,7 +97,12 @@ export const apiSlice = createSlice({
       });
     },
     _liquidity2(state, { payload }) {
-      state.liquidity = state.liquidity = payload[2];
+      if(
+        payload[0] === state.network &&
+        payload[1] === state.currentMarket
+      ) {
+        state.liquidity = state.liquidity = payload[2];
+      }      
     },
     _orderstatus(state, { payload }) {
       (payload[0] || []).forEach(async (update) => {
