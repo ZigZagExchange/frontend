@@ -85,7 +85,7 @@ export default class APIZKProvider extends APIProvider {
             toast.info('You need to sign a one-time transaction to activate your zksync account.')
         }
         let feeToken = "ETH";
-        const accountState = await this.getAccountState()
+        const accountState = this.accountState ? this.accountState : await this.getAccountState()
         const balances = accountState.committed.balances;
         if (balances.ETH && balances.ETH > 0.005e18) {
             feeToken = "ETH";
@@ -129,7 +129,7 @@ export default class APIZKProvider extends APIProvider {
             tokenSell = marketInfo.quoteAssetId;
             tokenBuy = marketInfo.baseAssetId;
 
-            const accountState = await this.getAccountState();
+            const accountState = this.accountState ? this.accountState : await this.getAccountState()
             const balances = accountState.committed.balances;
             const tokenSellSymbol = marketInfo.quoteAsset.symbol;
             const balanceQuote = balances.tokenSellSymbol.toFixed(marketInfo.quoteAsset.decimals);
@@ -172,7 +172,7 @@ export default class APIZKProvider extends APIProvider {
     }
 
     getBalances = async () => {
-        const account = await this.getAccountState()
+        const account = this.accountState ? this.accountState : await this.getAccountState()
         const balances = {}
 
         this.getCurrencies().forEach(ticker => {
@@ -190,17 +190,10 @@ export default class APIZKProvider extends APIProvider {
     }
 
     getAccountState = async () => {
-        if(!this.accountState) {
-            this.accountState = this.syncWallet 
-                ? await this.syncWallet.getAccountState() 
-                : {}
-        }
+        this.accountState = this.syncWallet 
+            ? await this.syncWallet.getAccountState() 
+            : {}
         return this.accountState
-    }
-
-    updateAccountState = async () => {
-        if(!this.syncWallet) return        
-        this.accountState = this.syncWallet.getAccountState()
     }
 
     withdrawL2 = async (amountDecimals, token = 'ETH') => {
@@ -215,7 +208,7 @@ export default class APIZKProvider extends APIProvider {
             })
 
             await transfer.awaitReceipt()
-            this.updateAccountState()
+            
             this.api.emit('bridgeReceipt',
                 this.handleBridgeReceipt(transfer, amountDecimals, token, 'withdraw')
             )
@@ -245,7 +238,7 @@ export default class APIZKProvider extends APIProvider {
         amount
       })
       await transfer.awaitReceipt()
-      this.updateAccountState()
+
       this.api.emit('bridgeReceipt', this.handleFastBridgeReceipt(transfer, amountDecimals, token, 'withdraw'))
       return transfer
     }
@@ -263,7 +256,6 @@ export default class APIZKProvider extends APIProvider {
                 amount,
             })
 
-            this.updateAccountState()
             this.api.emit('bridgeReceipt',
                 this.handleBridgeReceipt(transfer, amountDecimals, token, 'deposit')
             )            
@@ -359,7 +351,7 @@ export default class APIZKProvider extends APIProvider {
             throw err
         }
 
-        const accountState = await this.getAccountState()
+        const accountState = this.accountState ? this.accountState : await this.getAccountState()
         if (!accountState.id) {
             if (!/^\/bridge(\/.*)?$/.test(window.location.pathname)) {
                 toast.error("Account not found. Please use the bridge to deposit funds before trying again.");
