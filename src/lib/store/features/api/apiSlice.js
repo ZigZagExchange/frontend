@@ -54,8 +54,8 @@ export const apiSlice = createSlice({
         let feeamount;
         let feetoken;
         if (update[3]) txhash = update[3];
-        if (update[10]) feeamount = update[10];
-        if (update[11]) feetoken = update[11];
+        if (update[5]) feeamount = update[5];
+        if (update[6]) feetoken = update[6];
         if (state.marketFills[fillid]) {
           state.marketFills[fillid][6] = newstatus;
           if (txhash) state.marketFills[fillid][7] = txhash;
