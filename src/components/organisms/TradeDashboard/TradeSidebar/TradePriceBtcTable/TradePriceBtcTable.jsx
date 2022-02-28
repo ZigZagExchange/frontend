@@ -49,6 +49,7 @@ class TradePriceBtcTable extends React.Component {
   }
 
   searchPair(value) {
+    value = value.toUpperCase().replace("/", "-");
     var foundPairs = [];
 
     //
@@ -58,7 +59,7 @@ class TradePriceBtcTable extends React.Component {
       var pair_name = row.td1;
 
       //if found query, push it to found pairs
-      if (pair_name.includes(value.toUpperCase())) {
+      if (pair_name.includes(value)) {
         foundPairs.push(row);
       }
     });

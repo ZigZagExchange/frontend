@@ -149,7 +149,7 @@ const BridgeCurrencySelector = ({
   const image = api.getCurrencyLogo(value);
 
   function searchPair(value) {
-    value = value.toUpperCase();
+    value = value.toUpperCase()
 
     if (value !== "") {
       var foundPairs = [];
