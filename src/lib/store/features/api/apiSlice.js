@@ -51,14 +51,22 @@ export const apiSlice = createSlice({
         const fillid = update[1];
         const newstatus = update[2];
         let txhash;
+        let feeamount;
+        let feetoken;
         if (update[3]) txhash = update[3];
+        if (update[5]) feeamount = update[5];
+        if (update[6]) feetoken = update[6];
         if (state.marketFills[fillid]) {
           state.marketFills[fillid][6] = newstatus;
           if (txhash) state.marketFills[fillid][7] = txhash;
+          if (feeamount) state.marketFills[fillid][10] = feeamount;
+          if (feetoken) state.marketFills[fillid][11] = feetoken;
         }
         if (state.userFills[fillid]) {
           state.userFills[fillid][6] = newstatus;
           if (txhash) state.userFills[fillid][7] = txhash;
+          if (feeamount) state.userFills[fillid][10] = feeamount;
+          if (feetoken) state.userFills[fillid][11] = feetoken;
         }
       });
     },
@@ -90,7 +98,12 @@ export const apiSlice = createSlice({
       });
     },
     _liquidity2(state, { payload }) {
-      state.liquidity = state.liquidity = payload[2];
+      if(
+        payload[0] === state.network &&
+        payload[1] === state.currentMarket
+      ) {
+        state.liquidity = state.liquidity = payload[2];
+      }      
     },
     _orderstatus(state, { payload }) {
       (payload[0] || []).forEach(async (update) => {

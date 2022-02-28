@@ -210,10 +210,17 @@ export class OrdersTable extends React.Component {
             const sidetext = fill[3] === "b" ? "buy" : "sell";
             const sideclassname = fill[3] === "b" ? "up_value" : "down_value";
             const txhash = fill[7];
-            let feeText;
-            feeText = "1 USDC";
+            const feeamount = fill[10];
+            const feetoken = fill[11];
+            let feeText = "1 USDC";
             const marketInfo = api.marketInfo[market];
-            if (!marketInfo) {
+            if(feeamount && feetoken) {           
+              const displayFee = (feeamount > 9999) ? feeamount.toFixed(0) : feeamount.toPrecision(4);
+              feeText = (feeamount !== 0) ? `${displayFee} ${feetoken}` : "--";
+            } else if(["b", "o", "m"].includes(fillstatus)) {
+              feeText = "--";
+              // cases below make it backward compatible:
+            } else if (!marketInfo) {
               feeText = "1 USDC";
             } else if (fillstatus === "r" || !api.isZksyncChain()) {
               feeText = "0 " + marketInfo.baseAsset.symbol;
