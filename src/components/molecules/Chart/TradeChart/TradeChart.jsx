@@ -27,7 +27,7 @@ export const TradeChart = () => {
       save_image={false}
       hide_top_toolbar={false}
       container_id="tradingview_7f572"
-      interval="D"
+      interval="30"
       timezone="Etc/UTC"
       locale="en"
       enable_publishing={false}
