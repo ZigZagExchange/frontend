@@ -78,19 +78,19 @@ class TradeRatesCard extends React.Component {
               {percentChange}%
             </p>
           </div>
-          <div className="rates_box rb_text_4 hide_sm">
+          <div className="rates_box rb_text_4 hide_md">
             <h2>24h High</h2>
             <p>{this.props.marketSummary["24hi"]}</p>
           </div>
-          <div className="rates_box rb_text_4 hide_sm">
+          <div className="rates_box rb_text_4 hide_md">
             <h2>24hLow</h2>
             <p>{this.props.marketSummary["24lo"]}</p>
           </div>
-          <div className="rates_box rb_text_4 hide_md">
+          <div className="rates_box rb_text_4 hide_sm">
             <h2>24h Volume({marketInfo && marketInfo.baseAsset.symbol})</h2>
             <p>{this.props.marketSummary.baseVolume}</p>
           </div>
-          <div className="rates_box rb_text_4 hide_md">
+          <div className="rates_box rb_text_4 hide_sm">
             <h2>24h Volume({marketInfo && marketInfo.quoteAsset.symbol})</h2>
             <p>{this.props.marketSummary.quoteVolume}</p>
           </div>
