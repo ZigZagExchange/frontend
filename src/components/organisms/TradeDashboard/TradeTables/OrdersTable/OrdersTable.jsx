@@ -215,7 +215,8 @@ export class OrdersTable extends React.Component {
             let feeText = "1 USDC";
             const marketInfo = api.marketInfo[market];
             if(feeamount && feetoken) {           
-              feeText = (feeamount !== 0) ? `${feeamount} ${feetoken}` : "--";
+              const displayFee = (feeamount > 9999) ? feeamount.toFixed(0) : feeamount.toPrecision(4);
+              feeText = (feeamount !== 0) ? `${displayFee} ${feetoken}` : "--";
             } else if(["b", "o", "m"].includes(fillstatus)) {
               feeText = "--";
               // cases below make it backward compatible:
