@@ -257,8 +257,8 @@ export function TradeDashboard() {
     if (i === 0) {
       askBins.push(orderbookAsks[i]);
     } else if (
-      orderbookAsks[i].td1.toPrecision(6) ===
-      askBins[lastAskIndex].td1.toPrecision(6)
+      orderbookAsks[i].td1.toPrecision(5) ===
+      askBins[lastAskIndex].td1.toPrecision(5)
     ) {
       askBins[lastAskIndex].td2 += orderbookAsks[i].td2;
       askBins[lastAskIndex].td3 += orderbookAsks[i].td3;
@@ -273,8 +273,8 @@ export function TradeDashboard() {
     if (i === "0") {
       bidBins.push(orderbookBids[i]);
     } else if (
-      orderbookBids[i].td1.toPrecision(6) ===
-      bidBins[lastBidIndex].td1.toPrecision(6)
+      orderbookBids[i].td1.toPrecision(5) ===
+      bidBins[lastBidIndex].td1.toPrecision(5)
     ) {
       bidBins[lastBidIndex].td2 += orderbookBids[i].td2;
       bidBins[lastBidIndex].td3 += orderbookBids[i].td3;

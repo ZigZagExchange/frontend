@@ -48,11 +48,17 @@ const TradePriceTable = (props) => {
               rowStyle = {};
             }
             const price =
-              typeof d.td1 === "number" ? d.td1.toPrecision(6) : d.td1;
+              typeof d.td1 === "number" 
+                ? ((d.td1 > 99999) ? d.td1.toFixed(0) : d.td1.toPrecision(5)) 
+                : d.td1;
             const amount =
-              typeof d.td2 === "number" ? d.td2.toPrecision(6) : d.td2;
+              typeof d.td2 === "number" 
+                ? ((d.td2 > 999) ? d.td2.toFixed(0) : d.td2.toPrecision(6))
+                : d.td2;
             const total =
-              typeof d.td3 === "number" ? d.td3.toPrecision(6) : d.td3;
+              typeof d.td3 === "number" 
+                ? ((d.td3 > 10) ? d.td3.toFixed(0) : d.td3.toPrecision(2))
+                : d.td3;
             return (
               <tr key={i} style={rowStyle} onClick={() => onClickRow(d)}>
                 <td className={d.side === "b" ? "up_value" : "down_value"}>
