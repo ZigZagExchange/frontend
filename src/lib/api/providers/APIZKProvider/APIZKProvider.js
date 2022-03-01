@@ -140,7 +140,7 @@ export default class APIZKProvider extends APIProvider {
             tokenBuy = marketInfo.quoteAssetId;
             tokenRatio[marketInfo.baseAssetId] = sellQuantityWithFee;
             tokenRatio[marketInfo.quoteAssetId] = (amount * price).toFixed(marketInfo.quoteAsset.decimals);
-            fullSellQuantity = (sellQuantityWithFee * 10**(marketInfo.baseAsset.decimals)).toLocaleString('fullwide', {useGrouping: false })
+            fullSellQuantity = (sellQuantity * 10**(marketInfo.baseAsset.decimals)).toLocaleString('fullwide', {useGrouping: false })
         }
 
         const now_unix = Date.now() / 1000 | 0
