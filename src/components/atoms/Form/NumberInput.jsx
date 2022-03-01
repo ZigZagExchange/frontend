@@ -3,17 +3,18 @@ import Input from "./Input";
 import BaseInputStyle from "./BaseInput.style";
 
 const NumberInput = ({
-     name,
-     placeholder,
-     validate,
-     block,
-     label,
-     value,
-     onChange,
-     hideValidation,
-    rightOfLabel
+  name,
+  placeholder,
+  validate,
+  block,
+  label,
+  value,
+  onChange,
+  hideValidation,
+  rightOfLabel,
 }) => {
-    return <Input
+  return (
+    <Input
       name={name}
       placeholder={placeholder}
       validate={validate}
@@ -26,6 +27,7 @@ const NumberInput = ({
       w={block ? "100%" : "inherit"}
       {...BaseInputStyle}
     />
-}
+  );
+};
 
 export default NumberInput;

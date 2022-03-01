@@ -1,18 +1,18 @@
 article {
-    width: 100%;
+  width: 100%;
 }
 
 article > div {
-    width: 100% !important;
-    height: 100% !important;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 article > div > div {
-    width: 100% !important;
-    height: 100% !important;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 .tradingview_7f572 {
-    width: 300px !important;
-    height: 300px !important;
+  width: 300px !important;
+  height: 300px !important;
 }
