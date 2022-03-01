@@ -15,6 +15,7 @@ export default class APIZKProvider extends APIProvider {
 
     marketInfo = {}
     lastPrices = {}
+    accountState = {}
     ethWallet = null
     syncWallet = null
     syncProvider = null
@@ -87,7 +88,7 @@ export default class APIZKProvider extends APIProvider {
             toast.info('You need to sign a one-time transaction to activate your zksync account.')
         }
         let feeToken = "ETH";
-        const accountState = await this.syncWallet.getAccountState()
+        const accountState = this.accountState ? this.accountState : await this.getAccountState();
         const balances = accountState.committed.balances;
         if (balances.ETH && balances.ETH > 0.005e18) {
             feeToken = "ETH";
@@ -167,12 +168,12 @@ export default class APIZKProvider extends APIProvider {
     }
 
     getBalances = async () => {
-        const account = await this.getAccountState()
+        const accountState = this.accountState ? this.accountState : await this.getAccountState();
         const balances = {}
 
         this.getCurrencies().forEach(ticker => {
             const currencyInfo = this.getCurrencyInfo(ticker);
-            const balance = ((account && account.committed) ? (account.committed.balances[ticker] || 0) : 0)
+            const balance = ((accountState && accountState.committed) ? (accountState.committed.balances[ticker] || 0) : 0)
             if (!balance) return true;
             balances[ticker] = {
                 value: balance,
@@ -185,10 +186,9 @@ export default class APIZKProvider extends APIProvider {
     }
 
     getAccountState = async () => {
-        return this.syncWallet
-            ? this.syncWallet.getAccountState()
-            : {}
-    }
+		this.accountState = (this.syncWallet) ? await this.syncWallet.getAccountState() : {}
+		return this.accountState
+	}
 
     depositL2 = async (amountDecimals, token = 'ETH') => {
         let transfer
@@ -389,7 +389,7 @@ export default class APIZKProvider extends APIProvider {
 
       this.batchTransferService = new BatchTransferService(this.syncProvider, this.syncWallet)
 
-      const accountState = await this.api.getAccountState()
+      const accountState = this.accountState ? this.accountState : await this.getAccountState();
         if (!accountState.id) {
             if (!/^\/bridge(\/.*)?$/.test(window.location.pathname)) {
                 toast.error("Account not found. Please use the bridge to deposit funds before trying again.");
