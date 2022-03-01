@@ -15,6 +15,7 @@ export default class APIZKProvider extends APIProvider {
 
     marketInfo = {}
     lastPrices = {}
+    accountState = {}
     ethWallet = null
     syncWallet = null
     syncProvider = null
@@ -87,7 +88,7 @@ export default class APIZKProvider extends APIProvider {
             toast.info('You need to sign a one-time transaction to activate your zksync account.')
         }
         let feeToken = "ETH";
-        const accountState = await this.syncWallet.getAccountState()
+        const accountState = this.accountState ? this.accountState : await this.getAccountState()
         const balances = accountState.committed.balances;
         if (balances.ETH && balances.ETH > 0.005e18) {
             feeToken = "ETH";
@@ -129,7 +130,14 @@ export default class APIZKProvider extends APIProvider {
             sellQuantity = parseFloat(amount * price)
             sellQuantityWithFee = (sellQuantity + marketInfo.quoteFee).toFixed(marketInfo.quoteAsset.decimals);
             tokenSell = marketInfo.quoteAssetId;
-            tokenBuy = marketInfo.baseAssetId
+            tokenBuy = marketInfo.baseAssetId;
+
+            const accountState = this.accountState ? this.accountState : await this.getAccountState()
+            const balances = accountState.committed.balances;
+            const tokenSellSymbol = marketInfo.quoteAsset.symbol;
+            const balanceQuote = (balances[tokenSellSymbol]).toFixed(marketInfo.quoteAsset.decimals);
+            sellQuantityWithFee = (sellQuantityWithFee < balanceQuote) ? sellQuantityWithFee : balanceQuote;
+
             tokenRatio[marketInfo.baseAssetId] = amount;
             tokenRatio[marketInfo.quoteAssetId] = sellQuantityWithFee;
             fullSellQuantity = (sellQuantityWithFee * 10**(marketInfo.quoteAsset.decimals)).toLocaleString('fullwide', {useGrouping: false })
@@ -167,7 +175,7 @@ export default class APIZKProvider extends APIProvider {
     }
 
     getBalances = async () => {
-        const account = await this.getAccountState()
+        const account = this.accountState ? this.accountState : await this.getAccountState()
         const balances = {}
 
         this.getCurrencies().forEach(ticker => {
@@ -185,9 +193,57 @@ export default class APIZKProvider extends APIProvider {
     }
 
     getAccountState = async () => {
-        return this.syncWallet
-            ? this.syncWallet.getAccountState()
+        this.accountState = this.syncWallet 
+            ? await this.syncWallet.getAccountState() 
             : {}
+        return this.accountState
+    }
+
+    withdrawL2 = async (amountDecimals, token = 'ETH') => {
+        const currencyInfo = this.getCurrencyInfo(token);
+        const amount = toBaseUnit(amountDecimals, currencyInfo.decimals)
+
+        try {
+            const transfer = await this.syncWallet.withdrawFromSyncToEthereum({
+                token,
+                ethAddress: await this.ethWallet.getAddress(),
+                amount,
+            })
+
+            await transfer.awaitReceipt()
+            
+            this.api.emit('bridgeReceipt',
+                this.handleBridgeReceipt(transfer, amountDecimals, token, 'withdraw')
+            )
+            return transfer
+        } catch(err) {
+            console.log(err)
+        }
+    }
+
+    withdrawL2Fast = async (amountDecimals, token) => {
+      if (!this.eligibleFastWithdrawTokens.includes(token)) {
+        throw Error("Token not supported for fast withdraw")
+      }
+
+      const currencyInfo = this.getCurrencyInfo(token)
+      let amount = toBaseUnit(amountDecimals, currencyInfo.decimals)
+
+      // if amount is not packable
+      const isPackable = isTransactionAmountPackable(amount)
+      if (!isPackable) {
+        amount = closestPackableTransactionAmount(amount)
+      }
+
+      const transfer = await this.syncWallet.syncTransfer({
+        to: this._fastWithdrawContractAddress,
+        token,
+        amount
+      })
+      await transfer.awaitReceipt()
+
+      this.api.emit('bridgeReceipt', this.handleFastBridgeReceipt(transfer, amountDecimals, token, 'withdraw'))
+      return transfer
     }
 
     depositL2 = async (amountDecimals, token = 'ETH') => {
@@ -205,7 +261,7 @@ export default class APIZKProvider extends APIProvider {
 
             this.api.emit('bridgeReceipt',
                 this.handleBridgeReceipt(transfer, amountDecimals, token, 'deposit')
-            )
+            )            
             return transfer
         } catch(err) {
             console.log(err)
@@ -387,9 +443,8 @@ export default class APIZKProvider extends APIProvider {
             throw err
         }
 
-      this.batchTransferService = new BatchTransferService(this.syncProvider, this.syncWallet)
-
-      const accountState = await this.api.getAccountState()
+        this.batchTransferService = new BatchTransferService(this.syncProvider, this.syncWallet)
+        const accountState = this.accountState ? this.accountState : await this.getAccountState()
         if (!accountState.id) {
             if (!/^\/bridge(\/.*)?$/.test(window.location.pathname)) {
                 toast.error("Account not found. Please use the bridge to deposit funds before trying again.");
