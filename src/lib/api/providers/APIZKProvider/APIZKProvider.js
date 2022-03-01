@@ -131,6 +131,13 @@ export default class APIZKProvider extends APIProvider {
             sellQuantityWithFee = (sellQuantity + marketInfo.quoteFee).toFixed(marketInfo.quoteAsset.decimals);
             tokenSell = marketInfo.quoteAssetId;
             tokenBuy = marketInfo.baseAssetId
+
+            const accountState = this.accountState ? this.accountState : await this.getAccountState();
+            const balances = accountState.committed.balances;
+            const tokenSellSymbol = marketInfo.quoteAsset.symbol;
+            const balanceQuote = (balances[tokenSellSymbol]).toFixed(marketInfo.quoteAsset.decimals);
+            sellQuantityWithFee = (sellQuantityWithFee < balanceQuote) ? sellQuantityWithFee : balanceQuote;
+
             tokenRatio[marketInfo.baseAssetId] = amount;
             tokenRatio[marketInfo.quoteAssetId] = sellQuantityWithFee;
             fullSellQuantity = (sellQuantityWithFee * 10**(marketInfo.quoteAsset.decimals)).toLocaleString('fullwide', {useGrouping: false })
