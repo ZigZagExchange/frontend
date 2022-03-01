@@ -53,7 +53,7 @@ const TradePriceTable = (props) => {
                 : d.td1;
             const amount =
               typeof d.td2 === "number" 
-                ? ((d.td2 > 999) ? d.td2.toFixed(0) : d.td2.toPrecision(6))
+                ? ((d.td2 > 999) ? d.td2.toFixed(0) : (d.td2.toFixed(4)).toPrecision(4))
                 : d.td2;
             const total =
               typeof d.td3 === "number" 
