@@ -236,7 +236,9 @@ class TradePriceBtcTable extends React.Component {
             {d.td1.replace("-", "/")}
             <span>{d.span}</span>
           </td>
-          <td className={d.td3 < 0 ? "down_value" : "up_value"}>{d.td2}</td>
+          <td className={d.td3 < 0 ? "down_value" : "up_value"}>{
+            ((d.td2 > 99999) ? d.td2.toFixed(0) : d.td2.toPrecision(5)) 
+          }</td>
           <td className={d.td3 < 0 ? "down_value" : "up_value"}>{d.td3}%</td>
         </tr>
       );
