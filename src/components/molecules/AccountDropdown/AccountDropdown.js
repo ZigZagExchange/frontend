@@ -1,4 +1,4 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import React, { useState, useEffect } from "react";
 import { IoMdLogOut } from "react-icons/io";
 import { AiOutlineCaretDown } from "react-icons/ai";
@@ -9,9 +9,12 @@ import { userSelector } from "lib/store/features/auth/authSlice";
 import {
   networkSelector,
   balancesSelector,
+  layoutSelector,
 } from "lib/store/features/api/apiSlice";
 import { formatUSD } from "lib/utils";
 import api from "lib/api";
+import { Modal } from "components/atoms/Modal/Modal";
+import { setLayout } from "lib/helpers/storage/layouts";
 
 const DropdownDisplay = styled.div`
   position: absolute;
@@ -207,12 +210,52 @@ const LoaderContainer = styled.div`
   height: 100px;
 `;
 
+const LayoutItem = styled.ul`
+  width: 100%;
+  
+  margin: 5px;
+  font-size: 19px;
+
+`;
+
+const LayoutList = styled.ul`
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+  list-style-type: none;
+  padding: 20px 0;
+
+  ${LayoutItem}:nth-child(${(props) => props.layout + 1}) {
+    color: gray;
+  }
+`;
+
+
 export const AccountDropdown = () => {
+  const dispatch = useDispatch();
+
   const user = useSelector(userSelector);
   const network = useSelector(networkSelector);
   const balanceData = useSelector(balancesSelector);
   const [show, setShow] = useState(false);
+  
+  const layout = useSelector(layoutSelector);
+  const [showLayout, setShowLayout] = useState(false);
+  const [selectedLayout, setSelectedLayout ] = useState(layout);
+  
+  const changeLayout = (l) => {
+    
+    //local state
+    dispatch({type: 'api/setLayout', payload: l});
+    setLayout(l);
+
+    setSelectedLayout(l);
+  }
+
   const [selectedLayer, setSelectedLayer] = useState(2);
+  
+
   const coinEstimator = useCoinEstimator();
   const { profile } = user;
 
@@ -268,20 +311,69 @@ export const AccountDropdown = () => {
       <DropdownDisplay>
         <DropdownHeader>
           <h3>Your Wallet</h3>
-          <WalletToggle>
-            <WalletToggleItem
-              onClick={() => setSelectedLayer(1)}
-              show={selectedLayer === 1}
-            >
-              L1
-            </WalletToggleItem>
-            <WalletToggleItem
-              onClick={() => setSelectedLayer(2)}
-              show={selectedLayer === 2}
-            >
-              L2
-            </WalletToggleItem>
-          </WalletToggle>
+          
+          <div>
+            
+              <div onClick={() => setShowLayout(!showLayout)} tabIndex="0">
+                Layouts
+                <AiOutlineCaretDown />
+              </div>
+
+
+              <Modal title="Layouts"
+                show={showLayout}
+                onClose={() => setShowLayout(!showLayout)}
+                >
+                  <LayoutList layout={selectedLayout}>
+                    <LayoutItem
+                      onClick={() => changeLayout(0)}>
+                      image
+                      <div>
+                        sidebar / books / chart
+                      </div>
+                    </LayoutItem>
+                    <LayoutItem
+                      onClick={() => changeLayout(1)}>
+                        image
+                        <div>
+                          sidebar / chart / books
+                        </div>
+                    </LayoutItem>
+                    <LayoutItem
+                      onClick={() => changeLayout(2)}>
+                        image
+                        <div>
+                          books / chart / sidebar
+                        </div>
+                    </LayoutItem>
+                    <LayoutItem
+                      onClick={() => changeLayout(3)}>
+                        image
+                        <div>chart / books / sidebar</div>
+                    </LayoutItem>
+                  </LayoutList>
+                </Modal>
+          </div>
+
+
+
+          <div>
+            <WalletToggle>
+
+              <WalletToggleItem
+                onClick={() => setSelectedLayer(1)}
+                show={selectedLayer === 1}
+              >
+                L1
+              </WalletToggleItem>
+              <WalletToggleItem
+                onClick={() => setSelectedLayer(2)}
+                show={selectedLayer === 2}
+              >
+                L2
+              </WalletToggleItem>
+            </WalletToggle>
+          </div>
         </DropdownHeader>
         <DropdownContent>
           {!wallet && (
@@ -289,6 +381,7 @@ export const AccountDropdown = () => {
               <Loader type="TailSpin" color="#444" height={24} width={24} />
             </LoaderContainer>
           )}
+
           {wallet && (
             <CurrencyList>
               {Object.keys(wallet)

@@ -16,6 +16,7 @@ import apiReducer, {
   clearUserOrders,
   clearLastPrices,
   setArweaveAllocation,
+  setLayout
 } from "lib/store/features/api/apiSlice";
 import autoMergeLevel2 from "redux-persist/lib/stateReconciler/autoMergeLevel2";
 import api from "lib/api";
@@ -78,6 +79,10 @@ api.on("balanceUpdate", (network, balances) => {
 
 api.on("arweaveAllocationUpdate", (bytes) => {
   store.dispatch(setArweaveAllocation(bytes));
+});
+
+api.on("layoutUpdate", (layout) => {
+  store.dispatch(setLayout(layout));
 });
 
 api.on("signIn", (accountState) => {

@@ -1,6 +1,7 @@
 import { createSlice, createAction } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 import api from "lib/api";
+import { getLayout } from "lib/helpers/storage/layouts";
 
 const makeScope = (state) => `${state.network}-${state.userId}`;
 
@@ -9,6 +10,7 @@ export const apiSlice = createSlice({
   initialState: {
     network: 1,
     userId: null,
+    layout: getLayout() || 0,
     currentMarket: "ETH-USDC",
     marketFills: {},
     bridgeReceipts: [],
@@ -336,6 +338,10 @@ export const apiSlice = createSlice({
     setArweaveAllocation(state, { payload }) {
       state.arweaveAllocation = payload;
     },
+
+    setLayout(state, { payload }){
+      state.layout = payload;
+    },
   },
 });
 
@@ -350,8 +356,10 @@ export const {
   clearUserOrders,
   clearLastPrices,
   setArweaveAllocation,
+  setLayout
 } = apiSlice.actions;
 
+export const layoutSelector = (state) => state.api.layout;
 export const networkSelector = (state) => state.api.network;
 export const userOrdersSelector = (state) => state.api.userOrders;
 export const userFillsSelector = (state) => state.api.userFills;
