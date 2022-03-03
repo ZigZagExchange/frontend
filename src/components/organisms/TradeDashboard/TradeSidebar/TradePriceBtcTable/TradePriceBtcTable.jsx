@@ -60,7 +60,7 @@ class TradePriceBtcTable extends React.Component {
     //search all, if you'd prefer to search the current category just set this to use `state.pairs` instead
     //
     this.props.rowData.forEach((row) => {
-      var pair_name = row.td1;
+      var pair_name = row.td1.toUpperCase();
 
       //if found query, push it to found pairs
       if (
