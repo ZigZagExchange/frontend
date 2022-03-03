@@ -15,6 +15,7 @@ import { formatUSD } from "lib/utils";
 import api from "lib/api";
 import { Modal } from "components/atoms/Modal/Modal";
 import { setLayout } from "lib/helpers/storage/layouts";
+import { FaTable } from "react-icons/fa";
 
 const DropdownDisplay = styled.div`
   position: absolute;
@@ -212,19 +213,17 @@ const LoaderContainer = styled.div`
 
 const LayoutItem = styled.ul`
   width: 100%;
-  
-  margin: 5px;
-  font-size: 19px;
+  font-size: 15px;
 
+  padding: 5px;
+  margin: 5px;
 `;
 
 const LayoutList = styled.ul`
   display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  justify-content: flex-start;
-  list-style-type: none;
-  padding: 20px 0;
+  justify-content: space-between;
+
+  padding: 0;
 
   ${LayoutItem}:nth-child(${(props) => props.layout + 1}) {
     color: gray;
@@ -327,32 +326,32 @@ export const AccountDropdown = () => {
                   <LayoutList layout={selectedLayout}>
                     <LayoutItem
                       onClick={() => changeLayout(0)}>
-                      image
+                      <FaTable size="2xl"/>
                       <div>
                         sidebar / books / chart
                       </div>
                     </LayoutItem>
                     <LayoutItem
                       onClick={() => changeLayout(1)}>
-                        image
+                        <FaTable size="2xl"/>
                         <div>
                           sidebar / chart / books
                         </div>
                     </LayoutItem>
                     <LayoutItem
                       onClick={() => changeLayout(2)}>
-                        image
-                        <div>
+                      
+                        <div><FaTable size="2xl"/>
                           books / chart / sidebar
                         </div>
                     </LayoutItem>
                     <LayoutItem
                       onClick={() => changeLayout(3)}>
-                        image
-                        <div>chart / books / sidebar</div>
+                        <div>
+                      <FaTable size="2xl"/>chart / books / sidebar</div>
                     </LayoutItem>
                   </LayoutList>
-                </Modal>
+              </Modal>
           </div>
 
 
