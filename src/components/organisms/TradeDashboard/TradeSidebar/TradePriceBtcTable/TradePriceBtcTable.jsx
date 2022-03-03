@@ -49,9 +49,13 @@ class TradePriceBtcTable extends React.Component {
   }
 
   searchPair(value) {
-    value = value.toUpperCase().replace("/", "-");
+    value = value.toUpperCase()
+      .replace("/", "-")
+      .replace(" ", "-");
     var foundPairs = [];
 
+    var [base, quote] = value.split("-");
+    var reverseValue = quote + "-" + base;
     //
     //search all, if you'd prefer to search the current category just set this to use `state.pairs` instead
     //
@@ -59,7 +63,10 @@ class TradePriceBtcTable extends React.Component {
       var pair_name = row.td1;
 
       //if found query, push it to found pairs
-      if (pair_name.includes(value)) {
+      if (
+        pair_name.includes(value) ||
+        pair_name.includes(reverseValue)
+      ) {
         foundPairs.push(row);
       }
     });
