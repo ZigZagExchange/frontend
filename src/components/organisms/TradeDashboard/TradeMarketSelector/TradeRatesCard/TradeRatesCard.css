@@ -12,6 +12,11 @@
   margin-right: 10px;
 }
 
+.rates_box_symbol {
+  height: 1.2rem;
+  margin-right: 0.3rem;
+}
+
 .rates_box_label {
   display: inline-flex;
   height: 20px;
@@ -40,6 +45,7 @@
 
 .rb_text_1 p {
   color: #94a2c9;
+  margin-left: 1.7rem;
 }
 
 .rb_text_2 h1 {

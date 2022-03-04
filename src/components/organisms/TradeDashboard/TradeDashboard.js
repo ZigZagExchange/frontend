@@ -149,16 +149,21 @@ export function TradeDashboard() {
     const quoteCurrencyUSDC = quoteCurrency + "-USDC";
     let quoteCurrencyPrice = 0;
     if (quoteCurrency === "USDC") {
-        quoteCurrencyPrice = 1;
+      quoteCurrencyPrice = 1;
     }
     if (lastPrices[quoteCurrencyUSDC]) {
-        quoteCurrencyPrice = lastPrices[quoteCurrencyUSDC].price;
+      quoteCurrencyPrice = lastPrices[quoteCurrencyUSDC].price;
     }
     let usdVolume = 0;
     usdVolume = lastPrices[market].quoteVolume * quoteCurrencyPrice;
-    lastPriceTableData.push({ td1: market, td2: price, td3: pctchange, usdVolume });
+    lastPriceTableData.push({
+      td1: market,
+      td2: price,
+      td3: pctchange,
+      usdVolume,
+    });
   });
-  lastPriceTableData.sort((a,b) => b.usdVolume - a.usdVolume);
+  lastPriceTableData.sort((a, b) => b.usdVolume - a.usdVolume);
 
   const orderbookBids = [];
   const orderbookAsks = [];
