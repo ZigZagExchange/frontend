@@ -151,9 +151,9 @@ export const apiSlice = createSlice({
               toast.success(
                 `Your ${sideText} order for ${
                   noFeeOrder.baseQuantity.toPrecision(4) / 1
-                } ${baseCurrency} @ ${
+                } ${baseCurrency} was filled @ ${
                   noFeeOrder.price.toPrecision(4) / 1
-                } was filled!`
+                }!`
               );
             }
             break;
