@@ -44,7 +44,7 @@ class TradePriceBtcTable extends React.Component {
 
   componentDidUpdate() {
     if (this.state.pairs.length === 0 && this.props.rowData.length !== 0) {
-      this.setState({ pairs: this.props.rowData });
+      this.setState({ pairs: this.props.rowData.map(r => r.td1) });
     }
   }
 
@@ -67,7 +67,7 @@ class TradePriceBtcTable extends React.Component {
         pair_name.includes(value) ||
         pair_name.includes(reverseValue)
       ) {
-        foundPairs.push(row);
+        foundPairs.push(row.td1);
       }
     });
 
@@ -119,7 +119,7 @@ class TradePriceBtcTable extends React.Component {
 
             //if found query, push it to found pairs
             if (pair_name.includes(value.toUpperCase())) {
-              foundPairs.push(row);
+              foundPairs.push(pair_name);
             }
           });
         });
@@ -217,7 +217,8 @@ class TradePriceBtcTable extends React.Component {
     var changeDirection = this.state.changeDirection;
     var priceDirection = this.state.priceDirection;
 
-    const shown_pairs = pairs.map((d, i) => {
+    const shown_pairs = pairs.map((pair, i) => {
+      const d = this.props.rowData.find(row => row.td1 === pair);
       var selected = this.props.currentMarket === d.td1; //if current market selected
       var isFavourited = this.state.favourites.includes(d.td1); //if contains, isFavourited
 
