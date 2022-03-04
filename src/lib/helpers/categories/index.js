@@ -8,8 +8,8 @@ export function getStables(rows) {
       //check if this has a stable coin inside of the pair
       if (row.td1.includes(stable.toUpperCase())) {
         //check if already in found results, no need to add it twice.
-        if (!found_stables.includes(row)) {
-          found_stables.push(row);
+        if (!found_stables.includes(row.td1)) {
+          found_stables.push(row.td1);
         }
       }
     });
