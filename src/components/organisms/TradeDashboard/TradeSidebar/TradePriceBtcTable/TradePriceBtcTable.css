@@ -7,11 +7,22 @@
   transition: opacity 0.2s ease-in-out;
   user-select: none;
   cursor: pointer;
-  opacity: 0.8;
 }
 
 .trade_price_btc_table thead:hover,
 .trade_price_btc_table thead:focus {
+  opacity: 1;
+}
+
+.trade_price_btc_table thead tr {
+  transition: opacity 0.2s ease-in-out;
+  user-select: none;
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.trade_price_btc_table thead tr:hover,
+.trade_price_btc_table thead tr:focus {
   opacity: 1;
 }
 
