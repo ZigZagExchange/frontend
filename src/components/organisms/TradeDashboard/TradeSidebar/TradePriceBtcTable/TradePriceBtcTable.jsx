@@ -44,7 +44,7 @@ class TradePriceBtcTable extends React.Component {
 
   componentDidUpdate() {
     if (this.state.pairs.length === 0 && this.props.rowData.length !== 0) {
-      this.setState({ pairs: this.props.rowData });
+      this.setState({ pairs: this.props.rowData.map(r => r.td1) });
     }
   }
 
@@ -67,7 +67,7 @@ class TradePriceBtcTable extends React.Component {
         pair_name.includes(value) ||
         pair_name.includes(reverseValue)
       ) {
-        foundPairs.push(row);
+        foundPairs.push(row.td1);
       }
     });
 
@@ -99,7 +99,7 @@ class TradePriceBtcTable extends React.Component {
 
     switch (category_name) {
       case "ALL":
-        this.setState({ pairs: this.props.rowData });
+        this.setState({ pairs: this.props.rowData.map(row => row.td1) });
         break;
       case "STABLES":
         //look for pairs against stables.
@@ -119,7 +119,7 @@ class TradePriceBtcTable extends React.Component {
 
             //if found query, push it to found pairs
             if (pair_name.includes(value.toUpperCase())) {
-              foundPairs.push(row);
+              foundPairs.push(pair_name);
             }
           });
         });
@@ -217,16 +217,17 @@ class TradePriceBtcTable extends React.Component {
     var changeDirection = this.state.changeDirection;
     var priceDirection = this.state.priceDirection;
 
-    const shown_pairs = pairs.map((d, i) => {
-      var selected = this.props.currentMarket === d.td1; //if current market selected
-      var isFavourited = this.state.favourites.includes(d.td1); //if contains, isFavourited
+    const shown_pairs = pairs.map((pair, i) => {
+      const d = this.props.rowData.find(row => row.td1 === pair);
+      var selected = this.props.currentMarket === pair; //if current market selected
+      var isFavourited = this.state.favourites.includes(pair); //if contains, isFavourited
 
       return (
         <tr
           key={i}
           onClick={(e) => {
             if (selected) return;
-            this.props.updateMarketChain(d.td1);
+            this.props.updateMarketChain(pair);
           }}
           className={selected ? "selected" : ""}
         >
@@ -240,7 +241,7 @@ class TradePriceBtcTable extends React.Component {
               {isFavourited ? <BsStarFill /> : <BsStar />}
             </span>
 
-            {d.td1.replace("-", "/")}
+            {pair.replace("-", "/")}
             <span>{d.span}</span>
           </td>
           <td className={d.td3 < 0 ? "down_value" : "up_value"}>{d.td2}</td>
@@ -291,6 +292,7 @@ class TradePriceBtcTable extends React.Component {
   }
 
   render() {
+    console.log(this.state.pairs);
     return (
       <>
         <SearchBox searchPair={this.searchPair} className="pairs_searchbox" />
