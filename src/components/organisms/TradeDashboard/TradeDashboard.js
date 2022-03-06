@@ -199,7 +199,7 @@ export function TradeDashboard() {
     const quoteCurrency = market.split("-")[1];
     const quoteCurrencyUSDC = quoteCurrency + "-USDC";
     let quoteCurrencyPrice = 0;
-    if (quoteCurrency === "USDC") {
+    if (quoteCurrency === "USDC" || quoteCurrency === "USDT") {
         quoteCurrencyPrice = 1;
     }
     if (lastPrices[quoteCurrencyUSDC]) {
