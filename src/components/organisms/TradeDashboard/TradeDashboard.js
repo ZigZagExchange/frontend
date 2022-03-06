@@ -207,11 +207,10 @@ export function TradeDashboard() {
     .sort((a, b) => b[1] - a[1])
     .forEach((fill) => {
       if (api.isZksyncChain()) {
-        const fillWithoutFee = api.getFillDetailsWithoutFee(fill);
         fillData.push({
-          td1: fillWithoutFee.price,
-          td2: fillWithoutFee.baseQuantity,
-          td3: fillWithoutFee.quoteQuantity,
+          td1: fill[4],
+          td2: fill[5],
+          td3: fill[4] * fill[5],
           side: fill[3],
         });
       } else {
