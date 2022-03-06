@@ -138,9 +138,9 @@ class TradePriceBtcTable extends React.Component {
   }
 
   favouritePair(pair) {
+    var favourites = [];
     var isFavourited = fetchFavourites().includes(pair.td1);
 
-    var favourites = [];
     if (!isFavourited) {
       favourites = addFavourite(pair.td1);
     } else {
@@ -156,14 +156,17 @@ class TradePriceBtcTable extends React.Component {
     var toggled = !this.state.changeDirection;
     var sorted_pairs = this.state.pairs;
 
-    sorted_pairs.sort(function compareFn(firstEl, secondEl) {
+    sorted_pairs.sort((frstEl, secondEl) => {
+      var firstRow =  this.props.rowData.find((row => row.td1.includes(frstEl) && row));
+      var secondRow =  this.props.rowData.find((row => row.td1.includes(secondEl) && row));
+      
       if (toggled) {
         //console.log(firstEl.td3, secondEl.td3, (parseInt(secondEl.td3) - parseInt(firstEl.td3)))
-        return parseInt(firstEl.td3) - parseInt(secondEl.td3);
+        return parseInt(firstRow.td3) - parseInt(secondRow.td3);
       } else {
         //reverse
         //console.log(secondEl.td3, firstEl.td3, (parseInt(secondEl.td3) - parseInt(firstEl.td3)))
-        return parseInt(secondEl.td3) - parseInt(firstEl.td3);
+        return parseInt(secondRow.td3) - parseInt(firstRow.td3);
       }
     });
     this.setState({
@@ -181,11 +184,14 @@ class TradePriceBtcTable extends React.Component {
 
     var sorted_pairs = this.state.pairs;
 
-    sorted_pairs.sort(function compareFn(firstEl, secondEl) {
+    sorted_pairs.sort((frstEl, secondEl) => {
+      var firstRow =  this.props.rowData.find((row => row.td1.includes(frstEl) && row));
+      var secondRow =  this.props.rowData.find((row => row.td1.includes(secondEl) && row));
+
       if (toggled) {
-        return parseInt(firstEl.td2) - parseInt(secondEl.td2);
+        return parseInt(firstRow.td2) - parseInt(secondRow.td2);
       } else {
-        return parseInt(secondEl.td2) - parseInt(firstEl.td2);
+        return parseInt(secondRow.td2) - parseInt(firstRow.td2);
       }
     });
     this.setState({
@@ -219,6 +225,7 @@ class TradePriceBtcTable extends React.Component {
 
     const shown_pairs = pairs.map((pair, i) => {
       const d = this.props.rowData.find(row => row.td1 === pair);
+      
       var selected = this.props.currentMarket === pair; //if current market selected
       var isFavourited = this.state.favourites.includes(pair); //if contains, isFavourited
 
