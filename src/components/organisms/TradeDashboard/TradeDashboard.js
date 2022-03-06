@@ -338,8 +338,7 @@ export function TradeDashboard() {
   const activeUserOrders = Object.values(userOrders).filter((order) =>
     activeOrderStatuses.includes(order[9])
   ).length;
-
-  console.log("layout:", layout);
+  
   return (
     <TradeContainer>
       <TradeGrid layout={layout}>
