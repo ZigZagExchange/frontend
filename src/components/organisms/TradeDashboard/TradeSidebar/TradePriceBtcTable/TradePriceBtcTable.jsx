@@ -219,7 +219,7 @@ class TradePriceBtcTable extends React.Component {
 
     const shown_pairs = pairs.map((pair, i) => {
       const d = this.props.rowData.find(row => row.td1 === pair);
-      if (!d) return;
+      if (!d) return "";
       var selected = this.props.currentMarket === pair; //if current market selected
       var isFavourited = this.state.favourites.includes(pair); //if contains, isFavourited
 
