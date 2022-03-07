@@ -75,7 +75,7 @@ class TradeRatesCard extends React.Component {
                 (this.props.marketSummary.priceChange / 1).toFixed(
                   marketInfo.pricePrecisionDecimals
                 )}{" "}
-              {percentChange}%
+              {percentChange!=='NaN' && `${percentChange}%`}
             </p>
           </div>
           <div className="rates_box rb_text_4 hide_md">
