@@ -25,7 +25,7 @@ const TradePriceTable = (props) => {
 
   return (
     <>
-      <table className={`trade_price_table ${props.className}`}>
+      <table className={`zig_scrollstyle trade_price_table ${props.className}`}>
         {props.head && (
           <thead>
             <tr>

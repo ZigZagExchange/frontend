@@ -110,12 +110,12 @@ class TradePriceBtcTable extends React.Component {
         break;
       case "FAVOURITES":
         //set favourites from localstorage
-        var favourites = fetchFavourites();
+        let favourites = fetchFavourites();
         foundPairs = [];
 
         favourites.forEach((value) => {
           this.props.rowData.forEach((row) => {
-            var pair_name = row.td1;
+            let pair_name = row.td1;
 
             //if found query, push it to found pairs
             if (pair_name.includes(value.toUpperCase())) {
@@ -154,7 +154,7 @@ class TradePriceBtcTable extends React.Component {
 
   toggleChangeSorting() {
     var toggled = !this.state.changeDirection;
-    var sorted_pairs = this.state.pairs;
+    var sorted_pairs = [...this.state.pairs];
 
     sorted_pairs.sort(function compareFn(firstEl, secondEl) {
       if (toggled) {
@@ -166,6 +166,7 @@ class TradePriceBtcTable extends React.Component {
         return parseInt(secondEl.td3) - parseInt(firstEl.td3);
       }
     });
+
     this.setState({
       pairs: sorted_pairs,
 
@@ -268,7 +269,7 @@ class TradePriceBtcTable extends React.Component {
               )}
               Price
             </th>
-            <th onClick={() => this.toggleChangeSorting()}>
+            <th style={{ minWidth: 108 }} onClick={() => this.toggleChangeSorting()}>
               {changeSorted ? (
                 changeDirection ? (
                   <FaSortDown />
@@ -293,7 +294,6 @@ class TradePriceBtcTable extends React.Component {
   }
 
   render() {
-    console.log(this.state.pairs);
     return (
       <>
         <SearchBox searchPair={this.searchPair} className="pairs_searchbox" />
@@ -303,7 +303,7 @@ class TradePriceBtcTable extends React.Component {
           initialValue="ALL"
         />
 
-        <div className="trade_price_btc_table">
+        <div className="trade_price_btc_table zig_scrollstyle">
           {this.renderPairs(this.state.pairs)}
         </div>
       </>

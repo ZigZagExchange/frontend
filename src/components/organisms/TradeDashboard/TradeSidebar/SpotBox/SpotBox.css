@@ -102,6 +102,10 @@
   cursor: pointer;
 }
 
+.spot_tabs .st_l h2.trade_price_active_tab {
+  color: #08aff3;
+}
+
 .spot_tabs .st_l div h2 {
   margin-right: 5px;
 }

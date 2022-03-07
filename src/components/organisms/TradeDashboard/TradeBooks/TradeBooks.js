@@ -20,11 +20,11 @@ const StyledTradeBooks = styled.section`
   & .trade_price_head_third {
     display: flex;
     align-items: center;
-    color: #94a2c9;
-    background: rgba(0, 0, 0, 0.5);
+    color: #798ec9;
     height: 30px;
     margin-bottom: 10px;
-
+    opacity: 0.85;
+    border-bottom: 1px solid #333;
     & strong {
       border-radius: 10px;
       font-size: 12px;
@@ -42,35 +42,39 @@ export default function TradeBooks(props) {
 
   // Only display recent trades
   // There's a bunch of user trades in this list that are too old to display
-  const fillData = [];
   const maxFillId = Math.max(...Object.values(marketFills).map((f) => f[1]));
-  Object.values(marketFills)
+
+ let fillData = Object.values(marketFills)
     .filter((fill) => fill[1] > maxFillId - 500)
     .sort((a, b) => b[1] - a[1])
-    .forEach((fill) => {
-      if (api.isZksyncChain()) {
-        const fillWithoutFee = api.getFillDetailsWithoutFee(fill);
-        fillData.push({
-          td1: fillWithoutFee.price,
-          td2: fillWithoutFee.baseQuantity,
-          td3: fillWithoutFee.quoteQuantity,
-          side: fill[3],
-        });
-      } else {
-        fillData.push({
-          td1: fill[4],
-          td2: fill[5],
-          td3: fill[4] * fill[5],
-          side: fill[3],
-        });
-      }
-    });
+  
+  if (api.isZksyncChain()) {
+    fillData = fillData
+      .filter(fill => fill[6] !== 'r')
+      .map((fill) => [fill[3], api.getFillDetailsWithoutFee(fill)])
+      .map(([side, fill]) => ({
+        td1: fill.price,
+        td2: fill.baseQuantity,
+        td3: fill.quoteQuantity,
+        side,
+      }))
+  } else {
+    fillData = fillData.map(fill => ({
+      td1: fill[4],
+      td2: fill[5],
+      td3: fill[4] * fill[5],
+      side: fill[3],
+    }))
+  }
+  
+
   let openOrdersLatestTradesData;
   if (marketDataTab === "orders") {
     openOrdersLatestTradesData = openOrdersData;
   } else if (marketDataTab === "fills") {
     openOrdersLatestTradesData = fillData;
   }
+
   return (
     <>
       <StyledTradeBooks>

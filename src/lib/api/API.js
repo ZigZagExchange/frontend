@@ -460,6 +460,7 @@ export default class API extends Emitter {
         const baseQuantity = fill[5];
         const quoteQuantity = fill[4] * fill[5];
         const market = fill[2];
+        const status = fill[6] || 'r';
         let baseQuantityWithoutFee, quoteQuantityWithoutFee, priceWithoutFee;
         const marketInfo = this.apiProvider.marketInfo[market];
         if (!marketInfo) {
@@ -467,6 +468,7 @@ export default class API extends Emitter {
                 price: 1,
                 quoteQuantity: 1,
                 baseQuantity: 1,
+                status,
             };
         }
         if (side === "s") {
@@ -484,6 +486,7 @@ export default class API extends Emitter {
             price: priceWithoutFee,
             quoteQuantity: quoteQuantityWithoutFee,
             baseQuantity: baseQuantityWithoutFee,
+            status,
         };
     }
 

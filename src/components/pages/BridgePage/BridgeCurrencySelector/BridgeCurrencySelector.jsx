@@ -114,9 +114,7 @@ const BridgeCurrencySelector = ({
   const network = useSelector(networkSelector);
   const user = useSelector(userSelector);
   const coinEstimator = useCoinEstimator();
-  const tickers = api.getCurrencies();
-
-  var [availableTickers, setTickers] = useState(tickers);
+  var [tickers, setTickers] = useState(api.getCurrencies());
 
   useEffect(() => {
     onChange(api.marketInfo["ETH"] ? "ETH" : tickers[0]);
@@ -198,7 +196,7 @@ const BridgeCurrencySelector = ({
       >
         <SearchBox searchPair={searchPair} className="bridge_searchbox" />
         <BridgeCurrencyOptions>
-          {availableTickers.map((ticker, key) =>
+          {tickers.map((ticker, key) =>
             ticker === value ? null : (
               <li
                 key={key}
