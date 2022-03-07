@@ -11,10 +11,22 @@ const StyledTradeFooter = styled.footer`
   font-size: 12px;
 `;
 
+const StyledStatus = styled.a`
+  font-size: 12px;
+  color: #94a2c9;
+  text-decoration: none;
+  &:hover {
+    color: white;
+    text-decoration: underline;
+  }
+`;
+
 export default function TradeFooter() {
   return (
     <StyledTradeFooter>
-      <div></div>
+      <StyledStatus href="https://status.zigzag.exchange/ " target="_blank">
+        Status
+      </StyledStatus>
       <div>Powered By zkSync</div>
     </StyledTradeFooter>
   );

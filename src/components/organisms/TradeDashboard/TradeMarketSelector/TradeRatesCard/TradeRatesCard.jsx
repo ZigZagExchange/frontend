@@ -1,5 +1,6 @@
 import React from "react";
 // css
+import api from "lib/api";
 import "./TradeRatesCard.css";
 
 class TradeRatesCard extends React.Component {
@@ -38,7 +39,7 @@ class TradeRatesCard extends React.Component {
     let marketDisplay = "--/--";
     if (this.state.marketInfo) {
       marketInfo = this.state.marketInfo;
-      marketDisplay = `${marketInfo.baseAsset.symbol}/${marketInfo.quoteAsset.symbol}`;
+      marketDisplay = <div><img src={api.getCurrencyLogo(marketInfo.baseAsset.symbol).default} alt={marketInfo.baseAsset.symbol} className="rates_box_symbol" />{marketInfo.baseAsset.symbol}/{marketInfo.quoteAsset.symbol}</div>;
     }
     const percentChange = (
       (this.props.marketSummary.priceChange / this.props.marketSummary.price) *
