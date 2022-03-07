@@ -43,7 +43,7 @@ class TradePriceBtcTable extends React.Component {
   }
 
   componentDidUpdate() {
-    if (this.state.pairs.length === 0 && this.props.rowData.length !== 0) {
+    if (this.state.categorySelected!=='FAVOURITES' && this.state.pairs.length === 0 && this.props.rowData.length !== 0) {
       this.setState({ pairs: this.props.rowData.map(r => r.td1) });
     }
   }
@@ -293,7 +293,6 @@ class TradePriceBtcTable extends React.Component {
   }
 
   render() {
-    console.log(this.state.pairs);
     return (
       <>
         <SearchBox searchPair={this.searchPair} className="pairs_searchbox" />
