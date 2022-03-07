@@ -231,8 +231,8 @@ export class OrdersTable extends React.Component {
                 marketInfo.quoteFee + " " + marketInfo.quoteAsset.symbol;
             }
             if (api.isZksyncChain()) {
-              price = fill[4];
-              baseQuantity = fill[5];
+              price = Number(fill[4]);
+              baseQuantity = Number(fill[5]);
             }
             let statusText, statusClass;
             switch (fillstatus) {

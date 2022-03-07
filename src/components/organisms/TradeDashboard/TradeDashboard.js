@@ -206,21 +206,12 @@ export function TradeDashboard() {
     .filter((fill) => fill[1] > maxFillId - 500 && fill[6] !== "r")
     .sort((a, b) => b[1] - a[1])
     .forEach((fill) => {
-      if (api.isZksyncChain()) {
-        fillData.push({
-          td1: fill[4],
-          td2: fill[5],
-          td3: fill[4] * fill[5],
-          side: fill[3],
-        });
-      } else {
-        fillData.push({
-          td1: fill[4],
-          td2: fill[5],
-          td3: fill[4] * fill[5],
-          side: fill[3],
-        });
-      }
+      fillData.push({
+        td1: Number(fill[4]),
+        td2: Number(fill[5]),
+        td3: Number(fill[4] * fill[5]),
+        side: fill[3],
+      });
     });
 
   if (api.isZksyncChain()) {
