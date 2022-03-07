@@ -5,7 +5,6 @@ import TradePriceTable from "./TradePriceTable/TradePriceTable";
 import TradePriceHeadSecond from "./TradePriceHeadSecond/TradePriceHeadSecond";
 import { Tabs } from "components";
 import { marketFillsSelector } from "lib/store/features/api/apiSlice";
-import api from "lib/api";
 
 const StyledTradeBooks = styled.section`
   display: flex;
