@@ -5,7 +5,6 @@ import TradePriceTable from "./TradePriceTable/TradePriceTable";
 import TradePriceHeadSecond from "./TradePriceHeadSecond/TradePriceHeadSecond";
 import { Tabs } from "components";
 import { marketFillsSelector } from "lib/store/features/api/apiSlice";
-import api from "lib/api";
 
 const StyledTradeBooks = styled.section`
   display: flex;
@@ -48,22 +47,12 @@ export default function TradeBooks(props) {
     .filter((fill) => fill[1] > maxFillId - 500)
     .sort((a, b) => b[1] - a[1])
     .forEach((fill) => {
-      if (api.isZksyncChain()) {
-        const fillWithoutFee = api.getFillDetailsWithoutFee(fill);
-        fillData.push({
-          td1: fillWithoutFee.price,
-          td2: fillWithoutFee.baseQuantity,
-          td3: fillWithoutFee.quoteQuantity,
-          side: fill[3],
-        });
-      } else {
-        fillData.push({
-          td1: fill[4],
-          td2: fill[5],
-          td3: fill[4] * fill[5],
-          side: fill[3],
-        });
-      }
+      fillData.push({
+        td1: Number(fill[4]),
+        td2: Number(fill[5]),
+        td3: Number(fill[4] * fill[5]),
+        side: fill[3],
+      });
     });
   let openOrdersLatestTradesData;
   if (marketDataTab === "orders") {
