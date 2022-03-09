@@ -39,7 +39,7 @@ class TradeRatesCard extends React.Component {
     let marketDisplay = "--/--";
     if (this.state.marketInfo) {
       marketInfo = this.state.marketInfo;
-      marketDisplay = <div><img src={api.getCurrencyLogo(marketInfo.baseAsset.symbol).default} alt={marketInfo.baseAsset.symbol} className="rates_box_symbol" />{marketInfo.baseAsset.symbol}/{marketInfo.quoteAsset.symbol}</div>;
+      marketDisplay = <div>{marketInfo.baseAsset.symbol}/{marketInfo.quoteAsset.symbol}</div>;
     }
     const percentChange = (
       (this.props.marketSummary.priceChange / this.props.marketSummary.price) *
@@ -50,13 +50,18 @@ class TradeRatesCard extends React.Component {
       <>
         <div className="tl_rates">
           <div className="rates_box rb_text_1">
-            <strong>{marketDisplay}</strong>
-            <p>
-              {marketInfo?.baseAsset && marketInfo.baseAsset.name}{" "}
-              <span className="rates_box_label">
-                {marketInfo && marketInfo.baseAsset.symbol}
-              </span>
-            </p>
+            <div>
+              <img src={api.getCurrencyLogo(this.state.marketInfo?.baseAsset.symbol).default} alt={this.state.marketInfo?.baseAsset.symbol} className="rates_box_symbol" />
+              <div>
+                <strong>{marketDisplay}</strong>
+                <p>
+                  {marketInfo?.baseAsset && marketInfo.baseAsset.name}{" "}
+                  <span className="rates_box_label">
+                    {marketInfo && marketInfo.baseAsset.symbol}
+                  </span>
+                </p>
+              </div>
+            </div>
           </div>
           <div className="rates_box rb_text_2">
             <h1>{this.props.marketSummary.price}</h1>
