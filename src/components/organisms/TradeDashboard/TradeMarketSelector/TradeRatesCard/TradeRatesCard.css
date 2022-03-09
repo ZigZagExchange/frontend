@@ -55,18 +55,22 @@
 
 .rb_text_2 p {
   color: white;
+  min-height: 1rem;
 }
 
 .rb_text_3_down_value p {
   color: #c4384e;
+  min-height: 1rem;
 }
 
 .rb_text_3_up_value p {
   color: #3fe199;
+  min-height: 1rem;
 }
 
 .rb_text_4 p {
   color: white;
+  min-height: 1rem;
 }
 @media screen and (max-width: 991px) {
   .tl_rates .hide_sm {
