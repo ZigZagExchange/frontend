@@ -17,7 +17,7 @@ const StyledStatus = styled.a`
   color: #94a2c9;
   text-decoration: none;
   display: flex;
-  align-items: center;
+  align-items: left;
   &:hover {
     color: white;
     text-decoration: underline;
@@ -32,7 +32,7 @@ export default function TradeFooter() {
         <HiExternalLink />
       </StyledStatus>
       <StyledStatus href="https://docs.zigzag.exchange/zksync/token-info " target="_blank">
-        Token info
+        Token Info
         <HiExternalLink />
       </StyledStatus>
       <div>Powered By zkSync</div>
