@@ -17,6 +17,20 @@ const StyledStatus = styled.a`
   color: #94a2c9;
   text-decoration: none;
   display: flex;
+  width: 5%;
+  align-items: left;
+  &:hover {
+    color: white;
+    text-decoration: underline;
+  }
+`;
+
+const StyledStatus2 = styled.a`
+  font-size: 12px;
+  color: #94a2c9;
+  text-decoration: none;
+  display: flex;
+  width: 15%;
   align-items: left;
   &:hover {
     color: white;
@@ -31,10 +45,10 @@ export default function TradeFooter() {
         Uptime Status
         <HiExternalLink />
       </StyledStatus>
-      <StyledStatus href="https://docs.zigzag.exchange/zksync/token-info " target="_blank">
+      <StyledStatus2 href="https://docs.zigzag.exchange/zksync/token-info " target="_blank">
         Token Info
         <HiExternalLink />
-      </StyledStatus>
+      </StyledStatus2>
       <div>Powered By zkSync</div>
     </StyledTradeFooter>
   );
