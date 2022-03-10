@@ -12,6 +12,11 @@
   margin-right: 10px;
 }
 
+.rates_box_symbol {
+  height: 1.3rem;
+  margin-right: 0.5rem;
+}
+
 .rates_box_label {
   display: inline-flex;
   height: 20px;
@@ -33,6 +38,11 @@
   font-size: 0.8rem;
 }
 
+.rb_text_1 > div {
+  display: flex;
+  align-items: center;
+}
+
 .rb_text_1 strong {
   color: white;
   font-size: 0.9rem;
@@ -49,18 +59,22 @@
 
 .rb_text_2 p {
   color: white;
+  min-height: 1rem;
 }
 
 .rb_text_3_down_value p {
   color: #c4384e;
+  min-height: 1rem;
 }
 
 .rb_text_3_up_value p {
   color: #3fe199;
+  min-height: 1rem;
 }
 
 .rb_text_4 p {
   color: white;
+  min-height: 1rem;
 }
 @media screen and (max-width: 991px) {
   .tl_rates .hide_sm {

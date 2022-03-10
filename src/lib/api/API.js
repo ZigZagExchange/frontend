@@ -455,7 +455,7 @@ export default class API extends Emitter {
         };
     }
 
-    getFillDetailsWithoutFee(fill) {
+    getFillDetailsWithoutFee = (fill) => {
         const side = fill[3];
         const baseQuantity = fill[5];
         const quoteQuantity = fill[4] * fill[5];
@@ -489,7 +489,7 @@ export default class API extends Emitter {
             status,
         };
     }
-
+  
     submitOrder = async (product, side, price, amount, orderType) => {
         await this.apiProvider.submitOrder(product, side, price, amount, orderType)
     }

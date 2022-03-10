@@ -405,7 +405,7 @@ export class SpotForm extends React.Component {
                 <strong>
                   {this.props.orderType === "limit" ? (
                     <>
-                      {(this.state.price * this.state.amount).toPrecision(6)}{" "}
+                      {(this.currentPrice() * this.state.amount).toPrecision(6)}{" "}
                       {marketInfo && marketInfo.quoteAsset.symbol}
                     </>
                   ) : (
