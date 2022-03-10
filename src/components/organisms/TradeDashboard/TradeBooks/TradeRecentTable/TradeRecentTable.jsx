@@ -27,7 +27,7 @@ const TradeRecentTable = (props) => {
         {props.head && (
           <thead>
             <tr>
-              <th>Timestamp</th>
+              <th>Time</th>
               <th>Price</th>
               <th>Amount</th>
             </tr>
@@ -45,18 +45,18 @@ const TradeRecentTable = (props) => {
             } else {
               rowStyle = {};
             }
-            const timestamp = moment(d.td1).format('HH:mm');
+            const time = moment(d.td1).format('HH:mm:ss');
             const price =
               typeof d.td2 === "number" ? d.td2.toPrecision(6) : d.td2;
             const amount =
               typeof d.td3 === "number" ? d.td3.toPrecision(6) : d.td3;
             return (
               <tr key={i} style={rowStyle} onClick={() => onClickRow(d)}>
-                <td className={d.side === "b" ? "up_value" : "down_value"}>
-                  {timestamp}
-                </td>
+                <td> {time} </td>
                 <td>{numStringToSymbol(price, 2)}</td>
-                <td>{numStringToSymbol(amount, 2)}</td>
+                <td className={d.side === "b" ? "up_value" : "down_value"}>
+                  {numStringToSymbol(amount, 2)}
+                </td>
               </tr>
             );
           })}
