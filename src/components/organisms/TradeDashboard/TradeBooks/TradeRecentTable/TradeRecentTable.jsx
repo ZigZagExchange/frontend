@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import moment from 'moment';
 // css
 import "./TradeRecentTable.css";
 import { numStringToSymbol } from "lib/utils";
@@ -45,7 +44,8 @@ const TradeRecentTable = (props) => {
             } else {
               rowStyle = {};
             }
-            const time = moment(d.td1).format('HH:mm:ss');
+            let time = "N/A"
+            if(d.td1) time = new Date(d.td1).toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1");
             const price =
               typeof d.td2 === "number" ? d.td2.toPrecision(6) : d.td2;
             const amount =
