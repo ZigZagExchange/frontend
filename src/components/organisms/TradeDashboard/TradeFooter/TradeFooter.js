@@ -31,6 +31,10 @@ export default function TradeFooter() {
         Uptime Status
         <HiExternalLink />
       </StyledStatus>
+      <StyledStatus href="https://docs.zigzag.exchange/zksync/token-info " target="_blank">
+        Token info
+        <HiExternalLink />
+      </StyledStatus>
       <div>Powered By zkSync</div>
     </StyledTradeFooter>
   );
