@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useSelector } from "react-redux";
 import styled from "@xstyled/styled-components";
 import TradePriceTable from "./TradePriceTable/TradePriceTable";
@@ -43,28 +43,15 @@ export default function TradeBooks(props) {
   // There's a bunch of user trades in this list that are too old to display
   const maxFillId = Math.max(...Object.values(marketFills).map((f) => f[1]));
 
- let fillData = Object.values(marketFills)
+ const fillData = useMemo(() => Object.values(marketFills)
     .filter((fill) => fill[1] > maxFillId - 500)
     .sort((a, b) => b[1] - a[1])
-  
-  if (api.isZksyncChain()) {
-    fillData = fillData
-      .filter(fill => fill[6] !== 'r')
-      .map((fill) => [fill[3], api.getFillDetailsWithoutFee(fill)])
-      .map(([side, fill]) => ({
-        td1: fill.price,
-        td2: fill.baseQuantity,
-        td3: fill.quoteQuantity,
-        side,
-      }))
-  } else {
-    fillData = fillData.map(fill => ({
+    .map(fill => ({
       td1: Number(fill[4]),
       td2: Number(fill[5]),
       td3: Number(fill[4] * fill[5]),
       side: Number(fill[3]),
-    }))
-  }
+    })), [maxFillId, marketFills])
   
   let openOrdersLatestTradesData;
   if (marketDataTab === "orders") {

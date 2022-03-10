@@ -126,7 +126,20 @@ const BridgeCurrencySelector = ({
   };
 
   const resetTickers = () => {
-    setTickers(api.getCurrencies())
+    const tickers = api.getCurrencies()
+    const tickersOfBalance = tickers.filter(x => {
+      return balances[x] && parseFloat(balances[x].valueReadable) > 0
+    })
+
+    const tickersRest = tickers.filter(x => {
+      return balances[x] && parseFloat(balances[x].valueReadable) === 0
+    })
+
+    tickersOfBalance.sort((a,b) => {
+      return parseFloat(coinEstimator(b) * balances[b].valueReadable) - parseFloat(coinEstimator(a) * balances[a].valueReadable)
+    })
+
+    setTickers([...tickersOfBalance, ...tickersRest])
   }
 
   useEffect(() => {

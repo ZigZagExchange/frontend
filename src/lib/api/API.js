@@ -455,41 +455,6 @@ export default class API extends Emitter {
         };
     }
 
-    getFillDetailsWithoutFee = (fill) => {
-        const side = fill[3];
-        const baseQuantity = fill[5];
-        const quoteQuantity = fill[4] * fill[5];
-        const market = fill[2];
-        const status = fill[6] || 'r';
-        let baseQuantityWithoutFee, quoteQuantityWithoutFee, priceWithoutFee;
-        const marketInfo = this.apiProvider.marketInfo[market];
-        if (!marketInfo) {
-            return {
-                price: 1,
-                quoteQuantity: 1,
-                baseQuantity: 1,
-                status,
-            };
-        }
-        if (side === "s") {
-            const fee = marketInfo.baseFee;
-            baseQuantityWithoutFee = baseQuantity - fee;
-            priceWithoutFee = quoteQuantity / baseQuantityWithoutFee;
-            quoteQuantityWithoutFee = priceWithoutFee * baseQuantityWithoutFee;
-        } else {
-            const fee = marketInfo.quoteFee;
-            quoteQuantityWithoutFee = quoteQuantity - fee;
-            priceWithoutFee = quoteQuantityWithoutFee / baseQuantity;
-            baseQuantityWithoutFee = quoteQuantityWithoutFee / priceWithoutFee;
-        }
-        return {
-            price: priceWithoutFee,
-            quoteQuantity: quoteQuantityWithoutFee,
-            baseQuantity: baseQuantityWithoutFee,
-            status,
-        };
-    }
-  
     submitOrder = async (product, side, price, amount, orderType) => {
         await this.apiProvider.submitOrder(product, side, price, amount, orderType)
     }
