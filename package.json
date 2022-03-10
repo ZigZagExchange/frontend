@@ -58,6 +58,7 @@
     "lodash": "^4.17.21",
     "match-sorter": "^6.3.1",
     "mini-css-extract-plugin": "0.11.3",
+    "moment": "^2.29.1",
     "optimize-css-assets-webpack-plugin": "5.0.4",
     "pnp-webpack-plugin": "1.6.4",
     "postcss-flexbugs-fixes": "4.2.1",
@@ -208,7 +209,12 @@
     "plugins": [
       "babel-plugin-styled-components",
       "@babel/plugin-proposal-nullish-coalescing-operator",
-      ["@babel/plugin-proposal-private-methods", { "loose": true }]
+      [
+        "@babel/plugin-proposal-private-methods",
+        {
+          "loose": true
+        }
+      ]
     ]
   }
 }

@@ -293,7 +293,6 @@ class TradePriceBtcTable extends React.Component {
   }
 
   render() {
-    console.log(this.state.pairs);
     return (
       <>
         <SearchBox searchPair={this.searchPair} className="pairs_searchbox" />
