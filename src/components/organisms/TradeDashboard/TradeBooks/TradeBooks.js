@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import { useSelector } from "react-redux";
 import styled from "@xstyled/styled-components";
 import TradePriceTable from "./TradePriceTable/TradePriceTable";
+import TradeRecentTable from "./TradeRecentTable/TradeRecentTable";
 import TradePriceHeadSecond from "./TradePriceHeadSecond/TradePriceHeadSecond";
 import { Tabs } from "components";
 import { marketFillsSelector } from "lib/store/features/api/apiSlice";
@@ -35,8 +36,6 @@ const StyledTradeBooks = styled.section`
 `;
 
 export default function TradeBooks(props) {
-  const [marketDataTab, updateMarketDataTab] = useState("fills");
-  const openOrdersData = [];
   const marketFills = useSelector(marketFillsSelector);
 
   // Only display recent trades
@@ -48,18 +47,14 @@ export default function TradeBooks(props) {
     .sort((a, b) => b[1] - a[1])
     .forEach((fill) => {
       fillData.push({
-        td1: Number(fill[4]),
-        td2: Number(fill[5]),
-        td3: Number(fill[4] * fill[5]),
+        td1: fill[12], // timestamp
+        td2: Number(fill[4]), // price
+        td3: Number(fill[5]), // amount
         side: fill[3],
       });
     });
-  let openOrdersLatestTradesData;
-  if (marketDataTab === "orders") {
-    openOrdersLatestTradesData = openOrdersData;
-  } else if (marketDataTab === "fills") {
-    openOrdersLatestTradesData = fillData;
-  }
+  let openOrdersLatestTradesData = fillData;
+
   return (
     <>
       <StyledTradeBooks>
@@ -81,18 +76,9 @@ export default function TradeBooks(props) {
             />
           </div>
           <div label="Trades">
-            <div className="trade_price_head_third">
-              <strong
-                className={
-                  marketDataTab === "fills" ? "trade_price_active_tab" : ""
-                }
-                onClick={() => updateMarketDataTab("fills")}
-              >
-                Latest Trades
-              </strong>
-            </div>
             {/* TradePriceTable*/}
-            <TradePriceTable
+            <TradeRecentTable
+              head
               className=""
               value="up_value"
               priceTableData={openOrdersLatestTradesData}

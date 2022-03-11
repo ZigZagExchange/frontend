@@ -50,6 +50,7 @@ export const apiSlice = createSlice({
       payload[0].forEach((update) => {
         const fillid = update[1];
         const newstatus = update[2];
+        const timestamp = update[7];
         let txhash;
         let feeamount;
         let feetoken;
@@ -58,12 +59,14 @@ export const apiSlice = createSlice({
         if (update[6]) feetoken = update[6];
         if (state.marketFills[fillid]) {
           state.marketFills[fillid][6] = newstatus;
+          state.marketFills[fillid][12] = timestamp;
           if (txhash) state.marketFills[fillid][7] = txhash;
           if (feeamount) state.marketFills[fillid][10] = feeamount;
           if (feetoken) state.marketFills[fillid][11] = feetoken;
         }
         if (state.userFills[fillid]) {
           state.userFills[fillid][6] = newstatus;
+          state.userFills[fillid][12] = timestamp;
           if (txhash) state.userFills[fillid][7] = txhash;
           if (feeamount) state.userFills[fillid][10] = feeamount;
           if (feetoken) state.userFills[fillid][11] = feetoken;
