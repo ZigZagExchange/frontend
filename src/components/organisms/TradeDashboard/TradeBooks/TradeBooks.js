@@ -2,6 +2,7 @@ import React, { useState, useMemo } from "react";
 import { useSelector } from "react-redux";
 import styled from "@xstyled/styled-components";
 import TradePriceTable from "./TradePriceTable/TradePriceTable";
+import TradeRecentTable from "./TradeRecentTable/TradeRecentTable";
 import TradePriceHeadSecond from "./TradePriceHeadSecond/TradePriceHeadSecond";
 import { Tabs } from "components";
 import { marketFillsSelector } from "lib/store/features/api/apiSlice";
@@ -35,8 +36,6 @@ const StyledTradeBooks = styled.section`
 `;
 
 export default function TradeBooks(props) {
-  const [marketDataTab, updateMarketDataTab] = useState("fills");
-  const openOrdersData = [];
   const marketFills = useSelector(marketFillsSelector);
 
   // Only display recent trades
@@ -47,10 +46,10 @@ export default function TradeBooks(props) {
     .filter((fill) => fill[1] > maxFillId - 500)
     .sort((a, b) => b[1] - a[1])
     .map(fill => ({
-      td1: Number(fill[4]),
+      td1: fill[12],
       td2: Number(fill[5]),
       td3: Number(fill[4] * fill[5]),
-      side: Number(fill[3]),
+      side: fill[3],
     })), [maxFillId, marketFills])
   
   let openOrdersLatestTradesData;
@@ -81,18 +80,9 @@ export default function TradeBooks(props) {
             />
           </div>
           <div label="Trades">
-            <div className="trade_price_head_third">
-              <strong
-                className={
-                  marketDataTab === "fills" ? "trade_price_active_tab" : ""
-                }
-                onClick={() => updateMarketDataTab("fills")}
-              >
-                Latest Trades
-              </strong>
-            </div>
             {/* TradePriceTable*/}
-            <TradePriceTable
+            <TradeRecentTable
+              head
               className=""
               value="up_value"
               priceTableData={openOrdersLatestTradesData}
