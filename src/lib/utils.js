@@ -81,18 +81,35 @@ function padTo2Digits(num) {
   return num.toString().padStart(2, "0");
 }
 
+function isLessThan24HourAgo(date) {
+  // 👇️                    hour  min  sec  milliseconds
+  const twentyFourHrInMs = 24 * 60 * 60 * 1000;
+
+  const twentyFourHoursAgo = Date.now() - twentyFourHrInMs;
+
+  return date > twentyFourHoursAgo;
+}
+
 export function formatDate(date) {
-  return (
-    [
-      date.getFullYear(),
-      padTo2Digits(date.getMonth() + 1),
-      padTo2Digits(date.getDate()),
-    ].join("-") +
-    " " +
-    [
+  if (isLessThan24HourAgo(date)) {
+    return [
       padTo2Digits(date.getHours()),
       padTo2Digits(date.getMinutes()),
       padTo2Digits(date.getSeconds()),
-    ].join(":")
-  );
+    ].join(":");
+  } else {
+    return (
+      [
+        date.getFullYear(),
+        padTo2Digits(date.getMonth() + 1),
+        padTo2Digits(date.getDate()),
+      ].join("-") +
+      " " +
+      [
+        padTo2Digits(date.getHours()),
+        padTo2Digits(date.getMinutes()),
+        padTo2Digits(date.getSeconds()),
+      ].join(":")
+    );
+  }
 }
