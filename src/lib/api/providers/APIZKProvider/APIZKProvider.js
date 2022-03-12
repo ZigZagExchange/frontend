@@ -96,7 +96,7 @@ export default class APIZKProvider extends APIProvider {
                     }
                 );
                 const feeUSD = data.result.totalFee / 10**6;
-                toast.info(`You need to sign a one-time transaction to activate your zksync account. The fee for this tx will be $${feeUSD}`)
+                toast.info(`You need to sign a one-time transaction to activate your zksync account. The fee for this tx will be $${feeUSD.toFixed(2)}`)
             } catch (err) {
                 toast.info(`You need to sign a one-time transaction to activate your zksync account. The fee for this tx will be ~$2.5`)
             }            
