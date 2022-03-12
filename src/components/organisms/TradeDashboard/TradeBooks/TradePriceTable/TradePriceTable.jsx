@@ -11,18 +11,17 @@ const TradePriceTable = (props) => {
 
   const scrollToBottom = () => {
     if (props.scrollToBottom) {
-      if (!firstScroll) setFirstScroll(true);
       const tableDiv = document.getElementsByClassName(props.className);
-      console.log(tableDiv[0].scrollTop, tableDiv[0].scrollHeight - tableDiv[0].clientHeight);
       if (tableDiv.length > 0 && (tableDiv[0].scrollTop >= tableDiv[0].scrollHeight - 3 || !firstScroll)) {
         tableDiv[0].scrollTop = tableDiv[0].scrollHeight;
+        if (!firstScroll && tableDiv[0].scrollTop > 0) setFirstScroll(true);
       }
     }
   };
 
   useEffect(() => {
     scrollToBottom();
-  }, [props.priceTableData]);
+  }, [props.scrollToBottom, props.priceTableData]);
 
   const maxQuantity = Math.max(...props.priceTableData.map((d) => d.td2));
   let onClickRow;

@@ -42,7 +42,7 @@ export default function TradeBooks(props) {
   // There's a bunch of user trades in this list that are too old to display
   const maxFillId = Math.max(...Object.values(marketFills).map((f) => f[1]));
 
- const fillData = useMemo(() => Object.values(marketFills)
+ const openOrdersLatestTradesData = useMemo(() => Object.values(marketFills)
     .filter((fill) => fill[1] > maxFillId - 500)
     .sort((a, b) => b[1] - a[1])
     .map(fill => ({
@@ -52,13 +52,6 @@ export default function TradeBooks(props) {
       side: fill[3],
     })), [maxFillId, marketFills])
   
-  let openOrdersLatestTradesData;
-  if (marketDataTab === "orders") {
-    openOrdersLatestTradesData = openOrdersData;
-  } else if (marketDataTab === "fills") {
-    openOrdersLatestTradesData = fillData;
-  }
-
   return (
     <>
       <StyledTradeBooks>

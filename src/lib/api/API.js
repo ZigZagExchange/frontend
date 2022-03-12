@@ -524,9 +524,9 @@ export default class API extends Emitter {
 
     getCurrencyLogo(currency) {
         try {
-            return require(`assets/images/currency/${currency}.svg`)
+            return require(`assets/images/currency/${currency}.svg`).default
         } catch(e) {
-            return require(`assets/images/currency/ZZ.webp`)
+            return `https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/32/icon/${`${currency}`}.toLowerCase()}.png`
         }
     }
 

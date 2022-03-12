@@ -192,7 +192,7 @@ const BridgeCurrencySelector = ({
     <BridgeCurrencyWrapper>
       <StyledBridgeCurrencySelector onClick={() => setShow(true)}>
         <div className="currencyIcon">
-          <img src={image && image.default} alt={currency && currency.symbol} />
+          <img src={image && image} alt={currency && currency.symbol} />
         </div>
         <div className="currencyName">
           {value}
@@ -220,8 +220,7 @@ const BridgeCurrencySelector = ({
                 <div className="currencyIcon">
                   <img
                     src={
-                      api.getCurrencyLogo(ticker) &&
-                      api.getCurrencyLogo(ticker).default
+                      api.getCurrencyLogo(ticker)
                     }
                     alt={currency && currency.symbol}
                   />
