@@ -25,10 +25,9 @@ export const apiSlice = createSlice({
   reducers: {
     _marketinfo(state, { payload }) {
       if (payload[0].error) {
-          console.error(payload[0]);
-      }
-      else {
-          state.marketinfo = payload[0];
+        console.error(payload[0]);
+      } else {
+        state.marketinfo = payload[0];
       }
     },
     _fills(state, { payload }) {
@@ -92,7 +91,7 @@ export const apiSlice = createSlice({
         state.lastPrices[market] = {
           price: update[1],
           change: update[2],
-          quoteVolume: update[3]
+          quoteVolume: update[3],
         };
         if (update[0] === state.currentMarket) {
           state.marketSummary.price = price;
@@ -101,12 +100,9 @@ export const apiSlice = createSlice({
       });
     },
     _liquidity2(state, { payload }) {
-      if(
-        payload[0] === state.network &&
-        payload[1] === state.currentMarket
-      ) {
+      if (payload[0] === state.network && payload[1] === state.currentMarket) {
         state.liquidity = state.liquidity = payload[2];
-      }      
+      }
     },
     _orderstatus(state, { payload }) {
       (payload[0] || []).forEach(async (update) => {
