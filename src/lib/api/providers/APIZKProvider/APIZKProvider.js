@@ -86,7 +86,7 @@ export default class APIZKProvider extends APIProvider {
                     'https://api.zksync.io/api/v0.2/fee',
                     {
                         txType: { ChangePubKey: "ECDSA" },
-                        address: "0xf33A2D61DD09541A8C9897D7236aDcCCC14Cf769",
+                        address: this.syncWallet.ethSigner.address,
                         tokenLike: 'USDC'
                     },
                     {
