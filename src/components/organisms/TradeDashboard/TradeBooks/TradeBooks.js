@@ -41,9 +41,10 @@ export default function TradeBooks(props) {
   // Only display recent trades
   // There's a bunch of user trades in this list that are too old to display
   const fillData = [];
-  const maxFillId = Math.max(...Object.values(marketFills).map((f) => f[1]));
+  // const maxFillId = Math.max(...Object.values(marketFills).map((f) => f[1]));
+  // console.log(Object.values(marketFills));
   Object.values(marketFills)
-    .filter((fill) => fill[1] > maxFillId - 500)
+    // .filter((fill) => fill[1] > maxFillId - 500)
     .sort((a, b) => b[1] - a[1])
     .forEach((fill) => {
       fillData.push({
