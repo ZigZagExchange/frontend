@@ -81,7 +81,25 @@ export default class APIZKProvider extends APIProvider {
 
     changePubKey = async () => {
         if (this.network === 1) {
-            toast.info('You need to sign a one-time transaction to activate your zksync account. The fee for this tx will be ~0.003 ETH (~$15)')
+            try {
+                const { data } = await axios.post(
+                    'https://api.zksync.io/api/v0.2/fee',
+                    {
+                        txType: { ChangePubKey: "ECDSA" },
+                        address: this.syncWallet.ethSigner.address,
+                        tokenLike: 'USDC'
+                    },
+                    {
+                      headers: {
+                        'Content-Type': 'application/json'
+                      }
+                    }
+                );
+                const feeUSD = data.result.totalFee / 10**6;
+                toast.info(`You need to sign a one-time transaction to activate your zksync account. The fee for this tx will be $${feeUSD.toFixed(2)}`)
+            } catch (err) {
+                toast.info(`You need to sign a one-time transaction to activate your zksync account. The fee for this tx will be ~$2.5`)
+            }            
         }
         else if (this.network === 1000) {
             toast.info('You need to sign a one-time transaction to activate your zksync account.')
