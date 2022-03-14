@@ -455,8 +455,8 @@ export default class API extends Emitter {
         };
     }
 
-    submitOrder = async (product, side, price, amount, orderType) => {
-        await this.apiProvider.submitOrder(product, side, price, amount, orderType)
+    submitOrder = async (product, side, price, baseAmount, quoteAmount, orderType) => {
+        await this.apiProvider.submitOrder(product, side, price, baseAmount, quoteAmount, orderType)
     }
 
     calculatePriceFromLiquidity = (quantity, spotPrice, side, liquidity) => {
