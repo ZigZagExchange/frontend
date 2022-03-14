@@ -31,7 +31,7 @@ const TradePriceTable = (props) => {
             <tr>
               <th>Price</th>
               <th>Amount</th>
-              <th>Total ({marketInfo && marketInfo.quoteAsset.symbol})</th>
+              <th>Total {marketInfo && marketInfo.quoteAsset.symbol}</th>
             </tr>
           </thead>
         )}
