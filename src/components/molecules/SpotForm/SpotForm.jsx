@@ -229,7 +229,7 @@ export class SpotForm extends React.Component {
     } else if (this.props.side === "b") {
       const quoteBalance = this.getQuoteBalance();
       if (this.state.quoteAmount) {
-        return (total / (quoteBalance - marketInfo.quoteFee)) * 100;
+        return (this.state.quoteAmount / (quoteBalance - marketInfo.quoteFee)) * 100;
       } else {
         const amount = this.state.baseAmount || 0;
         const total = amount * this.currentPrice();
