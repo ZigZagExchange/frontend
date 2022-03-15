@@ -112,18 +112,6 @@ export class SpotForm extends React.Component {
       quoteAmount = this.state.quoteAmount;
     }
 
-    const marketInfo = this.props.marketInfo;
-    let amount = (baseAmount) 
-      ? baseAmount.toFixed(marketInfo.baseAsset.decimals)
-      : (quoteAmount / price).toFixed(marketInfo.baseAsset.decimals)
-
-    // if quoteAmount is set -> use that
-    baseAmount = (quoteAmount && this.props.side === "b") ? null : baseAmount
-    if (isNaN(amount)) {
-      toast.error("Amount is not a number");
-      return;
-    }
-
     let price = this.currentPrice();
     if (!price) {
       toast.error("No price available");
@@ -135,6 +123,18 @@ export class SpotForm extends React.Component {
       } else if (this.props.side === "s") {
         price *= 0.9985;
       }
+    }
+
+    const marketInfo = this.props.marketInfo;
+    let amount = (baseAmount) 
+      ? baseAmount.toFixed(marketInfo.baseAsset.decimals)
+      : (quoteAmount / price).toFixed(marketInfo.baseAsset.decimals)
+
+    // if quoteAmount is set -> use that
+    baseAmount = (quoteAmount && this.props.side === "b") ? null : baseAmount
+    if (isNaN(amount)) {
+      toast.error("Amount is not a number");
+      return;
     }
 
     if (this.props.activeOrderCount > 0 && api.isZksyncChain()) {
