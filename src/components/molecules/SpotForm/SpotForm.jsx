@@ -105,13 +105,17 @@ export class SpotForm extends React.Component {
       amount = this.state.amount;
     }
     if (isNaN(amount)) {
-      toast.error("Amount is not a number");
+      toast.error("Amount is not a number", {
+        toastId: 'Amount is not a number',
+    });
       return;
     }
     const marketInfo = this.props.marketInfo;
     amount = parseFloat(amount.toFixed(marketInfo.baseAsset.decimals));
     if (this.props.activeOrderCount > 0 && api.isZksyncChain()) {
-      toast.error("Only one active order permitted at a time");
+      toast.error("Only one active order permitted at a time", {
+        toastId: 'Only one active order permitted at a time',
+    });
       return;
     }
     let baseBalance, quoteBalance;
@@ -125,7 +129,9 @@ export class SpotForm extends React.Component {
 
     let price = this.currentPrice();
     if (!price) {
-      toast.error("No price available");
+      toast.error("No price available", {
+        toastId: 'No price available',
+    });
       return;
     }
     if (this.props.orderType === "market") {
@@ -139,16 +145,24 @@ export class SpotForm extends React.Component {
     baseBalance = parseFloat(baseBalance);
     quoteBalance = parseFloat(quoteBalance);
     if (this.props.side === "s" && isNaN(baseBalance)) {
-      toast.error(`No ${marketInfo.baseAsset.symbol} balance`);
+      toast.error(`No ${marketInfo.baseAsset.symbol} balance`, {
+        toastId: `No ${marketInfo.baseAsset.symbol} balance`,
+    });
       return;
     } else if (this.props.side === "b" && isNaN(quoteBalance)) {
-      toast.error(`No ${marketInfo.quoteAsset.symbol} balance`);
+      toast.error(`No ${marketInfo.quoteAsset.symbol} balance`, {
+        toastId: `No ${marketInfo.quoteAsset.symbol} balance`,
+    });
       return;
     } else if (this.props.side === "s" && amount > baseBalance) {
-      toast.error(`Amount exceeds ${marketInfo.baseAsset.symbol} balance`);
+      toast.error(`Amount exceeds ${marketInfo.baseAsset.symbol} balance`, {
+        toastId: `Amount exceeds ${marketInfo.baseAsset.symbol} balance`,
+    });
       return;
     } else if (this.props.side === "b" && amount * price > quoteBalance) {
-      toast.error(`Total exceeds ${marketInfo.quoteAsset.symbol} balance`);
+      toast.error(`Total exceeds ${marketInfo.quoteAsset.symbol} balance`, {
+        toastId: `Total exceeds ${marketInfo.quoteAsset.symbol} balance`,
+    });
       return;
     } else if (amount < this.MINIMUM_AMOUNTS[marketInfo.baseAsset.symbol]) {
       toast.error(
@@ -158,13 +172,17 @@ export class SpotForm extends React.Component {
       );
       return;
     } else if (isNaN(price)) {
-      toast.error("Price undefined");
+      toast.error("Price undefined", {
+        toastId: "Price undefined",
+    });
       return;
     } else if (
       (this.props.side === "b" && price > this.getFirstAsk() * 1.2) ||
       (this.props.side === "s" && price < this.getFirstBid() * 0.8)
     ) {
-      toast.error("Limit orders cannot exceed 20% beyond spot");
+      toast.error("Limit orders cannot exceed 20% beyond spot", {
+        toastId: "Limit orders cannot exceed 20% beyond spot",
+    });
       return;
     }
 
@@ -174,7 +192,9 @@ export class SpotForm extends React.Component {
     let orderPendingToast;
     if (api.isZksyncChain()) {
       orderPendingToast = toast.info(
-        "Order pending. Sign or Cancel to continue..."
+        "Order pending. Sign or Cancel to continue...", {
+          toastId: "Order pending. Sign or Cancel to continue...",
+      }
       );
     }
 

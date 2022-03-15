@@ -177,10 +177,20 @@ export const apiSlice = createSlice({
                   noFeeOrder.baseQuantity.toPrecision(4) / 1
                 } ${baseCurrency} @ ${
                   noFeeOrder.price.toPrecision(4) / 1
-                } was rejected: ${error}`
+                } was rejected: ${error}`,
+                {
+                  toastId: `Your ${sideText} order for ${
+                    noFeeOrder.baseQuantity.toPrecision(4) / 1
+                  } ${baseCurrency} @ ${
+                    noFeeOrder.price.toPrecision(4) / 1
+                  } was rejected: ${error}`,
+                }
               );
               toast.info(
-                `This happens occasionally. Run the transaction again and you should be fine.`
+                `This happens occasionally. Run the transaction again and you should be fine.`,
+                {
+                  toastId: `This happens occasionally. Run the transaction again and you should be fine.`,
+                }
               );
             }
             break;
