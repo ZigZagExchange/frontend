@@ -405,9 +405,11 @@ export class SpotForm extends React.Component {
               value={
                 this.state.baseAmount
                   ? this.state.baseAmount
-                  : (this.state.quoteAmount/this.state.price).toFixed(
-                      marketInfo.pricePrecisionDecimals
-                    )
+                  : (this.state.quoteAmount && this.state.price)
+                    ? (parseFloat(this.state.quoteAmount)/parseFloat(this.state.price)).toFixed(
+                        marketInfo.pricePrecisionDecimals
+                      )
+                    : "0"
               }
               placeholder="0.00"
               onChange={this.updateAmount.bind(this)}
