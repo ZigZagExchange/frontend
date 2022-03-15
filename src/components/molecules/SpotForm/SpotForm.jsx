@@ -278,7 +278,7 @@ export class SpotForm extends React.Component {
     if (val === 100) {
       newstate.maxSizeSelected = true;
       if (this.props.side === "b") {
-        val = 99.8;
+        val = 99.999;
       }
       if (this.props.side === "s") {
         val = 99.999;
@@ -291,29 +291,37 @@ export class SpotForm extends React.Component {
       const decimals = marketInfo.baseAsset.decimals;
       let displayAmount = (baseBalance * val) / 100;
       displayAmount -= marketInfo.baseFee;
-      displayAmount = parseFloat(displayAmount.toFixed(decimals)).toPrecision(
-        5
-      );
+      displayAmount = parseFloat(displayAmount.toFixed(decimals))
+      displayAmount = (displayAmount > 9999)
+        ? displayAmount.toFixed(0)
+        : displayAmount.toPrecision(5)
+
       if (displayAmount < 1e-5) {
         newstate.baseAmount = 0;
       } else {
-        newstate.baseAmount = parseFloat(displayAmount.slice(0, -1));
+        newstate.baseAmount = displayAmount;
       }
     } else if (this.props.side === "b") {
       const quoteBalance = this.getQuoteBalance();
       const quoteDecimals = marketInfo.quoteAsset.decimals;
       const baseDecimals = marketInfo.baseAsset.decimals;
-      let displayAmount = (quoteBalance * val) / 100;
-      newstate.baseAmount = parseFloat(
-          (displayAmount / this.currentPrice()).toFixed(baseDecimals)
-        ).toPrecision(5)
+      let displayAmount = (quoteBalance * val) / 100;      
       displayAmount -= marketInfo.quoteFee;
       displayAmount = parseFloat(displayAmount.toFixed(quoteDecimals))
-        .toPrecision(5);
-      if (displayAmount < 1e-5) {
+      displayAmount = (displayAmount > 9999)
+        ? displayAmount.toFixed(0)
+        : displayAmount.toPrecision(5)
+
+      if (displayAmount < 1e-5) {        
         newstate.quoteAmount = 0;
       } else {
-        newstate.quoteAmount = parseFloat(displayAmount.slice(0, -1));
+        newstate.quoteAmount = displayAmount;
+        const baseDisplayAmount = parseFloat(
+          (displayAmount / this.currentPrice()).toFixed(baseDecimals)
+        )
+        newstate.baseAmount = (baseDisplayAmount > 9999)
+        ? baseDisplayAmount.toFixed(0)
+        : baseDisplayAmount.toPrecision(5)
       }
     }
 
