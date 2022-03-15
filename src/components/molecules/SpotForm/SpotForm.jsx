@@ -300,13 +300,14 @@ export class SpotForm extends React.Component {
       }
     } else if (this.props.side === "b") {
       const quoteBalance = this.getQuoteBalance();
-      const decimals = marketInfo.baseAsset.decimals;
-      let quoteAmount = ((quoteBalance - marketInfo.quoteFee) * val) / 100;
-      quoteAmount = parseFloat(quoteAmount.toFixed(decimals)).toPrecision(5);
-      if (quoteAmount < 1e-5) {
+      const decimals = marketInfo.quoteAsset.decimals;
+      let displayAmount = (quoteBalance * val) / 100;
+      displayAmount -= marketInfo.quoteFee;
+      displayAmount = parseFloat(displayAmount.toFixed(decimals)).toPrecision(5);
+      if (displayAmount < 1e-5) {
         newstate.quoteAmount = 0;
       } else {
-        newstate.quoteAmount = parseFloat(quoteAmount.slice(0, -1));
+        newstate.quoteAmount = parseFloat(displayAmount.slice(0, -1));
       }
     }
 
@@ -401,7 +402,13 @@ export class SpotForm extends React.Component {
             <span className="spf_desc_text">Amount</span>
             <input
               type="text"
-              value={this.state.amount}
+              value={
+                this.state.baseAmount
+                  ? this.state.baseAmount
+                  : (this.state.quoteAmount/this.state.price).toFixed(
+                      marketInfo.pricePrecisionDecimals
+                    )
+              }
               placeholder="0.00"
               onChange={this.updateAmount.bind(this)}
             />
