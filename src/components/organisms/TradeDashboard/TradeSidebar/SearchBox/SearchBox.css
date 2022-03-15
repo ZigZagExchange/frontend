@@ -1,0 +1,31 @@
+.pairs_searchbox input {
+  padding: 0px 20px;
+  width: 100%;
+  height: 40px;
+  border: none;
+  outline: none;
+  border-bottom: 1px solid rgb(39, 44, 57);
+  color: #fff;
+  background-color: rgb(19, 23, 34);
+  box-sizing: border-box;
+}
+
+.pairs_searchbox input::placeholder {
+  color: #aeaebf;
+}
+
+.bridge_searchbox input {
+  padding: 13px;
+  width: 100%;
+  border: none;
+  outline: none;
+  color: #fff;
+  border-radius: 10px;
+  background-color: rgba(0, 0, 0, 0.4);
+  box-sizing: border-box;
+  margin-bottom: 10px;
+}
+
+.bridge_searchbox input::placeholder {
+  color: #aeaebf;
+}

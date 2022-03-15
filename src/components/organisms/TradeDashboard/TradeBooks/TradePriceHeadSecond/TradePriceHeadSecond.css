@@ -1,0 +1,36 @@
+.trade_price_head_2 {
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  padding: 8px 20px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.trade_price_head_2 div {
+  display: flex;
+  align-items: center;
+}
+
+.trade_price_head_2 div h2 {
+  font-size: 1.2rem;
+  color: #3fe199;
+  font-weight: 400;
+  margin-right: 10px;
+}
+
+.trade_price_head_2 span {
+  color: #94a2c9;
+}
+
+@media screen and (min-width: 1800px) {
+  .trade_price_head_2 {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 991px) {
+  .trade_price_head_2 {
+    width: 100%;
+  }
+}

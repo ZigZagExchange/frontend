@@ -1,0 +1,6 @@
+.tl_head {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+}

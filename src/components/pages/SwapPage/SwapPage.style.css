@@ -1,0 +1,324 @@
+.swap_section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 48px);
+  height: 100%;
+  background-color: #1c2231;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  padding-bottom: 2rem;
+}
+
+.swap_incompatible {
+  width: 100%;
+  min-height: 200px;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.swap_box_swap_wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: -62px;
+  margin-bottom: 0;
+  width: 100%;
+}
+
+.swap_box_swap_wrapper h5 {
+  margin-top: 15px;
+  font-size: 15px;
+  font-weight: normal;
+}
+
+.swap_section a {
+  color: #1c4fa8;
+  text-decoration: none;
+}
+
+.swap_coin_stats {
+  display: flex;
+  flex-direction: row;
+  margin: 20px 0;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.swap_box_bottom .swap_coin_title {
+  margin-bottom: 0;
+}
+
+.swap_box_bottom .swap_coin_stats {
+  margin-top: -15px;
+  align-items: flex-end;
+}
+
+.swap_coin_stat:last-child {
+  text-align: right;
+}
+
+.swap_coin_stat h5 {
+  font-weight: normal;
+  font-size: 12px;
+}
+
+.swap_section a:hover {
+  color: #09aaf5;
+}
+
+.swap_head_tabs {
+  display: inline-flex;
+  flex-direction: row;
+  margin: 20px 0;
+}
+
+.swap_head_tabs > a {
+  display: block;
+  transition: all 0.15s ease-in-out;
+  text-transform: uppercase;
+  padding: 9px 30px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.7);
+  text-shadow: 0 0 4px rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.01);
+  font-weight: 500;
+  font-size: 13px;
+  margin-left: -1px;
+}
+
+.swap_link {
+  color: #fff;
+  cursor: pointer;
+}
+
+.swap_link:hover {
+  text-decoration: underline;
+}
+
+.swap_box_receipts {
+  height: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.swap_box_transactions {
+  margin: 0 0 25px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 100%;
+}
+
+.swap_box_receipt_head {
+  padding: 26px 20px 12px;
+}
+
+.swap_box_transaction {
+  padding: 15px 20px;
+  cursor: pointer;
+}
+
+.swap_contain {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.swap_contain > *:not(:last-child) {
+  margin-right: 12px;
+}
+
+.swap_box_transaction:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.swap_box_transaction:active {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.swap_box_transaction_txId {
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+.swap_box_transaction_txType_deposit,
+.swap_box_transaction_txType_withdraw {
+  background: #048;
+  display: inline-flex;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.swap_box_transaction_amount {
+  font-weight: bold;
+  color: #ddf;
+}
+
+.swap_box_transaction_txType_withdraw {
+  background: #848;
+}
+
+.swap_head_tabs > a:hover {
+  border-color: #fff;
+  background: rgba(255, 255, 255, 0.5);
+  color: #000;
+}
+
+.swap_head_tabs > a:active,
+.swap_head_tabs > a.swap_head_tab_active {
+  border-color: #fff;
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 3px 0 rgba(255, 255, 255, 0.9);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+  color: #fff;
+}
+
+.swap_head_tabs > a:first-child {
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  margin-left: 0;
+}
+
+.swap_head_tabs > a:last-child {
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+.swap_connected_as {
+  font-size: 12px;
+  margin-top: auto;
+  margin-bottom: 10px;
+  padding: 10px 15px;
+  display: flex;
+  justify-content: center;
+  flex: 0 0 auto;
+  color: rgba(255, 255, 255, 0.5);
+  align-items: center;
+}
+
+.swap_disconnect {
+  display: inline-block;
+  font-size: 18px;
+  line-height: 12px;
+  margin-left: 6px;
+}
+
+.swap_disconnect > a {
+  display: inline-block;
+  margin-left: 2px;
+  font-size: 12px;
+  color: #69f;
+}
+
+.swap_disconnect > a:hover {
+  color: #09aaf5;
+}
+
+.swap_bubble_connected,
+.swap_bubble_disconnected {
+  width: 6px;
+  height: 6px;
+  border-radius: 6px;
+  background: #c00;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.swap_bubble_connected {
+  background: #0c0;
+}
+
+.swap_container {
+  width: 100%;
+  margin: 0 auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.swap_box {
+  width: 509px;
+  max-width: 90%;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 24px;
+  color: #94a2c9;
+  margin-bottom: 15px;
+}
+
+.swap_box_bottom,
+.swap_box_top {
+  padding: 30px;
+}
+
+.swap_box_top {
+  padding-bottom: 40px;
+}
+
+.swap_box_bottom {
+  border-bottom-left-radius: 24px;
+  border-bottom-right-radius: 24px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.swap_transfer_fee {
+  text-align: center;
+  margin-top: 30px;
+  margin-bottom: 20px;
+  color: rgba(185, 205, 255, 0.3);
+}
+
+.swap_coin_name {
+  font-size: 20px;
+  color: #fff;
+}
+
+.swap_coin_title {
+  margin-bottom: 24px;
+}
+
+.swap_coin_title h5 {
+  font-size: 12px;
+  margin: 10px 0 8px;
+}
+
+.swap_coin_details {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+}
+
+.swap_coin_details .swap_coin_image {
+  margin-right: 8px;
+}
+
+.swap_coin_image img {
+  max-width: 100%;
+  height: 100%;
+  border-radius: 32px;
+}
+
+.swap_coin_image {
+  width: 32px;
+  height: 32px;
+  text-align: center;
+  overflow: hidden;
+  border-radius: 32px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px;
+}

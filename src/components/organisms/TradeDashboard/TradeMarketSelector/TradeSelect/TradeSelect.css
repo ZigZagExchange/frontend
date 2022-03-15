@@ -1,0 +1,51 @@
+.tl_select {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-right: 1rem;
+  min-width: 150px;
+}
+
+.tl_select div:nth-child(1) {
+  border: 1px solid #272c39;
+  border-radius: 20px;
+  width: 240px;
+  background-color: #131722;
+  padding: 6px 15px;
+}
+
+.tl_select select {
+  width: 100%;
+  background-image: url("../../../../../assets/icons/select-arrow.png");
+  color: #94a2c9;
+  border: none;
+  display: flex;
+  font-weight: 600;
+  align-items: center;
+  justify-content: space-between;
+  outline: none;
+  background-color: transparent;
+  background-size: 8px 6px;
+  background-repeat: no-repeat;
+  appearance: none;
+  background-position: right;
+}
+
+.spot_play {
+  display: flex;
+  align-items: center;
+}
+
+.spot_play img {
+  margin-right: 8px;
+}
+
+.spot_play span {
+  color: white;
+}
+
+@media screen and (max-width: 425px) {
+  .tl_select div:nth-child(1) {
+    width: 100%;
+  }
+}

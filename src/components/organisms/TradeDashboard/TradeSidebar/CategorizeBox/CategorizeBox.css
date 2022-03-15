@@ -1,0 +1,31 @@
+.categorize_tabs {
+  display: flex;
+  flex-direction: row;
+  height: 30px;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  padding: 0 20px;
+  border-bottom: 1px solid rgb(39, 44, 57);
+  background: rgb(19, 23, 34);
+  font-weight: bold;
+}
+
+.categorize_tab {
+  font-size: 12px;
+  cursor: pointer;
+  user-select: none;
+  color: #aeaebf;
+  transition: all 0.1s linear;
+}
+
+.categorize_tab:hover,
+.categorize_tab:focus {
+  color: #cecedf;
+  text-shadow: 0 0 6px rgba(180, 255, 255, 0.4);
+}
+
+.categorize_selected_tab {
+  color: #08aff3; /* needs updating*/
+  text-shadow: 0 0 6px rgba(19, 147, 221, 0.4);
+}
