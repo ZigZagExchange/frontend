@@ -112,8 +112,14 @@ export class SpotForm extends React.Component {
       quoteAmount = this.state.quoteAmount;
     }
 
-    // quoteAmount is not exposed to user
-    if (isNaN(baseAmount)) {
+    const marketInfo = this.props.marketInfo;
+    let amount = (baseAmount) 
+      ? baseAmount.toFixed(marketInfo.baseAsset.decimals)
+      : (quoteAmount / price).toFixed(marketInfo.baseAsset.decimals)
+
+    // if quoteAmount is set -> use that
+    baseAmount = (quoteAmount && this.props.side === "b") ? null : baseAmount
+    if (isNaN(amount)) {
       toast.error("Amount is not a number");
       return;
     }
@@ -131,10 +137,6 @@ export class SpotForm extends React.Component {
       }
     }
 
-    const marketInfo = this.props.marketInfo;
-    let amount = (baseAmount) 
-      ? baseAmount.toFixed(marketInfo.baseAsset.decimals)
-      : (quoteAmount / price).toFixed(marketInfo.baseAsset.decimals)
     if (this.props.activeOrderCount > 0 && api.isZksyncChain()) {
       toast.error("Only one active order permitted at a time");
       return;
@@ -300,10 +302,14 @@ export class SpotForm extends React.Component {
       }
     } else if (this.props.side === "b") {
       const quoteBalance = this.getQuoteBalance();
-      const decimals = marketInfo.quoteAsset.decimals;
+      const quoteDecimals = marketInfo.quoteAsset.decimals;
+      const baseDecimals = marketInfo.baseAsset.decimals;
       let displayAmount = (quoteBalance * val) / 100;
+      newstate.baseAmount = (displayAmount / this.currentPrice())
+        .toFixed(baseDecimals)
       displayAmount -= marketInfo.quoteFee;
-      displayAmount = parseFloat(displayAmount.toFixed(decimals)).toPrecision(5);
+      displayAmount = parseFloat(displayAmount.toFixed(quoteDecimals))
+        .toPrecision(5);
       if (displayAmount < 1e-5) {
         newstate.quoteAmount = 0;
       } else {
@@ -402,15 +408,7 @@ export class SpotForm extends React.Component {
             <span className="spf_desc_text">Amount</span>
             <input
               type="text"
-              value={
-                this.state.baseAmount
-                  ? this.state.baseAmount
-                  : (this.state.quoteAmount && this.state.price)
-                    ? (parseFloat(this.state.quoteAmount)/parseFloat(this.state.price)).toFixed(
-                        marketInfo.pricePrecisionDecimals
-                      )
-                    : "0"
-              }
+              value={this.state.baseAmount}
               placeholder="0.00"
               onChange={this.updateAmount.bind(this)}
             />
