@@ -114,9 +114,7 @@ const BridgeCurrencySelector = ({
   const network = useSelector(networkSelector);
   const user = useSelector(userSelector);
   const coinEstimator = useCoinEstimator();
-  const tickers = api.getCurrencies();
-
-  var [availableTickers, setTickers] = useState(tickers);
+  var [tickers, setTickers] = useState(api.getCurrencies());
 
   useEffect(() => {
     onChange(api.marketInfo["ETH"] ? "ETH" : tickers[0]);
@@ -128,7 +126,20 @@ const BridgeCurrencySelector = ({
   };
 
   const resetTickers = () => {
-    setTickers(api.getCurrencies())
+    const tickers = api.getCurrencies()
+    const tickersOfBalance = tickers.filter(x => {
+      return balances[x] && parseFloat(balances[x].valueReadable) > 0
+    })
+
+    const tickersRest = tickers.filter(x => {
+      return balances[x] && parseFloat(balances[x].valueReadable) === 0
+    })
+
+    tickersOfBalance.sort((a,b) => {
+      return parseFloat(coinEstimator(b) * balances[b].valueReadable) - parseFloat(coinEstimator(a) * balances[a].valueReadable)
+    })
+
+    setTickers([...tickersOfBalance, ...tickersRest])
   }
 
   useEffect(() => {
@@ -181,7 +192,7 @@ const BridgeCurrencySelector = ({
     <BridgeCurrencyWrapper>
       <StyledBridgeCurrencySelector onClick={() => setShow(true)}>
         <div className="currencyIcon">
-          <img src={image && image.default} alt={currency && currency.symbol} />
+          <img src={image && image} alt={currency && currency.symbol} />
         </div>
         <div className="currencyName">
           {value}
@@ -198,7 +209,7 @@ const BridgeCurrencySelector = ({
       >
         <SearchBox searchPair={searchPair} className="bridge_searchbox" />
         <BridgeCurrencyOptions>
-          {availableTickers.map((ticker, key) =>
+          {tickers.map((ticker, key) =>
             ticker === value ? null : (
               <li
                 key={key}
@@ -209,8 +220,7 @@ const BridgeCurrencySelector = ({
                 <div className="currencyIcon">
                   <img
                     src={
-                      api.getCurrencyLogo(ticker) &&
-                      api.getCurrencyLogo(ticker).default
+                      api.getCurrencyLogo(ticker)
                     }
                     alt={currency && currency.symbol}
                   />

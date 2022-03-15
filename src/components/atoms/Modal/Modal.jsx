@@ -28,7 +28,7 @@ export const Modal = (props) => {
           <div className="zig_modal_header">
             <h4 className="zig_modal_title">{props.title}</h4>
           </div>
-          <div className="zig_modal_body">{props.children}</div>
+          <div className="zig_modal_body zig_scrollstyle">{props.children}</div>
         </div>
       </div>
     </CSSTransition>,
