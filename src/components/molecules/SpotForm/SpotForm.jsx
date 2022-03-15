@@ -130,8 +130,6 @@ export class SpotForm extends React.Component {
       ? baseAmount.toFixed(marketInfo.baseAsset.decimals)
       : (quoteAmount / price).toFixed(marketInfo.baseAsset.decimals)
 
-    // if quoteAmount is set -> use that
-    baseAmount = (quoteAmount && this.props.side === "b") ? null : baseAmount
     if (isNaN(amount)) {
       toast.error("Amount is not a number");
       return;

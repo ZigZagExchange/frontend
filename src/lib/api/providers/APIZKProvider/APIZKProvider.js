@@ -139,12 +139,27 @@ export default class APIZKProvider extends APIProvider {
         if (!APIZKProvider.VALID_SIDES.includes(side)) {
             throw new Error('Invalid side')
         }
+        if (!quoteAmount && !baseAmount) {
+            throw new Error('Set base or quote amount')
+        }
+
+
+        quoteAmount = (quoteAmount) ? parseFloat(quoteAmount).toFixed(marketInfo.quoteAsset.decimals) : null;
+        baseAmount = (baseAmount) ? parseFloat(baseAmount).toFixed(marketInfo.baseAsset.decimals) : null;
 
         let tokenBuy, tokenSell, sellQuantity, sellQuantityWithFee, tokenRatio = {}, fullSellQuantity;
-
-        if(baseAmount) {
-            baseAmount = parseFloat(baseAmount).toFixed(marketInfo.baseAsset.decimals);;
-            if (side === 'b') {
+        if (side === 'b') {
+            // quoteAmount is first choice for buy
+            if (quoteAmount) {
+                sellQuantity = parseFloat(quoteAmount);
+                sellQuantityWithFee = (sellQuantity + marketInfo.quoteFee).toFixed(marketInfo.quoteAsset.decimals);
+                tokenSell = marketInfo.quoteAssetId;
+                tokenBuy = marketInfo.baseAssetId;
+                tokenRatio[marketInfo.baseAssetId] = (quoteAmount / price).toFixed(marketInfo.baseAsset.decimals);
+                tokenRatio[marketInfo.quoteAssetId] = sellQuantityWithFee;
+                fullSellQuantity = (sellQuantityWithFee * 10**(marketInfo.quoteAsset.decimals))
+                    .toLocaleString('fullwide', {useGrouping: false });
+            } else {
                 sellQuantity = parseFloat(baseAmount * price);
                 sellQuantityWithFee = (sellQuantity + marketInfo.quoteFee).toFixed(marketInfo.quoteAsset.decimals);
                 tokenSell = marketInfo.quoteAssetId;
@@ -153,7 +168,10 @@ export default class APIZKProvider extends APIProvider {
                 tokenRatio[marketInfo.quoteAssetId] = sellQuantityWithFee;
                 fullSellQuantity = (sellQuantityWithFee * 10**(marketInfo.quoteAsset.decimals))
                     .toLocaleString('fullwide', {useGrouping: false });
-            } else {
+            }
+        } else {
+            // baseAmount is first choice for sell
+            if (baseAmount) {
                 sellQuantity = parseFloat(baseAmount);
                 sellQuantityWithFee = (sellQuantity + marketInfo.baseFee).toFixed(marketInfo.baseAsset.decimals);
                 tokenSell = marketInfo.baseAssetId;
@@ -161,18 +179,6 @@ export default class APIZKProvider extends APIProvider {
                 tokenRatio[marketInfo.baseAssetId] = sellQuantityWithFee;
                 tokenRatio[marketInfo.quoteAssetId] = (baseAmount * price).toFixed(marketInfo.quoteAsset.decimals);
                 fullSellQuantity = (sellQuantityWithFee * 10**(marketInfo.baseAsset.decimals))
-                    .toLocaleString('fullwide', {useGrouping: false });
-            }
-        } else if (quoteAmount) {
-            quoteAmount = parseFloat(quoteAmount).toFixed(marketInfo.quoteAsset.decimals);
-            if (side === 'b') {
-                sellQuantity = parseFloat(quoteAmount);
-                sellQuantityWithFee = (sellQuantity + marketInfo.quoteFee).toFixed(marketInfo.quoteAsset.decimals);                
-                tokenSell = marketInfo.quoteAssetId;
-                tokenBuy = marketInfo.baseAssetId;
-                tokenRatio[marketInfo.baseAssetId] = (quoteAmount / price).toFixed(marketInfo.baseAsset.decimals);
-                tokenRatio[marketInfo.quoteAssetId] = sellQuantityWithFee;
-                fullSellQuantity = (sellQuantityWithFee * 10**(marketInfo.quoteAsset.decimals))
                     .toLocaleString('fullwide', {useGrouping: false });
             } else {
                 sellQuantity = parseFloat(quoteAmount / price);
@@ -184,8 +190,6 @@ export default class APIZKProvider extends APIProvider {
                 fullSellQuantity = (sellQuantityWithFee * 10**(marketInfo.baseAsset.decimals))
                     .toLocaleString('fullwide', {useGrouping: false });
             }
-        } else {
-            throw new Error('Set base or quote amount')
         }
 
         const now_unix = Date.now() / 1000 | 0
