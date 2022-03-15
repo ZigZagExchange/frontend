@@ -11,7 +11,8 @@ export class SpotForm extends React.Component {
     this.state = {
       userHasEditedPrice: false,
       price: "",
-      amount: "",
+      baseAmount: "",
+      quoteAmount: "",
       orderButtonDisabled: false,
       maxSizeSelected: false,
     };
@@ -36,7 +37,8 @@ export class SpotForm extends React.Component {
 
   updateAmount(e) {
     const newState = { ...this.state };
-    newState.amount = e.target.value;
+    newState.baseAmount = e.target.value;
+    newState.quoteAmount = "";
     this.setState(newState);
   }
 
@@ -62,13 +64,13 @@ export class SpotForm extends React.Component {
     const marketInfo = this.props.marketInfo;
     if (!marketInfo) return 0;
 
-    let amount = this.state.amount;
+    let baseAmount = this.state.baseAmount;
     const side = this.props.side;
 
-    if (!amount) amount = 0;
+    if (!baseAmount) baseAmount = 0;
 
     let price,
-      unfilled = amount;
+      unfilled = baseAmount;
     if (side === "b") {
       const asks = this.props.liquidity.filter((l) => l[0] === "s");
       asks.sort((a, b) => a[1] - b[1]);
@@ -98,29 +100,22 @@ export class SpotForm extends React.Component {
   }
 
   async buySellHandler(e) {
-    let amount;
-    if (typeof this.state.amount === "string") {
-      amount = parseFloat(this.state.amount.replace(",", "."));
+    let baseAmount, quoteAmount;
+    if (typeof this.state.baseAmount === "string") {
+      baseAmount = parseFloat(this.state.baseAmount.replace(",", "."));
     } else {
-      amount = this.state.amount;
+      baseAmount = this.state.baseAmount;
     }
-    if (isNaN(amount)) {
+    if (typeof this.state.quoteAmount === "string") {
+      quoteAmount = parseFloat(this.state.quoteAmount.replace(",", "."));
+    } else {
+      quoteAmount = this.state.quoteAmount;
+    }
+
+    // quoteAmount is not exposed to user
+    if (isNaN(baseAmount)) {
       toast.error("Amount is not a number");
       return;
-    }
-    const marketInfo = this.props.marketInfo;
-    amount = parseFloat(amount.toFixed(marketInfo.baseAsset.decimals));
-    if (this.props.activeOrderCount > 0 && api.isZksyncChain()) {
-      toast.error("Only one active order permitted at a time");
-      return;
-    }
-    let baseBalance, quoteBalance;
-    if (this.props.user.id) {
-      baseBalance = await this.getBaseBalance();
-      quoteBalance = await this.getQuoteBalance();
-    } else {
-      baseBalance = 0;
-      quoteBalance = 0;
     }
 
     let price = this.currentPrice();
@@ -135,6 +130,23 @@ export class SpotForm extends React.Component {
         price *= 0.9985;
       }
     }
+
+    const marketInfo = this.props.marketInfo;
+    let amount = (baseAmount) 
+      ? baseAmount.toFixed(marketInfo.baseAsset.decimals)
+      : (quoteAmount / price).toFixed(marketInfo.baseAsset.decimals)
+    if (this.props.activeOrderCount > 0 && api.isZksyncChain()) {
+      toast.error("Only one active order permitted at a time");
+      return;
+    }
+    let baseBalance, quoteBalance;
+    if (this.props.user.id) {
+      baseBalance = this.getBaseBalance();
+      quoteBalance = this.getQuoteBalance();
+    } else {
+      baseBalance = 0;
+      quoteBalance = 0;
+    }    
 
     baseBalance = parseFloat(baseBalance);
     quoteBalance = parseFloat(quoteBalance);
@@ -183,7 +195,8 @@ export class SpotForm extends React.Component {
         this.props.currentMarket,
         this.props.side,
         price,
-        amount,
+        baseAmount,
+        quoteAmount,
         this.props.orderType
       );
     } catch (e) {
@@ -211,13 +224,17 @@ export class SpotForm extends React.Component {
 
     if (this.props.side === "s") {
       const baseBalance = this.getBaseBalance() - marketInfo.baseFee;
-      const amount = this.state.amount || 0;
-      return Math.round((amount / baseBalance) * 100);
+      const baseAmount = this.state.baseAmount || 0;
+      return Math.round((baseAmount / baseBalance) * 100);
     } else if (this.props.side === "b") {
       const quoteBalance = this.getQuoteBalance();
-      const amount = this.state.amount || 0;
-      const total = amount * this.currentPrice();
-      return (total / (quoteBalance - marketInfo.quoteFee)) * 100;
+      if (this.state.quoteAmount) {
+        return (total / (quoteBalance - marketInfo.quoteFee)) * 100;
+      } else {
+        const amount = this.state.baseAmount || 0;
+        const total = amount * this.currentPrice();
+        return (total / (quoteBalance - marketInfo.quoteFee)) * 100;
+      }      
     }
   }
 
@@ -277,26 +294,24 @@ export class SpotForm extends React.Component {
         5
       );
       if (displayAmount < 1e-5) {
-        newstate.amount = 0;
+        newstate.baseAmount = 0;
       } else {
-        newstate.amount = parseFloat(displayAmount.slice(0, -1));
+        newstate.baseAmount = parseFloat(displayAmount.slice(0, -1));
       }
     } else if (this.props.side === "b") {
       const quoteBalance = this.getQuoteBalance();
       const decimals = marketInfo.baseAsset.decimals;
-      let quoteAmount =
-        ((quoteBalance - marketInfo.quoteFee) * val) /
-        100 /
-        this.currentPrice();
+      let quoteAmount = ((quoteBalance - marketInfo.quoteFee) * val) / 100;
       quoteAmount = parseFloat(quoteAmount.toFixed(decimals)).toPrecision(5);
       if (quoteAmount < 1e-5) {
-        newstate.amount = 0;
+        newstate.quoteAmount = 0;
       } else {
-        newstate.amount = parseFloat(quoteAmount.slice(0, -1));
+        newstate.quoteAmount = parseFloat(quoteAmount.slice(0, -1));
       }
     }
 
-    if (isNaN(newstate.amount)) newstate.amount = 0;
+    if (isNaN(newstate.baseAmount)) newstate.baseAmount = 0;
+    if (isNaN(newstate.quoteAmount)) newstate.quoteAmount = 0;
     this.setState(newstate);
   }
 
@@ -311,7 +326,7 @@ export class SpotForm extends React.Component {
     }
 
     if (this.props.currentMarket !== prevProps.currentMarket) {
-      this.setState((state) => ({ ...state, price: "", amount: "" }));
+      this.setState((state) => ({ ...state, price: "", baseAmount: "", quoteAmount: ""}));
     }
   }
 
@@ -405,13 +420,13 @@ export class SpotForm extends React.Component {
                 <strong>
                   {this.props.orderType === "limit" ? (
                     <>
-                      {(this.currentPrice() * this.state.amount).toPrecision(6)}{" "}
+                      {(this.currentPrice() * this.state.baseAmount).toPrecision(6)}{" "}
                       {marketInfo && marketInfo.quoteAsset.symbol}
                     </>
                   ) : (
                     <>
                       {(
-                        this.props.marketSummary.price * this.state.amount
+                        this.props.marketSummary.price * this.state.baseAmount
                       ).toPrecision(6)}{" "}
                       {marketInfo && marketInfo.quoteAsset.symbol}
                     </>
