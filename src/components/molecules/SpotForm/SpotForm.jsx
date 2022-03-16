@@ -102,11 +102,19 @@ export class SpotForm extends React.Component {
       quoteAmount = this.state.quoteAmount;
     }
 
+    quoteAmount = isNaN(quoteAmount) ? 0 : quoteAmount
+    baseAmount = isNaN(baseAmount) ? 0 : baseAmount
+    if(!baseAmount && !quoteAmount) {
+      toast.error("No amount available");
+      return;
+    }
+
     let price = this.currentPrice();
     if (!price) {
       toast.error("No price available");
       return;
     }
+
     if (this.props.orderType === "market") {
       if (this.props.side === "b") {
         price *= 1.0015;
@@ -137,12 +145,17 @@ export class SpotForm extends React.Component {
         return;
       }
 
-      if (amount > baseBalance) {
+      if (
+        (baseAmount && baseAmount > baseBalance) ||
+        (!baseAmount && (quoteAmount / price) > baseBalance)
+      ) {
         toast.error(`Amount exceeds ${marketInfo.baseAsset.symbol} balance`);
         return;
       }
 
-      if (baseAmount && baseAmount < this.marketInfo.baseFee) {
+      if (
+        (baseAmount && baseAmount < marketInfo.baseFee) ||
+        (!baseAmount && (quoteAmount*0.95) < marketInfo.quoteFee)) {
         toast.error(
           `Minimum order size is ${this.marketInfo.baseFee} ${marketInfo.baseAsset.symbol}`
         );
@@ -167,7 +180,10 @@ export class SpotForm extends React.Component {
         return;
       }
 
-      if (quoteAmount && quoteAmount < this.marketInfo.quoteFee) {
+      if (
+        (quoteAmount && quoteAmount < marketInfo.quoteFee) ||
+        (!quoteAmount && (baseAmount*0.95) < marketInfo.baseFee)         
+      ) {
         toast.error(
           `Minimum order size is ${this.marketInfo.quoteFee} ${marketInfo.quoteAsset.symbol}`
         );
