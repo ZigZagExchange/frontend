@@ -126,28 +126,25 @@ export class SpotForm extends React.Component {
     } else {
       baseBalance = 0;
       quoteBalance = 0;
-    }    
+    }
 
     const marketInfo = this.props.marketInfo;
     baseBalance = parseFloat(baseBalance);
     quoteBalance = parseFloat(quoteBalance);
     if(this.props.side === "s") {
+      baseAmount = baseAmount ? baseAmount : (quoteAmount / price);
+      quoteAmount = 0;
       if(isNaN(baseBalance)) {
         toast.error(`No ${marketInfo.baseAsset.symbol} balance`);
         return;
       }
 
-      if (
-        (baseAmount && baseAmount > baseBalance) ||
-        (!baseAmount && (quoteAmount / price) > baseBalance)
-      ) {
+      if (baseAmount && baseAmount > baseBalance) {
         toast.error(`Amount exceeds ${marketInfo.baseAsset.symbol} balance`);
         return;
       }
 
-      if (
-        (baseAmount && baseAmount < marketInfo.baseFee) ||
-        (!baseAmount && (quoteAmount*0.95) < marketInfo.quoteFee)) {
+      if (baseAmount && baseAmount < marketInfo.baseFee) {
         toast.error(
           `Minimum order size is ${
             marketInfo.baseFee.toPrecision(5)
@@ -161,23 +158,20 @@ export class SpotForm extends React.Component {
         return;
       }
     } else if (this.props.side === "b") {
+      quoteAmount = quoteAmount ? quoteAmount : (baseAmount * price);
+      baseAmount = 0;
+
       if(isNaN(quoteBalance)) {
         toast.error(`No ${marketInfo.quoteAsset.symbol} balance`);
         return;
       }
 
-      if (
-        (quoteAmount && quoteAmount > quoteBalance) ||
-        (!quoteAmount && baseAmount * price > quoteBalance)
-      ) {
+      if (quoteAmount && quoteAmount > quoteBalance) {
         toast.error(`Total exceeds ${marketInfo.quoteAsset.symbol} balance`);
         return;
       }
 
-      if (
-        (quoteAmount && quoteAmount < marketInfo.quoteFee) ||
-        (!quoteAmount && (baseAmount*0.95) < marketInfo.baseFee)         
-      ) {
+      if (quoteAmount && quoteAmount < marketInfo.quoteFee) {
         toast.error(
           `Minimum order size is ${
             marketInfo.quoteFee.toPrecision(5)
