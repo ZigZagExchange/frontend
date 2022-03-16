@@ -322,7 +322,7 @@ export class SpotForm extends React.Component {
       const quoteDecimals = marketInfo.quoteAsset.decimals;
       const baseDecimals = marketInfo.baseAsset.decimals;
       let displayAmount = (quoteBalance * val) / 100;      
-      displayAmount -= marketInfo.baseFee;
+      displayAmount -= marketInfo.quoteFee;
       displayAmount = parseFloat(displayAmount.toFixed(quoteDecimals))
       displayAmount = (displayAmount > 9999)
         ? displayAmount.toFixed(0)
