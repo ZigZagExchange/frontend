@@ -157,7 +157,7 @@ export class SpotForm extends React.Component {
         (baseAmount && baseAmount < marketInfo.baseFee) ||
         (!baseAmount && (quoteAmount*0.95) < marketInfo.quoteFee)) {
         toast.error(
-          `Minimum order size is ${this.marketInfo.baseFee} ${marketInfo.baseAsset.symbol}`
+          `Minimum order size is ${marketInfo.baseFee} ${marketInfo.baseAsset.symbol}`
         );
         return;
       }
@@ -185,7 +185,7 @@ export class SpotForm extends React.Component {
         (!quoteAmount && (baseAmount*0.95) < marketInfo.baseFee)         
       ) {
         toast.error(
-          `Minimum order size is ${this.marketInfo.quoteFee} ${marketInfo.quoteAsset.symbol}`
+          `Minimum order size is ${marketInfo.quoteFee} ${marketInfo.quoteAsset.symbol}`
         );
         return;
       }
