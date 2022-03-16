@@ -40,7 +40,7 @@ export default function TradeBooks(props) {
 
   // Only display recent trades
   // There's a bunch of user trades in this list that are too old to display
-  const one_day_ago = Date.now() - 86400 * 1000;
+  const one_day_ago = Date.now() - 86400;
   const fillData = [];  
   Object.values(marketFills)
     .filter((fill) => fill[12] > one_day_ago)

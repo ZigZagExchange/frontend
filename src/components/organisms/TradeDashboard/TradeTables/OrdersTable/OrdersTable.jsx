@@ -42,7 +42,7 @@ export class OrdersTable extends React.Component {
           {orders.map((order, i) => {
             const orderId = order[1];
             const market = order[2];
-            const time = order[7] && formatDate(new Date(order[7]*1000)); //new Date(order[7]).toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1");
+            const time = order[7] && formatDate(new Date(order[7]*1000));
             let price = order[4];
             let baseQuantity = order[5];
             let remaining = isNaN(Number(order[11])) ? order[5] : order[11];
@@ -208,7 +208,7 @@ export class OrdersTable extends React.Component {
           {fills.map((fill, i) => {
             const fillid = fill[1];
             const market = fill[2];
-            const time = fill[12] && formatDate(new Date(fill[12])); //new Date(fill[12]).toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1");
+            const time = fill[12] && formatDate(new Date(fill[12]));
             const side = fill[3];
             let price = fill[4];
             let baseQuantity = fill[5];
