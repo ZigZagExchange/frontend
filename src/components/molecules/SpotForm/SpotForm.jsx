@@ -115,14 +115,6 @@ export class SpotForm extends React.Component {
       return;
     }
 
-    if (this.props.orderType === "market") {
-      if (this.props.side === "b") {
-        price *= 1.0015;
-      } else if (this.props.side === "s") {
-        price *= 0.9985;
-      }
-    }
-
     if (this.props.activeOrderCount > 0 && api.isZksyncChain()) {
       toast.error("Only one active order permitted at a time");
       return;
@@ -193,6 +185,14 @@ export class SpotForm extends React.Component {
       if (price > this.getFirstAsk() * 1.2) {
         toast.error("Limit orders cannot exceed 20% beyond spot");
         return;
+      }
+    }
+
+    if (this.props.orderType === "market") {
+      if (this.props.side === "b") {
+        price *= 1.0015;
+      } else if (this.props.side === "s") {
+        price *= 0.9985;
       }
     }
 
