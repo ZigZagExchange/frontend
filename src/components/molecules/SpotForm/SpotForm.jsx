@@ -139,7 +139,7 @@ export class SpotForm extends React.Component {
         return;
       }
 
-      if (baseAmount && baseAmount > baseBalance) {
+      if (baseAmount && (baseAmount + marketInfo.baseFee) > baseBalance) {
         toast.error(`Amount exceeds ${marketInfo.baseAsset.symbol} balance`);
         return;
       }
@@ -166,7 +166,7 @@ export class SpotForm extends React.Component {
         return;
       }
 
-      if (quoteAmount && quoteAmount > quoteBalance) {
+      if (quoteAmount && (quoteAmount + marketInfo.quoteFee) > quoteBalance) {
         toast.error(`Total exceeds ${marketInfo.quoteAsset.symbol} balance`);
         return;
       }
@@ -292,10 +292,10 @@ export class SpotForm extends React.Component {
     if (val === 100) {
       newstate.maxSizeSelected = true;
       if (this.props.side === "b") {
-        val = 99.999;
+        val = 99.9;
       }
       if (this.props.side === "s") {
-        val = 99.999;
+        val = 99.9;
       }
     } else {
       newstate.maxSizeSelected = false;
