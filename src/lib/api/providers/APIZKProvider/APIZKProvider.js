@@ -139,11 +139,7 @@ export default class APIZKProvider extends APIProvider {
         if (!APIZKProvider.VALID_SIDES.includes(side)) {
             throw new Error('Invalid side')
         }
-        if (!quoteAmount && !baseAmount) {
-            throw new Error('Set base or quote amount')
-        }
-
-
+        
         quoteAmount = (quoteAmount) ? parseFloat(quoteAmount).toFixed(marketInfo.quoteAsset.decimals) : null;
         baseAmount = (baseAmount) ? parseFloat(baseAmount).toFixed(marketInfo.baseAsset.decimals) : null;
 

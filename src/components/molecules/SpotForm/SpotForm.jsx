@@ -16,16 +16,6 @@ export class SpotForm extends React.Component {
       orderButtonDisabled: false,
       maxSizeSelected: false,
     };
-    this.MINIMUM_AMOUNTS = {
-      ETH: 0.0002,
-      WETH: 0.0001,
-      USDC: 1,
-      USDT: 1,
-      WBTC: 0.0002,
-      DAI: 1,
-      FRAX: 1,
-      FXS: 0.1,
-    };
   }
 
   updatePrice(e) {
@@ -125,16 +115,6 @@ export class SpotForm extends React.Component {
       }
     }
 
-    const marketInfo = this.props.marketInfo;
-    let amount = (baseAmount) 
-      ? baseAmount.toFixed(marketInfo.baseAsset.decimals)
-      : (quoteAmount / price).toFixed(marketInfo.baseAsset.decimals)
-
-    if (isNaN(amount)) {
-      toast.error("Amount is not a number");
-      return;
-    }
-
     if (this.props.activeOrderCount > 0 && api.isZksyncChain()) {
       toast.error("Only one active order permitted at a time");
       return;
@@ -148,36 +128,56 @@ export class SpotForm extends React.Component {
       quoteBalance = 0;
     }    
 
+    const marketInfo = this.props.marketInfo;
     baseBalance = parseFloat(baseBalance);
     quoteBalance = parseFloat(quoteBalance);
-    if (this.props.side === "s" && isNaN(baseBalance)) {
-      toast.error(`No ${marketInfo.baseAsset.symbol} balance`);
-      return;
-    } else if (this.props.side === "b" && isNaN(quoteBalance)) {
-      toast.error(`No ${marketInfo.quoteAsset.symbol} balance`);
-      return;
-    } else if (this.props.side === "s" && amount > baseBalance) {
-      toast.error(`Amount exceeds ${marketInfo.baseAsset.symbol} balance`);
-      return;
-    } else if (this.props.side === "b" && amount * price > quoteBalance) {
-      toast.error(`Total exceeds ${marketInfo.quoteAsset.symbol} balance`);
-      return;
-    } else if (amount < this.MINIMUM_AMOUNTS[marketInfo.baseAsset.symbol]) {
-      toast.error(
-        `Minimum order size is ${
-          this.MINIMUM_AMOUNTS[marketInfo.baseAsset.symbol]
-        } ${marketInfo.baseAsset.symbol}`
-      );
-      return;
-    } else if (isNaN(price)) {
-      toast.error("Price undefined");
-      return;
-    } else if (
-      (this.props.side === "b" && price > this.getFirstAsk() * 1.2) ||
-      (this.props.side === "s" && price < this.getFirstBid() * 0.8)
-    ) {
-      toast.error("Limit orders cannot exceed 20% beyond spot");
-      return;
+    if(this.props.side === "s") {
+      if(isNaN(baseBalance)) {
+        toast.error(`No ${marketInfo.baseAsset.symbol} balance`);
+        return;
+      }
+
+      if (amount > baseBalance) {
+        toast.error(`Amount exceeds ${marketInfo.baseAsset.symbol} balance`);
+        return;
+      }
+
+      if (baseAmount && baseAmount < this.marketInfo.baseFee) {
+        toast.error(
+          `Minimum order size is ${this.marketInfo.baseFee} ${marketInfo.baseAsset.symbol}`
+        );
+        return;
+      }
+
+      if (price < this.getFirstBid() * 0.8) {
+        toast.error("Limit orders cannot exceed 20% beyond spot");
+        return;
+      }
+    } else if (this.props.side === "b") {
+      if(isNaN(quoteBalance)) {
+        toast.error(`No ${marketInfo.quoteAsset.symbol} balance`);
+        return;
+      }
+
+      if (
+        (quoteAmount && quoteAmount > quoteBalance) ||
+        (!quoteAmount && baseAmount * price > quoteBalance)
+      ) {
+        toast.error(`Total exceeds ${marketInfo.quoteAsset.symbol} balance`);
+        return;
+      }
+
+      if (quoteAmount && quoteAmount < this.marketInfo.quoteFee) {
+        toast.error(
+          `Minimum order size is ${this.marketInfo.quoteFee} ${marketInfo.quoteAsset.symbol}`
+        );
+        return;
+      }
+
+      if (price > this.getFirstAsk() * 1.2) {
+        toast.error("Limit orders cannot exceed 20% beyond spot");
+        return;
+      }
     }
 
     let newstate = { ...this.state };
@@ -306,7 +306,7 @@ export class SpotForm extends React.Component {
       const quoteDecimals = marketInfo.quoteAsset.decimals;
       const baseDecimals = marketInfo.baseAsset.decimals;
       let displayAmount = (quoteBalance * val) / 100;      
-      displayAmount -= marketInfo.quoteFee;
+      displayAmount -= marketInfo.baseFee;
       displayAmount = parseFloat(displayAmount.toFixed(quoteDecimals))
       displayAmount = (displayAmount > 9999)
         ? displayAmount.toFixed(0)

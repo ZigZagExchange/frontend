@@ -456,6 +456,9 @@ export default class API extends Emitter {
     }
 
     submitOrder = async (product, side, price, baseAmount, quoteAmount, orderType) => {
+        if (!quoteAmount && !baseAmount) {
+            throw new Error('Set base or quote amount')
+        }
         await this.apiProvider.submitOrder(product, side, price, baseAmount, quoteAmount, orderType)
     }
 
