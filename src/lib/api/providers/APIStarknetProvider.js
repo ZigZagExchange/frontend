@@ -21,7 +21,7 @@ export default class APIStarknetProvider extends APIProvider {
     return {};
   };
 
-  submitOrder = async (product, side, price, amount) => {
+  submitOrder = async (product, side, price, baseAmount, quoteAmount) => {
     // check allowance first
     const baseCurrency = product.split("-")[0];
     const quoteCurrency = product.split("-")[1];
@@ -50,7 +50,10 @@ export default class APIStarknetProvider extends APIProvider {
     }
     toast.dismiss(allowancesToast);
 
-    const expiration = Date.now() + 86400;
+    if(!baseAmount && quoteAmount) {
+      baseAmount = quoteAmount / price;
+    }
+    const expiration = Date.now() + 86400;    
     const orderhash = this._createOrderHash(
       product,
       side,

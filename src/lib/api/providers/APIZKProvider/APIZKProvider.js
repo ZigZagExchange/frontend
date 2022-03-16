@@ -53,7 +53,7 @@ export default class APIZKProvider extends APIProvider {
         throw err;
       }
     }
-
+    
     return {};
   };
 
@@ -66,7 +66,7 @@ export default class APIZKProvider extends APIProvider {
       type,
     };
     const subdomain = this.network === 1 ? "" : "rinkeby.";
-
+    
     if (!_receipt) {
       return receipt;
     }
@@ -161,52 +161,62 @@ export default class APIZKProvider extends APIProvider {
     return signingKey;
   };
 
-  submitOrder = async (market, side, price, amount, orderType) => {
+  submitOrder = async (market, side, price, baseAmount, quoteAmount, orderType) => {
     const marketInfo = this.marketInfo[market];
-    amount = parseFloat(amount).toFixed(marketInfo.baseAsset.decimals);
     price = parseFloat(price).toFixed(marketInfo.pricePrecisionDecimals);
 
     if (!APIZKProvider.VALID_SIDES.includes(side)) {
-      throw new Error("Invalid side");
+      throw new Error('Invalid side')
     }
 
-    let tokenBuy,
-      tokenSell,
-      sellQuantity,
-      sellQuantityWithFee,
-      tokenRatio = {},
-      fullSellQuantity;
+    quoteAmount = (quoteAmount) ? parseFloat(quoteAmount).toFixed(marketInfo.quoteAsset.decimals) : null;
+    baseAmount = (baseAmount) ? parseFloat(baseAmount).toFixed(marketInfo.baseAsset.decimals) : null;
 
-    if (side === "b") {
-      sellQuantity = parseFloat(amount * price);
-      sellQuantityWithFee = (sellQuantity + marketInfo.quoteFee).toFixed(
-        marketInfo.quoteAsset.decimals
-      );
-      tokenSell = marketInfo.quoteAssetId;
-      tokenBuy = marketInfo.baseAssetId;
-      tokenRatio[marketInfo.baseAssetId] = amount;
-      tokenRatio[marketInfo.quoteAssetId] = sellQuantityWithFee;
-      fullSellQuantity = (
-        sellQuantityWithFee *
-        10 ** marketInfo.quoteAsset.decimals
-      ).toLocaleString("fullwide", { useGrouping: false });
-    } else if (side === "s") {
-      sellQuantity = parseFloat(amount);
-      sellQuantityWithFee = (sellQuantity + marketInfo.baseFee).toFixed(
-        marketInfo.baseAsset.decimals
-      );
-      tokenSell = marketInfo.baseAssetId;
-      tokenBuy = marketInfo.quoteAssetId;
-      tokenRatio[marketInfo.baseAssetId] = sellQuantityWithFee;
-      tokenRatio[marketInfo.quoteAssetId] = (amount * price).toFixed(
-        marketInfo.quoteAsset.decimals
-      );
-      fullSellQuantity = (
-        sellQuantityWithFee *
-        10 ** marketInfo.baseAsset.decimals
-      ).toLocaleString("fullwide", { useGrouping: false });
+    let tokenBuy, tokenSell, sellQuantity, sellQuantityWithFee, tokenRatio = {}, fullSellQuantity;
+    if (side === 'b') {
+      // quoteAmount is first choice for buy
+      if (quoteAmount) {
+        sellQuantity = parseFloat(quoteAmount);
+        sellQuantityWithFee = (sellQuantity + marketInfo.quoteFee).toFixed(marketInfo.quoteAsset.decimals);
+        tokenSell = marketInfo.quoteAssetId;
+        tokenBuy = marketInfo.baseAssetId;
+        tokenRatio[marketInfo.baseAssetId] = (quoteAmount / price).toFixed(marketInfo.baseAsset.decimals);
+        tokenRatio[marketInfo.quoteAssetId] = sellQuantityWithFee;
+        fullSellQuantity = (sellQuantityWithFee * 10**(marketInfo.quoteAsset.decimals))
+          .toLocaleString('fullwide', {useGrouping: false });
+      } else {
+        sellQuantity = parseFloat(baseAmount * price);
+        sellQuantityWithFee = (sellQuantity + marketInfo.quoteFee).toFixed(marketInfo.quoteAsset.decimals);
+        tokenSell = marketInfo.quoteAssetId;
+        tokenBuy = marketInfo.baseAssetId;
+        tokenRatio[marketInfo.baseAssetId] = baseAmount;
+        tokenRatio[marketInfo.quoteAssetId] = sellQuantityWithFee;
+        fullSellQuantity = (sellQuantityWithFee * 10**(marketInfo.quoteAsset.decimals))
+          .toLocaleString('fullwide', {useGrouping: false });
+      }
+    } else {
+      // baseAmount is first choice for sell
+      if (baseAmount) {
+        sellQuantity = parseFloat(baseAmount);
+        sellQuantityWithFee = (sellQuantity + marketInfo.baseFee).toFixed(marketInfo.baseAsset.decimals);
+        tokenSell = marketInfo.baseAssetId;
+        tokenBuy = marketInfo.quoteAssetId;
+        tokenRatio[marketInfo.baseAssetId] = sellQuantityWithFee;
+        tokenRatio[marketInfo.quoteAssetId] = (baseAmount * price).toFixed(marketInfo.quoteAsset.decimals);
+        fullSellQuantity = (sellQuantityWithFee * 10**(marketInfo.baseAsset.decimals))
+          .toLocaleString('fullwide', {useGrouping: false });
+      } else {
+        sellQuantity = parseFloat(quoteAmount / price);
+        sellQuantityWithFee = (sellQuantity + marketInfo.baseFee).toFixed(marketInfo.baseAsset.decimals);
+        tokenSell = marketInfo.baseAssetId;
+        tokenBuy = marketInfo.quoteAssetId;
+        tokenRatio[marketInfo.baseAssetId] = sellQuantityWithFee;
+        tokenRatio[marketInfo.quoteAssetId] = quoteAmount;
+        fullSellQuantity = (sellQuantityWithFee * 10**(marketInfo.baseAsset.decimals))
+          .toLocaleString('fullwide', {useGrouping: false });
+      }
     }
-
+  
     const now_unix = (Date.now() / 1000) | 0;
     const two_minute_expiry = now_unix + 120;
     const one_week_expiry = now_unix + 7 * 24 * 3600;

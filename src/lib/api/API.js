@@ -410,178 +410,180 @@ export default class API extends Emitter {
   };
 
   getWalletBalances = async () => {
-    const balances = {};
+      const balances = {}
 
-    const getBalance = async (ticker) => {
-      const currencyInfo = this.getCurrencyInfo(ticker);
-      const { balance, allowance } = await this.getBalanceOfCurrency(ticker);
-      balances[ticker] = {
-        value: balance,
-        allowance,
-        valueReadable: "0",
-      };
-      if (currencyInfo) {
-        balances[ticker].valueReadable = formatAmount(balance, currencyInfo);
+      const getBalance = async (ticker) => {
+        const currencyInfo = this.getCurrencyInfo(ticker);
+        const { balance, allowance } = await this.getBalanceOfCurrency(ticker)
+        balances[ticker] = {
+          value: balance,
+          allowance,
+          valueReadable: "0",
+        }
+        if (currencyInfo) {
+          balances[ticker].valueReadable = formatAmount(balance, currencyInfo);
+        }
+
+        this.emit('balanceUpdate', 'wallet', { ...balances })
       }
 
-      this.emit("balanceUpdate", "wallet", { ...balances });
-    };
+      const tickers = this.getCurrencies();
 
-    const tickers = this.getCurrencies();
+      await Promise.all(tickers.map(ticker => getBalance(ticker)))
 
-    await Promise.all(tickers.map((ticker) => getBalance(ticker)));
-
-    return balances;
-  };
-
-  getBalances = async () => {
-    const balances = await this.apiProvider.getBalances();
-    this.emit("balanceUpdate", this.apiProvider.network, balances);
-    return balances;
-  };
-
-  getOrderDetailsWithoutFee = (order) => {
-    const side = order[3];
-    const baseQuantity = order[5];
-    const quoteQuantity = order[4] * order[5];
-    const remaining = isNaN(Number(order[11])) ? order[5] : order[11];
-    const market = order[2];
-    const marketInfo = this.apiProvider.marketInfo[market];
-    let baseQuantityWithoutFee,
-      quoteQuantityWithoutFee,
-      priceWithoutFee,
-      remainingWithoutFee;
-    if (side === "s") {
-      const fee = marketInfo ? marketInfo.baseFee : 0;
-      baseQuantityWithoutFee = baseQuantity - fee;
-      remainingWithoutFee = Math.max(0, remaining - fee);
-      priceWithoutFee = quoteQuantity / baseQuantityWithoutFee;
-      quoteQuantityWithoutFee = priceWithoutFee * baseQuantityWithoutFee;
-    } else {
-      const fee = marketInfo ? marketInfo.quoteFee : 0;
-      quoteQuantityWithoutFee = quoteQuantity - fee;
-      priceWithoutFee = quoteQuantityWithoutFee / baseQuantity;
-      baseQuantityWithoutFee = quoteQuantityWithoutFee / priceWithoutFee;
-      remainingWithoutFee = Math.min(baseQuantityWithoutFee, remaining);
+      return balances
     }
-    return {
-      price: priceWithoutFee,
-      quoteQuantity: quoteQuantityWithoutFee,
-      baseQuantity: baseQuantityWithoutFee,
-      remaining: remainingWithoutFee,
-    };
-  };
 
-  submitOrder = async (product, side, price, amount, orderType) => {
-    await this.apiProvider.submitOrder(product, side, price, amount, orderType);
-  };
-
-  calculatePriceFromLiquidity = (quantity, spotPrice, side, liquidity) => {
-    //let availableLiquidity;
-    //if (side === 's') {
-    //    availableLiquidity = liquidity.filter(l => (['d','s']).includes(l[2]));
-    //} else if (side === 'b') {
-    //    availableLiquidity = liquidity.filter(l => (['d','b']).includes(l[2]));
-    //}
-    //availableLiquidity.sort((a,b) => a[1] - b[1]);
-    //const avgSpread = 0;
-    //for (let i in availableLiquidity) {
-    //    const spread = availableLiquidity[2];
-    //    const amount = availableLiquidity[2];
-    //}
-  };
-
-  refreshArweaveAllocation = async (address) => {
-    return this.apiProvider.refreshArweaveAllocation(address);
-  };
-
-  purchaseArweaveBytes = (bytes) => {
-    return this.apiProvider.purchaseArweaveBytes(bytes);
-  };
-
-  signMessage = async (message) => {
-    return this.apiProvider.signMessage(message);
-  };
-
-  uploadArweaveFile = async (sender, timestamp, signature, file) => {
-    const formData = new FormData();
-    formData.append("sender", sender);
-    formData.append("timestamp", timestamp);
-    formData.append("signature", signature);
-    formData.append("file", file);
-
-    const url = "https://zigzag-arweave-bridge.herokuapp.com/arweave/upload";
-    const response = await fetch(url, {
-      method: "POST",
-      body: formData,
-    }).then((r) => r.json());
-    return response;
-  };
-
-  getTokenInfo = (tokenLike, chainId) => {
-    return this.apiProvider.getTokenInfo(tokenLike, chainId);
-  };
-
-  getTokenPrice = (tokenLike, chainId) => {
-    return this.apiProvider.tokenPrice(tokenLike, chainId);
-  };
-
-  getCurrencies = () => {
-    return this.apiProvider.getCurrencies();
-  };
-
-  getPairs = () => {
-    return this.apiProvider.getPairs();
-  };
-
-  getCurrencyInfo(currency) {
-    return this.apiProvider.getCurrencyInfo(currency);
-  }
-
-  getCurrencyLogo(currency) {
-    try {
-      return require(`assets/images/currency/${currency}.svg`);
-    } catch (e) {
-      return require(`assets/images/currency/ZZ.webp`);
+    getBalances = async () => {
+      const balances = await this.apiProvider.getBalances()
+      this.emit('balanceUpdate', this.apiProvider.network, balances)
+      return balances
     }
-  }
 
-  get fastWithdrawTokenAddresses() {
-    if (this.apiProvider.network === 1) {
+    getOrderDetailsWithoutFee = (order) => {
+      const side = order[3]
+      const baseQuantity = order[5]
+      const quoteQuantity = order[4] * order[5]
+      const remaining = isNaN(Number(order[11])) ? order[5] : order[11]
+      const market = order[2];
+      const marketInfo = this.apiProvider.marketInfo[market];
+      let baseQuantityWithoutFee, quoteQuantityWithoutFee, priceWithoutFee, remainingWithoutFee
+      if (side === "s") {
+        const fee = marketInfo ? marketInfo.baseFee : 0;
+        baseQuantityWithoutFee = baseQuantity - fee;
+        remainingWithoutFee = Math.max(0, remaining - fee);
+        priceWithoutFee = quoteQuantity / baseQuantityWithoutFee;
+        quoteQuantityWithoutFee = priceWithoutFee * baseQuantityWithoutFee;
+      } else {
+        const fee = marketInfo ? marketInfo.quoteFee: 0;
+        quoteQuantityWithoutFee = quoteQuantity - fee;
+        priceWithoutFee = quoteQuantityWithoutFee / baseQuantity;
+        baseQuantityWithoutFee = quoteQuantityWithoutFee / priceWithoutFee;
+        remainingWithoutFee = Math.min(baseQuantityWithoutFee, remaining);
+      }
       return {
-        FRAX: "0x853d955aCEf822Db058eb8505911ED77F175b99e",
-        UST: "0xa693b19d2931d498c5b318df961919bb4aee87a5",
+        price: priceWithoutFee,
+        quoteQuantity: quoteQuantityWithoutFee,
+        baseQuantity: baseQuantityWithoutFee,
+        remaining: remainingWithoutFee,
       };
-    } else if (this.apiProvider.network === 1000) {
-      return {
-        // these are just tokens on rinkeby with the correct tickers.
-        // neither are actually on rinkeby.
-        FRAX: "0x6426e27d8c6fDCd1e0c165d0D58c7eC0ef51f3a7",
-        UST: "0x2fd4e2b5340b7a29feb6ce737bc82bc4b3eefdb4",
-      };
+    }
+
+    submitOrder = async (product, side, price, baseAmount, quoteAmount, orderType) => {
+      if (!quoteAmount && !baseAmount) {
+        throw new Error('Set base or quote amount')
+      }
+      await this.apiProvider.submitOrder(product, side, price, baseAmount, quoteAmount, orderType)
+    }
+
+    calculatePriceFromLiquidity = (quantity, spotPrice, side, liquidity) => {
+      //let availableLiquidity;
+      //if (side === 's') {
+      //    availableLiquidity = liquidity.filter(l => (['d','s']).includes(l[2]));
+      //} else if (side === 'b') {
+      //    availableLiquidity = liquidity.filter(l => (['d','b']).includes(l[2]));
+      //}
+      //availableLiquidity.sort((a,b) => a[1] - b[1]);
+      //const avgSpread = 0;
+      //for (let i in availableLiquidity) {
+      //    const spread = availableLiquidity[2];
+      //    const amount = availableLiquidity[2];
+      //}
+
+    }
+
+    refreshArweaveAllocation = async (address) => {
+      return this.apiProvider.refreshArweaveAllocation(address);
+    }
+
+    purchaseArweaveBytes = (bytes) => {
+      return this.apiProvider.purchaseArweaveBytes(bytes);
+    }
+
+    signMessage = async (message) => {
+      return this.apiProvider.signMessage(message);
+    }
+
+    uploadArweaveFile = async (sender, timestamp, signature, file) => {
+      const formData = new FormData();
+      formData.append("sender", sender);
+      formData.append("timestamp", timestamp);
+      formData.append("signature", signature);
+      formData.append("file", file);
+
+      const url = "https://zigzag-arweave-bridge.herokuapp.com/arweave/upload";
+      const response = await fetch(url, {
+        method: 'POST',
+        body: formData
+      }).then(r => r.json());
+      return response;
+    }
+
+    getTokenInfo = (tokenLike, chainId) => {
+      return this.apiProvider.getTokenInfo(tokenLike, chainId)
+    }
+
+    getTokenPrice = (tokenLike, chainId) => {
+      return this.apiProvider.tokenPrice(tokenLike, chainId)
+    }
+
+    getCurrencies = () => {
+      return this.apiProvider.getCurrencies();
+    }
+
+    getPairs = () => {
+      return this.apiProvider.getPairs();
+    }
+
+    getCurrencyInfo (currency) {
+      return this.apiProvider.getCurrencyInfo(currency);
+    }
+
+    getCurrencyLogo(currency) {
+      try {
+        return require(`assets/images/currency/${currency}.svg`)
+      } catch(e) {
+        return require(`assets/images/currency/ZZ.webp`)
+      }
+    }
+
+    get fastWithdrawTokenAddresses() {
+      if (this.apiProvider.network === 1) {
+        return {
+          FRAX: "0x853d955aCEf822Db058eb8505911ED77F175b99e",
+          UST: "0xa693b19d2931d498c5b318df961919bb4aee87a5"
+        }
+        const currencyInfo = this.getCurrencyInfo(currency);
+        if (!currencyInfo) {
+          return {};
+        }
+        currencyMaxes[currency] = max / 10 ** currencyInfo.decimals;
+      }
+      return currencyMaxes;
     } else {
-      throw Error("Network unknown");
+      console.error("Ethers provider null or undefined");
+      return {};
     }
   }
-
+  
   async getL2FastWithdrawLiquidity() {
     if (this.ethersProvider) {
       const currencyMaxes = {};
       for (const currency of this.apiProvider.eligibleFastWithdrawTokens) {
         let max = 0;
         try {
-          if (currency === "ETH") {
+            if (currency === "ETH") {
             max = await this.ethersProvider.getBalance(
-              this.apiProvider.fastWithdrawContractAddress
+            this.apiProvider.fastWithdrawContractAddress
             );
           } else {
             const contract = new ethers.Contract(
-              this.fastWithdrawTokenAddresses[currency],
-              erc20ContractABI,
-              this.ethersProvider
+            this.fastWithdrawTokenAddresses[currency],
+            erc20ContractABI,
+            this.ethersProvider
             );
             max = await contract.balanceOf(
-              this.apiProvider.fastWithdrawContractAddress
+            this.apiProvider.fastWithdrawContractAddress
             );
           }
         } catch (e) {
@@ -599,4 +601,4 @@ export default class API extends Emitter {
       return {};
     }
   }
-}
+} 
