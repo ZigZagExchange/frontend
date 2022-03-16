@@ -43,8 +43,9 @@ export default function TradeBooks(props) {
   const fillData = [];
   // const maxFillId = Math.max(...Object.values(marketFills).map((f) => f[1]));
   // console.log(Object.values(marketFills));
+  const one_day_ago = Date.now() - 86400 * 1000;
   Object.values(marketFills)
-    // .filter((fill) => fill[1] > maxFillId - 500)
+    .filter((fill) => Date.parse(fill[12]) > one_day_ago)
     .sort((a, b) => b[1] - a[1])
     .forEach((fill) => {
       fillData.push({

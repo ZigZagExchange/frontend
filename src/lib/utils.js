@@ -100,9 +100,9 @@ export function formatDate(date) {
   } else {
     return (
       [
-        date.getFullYear(),
-        padTo2Digits(date.getMonth() + 1),
         padTo2Digits(date.getDate()),
+        padTo2Digits(date.getMonth() + 1),
+        date.getFullYear(),
       ].join("-") +
       " " +
       [
