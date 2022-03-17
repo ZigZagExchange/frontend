@@ -119,6 +119,13 @@ export class SpotForm extends React.Component {
       return;
     }
 
+    if(price < 0) {
+      toast.error(`Price (${price}) can't be below 0`, {
+        toastId: `Price (${price}) can't be below 0`,
+      });
+      return;
+    }
+
     if (this.props.activeOrderCount > 0 && api.isZksyncChain()) {
       toast.error("Only one active order permitted at a time", {
         toastId: 'Only one active order permitted at a time',
@@ -140,6 +147,14 @@ export class SpotForm extends React.Component {
     if(this.props.side === "s") {
       baseAmount = baseAmount ? baseAmount : (quoteAmount / price);
       quoteAmount = 0;
+
+      if(baseAmount < 0) {
+        toast.error(`Amount (${baseAmount}) can't be below 0`, {
+          toastId: `Amount (${baseAmount}) can't be below 0`,
+        });
+        return;
+      }
+
       if(isNaN(baseBalance)) {
         toast.error(`No ${marketInfo.baseAsset.symbol} balance`, {
           toastId: `No ${marketInfo.baseAsset.symbol} balance`,
@@ -173,6 +188,13 @@ export class SpotForm extends React.Component {
       quoteAmount = quoteAmount ? quoteAmount : (baseAmount * price);
       baseAmount = 0;
 
+      if(quoteAmount < 0) {
+        toast.error(`Total (${quoteAmount}) can't be below 0`, {
+          toastId: `Total (${quoteAmount}) can't be below 0`,
+        });
+        return;
+      }
+
       if(isNaN(quoteBalance)) {
         toast.error(`No ${marketInfo.quoteAsset.symbol} balance`, {
           toastId: `No ${marketInfo.quoteAsset.symbol} balance`,
@@ -182,7 +204,7 @@ export class SpotForm extends React.Component {
 
       if (quoteAmount && (quoteAmount + marketInfo.quoteFee) > quoteBalance) {
         toast.error(`Total exceeds ${marketInfo.quoteAsset.symbol} balance`, {
-          toastId: `Amount exceeds ${marketInfo.quoteAsset.symbol} balance`,
+          toastId: `Total exceeds ${marketInfo.quoteAsset.symbol} balance`,
         });
         return;
       }
