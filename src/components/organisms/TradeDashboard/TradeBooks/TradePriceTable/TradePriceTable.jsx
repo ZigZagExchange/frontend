@@ -63,7 +63,7 @@ const TradePriceTable = (props) => {
                 {price}
               </td>
               <td>{numStringToSymbol(amount, 2)}</td>
-              <td>{numStringToSymbol(total, 2)}</td>
+              <td>{numStringToSymbol(total, 2)}</td>   
             </tr>
           );
         })}

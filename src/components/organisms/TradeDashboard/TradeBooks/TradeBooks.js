@@ -40,10 +40,10 @@ export default function TradeBooks(props) {
 
   // Only display recent trades
   // There's a bunch of user trades in this list that are too old to display
-  const maxFillId = Math.max(...Object.values(marketFills).map((f) => f[1]));
-
- const openOrdersLatestTradesData = useMemo(() => Object.values(marketFills)
-    .filter((fill) => fill[1] > maxFillId - 500)
+  const fillData = [];
+  const one_day_ago = Date.now() - 86400 * 1000;
+  Object.values(marketFills)
+    .filter((fill) => Date.parse(fill[12]) > one_day_ago)
     .sort((a, b) => b[1] - a[1])
     .map(fill => ({
       td1: fill[12],

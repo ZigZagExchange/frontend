@@ -1,5 +1,5 @@
-import { BigNumber } from 'ethers'
-import isString from 'lodash/isString'
+import { BigNumber } from "ethers";
+import isString from "lodash/isString";
 
 export function formatUSD(floatNum) {
   const num = parseFloat(floatNum || 0)
@@ -73,7 +73,35 @@ export function numStringToSymbol(str, decimals) {
   return (str / item.value).toFixed(decimals) + item.symbol;
 }
 
-
 export function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function padTo2Digits(num) {
+  return num.toString().padStart(2, "0");
+}
+
+function isLessThan24HourAgo(date) {
+  // 👇️                    hour  min  sec  milliseconds
+  const twentyFourHrInMs = 24 * 60 * 60 * 1000;
+
+  const twentyFourHoursAgo = Date.now() - twentyFourHrInMs;
+
+  return date > twentyFourHoursAgo;
+}
+
+export function formatDate(date) {
+  if (isLessThan24HourAgo(date)) {
+    return [
+      padTo2Digits(date.getHours()),
+      padTo2Digits(date.getMinutes()),
+      padTo2Digits(date.getSeconds()),
+    ].join(":");
+  } else {
+    return [
+      padTo2Digits(date.getDate()),
+      padTo2Digits(date.getMonth() + 1),
+      date.getFullYear(),
+    ].join("-");
+  }
 }
