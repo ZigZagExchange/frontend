@@ -148,13 +148,6 @@ export class SpotForm extends React.Component {
       baseAmount = baseAmount ? baseAmount : (quoteAmount / price);
       quoteAmount = 0;
 
-      if(baseAmount < 0) {
-        toast.error(`Amount (${baseAmount}) can't be below 0`, {
-          toastId: `Amount (${baseAmount}) can't be below 0`,
-        });
-        return;
-      }
-
       if(isNaN(baseBalance)) {
         toast.error(`No ${marketInfo.baseAsset.symbol} balance`, {
           toastId: `No ${marketInfo.baseAsset.symbol} balance`,
@@ -187,13 +180,6 @@ export class SpotForm extends React.Component {
     } else if (this.props.side === "b") {
       quoteAmount = quoteAmount ? quoteAmount : (baseAmount * price);
       baseAmount = 0;
-
-      if(quoteAmount < 0) {
-        toast.error(`Total (${quoteAmount}) can't be below 0`, {
-          toastId: `Total (${quoteAmount}) can't be below 0`,
-        });
-        return;
-      }
 
       if(isNaN(quoteBalance)) {
         toast.error(`No ${marketInfo.quoteAsset.symbol} balance`, {
