@@ -45,12 +45,15 @@ export default function TradeBooks(props) {
   Object.values(marketFills)
     .filter((fill) => Date.parse(fill[12]) > one_day_ago)
     .sort((a, b) => b[1] - a[1])
-    .map(fill => ({
-      td1: fill[12],
-      td2: Number(fill[5]),
-      td3: Number(fill[4] * fill[5]),
-      side: fill[3],
-    })), [maxFillId, marketFills])
+    .forEach((fill) => {
+      fillData.push({
+        td1: fill[12], // timestamp
+        td2: Number(fill[4]), // price
+        td3: Number(fill[5]), // amount
+        side: fill[3],
+      });
+    });
+  let openOrdersLatestTradesData = fillData;
   
   return (
     <>

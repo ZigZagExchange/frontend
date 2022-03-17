@@ -547,7 +547,7 @@ export default class API extends Emitter {
     }
   }
 
-  get fastWithdrawTokenAddresses() {
+  getfastWithdrawTokenAddresses() {
     if (this.apiProvider.network === 1) {
       return {
         FRAX: "0x853d955aCEf822Db058eb8505911ED77F175b99e",
@@ -565,67 +565,36 @@ export default class API extends Emitter {
     }
   }
 
-
   async getL2FastWithdrawLiquidity() {
     if (this.ethersProvider) {
-      const currencyMaxes = {};
+      const currencyMaxes = {}
       for (const currency of this.apiProvider.eligibleFastWithdrawTokens) {
-        let max = 0;
+        let max = 0
         try {
-            return require(`assets/images/currency/${currency}.svg`).default
-        } catch(e) {
-            return `https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/32/icon/${`${currency}`}.toLowerCase()}.png`
+          if (currency === "ETH") {
+          max = await this.ethersProvider.getBalance(
+          this.apiProvider.fastWithdrawContractAddress
+          );
+        } else {
+          const contract = new ethers.Contract(
+          this.fastWithdrawTokenAddresses[currency],
+          erc20ContractABI,
+          this.ethersProvider
+          );
+          max = await contract.balanceOf(
+          this.apiProvider.fastWithdrawContractAddress
+          );
         }
-    }
-
-    get fastWithdrawTokenAddresses() {
-      if (this.apiProvider.network === 1) {
-        return {
-          FRAX: "0x853d955aCEf822Db058eb8505911ED77F175b99e",
-          UST: "0xa693b19d2931d498c5b318df961919bb4aee87a5"
-        }
-      } else if (this.apiProvider.network === 1000) {
-        return {
-          // these are just tokens on rinkeby with the correct tickers.
-          // neither are actually on rinkeby.
-          FRAX: "0x6426e27d8c6fDCd1e0c165d0D58c7eC0ef51f3a7",
-          UST: "0x2fd4e2b5340b7a29feb6ce737bc82bc4b3eefdb4"
-        }
-      } else {
-        throw Error("Network unknown")
+      } catch (e) {
+        console.error(e);
       }
-    }
-
-    async getL2FastWithdrawLiquidity() {
-      if (this.ethersProvider) {
-        const currencyMaxes = {}
-        for (const currency of this.apiProvider.eligibleFastWithdrawTokens) {
-          let max = 0
-          try {
-            if (currency === "ETH") {
-            max = await this.ethersProvider.getBalance(
-            this.apiProvider.fastWithdrawContractAddress
-            );
-          } else {
-            const contract = new ethers.Contract(
-            this.fastWithdrawTokenAddresses[currency],
-            erc20ContractABI,
-            this.ethersProvider
-            );
-            max = await contract.balanceOf(
-            this.apiProvider.fastWithdrawContractAddress
-            );
-          }
-        } catch (e) {
-          console.error(e);
-        }
-        const currencyInfo = this.getCurrencyInfo(currency);
-        if (!currencyInfo) {
-          return {};
-        }
-        currencyMaxes[currency] = max / 10 ** currencyInfo.decimals;
+      const currencyInfo = this.getCurrencyInfo(currency);
+      if (!currencyInfo) {
+        return {};
       }
-      return currencyMaxes;
+      currencyMaxes[currency] = max / 10 ** currencyInfo.decimals;
+    }
+    return currencyMaxes;
     } else {
       console.error("Ethers provider null or undefined");
       return {};
