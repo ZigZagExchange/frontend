@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React from "react";
 import { useSelector } from "react-redux";
 import styled from "@xstyled/styled-components";
 import TradePriceTable from "./TradePriceTable/TradePriceTable";
