@@ -19,7 +19,7 @@ export class OrdersTable extends React.Component {
   }
 
   getUserOrders() {
-    return Object.values(this.props.userOrders).sort((a, b) => b[1] - a[1]);
+    return Object.values(this.props.userOrders).filter(i=>i[9]!=='f').sort((a, b) => b[1] - a[1]);
   }
 
   renderOrderTable(orders) {
