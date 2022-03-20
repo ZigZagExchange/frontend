@@ -125,29 +125,29 @@ export default class APIZKProvider extends APIProvider {
       );
     }
     let feeToken = "ETH";
-    const balances = await this.getBalances();
-    if (balances.ETH && balances.ETH.valueReadable > 0.004) {
+    const accountState = await this.syncWallet.getAccountState();
+    const balances = accountState.committed.balances;
+    if (balances.ETH && balances.ETH.valueReadable > 0.006e18) {
       feeToken = "ETH";
-    } else if (balances.USDC.valueReadable && balances.USDC > 10) {
+    } else if (balances.USDC && balances.USDC > 15e6) {
       feeToken = "USDC";
-    } else if (balances.USDT.valueReadable && balances.USDT > 10) {
+    } else if (balances.USDT && balances.USDT > 15e6) {
       feeToken = "USDT";
-    } else if (balances.DAI.valueReadable && balances.DAI > 10) {
+    } else if (balances.DAI && balances.DAI > 15e6) {
       feeToken = "DAI";
-    } else if (balances.WBTC.valueReadable && balances.WBTC > 0.0003) {
+    } else if (balances.WBTC && balances.WBTC > 0.0003e8) {
       feeToken = "WBTC";
     } else {
       toast.warn(
         "Your token balances are very low. You might need to bridge in more funds first."
       );      
-      feeToken = "ETH"
       let maxValue = 0;
       const tokens = Object.keys(balances);
       tokens.forEach(async (token) => {
-        const enabledForFees = (await this.getCurrencyInfo(token)).enabledForFees;
-        if (enabledForFees) {
+        const tokenInfo = await this.getCurrencyInfo(token);
+        if (tokenInfo.enabledForFees) {
           const priceInfo = await this.tokenPrice(token);
-          const usdValue = priceInfo * balances.token.valueReadable
+          const usdValue = priceInfo * balances.token / 10 ** tokenInfo.decimals;
           if (usdValue > maxValue) {
             maxValue = usdValue;
             feeToken = token;
