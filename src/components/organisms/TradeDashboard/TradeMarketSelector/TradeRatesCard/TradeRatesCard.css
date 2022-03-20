@@ -14,19 +14,7 @@
 
 .rates_box_symbol {
   height: 1.3rem;
-  margin-right: 0.5rem;
-}
-
-.rates_box_label {
-  display: inline-flex;
-  height: 20px;
-  background: rgba(0, 0, 0, 0.3);
-  color: rgb(102, 153, 255);
-  border-radius: 5px;
-  align-items: center;
-  justify-content: center;
-  padding: 0 5px;
-  border: 1px solid rgba(102, 153, 255, 0.4);
+  margin-right: .7rem;
 }
 
 .rates_box h2 {
@@ -41,6 +29,16 @@
 .rb_text_1 > div {
   display: flex;
   align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  padding: 2px 15px;
+  line-height: 1.4;
+  min-width: 150px;
+  cursor: pointer;
+}
+
+.rb_text_1 > div:hover {
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .rb_text_1 strong {

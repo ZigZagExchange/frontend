@@ -7,6 +7,7 @@ const StyledTradeSidebar = styled.aside`
   display: flex;
   flex-direction: column;
   grid-area: sidebar;
+  position: relative;
 `;
 
 export default function TradeSidebar(props) {

@@ -547,7 +547,7 @@ export default class API extends Emitter {
     }
   }
 
-  get fastWithdrawTokenAddresses() {
+  getfastWithdrawTokenAddresses() {
     if (this.apiProvider.network === 1) {
       return {
         FRAX: "0x853d955aCEf822Db058eb8505911ED77F175b99e",
@@ -565,37 +565,36 @@ export default class API extends Emitter {
     }
   }
 
-
   async getL2FastWithdrawLiquidity() {
     if (this.ethersProvider) {
-      const currencyMaxes = {};
+      const currencyMaxes = {}
       for (const currency of this.apiProvider.eligibleFastWithdrawTokens) {
-        let max = 0;
+        let max = 0
         try {
-            if (currency === "ETH") {
-            max = await this.ethersProvider.getBalance(
-            this.apiProvider.fastWithdrawContractAddress
-            );
-          } else {
-            const contract = new ethers.Contract(
-            this.fastWithdrawTokenAddresses[currency],
-            erc20ContractABI,
-            this.ethersProvider
-            );
-            max = await contract.balanceOf(
-            this.apiProvider.fastWithdrawContractAddress
-            );
-          }
-        } catch (e) {
-          console.error(e);
+          if (currency === "ETH") {
+          max = await this.ethersProvider.getBalance(
+          this.apiProvider.fastWithdrawContractAddress
+          );
+        } else {
+          const contract = new ethers.Contract(
+          this.fastWithdrawTokenAddresses[currency],
+          erc20ContractABI,
+          this.ethersProvider
+          );
+          max = await contract.balanceOf(
+          this.apiProvider.fastWithdrawContractAddress
+          );
         }
-        const currencyInfo = this.getCurrencyInfo(currency);
-        if (!currencyInfo) {
-          return {};
-        }
-        currencyMaxes[currency] = max / 10 ** currencyInfo.decimals;
+      } catch (e) {
+        console.error(e);
       }
-      return currencyMaxes;
+      const currencyInfo = this.getCurrencyInfo(currency);
+      if (!currencyInfo) {
+        return {};
+      }
+      currencyMaxes[currency] = max / 10 ** currencyInfo.decimals;
+    }
+    return currencyMaxes;
     } else {
       console.error("Ethers provider null or undefined");
       return {};

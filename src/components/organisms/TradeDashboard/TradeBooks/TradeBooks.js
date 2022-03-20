@@ -20,11 +20,11 @@ const StyledTradeBooks = styled.section`
   & .trade_price_head_third {
     display: flex;
     align-items: center;
-    color: #94a2c9;
-    background: rgba(0, 0, 0, 0.5);
+    color: #798ec9;
     height: 30px;
     margin-bottom: 10px;
-
+    opacity: 0.85;
+    border-bottom: 1px solid #333;
     & strong {
       border-radius: 10px;
       font-size: 12px;
@@ -41,8 +41,6 @@ export default function TradeBooks(props) {
   // Only display recent trades
   // There's a bunch of user trades in this list that are too old to display
   const fillData = [];
-  // const maxFillId = Math.max(...Object.values(marketFills).map((f) => f[1]));
-  // console.log(Object.values(marketFills));
   const one_day_ago = Date.now() - 86400 * 1000;
   Object.values(marketFills)
     .filter((fill) => Date.parse(fill[12]) > one_day_ago)
@@ -56,7 +54,7 @@ export default function TradeBooks(props) {
       });
     });
   let openOrdersLatestTradesData = fillData;
-
+  
   return (
     <>
       <StyledTradeBooks>

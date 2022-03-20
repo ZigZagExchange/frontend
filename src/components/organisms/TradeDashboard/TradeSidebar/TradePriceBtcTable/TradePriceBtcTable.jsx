@@ -43,7 +43,7 @@ class TradePriceBtcTable extends React.Component {
   }
 
   componentDidUpdate() {
-    if (this.state.categorySelected!=='FAVOURITES' && this.state.pairs.length === 0 && this.props.rowData.length !== 0) {
+    if (this.state.categorySelected !== 'FAVOURITES' && this.state.pairs.length === 0 && this.props.rowData.length !== 0) {
       this.setState({ pairs: this.props.rowData.map(r => r.td1) });
     }
   }
@@ -110,12 +110,12 @@ class TradePriceBtcTable extends React.Component {
         break;
       case "FAVOURITES":
         //set favourites from localstorage
-        var favourites = fetchFavourites();
+        let favourites = fetchFavourites();
         foundPairs = [];
 
         favourites.forEach((value) => {
           this.props.rowData.forEach((row) => {
-            var pair_name = row.td1;
+            let pair_name = row.td1;
 
             //if found query, push it to found pairs
             if (pair_name.includes(value.toUpperCase())) {
@@ -154,18 +154,16 @@ class TradePriceBtcTable extends React.Component {
 
   toggleChangeSorting() {
     var toggled = !this.state.changeDirection;
-    var sorted_pairs = this.state.pairs;
+    var sorted_pairs = [...this.state.pairs];
 
     sorted_pairs.sort(function compareFn(firstEl, secondEl) {
       if (toggled) {
-        //console.log(firstEl.td3, secondEl.td3, (parseInt(secondEl.td3) - parseInt(firstEl.td3)))
         return parseInt(firstEl.td3) - parseInt(secondEl.td3);
       } else {
-        //reverse
-        //console.log(secondEl.td3, firstEl.td3, (parseInt(secondEl.td3) - parseInt(firstEl.td3)))
         return parseInt(secondEl.td3) - parseInt(firstEl.td3);
       }
     });
+
     this.setState({
       pairs: sorted_pairs,
 
@@ -217,9 +215,19 @@ class TradePriceBtcTable extends React.Component {
     var changeDirection = this.state.changeDirection;
     var priceDirection = this.state.priceDirection;
 
-    const shown_pairs = pairs.map((pair, i) => {
-      const d = this.props.rowData.find(row => row.td1 === pair);
-      if (!d) return "";
+    const shown_pairs = pairs
+    .map(pair => ([pair, this.props.rowData.find(row => row.td1 === pair)]))
+    .sort(([_, d], [__, d2]) => {
+      if (changeSorted) {
+        return changeDirection ? d.td3 - d2.td3 : d2.td3 - d.td3
+      } else if (priceSorted) {
+        return priceDirection ? d.td2 - d2.td2 : d2.td2 - d.td2
+      } else {
+        return 0
+      }
+    })
+    .map(([pair, d], i) => {
+      if (!d) return '';
       var selected = this.props.currentMarket === pair; //if current market selected
       var isFavourited = this.state.favourites.includes(pair); //if contains, isFavourited
 
@@ -268,7 +276,7 @@ class TradePriceBtcTable extends React.Component {
               )}
               Price
             </th>
-            <th onClick={() => this.toggleChangeSorting()}>
+            <th style={{ minWidth: 108 }} onClick={() => this.toggleChangeSorting()}>
               {changeSorted ? (
                 changeDirection ? (
                   <FaSortDown />
@@ -302,7 +310,7 @@ class TradePriceBtcTable extends React.Component {
           initialValue="ALL"
         />
 
-        <div className="trade_price_btc_table">
+        <div className="trade_price_btc_table zig_scrollstyle">
           {this.renderPairs(this.state.pairs)}
         </div>
       </>
