@@ -143,7 +143,7 @@ export default class APIZKProvider extends APIProvider {
       feeToken = "ETH", maxValue = 0;
       const tokens = Object.keys(balances);
       tokens.forEach(async (token) => {
-        const enabledForFees = (await this.getTokenInfo(token)).enabledForFees;
+        const enabledForFees = (await this.getCurrencyInfo(token)).enabledForFees;
         if (enabledForFees) {
           const priceInfo = await this.tokenPrice(token);
           const usdValue = priceInfo * balances.token.valueReadable
