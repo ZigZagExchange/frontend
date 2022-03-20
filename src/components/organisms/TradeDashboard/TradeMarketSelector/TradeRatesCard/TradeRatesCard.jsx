@@ -46,19 +46,20 @@ class TradeRatesCard extends React.Component {
       100
     ).toFixed(2);
 
+    if (!this.state.marketInfo) {
+      return null
+    }
+
     return (
       <>
         <div className="tl_rates">
           <div className="rates_box rb_text_1">
             <div>
-              <img src={api.getCurrencyLogo(this.state.marketInfo?.baseAsset.symbol).default} alt={this.state.marketInfo?.baseAsset.symbol} className="rates_box_symbol" />
+              <img src={api.getCurrencyLogo(this.state.marketInfo?.baseAsset.symbol)} alt={this.state.marketInfo?.baseAsset.symbol} className="rates_box_symbol" />
               <div>
                 <strong>{marketDisplay}</strong>
                 <p>
                   {marketInfo?.baseAsset && marketInfo.baseAsset.name}{" "}
-                  <span className="rates_box_label">
-                    {marketInfo && marketInfo.baseAsset.symbol}
-                  </span>
                 </p>
               </div>
             </div>

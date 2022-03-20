@@ -200,8 +200,7 @@ const SwapCurrencySelector = ({
                 <div className="currencyIcon">
                   <img
                     src={
-                      api.getCurrencyLogo(ticker) &&
-                      api.getCurrencyLogo(ticker).default
+                      api.getCurrencyLogo(ticker)
                     }
                     alt={currency && currency.symbol}
                   />

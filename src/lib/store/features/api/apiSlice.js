@@ -91,8 +91,13 @@ export const apiSlice = createSlice({
         state.lastPrices[market] = {
           price: update[1],
           change: update[2],
-          quoteVolume: update[3],
+          quoteVolume: state.lastPrices[market] ? state.lastPrices[market].quoteVolume : 0
         };
+        // Sometimes lastprice doesn't have volume data
+        // Keep the old data if it doesn't
+        if (update[3]) {
+            state.lastPrices[market].quoteVolume = update[3];
+        }
         if (update[0] === state.currentMarket) {
           state.marketSummary.price = price;
           state.marketSummary.priceChange = change;

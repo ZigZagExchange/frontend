@@ -4,6 +4,28 @@
   box-sizing: border-box;
 }
 
+.zig_scrollstyle::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  background-color: #171c28;
+  border-radius: 10px;
+}
+
+.zig_scrollstyle::-webkit-scrollbar {
+  width: 5px;
+  background-color: #171c28;
+}
+
+.zig_scrollstyle::-webkit-scrollbar-thumb {
+  background-image: -webkit-gradient(
+    linear,
+    left bottom,
+    left top,
+    color-stop(0, #1b2d52),
+    color-stop(0.44, rgb(19, 34, 80)),
+    color-stop(0.55, #1b2d52)
+  );
+}
+
 h1,
 h2,
 h3,
@@ -35,10 +57,6 @@ html {
 
 .down_value {
   color: #c4384e !important;
-}
-
-.trade_price_active_tab {
-  color: #08aff3 !important;
 }
 
 .zig-dropdown .rc-dropdown-menu > .rc-dropdown-menu-item {
