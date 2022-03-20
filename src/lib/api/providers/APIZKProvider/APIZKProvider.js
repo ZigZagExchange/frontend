@@ -143,17 +143,18 @@ export default class APIZKProvider extends APIProvider {
       );      
       let maxValue = 0;
       const tokens = Object.keys(balances);
-      tokens.forEach(async (token) => {
+      const result = tokens.map(async (token) => {
         const tokenInfo = await this.getTokenInfo(token);
         if (tokenInfo.enabledForFees) {
           const priceInfo = await this.tokenPrice(token);
-          const usdValue = priceInfo * balances.token / 10 ** tokenInfo.decimals;
+          const usdValue = priceInfo.price * balances[token] / 10 ** tokenInfo.decimals;
           if (usdValue > maxValue) {
             maxValue = usdValue;
             feeToken = token;
           }
         }
       })
+      await Promise.all(result) 
     }
 
     const signingKey = await this.syncWallet.setSigningKey({
