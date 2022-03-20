@@ -139,8 +139,20 @@ export default class APIZKProvider extends APIProvider {
     } else {
       toast.warn(
         "Your token balances are very low. You might need to bridge in more funds first."
-      );
-      feeToken = "ETH";
+      );      
+      feeToken = "ETH", maxValue = 0;
+      const tokens = Object.keys(balances);
+      tokens.forEach(async (token) => {
+        const enabledForFees = (await this.getTokenInfo(token)).enabledForFees;
+        if (enabledForFees) {
+          const priceInfo = await this.tokenPrice(token);
+          const usdValue = priceInfo * balances.token.valueReadable
+          if (usdValue > maxValue) {
+            maxValue = usdValue;
+            feeToken = token;
+          }
+        }
+      })
     }
 
     const signingKey = await this.syncWallet.setSigningKey({
