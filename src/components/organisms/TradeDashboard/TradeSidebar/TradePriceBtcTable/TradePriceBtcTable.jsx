@@ -77,6 +77,14 @@ class TradePriceBtcTable extends React.Component {
     });
   }
 
+  componentDidUpdate() {
+    if (this.state.categorySelected !== 'FAVOURITES' && this.state.pairs.length === 0 && this.props.rowData.length !== 0) {
+      this.setState({ pairs: this.props.rowData.map(r => r.td1) });
+    }
+  }
+
+
+
   categorizePairs(category_name) {
     category_name = category_name.toUpperCase();
     var foundPairs = [];
