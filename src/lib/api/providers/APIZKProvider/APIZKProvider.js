@@ -88,7 +88,7 @@ export default class APIZKProvider extends APIProvider {
   changePubKey = async () => {
     if (this.network === 1) {
       try {
-        const { data } = await axios.post(this.getZkSyncBaseUrl(chainId) + "/fee",
+        const { data } = await axios.post(this.getZkSyncBaseUrl(1) + "/fee",
           {
             txType: { ChangePubKey: "ECDSA" },
             address: this.syncWallet.ethSigner.address,
@@ -140,7 +140,8 @@ export default class APIZKProvider extends APIProvider {
       toast.warn(
         "Your token balances are very low. You might need to bridge in more funds first."
       );      
-      feeToken = "ETH", maxValue = 0;
+      feeToken = "ETH"
+      let maxValue = 0;
       const tokens = Object.keys(balances);
       tokens.forEach(async (token) => {
         const enabledForFees = (await this.getCurrencyInfo(token)).enabledForFees;
