@@ -88,18 +88,13 @@ export default class APIZKProvider extends APIProvider {
   changePubKey = async () => {
     if (this.network === 1) {
       try {
-        const { data } = await axios.post(
-          "https://api.zksync.io/api/v0.2/fee",
+        const { data } = await axios.post(this.getZkSyncBaseUrl(chainId) + "/fee",
           {
             txType: { ChangePubKey: "ECDSA" },
             address: this.syncWallet.ethSigner.address,
             tokenLike: "USDC",
           },
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
+          { headers: { "Content-Type": "application/json", }, }
         );
         const feeUSD = data.result.totalFee / 10 ** 6;
         toast.info(
@@ -130,17 +125,16 @@ export default class APIZKProvider extends APIProvider {
       );
     }
     let feeToken = "ETH";
-    const accountState = await this.syncWallet.getAccountState();
-    const balances = accountState.committed.balances;
-    if (balances.ETH && balances.ETH > 0.004e18) {
+    const balances = await this.getBalances();
+    if (balances.ETH && balances.ETH.valueReadable > 0.004) {
       feeToken = "ETH";
-    } else if (balances.USDC && balances.USDC > 15e6) {
+    } else if (balances.USDC.valueReadable && balances.USDC > 10) {
       feeToken = "USDC";
-    } else if (balances.USDT && balances.USDT > 15e6) {
+    } else if (balances.USDT.valueReadable && balances.USDT > 10) {
       feeToken = "USDT";
-    } else if (balances.DAI && balances.DAI > 15e6) {
+    } else if (balances.DAI.valueReadable && balances.DAI > 10) {
       feeToken = "DAI";
-    } else if (balances.WBTC && balances.WBTC > 0.0004e8) {
+    } else if (balances.WBTC.valueReadable && balances.WBTC > 0.0003) {
       feeToken = "WBTC";
     } else {
       toast.warn(
