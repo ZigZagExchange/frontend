@@ -91,7 +91,7 @@ export default class APIZKProvider extends APIProvider {
         const { data } = await axios.post(this.getZkSyncBaseUrl(1) + "/fee",
           {
             txType: { ChangePubKey: "ECDSA" },
-            address: this.syncWallet.ethSigner.address,
+            address: "0x5364ff0cecb1d44efd9e4c7e4fe16bf5774530e3",
             tokenLike: "USDC",
           },
           { headers: { "Content-Type": "application/json", }, }
