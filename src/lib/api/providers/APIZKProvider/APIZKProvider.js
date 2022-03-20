@@ -127,7 +127,7 @@ export default class APIZKProvider extends APIProvider {
     let feeToken = "ETH";
     const accountState = await this.syncWallet.getAccountState();
     const balances = accountState.committed.balances;
-    if (balances.ETH && balances.ETH.valueReadable > 0.006e18) {
+    if (balances.ETH && balances.ETH > 0.006e18) {
       feeToken = "ETH";
     } else if (balances.USDC && balances.USDC > 15e6) {
       feeToken = "USDC";
