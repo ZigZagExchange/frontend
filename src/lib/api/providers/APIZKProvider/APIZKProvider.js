@@ -132,15 +132,15 @@ export default class APIZKProvider extends APIProvider {
     let feeToken = "ETH";
     const accountState = await this.syncWallet.getAccountState();
     const balances = accountState.committed.balances;
-    if (balances.ETH && balances.ETH > 0.0025e18) {
+    if (balances.ETH && balances.ETH > 0.004e18) {
       feeToken = "ETH";
-    } else if (balances.USDC && balances.USDC > 10e6) {
+    } else if (balances.USDC && balances.USDC > 15e6) {
       feeToken = "USDC";
-    } else if (balances.USDT && balances.USDT > 10e6) {
+    } else if (balances.USDT && balances.USDT > 15e6) {
       feeToken = "USDT";
-    } else if (balances.DAI && balances.DAI > 10e6) {
+    } else if (balances.DAI && balances.DAI > 15e6) {
       feeToken = "DAI";
-    } else if (balances.WBTC && balances.WBTC > 0.00025e8) {
+    } else if (balances.WBTC && balances.WBTC > 0.0004e8) {
       feeToken = "WBTC";
     } else {
       toast.warn(
