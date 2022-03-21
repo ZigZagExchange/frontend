@@ -173,9 +173,15 @@ export class SpotForm extends React.Component {
 
       const askPrice = this.getFirstAsk();
       const delta = ((askPrice - price) / askPrice) * 100;
-      if (delta > 20) {
-        toast.error(`Your limit order exceeds the spot price by ${delta.toFixed(2)}% Proceed carefully!`, {
-          toastId: `Your limit order exceeds the spot price by ${delta.toFixed(2)}% Proceed carefully!`,
+      if (delta > 10) {
+        toast.error(
+          `You are selling ${
+            delta.toFixed(2)
+          }% under the current market price. You will lose money when signing this transaction!`, 
+          {
+            toastId: `You are selling ${
+                delta.toFixed(2)
+              }% under the current market price. You will lose money when signing this transaction!`,
         });
       }
     } else if (this.props.side === "b") {
@@ -207,9 +213,15 @@ export class SpotForm extends React.Component {
       
       const bidPrice = this.getFirstBid();
       const delta = ((price - bidPrice) / bidPrice) * 100;
-      if (delta > 20) {
-        toast.error(`Your limit order exceeds the spot price by ${delta.toFixed(2)}% Proceed carefully!`, {
-          toastId: `Your limit order exceeds the spot price by ${delta.toFixed(2)}% Proceed carefully!`,
+      if (delta > 10) {
+        toast.error(
+          `You are buying ${
+            delta.toFixed(2)
+          }% above the current market price. You will lose money when signing this transaction!`, 
+          {
+            toastId: `You are buying ${
+                delta.toFixed(2)
+              }% above the current market price. You will lose money when signing this transaction!`,
         });
       }
     }
