@@ -64,7 +64,7 @@ const SpotBox = ({
                 <x.strong color={"#fff"}>
                   {marketInfo &&
                     marketInfo.quoteFee &&
-                    marketInfo.quoteFee.toPrecision(4)}{" "}
+                    Number(marketInfo.quoteFee).toPrecision(4)}{" "}
                   {marketInfo && marketInfo.quoteAsset.symbol}
                 </x.strong>
               </x.div>
