@@ -171,9 +171,11 @@ export class SpotForm extends React.Component {
         return;
       }
 
-      if (price < this.getFirstBid() * 0.8) {
-        toast.error("Limit orders cannot exceed 20% beyond spot", {
-          toastId: "Limit orders cannot exceed 20% beyond spot",
+      const askPrice = this.getFirstAsk();
+      const delta = ((askPrice - price) / askPrice) * 100;
+      if (delta > 20) {
+        toast.error(`Your limit order exceeds the spot price by ${delta.toFixed(2)}% Proceed carefully!`, {
+          toastId: `Your limit order exceeds the spot price by ${delta.toFixed(2)}% Proceed carefully!`,
         });
         return;
       }
@@ -203,10 +205,12 @@ export class SpotForm extends React.Component {
         );
         return;
       }
-
-      if (price > this.getFirstAsk() * 1.2) {
-        toast.error("Limit orders cannot exceed 20% beyond spot", {
-          toastId: "Limit orders cannot exceed 20% beyond spot",
+      
+      const bidPrice = this.getFirstBid();
+      const delta = ((price - bidPrice) / bidPrice) * 100;
+      if (delta > 20) {
+        toast.error(`Your limit order exceeds the spot price by ${delta.toFixed(2)}% Proceed carefully!`, {
+          toastId: `Your limit order exceeds the spot price by ${delta.toFixed(2)}% Proceed carefully!`,
         });
         return;
       }
