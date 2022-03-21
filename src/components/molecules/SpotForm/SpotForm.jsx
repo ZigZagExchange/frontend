@@ -177,7 +177,6 @@ export class SpotForm extends React.Component {
         toast.error(`Your limit order exceeds the spot price by ${delta.toFixed(2)}% Proceed carefully!`, {
           toastId: `Your limit order exceeds the spot price by ${delta.toFixed(2)}% Proceed carefully!`,
         });
-        return;
       }
     } else if (this.props.side === "b") {
       quoteAmount = quoteAmount ? quoteAmount : (baseAmount * price);
@@ -212,7 +211,6 @@ export class SpotForm extends React.Component {
         toast.error(`Your limit order exceeds the spot price by ${delta.toFixed(2)}% Proceed carefully!`, {
           toastId: `Your limit order exceeds the spot price by ${delta.toFixed(2)}% Proceed carefully!`,
         });
-        return;
       }
     }
 
