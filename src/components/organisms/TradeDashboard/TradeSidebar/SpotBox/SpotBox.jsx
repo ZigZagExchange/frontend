@@ -62,8 +62,7 @@ const SpotBox = ({
               <x.div className="spf_head" mt={"5px"} mb={"10px"}>
                 <span>Buy Fee:</span>
                 <x.strong color={"#fff"}>
-                  {marketInfo &&
-                    marketInfo.quoteFee &&
+                  {marketInfo && marketInfo.quoteFee &&
                     Number(marketInfo.quoteFee).toPrecision(4)}{" "}
                   {marketInfo && marketInfo.quoteAsset.symbol}
                 </x.strong>
@@ -84,7 +83,8 @@ const SpotBox = ({
               <x.div className="spf_head" mt={"5px"} mb={"10px"}>
                 <span>Sell Fee</span>
                 <x.strong color={"#fff"}>
-                  {marketInfo && marketInfo.baseFee.toPrecision(4)}{" "}
+                  {marketInfo && marketInfo.baseFee &&
+                    Number(marketInfo.baseFee).toPrecision(4)}{" "}
                   {marketInfo && marketInfo.baseAsset.symbol}
                 </x.strong>
               </x.div>
