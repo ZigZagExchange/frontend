@@ -557,15 +557,15 @@ export default class API extends Emitter {
 
   getCurrencyLogo(currency) {
     try {
-      return require(`assets/images/currency/${currency}.svg`);
+      return require(`assets/images/currency/${currency}.svg`).default;
     } catch (e) {
       try {
-        return require(`assets/images/currency/${currency}.png`);
+        return require(`assets/images/currency/${currency}.png`).default;
       } catch (e) {
         try {
-          return require(`assets/images/currency/${currency}.webp`);
+          return require(`assets/images/currency/${currency}.webp`).default;
         } catch (e) {
-          return require(`assets/images/currency/ZZ.webp`);
+          return require(`assets/images/currency/ZZ.webp`).default;
         }
       }
     }

@@ -2,6 +2,7 @@ import React from "react";
 import "./OrdersTable.css";
 import loadingGif from "assets/icons/loading.svg";
 import api from "lib/api";
+import {formatDate} from 'lib/utils'
 
 export class OrdersTable extends React.Component {
   constructor(props) {
@@ -18,7 +19,7 @@ export class OrdersTable extends React.Component {
   }
 
   getUserOrders() {
-    return Object.values(this.props.userOrders).sort((a, b) => b[1] - a[1]);
+    return Object.values(this.props.userOrders).filter(i=>i[9]!=='f').sort((a, b) => b[1] - a[1]);
   }
 
   renderOrderTable(orders) {
@@ -27,6 +28,7 @@ export class OrdersTable extends React.Component {
         <thead>
           <tr>
             <th scope="col">Market</th>
+            <th scope="col">Time</th>
             <th scope="col">Price</th>
             <th scope="col">Quantity</th>
             <th scope="col">Remaining</th>
@@ -40,6 +42,7 @@ export class OrdersTable extends React.Component {
           {orders.map((order, i) => {
             const orderId = order[1];
             const market = order[2];
+            const time = order[7] && formatDate(new Date(order[7]*1000));
             let price = order[4];
             let baseQuantity = order[5];
             let remaining = isNaN(Number(order[11])) ? order[5] : order[11];
@@ -139,6 +142,7 @@ export class OrdersTable extends React.Component {
             return (
               <tr key={orderId}>
                 <td data-label="Market">{market}</td>
+                <td data-label="Time">{time}</td>
                 <td data-label="Price">{price.toPrecision(6) / 1}</td>
                 <td data-label="Quantity">
                   {baseQuantity.toPrecision(6) / 1} {baseCurrency}
@@ -191,6 +195,7 @@ export class OrdersTable extends React.Component {
         <thead>
           <tr>
             <th scope="col">Market</th>
+            <th scope="col">Time</th>
             <th scope="col">Price</th>
             <th scope="col">Quantity</th>
             <th scope="col">Side</th>
@@ -203,6 +208,7 @@ export class OrdersTable extends React.Component {
           {fills.map((fill, i) => {
             const fillid = fill[1];
             const market = fill[2];
+            const time = fill[12] && formatDate(new Date(fill[12]));
             const side = fill[3];
             let price = fill[4];
             let baseQuantity = fill[5];
@@ -306,6 +312,7 @@ export class OrdersTable extends React.Component {
             return (
               <tr key={fillid}>
                 <td data-label="Market">{market}</td>
+                <td data-label="Time">{time}</td>
                 <td data-label="Price">{price.toPrecision(6) / 1}</td>
                 <td data-label="Quantity">
                   {baseQuantity.toPrecision(6) / 1}{" "}

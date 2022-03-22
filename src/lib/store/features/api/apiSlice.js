@@ -25,10 +25,9 @@ export const apiSlice = createSlice({
   reducers: {
     _marketinfo(state, { payload }) {
       if (payload[0].error) {
-          console.error(payload[0]);
-      }
-      else {
-          state.marketinfo = payload[0];
+        console.error(payload[0]);
+      } else {
+        state.marketinfo = payload[0];
       }
     },
     _fills(state, { payload }) {
@@ -92,8 +91,13 @@ export const apiSlice = createSlice({
         state.lastPrices[market] = {
           price: update[1],
           change: update[2],
-          quoteVolume: update[3]
+          quoteVolume: state.lastPrices[market] ? state.lastPrices[market].quoteVolume : 0
         };
+        // Sometimes lastprice doesn't have volume data
+        // Keep the old data if it doesn't
+        if (update[3]) {
+            state.lastPrices[market].quoteVolume = update[3];
+        }
         if (update[0] === state.currentMarket) {
           state.marketSummary.price = price;
           state.marketSummary.priceChange = change;
@@ -101,12 +105,9 @@ export const apiSlice = createSlice({
       });
     },
     _liquidity2(state, { payload }) {
-      if(
-        payload[0] === state.network &&
-        payload[1] === state.currentMarket
-      ) {
+      if (payload[0] === state.network && payload[1] === state.currentMarket) {
         state.liquidity = state.liquidity = payload[2];
-      }      
+      }
     },
     _orderstatus(state, { payload }) {
       (payload[0] || []).forEach(async (update) => {
@@ -156,7 +157,14 @@ export const apiSlice = createSlice({
                   noFeeOrder.baseQuantity.toPrecision(4) / 1
                 } ${baseCurrency} was filled @ ${
                   noFeeOrder.price.toPrecision(4) / 1
-                }!`
+                }!`,
+                {
+                  toastId: `Your ${sideText} order for ${
+                    noFeeOrder.baseQuantity.toPrecision(4) / 1
+                  } ${baseCurrency} was filled @ ${
+                    noFeeOrder.price.toPrecision(4) / 1
+                  }!`,
+                }
               );
             }
             break;
@@ -181,10 +189,20 @@ export const apiSlice = createSlice({
                   noFeeOrder.baseQuantity.toPrecision(4) / 1
                 } ${baseCurrency} @ ${
                   noFeeOrder.price.toPrecision(4) / 1
-                } was rejected: ${error}`
+                } was rejected: ${error}`,
+                {
+                  toastId: `Your ${sideText} order for ${
+                    noFeeOrder.baseQuantity.toPrecision(4) / 1
+                  } ${baseCurrency} @ ${
+                    noFeeOrder.price.toPrecision(4) / 1
+                  } was rejected: ${error}`,
+                }
               );
               toast.info(
-                `This happens occasionally. Run the transaction again and you should be fine.`
+                `This happens occasionally. Run the transaction again and you should be fine.`,
+                {
+                  toastId: `This happens occasionally. Run the transaction again and you should be fine.`,
+                }
               );
             }
             break;

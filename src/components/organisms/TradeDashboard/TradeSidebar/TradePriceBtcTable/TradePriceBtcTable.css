@@ -21,13 +21,14 @@
   opacity: 0.8;
 }
 
+.trade_price_btc_table thead th,
+.trade_price_btc_table tbody td {
+  white-space: nowrap;
+}
+
 .trade_price_btc_table thead tr:hover,
 .trade_price_btc_table thead tr:focus {
   opacity: 1;
-}
-
-.trade_price_btc_table thead th:first-child {
-  width: 40%;
 }
 
 .trade_price_btc_table th svg {
@@ -40,7 +41,8 @@
 .trade_price_btc_table {
   height: calc(100vh - 571px);
   min-height: 200px;
-  overflow: auto;
+  overflow-x: hidden;
+  overflow-y: scroll;
 }
 
 .trade_price_btc_table::-webkit-scrollbar {
