@@ -176,7 +176,6 @@ export default class APIZKProvider extends APIProvider {
     orderType
   ) => {
     const marketInfo = this.marketInfo[market];
-    price = parseFloat(price).toFixed(marketInfo.pricePrecisionDecimals);
 
     if (!APIZKProvider.VALID_SIDES.includes(side)) {
       throw new Error("Invalid side");
