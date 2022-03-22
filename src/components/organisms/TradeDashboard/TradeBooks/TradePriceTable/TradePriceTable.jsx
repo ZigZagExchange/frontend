@@ -11,10 +11,7 @@ const TradePriceTable = (props) => {
 
   const scrollToBottom = () => {
     if (props.scrollToBottom) {
-      ref.current.scrollBy({ 
-        top: ref.current.scrollHeight,
-        behavior: 'smooth' 
-      });
+      ref.current.scrollTo(0,  ref.current.scrollHeight)
     }
   };
 
