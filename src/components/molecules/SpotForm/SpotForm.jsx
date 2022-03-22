@@ -173,7 +173,7 @@ export class SpotForm extends React.Component {
 
       const askPrice = this.getFirstAsk();
       const delta = ((askPrice - price) / askPrice) * 100;
-      if (delta > 10) {
+      if (delta > 10 && this.props.orderType === "limit") {
         toast.error(
           `You are selling ${
             delta.toFixed(2)
@@ -183,6 +183,21 @@ export class SpotForm extends React.Component {
                 delta.toFixed(2)
               }% under the current market price. You will lose money when signing this transaction!`,
         });
+      }
+
+      if (this.props.orderType === "market") {
+        price *= 0.9985;
+        if (delta > 2) {
+          toast.error(
+            `You are selling ${
+              delta.toFixed(2)
+            }% under the current market price. You could lose money when signing this transaction!`, 
+            {
+              toastId: `You are selling ${
+                  delta.toFixed(2)
+                }% under the current market price. You could lose money when signing this transaction!`,
+          });
+        }
       }
     } else if (this.props.side === "b") {
       quoteAmount = quoteAmount ? quoteAmount : (baseAmount * price);
@@ -213,7 +228,7 @@ export class SpotForm extends React.Component {
       
       const bidPrice = this.getFirstBid();
       const delta = ((price - bidPrice) / bidPrice) * 100;
-      if (delta > 10) {
+      if (delta > 10 && this.props.orderType === "limit") {
         toast.error(
           `You are buying ${
             delta.toFixed(2)
@@ -224,15 +239,22 @@ export class SpotForm extends React.Component {
               }% above the current market price. You will lose money when signing this transaction!`,
         });
       }
-    }
 
-    if (this.props.orderType === "market") {
-      if (this.props.side === "b") {
+      if (this.props.orderType === "market") {
         price *= 1.0015;
-      } else if (this.props.side === "s") {
-        price *= 0.9985;
+        if (delta > 2) {
+          toast.error(
+            `You are buying ${
+              delta.toFixed(2)
+            }% above the current market price. You could lose money when signing this transaction!`, 
+            {
+              toastId: `You are buying ${
+                  delta.toFixed(2)
+                }% above the current market price. You could lose money when signing this transaction!`,
+          });
+        }
       }
-    }
+    }    
 
     let newstate = { ...this.state };
     newstate.orderButtonDisabled = true;
