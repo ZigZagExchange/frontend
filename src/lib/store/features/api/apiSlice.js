@@ -74,8 +74,8 @@ export const apiSlice = createSlice({
             const fillDetails = state.userFills[fillid];
             const baseCurrency = fillDetails[2].split("-")[0];
             const sideText = fillDetails[3] === "b" ? "buy" : "sell";
-            const price = fillDetails[4];
-            const baseQuantity = fillDetails[5];
+            const price = Number(fillDetails[4]);
+            const baseQuantity = Number(fillDetails[5]);
             toast.success(
               `Your ${sideText} order for ${
                 baseQuantity.toPrecision(4) / 1
