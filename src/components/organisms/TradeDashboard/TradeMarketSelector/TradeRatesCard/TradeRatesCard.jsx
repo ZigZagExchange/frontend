@@ -38,6 +38,7 @@ class TradeRatesCard extends React.Component {
 
     let marketDisplay = "--/--";
     if (this.state.marketInfo) {
+      console.log(marketInfo.baseAsset.symbol)
       marketInfo = this.state.marketInfo;
       marketDisplay = <div>{marketInfo.baseAsset.symbol}/{marketInfo.quoteAsset.symbol}</div>;
     }
