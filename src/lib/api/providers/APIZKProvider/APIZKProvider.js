@@ -140,7 +140,7 @@ export default class APIZKProvider extends APIProvider {
     } else {
       toast.warn(
         "Your token balances are very low. You might need to bridge in more funds first."
-      );      
+      );
       let maxValue = 0;
       const tokens = Object.keys(balances);
       const result = tokens.map(async (token) => {
@@ -154,7 +154,7 @@ export default class APIZKProvider extends APIProvider {
           }
         }
       })
-      await Promise.all(result) 
+      await Promise.all(result)
     }
 
     const signingKey = await this.syncWallet.setSigningKey({
