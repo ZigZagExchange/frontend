@@ -69,6 +69,28 @@ export const apiSlice = createSlice({
           if (txhash) state.userFills[fillid][7] = txhash;
           if (feeamount) state.userFills[fillid][10] = feeamount;
           if (feetoken) state.userFills[fillid][11] = feetoken;
+          
+          if (newstatus === 'f') {
+            const fillDetails = state.userFills[fillid];
+            const baseCurrency = fillDetails[2].split("-")[0];
+            const sideText = fillDetails[3] === "b" ? "buy" : "sell";
+            const price = Number(fillDetails[4]);
+            const baseQuantity = Number(fillDetails[5]);
+            toast.success(
+              `Your ${sideText} order for ${
+                baseQuantity.toPrecision(4) / 1
+              } ${baseCurrency} was filled @ ${
+                price.toPrecision(4) / 1
+              }!`,
+              {
+                toastId: `Your ${sideText} order for ${
+                  baseQuantity.toPrecision(4) / 1
+                } ${baseCurrency} was filled @ ${
+                  price.toPrecision(4) / 1
+                }!`,
+              }
+            );
+          }
         }
       });
     },
@@ -147,25 +169,8 @@ export const apiSlice = createSlice({
           case "f":
             filledOrder = state.userOrders[orderId];
             if (filledOrder) {
-              const sideText = filledOrder[3] === "b" ? "buy" : "sell";
-              const baseCurrency = filledOrder[2].split("-")[0];
               filledOrder[9] = "f";
               filledOrder[10] = txHash;
-              const noFeeOrder = api.getOrderDetailsWithoutFee(filledOrder);
-              toast.success(
-                `Your ${sideText} order for ${
-                  noFeeOrder.baseQuantity.toPrecision(4) / 1
-                } ${baseCurrency} was filled @ ${
-                  noFeeOrder.price.toPrecision(4) / 1
-                }!`,
-                {
-                  toastId: `Your ${sideText} order for ${
-                    noFeeOrder.baseQuantity.toPrecision(4) / 1
-                  } ${baseCurrency} was filled @ ${
-                    noFeeOrder.price.toPrecision(4) / 1
-                  }!`,
-                }
-              );
             }
             break;
           case "b":
