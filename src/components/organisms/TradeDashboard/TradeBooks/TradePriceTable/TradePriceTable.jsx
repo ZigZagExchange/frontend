@@ -2,22 +2,23 @@ import React, { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 // css
 import "./TradePriceTable.css";
-import { marketInfoSelector } from "lib/store/features/api/apiSlice";
+import { marketInfoSelector, currentMarketSelector } from "lib/store/features/api/apiSlice";
 import { numStringToSymbol } from "lib/utils";
 
 const TradePriceTable = (props) => {
   const marketInfo = useSelector(marketInfoSelector);
+  const currentMarket = useSelector(currentMarketSelector)
   const ref = useRef(null)
 
   const scrollToBottom = () => {
     if (props.scrollToBottom) {
-      ref.current.scrollTo(0,  ref.current.scrollHeight)
+      ref.current.scrollTo(0, ref.current.scrollHeight)
     }
   };
 
   useEffect(() => {
-    scrollToBottom();
-  }, [props.scrollToBottom, props.priceTableData]);
+    setTimeout(()=>scrollToBottom(), 1000)
+  }, [currentMarket]);
 
   const maxQuantity = Math.max(...props.priceTableData.map((d) => d.td2));
   let onClickRow;
