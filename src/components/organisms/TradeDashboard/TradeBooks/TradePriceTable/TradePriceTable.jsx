@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useSelector } from "react-redux";
 // css
 import "./TradePriceTable.css";
@@ -7,15 +7,14 @@ import { numStringToSymbol } from "lib/utils";
 
 const TradePriceTable = (props) => {
   const marketInfo = useSelector(marketInfoSelector);
-  const [firstScroll, setFirstScroll] = useState(false);
+  const ref = useRef(null)
 
   const scrollToBottom = () => {
     if (props.scrollToBottom) {
-      const tableDiv = document.getElementsByClassName(props.className);
-      if (tableDiv.length > 0 && (tableDiv[0].scrollTop >= tableDiv[0].scrollHeight - 3 || !firstScroll)) {
-        tableDiv[0].scrollTop = tableDiv[0].scrollHeight;
-        if (!firstScroll && tableDiv[0].scrollTop > 0) setFirstScroll(true);
-      }
+      ref.current.scrollBy({ 
+        top: ref.current.scrollHeight,
+        behavior: 'smooth' 
+      });
     }
   };
 
@@ -29,7 +28,7 @@ const TradePriceTable = (props) => {
   else onClickRow = () => null;
 
   return (
-    <table className={`trade_price_table zig_scrollstyle ${props.className}`}>
+    <table className={`trade_price_table zig_scrollstyle ${props.className}`} ref={ref}>
       {props.head && (
         <thead>
           <tr>
@@ -39,8 +38,8 @@ const TradePriceTable = (props) => {
           </tr>
         </thead>
       )}
-      <tbody>
-        {props.priceTableData.map((d, i) => {
+      <tbody >
+          {props.priceTableData.map((d, i) => {
           const color = d.side === "b" ? "#27302F" : "#2C232D";
           const breakpoint = Math.round((d.td2 / maxQuantity) * 100);
           let rowStyle;
