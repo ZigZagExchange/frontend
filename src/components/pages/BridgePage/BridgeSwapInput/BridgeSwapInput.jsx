@@ -55,7 +55,14 @@ const BridgeSwapInput = ({ value = {}, onChange, bridgeFee, balances = {}, feeCu
   const setAmount = useCallback(e => onChange({ amount: e.target.value.replace(/[^0-9.]/g,'') }), [onChange])
 
   const setMax = () => {
-    let max = parseFloat((balances[value.currency] && balances[value.currency].valueReadable) || 0)
+    let max;
+    try {
+        const integerDigits = balances[value.currency].valueReadable.split('.')[0].length;
+        const decimalDigits = balances[value.currency].value.length - integerDigits;
+        max = balances[value.currency].value / (10 ** decimalDigits);
+    } catch (e) {
+        max = parseFloat((balances[value.currency] && balances[value.currency].valueReadable) || 0)
+    }
     if (feeCurrency === value.currency) {
       max -= parseFloat(bridgeFee)
     }
