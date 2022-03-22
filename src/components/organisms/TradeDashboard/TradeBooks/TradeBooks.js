@@ -54,7 +54,7 @@ export default function TradeBooks(props) {
       });
     });
   let openOrdersLatestTradesData = fillData;
-  
+
   return (
     <>
       <StyledTradeBooks>
@@ -66,7 +66,7 @@ export default function TradeBooks(props) {
               useGradient="true"
               priceTableData={props.priceTableData}
               currentMarket={props.currentMarket}
-              scrollToBottom="true"
+              scrollToBottom={true}
             />
             <TradePriceHeadSecond lastPrice={props.lastPrice} />
             <TradePriceTable
