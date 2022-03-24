@@ -21,6 +21,9 @@ import RadioButtons from "../../../atoms/RadioButtons/RadioButtons";
 import L2Header from "./L2Header";
 import L1Header from "./L1Header";
 import FastWithdrawTooltip from "./FastWithdrawTooltip";
+import zksyncLogo from "../../../../assets/images/logo.png";
+import ethLogo from "../../../../assets/images/currency/ETH.svg";
+import polygonLogo from "../../../../assets/images/polygon.png";
 
 const defaultTransfer = {
   type: "deposit",
@@ -29,17 +32,20 @@ const defaultTransfer = {
 
 const Networks = [
   { from: {
-    network: 'Ethereum L1',
-    key: 'ethereum'
-  }, to: [{network: 'zkSync L2', key: 'zksync'}] },
+    network: 'Ethereum',
+    key: 'ethereum',
+    icon: ethLogo,
+  }, to: [{network: 'zkSync', key: 'zksync', icon: zksyncLogo}] },
   { from: {
-    network: 'zkSync L2',
-    key: 'zksync'
-  }, to: [{network: 'Ethereum L1', key: 'ethereum'}, {network: 'Polygon', key: 'polygon'}] },
+    network: 'zkSync',
+    key: 'zksync',
+    icon: zksyncLogo
+  }, to: [{network: 'Ethereum', key: 'ethereum', icon: ethLogo}, {network: 'Polygon', key: 'polygon', icon: polygonLogo}] },
   { from: {
     network: 'Polygon',
-    key: 'polygon'
-  }, to: [{network: 'zkSync L2', key: 'zksync'}] },
+    key: 'polygon',
+    icon: polygonLogo
+  }, to: [{network: 'zkSync', key: 'zksync', icon: zksyncLogo}] },
 ];
 
 const Bridge = () => {
@@ -338,7 +344,6 @@ const Bridge = () => {
           <div className="bridge_coin_title">
             <h5>FROM</h5>
             <L1Header networks={Networks} onSelect={onSelectFromNetwork} selectedNetwork={fromNetwork} />
-            
           </div>
           <BridgeSwapInput
             bridgeFee={L2Fee}
@@ -392,7 +397,7 @@ const Bridge = () => {
             display={"flex"}
             alignItems={"flex-end"}
           >
-            {transfer.type === "withdraw" && (
+            {fromNetwork.from.key==='zksync' && toNetwork.key==='ethereum' && (
               <>
                 <RadioButtons
                   horizontal
