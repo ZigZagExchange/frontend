@@ -1,4 +1,5 @@
 import React from "react";
+import { formatPrice } from "lib/utils";
 // css
 import api from "lib/api";
 import "./TradeRatesCard.css";
@@ -83,10 +84,8 @@ class TradeRatesCard extends React.Component {
             <h2>24h Change</h2>
             <p>
               {this.props.marketSummary.priceChange &&
-                marketInfo &&
-                (this.props.marketSummary.priceChange / 1).toFixed(
-                  marketInfo.pricePrecisionDecimals
-                )}{" "}
+                formatPrice(this.props.marketSummary.priceChange / 1)
+              }{" "}
               {percentChange !== 'NaN' && `${percentChange}%`}
             </p>
           </div>
