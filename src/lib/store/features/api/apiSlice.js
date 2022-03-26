@@ -27,11 +27,11 @@ export const apiSlice = createSlice({
       const op = payload[0];
       const errorMessage = payload[1];
       toast.error(
-        `Error while processing '${op}' because: ${errorMessage
-        }. If you need further help, please contact us on discord.`,
+        `An unknown error has occurred while processing  '${op}' (${errorMessage
+          }) Please contact us or join the Discord to report and solve this bug.`,
         {
-          toastId: `Error while processing '${op}' because: ${errorMessage
-            }. If you need further help, please contact us on discord.`,
+          toastId: `An unknown error has occurred while processing  '${op}' (${errorMessage
+            }) Please contact us or join the Discord to report and solve this bug.`,
         }
       );
     },
