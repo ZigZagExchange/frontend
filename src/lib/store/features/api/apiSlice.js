@@ -24,7 +24,9 @@ export const apiSlice = createSlice({
   },
   reducers: {
     _error(state, { payload }) {
-      const renderToastContent = (op, errorMessage) => {
+      const op = payload[0];
+      const errorMessage = payload[1];
+      const renderToastContent = () => {
         <>
           An unknown error has occurred while processing {op} ({errorMessage}). Please
           <a
@@ -55,8 +57,6 @@ export const apiSlice = createSlice({
           to report and solve this bug.
         </>
       }
-      const op = payload[0];
-      const errorMessage = payload[1];
       const toastContent = renderToastContent(op, errorMessage)
       toast.error(toastContent,
         { toastId: toastContent, },
