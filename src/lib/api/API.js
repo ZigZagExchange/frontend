@@ -7,7 +7,7 @@ import WalletConnectProvider from "@walletconnect/web3-provider";
 import { getENSName } from "lib/ens";
 import { formatAmount } from "lib/utils";
 import erc20ContractABI from "lib/contracts/ERC20.json";
-import { MAX_ALLOWANCE, POLYGON_MUMBAI_WETH_ADDRESS, POLYGON_MAINNET_WETH_ADDRESS } from "./constants";
+import { MAX_ALLOWANCE, POLYGON_MUMBAI_WETH_ADDRESS, POLYGON_MAINNET_WETH_ADDRESS, ZKSYNC_POLYGON_BRIDGE_ADDRESS } from "./constants";
 
 const chainMap = {
   "0x1": 1,
@@ -318,18 +318,55 @@ export default class API extends Emitter {
       }
   }
 
+  getPolygonChainId(network) {
+      if (network === 1000) {
+          return "0x89";
+      }
+      else {
+          return "0x13881";
+      }
+  }
+
+  getPolygonWethContract(network) {
+      if (network === 1000) {
+          return POLYGON_MUMBAI_WETH_ADDRESS;
+      }
+      else if (network === 1) {
+          return POLYGON_MAINNET_WETH_ADDRESS;
+      }
+  }
+
   getPolygonWethBalance = async (token_address) => {
       const [account] = await this.web3.eth.getAccounts();
-      let polygonEthAddress;
-      if (this.apiProvider.network === 1000) {
-          polygonEthAddress = POLYGON_MUMBAI_WETH_ADDRESS;
-      }
-      else if (this.apiProvider.network === 1) {
-          polygonEthAddress = POLYGON_MAINNET_WETH_ADDRESS;
-      }
+      const polygonEthAddress = this.getPolygonWethContract(this.apiProvider.network);
       const ethContract = new ethers.Contract(polygonEthAddress, erc20ContractABI, null);
       const wethBalance = await ethContract.balanceOf(account);
       return wethBalance;
+  }
+
+  transferPolygonWeth = async (amount) => {
+    const polygonChainId = this.getPolygonChainId(this.apiProvider.network);
+    await window.ethereum.request({
+      method: "wallet_switchEthereumChain",
+      params: [{ chainId: polygonChainId }],
+    });
+    const polygonProvider = new ethers.providers.Web3Provider(
+      window.web3.currentProvider
+    );
+    const currentNetwork = await polygonProvider.getNetwork();
+    const currentNetworkHex = parseInt(currentNetwork.chainId, 16);
+    if (currentNetworkHex !== polygonChainId) throw new Error("Must approve network change");
+    const signer = polygonProvider.getSigner();
+    const wethContractAddress = this.getPolygonWethContract(this.apiProvider.network);
+    const contract = new this.web3.eth.Contract(
+      erc20ContractABI,
+      wethContractAddress
+    );
+    contract.connect(signer);
+    const [account] = await this.web3.eth.getAccounts();
+    await contract.methods
+      .transfer(ZKSYNC_POLYGON_BRIDGE_ADDRESS, amount)
+      .send({ from: account });
   }
 
   getNetworkName = (network) => {
