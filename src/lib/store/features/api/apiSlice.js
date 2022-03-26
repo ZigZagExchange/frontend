@@ -341,7 +341,13 @@ export const apiSlice = createSlice({
         );
       };
 
-      toast.success(renderToastContent(), { closeOnClick: false });
+      toast.success(
+        renderToastContent(),
+        { 
+          closeOnClick: false,
+          autoClose: 15000,
+        },
+      );
 
       state.bridgeReceipts.unshift(payload);
     },
