@@ -29,7 +29,7 @@ export const apiSlice = createSlice({
       const renderToastContent = () => {
         return (
           <>
-            An unknown error has occurred while processing {op} ({errorMessage}). Please
+            An unknown error has occurred while processing {op} ({errorMessage}). Please{" "}
             <a
               href={"https://info.zigzag.exchange/#contact"}
               style={{
@@ -42,7 +42,7 @@ export const apiSlice = createSlice({
             >
               contact us
             </a>
-            or join the
+            {" "}or join the{" "}
             <a
               href={"https://discord.gg/zigzag"}
               style={{
@@ -55,7 +55,7 @@ export const apiSlice = createSlice({
             >
               Discord
             </a>
-            to report and solve this bug.
+            {" "}to report and solve this bug.
           </>
         );
       };
