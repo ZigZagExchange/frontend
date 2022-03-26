@@ -61,8 +61,10 @@ export const apiSlice = createSlice({
       };
       const toastContent = renderToastContent(op, errorMessage)
       toast.error(toastContent,
-        { toastId: toastContent, },
-        { closeOnClick: false, },
+        { toastId: toastContent,
+          closeOnClick: false,
+          autoClose: false,
+        },
       );
     },
     _marketinfo(state, { payload }) {
