@@ -80,7 +80,7 @@ class TradeRatesCard extends React.Component {
             <p>
               {this.props.marketSummary.priceChange &&
                 formatPrice(this.props.marketSummary.priceChange / 1)
-              }{" "}{" "}
+              }{" "}
               {percentChange !== 'NaN' && `${percentChange}%`}
             </p>
           </div>
