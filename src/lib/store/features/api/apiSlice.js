@@ -27,36 +27,38 @@ export const apiSlice = createSlice({
       const op = payload[0];
       const errorMessage = payload[1];
       const renderToastContent = () => {
-        <>
-          An unknown error has occurred while processing {op} ({errorMessage}). Please
-          <a
-            href={"https://info.zigzag.exchange/#contact"}
-            style={{
-              color: "white",
-              textDecoration: "underline",
-              fontWeight: "bold",
-            }}
-            target="_blank"
-            rel="noreferrer"
-          >
-            contact us
-          </a>
-          or join the
-          <a
-            href={"https://discord.gg/zigzag"}
-            style={{
-              color: "white",
-              textDecoration: "underline",
-              fontWeight: "bold",
-            }}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Discord
-          </a>
-          to report and solve this bug.
-        </>
-      }
+        return (
+          <>
+            An unknown error has occurred while processing {op} ({errorMessage}). Please
+            <a
+              href={"https://info.zigzag.exchange/#contact"}
+              style={{
+                color: "white",
+                textDecoration: "underline",
+                fontWeight: "bold",
+              }}
+              target="_blank"
+              rel="noreferrer"
+            >
+              contact us
+            </a>
+            or join the
+            <a
+              href={"https://discord.gg/zigzag"}
+              style={{
+                color: "white",
+                textDecoration: "underline",
+                fontWeight: "bold",
+              }}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Discord
+            </a>
+            to report and solve this bug.
+          </>
+        );
+      };
       const toastContent = renderToastContent(op, errorMessage)
       toast.error(toastContent,
         { toastId: toastContent, },
