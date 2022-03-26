@@ -23,6 +23,18 @@ export const apiSlice = createSlice({
     arweaveAllocation: 0,
   },
   reducers: {
+    _error(state, { payload }) {
+      const op = payload[0];
+      const errorMessage = payload[1];
+      toast.error(
+        `Error while processing '${op}' because: ${errorMessage
+        }. If you need further help, please contact us on discord.`,
+        {
+          toastId: `Error while processing '${op}' because: ${errorMessage
+            }. If you need further help, please contact us on discord.`,
+        }
+      );
+    },
     _marketinfo(state, { payload }) {
       if (payload[0].error) {
         console.error(payload[0]);
