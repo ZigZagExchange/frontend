@@ -7,7 +7,7 @@ import WalletConnectProvider from "@walletconnect/web3-provider";
 import { getENSName } from "lib/ens";
 import { formatAmount } from "lib/utils";
 import erc20ContractABI from "lib/contracts/ERC20.json";
-import { MAX_ALLOWANCE } from "./constants";
+import { MAX_ALLOWANCE, POLYGON_MUMBAI_WETH_ADDRESS, POLYGON_MAINNET_WETH_ADDRESS } from "./constants";
 
 const chainMap = {
   "0x1": 1,
@@ -18,6 +18,7 @@ export default class API extends Emitter {
   ws = null;
   apiProvider = null;
   ethersProvider = null;
+  polygonProvider = null;
   currencies = null;
   marketInfo = {};
   lastprices = {};
@@ -255,6 +256,13 @@ export default class API extends Emitter {
               web3Provider
             );
           }
+          
+
+          // set up polygon providers. mumbai for testnet. polygon for mainnet
+          this.polygonProvider = new ethers.providers.JsonRpcProvider(
+            this.getPolygonUrl(network)
+          );
+        
 
           let accountState;
           try {
@@ -300,6 +308,29 @@ export default class API extends Emitter {
     this.emit("accountState", {});
     this.emit("signOut");
   };
+  
+  getPolygonUrl(network) {
+      if (network === 1000) {
+          return `https://polygon-mumbai.infura.io/v3/${this.infuraId}`;
+      }
+      else {
+          return `https://polygon-mainnet.infura.io/v3/${this.infuraId}`;
+      }
+  }
+
+  getPolygonWethBalance = async (token_address) => {
+      const [account] = await this.web3.eth.getAccounts();
+      let polygonEthAddress;
+      if (this.apiProvider.network === 1000) {
+          polygonEthAddress = POLYGON_MUMBAI_WETH_ADDRESS;
+      }
+      else if (this.apiProvider.network === 1) {
+          polygonEthAddress = POLYGON_MAINNET_WETH_ADDRESS;
+      }
+      const ethContract = new ethers.Contract(polygonEthAddress, erc20ContractABI, null);
+      const wethBalance = await ethContract.balanceOf(account);
+      return wethBalance;
+  }
 
   getNetworkName = (network) => {
     const keys = Object.keys(this.networks);
