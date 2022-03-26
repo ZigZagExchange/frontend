@@ -29,7 +29,7 @@ export const apiSlice = createSlice({
       const renderToastContent = () => {
         return (
           <>
-            An unknown error has occurred while processing {op} ({errorMessage}). Please{" "}
+            An unknown error has occurred while processing '{op}' ({errorMessage}). Please{" "}
             <a
               href={"https://info.zigzag.exchange/#contact"}
               style={{
