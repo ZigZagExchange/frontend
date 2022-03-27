@@ -1,5 +1,6 @@
 import { createSlice, createAction } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
+import { formatPrice } from "lib/utils";
 import api from "lib/api";
 
 const makeScope = (state) => `${state.network}-${state.userId}`;
@@ -78,15 +79,15 @@ export const apiSlice = createSlice({
             const baseQuantity = Number(fillDetails[5]);
             toast.success(
               `Your ${sideText} order for ${
-                baseQuantity.toPrecision(4) / 1
+                Number(baseQuantity.toPrecision(4))
               } ${baseCurrency} was filled @ ${
-                price.toPrecision(4) / 1
+                Number(formatPrice(price))
               }!`,
               {
                 toastId: `Your ${sideText} order for ${
-                  baseQuantity.toPrecision(4) / 1
+                  Number(baseQuantity.toPrecision(4))
                 } ${baseCurrency} was filled @ ${
-                  price.toPrecision(4) / 1
+                  Number(formatPrice(price))
                 }!`,
               }
             );
@@ -341,7 +342,13 @@ export const apiSlice = createSlice({
         );
       };
 
-      toast.success(renderToastContent(), { closeOnClick: false });
+      toast.success(
+        renderToastContent(),
+        { 
+          closeOnClick: false,
+          autoClose: 15000,
+        },
+      );
 
       state.bridgeReceipts.unshift(payload);
     },
