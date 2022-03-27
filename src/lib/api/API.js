@@ -344,7 +344,7 @@ export default class API extends Emitter {
     const ethContract = new ethers.Contract(
       polygonEthAddress,
       erc20ContractABI,
-      null
+      this.polygonProvider
     );
     const wethBalance = await ethContract.balanceOf(account);
     this.emit("balanceUpdate", "polygon", { ...wethBalance });
