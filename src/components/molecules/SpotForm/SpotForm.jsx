@@ -2,6 +2,7 @@ import React from "react";
 import { toast } from "react-toastify";
 import api from "lib/api";
 import { RangeSlider } from "components";
+import { formatPrice } from "lib/utils";
 import "./SpotForm.css";
 import ConnectWalletButton from "../../atoms/ConnectWalletButton/ConnectWalletButton";
 
@@ -86,7 +87,7 @@ export class SpotForm extends React.Component {
       }
     }
     if (!price) return 0;
-    return price.toFixed(marketInfo.pricePrecisionDecimals);
+    return formatPrice(price);
   }
 
   async buySellHandler(e) {
@@ -325,7 +326,7 @@ export class SpotForm extends React.Component {
     const asks = this.props.liquidity
       .filter((l) => l[0] === "s")
       .map((l) => l[1]);
-    return Math.min(...asks).toFixed(marketInfo.pricePrecisionDecimals);
+    return formatPrice(Math.min(...asks));
   }
 
   getFirstBid() {
@@ -334,7 +335,7 @@ export class SpotForm extends React.Component {
     const bids = this.props.liquidity
       .filter((l) => l[0] === "b")
       .map((l) => l[1]);
-    return Math.max(...bids).toFixed(marketInfo.pricePrecisionDecimals);
+    return formatPrice(Math.max(...bids));
   }
 
   rangeSliderHandler(e, val) {
