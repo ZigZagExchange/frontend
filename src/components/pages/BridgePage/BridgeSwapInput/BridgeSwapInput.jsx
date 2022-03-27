@@ -56,9 +56,15 @@ const BridgeSwapInput = ({ value = {}, onChange, bridgeFee, balances = {}, feeCu
 
   const setMax = () => {
     let max;
+    console.log(balances[value.currency]);
     try {
-        const integerDigits = balances[value.currency].valueReadable.split('.')[0].length;
+        const integerValue = balances[value.currency].valueReadable.split('.')[0];
+        let integerDigits = 0;
+        if (integerValue !== '0') {
+            integerDigits = integerValue.length;
+        }
         const decimalDigits = balances[value.currency].value.length - integerDigits;
+        console.log(integerDigits, decimalDigits);
         max = balances[value.currency].value / (10 ** decimalDigits);
         max = Math.floor(max * 10**8) / 10**8; // 8 decimal places max
     } catch (e) {
