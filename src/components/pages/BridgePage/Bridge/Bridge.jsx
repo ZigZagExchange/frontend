@@ -328,12 +328,22 @@ const Bridge = () => {
 
   const onSelectFromNetwork = ({ key }) => {
     const f = Networks.find((i)=> i.from.key===key)
+    if(f.from.key==='polygon') {
+      api.getPolygonWethBalance().then(b=> {
+        console.log(b)
+      })
+    }
     setFromNetwork(f)
     setToNetwork(f.to[0])
   };
 
   const onSelectToNetwork = ({key}) => {
     const t=fromNetwork.to.find((i)=>i.key===key)
+    if(t.key==='polygon') {
+      api.getPolygonWethBalance().then(b=> {
+        console.log(b)
+      })
+    }
     setToNetwork(t)
   }
 

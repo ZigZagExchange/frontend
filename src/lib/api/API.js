@@ -7,7 +7,12 @@ import WalletConnectProvider from "@walletconnect/web3-provider";
 import { getENSName } from "lib/ens";
 import { formatAmount } from "lib/utils";
 import erc20ContractABI from "lib/contracts/ERC20.json";
-import { MAX_ALLOWANCE, POLYGON_MUMBAI_WETH_ADDRESS, POLYGON_MAINNET_WETH_ADDRESS, ZKSYNC_POLYGON_BRIDGE_ADDRESS } from "./constants";
+import {
+  MAX_ALLOWANCE,
+  POLYGON_MUMBAI_WETH_ADDRESS,
+  POLYGON_MAINNET_WETH_ADDRESS,
+  ZKSYNC_POLYGON_BRIDGE_ADDRESS,
+} from "./constants";
 
 const chainMap = {
   "0x1": 1,
@@ -256,13 +261,11 @@ export default class API extends Emitter {
               web3Provider
             );
           }
-          
 
           // set up polygon providers. mumbai for testnet. polygon for mainnet
           this.polygonProvider = new ethers.providers.JsonRpcProvider(
             this.getPolygonUrl(network)
           );
-        
 
           let accountState;
           try {
@@ -308,41 +311,45 @@ export default class API extends Emitter {
     this.emit("accountState", {});
     this.emit("signOut");
   };
-  
+
   getPolygonUrl(network) {
-      if (network === 1000) {
-          return `https://polygon-mumbai.infura.io/v3/${this.infuraId}`;
-      }
-      else {
-          return `https://polygon-mainnet.infura.io/v3/${this.infuraId}`;
-      }
+    if (network === 1000) {
+      return `https://polygon-mumbai.infura.io/v3/${this.infuraId}`;
+    } else {
+      return `https://polygon-mainnet.infura.io/v3/${this.infuraId}`;
+    }
   }
 
   getPolygonChainId(network) {
-      if (network === 1000) {
-          return "0x89";
-      }
-      else {
-          return "0x13881";
-      }
+    if (network === 1000) {
+      return "0x89";
+    } else {
+      return "0x13881";
+    }
   }
 
   getPolygonWethContract(network) {
-      if (network === 1000) {
-          return POLYGON_MUMBAI_WETH_ADDRESS;
-      }
-      else if (network === 1) {
-          return POLYGON_MAINNET_WETH_ADDRESS;
-      }
+    if (network === 1000) {
+      return POLYGON_MUMBAI_WETH_ADDRESS;
+    } else if (network === 1) {
+      return POLYGON_MAINNET_WETH_ADDRESS;
+    }
   }
 
-  getPolygonWethBalance = async (token_address) => {
-      const [account] = await this.web3.eth.getAccounts();
-      const polygonEthAddress = this.getPolygonWethContract(this.apiProvider.network);
-      const ethContract = new ethers.Contract(polygonEthAddress, erc20ContractABI, null);
-      const wethBalance = await ethContract.balanceOf(account);
-      return wethBalance;
-  }
+  getPolygonWethBalance = async () => {
+    const [account] = await this.web3.eth.getAccounts();
+    const polygonEthAddress = this.getPolygonWethContract(
+      this.apiProvider.network
+    );
+    const ethContract = new ethers.Contract(
+      polygonEthAddress,
+      erc20ContractABI,
+      null
+    );
+    const wethBalance = await ethContract.balanceOf(account);
+    this.emit("balanceUpdate", "polygon", { ...wethBalance });
+    return wethBalance;
+  };
 
   transferPolygonWeth = async (amount) => {
     const polygonChainId = this.getPolygonChainId(this.apiProvider.network);
@@ -355,9 +362,12 @@ export default class API extends Emitter {
     );
     const currentNetwork = await polygonProvider.getNetwork();
     const currentNetworkHex = parseInt(currentNetwork.chainId, 16);
-    if (currentNetworkHex !== polygonChainId) throw new Error("Must approve network change");
+    if (currentNetworkHex !== polygonChainId)
+      throw new Error("Must approve network change");
     const signer = polygonProvider.getSigner();
-    const wethContractAddress = this.getPolygonWethContract(this.apiProvider.network);
+    const wethContractAddress = this.getPolygonWethContract(
+      this.apiProvider.network
+    );
     const contract = new this.web3.eth.Contract(
       erc20ContractABI,
       wethContractAddress
@@ -367,7 +377,7 @@ export default class API extends Emitter {
     await contract.methods
       .transfer(ZKSYNC_POLYGON_BRIDGE_ADDRESS, amount)
       .send({ from: account });
-  }
+  };
 
   getNetworkName = (network) => {
     const keys = Object.keys(this.networks);

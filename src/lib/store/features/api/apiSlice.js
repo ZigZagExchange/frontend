@@ -69,8 +69,8 @@ export const apiSlice = createSlice({
           if (txhash) state.userFills[fillid][7] = txhash;
           if (feeamount) state.userFills[fillid][10] = feeamount;
           if (feetoken) state.userFills[fillid][11] = feetoken;
-          
-          if (newstatus === 'f') {
+
+          if (newstatus === "f") {
             const fillDetails = state.userFills[fillid];
             const baseCurrency = fillDetails[2].split("-")[0];
             const sideText = fillDetails[3] === "b" ? "buy" : "sell";
@@ -79,15 +79,11 @@ export const apiSlice = createSlice({
             toast.success(
               `Your ${sideText} order for ${
                 baseQuantity.toPrecision(4) / 1
-              } ${baseCurrency} was filled @ ${
-                price.toPrecision(4) / 1
-              }!`,
+              } ${baseCurrency} was filled @ ${price.toPrecision(4) / 1}!`,
               {
                 toastId: `Your ${sideText} order for ${
                   baseQuantity.toPrecision(4) / 1
-                } ${baseCurrency} was filled @ ${
-                  price.toPrecision(4) / 1
-                }!`,
+                } ${baseCurrency} was filled @ ${price.toPrecision(4) / 1}!`,
               }
             );
           }
@@ -113,12 +109,14 @@ export const apiSlice = createSlice({
         state.lastPrices[market] = {
           price: update[1],
           change: update[2],
-          quoteVolume: state.lastPrices[market] ? state.lastPrices[market].quoteVolume : 0
+          quoteVolume: state.lastPrices[market]
+            ? state.lastPrices[market].quoteVolume
+            : 0,
         };
         // Sometimes lastprice doesn't have volume data
         // Keep the old data if it doesn't
         if (update[3]) {
-            state.lastPrices[market].quoteVolume = update[3];
+          state.lastPrices[market].quoteVolume = update[3];
         }
         if (update[0] === state.currentMarket) {
           state.marketSummary.price = price;
