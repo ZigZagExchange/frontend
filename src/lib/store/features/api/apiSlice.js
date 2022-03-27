@@ -330,7 +330,7 @@ export const apiSlice = createSlice({
             {!isFastWithdraw &&
               renderBridgeLink(
                 "Bridge FAQ",
-                "https://zksync.io/faq/faq.html#how-long-are-withdrawal-times"
+                "https://docs.zigzag.exchange/zksync/bridge-guide"
               )}
             {isFastWithdraw &&
               renderBridgeLink(
