@@ -140,7 +140,7 @@ export default class APIZKProvider extends APIProvider {
     } else {
       toast.warn(
         "Your token balances are very low. You might need to bridge in more funds first."
-      );      
+      );
       let maxValue = 0;
       const tokens = Object.keys(balances);
       const result = tokens.map(async (token) => {
@@ -154,7 +154,7 @@ export default class APIZKProvider extends APIProvider {
           }
         }
       })
-      await Promise.all(result) 
+      await Promise.all(result)
     }
 
     const signingKey = await this.syncWallet.setSigningKey({
@@ -176,7 +176,6 @@ export default class APIZKProvider extends APIProvider {
     orderType
   ) => {
     const marketInfo = this.marketInfo[market];
-    price = parseFloat(price).toFixed(marketInfo.pricePrecisionDecimals);
 
     if (!APIZKProvider.VALID_SIDES.includes(side)) {
       throw new Error("Invalid side");
@@ -202,12 +201,12 @@ export default class APIZKProvider extends APIProvider {
         sellQuantityWithFee = (sellQuantity + marketInfo.quoteFee).toFixed(
           marketInfo.quoteAsset.decimals
         );
-        tokenSell = marketInfo.quoteAssetId;
-        tokenBuy = marketInfo.baseAssetId;
-        tokenRatio[marketInfo.baseAssetId] = (quoteAmount / price).toFixed(
+        tokenSell = marketInfo.quoteAsset.id;
+        tokenBuy = marketInfo.baseAsset.id;
+        tokenRatio[marketInfo.baseAsset.id] = (quoteAmount / price).toFixed(
           marketInfo.baseAsset.decimals
         );
-        tokenRatio[marketInfo.quoteAssetId] = sellQuantityWithFee;
+        tokenRatio[marketInfo.quoteAsset.id] = sellQuantityWithFee;
         fullSellQuantity = (
           sellQuantityWithFee *
           10 ** marketInfo.quoteAsset.decimals
@@ -217,10 +216,10 @@ export default class APIZKProvider extends APIProvider {
         sellQuantityWithFee = (sellQuantity + marketInfo.quoteFee).toFixed(
           marketInfo.quoteAsset.decimals
         );
-        tokenSell = marketInfo.quoteAssetId;
-        tokenBuy = marketInfo.baseAssetId;
-        tokenRatio[marketInfo.baseAssetId] = baseAmount;
-        tokenRatio[marketInfo.quoteAssetId] = sellQuantityWithFee;
+        tokenSell = marketInfo.quoteAsset.id;
+        tokenBuy = marketInfo.baseAsset.id;
+        tokenRatio[marketInfo.baseAsset.id] = baseAmount;
+        tokenRatio[marketInfo.quoteAsset.id] = sellQuantityWithFee;
         fullSellQuantity = (
           sellQuantityWithFee *
           10 ** marketInfo.quoteAsset.decimals
@@ -233,10 +232,10 @@ export default class APIZKProvider extends APIProvider {
         sellQuantityWithFee = (sellQuantity + marketInfo.baseFee).toFixed(
           marketInfo.baseAsset.decimals
         );
-        tokenSell = marketInfo.baseAssetId;
-        tokenBuy = marketInfo.quoteAssetId;
-        tokenRatio[marketInfo.baseAssetId] = sellQuantityWithFee;
-        tokenRatio[marketInfo.quoteAssetId] = (baseAmount * price).toFixed(
+        tokenSell = marketInfo.baseAsset.id;
+        tokenBuy = marketInfo.quoteAsset.id;
+        tokenRatio[marketInfo.baseAsset.id] = sellQuantityWithFee;
+        tokenRatio[marketInfo.quoteAsset.id] = (baseAmount * price).toFixed(
           marketInfo.quoteAsset.decimals
         );
         fullSellQuantity = (
@@ -248,10 +247,10 @@ export default class APIZKProvider extends APIProvider {
         sellQuantityWithFee = (sellQuantity + marketInfo.baseFee).toFixed(
           marketInfo.baseAsset.decimals
         );
-        tokenSell = marketInfo.baseAssetId;
-        tokenBuy = marketInfo.quoteAssetId;
-        tokenRatio[marketInfo.baseAssetId] = sellQuantityWithFee;
-        tokenRatio[marketInfo.quoteAssetId] = quoteAmount;
+        tokenSell = marketInfo.baseAsset.id;
+        tokenBuy = marketInfo.quoteAsset.id;
+        tokenRatio[marketInfo.baseAsset.id] = sellQuantityWithFee;
+        tokenRatio[marketInfo.quoteAsset.id] = quoteAmount;
         fullSellQuantity = (
           sellQuantityWithFee *
           10 ** marketInfo.baseAsset.decimals

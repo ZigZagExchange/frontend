@@ -2,6 +2,7 @@ import React from "react";
 import { toast } from "react-toastify";
 import api from "lib/api";
 import { RangeSlider } from "components";
+import { formatPrice } from "lib/utils";
 import "./SpotForm.css";
 import ConnectWalletButton from "../../atoms/ConnectWalletButton/ConnectWalletButton";
 
@@ -86,7 +87,7 @@ export class SpotForm extends React.Component {
       }
     }
     if (!price) return 0;
-    return price.toFixed(marketInfo.pricePrecisionDecimals);
+    return formatPrice(price);
   }
 
   async buySellHandler(e) {
@@ -101,13 +102,13 @@ export class SpotForm extends React.Component {
     } else {
       quoteAmount = this.state.quoteAmount;
     }
-    
+
     quoteAmount = isNaN(quoteAmount) ? 0 : quoteAmount
     baseAmount = isNaN(baseAmount) ? 0 : baseAmount
-    if(!baseAmount && !quoteAmount) {
+    if (!baseAmount && !quoteAmount) {
       toast.error("No amount available", {
         toastId: 'No amount available',
-    });
+      });
       return;
     }
 
@@ -119,7 +120,7 @@ export class SpotForm extends React.Component {
       return;
     }
 
-    if(price < 0) {
+    if (price < 0) {
       toast.error(`Price (${price}) can't be below 0`, {
         toastId: `Price (${price}) can't be below 0`,
       });
@@ -140,15 +141,15 @@ export class SpotForm extends React.Component {
       baseBalance = 0;
       quoteBalance = 0;
     }
-    
+
     const marketInfo = this.props.marketInfo;
     baseBalance = parseFloat(baseBalance);
     quoteBalance = parseFloat(quoteBalance);
-    if(this.props.side === "s") {
+    if (this.props.side === "s") {
       baseAmount = baseAmount ? baseAmount : (quoteAmount / price);
       quoteAmount = 0;
 
-      if(isNaN(baseBalance)) {
+      if (isNaN(baseBalance)) {
         toast.error(`No ${marketInfo.baseAsset.symbol} balance`, {
           toastId: `No ${marketInfo.baseAsset.symbol} balance`,
         });
@@ -164,8 +165,7 @@ export class SpotForm extends React.Component {
 
       if (baseAmount && baseAmount < marketInfo.baseFee) {
         toast.error(
-          `Minimum order size is ${
-            marketInfo.baseFee.toPrecision(5)
+          `Minimum order size is ${marketInfo.baseFee.toPrecision(5)
           } ${marketInfo.baseAsset.symbol}`
         );
         return;
@@ -173,22 +173,33 @@ export class SpotForm extends React.Component {
 
       const askPrice = this.getFirstAsk();
       const delta = ((askPrice - price) / askPrice) * 100;
-      if (delta > 10) {
+      if (delta > 10 && this.props.orderType === "limit") {
         toast.error(
-          `You are selling ${
-            delta.toFixed(2)
-          }% under the current market price. You will lose money when signing this transaction!`, 
+          `You are selling ${delta.toFixed(2)
+          }% under the current market price. You will lose money when signing this transaction!`,
           {
-            toastId: `You are selling ${
-                delta.toFixed(2)
+            toastId: `You are selling ${delta.toFixed(2)
               }% under the current market price. You will lose money when signing this transaction!`,
-        });
+          });
+      }
+
+      if (this.props.orderType === "market") {
+        price *= 0.9985;
+        if (delta > 2) {
+          toast.error(
+            `You are selling ${delta.toFixed(2)
+            }% under the current market price. You could lose money when signing this transaction!`,
+            {
+              toastId: `You are selling ${delta.toFixed(2)
+                }% under the current market price. You could lose money when signing this transaction!`,
+            });
+        }
       }
     } else if (this.props.side === "b") {
       quoteAmount = quoteAmount ? quoteAmount : (baseAmount * price);
       baseAmount = 0;
 
-      if(isNaN(quoteBalance)) {
+      if (isNaN(quoteBalance)) {
         toast.error(`No ${marketInfo.quoteAsset.symbol} balance`, {
           toastId: `No ${marketInfo.quoteAsset.symbol} balance`,
         });
@@ -204,33 +215,35 @@ export class SpotForm extends React.Component {
 
       if (quoteAmount && quoteAmount < marketInfo.quoteFee) {
         toast.error(
-          `Minimum order size is ${
-            marketInfo.quoteFee.toPrecision(5)
+          `Minimum order size is ${marketInfo.quoteFee.toPrecision(5)
           } ${marketInfo.quoteAsset.symbol}`
         );
         return;
       }
-      
+
       const bidPrice = this.getFirstBid();
       const delta = ((price - bidPrice) / bidPrice) * 100;
-      if (delta > 10) {
+      if (delta > 10 && this.props.orderType === "limit") {
         toast.error(
-          `You are buying ${
-            delta.toFixed(2)
-          }% above the current market price. You will lose money when signing this transaction!`, 
+          `You are buying ${delta.toFixed(2)
+          }% above the current market price. You will lose money when signing this transaction!`,
           {
-            toastId: `You are buying ${
-                delta.toFixed(2)
+            toastId: `You are buying ${delta.toFixed(2)
               }% above the current market price. You will lose money when signing this transaction!`,
-        });
+          });
       }
-    }
 
-    if (this.props.orderType === "market") {
-      if (this.props.side === "b") {
+      if (this.props.orderType === "market") {
         price *= 1.0015;
-      } else if (this.props.side === "s") {
-        price *= 0.9985;
+        if (delta > 2) {
+          toast.error(
+            `You are buying ${delta.toFixed(2)
+            }% above the current market price. You could lose money when signing this transaction!`,
+            {
+              toastId: `You are buying ${delta.toFixed(2)
+                }% above the current market price. You could lose money when signing this transaction!`,
+            });
+        }
       }
     }
 
@@ -241,7 +254,7 @@ export class SpotForm extends React.Component {
     if (api.isZksyncChain()) {
       orderPendingToast = toast.info(
         "Order pending. Sign or Cancel to continue...", {
-          toastId: "Order pending. Sign or Cancel to continue...",
+        toastId: "Order pending. Sign or Cancel to continue...",
       }
       );
     }
@@ -291,7 +304,7 @@ export class SpotForm extends React.Component {
         const baseAmount = this.state.baseAmount || 0;
         const total = baseAmount * this.currentPrice();
         return Math.round((total / quoteBalance) * 100);
-      }      
+      }
     }
   }
 
@@ -313,7 +326,7 @@ export class SpotForm extends React.Component {
     const asks = this.props.liquidity
       .filter((l) => l[0] === "s")
       .map((l) => l[1]);
-    return Math.min(...asks).toFixed(marketInfo.pricePrecisionDecimals);
+    return formatPrice(Math.min(...asks));
   }
 
   getFirstBid() {
@@ -322,7 +335,7 @@ export class SpotForm extends React.Component {
     const bids = this.props.liquidity
       .filter((l) => l[0] === "b")
       .map((l) => l[1]);
-    return Math.max(...bids).toFixed(marketInfo.pricePrecisionDecimals);
+    return formatPrice(Math.max(...bids));
   }
 
   rangeSliderHandler(e, val) {
@@ -361,14 +374,14 @@ export class SpotForm extends React.Component {
       const quoteBalance = this.getQuoteBalance();
       const quoteDecimals = marketInfo.quoteAsset.decimals;
       const baseDecimals = marketInfo.baseAsset.decimals;
-      let displayAmount = (quoteBalance * val) / 100;      
+      let displayAmount = (quoteBalance * val) / 100;
       displayAmount -= marketInfo.quoteFee;
       displayAmount = parseFloat(displayAmount.toFixed(quoteDecimals))
       displayAmount = (displayAmount > 9999)
         ? displayAmount.toFixed(0)
         : displayAmount.toPrecision(5)
 
-      if (displayAmount < 1e-5) {        
+      if (displayAmount < 1e-5) {
         newstate.quoteAmount = 0;
       } else {
         newstate.quoteAmount = displayAmount;
@@ -376,8 +389,8 @@ export class SpotForm extends React.Component {
           (displayAmount / this.currentPrice()).toFixed(baseDecimals)
         )
         newstate.baseAmount = (baseDisplayAmount > 9999)
-        ? baseDisplayAmount.toFixed(0)
-        : baseDisplayAmount.toPrecision(5)
+          ? baseDisplayAmount.toFixed(0)
+          : baseDisplayAmount.toPrecision(5)
       }
     }
 
@@ -397,7 +410,7 @@ export class SpotForm extends React.Component {
     }
 
     if (this.props.currentMarket !== prevProps.currentMarket) {
-      this.setState((state) => ({ ...state, price: "", baseAmount: "", quoteAmount: ""}));
+      this.setState((state) => ({ ...state, price: "", baseAmount: "", quoteAmount: "" }));
     }
   }
 
