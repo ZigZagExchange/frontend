@@ -285,6 +285,7 @@ const Bridge = () => {
             {transfer.type === 'withdraw' ? <L2Header/> : <L1Header/>}
           </div>
           <BridgeSwapInput
+            gasFee={L1Fee}
             bridgeFee={L2Fee}
             balances={balances}
             value={swapDetails}

@@ -51,25 +51,25 @@ const BridgeInputBox = styled.div`
   }
 `;
 
-const BridgeSwapInput = ({ value = {}, onChange, bridgeFee, balances = {}, feeCurrency }) => {
+const BridgeSwapInput = ({ value = {}, onChange, balances = {}, gasFee, bridgeFee, feeCurrency }) => {
   const setCurrency = useCallback(currency => onChange({ currency, amount: '' }), [onChange])
   const setAmount = useCallback(e => onChange({ amount: e.target.value.replace(/[^0-9.]/g,'') }), [onChange])
 
   const setMax = () => {
     let max;
     try {
-        const currencyInfo = api.getCurrencyInfo(value.currency);
-        const roundedDecimalDigits = Math.min(currencyInfo.decimals, 8);
-        const balance = balances[value.currency].value / (10 ** currencyInfo.decimals);
-        max = Math.round(balance * 10**roundedDecimalDigits) / 10**roundedDecimalDigits;
+      const currencyInfo = api.getCurrencyInfo(value.currency);
+      const roundedDecimalDigits = Math.min(currencyInfo.decimals, 8);
+      let balance = balances[value.currency].value / (10 ** currencyInfo.decimals);
+      if (feeCurrency === value.currency) {
+        balance -= (bridgeFee + gasFee);
+      }
+      max = Math.round(balance * 10**roundedDecimalDigits) / 10**roundedDecimalDigits;
     } catch (e) {
-        max = parseFloat((balances[value.currency] && balances[value.currency].valueReadable) || 0)
-    }
-    if (feeCurrency === value.currency) {
-      max -= parseFloat(bridgeFee)
+      max = parseFloat((balances[value.currency] && balances[value.currency].valueReadable) || 0)
     }
 
-    onChange({amount: max})
+    onChange({ amount: max })
   }
 
   return (
