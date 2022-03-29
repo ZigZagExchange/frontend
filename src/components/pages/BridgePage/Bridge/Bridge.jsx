@@ -91,8 +91,9 @@ const Bridge = () => {
   }, [transfer.type])
 
   const validateInput = (inputValue, swapCurrency) => {
+    const swapCurrencyInfo = api.getCurrencyInfo(swapCurrency);
     const bals = transfer.type === 'deposit' ? walletBalances : zkBalances
-    const getCurrencyBalance = (cur) => parseFloat(bals[cur] && bals[cur].valueReadable) || 0
+    const getCurrencyBalance = (cur) => (bals[cur] && bals[cur] / (10**swapCurrencyInfo.decimals));
     const detailBalance = getCurrencyBalance(swapCurrency)
     let error = null
 
@@ -284,6 +285,7 @@ const Bridge = () => {
             {transfer.type === 'withdraw' ? <L2Header/> : <L1Header/>}
           </div>
           <BridgeSwapInput
+            gasFee={L1Fee}
             bridgeFee={L2Fee}
             balances={balances}
             value={swapDetails}
