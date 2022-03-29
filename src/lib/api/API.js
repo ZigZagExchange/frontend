@@ -5,7 +5,7 @@ import Emitter from "tiny-emitter";
 import { ethers } from "ethers";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import { getENSName } from "lib/ens";
-import { formatAmount } from "lib/utils";
+import { formatAmount, toBaseUnit } from "lib/utils";
 import erc20ContractABI from "lib/contracts/ERC20.json";
 import {
   MAX_ALLOWANCE,
@@ -347,7 +347,15 @@ export default class API extends Emitter {
       this.polygonProvider
     );
     const wethBalance = await ethContract.balanceOf(account);
-    this.emit("balanceUpdate", "polygon", { ...wethBalance });
+    let p = formatAmount(wethBalance, { decimals: 18 });
+
+    this.emit("balanceUpdate", "polygon", {
+      WETH: {
+        value: wethBalance.toString(),
+        allowance: wethBalance,
+        valueReadable: p,
+      },
+    });
     return wethBalance;
   };
 
@@ -493,6 +501,7 @@ export default class API extends Emitter {
     const getBalance = async (ticker) => {
       const currencyInfo = this.getCurrencyInfo(ticker);
       const { balance, allowance } = await this.getBalanceOfCurrency(ticker);
+      // console.log(balance);
       balances[ticker] = {
         value: balance,
         allowance,

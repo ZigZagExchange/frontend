@@ -79,6 +79,7 @@ const Bridge = () => {
 
   let walletBalances = balanceData.wallet || {};
   let zkBalances = balanceData[network] || {};
+  let polygonBalances = balanceData.polygon || {};
 
   const [withdrawSpeed, setWithdrawSpeed] = useState("fast");
   const isFastWithdraw =
@@ -86,8 +87,8 @@ const Bridge = () => {
     transfer.type === "withdraw" &&
     api.apiProvider.eligibleFastWithdrawTokens.includes(swapDetails.currency);
 
-  const balances = transfer.type === "deposit" ? walletBalances : zkBalances;
-  const altBalances = transfer.type === "deposit" ? zkBalances : walletBalances;
+  const balances = fromNetwork.from.key==='ethereum' ? walletBalances : fromNetwork.from.key==='zksync'? zkBalances: polygonBalances;
+  const altBalances = toNetwork.key==='ethereum' ? walletBalances : toNetwork.key==='zksync'? zkBalances: polygonBalances;
   const hasAllowance =
     balances[swapDetails.currency] &&
     balances[swapDetails.currency].allowance.gte(MAX_ALLOWANCE.div(3));
@@ -329,23 +330,23 @@ const Bridge = () => {
   const onSelectFromNetwork = ({ key }) => {
     const f = Networks.find((i)=> i.from.key===key)
     if(f.from.key==='polygon') {
-      api.getPolygonWethBalance().then(b=> {
-        console.log(b)
-      })
+      setSwapDetails({amount: '', currency: 'WETH'})
     }
     setFromNetwork(f)
     setToNetwork(f.to[0])
+   
   };
 
   const onSelectToNetwork = ({key}) => {
     const t=fromNetwork.to.find((i)=>i.key===key)
     if(t.key==='polygon') {
       api.getPolygonWethBalance().then(b=> {
-        console.log(b)
+        setSwapDetails({amount: '', currency: 'WETH'})
       })
     }
     setToNetwork(t)
   }
+
 
   return (
     <>
@@ -370,8 +371,8 @@ const Bridge = () => {
             <div className="bridge_coin_stat">
               <h5>Available balance</h5>
               <span>
-                {balances[swapDetails.currency] &&
-                  balances[swapDetails.currency].valueReadable}
+                {balances[swapDetails.currency] ?
+                  balances[swapDetails.currency].valueReadable: '0.00'}
                 {` ${swapDetails.currency}`}
               </span>
             </div>
@@ -396,8 +397,8 @@ const Bridge = () => {
             <div className="bridge_coin_stat">
               <h5>Available balance</h5>
               <span>
-                {altBalances[swapDetails.currency] &&
-                  altBalances[swapDetails.currency].valueReadable}
+                {altBalances[swapDetails.currency] ?
+                  altBalances[swapDetails.currency].valueReadable: '0.00'}
                 {` ${swapDetails.currency}`}
               </span>
             </div>
