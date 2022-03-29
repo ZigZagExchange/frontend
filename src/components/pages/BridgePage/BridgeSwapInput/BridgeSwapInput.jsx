@@ -1,6 +1,7 @@
 import React, { useCallback } from "react";
 import styled from "@xstyled/styled-components";
 import BridgeCurrencySelector from "../BridgeCurrencySelector/BridgeCurrencySelector";
+import api from "lib/api";
 
 const BridgeInputBox = styled.div`
   display: flex;
@@ -56,17 +57,11 @@ const BridgeSwapInput = ({ value = {}, onChange, bridgeFee, balances = {}, feeCu
 
   const setMax = () => {
     let max;
-    console.log(balances[value.currency]);
     try {
-        const integerValue = balances[value.currency].valueReadable.split('.')[0];
-        let integerDigits = 0;
-        if (integerValue !== '0') {
-            integerDigits = integerValue.length;
-        }
-        const decimalDigits = balances[value.currency].value.length - integerDigits;
-        console.log(integerDigits, decimalDigits);
-        max = balances[value.currency].value / (10 ** decimalDigits);
-        max = Math.floor(max * 10**8) / 10**8; // 8 decimal places max
+        const currencyInfo = api.getCurrencyInfo(value.currency);
+        const roundedDecimalDigits = Math.min(currencyInfo.decimals, 8);
+        const balance = balances[value.currency].value / (10 ** currencyInfo.decimals);
+        max = Math.round(balance * 10**roundedDecimalDigits) / 10**roundedDecimalDigits;
     } catch (e) {
         max = parseFloat((balances[value.currency] && balances[value.currency].valueReadable) || 0)
     }
