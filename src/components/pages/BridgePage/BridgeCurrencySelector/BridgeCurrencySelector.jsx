@@ -187,13 +187,12 @@ const BridgeCurrencySelector = ({ onChange, balances = {}, value }) => {
         }}
         show={show}
       >
-        <SearchBox searchPair={(value)=>setSearchValue(value)} className="bridge_searchbox" />
+        <SearchBox searchPair={(value)=>setSearchValue(value)} searchValue={searchValue} className="bridge_searchbox" />
         <BridgeCurrencyOptions>
           {tickers
             .filter((item) => {
               if (!searchValue) return true;
               if (
-                item.toLowerCase().includes(searchValue.toLowerCase()) ||
                 item.toLowerCase().includes(searchValue.toLowerCase())
               ) {
                 return true;
