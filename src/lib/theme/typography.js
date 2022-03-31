@@ -1,148 +1,175 @@
-const h1Bold = {
-  fontFamily: 'Gilroy-Bold',
+const primaryDisplay = {
+  fontFamily: 'Work Sans',
+  fontSize: '104px',
+  fontWeight: '600',
+  lineHeight: '109px',
+  letterSpacing: '0em',
+}
+
+const primaryHeading1 = {
+  fontFamily: 'Work Sans',
+  fontSize: '56px',
+  fontWeight: '600',
+  lineHeight: '59px',
+  letterSpacing: '0em',
+}
+
+const primaryHeading2 = {
+  fontFamily: 'Work Sans',
+  fontSize: '48px',
+  fontWeight: '600',
+  lineHeight: '50px',
+  letterSpacing: '0em',
+}
+
+const primaryHeading3 = {
+  fontFamily: 'Work Sans',
+  fontSize: '34px',
+  fontWeight: '600',
+  lineHeight: '36px',
+  letterSpacing: '0em',
+}
+
+const primaryHeading4 = {
+  fontFamily: 'Work Sans',
+  fontSize: '28px',
+  fontWeight: '600',
+  lineHeight: '29px',
+  letterSpacing: '0em',
+}
+
+const primaryHeading5 = {
+  fontFamily: 'Work Sans',
   fontSize: '24px',
-  lineHeight: '30px',
-  letterSpacing: '0.006em',
+  fontWeight: '600',
+  lineHeight: '25px',
+  letterSpacing: '0em',
 }
 
-const h1BoldCap = {
-  ...h1Bold,
-  textTransform: 'uppercase',
-}
-
-const h2Bold = {
-  fontFamily: 'Gilroy-Bold',
+const primaryHeading6 = {
+  fontFamily: 'Work Sans',
   fontSize: '20px',
-  lineHeight: '26px',
-  letterSpacing: '0.025em',
+  fontWeight: '600',
+  lineHeight: '21px',
+  letterSpacing: '0em',
 }
 
-const h2BoldCap = {
-  ...h2Bold,
-  textTransform: 'uppercase',
+const primarySubtitle = {
+  fontFamily: 'Work Sans',
+  fontSize: '24px',
+  fontWeight: '400',
+  lineHeight: '30px',
+  letterSpacing: '0em',
 }
 
-const h2SmBold = {
-  ...h2Bold,
-  fontFamily: 'Gilroy-SemiBold',
+const primaryBody1 = {
+  fontFamily: 'Work Sans',
+  fontSize: '20px',
+  fontWeight: '400',
+  lineHeight: '30px',
+  letterSpacing: '0em',
 }
 
-const h2SmBoldCap = {
-  ...h2SmBold,
-  textTransform: 'uppercase',
-}
-
-const h3Bold = {
-  fontFamily: 'Gilroy-Bold',
-  fontSize: '18px',
-  lineHeight: '22px',
-  letterSpacing: '0.005em',
-}
-
-const h3BoldCap = {
-  ...h3Bold,
-  textTransform: 'uppercase',
-}
-
-const h3SmBold = {
-  ...h3Bold,
-  fontFamily: 'Gilroy-SemiBold',
-}
-
-const h3SmBoldCap = {
-  ...h3SmBold,
-  textTransform: 'uppercase',
-}
-
-const h4Bold = {
-  fontFamily: 'Gilroy-Bold',
+const primaryBody2 = {
+  fontFamily: 'Work Sans',
   fontSize: '16px',
-  lineHeight: '22px',
-  letterSpacing: '0.005em',
+  fontWeight: '400',
+  lineHeight: '24px',
+  letterSpacing: '0em',
 }
 
-const h4BoldCap = {
-  ...h4Bold,
-  textTransform: 'uppercase',
-}
-
-const h4Medium = {
-  ...h4Bold,
-  fontFamily: 'Gilroy-Medium',
-}
-
-const h4MediumCap = {
-  ...h4Medium,
-  textTransform: 'uppercase',
-}
-
-const h5Bold = {
-  fontFamily: 'Gilroy-Bold',
+const primarySmall = {
+  fontFamily: 'Work Sans',
   fontSize: '14px',
-  lineHeight: '16px',
-  letterSpacing: '0.005em',
+  fontWeight: '400',
+  lineHeight: '15px',
+  letterSpacing: '0em',
 }
 
-const h5BoldCap = {
-  ...h5Bold,
-  textTransform: 'uppercase',
-}
-
-const h5Medium = {
-  ...h5Bold,
-  fontFamily: 'Gilroy-Medium',
-}
-
-const h5MediumCap = {
-  ...h5Medium,
-  textTransform: 'uppercase',
-}
-
-const h6Bold = {
-  fontFamily: 'Gilroy-Bold',
+const primaryExtraSmall = {
+  fontFamily: 'Work Sans',
   fontSize: '12px',
-  lineHeight: '22px',
-  letterSpacing: '0.025em',
+  fontWeight: '400',
+  lineHeight: '13px',
+  letterSpacing: '0em',
 }
 
-const h6BoldCap = {
-  ...h6Bold,
-  textTransform: 'uppercase',
+const primaryTiny = {
+  fontFamily: 'Work Sans',
+  fontSize: '10px',
+  fontWeight: '400',
+  lineHeight: '10px',
+  letterSpacing: '0em',
 }
 
-const h6Medium = {
-  ...h6Bold,
-  fontFamily: 'Gilroy-Medium',
+const monospace2XL = {
+  fontFamily: 'IBM Plex Mono',
+  fontSize: '24px',
+  fontWeight: '500',
+  lineHeight: '36px',
+  letterSpacing: '0em',
 }
 
-const h6MediumCap = {
-  ...h6Medium,
-  textTransform: 'uppercase',
+const monospaceXL = {
+  fontFamily: 'IBM Plex Mono',
+  fontSize: '20px',
+  fontWeight: '500',
+  lineHeight: '32px',
+  letterSpacing: '0em',
+}
+
+const monospaceLarge = {
+  fontFamily: 'IBM Plex Mono',
+  fontSize: '16px',
+  fontWeight: '500',
+  lineHeight: '28px',
+  letterSpacing: '0em',
+}
+
+const monospaceRegular = {
+  fontFamily: 'IBM Plex Mono',
+  fontSize: '14px',
+  fontWeight: '500',
+  lineHeight: '24px',
+  letterSpacing: '0em',
+}
+
+const monospaceSmall = {
+  fontFamily: 'IBM Plex Mono',
+  fontSize: '12px',
+  fontWeight: '500',
+  lineHeight: '20px',
+  letterSpacing: '0em',
+}
+
+const monospaceTiny = {
+  fontFamily: 'IBM Plex Mono',
+  fontSize: '10px',
+  fontWeight: '500',
+  lineHeight: '16px',
+  letterSpacing: '0.20000000298023224px',
 }
 
 const typography = {
-  h1Bold,
-  h1BoldCap,
-  h2Bold,
-  h2BoldCap,
-  h2SmBold,
-  h2SmBoldCap,
-  h3Bold,
-  h3BoldCap,
-  h3SmBold,
-  h3SmBoldCap,
-  h4Bold,
-  h4BoldCap,
-  h4Medium,
-  h4MediumCap,
-  h5Bold,
-  h5BoldCap,
-  h5Medium,
-  h5MediumCap,
-  h6Bold,
-  h6BoldCap,
-  h6Medium,
-  h6MediumCap
+  primaryDisplay,
+  primaryHeading1,
+  primaryHeading2,
+  primaryHeading3,
+  primaryHeading4,
+  primaryHeading5,
+  primaryHeading6,
+  primarySubtitle,
+  primaryBody1,
+  primaryBody2,
+  primarySmall,
+  primaryExtraSmall,
+  primaryTiny,
+  monospace2XL,
+  monospaceXL,
+  monospaceLarge,
+  monospaceRegular,
+  monospaceSmall,
+  monospaceTiny
 }
 
 export default typography

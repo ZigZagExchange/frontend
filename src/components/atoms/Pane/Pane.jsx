@@ -1,35 +1,16 @@
 import React from "react";
-import { x } from "@xstyled/styled-components";
+import styled from "styled-components";
 
-const sizes = {
-  xs: {
-    borderRadius: 1,
-    p: 2,
-  },
-  sm: {
-    borderRadius: 4,
-    p: 7,
-  },
-  md: {
-    borderRadius: "3xl",
-    p: 8,
-  },
-};
-
-const colors = {
-  light: {
-    backgroundColor: "blue-500",
-  },
-  dark: {
-    backgroundColor: "blue-600",
-  },
-};
+const PaneWrapper = styled.div`
+  ${(p) => p.size === 'xs' ? 'border-radius: 1px; padding: 2px;' : p.size === 'sm' ? 'border-radius: 4px; padding: 7px;' : 'border-radius: 6px; padding: 8px;'};
+  background-color: ${(p) => p.theme.colors.backgroundLowEmphasis};
+`
 
 const Pane = ({ size = "sm", variant = "dark", children, ...rest }) => {
   return (
-    <x.div {...sizes[size]} {...colors[variant]} {...rest}>
+    <PaneWrapper size={size} {...rest}>
       {children && children}
-    </x.div>
+    </PaneWrapper>
   );
 };
 
