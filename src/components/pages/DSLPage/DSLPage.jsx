@@ -1,5 +1,5 @@
 import React from "react";
-import { x } from "@xstyled/styled-components";
+import styled from "styled-components";
 import { DefaultTemplate } from "../../templates/DefaultTemplate";
 import Pane from "../../atoms/Pane/Pane";
 import FormDemo from "../../atoms/Form/Form.demo";
@@ -8,23 +8,41 @@ import RadioButtonsDemo from "../../atoms/RadioButtons/RadioButtons.demo";
 import { Button } from "../../atoms/Form/Submit";
 import { toast } from "react-toastify";
 
+const DSLWrapper = styled.div`
+  height: 100%;
+  padding: 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: ${(p) => p.theme.colors.backgroundHighEmphasis};
+  color: white;
+`
+
+const DSLSpan = styled.span`
+  font-size: 24px;
+  margin-bottom: 3px;
+  margin-top: 5px;
+`
+
+const DSLItemsWrapper = styled.div`
+  display: grid;
+  grid-auto-flow: row;
+  gap: 6px;
+`
+
+const DSLItemTitle = styled.div`
+  font-size: 18px;
+`
+
 const DSLPage = () => {
   return (
     <DefaultTemplate>
       <div style={{ minHeight: "calc(100vh - 48px)" }}>
-        <x.div
-          h={"100%"}
-          padding={2}
-          display={"flex"}
-          flexDirection={"column"}
-          alignItems={"center"}
-          backgroundColor={"blue-400"}
-          color={"white"}
-        >
-          <x.span fontSize={24} mb={3} mt={5}>
+        <DSLWrapper>
+          <DSLSpan>
             DSL
-          </x.span>
-          <x.div spaceY={6}>
+          </DSLSpan>
+          <DSLItemsWrapper>
             <DSLItem title={"Form"}>
               <FormDemo />
             </DSLItem>
@@ -42,8 +60,8 @@ const DSLPage = () => {
                 Success
               </Button>
             </DSLItem>
-          </x.div>
-        </x.div>
+          </DSLItemsWrapper>
+        </DSLWrapper>
       </div>
     </DefaultTemplate>
   );
@@ -51,8 +69,8 @@ const DSLPage = () => {
 
 const DSLItem = ({ title, children }) => {
   return (
-    <Pane size={"sm"} variant={"light"} w={"lg"}>
-      <x.div fontSize={18}>{title}</x.div>
+    <Pane size={"sm"} variant={"dark"} w={"lg"}>
+      <DSLItemTitle>{title}</DSLItemTitle>
       {children && children}
     </Pane>
   );
