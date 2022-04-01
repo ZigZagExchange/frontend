@@ -132,12 +132,13 @@ const ListPairForm = ({
           rowGap={5}
           columnGap={6}
           mb={5}
+          alignItems="flex-end"
         >
           <NumberInput
             block
             {...model(baseAssetId, setBaseAssetId)}
             label={
-              <x.span>
+              <x.span fontSize={{xs: 'xs', md: '14px'}}>
                 Base Asset{" "}
                 <x.a
                   color={{ _: "blue-gray-500", hover: "teal-200" }}
@@ -169,7 +170,7 @@ const ListPairForm = ({
             block
             {...model(quoteAssetId, setQuoteAssetId)}
             label={
-              <x.span>
+              <x.span fontSize={{xs: 'xs', md: '14px'}}>
                 Quote Asset{" "}
                 <x.a
                   color={{ _: "blue-gray-500", hover: "teal-200" }}

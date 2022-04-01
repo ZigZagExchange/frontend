@@ -391,7 +391,7 @@ export const AccountDropdown = () => {
                     <CurrencyListItem key={key}>
                       <img
                         className="currency-icon"
-                        src={api.getCurrencyLogo(ticker).default}
+                        src={api.getCurrencyLogo(ticker)}
                         alt={ticker}
                       />
                       <div>

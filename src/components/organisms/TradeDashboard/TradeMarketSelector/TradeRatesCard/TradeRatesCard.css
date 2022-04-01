@@ -12,16 +12,9 @@
   margin-right: 10px;
 }
 
-.rates_box_label {
-  display: inline-flex;
-  height: 20px;
-  background: rgba(0, 0, 0, 0.3);
-  color: rgb(102, 153, 255);
-  border-radius: 5px;
-  align-items: center;
-  justify-content: center;
-  padding: 0 5px;
-  border: 1px solid rgba(102, 153, 255, 0.4);
+.rates_box_symbol {
+  height: 1.3rem;
+  margin-right: .7rem;
 }
 
 .rates_box h2 {
@@ -31,6 +24,21 @@
 
 .rates_box p {
   font-size: 0.8rem;
+}
+
+.rb_text_1 > div {
+  display: flex;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  padding: 2px 15px;
+  line-height: 1.4;
+  min-width: 150px;
+  cursor: pointer;
+}
+
+.rb_text_1 > div:hover {
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .rb_text_1 strong {
@@ -49,18 +57,22 @@
 
 .rb_text_2 p {
   color: white;
+  min-height: 1rem;
 }
 
 .rb_text_3_down_value p {
   color: #c4384e;
+  min-height: 1rem;
 }
 
 .rb_text_3_up_value p {
   color: #3fe199;
+  min-height: 1rem;
 }
 
 .rb_text_4 p {
   color: white;
+  min-height: 1rem;
 }
 @media screen and (max-width: 991px) {
   .tl_rates .hide_sm {

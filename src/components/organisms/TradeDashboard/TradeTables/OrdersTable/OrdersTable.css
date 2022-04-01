@@ -115,20 +115,33 @@
   width: 100%;
   display: flex;
   align-items: center;
-  margin-top: 20px;
+  margin: 15px 0;
 }
 
 .ft_tabs strong {
-  margin-right: 30px;
-  color: #94a2c9;
+  margin-right: 14px;
+  color: #798ec9;
+  opacity: 0.8;
+  font-size: 13px;
+  transition: all 0.1s linear;
   text-transform: uppercase;
   font-weight: 500;
   cursor: pointer;
+  display: inline-block;
+  padding: 4px 6px;
+  border-radius: 3px;
+}
+
+.ft_tabs strong:hover {
+  opacity: 1;
 }
 
 .ft_tabs strong.selected {
-  color: #08aff3;
+  background: rgba(0, 0, 0, 0.25);
+  color: rgb(102, 153, 255);
+  opacity: 1;
 }
+
 
 .footer_bottom {
   margin-top: 40px;
@@ -159,6 +172,7 @@
 }
 .footer_orders table tbody td,
 .footer_orders table thead th {
+  font-size: 13px;
   padding: 5px 0;
   color: white;
 }
