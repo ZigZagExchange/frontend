@@ -74,14 +74,17 @@
 }
 .trade_price_table th:nth-child(1),
 .trade_price_table td:nth-child(1) {
+    width:30%;
     text-align: start;
 }
 .trade_price_table th:nth-child(2),
 .trade_price_table td:nth-child(2) {
+    width:40%;
     text-align: center;
 }
 .trade_price_table th:nth-child(3),
 .trade_price_table td:nth-child(3) {
+    width:30%;
     text-align: right;
 }
 

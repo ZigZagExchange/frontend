@@ -50,3 +50,15 @@ export function toBaseUnit(value, decimals) {
     fraction = BigNumber.from(fraction);    
     return BigNumber.from(whole.mul(base).add(fraction).toString(10));
   }
+
+export function numStringToSymbol(str, decimals) {
+  const lookup = [
+    { value: 1e6, symbol: "M" },
+    // { value: 1e3, symbol: "k" }, uncomment for thousands abbreviation
+  ]
+
+  const item = lookup.find(item => str >= item.value);
+  
+  if (!item) return str;
+  return (str / item.value).toFixed(decimals) + item.symbol;
+}
