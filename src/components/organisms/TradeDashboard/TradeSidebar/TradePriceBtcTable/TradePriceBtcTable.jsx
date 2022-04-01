@@ -2,311 +2,319 @@ import React from "react";
 import "./TradePriceBtcTable.css";
 import CategorizeBox from "../CategorizeBox/CategorizeBox";
 import SearchBox from "../SearchBox/SearchBox";
-import {getStables} from '../../../../../lib/helpers/categories/index.js'
-import {addFavourite, removeFavourite, fetchFavourites} from '../../../../../lib/helpers/storage/favourites'
+import { getStables } from "../../../../../lib/helpers/categories/index.js";
+import {
+  addFavourite,
+  removeFavourite,
+  fetchFavourites,
+} from "../../../../../lib/helpers/storage/favourites";
 import { BsStar, BsStarFill } from "react-icons/bs";
 import { FaSort, FaSortDown, FaSortUp } from "react-icons/fa";
 
 class TradePriceBtcTable extends React.Component {
+  constructor(props) {
+    super(props);
+    this.props = props;
 
-    constructor(props){
-        super(props);
-        this.props = props;
+    this.state = {
+      foundPairs: [],
+      pairs: [],
 
-        this.state = {
-            foundPairs: [],
-            pairs: [],
+      categorySelected: "ALL",
+      favourites: [],
 
-            categorySelected: "ALL",
-            favourites: [],
+      changeSorted: false,
+      changeDirection: false,
 
-            changeSorted: false,
-            changeDirection: false,
+      priceSorted: false,
+      priceDirection: false,
+    };
 
-            priceSorted: false,
-            priceDirection: false
-        }
+    this.searchPair = this.searchPair.bind(this);
+    this.categorizePairs = this.categorizePairs.bind(this);
 
-        this.searchPair = this.searchPair.bind(this);
-        this.categorizePairs = this.categorizePairs.bind(this);
+    this.favouritePair = this.favouritePair.bind(this);
 
-        this.favouritePair = this.favouritePair.bind(this);
+    this.toggleChangeSorting = this.toggleChangeSorting.bind(this);
+    this.togglePriceSorting = this.togglePriceSorting.bind(this);
+    this.resetSorting = this.resetSorting.bind(this);
 
-        this.toggleChangeSorting = this.toggleChangeSorting.bind(this);
-        this.togglePriceSorting = this.togglePriceSorting.bind(this);
-        this.resetSorting = this.resetSorting.bind(this);
+    this.renderPairs = this.renderPairs.bind(this);
+  }
 
-        this.renderPairs = this.renderPairs.bind(this);
+  componentDidUpdate() {
+    if (this.state.pairs.length === 0 && this.props.rowData.length !== 0) {
+      this.setState({ pairs: this.props.rowData.map(r => r.td1) });
     }
+  }
 
+  searchPair(value) {
+    value = value.toUpperCase()
+      .replace("/", "-")
+      .replace(" ", "-");
+    var foundPairs = [];
 
-    componentDidUpdate(){
-        if(this.state.pairs.length === 0 && this.props.rowData.length !== 0){
-            this.setState({pairs: this.props.rowData});
-        }
-    }
+    var [base, quote] = value.split("-");
+    var reverseValue = quote + "-" + base;
+    //
+    //search all, if you'd prefer to search the current category just set this to use `state.pairs` instead
+    //
+    this.props.rowData.forEach((row) => {
+      var pair_name = row.td1.toUpperCase();
 
-    searchPair(value){
-        var foundPairs = [];
+      //if found query, push it to found pairs
+      if (
+        pair_name.includes(value) ||
+        pair_name.includes(reverseValue)
+      ) {
+        foundPairs.push(row.td1);
+      }
+    });
 
-        //
-        //search all, if you'd prefer to search the current category just set this to use `state.pairs` instead
-        //
-        this.props.rowData.forEach(row => {
+    //update found pairs
+    this.setState({
+      pairs: foundPairs,
+
+      //reset sorting
+      priceSorted: false,
+      priceDirection: false,
+      changeSorted: false,
+      changeDirection: false,
+    });
+  }
+
+  categorizePairs(category_name) {
+    category_name = category_name.toUpperCase();
+    var foundPairs = [];
+
+    this.setState({
+      categorySelected: category_name,
+
+      //reset sorting
+      priceSorted: false,
+      priceDirection: false,
+      changeSorted: false,
+      changeDirection: false,
+    });
+
+    switch (category_name) {
+      case "ALL":
+        this.setState({ pairs: this.props.rowData.map(row => row.td1) });
+        break;
+      case "STABLES":
+        //look for pairs against stables.
+        foundPairs = getStables(this.props.rowData);
+        this.setState({
+          pairs: foundPairs,
+        });
+        break;
+      case "FAVOURITES":
+        //set favourites from localstorage
+        var favourites = fetchFavourites();
+        foundPairs = [];
+
+        favourites.forEach((value) => {
+          this.props.rowData.forEach((row) => {
             var pair_name = row.td1;
 
             //if found query, push it to found pairs
-            if(pair_name.includes(value.toUpperCase())){
-                foundPairs.push(row);
+            if (pair_name.includes(value.toUpperCase())) {
+              foundPairs.push(pair_name);
             }
+          });
         });
-
-        //update found pairs
-        this.setState({
-            pairs: foundPairs,
-
-            //reset sorting
-            priceSorted: false, priceDirection: false, 
-            changeSorted: false, changeDirection: false
-        });
-
-    }
-
-    categorizePairs(category_name){
-        category_name = category_name.toUpperCase();
-        var foundPairs = [];
 
         this.setState({
-            categorySelected: category_name, 
-            
-            //reset sorting
-            priceSorted: false, priceDirection: false, 
-            changeSorted: false, changeDirection: false
+          pairs: foundPairs,
         });
 
-        switch (category_name){
-            case "ALL":
-                this.setState({pairs: this.props.rowData});
-                break;
-            case "STABLES":
-                //look for pairs against stables.
-                foundPairs = getStables(this.props.rowData);
-                this.setState({
-                    pairs: foundPairs
-                });
-                break;
-            case "FAVOURITES":
-                //set favourites from localstorage
-                var favourites = fetchFavourites();
-                foundPairs = [];
+        break;
+      default:
+        //search for custom category
+        this.searchPair(category_name);
 
-                favourites.forEach(value => {
-                    this.props.rowData.forEach(row => {
-                        var pair_name = row.td1;
-            
-                        //if found query, push it to found pairs
-                        if(pair_name.includes(value.toUpperCase())){
-                            foundPairs.push(row);
-                        }
-                    });
-                })
-                
-                this.setState({
-                    pairs: foundPairs
-                });
+        return this.state.pairs;
+    }
+  }
 
-                break;
-            default:
-                //search for custom category
-                this.searchPair(category_name);
+  favouritePair(pair) {
+    var favourites = [];
+    var isFavourited = fetchFavourites().includes(pair.td1);
 
-            return this.state.pairs;
-        }
-
-
- 
-
-
+    if (!isFavourited) {
+      favourites = addFavourite(pair.td1);
+    } else {
+      favourites = removeFavourite(pair.td1);
     }
 
-    favouritePair(pair){
-        var isFavourited = fetchFavourites().includes(pair.td1);
+    this.setState({
+      favourites: favourites,
+    });
+  }
 
-        var favourites = [];
-        if(!isFavourited){
-            favourites = addFavourite(pair.td1);
-        } else {
-            favourites = removeFavourite(pair.td1);
-        }
+  toggleChangeSorting() {
+    var toggled = !this.state.changeDirection;
+    var sorted_pairs = this.state.pairs;
 
-        this.setState({
-            favourites: favourites
-        })
-    }
+    sorted_pairs.sort((frstEl, secondEl) => {
+      var firstRow =  this.props.rowData.find((row => row.td1.includes(frstEl) && row));
+      var secondRow =  this.props.rowData.find((row => row.td1.includes(secondEl) && row));
+      
+      if (toggled) {
+        //console.log(firstEl.td3, secondEl.td3, (parseInt(secondEl.td3) - parseInt(firstEl.td3)))
+        return parseInt(firstRow.td3) - parseInt(secondRow.td3);
+      } else {
+        //reverse
+        //console.log(secondEl.td3, firstEl.td3, (parseInt(secondEl.td3) - parseInt(firstEl.td3)))
+        return parseInt(secondRow.td3) - parseInt(firstRow.td3);
+      }
+    });
+    this.setState({
+      pairs: sorted_pairs,
 
+      priceSorted: false,
+      priceDirection: false,
+      changeSorted: true,
+      changeDirection: !this.state.changeDirection,
+    });
+  }
 
-    toggleChangeSorting(){
-        
-        var toggled = !this.state.changeDirection;
-        var sorted_pairs = this.state.pairs;
-        
-        sorted_pairs.sort(function compareFn(firstEl, secondEl){
-            if(toggled){
-                //console.log(firstEl.td3, secondEl.td3, (parseInt(secondEl.td3) - parseInt(firstEl.td3)))
-                return parseInt(firstEl.td3) - parseInt(secondEl.td3);
-            } else {
-                //reverse
-                //console.log(secondEl.td3, firstEl.td3, (parseInt(secondEl.td3) - parseInt(firstEl.td3)))
-                return parseInt(secondEl.td3) - parseInt(firstEl.td3);
-            }
-            
-        });
-        this.setState({
-            pairs: sorted_pairs, 
-            
+  togglePriceSorting() {
+    var toggled = !this.state.priceDirection;
 
-            priceSorted: false,  priceDirection: false,
-            changeSorted: true, changeDirection: !this.state.changeDirection
-        });
-    }
+    var sorted_pairs = this.state.pairs;
 
-    togglePriceSorting(){
-        var toggled = !this.state.priceDirection;
-        
-        var sorted_pairs = this.state.pairs;
+    sorted_pairs.sort((frstEl, secondEl) => {
+      var firstRow =  this.props.rowData.find((row => row.td1.includes(frstEl) && row));
+      var secondRow =  this.props.rowData.find((row => row.td1.includes(secondEl) && row));
 
-        sorted_pairs.sort(function compareFn(firstEl, secondEl){
-            if(toggled){
-                return parseInt(firstEl.td2) - parseInt(secondEl.td2);
-            } else {
-                return parseInt(secondEl.td2) - parseInt(firstEl.td2);
-            }
-            
-        });
-        this.setState({
-            pairs: sorted_pairs, 
-            priceSorted: true,  priceDirection: toggled,
-            changeSorted: false, changeDirection: false
-        });
-    }
+      if (toggled) {
+        return parseInt(firstRow.td2) - parseInt(secondRow.td2);
+      } else {
+        return parseInt(secondRow.td2) - parseInt(firstRow.td2);
+      }
+    });
+    this.setState({
+      pairs: sorted_pairs,
+      priceSorted: true,
+      priceDirection: toggled,
+      changeSorted: false,
+      changeDirection: false,
+    });
+  }
 
+  resetSorting() {
+    var category = this.state.categorySelected;
+    this.categorizePairs(category);
 
+    this.setState({
+      priceSorted: false,
+      priceDirection: false,
+      changeSorted: false,
+      changeDirection: false,
+    });
+  }
 
-    resetSorting(){
-        var category = this.state.categorySelected;
-        this.categorizePairs(category);
-        
-        this.setState({priceSorted: false, priceDirection: false, changeSorted: false, changeDirection: false});
-    }
+  //render given pairs
+  renderPairs(pairs) {
+    var changeSorted = this.state.changeSorted;
+    var priceSorted = this.state.priceSorted;
 
-    //render given pairs
-    renderPairs(pairs){
+    var changeDirection = this.state.changeDirection;
+    var priceDirection = this.state.priceDirection;
 
-        var changeSorted = this.state.changeSorted;
-        var priceSorted = this.state.priceSorted;
+    const shown_pairs = pairs.map((pair, i) => {
+      const d = this.props.rowData.find(row => row.td1 === pair);
+      
+      var selected = this.props.currentMarket === pair; //if current market selected
+      var isFavourited = this.state.favourites.includes(pair); //if contains, isFavourited
 
-        var changeDirection = this.state.changeDirection;
-        var priceDirection = this.state.priceDirection;
-        
+      return (
+        <tr
+          key={i}
+          onClick={(e) => {
+            if (selected) return;
+            this.props.updateMarketChain(pair);
+          }}
+          className={selected ? "selected" : ""}
+        >
+          <td>
+            <span
+              className="favourite-icon"
+              onClick={(e) => {
+                this.favouritePair(d);
+              }}
+            >
+              {isFavourited ? <BsStarFill /> : <BsStar />}
+            </span>
 
-        const shown_pairs = pairs.map((d, i) => {
-            var selected = this.props.currentMarket === d.td1; //if current market selected
-            var isFavourited = this.state.favourites.includes(d.td1); //if contains, isFavourited
+            {pair.replace("-", "/")}
+            <span>{d.span}</span>
+          </td>
+          <td className={d.td3 < 0 ? "down_value" : "up_value"}>{d.td2}</td>
+          <td className={d.td3 < 0 ? "down_value" : "up_value"}>{d.td3}%</td>
+        </tr>
+      );
+    });
 
-            return (
-                <tr
-                    key={i}
-                    onClick={(e) => {
-                        if(selected) return;
-                        this.props.updateMarketChain(d.td1);
-                    }}
-                    className={ selected ? "selected" : "" }
-                >
-                    <td>
-                        
-                            <span onClick={(e) => {
-                                this.favouritePair(d);
-                            } }>
-                                { isFavourited
-                                    ? <BsStarFill /> 
-                                    : <BsStar />
-                                }
-                            </span>
+    return (
+      <table>
+        <thead>
+          <tr>
+            <th onClick={() => this.resetSorting()}>Pair</th>
+            <th onClick={() => this.togglePriceSorting()}>
+              {priceSorted ? (
+                priceDirection ? (
+                  <FaSortDown />
+                ) : (
+                  <FaSortUp />
+                )
+              ) : (
+                <FaSort />
+              )}
+              Price
+            </th>
+            <th onClick={() => this.toggleChangeSorting()}>
+              {changeSorted ? (
+                changeDirection ? (
+                  <FaSortDown />
+                ) : (
+                  <FaSortUp />
+                )
+              ) : (
+                <FaSort />
+              )}
+              Change
+            </th>
+          </tr>
+        </thead>
+        <tbody>{shown_pairs}</tbody>
+      </table>
+    );
+  }
 
-                        {d.td1.replace("-", "/")}
-                        <span>{d.span}</span>
-                    </td>
-                    <td
-                        className={
-                            d.td3 < 0
-                                ? "down_value"
-                                : "up_value"
-                        }
-                    >
-                        {d.td2}
-                    </td>
-                    <td
-                        className={
-                            d.td3 < 0
-                                ? "down_value"
-                                : "up_value"
-                        }
-                    >
-                        {d.td3}%
-                    </td>
-                </tr>
-            );
-        });
-            
-        return (
-                <table>
-                    <thead>
-                        <tr>
-                            <th onClick={() => this.resetSorting()}>
-                                Pair
-                            </th>
-                            <th onClick={() => this.togglePriceSorting()}>
-                                { priceSorted ? (priceDirection ? <FaSortDown/> : <FaSortUp/>) : <FaSort/>}
-                                Price
+  componentDidMount() {
+    var favourites = fetchFavourites();
+    this.setState({ favourites: favourites });
+  }
 
-                            </th>
-                            <th onClick={() => this.toggleChangeSorting()}>
-                                { changeSorted ? (changeDirection ? <FaSortDown/> : <FaSortUp/>) : <FaSort/>}
-                                Change
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {shown_pairs}
-                    </tbody>
-                </table>
-        );
-    }
+  render() {
+    console.log(this.state.pairs);
+    return (
+      <>
+        <SearchBox searchPair={this.searchPair} className="pairs_searchbox" />
+        <CategorizeBox
+          categories={["ALL", "ETH", "WBTC", "STABLES", "FAVOURITES"]}
+          categorizePairs={this.categorizePairs}
+          initialValue="ALL"
+        />
 
-    componentDidMount(){
-        var favourites = fetchFavourites();
-        this.setState({favourites: favourites});
-    }
-
-    render() {
-        
-        return (
-            <>
-                <SearchBox 
-                    searchPair={this.searchPair}
-                    className="pairs_searchbox"
-                />
-                <CategorizeBox 
-                    categories={["ALL", "ETH", "WBTC", "STABLES", "FAVOURITES"]}
-                    categorizePairs={this.categorizePairs}
-                />
-
-                <div className="trade_price_btc_table">
-                    {this.renderPairs(this.state.pairs)}
-                </div>
-            </>
-        );
-    }
+        <div className="trade_price_btc_table">
+          {this.renderPairs(this.state.pairs)}
+        </div>
+      </>
+    );
+  }
 }
 
 export default TradePriceBtcTable;

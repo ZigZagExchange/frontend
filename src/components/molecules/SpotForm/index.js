@@ -1,1 +1,1 @@
-export * from './SpotForm'
+export * from "./SpotForm";

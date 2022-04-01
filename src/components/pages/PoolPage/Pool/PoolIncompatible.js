@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 
 const PoolIncompatible = () => {
   return (
@@ -7,7 +7,7 @@ const PoolIncompatible = () => {
         <span>Pool is currently only compatible with zkSync.</span>
       </h3>
     </div>
-  )
-}
+  );
+};
 
-export default PoolIncompatible
+export default PoolIncompatible;

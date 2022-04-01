@@ -18,8 +18,7 @@ export class OrdersTable extends React.Component {
   }
 
   getUserOrders() {
-    return Object.values(this.props.userOrders)
-      .sort((a, b) => b[1] - a[1]);
+    return Object.values(this.props.userOrders).sort((a, b) => b[1] - a[1]);
   }
 
   renderOrderTable(orders) {
@@ -49,20 +48,17 @@ export class OrdersTable extends React.Component {
             const side = order[3] === "b" ? "buy" : "sell";
             const sideclassname = order[3] === "b" ? "up_value" : "down_value";
             const expiration = order[7];
-            const now = Date.now() / 1000 | 0;
+            const now = (Date.now() / 1000) | 0;
             const timeToExpiry = expiration - now;
             let expiryText;
             if (timeToExpiry > 86400) {
-                expiryText = Math.floor(timeToExpiry / 86400) + "d";
-            }
-            else if (timeToExpiry > 3600) {
-                expiryText = Math.floor(timeToExpiry / 3600) + "h";
-            }
-            else if (timeToExpiry > 0) {
-                expiryText = Math.floor(timeToExpiry / 3600) + "m";
-            }
-            else {
-                expiryText = "--"
+              expiryText = Math.floor(timeToExpiry / 86400) + "d";
+            } else if (timeToExpiry > 3600) {
+              expiryText = Math.floor(timeToExpiry / 3600) + "h";
+            } else if (timeToExpiry > 0) {
+              expiryText = Math.floor(timeToExpiry / 3600) + "m";
+            } else {
+              expiryText = "--";
             }
 
             const orderWithoutFee = api.getOrderDetailsWithoutFee(order);
@@ -137,7 +133,7 @@ export class OrdersTable extends React.Component {
                 statusClass = "expired";
                 break;
               default:
-                break
+                break;
             }
 
             return (
@@ -150,9 +146,13 @@ export class OrdersTable extends React.Component {
                 <td data-label="Remaining">
                   {remaining.toPrecision(6) / 1} {baseCurrency}
                 </td>
-                <td className={sideclassname} data-label="Side">{side}</td>
+                <td className={sideclassname} data-label="Side">
+                  {side}
+                </td>
                 <td data-label="Expiry">{expiryText}</td>
-                <td className={statusClass} data-label="Order Status">{statusText}</td>
+                <td className={statusClass} data-label="Order Status">
+                  {statusText}
+                </td>
                 <td data-label="Action">
                   {orderStatus === "o" ? (
                     <span
@@ -210,17 +210,22 @@ export class OrdersTable extends React.Component {
             const sidetext = fill[3] === "b" ? "buy" : "sell";
             const sideclassname = fill[3] === "b" ? "up_value" : "down_value";
             const txhash = fill[7];
-            let feeText;
-            feeText = "1 USDC";
+            const feeamount = fill[10];
+            const feetoken = fill[11];
+            let feeText = "1 USDC";
             const marketInfo = api.marketInfo[market];
-            if (!marketInfo) {
-                feeText = "1 USDC";
-            }
-            else if (fillstatus === "r" || !api.isZksyncChain()) {
+            if(feeamount && feetoken) {           
+              const displayFee = (feeamount > 9999) ? feeamount.toFixed(0) : feeamount.toPrecision(4);
+              feeText = (feeamount !== 0) ? `${displayFee} ${feetoken}` : "--";
+            } else if(["b", "o", "m", "r"].includes(fillstatus)) {
+              feeText = "--";
+              // cases below make it backward compatible:
+            } else if (!marketInfo) {
+              feeText = "1 USDC";
+            } else if (fillstatus === "r" || !api.isZksyncChain()) {
               feeText = "0 " + marketInfo.baseAsset.symbol;
             } else if (side === "s") {
-              feeText =
-                marketInfo.baseFee + " " + marketInfo.baseAsset.symbol;
+              feeText = marketInfo.baseFee + " " + marketInfo.baseAsset.symbol;
             } else if (side === "b") {
               feeText =
                 marketInfo.quoteFee + " " + marketInfo.quoteAsset.symbol;
@@ -304,11 +309,16 @@ export class OrdersTable extends React.Component {
                 <td data-label="Market">{market}</td>
                 <td data-label="Price">{price.toPrecision(6) / 1}</td>
                 <td data-label="Quantity">
-                  {baseQuantity.toPrecision(6) / 1} {marketInfo && marketInfo.baseAsset.symbol}
+                  {baseQuantity.toPrecision(6) / 1}{" "}
+                  {marketInfo && marketInfo.baseAsset.symbol}
                 </td>
-                <td className={sideclassname} data-label="Side">{sidetext}</td>
+                <td className={sideclassname} data-label="Side">
+                  {sidetext}
+                </td>
                 <td data-label="Fee">{feeText}</td>
-                <td className={statusClass} data-label="Order Status">{statusText}</td>
+                <td className={statusClass} data-label="Order Status">
+                  {statusText}
+                </td>
                 <td data-label="Action">
                   {txhash ? (
                     <a
@@ -360,19 +370,20 @@ export class OrdersTable extends React.Component {
         if (this.props.user.committed) {
           const balancesContent = Object.keys(
             this.props.user.committed.balances
-          ).sort().map((token) => {
-            const currencyInfo = api.getCurrencyInfo(token);
-            if (!currencyInfo) return "";
-            let balance = this.props.user.committed.balances[token];
-            balance =
-              parseInt(balance) / Math.pow(10, currencyInfo.decimals);
-            return (
-              <tr>
-                <td data-label="Token">{token}</td>
-                <td data-label="Balance">{balance}</td>
-              </tr>
-            );
-          });
+          )
+            .sort()
+            .map((token) => {
+              const currencyInfo = api.getCurrencyInfo(token);
+              if (!currencyInfo) return "";
+              let balance = this.props.user.committed.balances[token];
+              balance = parseInt(balance) / Math.pow(10, currencyInfo.decimals);
+              return (
+                <tr>
+                  <td data-label="Token">{token}</td>
+                  <td data-label="Balance">{balance}</td>
+                </tr>
+              );
+            });
           footerContent = (
             <div>
               <table className="balances_table">

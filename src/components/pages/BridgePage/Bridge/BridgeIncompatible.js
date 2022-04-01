@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 
 const BridgeIncompatible = () => {
   return (
@@ -7,7 +7,7 @@ const BridgeIncompatible = () => {
         <span>Bridge is currently only compatible with zkSync.</span>
       </h3>
     </div>
-  )
-}
+  );
+};
 
-export default BridgeIncompatible
+export default BridgeIncompatible;

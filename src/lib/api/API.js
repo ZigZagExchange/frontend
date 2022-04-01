@@ -2,7 +2,7 @@ import Web3 from 'web3'
 import { createIcon } from '@download/blockies'
 import Web3Modal from 'web3modal'
 import Emitter from 'tiny-emitter'
-import { ethers, utils } from 'ethers'
+import { ethers } from 'ethers'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { getENSName } from 'lib/ens'
 import { formatAmount } from 'lib/utils'
@@ -321,8 +321,8 @@ export default class API extends Emitter {
         return this.apiProvider.depositL2(amount, token)
     }
 
-    withdrawL2 = async (amount, token) => {
-        return this.apiProvider.withdrawL2(amount, token)
+    withdrawL2Normal = async (amount, token) => {
+        return this.apiProvider.withdrawL2Normal(amount, token)
     }
 
     withdrawL2Fast = (amount, token) => {
@@ -333,16 +333,16 @@ export default class API extends Emitter {
         return this.apiProvider.depositL2Fee(token)
     }
 
-    withdrawL2Fee = async (token) => {
-        return this.apiProvider.withdrawL2Fee(token)
+    withdrawL2GasFee = async (token) => {
+        return this.apiProvider.withdrawL2GasFee(token)
     }
 
-    withdrawL2FeeFast = async (token) => {
-      return this.apiProvider.withdrawL2FeeFast(token)
+    withdrawL2FastGasFee = async (token) => {
+      return this.apiProvider.withdrawL2FastGasFee(token)
     }
 
-    withdrawL2ZZFeeFast = async (token) => {
-        return this.apiProvider.withdrawL2ZZFeeFast(token)
+    withdrawL2FastBridgeFee = async (token) => {
+        return this.apiProvider.withdrawL2FastBridgeFee(token)
     }
 
     cancelAllOrders = async () => {
@@ -535,7 +535,7 @@ export default class API extends Emitter {
     }
 
     getTokenInfo = (tokenLike, chainId) => {
-        return this.apiProvider.tokenInfo(tokenLike, chainId)
+        return this.apiProvider.getTokenInfo(tokenLike, chainId)
     }
 
     getTokenPrice = (tokenLike, chainId) => {
@@ -562,37 +562,46 @@ export default class API extends Emitter {
         }
     }
 
-    get _fraxContractAddress() {
+    get fastWithdrawTokenAddresses() {
       if (this.apiProvider.network === 1) {
-        return "0x853d955aCEf822Db058eb8505911ED77F175b99e"
+        return {
+          FRAX: "0x853d955aCEf822Db058eb8505911ED77F175b99e",
+          UST: "0xa693b19d2931d498c5b318df961919bb4aee87a5"
+        }
       } else if (this.apiProvider.network === 1000) {
-        return "0x6426e27d8c6fDCd1e0c165d0D58c7eC0ef51f3a7"
+        return {
+          // these are just tokens on rinkeby with the correct tickers.
+          // neither are actually on rinkeby.
+          FRAX: "0x6426e27d8c6fDCd1e0c165d0D58c7eC0ef51f3a7",
+          UST: "0x2fd4e2b5340b7a29feb6ce737bc82bc4b3eefdb4"
+        }
       } else {
-        throw Error("No FRAX address for specified network")
+        throw Error("Network unknown")
       }
     }
 
     async getL2FastWithdrawLiquidity() {
       if (this.ethersProvider) {
-        let maxETH = 0
-        try {
-          maxETH = await this.ethersProvider.getBalance(this.apiProvider._fastWithdrawContractAddress)
-        } catch (e) {
-          console.error(e)
+        const currencyMaxes = {}
+        for (const currency of this.apiProvider.eligibleFastWithdrawTokens) {
+          let max = 0
+          try {
+            if (currency === "ETH") {
+              max = await this.ethersProvider.getBalance(this.apiProvider.fastWithdrawContractAddress)
+            } else {
+              const contract = new ethers.Contract(this.fastWithdrawTokenAddresses[currency], erc20ContractABI, this.ethersProvider)
+              max = await contract.balanceOf(this.apiProvider.fastWithdrawContractAddress)
+            }
+          } catch (e) {
+            console.error(e)
+          }
+          const currencyInfo = this.getCurrencyInfo(currency)
+          if (!currencyInfo) {
+            return {}
+          }
+          currencyMaxes[currency] = max / 10 ** currencyInfo.decimals;
         }
-
-        const fraxContract = new ethers.Contract(this._fraxContractAddress, erc20ContractABI, this.ethersProvider)
-        let maxFRAX = 0
-        try {
-          maxFRAX = await fraxContract.balanceOf(this.apiProvider._fastWithdrawContractAddress)
-        } catch (e) {
-          console.error(e)
-        }
-
-        return {
-          ETH: Number(utils.formatEther(maxETH)),
-          FRAX: Number(utils.formatEther(maxFRAX))
-        }
+        return currencyMaxes
       } else {
         console.error("Ethers provider null or undefined")
         return {}
