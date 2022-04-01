@@ -11,6 +11,7 @@ function* handleHydration({ payload }) {
       try {
         yield apply(api, api.signIn, [payload.network]);
       } catch (err) {
+        api.signOut();
         console.log("There was an error reauthenticating", err);
       }
     }

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./SpotBox.css";
 // assets
 import { SpotForm, Tabs, Tooltip } from "components";
-//import api from "lib/api";
+import { HiExternalLink } from "react-icons/hi";
 import { x } from "@xstyled/styled-components";
 import { AiOutlineQuestionCircle } from "react-icons/all";
 import ExternalLink from "../../../../pages/ListPairPage/ExternalLink";
@@ -62,9 +62,8 @@ const SpotBox = ({
               <x.div className="spf_head" mt={"5px"} mb={"10px"}>
                 <span>Buy Fee:</span>
                 <x.strong color={"#fff"}>
-                  {marketInfo &&
-                    marketInfo.quoteFee &&
-                    marketInfo.quoteFee.toPrecision(4)}{" "}
+                  {marketInfo && marketInfo.quoteFee &&
+                    Number(marketInfo.quoteFee).toPrecision(4)}{" "}
                   {marketInfo && marketInfo.quoteAsset.symbol}
                 </x.strong>
               </x.div>
@@ -84,7 +83,8 @@ const SpotBox = ({
               <x.div className="spf_head" mt={"5px"} mb={"10px"}>
                 <span>Sell Fee</span>
                 <x.strong color={"#fff"}>
-                  {marketInfo && marketInfo.baseFee.toPrecision(4)}{" "}
+                  {marketInfo && marketInfo.baseFee &&
+                    Number(marketInfo.baseFee).toPrecision(4)}{" "}
                   {marketInfo && marketInfo.baseAsset.symbol}
                 </x.strong>
               </x.div>
@@ -116,9 +116,9 @@ const SpotBox = ({
               </Tooltip>
             </Tooltip>
             <x.div ml={"12px"} fontSize={"12px"}>
-              These fees cover zkSync's{" "}
+              This fee covers zkSync's{" "}
               <ExternalLink href={"https://l2fees.info"}>
-                swap fees
+                swap fees<HiExternalLink />
               </ExternalLink>
             </x.div>
           </x.div>

@@ -74,7 +74,7 @@ const PoolModalInput = (props) => {
     );
   }
 
-  var coin_logo = api.getCurrencyLogo(props.currency).default;
+  var coin_logo = api.getCurrencyLogo(props.currency);
 
   return (
     <>

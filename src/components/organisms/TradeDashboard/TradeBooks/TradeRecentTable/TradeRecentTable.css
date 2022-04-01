@@ -1,0 +1,127 @@
+.trade_recent_table {
+    display: flex;
+    flex: auto;
+    overflow: auto;
+    height: 200px;
+    padding: 0 20px;
+    flex-direction: column;
+  }
+  
+  .trade_recent_table::-webkit-scrollbar {
+    width: 5px;
+    position: relative;
+    z-index: 20;
+  }
+  
+  .trade_recent_table::-webkit-scrollbar-track {
+    border-radius: 0px;
+    background: hsla(0, 0%, 100%, 0.15);
+    height: 23px;
+  }
+  
+  .trade_recent_table::-webkit-scrollbar-thumb {
+    border-radius: 0px;
+    background: hsla(0, 0%, 100%, 0.4);
+  }
+  
+  .trade_recent_table::-webkit-scrollbar-thumb:window-inactive {
+    background: #fff;
+  }
+  
+  .trade_recent_table tbody {
+    width: 100%;
+    display: table;
+    background-position: top right;
+    background-size: 70% 100%;
+    background-repeat: no-repeat;
+    margin-top: 0;
+  }
+  
+  .tpt_1 {
+    margin-top: 20px;
+  }
+  
+  .tpt_2 {
+    height: 480px;
+  }
+  
+  .tpt_3 tbody {
+    background-image: unset;
+  }
+  
+  .tpt_3 {
+    height: 75%;
+  }
+  
+  .tpt_3 tbody tr {
+    cursor: pointer;
+  }
+  .tpt_3 tbody tr:hover {
+    background-color: #a9a9a936;
+  }
+  
+  .trade_recent_table thead {
+    position: sticky;
+    top: 0;
+    display: table;
+    width: 100%;
+    background-color: #171c28;
+  }
+  
+  .trade_recent_table th {
+    font-size: 12px;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(102, 153, 255, 0.2);
+    color: #94a2c9;
+    font-weight: 400;
+    padding: 6px;
+  }
+  .trade_recent_table th:nth-child(1),
+  .trade_recent_table td:nth-child(1) {
+    width: 30%;
+    text-align: start;
+    padding-left: 0px;
+  }
+  .trade_recent_table th:nth-child(2),
+  .trade_recent_table td:nth-child(2) {
+    width: 40%;
+    text-align: center;
+  }
+  .trade_recent_table th:nth-child(3),
+  .trade_recent_table td:nth-child(3) {
+    width: 30%;
+    text-align: right;
+    padding-right: 0px;
+    white-space: nowrap;
+  }
+  
+  .tpt_1 td:nth-child(1) {
+    color: #c4384e;
+  }
+  
+  .tpt_2 td:nth-child(1) {
+    color: #3fe199;
+  }
+  
+  .trade_recent_table td {
+    color: white;
+  }
+  
+  @media screen and (min-width: 1800px) {
+    .trade_recent_table {
+      width: 100%;
+    }
+  }
+  
+  @media screen and (max-width: 991px) {
+    .trade_recent_table {
+      width: 100%;
+    }
+  }
+  
+  @media screen and (max-width: 768px) {
+    .tpt_3 {
+      height: 350px;
+    }
+  }
+  

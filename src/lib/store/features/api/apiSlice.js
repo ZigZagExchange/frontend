@@ -1,5 +1,6 @@
 import { createSlice, createAction } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
+import { formatPrice } from "lib/utils";
 import api from "lib/api";
 import { getLayout } from "lib/helpers/storage/layouts";
 
@@ -27,10 +28,9 @@ export const apiSlice = createSlice({
   reducers: {
     _marketinfo(state, { payload }) {
       if (payload[0].error) {
-          toast.error("Bad market");
-      }
-      else {
-          state.marketinfo = payload[0];
+        console.error(payload[0]);
+      } else {
+        state.marketinfo = payload[0];
       }
     },
     _fills(state, { payload }) {
@@ -52,6 +52,7 @@ export const apiSlice = createSlice({
       payload[0].forEach((update) => {
         const fillid = update[1];
         const newstatus = update[2];
+        const timestamp = update[7];
         let txhash;
         let feeamount;
         let feetoken;
@@ -60,15 +61,39 @@ export const apiSlice = createSlice({
         if (update[6]) feetoken = update[6];
         if (state.marketFills[fillid]) {
           state.marketFills[fillid][6] = newstatus;
+          state.marketFills[fillid][12] = timestamp;
           if (txhash) state.marketFills[fillid][7] = txhash;
           if (feeamount) state.marketFills[fillid][10] = feeamount;
           if (feetoken) state.marketFills[fillid][11] = feetoken;
         }
         if (state.userFills[fillid]) {
           state.userFills[fillid][6] = newstatus;
+          state.userFills[fillid][12] = timestamp;
           if (txhash) state.userFills[fillid][7] = txhash;
           if (feeamount) state.userFills[fillid][10] = feeamount;
           if (feetoken) state.userFills[fillid][11] = feetoken;
+          
+          if (newstatus === 'f') {
+            const fillDetails = state.userFills[fillid];
+            const baseCurrency = fillDetails[2].split("-")[0];
+            const sideText = fillDetails[3] === "b" ? "buy" : "sell";
+            const price = Number(fillDetails[4]);
+            const baseQuantity = Number(fillDetails[5]);
+            toast.success(
+              `Your ${sideText} order for ${
+                Number(baseQuantity.toPrecision(4))
+              } ${baseCurrency} was filled @ ${
+                Number(formatPrice(price))
+              }!`,
+              {
+                toastId: `Your ${sideText} order for ${
+                  Number(baseQuantity.toPrecision(4))
+                } ${baseCurrency} was filled @ ${
+                  Number(formatPrice(price))
+                }!`,
+              }
+            );
+          }
         }
       });
     },
@@ -91,8 +116,13 @@ export const apiSlice = createSlice({
         state.lastPrices[market] = {
           price: update[1],
           change: update[2],
-          quoteVolume: update[3]
+          quoteVolume: state.lastPrices[market] ? state.lastPrices[market].quoteVolume : 0
         };
+        // Sometimes lastprice doesn't have volume data
+        // Keep the old data if it doesn't
+        if (update[3]) {
+            state.lastPrices[market].quoteVolume = update[3];
+        }
         if (update[0] === state.currentMarket) {
           state.marketSummary.price = price;
           state.marketSummary.priceChange = change;
@@ -100,12 +130,9 @@ export const apiSlice = createSlice({
       });
     },
     _liquidity2(state, { payload }) {
-      if(
-        payload[0] === state.network &&
-        payload[1] === state.currentMarket
-      ) {
+      if (payload[0] === state.network && payload[1] === state.currentMarket) {
         state.liquidity = state.liquidity = payload[2];
-      }      
+      }
     },
     _orderstatus(state, { payload }) {
       (payload[0] || []).forEach(async (update) => {
@@ -145,18 +172,8 @@ export const apiSlice = createSlice({
           case "f":
             filledOrder = state.userOrders[orderId];
             if (filledOrder) {
-              const sideText = filledOrder[3] === "b" ? "buy" : "sell";
-              const baseCurrency = filledOrder[2].split("-")[0];
               filledOrder[9] = "f";
               filledOrder[10] = txHash;
-              const noFeeOrder = api.getOrderDetailsWithoutFee(filledOrder);
-              toast.success(
-                `Your ${sideText} order for ${
-                  noFeeOrder.baseQuantity.toPrecision(4) / 1
-                } ${baseCurrency} was filled @ ${
-                  noFeeOrder.price.toPrecision(4) / 1
-                }!`
-              );
             }
             break;
           case "b":
@@ -180,10 +197,20 @@ export const apiSlice = createSlice({
                   noFeeOrder.baseQuantity.toPrecision(4) / 1
                 } ${baseCurrency} @ ${
                   noFeeOrder.price.toPrecision(4) / 1
-                } was rejected: ${error}`
+                } was rejected: ${error}`,
+                {
+                  toastId: `Your ${sideText} order for ${
+                    noFeeOrder.baseQuantity.toPrecision(4) / 1
+                  } ${baseCurrency} @ ${
+                    noFeeOrder.price.toPrecision(4) / 1
+                  } was rejected: ${error}`,
+                }
               );
               toast.info(
-                `This happens occasionally. Run the transaction again and you should be fine.`
+                `This happens occasionally. Run the transaction again and you should be fine.`,
+                {
+                  toastId: `This happens occasionally. Run the transaction again and you should be fine.`,
+                }
               );
             }
             break;
@@ -306,7 +333,7 @@ export const apiSlice = createSlice({
             {!isFastWithdraw &&
               renderBridgeLink(
                 "Bridge FAQ",
-                "https://zksync.io/faq/faq.html#how-long-are-withdrawal-times"
+                "https://docs.zigzag.exchange/zksync/bridge-guide"
               )}
             {isFastWithdraw &&
               renderBridgeLink(
@@ -317,7 +344,13 @@ export const apiSlice = createSlice({
         );
       };
 
-      toast.success(renderToastContent(), { closeOnClick: false });
+      toast.success(
+        renderToastContent(),
+        { 
+          closeOnClick: false,
+          autoClose: 15000,
+        },
+      );
 
       state.bridgeReceipts.unshift(payload);
     },
