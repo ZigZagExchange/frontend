@@ -106,7 +106,6 @@ const WalletToggle = styled.ul`
   list-style-type: none;
   border: 1px solid #666;
   border-radius: 33px;
-  height: 33px;
   padding: 3px;
 `;
 
