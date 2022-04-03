@@ -223,9 +223,15 @@ class TradePriceBtcTable extends React.Component {
     var changeDirection = this.state.changeDirection;
     var priceDirection = this.state.priceDirection;
 
-    const shown_pairs = pairs.map((pair, i) => {
+    //make sure we skip invalid pairs
+    const tempPairs = pairs.filter((pair) => {
       const d = this.props.rowData.find(row => row.td1 === pair);
-      if(!d) return;
+      if(!d) return false;
+      return true;
+    })
+
+    const shownPairs = tempPairs.map((pair, i) => {
+      const d = this.props.rowData.find(row => row.td1 === pair);
 
       var selected = this.props.currentMarket === pair; //if current market selected
       var isFavourited = this.state.favourites.includes(pair); //if contains, isFavourited
@@ -289,7 +295,7 @@ class TradePriceBtcTable extends React.Component {
             </th>
           </tr>
         </thead>
-        <tbody>{shown_pairs}</tbody>
+        <tbody>{shownPairs}</tbody>
       </table>
     );
   }
