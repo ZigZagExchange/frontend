@@ -6,6 +6,7 @@ import FormDemo from "../../atoms/Form/Form.demo";
 import TooltipDemo from "../../atoms/Tooltip/Tooltip.demo";
 import RadioButtonsDemo from "../../atoms/RadioButtons/RadioButtons.demo";
 import TextDemo from "../../atoms/Text/Text.demo";
+import ButtonDemo from "../../molecules/Button/Button.demo";
 import { Button } from "../../atoms/Form/Submit";
 import { toast } from "react-toastify";
 
@@ -55,6 +56,9 @@ const DSLPage = () => {
             </DSLItem>
             <DSLItem title={"Text Demo"}>
               <TextDemo />
+            </DSLItem>
+            <DSLItem title={"Button Demo"}>
+              <ButtonDemo />
             </DSLItem>
             <DSLItem title={"Toast"}>
               <Button
