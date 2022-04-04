@@ -57,6 +57,14 @@ const BridgeCurrencyWrapper = styled.div`
   }
 `;
 
+const BridgeEligibleFastwithdraw = styled.div`
+  position: relative;
+  font-weight: 'bold';
+  
+  margin: 10px;
+ 
+`;
+
 const BridgeCurrencyOptions = styled.ul`
   width: 100%;
   overflow: auto;
@@ -198,38 +206,49 @@ const BridgeCurrencySelector = ({
       >
         <SearchBox searchPair={searchPair} className="bridge_searchbox" />
         <BridgeCurrencyOptions>
-          {availableTickers.map((ticker, key) =>
-            ticker === value ? null : (
-              <li
-                key={key}
-                onClick={selectOption(ticker)}
-                tabIndex="0"
-                className="currencyOption"
-              >
-                <div className="currencyIcon">
-                  <img
-                    src={
-                      api.getCurrencyLogo(ticker) &&
-                      api.getCurrencyLogo(ticker).default
-                    }
-                    alt={currency && currency.symbol}
-                  />
-                </div>
-                <div className="currencyName">{ticker}</div>
-                {balances[ticker] && (
-                  <div className="currencyBalance">
-                    <strong>{balances[ticker].valueReadable}</strong>
-                    <small>
-                      $
-                      {formatUSD(
-                        coinEstimator(ticker) * balances[ticker].valueReadable
-                      )}
-                    </small>
+          {availableTickers.map((ticker, key) => {
+              if(ticker === value) return (<></>);
+              
+              const isFastWithdraw = (api.apiProvider.eligibleFastWithdrawTokens.includes(ticker));
+                
+              return (
+                <li
+                  key={key}
+                  onClick={selectOption(ticker)}
+                  tabIndex="0"
+                  className="currencyOption"
+                >
+                  <div className="currencyIcon">
+                    <img
+                      src={
+                        api.getCurrencyLogo(ticker) &&
+                        api.getCurrencyLogo(ticker).default
+                      }
+                      alt={currency && currency.symbol}
+                    />
                   </div>
-                )}
-              </li>
-            )
-          )}
+                  <div className="currencyName">{ticker}</div>
+                  <BridgeEligibleFastwithdraw>
+                    {isFastWithdraw ? ("Eligible for fast withdrawals") : null}
+                  </BridgeEligibleFastwithdraw>
+
+
+                  {balances[ticker] && (
+                    <div className="currencyBalance">
+                      <strong>{balances[ticker].valueReadable}</strong>
+                      <small>
+                        $
+                        {formatUSD(
+                          coinEstimator(ticker) * balances[ticker].valueReadable
+                        )}
+                      </small>
+                    </div>
+                  )}
+                </li>
+              );
+            })
+          }
+            
         </BridgeCurrencyOptions>
       </Modal>
     </BridgeCurrencyWrapper>
