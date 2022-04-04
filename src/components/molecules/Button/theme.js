@@ -42,11 +42,6 @@ export const styleVariants = (theme) => {
 			background: `linear-gradient(93.46deg, ${theme.colors.primaryHighEmphasis} 16.94%, ${theme.colors.secondaryHighEmphasis} 97.24%)`,
 			boxShadow: theme.colors.gradientBtnBoxShadow,
 			color:  theme.colors.foregroundHighEmphasis,
-			":active": {
-				background: `${theme.colors.gradBtnInvert} padding-box, ${theme.colors.strokeGradNorm} border-box`,
-				boxShadow: theme.colors.gradientBtnPressedBoxShadow,
-				color: darkColors.textSecondary
-			},
 			":hover:not(:active):not(:disabled)": {
 				background: 'linear-gradient(93.46deg, rgba(42, 171, 238, 0.19) 16.94%, rgba(12, 207, 207, 0.19) 97.24%)'
 			},
@@ -57,56 +52,48 @@ export const styleVariants = (theme) => {
 			// },
 			":disabled": {
 				background: `${theme.colors.backgroundMediumEmphasis}`,
+				opacity: '0.5',
 				color:  theme.colors.foregroundMediumEmphasis,
 			},
 		},
-		[variants.SECONDARY]: {
-			background: `linear-gradient(${theme.colors.flatGlobal}, ${theme.colors.flatGlobal}) padding-box, ${theme.colors.strokeGradNorm} border-box`,
-			boxShadow: theme.colors.gradientBtnBoxShadow,
-			border: "1px solid",
-			borderImageSource: theme.colors.strokeGradNorm,
-			color: theme.colors.textPrimary,
-			borderImageSlice: 0,
-			":active": {
-				background: `linear-gradient(${theme.colors.flatGlobal}, ${theme.colors.flatGlobal}) padding-box, ${theme.colors.strokeGradNorm} border-box`,
-				boxShadow: theme.colors.gradientBtnPressedBoxShadow,
-			},
+		[variants.OUTLINED]: {
+			background: 'transparent',
+			border: `1px solid ${theme.colors.foreground400}`,
+			color:  theme.colors.foregroundHighEmphasis,
+			boxSizing: 'border-box',
 			":hover:not(:active):not(:disabled)": {
-				border: "1px solid",
-				borderImageSource: theme.colors.strokeGradNorm,
-				boxShadow: theme.colors.gradientBtnHoverBoxShadow,
-				borderImageSlice: 0,
+				color:  theme.colors.foregroundMediumEmphasis,
 			},
-			// ":focus:not(:active):not(:disabled)": {
-			// 	border: theme.name === "Dark" ? `4px solid ${theme.colors.strokeFlatNorm}` : "4px solid",
-			// 	borderImageSource: theme.name === "Dark" ? "" : theme.colors.strokeGradNorm,
-			// 	boxShadow: theme.colors.gradientBtnFocusBoxShadow,
-			// },
 			":disabled": {
-				boxShadow: "",
-				border: theme.name === "Dark" ? `2px solid ${theme.colors.strokeFlatNorm}` : "2px solid",
-				borderImageSource: theme.name === "Dark" ? "" : theme.colors.strokeGradNorm,
-				color:  theme.colors.textOnDisabled
+				background: 'transparent',
+				opacity: '0.5',
+				border: `1px solid ${theme.colors.foreground400}`,
+				color:  theme.colors.foreground900,
 			},
 		},
-		[variants.TERTIARY]: {
-			background: theme.colors.btnFlatBg,
-			border: "0px",
-			boxShadow: "none",
-			color: theme.colors.textPrimary,
-			":active": {
-				background: theme.colors.btnBGSecondary,
-				color: theme.colors.textOnHover,
-			},
+		[variants.BUY]: {
+			background: theme.colors.successHighEmphasis,
+			boxShadow: theme.colors.gradientBtnBoxShadow,
+			color:  theme.colors.backgroundMediumEmphasis,
+			textShadow: theme.colors.buyBtnBoxShadow,
 			":hover:not(:active):not(:disabled)": {
-				color: theme.colors.textPrimary,
-				background: theme.colors.btnFlatBg,
-				boxShadow: theme.colors.flatBtnHoverBoxShadow,
+				background: theme.colors.successMediumEmphasis,
 			},
 			":disabled": {
-				background: theme.colors.btnBGSecondary,
-				border: `1px solid ${theme.colors.strokeFlatNorm}`,
-				color: theme.colors.textOnDisabled
+				background: theme.colors.successDisabled,
+			},
+		},
+		[variants.SELL]: {
+			background: theme.colors.dangerHighEmphasis,
+			boxShadow: theme.colors.gradientBtnBoxShadow,
+			color:  theme.colors.foregroundHighEmphasis,
+			textShadow: theme.colors.buyBtnBoxShadow,
+			":hover:not(:active):not(:disabled)": {
+				background: theme.colors.dangerMediumEmphasis,
+			},
+			":disabled": {
+				color: theme.colors.foregroundDisabled,
+				background: theme.colors.dangerDisabled,
 			},
 		},
 	}

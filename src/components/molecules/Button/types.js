@@ -7,6 +7,7 @@ export const scales = {
 
 export const variants = {
   PRIMARY: "primary",
-  SECONDARY: "secondary",
-  TERTIARY: "tertiary"
+  OUTLINED: "outlined",
+  BUY: "buy",
+  SELL: "sell",
 };

@@ -47,6 +47,8 @@ export const baseColors = {
   danger300: '#E8368114',
   danger200: '#E836810D',
   danger100: '#E8368108',
+  gradientBtnBoxShadow: "0px 3px 3px -1px #00000014, 0px 1px 1px 0px #00000014",
+  buyBtnBoxShadow: "0px 1px 4px 0px #0000001A",
 }
 
 export const lightColors = {
