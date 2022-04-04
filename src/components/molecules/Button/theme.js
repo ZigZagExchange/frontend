@@ -1,5 +1,4 @@
 import { scales, variants } from "./types";
-import { darkColors } from "../../../lib/theme/colors"
 
 export const scaleVariants = {
   [scales.LG]: {
