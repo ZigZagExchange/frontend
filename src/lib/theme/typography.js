@@ -1,151 +1,132 @@
 const primaryDisplay = {
-  fontFamily: 'Work Sans',
+  fontFamily: 'WorkSans-SemiBold',
   fontSize: '104px',
-  fontWeight: '600',
   lineHeight: '109px',
   letterSpacing: '0em',
 }
 
 const primaryHeading1 = {
-  fontFamily: 'Work Sans',
+  fontFamily: 'WorkSans-SemiBold',
   fontSize: '56px',
-  fontWeight: '600',
   lineHeight: '59px',
   letterSpacing: '0em',
 }
 
 const primaryHeading2 = {
-  fontFamily: 'Work Sans',
+  fontFamily: 'WorkSans-SemiBold',
   fontSize: '48px',
-  fontWeight: '600',
   lineHeight: '50px',
   letterSpacing: '0em',
 }
 
 const primaryHeading3 = {
-  fontFamily: 'Work Sans',
+  fontFamily: 'WorkSans-SemiBold',
   fontSize: '34px',
-  fontWeight: '600',
   lineHeight: '36px',
   letterSpacing: '0em',
 }
 
 const primaryHeading4 = {
-  fontFamily: 'Work Sans',
+  fontFamily: 'WorkSans-SemiBold',
   fontSize: '28px',
-  fontWeight: '600',
   lineHeight: '29px',
   letterSpacing: '0em',
 }
 
 const primaryHeading5 = {
-  fontFamily: 'Work Sans',
+  fontFamily: 'WorkSans-SemiBold',
   fontSize: '24px',
-  fontWeight: '600',
   lineHeight: '25px',
   letterSpacing: '0em',
 }
 
 const primaryHeading6 = {
-  fontFamily: 'Work Sans',
+  fontFamily: 'WorkSans-SemiBold',
   fontSize: '20px',
-  fontWeight: '600',
   lineHeight: '21px',
   letterSpacing: '0em',
 }
 
 const primarySubtitle = {
-  fontFamily: 'Work Sans',
+  fontFamily: 'WorkSans-Regular',
   fontSize: '24px',
-  fontWeight: '400',
   lineHeight: '30px',
   letterSpacing: '0em',
 }
 
 const primaryBody1 = {
-  fontFamily: 'Work Sans',
+  fontFamily: 'WorkSans-Regular',
   fontSize: '20px',
-  fontWeight: '400',
   lineHeight: '30px',
   letterSpacing: '0em',
 }
 
 const primaryBody2 = {
-  fontFamily: 'Work Sans',
+  fontFamily: 'WorkSans-Regular',
   fontSize: '16px',
-  fontWeight: '400',
   lineHeight: '24px',
   letterSpacing: '0em',
 }
 
 const primarySmall = {
-  fontFamily: 'Work Sans',
+  fontFamily: 'WorkSans-Regular',
   fontSize: '14px',
-  fontWeight: '400',
   lineHeight: '15px',
   letterSpacing: '0em',
 }
 
 const primaryExtraSmall = {
-  fontFamily: 'Work Sans',
+  fontFamily: 'WorkSans-Regular',
   fontSize: '12px',
-  fontWeight: '400',
   lineHeight: '13px',
   letterSpacing: '0em',
 }
 
 const primaryTiny = {
-  fontFamily: 'Work Sans',
+  fontFamily: 'WorkSans-Regular',
   fontSize: '10px',
-  fontWeight: '400',
   lineHeight: '10px',
   letterSpacing: '0em',
 }
 
 const monospace2XL = {
-  fontFamily: 'IBM Plex Mono',
+  fontFamily: 'IBMPlexMono-Medium',
   fontSize: '24px',
-  fontWeight: '500',
   lineHeight: '36px',
   letterSpacing: '0em',
 }
 
 const monospaceXL = {
-  fontFamily: 'IBM Plex Mono',
+  fontFamily: 'IBMPlexMono-Medium',
   fontSize: '20px',
-  fontWeight: '500',
   lineHeight: '32px',
   letterSpacing: '0em',
 }
 
 const monospaceLarge = {
-  fontFamily: 'IBM Plex Mono',
+  fontFamily: 'IBMPlexMono-Medium',
   fontSize: '16px',
-  fontWeight: '500',
   lineHeight: '28px',
   letterSpacing: '0em',
 }
 
 const monospaceRegular = {
-  fontFamily: 'IBM Plex Mono',
+  fontFamily: 'IBMPlexMono-Medium',
   fontSize: '14px',
-  fontWeight: '500',
   lineHeight: '24px',
   letterSpacing: '0em',
 }
 
 const monospaceSmall = {
-  fontFamily: 'IBM Plex Mono',
+  fontFamily: 'IBMPlexMono-Medium',
   fontSize: '12px',
-  fontWeight: '500',
   lineHeight: '20px',
   letterSpacing: '0em',
 }
 
 const monospaceTiny = {
-  fontFamily: 'IBM Plex Mono',
+  fontFamily: 'IBMPlexMono-Medium',
   fontSize: '10px',
-  fontWeight: '500',
   lineHeight: '16px',
   letterSpacing: '0.20000000298023224px',
 }

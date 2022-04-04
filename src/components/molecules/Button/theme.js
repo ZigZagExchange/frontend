@@ -3,32 +3,28 @@ import { scales, variants } from "./types";
 export const scaleVariants = {
   [scales.LG]: {
     height: "41px",
-	fontFamily: "Work Sans",
-	fontWeight: "700",
+	fontFamily: "WorkSans-Bold",
 	fontSize: "16px",
 	lineHeight: "17px",
 	padding: "12px 24px"
   },
   [scales.IMD]: {
     height: "32px",
-	fontFamily: "Work Sans",
-	fontWeight: "700",
+	fontFamily: "WorkSans-Bold",
 	fontSize: "12px",
 	lineHeight: "13px",
 	padding: "9.5px 16px"
   },
   [scales.MD]: {
     height: "29px",
-	fontFamily: "Work Sans",
-	fontWeight: "700",
+	fontFamily: "WorkSans-Bold",
 	fontSize: "12px",
 	lineHeight: "13px",
 	padding: "8px 16px"
   },
   [scales.SM]: {
     height: "21px",
-	fontFamily: "Work Sans",
-	fontWeight: "700",
+	fontFamily: "WorkSans-Bold",
 	fontSize: "12px",
 	lineHeight: "13px",
 	padding: "4px 16px"
