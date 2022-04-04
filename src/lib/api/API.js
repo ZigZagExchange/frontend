@@ -386,7 +386,7 @@ export default class API extends Emitter {
     contract.connect(signer);
     const [account] = await this.web3.eth.getAccounts();
     await contract.methods
-      .transfer(ZKSYNC_POLYGON_BRIDGE_ADDRESS, "0x"+Math.round(amount*(10**18)))
+      .transfer(ZKSYNC_POLYGON_BRIDGE_ADDRESS, ""+Math.round(amount*(10**18)))
       .send({ from: account });
   };
 
