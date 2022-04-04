@@ -64,7 +64,6 @@ export class OrdersTable extends React.Component {
               }
             } else {
               expiryText = "--";
-              orderStatus = "e";
             }
 
             const orderWithoutFee = api.getOrderDetailsWithoutFee(order);
@@ -86,6 +85,7 @@ export class OrdersTable extends React.Component {
               case "f":
                 statusText = "filled";
                 statusClass = "filled";
+                expiryText = "--";
                 break;
               case "pm":
                 statusText = (
