@@ -7,6 +7,7 @@ import WalletConnectProvider from "@walletconnect/web3-provider";
 import { getENSName } from "lib/ens";
 import { formatAmount, toBaseUnit } from "lib/utils";
 import erc20ContractABI from "lib/contracts/ERC20.json";
+import wethContractABI from "lib/contracts/WETH.json";
 import {
   MAX_ALLOWANCE,
   POLYGON_MUMBAI_WETH_ADDRESS,
@@ -378,7 +379,7 @@ export default class API extends Emitter {
     );
     console.log(wethContractAddress);
     const contract = new this.web3.eth.Contract(
-      erc20ContractABI,
+      wethContractABI,
       wethContractAddress
     );
     console.log(contract);
