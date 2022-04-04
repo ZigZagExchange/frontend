@@ -295,22 +295,27 @@ const Bridge = () => {
 
     setLoading(true);
 
-    if (transfer.type === "deposit") {
-      deferredXfer = api.depositL2(
-        `${swapDetails.amount}`,
-        swapDetails.currency
-      );
+    if(fromNetwork.from.network === "Polygon") {
+      console.log("bridge polygon")
+      deferredXfer = api.transferPolygonWeth(`${swapDetails.amount}`)
     } else {
-      if (isFastWithdraw) {
-        deferredXfer = api.withdrawL2Fast(
+      if (transfer.type === "deposit") {
+        deferredXfer = api.depositL2(
           `${swapDetails.amount}`,
           swapDetails.currency
         );
       } else {
-        deferredXfer = api.withdrawL2Normal(
-          `${swapDetails.amount}`,
-          swapDetails.currency
-        );
+        if (isFastWithdraw) {
+          deferredXfer = api.withdrawL2Fast(
+            `${swapDetails.amount}`,
+            swapDetails.currency
+          );
+        } else {
+          deferredXfer = api.withdrawL2Normal(
+            `${swapDetails.amount}`,
+            swapDetails.currency
+          );
+        }
       }
     }
 
@@ -517,14 +522,22 @@ const Bridge = () => {
                 )}
 
                 {!hasError && (
+                  // <Button
+                  //   loading={loading}
+                  //   className={cx("bg_btn", {
+                  //     zig_disabled:
+                  //       L2Fee === null ||
+                  //       !hasAllowance ||
+                  //       swapDetails.amount.length === 0,
+                  //   })}
+                  //   text="TRANSFER"
+                  //   icon={<MdSwapCalls />}
+                  //   onClick={doTransfer}
+                  // />
+                  //For work only, remove later
                   <Button
                     loading={loading}
-                    className={cx("bg_btn", {
-                      zig_disabled:
-                        L2Fee === null ||
-                        !hasAllowance ||
-                        swapDetails.amount.length === 0,
-                    })}
+                    className={cx("bg_btn")}
                     text="TRANSFER"
                     icon={<MdSwapCalls />}
                     onClick={doTransfer}

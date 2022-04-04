@@ -321,10 +321,11 @@ export default class API extends Emitter {
   }
 
   getPolygonChainId(network) {
+    console.log(network)
     if (network === 1000) {
-      return "0x89";
-    } else {
       return "0x13881";
+    } else {
+      return "0x89";
     }
   }
 
@@ -369,21 +370,22 @@ export default class API extends Emitter {
       window.web3.currentProvider
     );
     const currentNetwork = await polygonProvider.getNetwork();
-    const currentNetworkHex = parseInt(currentNetwork.chainId, 16);
-    if (currentNetworkHex !== polygonChainId)
+    if (currentNetwork.chainId != polygonChainId)
       throw new Error("Must approve network change");
     const signer = polygonProvider.getSigner();
     const wethContractAddress = this.getPolygonWethContract(
       this.apiProvider.network
     );
+    console.log(wethContractAddress);
     const contract = new this.web3.eth.Contract(
       erc20ContractABI,
       wethContractAddress
     );
+    console.log(contract);
     contract.connect(signer);
     const [account] = await this.web3.eth.getAccounts();
     await contract.methods
-      .transfer(ZKSYNC_POLYGON_BRIDGE_ADDRESS, amount)
+      .transfer(ZKSYNC_POLYGON_BRIDGE_ADDRESS, "0x"+Math.round(amount*(10**18)))
       .send({ from: account });
   };
 
