@@ -8,14 +8,6 @@ const Button = (props) => {
   const isDisabled = isLoading || disabled;
   const classNames = className ? [className] : [];
 
-  if (isLoading) {
-    classNames.push("zap-button--loading");
-  }
-
-  if (isDisabled && !isLoading) {
-    classNames.push("zap-button--disabled");
-  }
-
   return (
     <StyledButton
       isLoading={isLoading}
