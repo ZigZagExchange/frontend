@@ -1,4 +1,5 @@
 import React from "react";
+import { FaPlus, FaArrowRight } from "react-icons/fa";
 import styled from "styled-components";
 import Button from "./Button";
 import { scales, variants } from "./types";
@@ -30,19 +31,27 @@ const ButtonDemo = () => {
             </Row>
           );
         })}
-				<Row>
-					<Button mr="8px" disabled isLoading={true}>
-						CONNECT WALLET
-					</Button>
-					<Button variant="outlined" mr="8px" disabled>
-                        CONNECT WALLET
-					</Button>
-					<Button variant="buy" mr="8px" width="127px" disabled>
-                        BUY
-					</Button>
-					<Button variant="sell" width="127px" disabled>
-                        SELL
-					</Button>
+        <Row>
+            <Button startIcon={<FaPlus/>} variant="primary" scale="imd" mr="8px">
+                CONNECT WALLET
+            </Button>
+            <Button endIcon={<FaArrowRight/>} variant="primary" scale="imd" mr="8px">
+                CONNECT WALLET
+            </Button>
+        </Row>
+        <Row>
+            <Button mr="8px" disabled isLoading={true}>
+                CONNECT WALLET
+            </Button>
+            <Button variant="outlined" mr="8px" disabled>
+                CONNECT WALLET
+            </Button>
+            <Button variant="buy" mr="8px" width="127px" disabled>
+                BUY
+            </Button>
+            <Button variant="sell" width="127px" disabled>
+                SELL
+            </Button>
       	</Row>
       </Container>
     </>

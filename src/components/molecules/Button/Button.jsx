@@ -15,16 +15,16 @@ const Button = (props) => {
       disabled={isDisabled}
       {...rest}
     >
-      {isLoading && <Loader type="TailSpin" color="#FFF" height={16} width={16} />}
+      {isLoading && <Loader type="TailSpin" color="#FFF" height={16} width={16} style={{marginRight: 8}} />}
 			<>
 			{isValidElement(startIcon) &&
           cloneElement(startIcon, {
-            mr: "0.5rem",
+            style: {marginRight: "11.33px"},
           })}
       {children}
 			{isValidElement(endIcon) &&
           cloneElement(endIcon, {
-            ml: "0.5rem",
+            style: {marginLeft: "13px"},
           })}
 			</>
     </StyledButton>
