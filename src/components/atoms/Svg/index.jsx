@@ -35,5 +35,6 @@ export { default as FiatIcon } from "./Icons/Fiat"
 export { default as MenuIcon } from "./Icons/Menu"
 export { default as CheckMarkCircleIcon } from "./Icons/CheckMarkCircle"
 export { default as ExternalLinkIcon } from "./Icons/ExternalLink"
+export { default as SpinnerIcon } from "./Icons/Spinner"
 
 export { default as Svg } from "./Svg";

@@ -39,7 +39,10 @@ import {
   MenuIcon,
   CheckMarkCircleIcon,
   ExternalLinkIcon,
+  SpinnerIcon,
 } from './index'
+
+import { LoadingSpinner } from '../LoadingSpinner'
 
 const Row = styled.div`
   display: grid;
@@ -93,6 +96,8 @@ const IconDemo = () => {
         <MenuIcon />
         <CheckMarkCircleIcon />
         <ExternalLinkIcon />
+        <SpinnerIcon />
+        <LoadingSpinner />
       </Row>
     </div>
   );
