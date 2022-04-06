@@ -136,11 +136,14 @@ const Bridge = () => {
     return true
   }
 
-  const validateFees = (bridgeFee, feeToken) => {
+  const validateFees = (inputValue, bridgeFee, feeToken) => {
     const bals = transfer.type === 'deposit' ? walletBalances : zkBalances
     const feeTokenBalance = parseFloat(bals[feeToken] && bals[feeToken].valueReadable) || 0
 
-    if (bridgeFee > feeTokenBalance) {
+    if (
+      inputValue > 0 &&
+      bridgeFee > feeTokenBalance
+    ) {
       setFormErr("Not enough balance to pay for fees")
       return false
     }
@@ -198,7 +201,7 @@ const Bridge = () => {
       setL2FeeToken(feeToken)
       const input = parseFloat(details.amount) || 0
       const isInputValid = validateInput(input, details.currency)
-      const isFeesValid = validateFees(bridgeFee, feeToken)
+      const isFeesValid = validateFees(input, bridgeFee, feeToken)
       if (isFeesValid && isInputValid) {
         setFormErr("")
       }
