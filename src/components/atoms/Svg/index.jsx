@@ -7,5 +7,10 @@ export { default as DownIcon } from "./Icons/Down"
 export { default as RightIcon } from "./Icons/Right"
 export { default as LeftIcon } from "./Icons/Left"
 export { default as UpIcon } from "./Icons/Up"
+export { default as DiscordIcon } from "./Icons/Discord"
+export { default as TelegramIcon } from "./Icons/Telegram"
+export { default as GithubIcon } from "./Icons/Github"
+export { default as TwitterIcon } from "./Icons/Twitter"
+export { default as InfoIcon } from "./Icons/Info"
 
 export { default as Svg } from "./Svg";
