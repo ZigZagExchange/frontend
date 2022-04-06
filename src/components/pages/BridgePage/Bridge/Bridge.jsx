@@ -95,6 +95,7 @@ const Bridge = () => {
     const bals = transfer.type === 'deposit' ? walletBalances : zkBalances
     const getCurrencyBalance = (cur) => (bals[cur] && bals[cur] / (10**swapCurrencyInfo.decimals));
     const detailBalance = getCurrencyBalance(swapCurrency)
+    console.log(detailBalance)
     let error = null
 
     if (inputValue > 0) {
@@ -199,7 +200,7 @@ const Bridge = () => {
       setL2Fee(bridgeFee)
       setL2FeeToken(feeToken)
       const input = parseFloat(details.amount) || 0
-      const isInputValid = validateInput(input, details.currency, feeToken)
+      const isInputValid = validateInput(input, details.currency)
       const isFeesValid = validateFees(bridgeFee, feeToken)
       if (isFeesValid && isInputValid) {
         setFormErr("")
