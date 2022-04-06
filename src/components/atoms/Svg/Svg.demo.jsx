@@ -11,6 +11,10 @@ import {
   CaretRightIcon,
   CaretLeftIcon,
   CaretUpIcon,
+  ArrowDownIcon,
+  ArrowRightIcon,
+  ArrowLeftIcon,
+  ArrowUpIcon,
   DiscordIcon,
   TelegramIcon,
   GithubIcon,
@@ -61,6 +65,10 @@ const IconDemo = () => {
         <CaretRightIcon />
         <CaretLeftIcon />
         <CaretUpIcon />
+        <ArrowDownIcon />
+        <ArrowRightIcon />
+        <ArrowLeftIcon />
+        <ArrowUpIcon />
         <DiscordIcon />
         <TelegramIcon />
         <GithubIcon />
