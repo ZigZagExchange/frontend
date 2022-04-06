@@ -182,7 +182,7 @@ const Bridge = () => {
 
   const setDepositFee = (setFee, details) => {
       api.depositL2Fee(details.currency).then(res => {
-        setFee(res)
+        setFee(res.amount, res.feeToken)
         setL1Fee(null)
       })
   }
