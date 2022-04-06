@@ -116,7 +116,7 @@ export default function ListPairPage() {
   return (
     <DefaultTemplate>
       <x.div
-        p={4}
+        p={{xs: '2'}}
         backgroundColor={"blue-400"}
         w={"full"}
         h={"full"}
@@ -126,12 +126,12 @@ export default function ListPairPage() {
         alignItems={"center"}
         justifyContent={"center"}
       >
-        <Pane size={"sm"} variant={"light"} maxWidth={"500px"} margin={"auto"}>
+        <Pane size={'sm'} variant={"light"} maxWidth={"500px"} margin={"auto"}>
           <x.div display={"flex"} justifyContent={"space-between"} mb={4}>
-            <x.div fontSize={28} mb={2}>
+            <x.div fontSize={{xs: 'lg', md: '2xl'}} mb={2}>
               List New Pair
             </x.div>
-            <x.div fontSize={12} color={"blue-gray-400"} textAlign={"center"}>
+            <x.div fontSize={{xs: 'xs', md: '12px'}} color={"blue-gray-400"} textAlign={"center"}>
               <x.div>No Internal ID?</x.div>
               <x.div>
                 <ExternalLink href={"https://zkscan.io/explorer/tokens"}>

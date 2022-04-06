@@ -171,6 +171,7 @@ header.bridge_header {
   padding: 10px;
   background: none;
   color: white;
+  letter-spacing: 1px;
 }
 
 .head_left_socials ul li a {
@@ -242,16 +243,16 @@ header.bridge_header {
   }
 
   .head_left {
-    margin: 3rem 0;
+    margin: 1rem 0;
   }
 
   .head_left ul {
-    flex-direction: column;
+    flex-direction: row;
     padding: 0;
   }
 
   .head_left ul li a {
-    width: 200px;
+    /* width: 200px; */
     padding: 10px 15px;
   }
 
