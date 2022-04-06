@@ -93,9 +93,8 @@ const Bridge = () => {
   const validateInput = (inputValue, swapCurrency) => {
     const swapCurrencyInfo = api.getCurrencyInfo(swapCurrency);
     const bals = transfer.type === 'deposit' ? walletBalances : zkBalances
-    const getCurrencyBalance = (cur) => (bals[cur] && bals[cur] / (10**swapCurrencyInfo.decimals));
+    const getCurrencyBalance = (cur) => (bals[cur] && bals[cur].value / (10**swapCurrencyInfo.decimals));
     const detailBalance = getCurrencyBalance(swapCurrency)
-    console.log(detailBalance)
     let error = null
 
     if (inputValue > 0) {
