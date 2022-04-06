@@ -96,8 +96,6 @@ const Bridge = () => {
     const getCurrencyBalance = (cur) => (bals[cur] && bals[cur].value / (10**swapCurrencyInfo.decimals));
     const detailBalance = getCurrencyBalance(swapCurrency)
     let error = null
-    console.log(`inputValue: ${inputValue}`)
-    console.log(`detailBalance: ${detailBalance}`)
 
     if (inputValue > 0) {
       if (inputValue <= activationFee) {
@@ -105,7 +103,6 @@ const Bridge = () => {
       } else if (inputValue - L2Fee < 0) {
         error = "Amount too small"
       } else if (inputValue > detailBalance) {
-        console.log("Insufficient balance")
         error = "Insufficient balance"
       } else if (isFastWithdraw) {
         if (inputValue - L1Fee < 0) {
@@ -120,10 +117,8 @@ const Bridge = () => {
             error = "Amount too small"
           }
         }
-      }
-
-      if (L2FeeToken === swapCurrency) {
-        if (detailBalance - (inputValue + L2Fee) < 0) {
+      } else if (L2FeeToken === swapCurrency) {
+        if ((inputValue + L2Fee) > detailBalance) {
           error = "Insufficient balance for fees"
         }
       } else {
@@ -133,7 +128,6 @@ const Bridge = () => {
         }
       }
     }
-    console.log(error)
 
     if (error) {
       setFormErr(error)

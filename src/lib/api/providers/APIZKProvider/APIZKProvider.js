@@ -335,7 +335,7 @@ export default class APIZKProvider extends APIProvider {
   depositL2Fee = async (token = "ETH") => {
     // TODO: implement
     return { 
-      amount: 0.00000005, 
+      amount: 0.005, 
       feeToken: 'ETH'
     };
   };
