@@ -7,10 +7,10 @@ import {
   CompareArrowIcon,
   EditIcon,
   DeleteIcon,
-  ArrowDownIcon,
-  ArrowRightIcon,
-  ArrowLeftIcon,
-  ArrowUpIcon,
+  CaretDownIcon,
+  CaretRightIcon,
+  CaretLeftIcon,
+  CaretUpIcon,
   DiscordIcon,
   TelegramIcon,
   GithubIcon,
@@ -57,10 +57,10 @@ const IconDemo = () => {
         <CompareArrowIcon />
         <EditIcon />
         <DeleteIcon />
-        <ArrowDownIcon />
-        <ArrowRightIcon />
-        <ArrowLeftIcon />
-        <ArrowUpIcon />
+        <CaretDownIcon />
+        <CaretRightIcon />
+        <CaretLeftIcon />
+        <CaretUpIcon />
         <DiscordIcon />
         <TelegramIcon />
         <GithubIcon />
