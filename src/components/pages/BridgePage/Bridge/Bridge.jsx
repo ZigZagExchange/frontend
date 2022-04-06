@@ -105,6 +105,7 @@ const Bridge = () => {
       } else if (inputValue - L2Fee < 0) {
         error = "Amount too small"
       } else if (inputValue > detailBalance) {
+        console.log("Insufficient balance")
         error = "Insufficient balance"
       } else if (isFastWithdraw) {
         if (inputValue - L1Fee < 0) {
@@ -132,6 +133,7 @@ const Bridge = () => {
         }
       }
     }
+    console.log(error)
 
     if (error) {
       setFormErr(error)
