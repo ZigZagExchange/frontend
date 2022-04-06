@@ -96,6 +96,8 @@ const Bridge = () => {
     const getCurrencyBalance = (cur) => (bals[cur] && bals[cur].value / (10**swapCurrencyInfo.decimals));
     const detailBalance = getCurrencyBalance(swapCurrency)
     let error = null
+    console.log(`inputValue: ${inputValue}`)
+    console.log(`detailBalance: ${detailBalance}`)
 
     if (inputValue > 0) {
       if (inputValue <= activationFee) {
