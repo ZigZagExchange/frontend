@@ -1,5 +1,8 @@
 import { BigNumber } from "ethers";
 import isString from "lodash/isString";
+import get from "lodash/get";
+
+export const getThemeValue = (path, fallback) => (theme) => get(theme, path, fallback);
 
 export function formatUSD(floatNum) {
   const num = parseFloat(floatNum || 0)
