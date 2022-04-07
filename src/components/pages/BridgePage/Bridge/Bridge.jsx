@@ -403,9 +403,9 @@ const Bridge = () => {
                 icon={<BiError/>}
               />}
 
-              {!hasError && swapDetails.amount > 0 && <Button
+              {!hasError && <Button
                 loading={loading}
-                className={cx("bg_btn", {zig_disabled: L2Fee === null || !hasAllowance || swapDetails.amount === 0})}
+                className={cx("bg_btn", {zig_disabled: (L2Fee === null && L1Fee === null) || !hasAllowance || swapDetails.amount === 0})}
                 text="TRANSFER"
                 icon={<MdSwapCalls/>}
                 onClick={doTransfer}
