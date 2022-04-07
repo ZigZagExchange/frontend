@@ -403,7 +403,7 @@ const Bridge = () => {
                 icon={<BiError/>}
               />}
 
-              {!hasError && <Button
+              {!hasError && swapDetails.amount > 0 && <Button
                 loading={loading}
                 className={cx("bg_btn", {zig_disabled: L2Fee === null || !hasAllowance || swapDetails.amount.length === 0})}
                 text="TRANSFER"
