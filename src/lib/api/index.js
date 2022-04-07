@@ -11,7 +11,7 @@ const api = new API({
       APIZKProvider,
       "0x82f67958a5474e40e1485742d648c0b0686b6e5d",
     ],
-    // starknet: [1001, APIStarknetProvider],
+    starknet: [1001, APIStarknetProvider],
   },
 });
 

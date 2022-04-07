@@ -10,22 +10,27 @@ import ExternalLink from "./ExternalLink";
 
 export const marketQueryParam = "market";
 export const networkQueryParam = "network";
-export const mainnetChainName = "zksync";
-export const rinkebyChainName = "zksync-rinkeby";
+export const zksyncMainnetChainName = "zksync";
+export const zksyncRinkebyChainName = "zksync-rinkeby";
+export const starknetGoerliChainName = "starknet-goerli";
 export const getMarketChainFromId = (chainId) => {
   if (chainId === 1) {
     return mainnetChainName;
   } else if (chainId === 1000) {
     return rinkebyChainName;
+  } else if (chainId === 1001) {
+    return starknetGoerliChainName;
   } else {
     return null;
   }
 };
 export const getChainIdFromMarketChain = (chainName) => {
-  if (chainName === mainnetChainName) {
+  if (chainName === zksyncMainnetChainName) {
     return 1;
-  } else if (chainName === rinkebyChainName) {
+  } else if (chainName === zksyncRinkebyChainName) {
     return 1000;
+  } else if (chainName === starknetGoerliChainName) {
+    return 1001;
   } else {
     return null;
   }
