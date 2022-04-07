@@ -391,7 +391,7 @@ const Bridge = () => {
             {user.address && <>
               {balances[swapDetails.currency] && !hasAllowance && <Button
                 loading={isApproving}
-                className={cx("bg_btn", {zig_disabled: formErr.length > 0 || swapDetails.amount.length === 0,})}
+                className={cx("bg_btn", {zig_disabled: formErr.length > 0 || swapDetails.amount == 0,})}
                 text="APPROVE"
                 style={{marginBottom: 10}}
                 onClick={approveSpend}
@@ -405,7 +405,7 @@ const Bridge = () => {
 
               {!hasError && <Button
                 loading={loading}
-                className={cx("bg_btn", {zig_disabled: (L2Fee === null && L1Fee === null) || !hasAllowance || swapDetails.amount === 0})}
+                className={cx("bg_btn", {zig_disabled: (L2Fee === null && L1Fee === null) || !hasAllowance || swapDetails.amount == 0})}
                 text="TRANSFER"
                 icon={<MdSwapCalls/>}
                 onClick={doTransfer}
