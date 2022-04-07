@@ -183,8 +183,8 @@ const Bridge = () => {
 
   const setDepositFee = (setFee, details) => {
       api.depositL2Fee(details.currency).then(res => {
-        setFee(res.amount, res.feeToken)
-        setL1Fee(null)
+        setFee(null, null)
+        setL1Fee(res.amount)
       })
   }
 
@@ -403,7 +403,7 @@ const Bridge = () => {
                 icon={<BiError/>}
               />}
 
-              {!hasError && <Button
+              {!hasError && swapDetails.amount > 0 && <Button
                 loading={loading}
                 className={cx("bg_btn", {zig_disabled: L2Fee === null || !hasAllowance || swapDetails.amount === 0})}
                 text="TRANSFER"
