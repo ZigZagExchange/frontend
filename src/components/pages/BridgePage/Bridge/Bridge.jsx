@@ -100,12 +100,12 @@ const Bridge = () => {
     if (inputValue > 0) {
       if (inputValue <= activationFee) {
         error = `Must be more than ${activationFee} ${swapCurrency}`
-      } else if (inputValue - L2Fee < 0) {
+      } else if (inputValue < L2Fee) {
         error = "Amount too small"
-      } else if (inputValue > detailBalance) {
+      } else if (inputValue >= detailBalance) {
         error = "Insufficient balance"
       } else if (isFastWithdraw) {
-        if (inputValue - L1Fee < 0) {
+        if (inputValue < L1Fee) {
           error = "Amount too small"
         }
 
@@ -113,7 +113,7 @@ const Bridge = () => {
           const maxAmount = fastWithdrawCurrencyMaxes[swapCurrency]
           if (inputValue > maxAmount) {
             error = `Max ${swapCurrency} liquidity for fast withdraw: ${maxAmount.toPrecision(4)}`
-          } else if (inputValue - (L2Fee + L1Fee) < 0) {
+          } else if (inputValue < (L2Fee + L1Fee)) {
             error = "Amount too small"
           }
         }
@@ -123,7 +123,7 @@ const Bridge = () => {
         }
       } else {
         const feeCurrencyBalance = getCurrencyBalance(L2FeeToken)
-        if (feeCurrencyBalance - L2Fee < 0) {
+        if (feeCurrencyBalance < L1Fee) {
           error = "Insufficient balance for fees"
         }
       }
