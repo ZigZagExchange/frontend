@@ -64,7 +64,7 @@ const BridgeSwapInput = ({ value = {}, onChange, balances = {}, gasFee, bridgeFe
       if (feeCurrency === value.currency) {
         balance -= (bridgeFee + gasFee);
       }
-      max = Math.round(balance * 10**roundedDecimalDigits) / 10**roundedDecimalDigits;
+      max = (Math.round(balance * 10**roundedDecimalDigits) / 10**roundedDecimalDigits) - (1 / 10**roundedDecimalDigits);
     } catch (e) {
       max = parseFloat((balances[value.currency] && balances[value.currency].valueReadable) || 0)
     }
