@@ -93,19 +93,19 @@ const Bridge = () => {
   const validateInput = (inputValue, swapCurrency) => {
     const swapCurrencyInfo = api.getCurrencyInfo(swapCurrency);
     const bals = transfer.type === 'deposit' ? walletBalances : zkBalances
-    const getCurrencyBalance = (cur) => (bals[cur] && bals[cur] / (10**swapCurrencyInfo.decimals));
+    const getCurrencyBalance = (cur) => (bals[cur] && bals[cur].value / (10**swapCurrencyInfo.decimals));
     const detailBalance = getCurrencyBalance(swapCurrency)
     let error = null
 
     if (inputValue > 0) {
       if (inputValue <= activationFee) {
         error = `Must be more than ${activationFee} ${swapCurrency}`
-      } else if (inputValue - L2Fee < 0) {
+      } else if (inputValue < L2Fee) {
         error = "Amount too small"
-      } else if (inputValue > detailBalance) {
+      } else if (inputValue >= detailBalance) {
         error = "Insufficient balance"
       } else if (isFastWithdraw) {
-        if (inputValue - L1Fee < 0) {
+        if (inputValue < L1Fee) {
           error = "Amount too small"
         }
 
@@ -113,19 +113,17 @@ const Bridge = () => {
           const maxAmount = fastWithdrawCurrencyMaxes[swapCurrency]
           if (inputValue > maxAmount) {
             error = `Max ${swapCurrency} liquidity for fast withdraw: ${maxAmount.toPrecision(4)}`
-          } else if (inputValue - (L2Fee + L1Fee) < 0) {
+          } else if (inputValue < (L2Fee + L1Fee)) {
             error = "Amount too small"
           }
         }
-      }
-
-      if (L2FeeToken === swapCurrency) {
-        if (detailBalance - (inputValue + L2Fee) < 0) {
+      } else if (L2FeeToken === swapCurrency) {
+        if ((inputValue + L2Fee) > detailBalance) {
           error = "Insufficient balance for fees"
         }
       } else {
         const feeCurrencyBalance = getCurrencyBalance(L2FeeToken)
-        if (feeCurrencyBalance - L2Fee < 0) {
+        if (feeCurrencyBalance < L1Fee) {
           error = "Insufficient balance for fees"
         }
       }
@@ -138,11 +136,14 @@ const Bridge = () => {
     return true
   }
 
-  const validateFees = (bridgeFee, feeToken) => {
+  const validateFees = (inputValue, bridgeFee, feeToken) => {
     const bals = transfer.type === 'deposit' ? walletBalances : zkBalances
     const feeTokenBalance = parseFloat(bals[feeToken] && bals[feeToken].valueReadable) || 0
 
-    if (bridgeFee > feeTokenBalance) {
+    if (
+      inputValue > 0 &&
+      bridgeFee > feeTokenBalance
+    ) {
       setFormErr("Not enough balance to pay for fees")
       return false
     }
@@ -182,8 +183,8 @@ const Bridge = () => {
 
   const setDepositFee = (setFee, details) => {
       api.depositL2Fee(details.currency).then(res => {
-        setFee(res)
-        setL1Fee(null)
+        setFee(null, null)
+        setL1Fee(res.amount)
       })
   }
 
@@ -199,8 +200,8 @@ const Bridge = () => {
       setL2Fee(bridgeFee)
       setL2FeeToken(feeToken)
       const input = parseFloat(details.amount) || 0
-      const isInputValid = validateInput(input, details.currency, feeToken)
-      const isFeesValid = validateFees(bridgeFee, feeToken)
+      const isInputValid = validateInput(input, details.currency)
+      const isFeesValid = validateFees(input, bridgeFee, feeToken)
       if (isFeesValid && isInputValid) {
         setFormErr("")
       }
@@ -390,7 +391,7 @@ const Bridge = () => {
             {user.address && <>
               {balances[swapDetails.currency] && !hasAllowance && <Button
                 loading={isApproving}
-                className={cx("bg_btn", {zig_disabled: formErr.length > 0 || swapDetails.amount.length === 0,})}
+                className={cx("bg_btn", {zig_disabled: formErr.length > 0 || swapDetails.amount == 0,})}
                 text="APPROVE"
                 style={{marginBottom: 10}}
                 onClick={approveSpend}
@@ -404,7 +405,7 @@ const Bridge = () => {
 
               {!hasError && <Button
                 loading={loading}
-                className={cx("bg_btn", {zig_disabled: L2Fee === null || !hasAllowance || swapDetails.amount.length === 0})}
+                className={cx("bg_btn", {zig_disabled: (L2Fee === null && L1Fee === null) || !hasAllowance || swapDetails.amount == 0})}
                 text="TRANSFER"
                 icon={<MdSwapCalls/>}
                 onClick={doTransfer}
