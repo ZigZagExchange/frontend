@@ -26,6 +26,7 @@ import L2Header from "./L2Header";
 import L1Header from "./L1Header";
 import FastWithdrawTooltip from "./FastWithdrawTooltip";
 import { formatPrice } from "lib/utils";
+import {MAX_ALLOWANCE} from 'lib/api/constants';
 
 const defaultTransfer = {
   type: "deposit",
@@ -67,7 +68,12 @@ const Bridge = () => {
   const isSwapAmountEmpty = swapDetails.amount === ""
 
   useEffect(() => {
-    if (isEmpty(balances) || !swapDetails.currency || swapDetails.currency === "ETH") {
+    if (swapDetails.currency === "ETH") {
+      setAllowance(MAX_ALLOWANCE);
+      setHasAllowance(true);
+      return;
+    }
+    if (isEmpty(balances) || !swapDetails.currency) {
       return;
     }
     const swapCurrencyInfo = api.getCurrencyInfo(swapDetails.currency);
@@ -77,7 +83,7 @@ const Bridge = () => {
       isSwapAmountEmpty ? '0.0' : swapDetails.amount,
       swapCurrencyInfo.decimals
     );
-    const allowanceBN = balances[swapDetails.currency]?.allowance ?? ethersConstants.Zero;
+    const allowanceBN = balances[swapDetails.currency]?.allowance ?? ethersConstants.Zero;      
     setAllowance(allowanceBN);
     setHasAllowance(allowanceBN.gte(swapAmountBN));
   }, [balances, swapDetails, isSwapAmountEmpty]);
@@ -114,13 +120,10 @@ const Bridge = () => {
   }, [transfer.type])
 
   const validateInput = (inputValue, swapCurrency) => {
-    if (isSwapAmountEmpty) {
-      return true;
-    }
-    const getCurrencyBalance = (_currency) => (balances[_currency]?.value / (10**swapCurrencyInfo.decimals));
-
-    const detailBalance = getCurrencyBalance(swapCurrency);
-
+    const swapCurrencyInfo = api.getCurrencyInfo(swapCurrency);
+    const bals = transfer.type === 'deposit' ? walletBalances : zkBalances
+    const getCurrencyBalance = (cur) => (bals[cur] && bals[cur].value / (10**swapCurrencyInfo.decimals));
+    const detailBalance = getCurrencyBalance(swapCurrency)
     let error = null
 
     if (inputValue > 0) {
@@ -163,7 +166,8 @@ const Bridge = () => {
   }
 
   const validateFees = (inputValue, bridgeFee, feeToken) => {
-    const feeTokenBalance = parseFloat(balances[feeToken] && balances[feeToken].valueReadable) || 0
+    const bals = transfer.type === 'deposit' ? walletBalances : zkBalances
+    const feeTokenBalance = parseFloat(bals[feeToken] && bals[feeToken].valueReadable) || 0
 
     if (
       inputValue > 0 &&
@@ -186,7 +190,7 @@ const Bridge = () => {
         setFee(null)
       })
 
-    api.withdrawL2FastBridgeFee(details.currency)
+      api.withdrawL2FastBridgeFee(details.currency)
       .then(res => setL1Fee(res))
       .catch(e => {
           console.error(e)
@@ -323,7 +327,10 @@ const Bridge = () => {
               <h5>Estimated value</h5>
               <span>~${formatUSD(estimatedValue)}</span>
             </div>
-            {swapDetails.currency !== "ETH" ? (
+            {(
+              swapDetails.currency !== "ETH" &&
+              (swapDetails.amount * 10 ** swapCurrencyInfo.decimals) > allowance
+            ) ? (
               <div className="bridge_coin_stat">
                 <h5>Available allowance</h5>
                 <span>
@@ -431,7 +438,8 @@ const Bridge = () => {
                 className={cx("bg_btn", {
                   zig_disabled: 
                     formErr.length > 0 ||
-                    Number(swapDetails.amount) === 0,
+                    Number(swapDetails.amount) === 0 ||
+                    swapDetails.currency === "ETH"
                   })}
                 text="APPROVE"
                 style={{marginBottom: 10}}
