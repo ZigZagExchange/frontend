@@ -21,6 +21,7 @@ import RadioButtons from "../../../atoms/RadioButtons/RadioButtons";
 import L2Header from "./L2Header";
 import L1Header from "./L1Header";
 import FastWithdrawTooltip from "./FastWithdrawTooltip";
+import { formatPrice } from "lib/utils";
 
 const defaultTransfer = {
   type: "deposit",
@@ -372,10 +373,10 @@ const Bridge = () => {
                 </div>}
                 <x.div color={"blue-gray-300"}>
                   You'll receive: ~{                  
-                    Number(swapDetails.amount
+                    formatPrice(swapDetails.amount
                       - (L1Fee ? Number(L1Fee) : 0)
                       - (L2Fee ? Number(L2Fee) : 0)
-                    ).toPrecision(4)
+                    )
                   }
                   {" " + swapDetails.currency} on L1
                 </x.div>
