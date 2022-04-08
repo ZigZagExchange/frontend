@@ -5,7 +5,7 @@ import React from "react";
 const L2Header = ({ networks, onSelect, selectedNetwork }) => {
   const dropdownMenu = () => {
     return (
-      <Menu className="brdige_menu" onSelect={onSelect} selectedKeys={[selectedNetwork.key]}>
+      <Menu className="bridge_menu" onSelect={onSelect} selectedKeys={[selectedNetwork.key]}>
         {networks.map((item) => {
           return (
             <MenuItem key={item.key}>
