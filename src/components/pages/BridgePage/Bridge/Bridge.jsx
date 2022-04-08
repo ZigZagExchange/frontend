@@ -21,6 +21,7 @@ import RadioButtons from "../../../atoms/RadioButtons/RadioButtons";
 import L2Header from "./L2Header";
 import L1Header from "./L1Header";
 import FastWithdrawTooltip from "./FastWithdrawTooltip";
+import { formatPrice } from "lib/utils";
 
 const defaultTransfer = {
   type: "deposit",
@@ -171,7 +172,7 @@ const Bridge = () => {
 
   const setNormalWithdrawFees = (setFee, details) => {
     api.withdrawL2GasFee(details.currency)
-      .then(({feeToken, amount}) => {
+      .then(({amount, feeToken}) => {
         setFee(amount, feeToken)
       })
       .catch(err => {
@@ -372,9 +373,12 @@ const Bridge = () => {
                   Bridge Fee: {L1Fee.toPrecision(4)} {swapDetails.currency}
                 </div>}
                 <x.div color={"blue-gray-300"}>
-                  You'll receive: ~{isFastWithdraw && L1Fee
-                  ? Number(swapDetails.amount - L1Fee).toPrecision(4)
-                  : Number(swapDetails.amount).toPrecision(4)}
+                  You'll receive: ~{                  
+                    formatPrice(swapDetails.amount
+                      - (L1Fee ? Number(L1Fee) : 0)
+                      - (L2Fee ? Number(L2Fee) : 0)
+                    )
+                  }
                   {" " + swapDetails.currency} on L1
                 </x.div>
               </x.div>}
