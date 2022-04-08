@@ -68,7 +68,11 @@ const Bridge = () => {
   const isSwapAmountEmpty = swapDetails.amount === ""
 
   useEffect(() => {
-    if (isEmpty(balances) || !swapDetails.currency || swapDetails.currency === "ETH") {
+    if (swapDetails.currency === "ETH") {
+      setAllowance(MAX_ALLOWANCE);
+      setHasAllowance(allowanceBN.gte(swapAmountBN));
+    }
+    if (isEmpty(balances) || !swapDetails.currency) {
       return;
     }
     const swapCurrencyInfo = api.getCurrencyInfo(swapDetails.currency);
@@ -78,9 +82,7 @@ const Bridge = () => {
       isSwapAmountEmpty ? '0.0' : swapDetails.amount,
       swapCurrencyInfo.decimals
     );
-    const allowanceBN = (swapDetails.currency === 'ETH')
-      ? MAX_ALLOWANCE
-      : balances[swapDetails.currency]?.allowance ?? ethersConstants.Zero;      
+    const allowanceBN = balances[swapDetails.currency]?.allowance ?? ethersConstants.Zero;      
     setAllowance(allowanceBN);
     setHasAllowance(allowanceBN.gte(swapAmountBN));
   }, [balances, swapDetails, isSwapAmountEmpty]);
@@ -326,7 +328,10 @@ const Bridge = () => {
               <h5>Estimated value</h5>
               <span>~${formatUSD(estimatedValue)}</span>
             </div>
-            {swapDetails.currency !== "ETH" ? (
+            {(
+              swapDetails.currency !== "ETH" &&
+              (swapDetails.amount * 10 ** swapCurrencyInfo.decimals) > allowance
+            ) ? (
               <div className="bridge_coin_stat">
                 <h5>Available allowance</h5>
                 <span>
