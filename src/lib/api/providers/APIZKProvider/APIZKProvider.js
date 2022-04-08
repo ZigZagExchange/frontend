@@ -501,10 +501,11 @@ export default class APIZKProvider extends APIProvider {
         throw Error("Token not eligible for fast withdraw");
       }
       const feeData = await this.api.ethersProvider.getFeeData();
-      const bridgeFee = feeData.maxFeePerGas
+      let bridgeFee = feeData.maxFeePerGas
         .add(feeData.maxPriorityFeePerGas)
         .mul(21000)
-        .mul(1.5); // ZigZag fee
+
+      bridgeFee *= 1.5; // ZigZag fee
 
       if (token === "ETH") {
         return getNumberFormatted(bridgeFee);
