@@ -180,7 +180,7 @@ const Bridge = () => {
   }
 
   const setFastWithdrawFees = (setFee, details) => {
-    await api.withdrawL2FastGasFee(details.currency)
+    api.withdrawL2FastGasFee(details.currency)
       .then(({amount, feeToken}) => {
         setFee(amount, feeToken)
       })
@@ -190,7 +190,7 @@ const Bridge = () => {
         setFee(null)
       })
 
-      await api.withdrawL2FastBridgeFee(details.currency)
+      api.withdrawL2FastBridgeFee(details.currency)
       .then(res => setL1Fee(res))
       .catch(e => {
           console.error(e)
@@ -199,7 +199,7 @@ const Bridge = () => {
   }
 
   const setNormalWithdrawFees = (setFee, details) => {
-    await api.withdrawL2GasFee(details.currency)
+    api.withdrawL2GasFee(details.currency)
       .then(({amount, feeToken}) => {
         setFee(amount, feeToken)
       })
@@ -211,7 +211,7 @@ const Bridge = () => {
   }
 
   const setDepositFee = (setFee, details) => {
-      await api.depositL2Fee(details.currency).then(res => {
+      api.depositL2Fee(details.currency).then(res => {
         setFee(null, null)
         setL1Fee(res.amount)
       })

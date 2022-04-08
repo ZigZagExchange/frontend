@@ -328,27 +328,27 @@ export default class API extends Emitter {
   };
 
   withdrawL2Normal = async (amount, token) => {
-    return this.apiProvider.withdrawL2Normal(amount, token);
+    return await this.apiProvider.withdrawL2Normal(amount, token);
   };
 
   withdrawL2Fast = (amount, token) => {
-    return this.apiProvider.withdrawL2Fast(amount, token);
+    return await this.apiProvider.withdrawL2Fast(amount, token);
   };
 
   depositL2Fee = async (token) => {
-    return this.apiProvider.depositL2Fee(token);
+    return await this.apiProvider.depositL2Fee(token);
   };
 
   withdrawL2GasFee = async (token) => {
-    return this.apiProvider.withdrawL2GasFee(token);
+    return await this.apiProvider.withdrawL2GasFee(token);
   };
 
   withdrawL2FastGasFee = async (token) => {
-    return this.apiProvider.withdrawL2FastGasFee(token);
+    return await this.apiProvider.withdrawL2FastGasFee(token);
   };
 
   withdrawL2FastBridgeFee = async (token) => {
-    return this.apiProvider.withdrawL2FastBridgeFee(token);
+    return await this.apiProvider.withdrawL2FastBridgeFee(token);
   };
 
   cancelAllOrders = async () => {
