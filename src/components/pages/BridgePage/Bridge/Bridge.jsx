@@ -68,6 +68,20 @@ const Bridge = () => {
   const [fromNetwork, setFromNetwork] = useState(Networks[0])
   const [toNetwork, setToNetwork] = useState(fromNetwork.to[0])
 
+  const getBalances = (network) => {
+    let balances = [];
+    if (network === "polygon") {
+      balances = polygonBalances;
+    } else if (network === "ethereum") {
+      balances = walletBalances;
+    } else if (network === "zksync") {
+      balances = zkBalances;
+    } else {
+      setFormErr("Bad Network");
+    }
+    return balances;
+  }
+  
   const [swapDetails, _setSwapDetails] = useState(() => ({
     amount: "",
     currency: "ETH",
@@ -339,20 +353,6 @@ const Bridge = () => {
         setLoading(false);
       });
   };
-
-  const getBalances = (network) => {
-    let balances = [];
-    if (network === "polygon") {
-      balances = polygonBalances;
-    } else if (network === "ethereum") {
-      balances = walletBalances;
-    } else if (network === "zksync") {
-      balances = zkBalances;
-    } else {
-      setFormErr("Bad Network");
-    }
-    return balances;
-  }
 
   const onSelectFromNetwork = ({ key }) => {
     const f = Networks.find((i) => i.from.key === key)
