@@ -5,7 +5,7 @@ import Emitter from "tiny-emitter";
 import { ethers } from "ethers";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import { getENSName } from "lib/ens";
-import { formatAmount, toBaseUnit } from "lib/utils";
+import { formatAmount } from "lib/utils";
 import erc20ContractABI from "lib/contracts/ERC20.json";
 import wethContractABI from "lib/contracts/WETH.json";
 import {
@@ -371,7 +371,7 @@ export default class API extends Emitter {
       window.web3.currentProvider
     );
     const currentNetwork = await polygonProvider.getNetwork();
-    if (currentNetwork.chainId != polygonChainId)
+    if (currentNetwork.chainId !== polygonChainId)
       throw new Error("Must approve network change");
     const signer = polygonProvider.getSigner();
     const wethContractAddress = this.getPolygonWethContract(
