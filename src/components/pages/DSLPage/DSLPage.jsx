@@ -8,6 +8,7 @@ import RadioButtonsDemo from "../../atoms/RadioButtons/RadioButtons.demo";
 import TextDemo from "../../atoms/Text/Text.demo";
 import SvgDemo from "../../atoms/Svg/Svg.demo";
 import ButtonDemo from "../../molecules/Button/Button.demo";
+import InputFieldDemo from "../../atoms/InputField/InputField.demo";
 import { Button } from "../../atoms/Form/Submit";
 import { toast } from "react-toastify";
 
@@ -63,6 +64,9 @@ const DSLPage = () => {
             </DSLItem>
             <DSLItem title={"Svg Icons Demo"}>
               <SvgDemo />
+            </DSLItem>
+            <DSLItem title={"Input Demo"}>
+              <InputFieldDemo />
             </DSLItem>
             <DSLItem title={"Toast"}>
               <Button
