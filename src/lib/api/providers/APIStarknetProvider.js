@@ -21,10 +21,10 @@ export default class APIStarknetProvider extends APIProvider {
     return {};
   };
 
-  submitOrder = async (product, side, price, baseAmount, quoteAmount) => {
+  submitOrder = async (market, side, price, baseAmount, quoteAmount) => {
     // check allowance first
-    const baseCurrency = product.split("-")[0];
-    const quoteCurrency = product.split("-")[1];
+    const baseCurrency = market.split("-")[0];
+    const quoteCurrency = market.split("-")[1];
     const sellCurrency = side === "s" ? baseCurrency : quoteCurrency;
     const tokenAddress =
       this.api.currencies[sellCurrency].chain[this.network].contractAddress;
@@ -50,29 +50,32 @@ export default class APIStarknetProvider extends APIProvider {
     }
     toast.dismiss(allowancesToast);
 
-    if(!baseAmount && quoteAmount) {
+    if (!baseAmount && quoteAmount) {
       baseAmount = quoteAmount / price;
     }
-    const expiration = Date.now() + 86400;    
-    const orderhash = this._createOrderHash(
-      product,
+    const expiration = Date.now() + 86400;
+    const domainPrefix = this._createStarkNetDomainHash();
+    const order = this._createOrderHash(
+      market,
       side,
       price,
       amount,
       expiration
     );
+    const ZZMessage = _createZZMessageHash(
+      domainPrefix,
+      order
+    );
+
     const keypair = starknet.ec.ec.keyFromPrivate(
       localStorage.getItem("starknet:privkey"),
       "hex"
     );
-    const sig = starknet.ec.sign(keypair, orderhash.hash);
+    const sig = starknet.ec.sign(keypair, ZZMessage.hash);
 
-    const starknetOrder = [
-      ...orderhash.order,
-      sig.r.toString(),
-      sig.s.toString(),
-    ];
-    this.api.send("submitorder", [this.network, starknetOrder]);
+    ZZMessage.push(sig.r.toString(), sig.s.toString());
+
+    this.api.send("submitorder2", [this.network, market, ZZMessage]);
   };
 
   signIn = async () => {
@@ -277,48 +280,73 @@ export default class APIStarknetProvider extends APIProvider {
     });
   };
 
-  _createOrderHash = (product, side, price, amount, expiration) => {
-    const baseCurrency = product.split("-")[0];
-    const quoteCurrency = product.split("-")[1];
+  _createStarkNetDomainHash = () => {
+    const name = "zigzag.exchange";
+    const veriosn = 1;
+    const chianId = "SN_GOERLI";
+
+    let orderhash = starknet.hash.pedersen(name);
+    orderhash = starknet.hash.pedersen([orderhash, veriosn]);
+    orderhash = starknet.hash.pedersen([orderhash, chianId]);
+
+    const starkNet_Domain = [
+      name,
+      veriosn,
+      chianId
+    ]
+    return { hash: orderhash, starkNet_Domain: starkNet_Domain };
+  }
+
+  _createOrderHash = (market, side, price, amount, expiration) => {
+    const [baseCurrency, quoteCurrency] = market.split("-");
     const baseAsset =
       this.api.currencies[baseCurrency].chain[this.network].contractAddress;
     const quoteAsset =
       this.api.currencies[quoteCurrency].chain[this.network].contractAddress;
-    const decimalDifference =
-      this.api.currencies[baseCurrency].decimals -
-      this.api.currencies[quoteCurrency].decimals;
-    let priceNumerator, priceDenominator;
-    if (product === "ETH-USDT" || product === "ETH-USDC") {
-      priceNumerator = "1";
-      priceDenominator = ((1 / price) * 10 ** decimalDifference).toFixed(0);
+    const getFraction = (decimals) => {
+      let denominator = 1;
+      for (; (decimals * denominator) % 1 !== 0; denominator++);
+      return { numerator: decimals * denominator, denominator }
     }
+    const priceRatio = getFraction(price);
     const sideInt = side === "b" ? 0 : 1;
     const baseQuantityInt = (
       amount *
       10 ** this.api.currencies[baseCurrency].decimals
     ).toFixed(0);
-    let orderhash = starknet.hash.pedersen([
-      this.network,
-      this._accountState.address,
-    ]);
-    orderhash = starknet.hash.pedersen([orderhash, baseAsset]);
+    let orderhash = starknet.hash.pedersen(baseAsset);
     orderhash = starknet.hash.pedersen([orderhash, quoteAsset]);
     orderhash = starknet.hash.pedersen([orderhash, sideInt]);
     orderhash = starknet.hash.pedersen([orderhash, baseQuantityInt]);
-    orderhash = starknet.hash.pedersen([orderhash, priceNumerator]);
-    orderhash = starknet.hash.pedersen([orderhash, priceDenominator]);
+    orderhash = starknet.hash.pedersen([orderhash, priceRatio.numerator]);
+    orderhash = starknet.hash.pedersen([orderhash, priceRatio.denominator]);
     orderhash = starknet.hash.pedersen([orderhash, expiration]);
     const starknetOrder = [
-      this.network.toString(),
-      this._accountState.address,
       baseAsset,
       quoteAsset,
       sideInt.toString(),
       baseQuantityInt.toString(),
-      priceNumerator,
-      priceDenominator,
+      priceRatio.numerator.toString(),
+      priceRatio.denominator.toString(),
       expiration.toString(),
     ];
     return { hash: orderhash, order: starknetOrder };
   };
+
+  _createZZMessageHash = (domainPrefix, order) => {
+    const sender = this._accountState.address;
+
+    let orderhash = starknet.hash.pedersen("StarkNet Message"); // message_prefix
+    orderhash = starknet.hash.pedersen([orderhash, domainPrefix.hash]);
+    orderhash = starknet.hash.pedersen([orderhash, sender]);
+    orderhash = starknet.hash.pedersen([orderhash, order.hash]);
+
+    const ZZMessage = [
+      "StarkNet Message",
+      ...domainPrefix.starkNet_Domain,
+      sender,
+      ...order.order
+    ]
+    return { hash: orderhash, ZZMessage: ZZMessage };
+  }
 }
