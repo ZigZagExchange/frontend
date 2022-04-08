@@ -170,7 +170,7 @@ const Bridge = () => {
 
   const setNormalWithdrawFees = (setFee, details) => {
     api.withdrawL2GasFee(details.currency)
-      .then(({feeToken, amount}) => {
+      .then(({amount, feeToken}) => {
         setFee(amount, feeToken)
       })
       .catch(err => {
