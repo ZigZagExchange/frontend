@@ -440,7 +440,8 @@ const Bridge = () => {
                 className={cx("bg_btn", {
                   zig_disabled: 
                     formErr.length > 0 ||
-                    Number(swapDetails.amount) === 0,
+                    Number(swapDetails.amount) === 0 ||
+                    swapDetails.currency === "ETH"
                   })}
                 text="APPROVE"
                 style={{marginBottom: 10}}
