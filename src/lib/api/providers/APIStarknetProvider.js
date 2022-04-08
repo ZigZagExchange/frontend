@@ -70,9 +70,9 @@ export default class APIStarknetProvider extends APIProvider {
     );
     const sig = starknet.ec.sign(keypair, ZZMessage.hash);
 
-    ZZMessage.push(sig.r.toString(), sig.s.toString());
+    ZZMessage.message.push(sig.r.toString(), sig.s.toString());
 
-    this.api.send("submitorder2", [this.network, market, ZZMessage]);
+    this.api.send("submitorder2", [this.network, market, ZZMessage.message]);
   };
 
   signIn = async () => {
@@ -379,6 +379,6 @@ export default class APIStarknetProvider extends APIProvider {
       sender,
       ...order.order
     ]
-    return { hash: orderhash, ZZMessage: ZZMessage };
+    return { hash: orderhash, message: ZZMessage };
   }
 }
