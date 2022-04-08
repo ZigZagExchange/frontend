@@ -1,5 +1,10 @@
 import React, {useEffect, useState} from 'react'
+import {
+  constants as ethersConstants,
+  utils as ethersUtils
+} from 'ethers';
 import {useSelector} from "react-redux";
+import isEmpty from "lodash/isEmpty";
 import {SwapButton, Button, useCoinEstimator} from 'components'
 import {
   networkSelector,
@@ -8,7 +13,6 @@ import {
 import Loader from "react-loader-spinner"
 import {userSelector} from "lib/store/features/auth/authSlice";
 import api from 'lib/api';
-import {MAX_ALLOWANCE} from 'lib/api/constants';
 import {formatUSD} from 'lib/utils';
 import cx from 'classnames';
 import {BiError} from 'react-icons/bi';
@@ -39,6 +43,9 @@ const Bridge = () => {
   const network = useSelector(networkSelector);
   const [transfer, setTransfer] = useState(defaultTransfer);
   const [swapDetails, _setSwapDetails] = useState(() => ({amount: '', currency: 'ETH'}));
+  const [swapCurrencyInfo, setSwapCurrencyInfo] = useState({decimals: 0});
+  const [allowance, setAllowance] = useState(ethersConstants.Zero);
+  const [hasAllowance, setHasAllowance] = useState(false);
   const coinEstimator = useCoinEstimator()
   const currencyValue = coinEstimator(swapDetails.currency)
   const activationFee = parseFloat((user.address && !user.id ? (15 / currencyValue) : 0).toFixed(5))
@@ -56,9 +63,24 @@ const Bridge = () => {
 
   const balances = transfer.type === 'deposit' ? walletBalances : zkBalances
   const altBalances = transfer.type === 'deposit' ? zkBalances : walletBalances
-  const hasAllowance = balances[swapDetails.currency] && balances[swapDetails.currency].allowance.gte(MAX_ALLOWANCE.div(3))
   const hasError = formErr && formErr.length > 0
   const isSwapAmountEmpty = swapDetails.amount === ""
+
+  useEffect(() => {
+    if (isEmpty(balances) || !swapDetails.currency || swapDetails.currency === "ETH") {
+      return;
+    }
+    const swapCurrencyInfo = api.getCurrencyInfo(swapDetails.currency);
+    setSwapCurrencyInfo(swapCurrencyInfo);
+
+    const swapAmountBN = ethersUtils.parseUnits(
+      isSwapAmountEmpty ? '0.0' : swapDetails.amount,
+      swapCurrencyInfo.decimals
+    );
+    const allowanceBN = balances[swapDetails.currency]?.allowance ?? ethersConstants.Zero;
+    setAllowance(allowanceBN);
+    setHasAllowance(allowanceBN.gte(swapAmountBN));
+  }, [balances, swapDetails, isSwapAmountEmpty]);
 
   useEffect(() => {
     if (user.address) {
@@ -92,10 +114,13 @@ const Bridge = () => {
   }, [transfer.type])
 
   const validateInput = (inputValue, swapCurrency) => {
-    const swapCurrencyInfo = api.getCurrencyInfo(swapCurrency);
-    const bals = transfer.type === 'deposit' ? walletBalances : zkBalances
-    const getCurrencyBalance = (cur) => (bals[cur] && bals[cur].value / (10**swapCurrencyInfo.decimals));
-    const detailBalance = getCurrencyBalance(swapCurrency)
+    if (isSwapAmountEmpty) {
+      return true;
+    }
+    const getCurrencyBalance = (_currency) => (balances[_currency]?.value / (10**swapCurrencyInfo.decimals));
+
+    const detailBalance = getCurrencyBalance(swapCurrency);
+
     let error = null
 
     if (inputValue > 0) {
@@ -138,8 +163,7 @@ const Bridge = () => {
   }
 
   const validateFees = (inputValue, bridgeFee, feeToken) => {
-    const bals = transfer.type === 'deposit' ? walletBalances : zkBalances
-    const feeTokenBalance = parseFloat(bals[feeToken] && bals[feeToken].valueReadable) || 0
+    const feeTokenBalance = parseFloat(balances[feeToken] && balances[feeToken].valueReadable) || 0
 
     if (
       inputValue > 0 &&
@@ -299,6 +323,15 @@ const Bridge = () => {
               <h5>Estimated value</h5>
               <span>~${formatUSD(estimatedValue)}</span>
             </div>
+            {swapDetails.currency !== "ETH" ? (
+              <div className="bridge_coin_stat">
+                <h5>Available allowance</h5>
+                <span>
+                    {ethersUtils.formatUnits(allowance, swapCurrencyInfo.decimals)}
+                  {` ${swapDetails.currency}`}
+                  </span>
+              </div>
+            ): null}
             <div className="bridge_coin_stat">
               <h5>Available balance</h5>
               <span>
@@ -395,7 +428,11 @@ const Bridge = () => {
             {user.address && <>
               {balances[swapDetails.currency] && !hasAllowance && <Button
                 loading={isApproving}
-                className={cx("bg_btn", {zig_disabled: formErr.length > 0 || swapDetails.amount == 0,})}
+                className={cx("bg_btn", {
+                  zig_disabled: 
+                    formErr.length > 0 ||
+                    Number(swapDetails.amount) === 0,
+                  })}
                 text="APPROVE"
                 style={{marginBottom: 10}}
                 onClick={approveSpend}
@@ -409,7 +446,12 @@ const Bridge = () => {
 
               {!hasError && <Button
                 loading={loading}
-                className={cx("bg_btn", {zig_disabled: (L2Fee === null && L1Fee === null) || !hasAllowance || swapDetails.amount == 0})}
+                className={cx("bg_btn", {
+                  zig_disabled: 
+                    (L2Fee === null && L1Fee === null) ||
+                    !hasAllowance ||
+                    Number(swapDetails.amount) === 0
+                  })}
                 text="TRANSFER"
                 icon={<MdSwapCalls/>}
                 onClick={doTransfer}
