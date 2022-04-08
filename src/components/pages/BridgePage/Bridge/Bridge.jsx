@@ -120,13 +120,10 @@ const Bridge = () => {
   }, [transfer.type])
 
   const validateInput = (inputValue, swapCurrency) => {
-    if (isSwapAmountEmpty) {
-      return true;
-    }
-    const getCurrencyBalance = (_currency) => (balances[_currency]?.value / (10**swapCurrencyInfo.decimals));
-
-    const detailBalance = getCurrencyBalance(swapCurrency);
-
+    const swapCurrencyInfo = api.getCurrencyInfo(swapCurrency);
+    const bals = transfer.type === 'deposit' ? walletBalances : zkBalances
+    const getCurrencyBalance = (cur) => (bals[cur] && bals[cur].value / (10**swapCurrencyInfo.decimals));
+    const detailBalance = getCurrencyBalance(swapCurrency)
     let error = null
 
     if (inputValue > 0) {
@@ -169,7 +166,8 @@ const Bridge = () => {
   }
 
   const validateFees = (inputValue, bridgeFee, feeToken) => {
-    const feeTokenBalance = parseFloat(balances[feeToken] && balances[feeToken].valueReadable) || 0
+    const bals = transfer.type === 'deposit' ? walletBalances : zkBalances
+    const feeTokenBalance = parseFloat(bals[feeToken] && bals[feeToken].valueReadable) || 0
 
     if (
       inputValue > 0 &&
