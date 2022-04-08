@@ -2,7 +2,7 @@ import Web3 from "web3";
 import { createIcon } from "@download/blockies";
 import Web3Modal from "web3modal";
 import Emitter from "tiny-emitter";
-import { ethers } from "ethers";
+import { ethers, constants as ethersConstants } from "ethers";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import { getENSName } from "lib/ens";
 import { formatAmount } from "lib/utils";
@@ -382,7 +382,7 @@ export default class API extends Emitter {
 
   getBalanceOfCurrency = async (currency) => {
     const currencyInfo = this.getCurrencyInfo(currency);
-    let result = { balance: 0, allowance: MAX_ALLOWANCE };
+    let result = { balance: 0, allowance: ethersConstants.Zero };
     if (!this.ethersProvider || !currencyInfo) return result;
 
     try {
