@@ -328,11 +328,11 @@ export default class API extends Emitter {
   };
 
   withdrawL2Normal = async (amount, token) => {
-    return await this.apiProvider.withdrawL2Normal(amount, token);
+    return this.apiProvider.withdrawL2Normal(amount, token);
   };
 
   withdrawL2Fast = (amount, token) => {
-    return await this.apiProvider.withdrawL2Fast(amount, token);
+    return this.apiProvider.withdrawL2Fast(amount, token);
   };
 
   depositL2Fee = async (token) => {
