@@ -56,16 +56,18 @@ const BridgeSwapInput = ({ value = {}, onChange, balances = {}, gasFee, bridgeFe
   const setAmount = useCallback(e => onChange({ amount: e.target.value.replace(/[^0-9.]/g,'') }), [onChange])
 
   const setMax = () => {
-    let max;
+    let max = 0;
     try {
       const currencyInfo = api.getCurrencyInfo(value.currency);
       const roundedDecimalDigits = Math.min(currencyInfo.decimals, 8);
       let balance = balances[value.currency].value / (10 ** currencyInfo.decimals);
-      if (feeCurrency === value.currency) {
-        balance -= (bridgeFee + gasFee);
+      if (balance !== 0) {
+        if (feeCurrency === value.currency) {
+          balance -= (bridgeFee + gasFee);
+        }
+        // one number to protect against overflow
+        max = Math.round(balance * 10**roundedDecimalDigits - 1) / 10**roundedDecimalDigits;
       }
-      // one number to protect against overflow 
-      max = Math.round(balance * 10**roundedDecimalDigits - 1) / 10**roundedDecimalDigits;
     } catch (e) {
       max = parseFloat((balances[value.currency] && balances[value.currency].valueReadable) || 0)
     }
