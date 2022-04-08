@@ -1,5 +1,5 @@
 import React from "react";
-import { FaPlus, FaArrowRight } from "react-icons/fa";
+import { FaPlus, FaCaretRight } from "react-icons/fa";
 import styled from "styled-components";
 import Button from "./Button";
 import { scales, variants } from "./types";
@@ -35,7 +35,7 @@ const ButtonDemo = () => {
             <Button startIcon={<FaPlus/>} variant="primary" scale="imd" mr="8px">
                 CONNECT WALLET
             </Button>
-            <Button endIcon={<FaArrowRight/>} variant="primary" scale="imd" mr="8px">
+            <Button endIcon={<FaCaretRight/>} variant="primary" scale="imd" mr="8px">
                 CONNECT WALLET
             </Button>
         </Row>
