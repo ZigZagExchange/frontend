@@ -94,7 +94,7 @@ const Bridge = () => {
     api.apiProvider.eligibleFastWithdrawTokens.includes(swapDetails.currency);
 
   const balances = getBalances(fromNetwork.from.key);
-  const altBalances = getBalances(toNetwork.from.key);
+  const altBalances = getBalances(toNetwork.key);
   const hasAllowance =
     balances[swapDetails.currency] &&
     balances[swapDetails.currency].allowance.gte(MAX_ALLOWANCE.div(3));
