@@ -71,6 +71,7 @@ const Bridge = () => {
     if (swapDetails.currency === "ETH") {
       setAllowance(MAX_ALLOWANCE);
       setHasAllowance(true);
+      return;
     }
     if (isEmpty(balances) || !swapDetails.currency) {
       return;
