@@ -93,7 +93,7 @@ const Bridge = () => {
     transfer.type === "withdraw" &&
     api.apiProvider.eligibleFastWithdrawTokens.includes(swapDetails.currency);
 
-  const balance = this.getBalances(fromNetwork.from.key);
+  const balances = this.getBalances(fromNetwork.from.key);
   const altBalances = this.getBalances(toNetwork.from.key);
   const hasAllowance =
     balances[swapDetails.currency] &&
@@ -135,8 +135,10 @@ const Bridge = () => {
   const validateInput = (inputValue, swapCurrency) => {
     const swapCurrencyInfo = api.getCurrencyInfo(swapCurrency);
     const balance = this.getBalances(fromNetwork.from.key);
-    if (balance.length === 0) return false;
+    if (balance.length === 0) return false;    
+    const feeTokenBalance = parseFloat(balance[feeToken] && balance[feeToken].value / (10 ** feeCurrencyInfo.decimals))
     const getCurrencyBalance = (cur) => (balance[cur] && balance[cur].value / (10 ** swapCurrencyInfo.decimals));
+    const detailBalance = getCurrencyBalance(swapCurrency);
 
     let error = null;
     if (inputValue > 0) {
@@ -161,9 +163,7 @@ const Bridge = () => {
             error = "Amount too small";
           }
         }
-      }
-
-      if (L2FeeToken === swapCurrency) {
+      } else if (L2FeeToken === swapCurrency) {
         if ((inputValue + L2Fee) > detailBalance) {
           error = "Insufficient balance for fees";
         }
