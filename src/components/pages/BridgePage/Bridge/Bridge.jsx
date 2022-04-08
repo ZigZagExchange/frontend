@@ -26,6 +26,7 @@ import L2Header from "./L2Header";
 import L1Header from "./L1Header";
 import FastWithdrawTooltip from "./FastWithdrawTooltip";
 import { formatPrice } from "lib/utils";
+import {MAX_ALLOWANCE} from 'lib/api/constants';
 
 const defaultTransfer = {
   type: "deposit",
@@ -77,7 +78,9 @@ const Bridge = () => {
       isSwapAmountEmpty ? '0.0' : swapDetails.amount,
       swapCurrencyInfo.decimals
     );
-    const allowanceBN = balances[swapDetails.currency]?.allowance ?? ethersConstants.Zero;
+    const allowanceBN = (swapDetails.currency === 'ETH')
+      ? MAX_ALLOWANCE
+      : balances[swapDetails.currency]?.allowance ?? ethersConstants.Zero;      
     setAllowance(allowanceBN);
     setHasAllowance(allowanceBN.gte(swapAmountBN));
   }, [balances, swapDetails, isSwapAmountEmpty]);
