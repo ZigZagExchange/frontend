@@ -135,8 +135,7 @@ const Bridge = () => {
   const validateInput = (inputValue, swapCurrency) => {
     const swapCurrencyInfo = api.getCurrencyInfo(swapCurrency);
     const balance = this.getBalances(fromNetwork.from.key);
-    if (balance.length === 0) return false;    
-    const feeTokenBalance = parseFloat(balance[feeToken] && balance[feeToken].value / (10 ** feeCurrencyInfo.decimals))
+    if (balance.length === 0) return false;
     const getCurrencyBalance = (cur) => (balance[cur] && balance[cur].value / (10 ** swapCurrencyInfo.decimals));
     const detailBalance = getCurrencyBalance(swapCurrency);
 
