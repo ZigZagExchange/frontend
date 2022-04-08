@@ -4,6 +4,7 @@ import {
   utils as ethersUtils
 } from 'ethers';
 import {useSelector} from "react-redux";
+import isEmpty from "lodash/isEmpty";
 import {SwapButton, Button, useCoinEstimator} from 'components'
 import {
   networkSelector,
@@ -65,7 +66,7 @@ const Bridge = () => {
   const isSwapAmountEmpty = swapDetails.amount === ""
 
   useEffect(() => {
-    if (swapDetails.currency === "ETH") {
+    if (isEmpty(balances) || !swapDetails.currency || swapDetails.currency === "ETH") {
       return;
     }
     const swapCurrencyInfo = api.getCurrencyInfo(swapDetails.currency);
@@ -75,7 +76,7 @@ const Bridge = () => {
       isSwapAmountEmpty ? '0.0' : swapDetails.amount,
       swapCurrencyInfo.decimals
     );
-    const allowanceBN = balances[swapDetails.currency]?.allowance;
+    const allowanceBN = balances[swapDetails.currency]?.allowance ?? ethersConstants.Zero;
     setAllowance(allowanceBN);
     setHasAllowance(allowanceBN.gte(swapAmountBN));
   }, [balances, swapDetails, isSwapAmountEmpty]);
@@ -423,7 +424,7 @@ const Bridge = () => {
             {user.address && <>
               {balances[swapDetails.currency] && !hasAllowance && <Button
                 loading={isApproving}
-                className={cx("bg_btn", {zig_disabled: formErr.length > 0 || swapDetails.amount == 0,})}
+                className={cx("bg_btn", {zig_disabled: formErr.length > 0 || swapDetails.amount === 0,})}
                 text="APPROVE"
                 style={{marginBottom: 10}}
                 onClick={approveSpend}
@@ -437,7 +438,7 @@ const Bridge = () => {
 
               {!hasError && <Button
                 loading={loading}
-                className={cx("bg_btn", {zig_disabled: (L2Fee === null && L1Fee === null) || !hasAllowance || swapDetails.amount == 0})}
+                className={cx("bg_btn", {zig_disabled: (L2Fee === null && L1Fee === null) || !hasAllowance || swapDetails.amount === 0})}
                 text="TRANSFER"
                 icon={<MdSwapCalls/>}
                 onClick={doTransfer}
