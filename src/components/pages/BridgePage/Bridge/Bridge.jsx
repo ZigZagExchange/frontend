@@ -93,8 +93,8 @@ const Bridge = () => {
     transfer.type === "withdraw" &&
     api.apiProvider.eligibleFastWithdrawTokens.includes(swapDetails.currency);
 
-  const balances = fromNetwork.from.key==='ethereum' ? walletBalances : fromNetwork.from.key==='zksync'? zkBalances: polygonBalances;
-  const altBalances = toNetwork.key==='ethereum' ? walletBalances : toNetwork.key==='zksync'? zkBalances: polygonBalances;
+  const balance = this.getBalances(fromNetwork.from.key);
+  const altBalances = this.getBalances(toNetwork.from.key);
   const hasAllowance =
     balances[swapDetails.currency] &&
     balances[swapDetails.currency].allowance.gte(MAX_ALLOWANCE.div(3));
@@ -134,19 +134,11 @@ const Bridge = () => {
 
   const validateInput = (inputValue, swapCurrency) => {
     const swapCurrencyInfo = api.getCurrencyInfo(swapCurrency);
-    let balance;
+    const balance = this.getBalances(fromNetwork.from.key);
+    if (balance.length === 0) return false;
+    const getCurrencyBalance = (cur) => (balance[cur] && balance[cur].value / (10 ** swapCurrencyInfo.decimals));
+
     let error = null;
-    if (fromNetwork.from.network === "Polygon") {
-      balance = polygonBalances;
-    } else if (fromNetwork.from.network === "Ethereum") {
-      balance = walletBalances;
-    } else if (fromNetwork.from.network === "zkSync") {
-      balance = zkBalances;
-    } else {
-      error = "Bad Network";
-    }
-    const getCurrencyBalance = (cur) => (balance[cur] && balance[cur].value / (10**swapCurrencyInfo.decimals));
-    
     if (inputValue > 0) {
       if (inputValue <= activationFee) {
         error = `Must be more than ${activationFee} ${swapCurrency}`
@@ -191,8 +183,10 @@ const Bridge = () => {
   };
 
   const validateFees = (inputValue, bridgeFee, feeToken) => {
-    const bals = transfer.type === 'deposit' ? walletBalances : zkBalances
-    const feeTokenBalance = parseFloat(bals[feeToken] && bals[feeToken].valueReadable) || 0
+    const feeCurrencyInfo = api.getCurrencyInfo(feeToken);
+    const balance = this.getBalances(fromNetwork.from.key);
+    if (balance.length === 0) return false;
+    const feeTokenBalance = parseFloat(balance[feeToken] && balance[feeToken].value / (10 ** feeCurrencyInfo.decimals))
 
     if (
       inputValue > 0 &&
@@ -347,6 +341,20 @@ const Bridge = () => {
       });
   };
 
+  const getBalances = (network) => {
+    let balances = [];
+    let error = null;
+    if (network === "polygon") {
+      balances = polygonBalances;
+    } else if (network === "ethereum") {
+      balances = walletBalances;
+    } else if (network === "zksync") {
+      balances = zkBalances;
+    } else {
+      error = setFormErr("Bad Network");
+    }
+    return balances;
+  }
 
   const onSelectFromNetwork = ({ key }) => {
     const f = Networks.find((i) => i.from.key === key)
