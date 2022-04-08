@@ -371,9 +371,12 @@ const Bridge = () => {
                   Bridge Fee: {L1Fee.toPrecision(4)} {swapDetails.currency}
                 </div>}
                 <x.div color={"blue-gray-300"}>
-                  You'll receive: ~{isFastWithdraw && L1Fee
-                  ? Number(swapDetails.amount - L1Fee).toPrecision(4)
-                  : Number(swapDetails.amount).toPrecision(4)}
+                  You'll receive: ~{                  
+                    Number(swapDetails.amount
+                      - (L1Fee ? Number(L1Fee) : 0)
+                      - (L2Fee ? Number(L2Fee) : 0)
+                    ).toPrecision(4)
+                  }
                   {" " + swapDetails.currency} on L1
                 </x.div>
               </x.div>}
