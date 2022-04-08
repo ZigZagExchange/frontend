@@ -70,7 +70,7 @@ const Bridge = () => {
   useEffect(() => {
     if (swapDetails.currency === "ETH") {
       setAllowance(MAX_ALLOWANCE);
-      setHasAllowance(allowanceBN.gte(swapAmountBN));
+      setHasAllowance(true);
     }
     if (isEmpty(balances) || !swapDetails.currency) {
       return;
