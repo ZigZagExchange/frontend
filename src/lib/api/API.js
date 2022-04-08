@@ -18,13 +18,12 @@ export default class API extends Emitter {
   ws = null;
   apiProvider = null;
   ethersProvider = null;
-  currencies = null;
   marketInfo = {};
   lastprices = {};
   _signInProgress = null;
   _profiles = {};
 
-  constructor({ infuraId, networks, currencies, validMarkets }) {
+  constructor({ infuraId, networks }) {
     super();
 
     if (networks) {
@@ -38,8 +37,6 @@ export default class API extends Emitter {
     }
 
     this.infuraId = infuraId;
-    this.currencies = currencies;
-    this.validMarkets = validMarkets;
 
     if (window.ethereum) {
       window.ethereum.on("accountsChanged", this.signOut);
