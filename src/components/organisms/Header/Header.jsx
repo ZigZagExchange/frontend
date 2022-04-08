@@ -75,7 +75,7 @@ export const Header = (props) => {
           <div className="mb_header_container mb_h">
             <img src={logo} alt="logo" />
             <div className="head_left">
-              <ul>
+              <ul className="flex-column mt-4">
                 <li>
                   <NavLink exact to="/" activeClassName="active_link">
                     Trade
@@ -88,6 +88,11 @@ export const Header = (props) => {
                     </NavLink>
                   </li>
                 )}
+                <li>
+                  <NavLink exact to="/list-pair" activeClassName="active_link">
+                    List Pair
+                  </NavLink>
+                </li>
                 {hasBridge && (
                   <li>
                     <a
@@ -99,11 +104,7 @@ export const Header = (props) => {
                     </a>
                   </li>
                 )}
-                <li>
-                  <NavLink exact to="/list-pair" activeClassName="active_link">
-                    List Pair
-                  </NavLink>
-                </li>
+                
                 <Dev>
                   <li>
                     <NavLink exact to="/pool" activeClassName="active_link">
@@ -128,7 +129,7 @@ export const Header = (props) => {
                 {user.id && user.address ? (
                   <Dropdown overlay={dropdownMenu}>
                     <button className="address_button">
-                      {user.address.slice(0, 6)}...
+                      {user.address.slice(0, 8)}···
                       {user.address.slice(-4)}
                     </button>
                   </Dropdown>
@@ -136,7 +137,7 @@ export const Header = (props) => {
                   <ConnectWalletButton />
                 )}
               </div>
-              <div className="eu_text">
+              <div className="eu_text mt-3">
                 <GoGlobe className="eu_network" />
                 <select
                   value={network.toString()}
@@ -151,6 +152,37 @@ export const Header = (props) => {
                   <option value="1000">zkSync - Rinkeby</option>
                 </select>
                 <BiChevronDown className="eu_caret" />
+              </div>
+              <div className="head_left head_left_socials">
+                <ul>
+                  <li className="head_social_link">
+                    <a
+                      target="_blank"
+                      rel="noreferrer"
+                      href="https://discord.gg/zigzag"
+                    >
+                      <FaDiscord />
+                    </a>
+                  </li>
+                  <li className="head_social_link">
+                    <a
+                      target="_blank"
+                      rel="noreferrer"
+                      href="https://twitter.com/ZigZagExchange"
+                    >
+                      <FaTwitter />
+                    </a>
+                  </li>
+                  <li className="head_social_link">
+                    <a
+                      target="_blank"
+                      rel="noreferrer"
+                      href="https://t.me/zigzagexchange"
+                    >
+                      <FaTelegramPlane />
+                    </a>
+                  </li>
+                </ul>
               </div>
             </div>
           </div>

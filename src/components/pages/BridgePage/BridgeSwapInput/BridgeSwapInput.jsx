@@ -1,6 +1,7 @@
 import React, { useCallback } from "react";
 import styled from "@xstyled/styled-components";
 import BridgeCurrencySelector from "../BridgeCurrencySelector/BridgeCurrencySelector";
+import api from "lib/api";
 
 const BridgeInputBox = styled.div`
   display: flex;
@@ -50,31 +51,26 @@ const BridgeInputBox = styled.div`
   }
 `;
 
-const BridgeSwapInput = ({ value = {}, onChange, bridgeFee, balances = {}, feeCurrency }) => {
+const BridgeSwapInput = ({ value = {}, onChange, balances = {}, gasFee, bridgeFee, feeCurrency }) => {
   const setCurrency = useCallback(currency => onChange({ currency, amount: '' }), [onChange])
   const setAmount = useCallback(e => onChange({ amount: e.target.value.replace(/[^0-9.]/g,'') }), [onChange])
 
   const setMax = () => {
     let max;
-    console.log(balances[value.currency]);
     try {
-        const integerValue = balances[value.currency].valueReadable.split('.')[0];
-        let integerDigits = 0;
-        if (integerValue !== '0') {
-            integerDigits = integerValue.length;
-        }
-        const decimalDigits = balances[value.currency].value.length - integerDigits;
-        console.log(integerDigits, decimalDigits);
-        max = balances[value.currency].value / (10 ** decimalDigits);
-        max = Math.floor(max * 10**8) / 10**8; // 8 decimal places max
+      const currencyInfo = api.getCurrencyInfo(value.currency);
+      const roundedDecimalDigits = Math.min(currencyInfo.decimals, 8);
+      let balance = balances[value.currency].value / (10 ** currencyInfo.decimals);
+      if (feeCurrency === value.currency) {
+        balance -= (bridgeFee + gasFee);
+      }
+      // one number to protect against overflow 
+      max = Math.round(balance * 10**roundedDecimalDigits - 1) / 10**roundedDecimalDigits;
     } catch (e) {
-        max = parseFloat((balances[value.currency] && balances[value.currency].valueReadable) || 0)
-    }
-    if (feeCurrency === value.currency) {
-      max -= parseFloat(bridgeFee)
+      max = parseFloat((balances[value.currency] && balances[value.currency].valueReadable) || 0)
     }
 
-    onChange({amount: max})
+    onChange({ amount: max })
   }
 
   return (

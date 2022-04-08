@@ -127,24 +127,29 @@ const Bridge = () => {
   }, [transfer.type]);
 
   const validateInput = (inputValue, swapCurrency) => {
-    let bals = transfer.type === "deposit" ? walletBalances : zkBalances;
-    if(fromNetwork.from.network === "Polygon") {
-      bals = polygonBalances;
-    }
-    const getCurrencyBalance = (cur) =>
-      parseFloat(bals[cur] && bals[cur].valueReadable) || 0;
-    const detailBalance = getCurrencyBalance(swapCurrency);
+    const swapCurrencyInfo = api.getCurrencyInfo(swapCurrency);
+    let balance;
     let error = null;
-
+    if (fromNetwork.from.network === "Polygon") {
+      balance = polygonBalances;
+    } else if (fromNetwork.from.network === "Ethereum") {
+      balance = walletBalances;
+    } else if (fromNetwork.from.network === "zkSync") {
+      balance = zkBalances;
+    } else {
+      error = "Bad Network";
+    }
+    const getCurrencyBalance = (cur) => (balance[cur] && balance[cur].value / (10**swapCurrencyInfo.decimals));
+    
     if (inputValue > 0) {
       if (inputValue <= activationFee) {
-        error = `Must be more than ${activationFee} ${swapCurrency}`;
-      } else if (inputValue - L2Fee < 0) {
+        error = `Must be more than ${activationFee} ${swapCurrency}`
+      } else if (inputValue < L2Fee) {
         error = "Amount too small";
-      } else if (inputValue > detailBalance) {
+      } else if (inputValue >= detailBalance) {
         error = "Insufficient balance";
       } else if (isFastWithdraw) {
-        if (inputValue - L1Fee < 0) {
+        if (inputValue < L1Fee) {
           error = "Amount too small";
         }
 
@@ -154,19 +159,19 @@ const Bridge = () => {
             error = `Max ${swapCurrency} liquidity for fast withdraw: ${maxAmount.toPrecision(
               4
             )}`;
-          } else if (inputValue - (L2Fee + L1Fee) < 0) {
+          } else if (inputValue < (L2Fee + L1Fee)) {
             error = "Amount too small";
           }
         }
       }
 
       if (L2FeeToken === swapCurrency) {
-        if (detailBalance - (inputValue + L2Fee) < 0) {
+        if ((inputValue + L2Fee) > detailBalance) {
           error = "Insufficient balance for fees";
         }
       } else {
         const feeCurrencyBalance = getCurrencyBalance(L2FeeToken);
-        if (feeCurrencyBalance - L2Fee < 0) {
+        if (feeCurrencyBalance < L1Fee) {
           error = "Insufficient balance for fees";
         }
       }
@@ -179,14 +184,16 @@ const Bridge = () => {
     return true;
   };
 
-  const validateFees = (bridgeFee, feeToken) => {
-    const bals = transfer.type === "deposit" ? walletBalances : zkBalances;
-    const feeTokenBalance =
-      parseFloat(bals[feeToken] && bals[feeToken].valueReadable) || 0;
+  const validateFees = (inputValue, bridgeFee, feeToken) => {
+    const bals = transfer.type === 'deposit' ? walletBalances : zkBalances
+    const feeTokenBalance = parseFloat(bals[feeToken] && bals[feeToken].valueReadable) || 0
 
-    if (bridgeFee > feeTokenBalance) {
-      setFormErr("Not enough balance to pay for fees");
-      return false;
+    if (
+      inputValue > 0 &&
+      bridgeFee > feeTokenBalance
+    ) {
+      setFormErr("Not enough balance to pay for fees")
+      return false
     }
     return true;
   };
@@ -226,11 +233,11 @@ const Bridge = () => {
   };
 
   const setDepositFee = (setFee, details) => {
-    api.depositL2Fee(details.currency).then((res) => {
-      setFee(res);
-      setL1Fee(null);
-    });
-  };
+      api.depositL2Fee(details.currency).then(res => {
+        setFee(null, null)
+        setL1Fee(res.amount)
+      })
+  }
 
   const setSwapDetails = (values) => {
     const details = {
@@ -241,11 +248,11 @@ const Bridge = () => {
     _setSwapDetails(details);
 
     const setFee = (bridgeFee, feeToken) => {
-      setL2Fee(bridgeFee);
-      setL2FeeToken(feeToken);
-      const input = parseFloat(details.amount) || 0;
-      const isInputValid = validateInput(input, details.currency, feeToken);
-      const isFeesValid = validateFees(bridgeFee, feeToken);
+      setL2Fee(bridgeFee)
+      setL2FeeToken(feeToken)
+      const input = parseFloat(details.amount) || 0
+      const isInputValid = validateInput(input, details.currency)
+      const isFeesValid = validateFees(input, bridgeFee, feeToken)
       if (isFeesValid && isInputValid) {
         setFormErr("");
       }
@@ -365,6 +372,7 @@ const Bridge = () => {
             <L1Header networks={Networks} onSelect={onSelectFromNetwork} selectedNetwork={fromNetwork} />
           </div>
           <BridgeSwapInput
+            gasFee={L1Fee}
             bridgeFee={L2Fee}
             balances={balances}
             value={swapDetails}
@@ -508,7 +516,7 @@ const Bridge = () => {
                     loading={isApproving}
                     className={cx("bg_btn", {
                       zig_disabled:
-                        formErr.length > 0 || swapDetails.amount.length === 0,
+                        formErr.length > 0 || swapDetails.amount === 0,
                     })}
                     text="APPROVE"
                     style={{ marginBottom: 10 }}
@@ -529,9 +537,9 @@ const Bridge = () => {
                   //   loading={loading}
                   //   className={cx("bg_btn", {
                   //     zig_disabled:
-                  //       L2Fee === null ||
+                  //       (L2Fee === null && L1Fee === null) ||
                   //       !hasAllowance ||
-                  //       swapDetails.amount.length === 0,
+                  //       swapDetails.amount == 0,
                   //   })}
                   //   text="TRANSFER"
                   //   icon={<MdSwapCalls />}
