@@ -31,21 +31,27 @@ const defaultTransfer = {
 
 
 const Networks = [
-  { from: {
-    network: 'Ethereum',
-    key: 'ethereum',
-    icon: ethLogo,
-  }, to: [{network: 'zkSync', key: 'zksync', icon: zksyncLogo}] },
-  { from: {
-    network: 'zkSync',
-    key: 'zksync',
-    icon: zksyncLogo
-  }, to: [{network: 'Ethereum', key: 'ethereum', icon: ethLogo}, {network: 'Polygon', key: 'polygon', icon: polygonLogo}] },
-  { from: {
-    network: 'Polygon',
-    key: 'polygon',
-    icon: polygonLogo
-  }, to: [{network: 'zkSync', key: 'zksync', icon: zksyncLogo}] },
+  {
+    from: {
+      network: 'Ethereum',
+      key: 'ethereum',
+      icon: ethLogo,
+    }, to: [{ network: 'zkSync', key: 'zksync', icon: zksyncLogo }]
+  },
+  {
+    from: {
+      network: 'zkSync',
+      key: 'zksync',
+      icon: zksyncLogo
+    }, to: [{ network: 'Ethereum', key: 'ethereum', icon: ethLogo }, { network: 'Polygon', key: 'polygon', icon: polygonLogo }]
+  },
+  {
+    from: {
+      network: 'Polygon',
+      key: 'polygon',
+      icon: polygonLogo
+    }, to: [{ network: 'zkSync', key: 'zksync', icon: zksyncLogo }]
+  },
 ];
 
 const Bridge = () => {
@@ -193,7 +199,7 @@ const Bridge = () => {
       bridgeFee > feeTokenBalance
     ) {
       setFormErr("Not enough balance to pay for fees")
-      return false
+      return false;
     }
     return true;
   };
@@ -233,10 +239,10 @@ const Bridge = () => {
   };
 
   const setDepositFee = (setFee, details) => {
-      api.depositL2Fee(details.currency).then(res => {
-        setFee(null, null)
-        setL1Fee(res.amount)
-      })
+    api.depositL2Fee(details.currency).then(res => {
+      setFee(null, null)
+      setL1Fee(res.amount)
+    })
   }
 
   const setSwapDetails = (values) => {
@@ -275,7 +281,7 @@ const Bridge = () => {
   };
 
   const switchTransferType = (e) => {
-    const f = Networks.find(i=>i.from.key === toNetwork.key)
+    const f = Networks.find(i => i.from.key === toNetwork.key)
     setToNetwork(fromNetwork.from)
     setFromNetwork(f)
 
@@ -305,7 +311,7 @@ const Bridge = () => {
 
     setLoading(true);
 
-    if(fromNetwork.from.network === "Polygon") {
+    if (fromNetwork.from.network === "Polygon") {
       console.log("bridge polygon")
       deferredXfer = api.transferPolygonWeth(`${swapDetails.amount}`)
     } else {
@@ -343,20 +349,20 @@ const Bridge = () => {
 
 
   const onSelectFromNetwork = ({ key }) => {
-    const f = Networks.find((i)=> i.from.key===key)
-    if(f.from.key==='polygon') {
-      setSwapDetails({amount: '', currency: 'WETH'})
+    const f = Networks.find((i) => i.from.key === key)
+    if (f.from.key === 'polygon') {
+      setSwapDetails({ amount: '', currency: 'WETH' })
     }
     setFromNetwork(f)
     setToNetwork(f.to[0])
-   
+
   };
 
-  const onSelectToNetwork = ({key}) => {
-    const t=fromNetwork.to.find((i)=>i.key===key)
-    if(t.key==='polygon') {
-      api.getPolygonWethBalance().then(b=> {
-        setSwapDetails({amount: '', currency: 'WETH'})
+  const onSelectToNetwork = ({ key }) => {
+    const t = fromNetwork.to.find((i) => i.key === key)
+    if (t.key === 'polygon') {
+      api.getPolygonWethBalance().then(b => {
+        setSwapDetails({ amount: '', currency: 'WETH' })
       })
     }
     setToNetwork(t)
@@ -388,7 +394,7 @@ const Bridge = () => {
               <h5>Available balance</h5>
               <span>
                 {balances[swapDetails.currency] ?
-                  balances[swapDetails.currency].valueReadable: '0.00'}
+                  balances[swapDetails.currency].valueReadable : '0.00'}
                 {` ${swapDetails.currency}`}
               </span>
             </div>
@@ -414,7 +420,7 @@ const Bridge = () => {
               <h5>Available balance</h5>
               <span>
                 {altBalances[swapDetails.currency] ?
-                  altBalances[swapDetails.currency].valueReadable: '0.00'}
+                  altBalances[swapDetails.currency].valueReadable : '0.00'}
                 {` ${swapDetails.currency}`}
               </span>
             </div>
@@ -424,7 +430,7 @@ const Bridge = () => {
             display={"flex"}
             alignItems={"flex-end"}
           >
-            {fromNetwork.from.key==='zksync' && toNetwork.key==='ethereum' && (
+            {fromNetwork.from.key === 'zksync' && toNetwork.key === 'ethereum' && (
               <>
                 <RadioButtons
                   horizontal
