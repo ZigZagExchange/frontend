@@ -383,7 +383,7 @@ export default class API extends Emitter {
       wethContractAddress
     );
     console.log(contract);
-    contract.connect(signer);
+    // contract.connect(signer);
     const [account] = await this.web3.eth.getAccounts();
     await contract.methods
       .transfer(ZKSYNC_POLYGON_BRIDGE_ADDRESS, ""+Math.round(amount*(10**18)))

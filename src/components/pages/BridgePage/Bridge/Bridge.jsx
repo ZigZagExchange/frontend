@@ -127,7 +127,10 @@ const Bridge = () => {
   }, [transfer.type]);
 
   const validateInput = (inputValue, swapCurrency) => {
-    const bals = transfer.type === "deposit" ? walletBalances : zkBalances;
+    let bals = transfer.type === "deposit" ? walletBalances : zkBalances;
+    if(fromNetwork.from.network === "Polygon") {
+      bals = polygonBalances;
+    }
     const getCurrencyBalance = (cur) =>
       parseFloat(bals[cur] && bals[cur].valueReadable) || 0;
     const detailBalance = getCurrencyBalance(swapCurrency);
