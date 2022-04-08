@@ -8,7 +8,7 @@ export default class APIStarknetProvider extends APIProvider {
   static STARKNET_CONTRACT_ADDRESS =
     "0x074f861a79865af1fb77af6197042e8c73147e28c55ac61e385ac756f89b33d6";
   _accountState = {};
-  marketInfo = {};
+  _marketInfo = {};
 
   getAccountState = async () => {
     return this._accountState;
@@ -23,7 +23,7 @@ export default class APIStarknetProvider extends APIProvider {
   };
 
   submitOrder = async (market, side, price, baseAmount, quoteAmount) => {
-    const marketInfo = this.marketInfo[market];
+    const marketInfo = this._marketInfo[market];
     // check allowance first
     const tokenInfo = side === "s" ? marketInfo.baseAsset : marketInfo.quoteAsset;
     const allowancesToast = toast.info("Checking and setting allowances", {
@@ -177,7 +177,7 @@ export default class APIStarknetProvider extends APIProvider {
     const url = `https://zigzag-markets.herokuapp.com/markets?id=${pairText}&chainid=${this.network}`;
     const marketInfoArray = await fetch(url).then((r) => r.json());
     if (!(marketInfoArray instanceof Array)) return;
-    marketInfoArray.forEach((info) => (this.marketInfo[info.alias] = info));
+    marketInfoArray.forEach((info) => (this._marketInfo[info.alias] = info));
     return;
   };
 
@@ -196,10 +196,10 @@ export default class APIStarknetProvider extends APIProvider {
       const pair = pairs[i];
       const baseCurrency = pair.split("-")[0];
       const quoteCurrency = pair.split("-")[1];
-      if (baseCurrency === currency && this.marketInfo[pair]) {
-        return this.marketInfo[pair].baseAsset;
-      } else if (quoteCurrency === currency && this.marketInfo[pair]) {
-        return this.marketInfo[pair].quoteAsset;
+      if (baseCurrency === currency && this._marketInfo[pair]) {
+        return this._marketInfo[pair].baseAsset;
+      } else if (quoteCurrency === currency && this._marketInfo[pair]) {
+        return this._marketInfo[pair].quoteAsset;
       }
     }
     return null;
