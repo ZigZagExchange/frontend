@@ -182,11 +182,11 @@ const Bridge = () => {
     return true;
   };
 
-  const validateFees = (inputValue, bridgeFee, feeToken) => {
-    const feeCurrencyInfo = api.getCurrencyInfo(feeToken);
+  const validateFees = (inputValue, bridgeFee, feeCurrency) => {
+    const feeCurrencyInfo = api.getCurrencyInfo(feeCurrency);
     const balance = this.getBalances(fromNetwork.from.key);
     if (balance.length === 0) return false;
-    const feeTokenBalance = parseFloat(balance[feeToken] && balance[feeToken].value / (10 ** feeCurrencyInfo.decimals))
+    const feeTokenBalance = parseFloat(balance[feeCurrency] && balance[feeCurrency].value / (10 ** feeCurrencyInfo.decimals))
 
     if (
       inputValue > 0 &&
