@@ -73,10 +73,6 @@ export default class APIZKProvider extends APIProvider {
       const subdomain = this.network === 1 ? "" : "rinkeby.";
       receipt.txId = _receipt.ethTx.hash;
       receipt.txUrl = `https://${subdomain}etherscan.io/tx/${receipt.txId}`;
-    } else if (target === "polygon") {
-      const subdomain = this.network === 1 ? "" : "mumbai.";
-      receipt.txId = _receipt.ethTx.hash;
-      receipt.txUrl = `https://${subdomain}polygonscan.com/tx/${receipt.txId}`;
     } else if (target === "zksync") {
       const subdomain = this.network === 1 ? "" : "rinkeby.";
       receipt.txId = _receipt.txHash.split(":")[1];
@@ -325,7 +321,7 @@ export default class APIZKProvider extends APIProvider {
 
       this.api.emit(
         "bridgeReceipt",
-        this.handleBridgeReceipt(transfer, amountDecimals, token, "deposit", "zksync")
+        this.handleBridgeReceipt(transfer, amountDecimals, token, "deposit", "ethereum")
       );
       return transfer;
     } catch (err) {
@@ -393,7 +389,7 @@ export default class APIZKProvider extends APIProvider {
     );
     this.api.emit(
       "bridgeReceipt",
-      this.handleBridgeReceipt(transfer, amountTransferred, token, "withdraw", "ethereum")
+      this.handleBridgeReceipt(transfer, amountTransferred, token, "withdraw", "zksync")
     );
     return transfer;
   };
@@ -444,7 +440,7 @@ export default class APIZKProvider extends APIProvider {
           amountTransferred,
           token,
           ZKSYNC_POLYGON_BRIDGE.receiptKeyZkSync,
-          "polygon"
+          "zksync"
         )
       );
     } else if (ZKSYNC_ETHEREUM_FAST_BRIDGE.address === address) {
@@ -455,7 +451,7 @@ export default class APIZKProvider extends APIProvider {
           amountTransferred,
           token,
           ZKSYNC_ETHEREUM_FAST_BRIDGE.receiptKeyZkSync,
-          "ethereum"
+          "zksync"
         )
       );
     }

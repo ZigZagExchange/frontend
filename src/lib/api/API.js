@@ -8,11 +8,11 @@ import { getENSName } from "lib/ens";
 import { formatAmount } from "lib/utils";
 import erc20ContractABI from "lib/contracts/ERC20.json";
 import wethContractABI from "lib/contracts/WETH.json";
+import { ZKSYNC_POLYGON_BRIDGE } from "components/pages/BridgePage/Bridge/constants";
 import {
   MAX_ALLOWANCE,
   POLYGON_MUMBAI_WETH_ADDRESS,
   POLYGON_MAINNET_WETH_ADDRESS,
-  ZKSYNC_POLYGON_BRIDGE_ADDRESS,
 } from "./constants";
 
 const chainMap = {
@@ -90,9 +90,9 @@ export default class API extends Emitter {
     if (this.isZksyncChain()) {
       this.web3 = new Web3(
         window.ethereum ||
-          new Web3.providers.HttpProvider(
-            `https://${networkName}.infura.io/v3/${this.infuraId}`
-          )
+        new Web3.providers.HttpProvider(
+          `https://${networkName}.infura.io/v3/${this.infuraId}`
+        )
       );
 
       this.web3Modal = new Web3Modal({
@@ -382,12 +382,23 @@ export default class API extends Emitter {
       wethContractABI,
       wethContractAddress
     );
-    console.log(contract);
-    // contract.connect(signer);
+    contract.connect(signer);
     const [account] = await this.web3.eth.getAccounts();
-    await contract.methods
-      .transfer(ZKSYNC_POLYGON_BRIDGE_ADDRESS, ""+Math.round(amount*(10**18)))
+    const result = await contract.methods
+      .transfer(ZKSYNC_POLYGON_BRIDGE.address, "" + Math.round(amount * (10 ** 18)))
       .send({ from: account });
+    const txHash = await result.getTransactionHash();
+
+    let receipt = {
+      date: +new Date(),
+      network: polygonProvider.getNetwork(),
+      amount,
+      token: "WETH",
+      type: ZKSYNC_POLYGON_BRIDGE.receiptKeyPolygon,
+    };
+    const subdomain = polygonProvider.getNetwork() === 1 ? "" : "mumbai.";
+    receipt.txUrl = `https://${subdomain}polygonscan.com/tx/${txHash}`;
+    this.api.emit("bridgeReceipt", receipt);
   };
 
   getNetworkName = (network) => {
