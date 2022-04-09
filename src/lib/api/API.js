@@ -340,6 +340,15 @@ export default class API extends Emitter {
 
   getPolygonWethBalance = async () => {
     const [account] = await this.web3.eth.getAccounts();
+    if (!account) {
+      this.emit("balanceUpdate", "polygon", {
+        WETH: {
+          value: 0,
+          allowance: ethersConstants.Zero,
+          valueReadable: "0",
+        },
+      });
+    }
     const polygonEthAddress = this.getPolygonWethContract(
       this.apiProvider.network
     );
