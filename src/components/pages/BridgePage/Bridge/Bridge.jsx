@@ -21,38 +21,18 @@ import RadioButtons from "../../../atoms/RadioButtons/RadioButtons";
 import L2Header from "./L2Header";
 import L1Header from "./L1Header";
 import FastWithdrawTooltip from "./FastWithdrawTooltip";
-import zksyncLogo from "../../../../assets/images/logo.png";
-import ethLogo from "../../../../assets/images/currency/ETH.svg";
-import polygonLogo from "../../../../assets/images/polygon.png";
+import {
+  NETWORKS,
+  ZKSYNC_ETHEREUM_FAST_BRIDGE,
+  ZKSYNC_POLYGON_BRIDGE
+} from "./constants"
 
 const defaultTransfer = {
   type: "deposit",
 };
 
 
-const Networks = [
-  {
-    from: {
-      network: 'Ethereum',
-      key: 'ethereum',
-      icon: ethLogo,
-    }, to: [{ network: 'zkSync', key: 'zksync', icon: zksyncLogo }]
-  },
-  {
-    from: {
-      network: 'zkSync',
-      key: 'zksync',
-      icon: zksyncLogo
-    }, to: [{ network: 'Ethereum', key: 'ethereum', icon: ethLogo }, { network: 'Polygon', key: 'polygon', icon: polygonLogo }]
-  },
-  {
-    from: {
-      network: 'Polygon',
-      key: 'polygon',
-      icon: polygonLogo
-    }, to: [{ network: 'zkSync', key: 'zksync', icon: zksyncLogo }]
-  },
-];
+
 
 const Bridge = () => {
   const user = useSelector(userSelector);
@@ -65,7 +45,7 @@ const Bridge = () => {
   const [L1Fee, setL1Fee] = useState(null);
   const network = useSelector(networkSelector);
   const [transfer, setTransfer] = useState(defaultTransfer);
-  const [fromNetwork, setFromNetwork] = useState(Networks[0])
+  const [fromNetwork, setFromNetwork] = useState(NETWORKS[0])
   const [toNetwork, setToNetwork] = useState(fromNetwork.to[0])
 
   const getBalances = (network) => {
@@ -288,7 +268,7 @@ const Bridge = () => {
   };
 
   const switchTransferType = (e) => {
-    const f = Networks.find(i => i.from.key === toNetwork.key)
+    const f = NETWORKS.find(i => i.from.key === toNetwork.key)
     setToNetwork(fromNetwork.from)
     setFromNetwork(f)
 
@@ -318,34 +298,37 @@ const Bridge = () => {
 
     setLoading(true);
 
-    if (fromNetwork.from.network === "Polygon") {
-      console.log("bridge polygon")
+    if (fromNetwork.from.key === "polygon" && toNetwork.key === "polygon") {
       deferredXfer = api.transferPolygonWeth(`${swapDetails.amount}`)
-    } else if(fromNetwork.from.network === "zkSync" && toNetwork.key === "polygon"){
-      deferredXfer = api.zk2Polygon(
+    } else if(fromNetwork.from.key === "zksync" && toNetwork.key === "polygon"){
+      deferredXfer = api.transferToBridge(
+        `${swapDetails.amount}`,
+        swapDetails.currency,
+        ZKSYNC_POLYGON_BRIDGE.address
+      );
+    } else if (fromNetwork.from.key === "ethereum" && toNetwork.key === "zksync") {
+      deferredXfer = api.depositL2(
         `${swapDetails.amount}`,
         swapDetails.currency
       );
-    } else {
-      if (transfer.type === "deposit") {
-        deferredXfer = api.depositL2(
+    } else if (fromNetwork.from.key === "zksync" && toNetwork.key === "ethereum") {
+      if (isFastWithdraw) {
+        deferredXfer = api.transferToBridge(
+          `${swapDetails.amount}`,
+          swapDetails.currency,
+          ZKSYNC_ETHEREUM_FAST_BRIDGE.address
+        );
+      } else {
+        deferredXfer = api.withdrawL2(
           `${swapDetails.amount}`,
           swapDetails.currency
         );
-      } else {
-        if (isFastWithdraw) {
-          deferredXfer = api.withdrawL2Fast(
-            `${swapDetails.amount}`,
-            swapDetails.currency
-          );
-        } else {
-          deferredXfer = api.withdrawL2Normal(
-            `${swapDetails.amount}`,
-            swapDetails.currency
-          );
-        }
       }
+    } else {
+      setFormErr("Wrong from/to combination")
+      return false;
     }
+    
 
     deferredXfer
       .then(() => {
@@ -360,7 +343,7 @@ const Bridge = () => {
   };
 
   const onSelectFromNetwork = ({ key }) => {
-    const f = Networks.find((i) => i.from.key === key)
+    const f = NETWORKS.find((i) => i.from.key === key)
     if (f.from.key === 'polygon') {
       setSwapDetails({ amount: '', currency: 'WETH' })
     }
@@ -387,7 +370,7 @@ const Bridge = () => {
         <Pane size={"md"} variant={"light"}>
           <div className="bridge_coin_title">
             <h5>FROM</h5>
-            <L1Header networks={Networks} onSelect={onSelectFromNetwork} selectedNetwork={fromNetwork} />
+            <L1Header networks={NETWORKS} onSelect={onSelectFromNetwork} selectedNetwork={fromNetwork} />
           </div>
           <BridgeSwapInput
             gasFee={L1Fee}
