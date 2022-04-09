@@ -390,7 +390,6 @@ const Bridge = () => {
 
   return (
     <>
-      {console.log(balanceData, zkBalances, fromNetwork.from.key, swapDetails.currency)}
       <div className="bridge_box">
         <Pane size={"md"} variant={"light"}>
           <div className="bridge_coin_title">
@@ -546,40 +545,45 @@ const Bridge = () => {
 
           <div className="bridge_button">
             {!user.address && <ConnectWalletButton />}
-
-            {user.address && <>
-              {balances[swapDetails.currency] && !hasAllowance && <Button
-                loading={isApproving}
-                className={cx("bg_btn", {
-                  zig_disabled:
-                    formErr.length > 0 ||
-                    Number(swapDetails.amount) === 0 ||
-                    swapDetails.currency === "ETH"
-                })}
-                text="APPROVE"
-                style={{ marginBottom: 10 }}
-                onClick={approveSpend}
-              />}
-
-              {hasError && <Button
-                className="bg_btn zig_btn_disabled bg_err"
-                text={formErr}
-                icon={<BiError />}
-              />}
-
-              {!hasError && <Button
-                loading={loading}
-                className={cx("bg_btn", {
-                  zig_disabled:
-                    (L2Fee === null && L1Fee === null) ||
-                    !hasAllowance ||
-                    Number(swapDetails.amount) === 0
-                })}
-                text="TRANSFER"
-                icon={<MdSwapCalls />}
-                onClick={doTransfer}
-              />}
-            </>}
+            {user.address && (
+              <>
+                {balances[swapDetails.currency] && !hasAllowance && (
+                  <Button
+                    loading={isApproving}
+                    className={cx("bg_btn", {
+                      zig_disabled:
+                        formErr.length > 0 || 
+                        swapDetails.amount === 0 || 
+                        swapDetails.currency === "ETH",
+                    })}
+                    text="APPROVE"
+                    style={{ marginBottom: 10 }}
+                    onClick={approveSpend}
+                  />
+                )}
+                {hasError && (
+                  <Button
+                    className="bg_btn zig_btn_disabled bg_err"
+                    text={formErr}
+                    icon={<BiError />}
+                  />
+                )}
+                {!hasError && (
+                  <Button
+                    loading={loading}
+                    className={cx("bg_btn", {
+                      zig_disabled:
+                        (L2Fee === null && L1Fee === null) ||
+                        !hasAllowance ||
+                        swapDetails.amount == 0,
+                    })}
+                    text="TRANSFER"
+                    icon={<MdSwapCalls />}
+                    onClick={doTransfer}
+                  />                  
+                )}
+              </>
+            )}
           </div>
         </Pane>
       </div>
