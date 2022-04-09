@@ -1,5 +1,5 @@
 import API from "./API";
-// import APIStarknetProvider from './providers/APIStarknetProvider'
+import APIStarknetProvider from './providers/APIStarknetProvider'
 import APIZKProvider from './providers/APIZKProvider/APIZKProvider'
 
 const api = new API({

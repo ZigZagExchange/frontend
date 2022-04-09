@@ -12,6 +12,7 @@ import { MAX_ALLOWANCE } from "./constants";
 const chainMap = {
   "0x1": 1,
   "0x4": 1000,
+  "0x5": 1001
 };
 export default class API extends Emitter {
   networks = {};
@@ -221,6 +222,9 @@ export default class API extends Emitter {
         break;
       case 1000:
         ethereumChainId = "0x4";
+        break;
+      case 1001:
+        ethereumChainId = "0x5";
         break;
       default:
         return;
