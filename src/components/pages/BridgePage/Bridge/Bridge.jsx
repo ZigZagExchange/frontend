@@ -47,9 +47,9 @@ const Bridge = () => {
   const [L1Fee, setL1Fee] = useState(null);
   const network = useSelector(networkSelector);
   const [transfer, setTransfer] = useState(defaultTransfer);
-  const [swapCurrencyInfo, setSwapCurrencyInfo] = useState({decimals: 0});
+  const [swapCurrencyInfo, setSwapCurrencyInfo] = useState({ decimals: 0 });
   const [allowance, setAllowance] = useState(ethersConstants.Zero);
-  const [hasAllowance, setHasAllowance] = useState(false); 
+  const [hasAllowance, setHasAllowance] = useState(false);
   const [fromNetwork, setFromNetwork] = useState(NETWORKS[0])
   const [toNetwork, setToNetwork] = useState(fromNetwork.to[0])
 
@@ -66,7 +66,7 @@ const Bridge = () => {
     }
     return balances;
   }
-  
+
   const [swapDetails, _setSwapDetails] = useState(() => ({
     amount: "",
     currency: "ETH",
@@ -94,9 +94,10 @@ const Bridge = () => {
 
   const balances = getBalances(fromNetwork.from.key);
   const altBalances = getBalances(toNetwork.key);
-  hasAllowance =
+  setHasAllowance(
     balances[swapDetails.currency] &&
-    balances[swapDetails.currency].allowance.gte(MAX_ALLOWANCE.div(3));
+    balances[swapDetails.currency].allowance.gte(MAX_ALLOWANCE.div(3))
+  );
   const hasError = formErr && formErr.length > 0;
   const isSwapAmountEmpty = swapDetails.amount === "";
 
@@ -116,7 +117,7 @@ const Bridge = () => {
       isSwapAmountEmpty ? '0.0' : swapDetails.amount,
       swapCurrencyInfo.decimals
     );
-    const allowanceBN = balances[swapDetails.currency]?.allowance ?? ethersConstants.Zero;      
+    const allowanceBN = balances[swapDetails.currency]?.allowance ?? ethersConstants.Zero;
     setAllowance(allowanceBN);
     setHasAllowance(allowanceBN.gte(swapAmountBN));
   }, [balances, swapDetails, isSwapAmountEmpty]);
@@ -324,7 +325,7 @@ const Bridge = () => {
 
     if (fromNetwork.from.key === "polygon" && toNetwork.key === "polygon") {
       deferredXfer = api.transferPolygonWeth(`${swapDetails.amount}`)
-    } else if(fromNetwork.from.key === "zksync" && toNetwork.key === "polygon"){
+    } else if (fromNetwork.from.key === "zksync" && toNetwork.key === "polygon") {
       deferredXfer = api.transferToBridge(
         `${swapDetails.amount}`,
         swapDetails.currency,
@@ -352,7 +353,7 @@ const Bridge = () => {
       setFormErr("Wrong from/to combination")
       return false;
     }
-    
+
 
     deferredXfer
       .then(() => {
@@ -389,7 +390,7 @@ const Bridge = () => {
 
   return (
     <>
-    {console.log(balanceData, zkBalances, fromNetwork.from.key, swapDetails.currency)}
+      {console.log(balanceData, zkBalances, fromNetwork.from.key, swapDetails.currency)}
       <div className="bridge_box">
         <Pane size={"md"} variant={"light"}>
           <div className="bridge_coin_title">
@@ -416,11 +417,11 @@ const Bridge = () => {
               <div className="bridge_coin_stat">
                 <h5>Available allowance</h5>
                 <span>
-                    {ethersUtils.formatUnits(allowance, swapCurrencyInfo.decimals)}
+                  {ethersUtils.formatUnits(allowance, swapCurrencyInfo.decimals)}
                   {` ${swapDetails.currency}`}
-                  </span>
+                </span>
               </div>
-            ): null}
+            ) : null}
             <div className="bridge_coin_stat">
               <h5>Available balance</h5>
               <span>
@@ -544,38 +545,38 @@ const Bridge = () => {
           )}
 
           <div className="bridge_button">
-            {!user.address && <ConnectWalletButton/>}
+            {!user.address && <ConnectWalletButton />}
 
             {user.address && <>
               {balances[swapDetails.currency] && !hasAllowance && <Button
                 loading={isApproving}
                 className={cx("bg_btn", {
-                  zig_disabled: 
+                  zig_disabled:
                     formErr.length > 0 ||
                     Number(swapDetails.amount) === 0 ||
                     swapDetails.currency === "ETH"
-                  })}
+                })}
                 text="APPROVE"
-                style={{marginBottom: 10}}
+                style={{ marginBottom: 10 }}
                 onClick={approveSpend}
               />}
 
               {hasError && <Button
                 className="bg_btn zig_btn_disabled bg_err"
                 text={formErr}
-                icon={<BiError/>}
+                icon={<BiError />}
               />}
 
               {!hasError && <Button
                 loading={loading}
                 className={cx("bg_btn", {
-                  zig_disabled: 
+                  zig_disabled:
                     (L2Fee === null && L1Fee === null) ||
                     !hasAllowance ||
                     Number(swapDetails.amount) === 0
-                  })}
+                })}
                 text="TRANSFER"
-                icon={<MdSwapCalls/>}
+                icon={<MdSwapCalls />}
                 onClick={doTransfer}
               />}
             </>}

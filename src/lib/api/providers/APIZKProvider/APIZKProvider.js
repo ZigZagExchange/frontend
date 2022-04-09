@@ -4,7 +4,7 @@ import { ethers } from "ethers";
 import { toast } from "react-toastify";
 import { toBaseUnit } from "lib/utils";
 import APIProvider from "../APIProvider";
-import { MAX_ALLOWANCE, ZKSYNC_POLYGON_BRIDGE_ADDRESS } from "../../constants";
+import { MAX_ALLOWANCE } from "../../constants";
 import axios from "axios";
 import { closestPackableTransactionAmount } from "zksync";
 import BatchTransferService from "./BatchTransferService";
