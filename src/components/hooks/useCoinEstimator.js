@@ -1,8 +1,7 @@
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { lastPricesSelector } from "lib/store/features/api/apiSlice";
-
-const USD_REGEX = /^([A-Z]?USD[A-Z]|FRAX)?$/i;
+import { stables } from "lib/helpers/categories";
 
 export function useCoinEstimator() {
   const pairPrices = useSelector(lastPricesSelector);
@@ -11,10 +10,10 @@ export function useCoinEstimator() {
   return useMemo(() => {
     Object.keys(pairPrices).forEach((pair) => {
       const [a, b] = pair.split("-").map((s) => s.toUpperCase());
-      if (USD_REGEX.test(a)) {
+      if (stables.includes(a)) {
         prices[b] = pairPrices[pair].price;
       }
-      if (USD_REGEX.test(b)) {
+      if (stables.includes(b)) {
         prices[a] = pairPrices[pair].price;
       }
     });

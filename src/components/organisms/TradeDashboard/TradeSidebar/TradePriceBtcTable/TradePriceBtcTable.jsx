@@ -2,7 +2,7 @@ import React from "react";
 import "./TradePriceBtcTable.css";
 import CategorizeBox from "../CategorizeBox/CategorizeBox";
 import SearchBox from "../SearchBox/SearchBox";
-import { getStables } from "../../../../../lib/helpers/categories/index.js";
+import { getStables } from "../../../../../lib/helpers/categories";
 import {
   addFavourite,
   removeFavourite,
