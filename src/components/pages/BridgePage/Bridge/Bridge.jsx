@@ -553,7 +553,7 @@ const Bridge = () => {
                     className={cx("bg_btn", {
                       zig_disabled:
                         formErr.length > 0 || 
-                        swapDetails.amount === 0 || 
+                        Number(swapDetails.amount) === 0 || 
                         swapDetails.currency === "ETH",
                     })}
                     text="APPROVE"
@@ -575,7 +575,7 @@ const Bridge = () => {
                       zig_disabled:
                         (L2Fee === null && L1Fee === null) ||
                         !hasAllowance ||
-                        swapDetails.amount == 0,
+                        Number(swapDetails.amount) === 0,
                     })}
                     text="TRANSFER"
                     icon={<MdSwapCalls />}
