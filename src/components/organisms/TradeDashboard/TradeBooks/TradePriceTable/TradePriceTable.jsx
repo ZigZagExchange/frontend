@@ -21,8 +21,10 @@ const TradePriceTable = (props) => {
   }, [currentMarket]);
 
   let total_total = 0;
-  let total_step = 0;
   props.priceTableData.map((d) => total_total += d.td2);
+  let total_step = (props.className === "trade_table_asks")
+    ? total_total
+    : 0
 
   let onClickRow;
   if (props.onClickRow) onClickRow = props.onClickRow;
@@ -43,10 +45,11 @@ const TradePriceTable = (props) => {
         {
           props.priceTableData.map((d, i) => {
             const color = d.side === "b" ? "#27302F" : "#2C232D";
-            total_step = total_step += d.td2;
-            const breakpoint = (props.className === "trade_table_asks")
-              ? Math.round((total_step / total_total) * 100)
-              : Math.round((total_total / total_step) * 100)
+            if (props.className !== "trade_table_asks") {
+              total_step += d.td2;
+            }
+
+            const breakpoint = Math.round((total_step / total_total) * 100);
             let rowStyle;
             if (props.useGradient) {
               rowStyle = {
@@ -61,6 +64,11 @@ const TradePriceTable = (props) => {
               typeof d.td2 === "number" ? d.td2.toPrecision(6) : d.td2;
             const total =
               typeof d.td3 === "number" ? d.td3.toPrecision(6) : d.td3;
+
+            // reduce after, net one needs to be this percentage
+            if (props.className === "trade_table_asks") {
+              total_step -= d.td2;
+            }
             return (
               <tr key={i} style={rowStyle} onClick={() => onClickRow(d)}>
                 <td className={d.side === "b" ? "up_value" : "down_value"}>
