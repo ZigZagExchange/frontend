@@ -4,7 +4,7 @@ import { ethers } from "ethers";
 import { toast } from "react-toastify";
 import { toBaseUnit } from "lib/utils";
 import APIProvider from "../APIProvider";
-import { MAX_ALLOWANCE } from "../../constants";
+import { MAX_ALLOWANCE, ZKSYNC_POLYGON_BRIDGE_ADDRESS } from "../../constants";
 import axios from "axios";
 import { closestPackableTransactionAmount } from "zksync";
 import BatchTransferService from "./BatchTransferService";
@@ -416,6 +416,47 @@ export default class APIZKProvider extends APIProvider {
       const hashes = await this.batchTransferService.sendTransfer(
         {
           to: this.fastWithdrawContractAddress,
+          token: token,
+          amount: amount,
+          fee: 0,
+        },
+        feeToken
+      );
+      return { txHash: hashes[0] };
+    };
+
+    const { transfer, amountTransferred } = await this.createWithdraw(
+      amountDecimals,
+      token,
+      onSameFeeToken,
+      onDiffFeeToken
+    );
+    this.api.emit(
+      "bridgeReceipt",
+      this.handleFastBridgeReceipt(
+        transfer,
+        amountTransferred,
+        token,
+        "withdraw"
+      )
+    );
+  };
+
+  zk2Polygon = async (amountDecimals, token) => {
+    const onSameFeeToken = async (amount) => {
+      const transfer = await this.syncWallet.syncTransfer({
+        to: ZKSYNC_POLYGON_BRIDGE_ADDRESS,
+        token,
+        amount,
+      });
+      await transfer.awaitReceipt();
+      return transfer;
+    };
+
+    const onDiffFeeToken = async (amount, feeToken) => {
+      const hashes = await this.batchTransferService.sendTransfer(
+        {
+          to: ZKSYNC_POLYGON_BRIDGE_ADDRESS,
           token: token,
           amount: amount,
           fee: 0,

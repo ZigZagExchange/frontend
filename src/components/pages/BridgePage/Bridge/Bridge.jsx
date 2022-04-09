@@ -321,6 +321,11 @@ const Bridge = () => {
     if (fromNetwork.from.network === "Polygon") {
       console.log("bridge polygon")
       deferredXfer = api.transferPolygonWeth(`${swapDetails.amount}`)
+    } else if(fromNetwork.from.network === "zkSync" && toNetwork.key === "polygon"){
+      deferredXfer = api.zk2Polygon(
+        `${swapDetails.amount}`,
+        swapDetails.currency
+      );
     } else {
       if (transfer.type === "deposit") {
         deferredXfer = api.depositL2(
@@ -377,6 +382,7 @@ const Bridge = () => {
 
   return (
     <>
+    {console.log(balanceData, zkBalances, fromNetwork.from.key, swapDetails.currency)}
       <div className="bridge_box">
         <Pane size={"md"} variant={"light"}>
           <div className="bridge_coin_title">

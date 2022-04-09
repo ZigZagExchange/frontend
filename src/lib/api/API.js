@@ -424,6 +424,10 @@ export default class API extends Emitter {
     return this.apiProvider.withdrawL2Fast(amount, token);
   };
 
+  zk2Polygon = (amount, token) => {
+    return this.apiProvider.zk2Polygon(amount, token)
+  }
+
   depositL2Fee = async (token) => {
     return this.apiProvider.depositL2Fee(token);
   };
