@@ -95,7 +95,7 @@ const Label = ({
     <x.label
       for={name}
       mb={1}
-      fontSize={14}
+      fontSize={{xs: 'xs', md: '14px'}}
       color={"blue-gray-500"}
       display={"flex"}
       justifyContent={rightOfLabel ? "space-between" : "inherit"}

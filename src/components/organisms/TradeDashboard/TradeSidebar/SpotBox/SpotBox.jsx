@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./SpotBox.css";
 // assets
 import { SpotForm, Tabs, Tooltip } from "components";
-//import api from "lib/api";
+import { HiExternalLink } from "react-icons/hi";
 import { x } from "@xstyled/styled-components";
 import { AiOutlineQuestionCircle } from "react-icons/all";
 import ExternalLink from "../../../../pages/ListPairPage/ExternalLink";
@@ -116,9 +116,9 @@ const SpotBox = ({
               </Tooltip>
             </Tooltip>
             <x.div ml={"12px"} fontSize={"12px"}>
-              These fees cover zkSync's{" "}
+              This fee covers zkSync's{" "}
               <ExternalLink href={"https://l2fees.info"}>
-                swap fees
+                swap fees<HiExternalLink />
               </ExternalLink>
             </x.div>
           </x.div>

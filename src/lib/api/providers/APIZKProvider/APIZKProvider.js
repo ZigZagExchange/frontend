@@ -201,12 +201,12 @@ export default class APIZKProvider extends APIProvider {
         sellQuantityWithFee = (sellQuantity + marketInfo.quoteFee).toFixed(
           marketInfo.quoteAsset.decimals
         );
-        tokenSell = marketInfo.quoteAssetId;
-        tokenBuy = marketInfo.baseAssetId;
-        tokenRatio[marketInfo.baseAssetId] = (quoteAmount / price).toFixed(
+        tokenSell = marketInfo.quoteAsset.id;
+        tokenBuy = marketInfo.baseAsset.id;
+        tokenRatio[marketInfo.baseAsset.id] = (quoteAmount / price).toFixed(
           marketInfo.baseAsset.decimals
         );
-        tokenRatio[marketInfo.quoteAssetId] = sellQuantityWithFee;
+        tokenRatio[marketInfo.quoteAsset.id] = sellQuantityWithFee;
         fullSellQuantity = (
           sellQuantityWithFee *
           10 ** marketInfo.quoteAsset.decimals
@@ -216,10 +216,10 @@ export default class APIZKProvider extends APIProvider {
         sellQuantityWithFee = (sellQuantity + marketInfo.quoteFee).toFixed(
           marketInfo.quoteAsset.decimals
         );
-        tokenSell = marketInfo.quoteAssetId;
-        tokenBuy = marketInfo.baseAssetId;
-        tokenRatio[marketInfo.baseAssetId] = baseAmount;
-        tokenRatio[marketInfo.quoteAssetId] = sellQuantityWithFee;
+        tokenSell = marketInfo.quoteAsset.id;
+        tokenBuy = marketInfo.baseAsset.id;
+        tokenRatio[marketInfo.baseAsset.id] = baseAmount;
+        tokenRatio[marketInfo.quoteAsset.id] = sellQuantityWithFee;
         fullSellQuantity = (
           sellQuantityWithFee *
           10 ** marketInfo.quoteAsset.decimals
@@ -232,10 +232,10 @@ export default class APIZKProvider extends APIProvider {
         sellQuantityWithFee = (sellQuantity + marketInfo.baseFee).toFixed(
           marketInfo.baseAsset.decimals
         );
-        tokenSell = marketInfo.baseAssetId;
-        tokenBuy = marketInfo.quoteAssetId;
-        tokenRatio[marketInfo.baseAssetId] = sellQuantityWithFee;
-        tokenRatio[marketInfo.quoteAssetId] = (baseAmount * price).toFixed(
+        tokenSell = marketInfo.baseAsset.id;
+        tokenBuy = marketInfo.quoteAsset.id;
+        tokenRatio[marketInfo.baseAsset.id] = sellQuantityWithFee;
+        tokenRatio[marketInfo.quoteAsset.id] = (baseAmount * price).toFixed(
           marketInfo.quoteAsset.decimals
         );
         fullSellQuantity = (
@@ -247,10 +247,10 @@ export default class APIZKProvider extends APIProvider {
         sellQuantityWithFee = (sellQuantity + marketInfo.baseFee).toFixed(
           marketInfo.baseAsset.decimals
         );
-        tokenSell = marketInfo.baseAssetId;
-        tokenBuy = marketInfo.quoteAssetId;
-        tokenRatio[marketInfo.baseAssetId] = sellQuantityWithFee;
-        tokenRatio[marketInfo.quoteAssetId] = quoteAmount;
+        tokenSell = marketInfo.baseAsset.id;
+        tokenBuy = marketInfo.quoteAsset.id;
+        tokenRatio[marketInfo.baseAsset.id] = sellQuantityWithFee;
+        tokenRatio[marketInfo.quoteAsset.id] = quoteAmount;
         fullSellQuantity = (
           sellQuantityWithFee *
           10 ** marketInfo.baseAsset.decimals
@@ -334,7 +334,10 @@ export default class APIZKProvider extends APIProvider {
 
   depositL2Fee = async (token = "ETH") => {
     // TODO: implement
-    return 0;
+    return { 
+      amount: 0.005, 
+      feeToken: 'ETH'
+    };
   };
 
   createWithdraw = async (
@@ -501,7 +504,11 @@ export default class APIZKProvider extends APIProvider {
         throw Error("Token not eligible for fast withdraw");
       }
       const feeData = await this.api.ethersProvider.getFeeData();
-      const bridgeFee = feeData.maxFeePerGas.mul(21000);
+      let bridgeFee = feeData.maxFeePerGas
+        .add(feeData.maxPriorityFeePerGas)
+        .mul(21000)
+
+      bridgeFee *= 1.5; // ZigZag fee
 
       if (token === "ETH") {
         return getNumberFormatted(bridgeFee);
@@ -730,7 +737,10 @@ export default class APIZKProvider extends APIProvider {
     if (pairs.length === 0) return;
     if (!this.network) return;
     const pairText = pairs.join(",");
-    const url = `https://zigzag-markets.herokuapp.com/markets?id=${pairText}&chainid=${this.network}`;
+    const url = (this.network === 1)
+      ? `https://zigzag-exchange.herokuapp.com/api/v1/marketinfos?chain_id=${this.network}&market=${pairText}`
+      : `https://secret-thicket-93345.herokuapp.com/api/v1/marketinfos?chain_id=${this.network}&market=${pairText}`
+
     const marketInfoArray = await fetch(url).then((r) => r.json());
     if (!(marketInfoArray instanceof Array)) return;
     marketInfoArray.forEach((info) => (this.marketInfo[info.alias] = info));

@@ -104,12 +104,9 @@ const BridgeCurrencyOptions = styled.ul`
   }
 `;
 
-const BridgeCurrencySelector = ({
-  onChange,
-  balances = {},
-  value,
-}) => {
+const BridgeCurrencySelector = ({ onChange, balances = {}, value }) => {
   const [show, setShow] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
   const [showingOptions, setShowingOptions] = useState(false);
   const network = useSelector(networkSelector);
   const user = useSelector(userSelector);
@@ -117,7 +114,9 @@ const BridgeCurrencySelector = ({
   var [tickers, setTickers] = useState(api.getCurrencies());
 
   useEffect(() => {
-    onChange(api.marketInfo["ETH"] ? "ETH" : tickers[0]);
+    if (tickers.length !== 0) {
+      onChange(api.marketInfo["ETH"] ? "ETH" : tickers[0]);
+    }
   }, [user.id, network]);
 
   const hideOptions = (e) => {
@@ -126,21 +125,24 @@ const BridgeCurrencySelector = ({
   };
 
   const resetTickers = () => {
-    const tickers = api.getCurrencies()
-    const tickersOfBalance = tickers.filter(x => {
-      return balances[x] && parseFloat(balances[x].valueReadable) > 0
-    })
+    const tickers = api.getCurrencies();
+    const tickersOfBalance = tickers.filter((x) => {
+      return balances[x] && parseFloat(balances[x].valueReadable) > 0;
+    });
 
-    const tickersRest = tickers.filter(x => {
-      return balances[x] && parseFloat(balances[x].valueReadable) === 0
-    })
+    const tickersRest = tickers.filter((x) => {
+      return balances[x] && parseFloat(balances[x].valueReadable) === 0;
+    });
 
-    tickersOfBalance.sort((a,b) => {
-      return parseFloat(coinEstimator(b) * balances[b].valueReadable) - parseFloat(coinEstimator(a) * balances[a].valueReadable)
-    })
+    tickersOfBalance.sort((a, b) => {
+      return (
+        parseFloat(coinEstimator(b) * balances[b].valueReadable) -
+        parseFloat(coinEstimator(a) * balances[a].valueReadable)
+      );
+    });
 
-    setTickers([...tickersOfBalance, ...tickersRest])
-  }
+    setTickers([...tickersOfBalance, ...tickersRest]);
+  };
 
   useEffect(() => {
     if (showingOptions) {
@@ -159,33 +161,13 @@ const BridgeCurrencySelector = ({
   const currency = api.getCurrencyInfo(value);
   const image = api.getCurrencyLogo(value);
 
-  function searchPair(value) {
-    value = value.toUpperCase()
-
-    if (value !== "") {
-      var foundPairs = [];
-
-      //search tickers
-      tickers.forEach((ticker) => {
-        if (ticker.includes(value)) {
-          foundPairs.push(ticker);
-        }
-      });
-
-      //set tickers
-      setTickers(foundPairs);
-    } else {
-      resetTickers()
-    }
-  }
-
   const selectOption = (ticker) => (e) => {
     if (e) e.preventDefault();
     onChange(ticker);
-    setShow(false)
+    setShow(false);
     setTimeout(() => {
-      resetTickers()
-    }, 500)
+      resetTickers();
+    }, 500);
   };
 
   return (
@@ -202,44 +184,52 @@ const BridgeCurrencySelector = ({
       <Modal
         title="Select a token to Bridge"
         onClose={() => {
-          setShow(false)
-          resetTickers()
+          setShow(false);
+          resetTickers();
         }}
         show={show}
       >
-        <SearchBox searchPair={searchPair} className="bridge_searchbox" />
+        <SearchBox searchPair={(value)=>setSearchValue(value)} searchValue={searchValue} className="bridge_searchbox" />
         <BridgeCurrencyOptions>
-          {tickers.map((ticker, key) =>
-            ticker === value ? null : (
-              <li
-                key={key}
-                onClick={selectOption(ticker)}
-                tabIndex="0"
-                className="currencyOption"
-              >
-                <div className="currencyIcon">
-                  <img
-                    src={
-                      api.getCurrencyLogo(ticker)
-                    }
-                    alt={currency && currency.symbol}
-                  />
-                </div>
-                <div className="currencyName">{ticker}</div>
-                {balances[ticker] && (
-                  <div className="currencyBalance">
-                    <strong>{balances[ticker].valueReadable}</strong>
-                    <small>
-                      $
-                      {formatUSD(
-                        coinEstimator(ticker) * balances[ticker].valueReadable
-                      )}
-                    </small>
+          {tickers
+            .filter((item) => {
+              if (!searchValue) return true;
+              if (
+                item.toLowerCase().includes(searchValue.toLowerCase())
+              ) {
+                return true;
+              }
+              return false;
+            })
+            .map((ticker, key) =>
+              ticker === value ? null : (
+                <li
+                  key={key}
+                  onClick={selectOption(ticker)}
+                  tabIndex="0"
+                  className="currencyOption"
+                >
+                  <div className="currencyIcon">
+                    <img
+                      src={api.getCurrencyLogo(ticker)}
+                      alt={currency && currency.symbol}
+                    />
                   </div>
-                )}
-              </li>
-            )
-          )}
+                  <div className="currencyName">{ticker}</div>
+                  {balances[ticker] && (
+                    <div className="currencyBalance">
+                      <strong>{balances[ticker].valueReadable}</strong>
+                      <small>
+                        $
+                        {formatUSD(
+                          coinEstimator(ticker) * balances[ticker].valueReadable
+                        )}
+                      </small>
+                    </div>
+                  )}
+                </li>
+              )
+            )}
         </BridgeCurrencyOptions>
       </Modal>
     </BridgeCurrencyWrapper>

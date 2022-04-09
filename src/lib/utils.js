@@ -15,6 +15,25 @@ export function formatAmount(amount, currency) {
   );
 }
 
+export function formatPrice(input) {
+  const inputNumber = Number(input)
+  if (inputNumber > 99999) {
+    return inputNumber.toFixed(0);
+  } else if (inputNumber > 9999) {
+    return inputNumber.toFixed(1);
+  } else if (inputNumber > 999) {
+    return inputNumber.toFixed(2);
+  } else if (inputNumber > 99) {
+    return inputNumber.toFixed(3);
+  } else if (inputNumber > 9) {
+    return inputNumber.toFixed(4);
+  } else if (inputNumber > 1) {
+    return inputNumber.toFixed(5);
+  } else {
+    return inputNumber.toPrecision(6);
+  }
+}
+
 export function toBaseUnit(value, decimals) {
   if (!isString(value)) {
     throw new Error("Pass strings to prevent floating point precision issues.");
@@ -29,7 +48,7 @@ export function toBaseUnit(value, decimals) {
   if (value === ".") {
     throw new Error(
       `Invalid value ${value} cannot be converted to` +
-        ` base unit with ${decimals} decimals.`
+      ` base unit with ${decimals} decimals.`
     );
   }
 
