@@ -21,10 +21,8 @@ const TradePriceTable = (props) => {
   }, [currentMarket]);
 
   let total_total = 0;
+  let total_step = 0;
   props.priceTableData.map((d) => total_total += d.td2);
-  let total_step = (props.className === "trade_table_asks")
-    ? total_total
-    : 0
 
   let onClickRow;
   if (props.onClickRow) onClickRow = props.onClickRow;
@@ -45,10 +43,10 @@ const TradePriceTable = (props) => {
         {
           props.priceTableData.map((d, i) => {
             const color = d.side === "b" ? "#27302F" : "#2C232D";
-            total_step = (props.className === "trade_table_asks")
-              ? total_step -= d.td2
-              : total_step += d.td2;
-            const breakpoint = Math.round((total_step / total_total) * 100);
+            total_step = total_step += d.td2;
+            const breakpoint = (props.className === "trade_table_asks")
+              ? Math.round((total_step / total_total) * 100)
+              : Math.round((total_total / total_step) * 100)
             let rowStyle;
             if (props.useGradient) {
               rowStyle = {
