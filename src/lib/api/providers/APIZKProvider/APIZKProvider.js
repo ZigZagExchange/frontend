@@ -481,10 +481,10 @@ export default class APIZKProvider extends APIProvider {
   withdrawL2FastGasFee = async (token) => {
     const feeToken = await this.getWithdrawFeeToken(token);
     const feeCurrencyInfo = this.getCurrencyInfo(feeToken);
+    const address = this.syncWallet.address();
 
     let totalFee;
     if (feeToken !== token) {
-      const address = this.syncWallet.address();
       // paying for tx fees with different tokens requires us to
       // send batch transactions. we estimate those fees here.
       totalFee = await this.syncProvider.getTransactionsBatchFee(

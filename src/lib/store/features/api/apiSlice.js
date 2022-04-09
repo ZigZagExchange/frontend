@@ -321,7 +321,11 @@ export const apiSlice = createSlice({
           targetMsg = "to your Polygon wallet";
           extraInfoLink = null;
           break;
-        default: "transferd"; break;
+        default:
+          successMsg = "transferd";
+          targetMsg = "to your wallet";
+          extraInfoLink = null;
+          break;
       }
 
       const renderToastContent = () => {

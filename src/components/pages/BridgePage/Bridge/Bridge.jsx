@@ -26,7 +26,6 @@ import RadioButtons from "../../../atoms/RadioButtons/RadioButtons";
 import L2Header from "./L2Header";
 import L1Header from "./L1Header";
 import FastWithdrawTooltip from "./FastWithdrawTooltip";
-import {MAX_ALLOWANCE} from 'lib/api/constants';
 import {
   NETWORKS,
   ZKSYNC_ETHEREUM_FAST_BRIDGE,
@@ -36,9 +35,6 @@ import {
 const defaultTransfer = {
   type: "deposit",
 };
-
-
-
 
 const Bridge = () => {
   const user = useSelector(userSelector);
@@ -97,7 +93,7 @@ const Bridge = () => {
 
   const balances = getBalances(fromNetwork.from.key);
   const altBalances = getBalances(toNetwork.key);
-  const hasAllowance =
+  hasAllowance =
     balances[swapDetails.currency] &&
     balances[swapDetails.currency].allowance.gte(MAX_ALLOWANCE.div(3));
   const hasError = formErr && formErr.length > 0;
@@ -522,15 +518,15 @@ const Bridge = () => {
                     <x.div>
                       {isFastWithdraw && L1Fee && (
                         <div>
-                          Bridge Fee: {L1Fee.toPrecision(4)}{" "}
+                          Bridge Fee: {formatPrice(L1Fee.toPrecision)}{" "}
                           {swapDetails.currency}
                         </div>
                       )}
                       <x.div color={"blue-gray-300"}>
                         You'll receive: ~
                         {isFastWithdraw && L1Fee
-                          ? Number(swapDetails.amount - L1Fee).toPrecision(4)
-                          : Number(swapDetails.amount).toPrecision(4)}
+                          ? formatPrice(swapDetails.amount - L1Fee)
+                          : formatPrice(swapDetails.amount)}
                         {" " + swapDetails.currency} on L1
                       </x.div>
                     </x.div>
