@@ -20,7 +20,9 @@ const TradePriceTable = (props) => {
     setTimeout(()=>scrollToBottom(), 1000)
   }, [currentMarket]);
 
-  const maxQuantity = Math.max(...props.priceTableData.map((d) => d.td2));
+  let total_total = 0;
+  let total_step = 0;
+  props.priceTableData.map((d) => total += d.td2);
   let onClickRow;
   if (props.onClickRow) onClickRow = props.onClickRow;
   else onClickRow = () => null;
@@ -37,9 +39,11 @@ const TradePriceTable = (props) => {
         </thead>
       )}
       <tbody >
-          {props.priceTableData.map((d, i) => {
+          {
+          props.priceTableData.map((d, i) => {
           const color = d.side === "b" ? "#27302F" : "#2C232D";
-          const breakpoint = Math.round((d.td2 / maxQuantity) * 100);
+          total_step += d.td2; 
+          const breakpoint = Math.round((total_step / maxQuantitytotal_total) * 100);
           let rowStyle;
           if (props.useGradient) {
             rowStyle = {
