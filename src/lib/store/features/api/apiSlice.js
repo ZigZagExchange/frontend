@@ -78,17 +78,13 @@ export const apiSlice = createSlice({
             const price = Number(fillDetails[4]);
             const baseQuantity = Number(fillDetails[5]);
             toast.success(
-              `Your ${sideText} order for ${
-                Number(baseQuantity.toPrecision(4))
-              } ${baseCurrency} was filled @ ${
-                Number(formatPrice(price))
+              `Your ${sideText} order for ${Number(baseQuantity.toPrecision(4))
+              } ${baseCurrency} was filled @ ${Number(formatPrice(price))
               }!`,
               {
-                toastId: `Your ${sideText} order for ${
-                  Number(baseQuantity.toPrecision(4))
-                } ${baseCurrency} was filled @ ${
-                  Number(formatPrice(price))
-                }!`,
+                toastId: `Your ${sideText} order for ${Number(baseQuantity.toPrecision(4))
+                  } ${baseCurrency} was filled @ ${Number(formatPrice(price))
+                  }!`,
               }
             );
           }
@@ -193,17 +189,13 @@ export const apiSlice = createSlice({
               filledOrder[10] = txHash;
               const noFeeOrder = api.getOrderDetailsWithoutFee(filledOrder);
               toast.error(
-                `Your ${sideText} order for ${
-                  noFeeOrder.baseQuantity.toPrecision(4) / 1
-                } ${baseCurrency} @ ${
-                  noFeeOrder.price.toPrecision(4) / 1
+                `Your ${sideText} order for ${noFeeOrder.baseQuantity.toPrecision(4) / 1
+                } ${baseCurrency} @ ${noFeeOrder.price.toPrecision(4) / 1
                 } was rejected: ${error}`,
                 {
-                  toastId: `Your ${sideText} order for ${
-                    noFeeOrder.baseQuantity.toPrecision(4) / 1
-                  } ${baseCurrency} @ ${
-                    noFeeOrder.price.toPrecision(4) / 1
-                  } was rejected: ${error}`,
+                  toastId: `Your ${sideText} order for ${noFeeOrder.baseQuantity.toPrecision(4) / 1
+                    } ${baseCurrency} @ ${noFeeOrder.price.toPrecision(4) / 1
+                    } was rejected: ${error}`,
                 }
               );
               toast.info(
@@ -283,7 +275,7 @@ export const apiSlice = createSlice({
     },
     addBridgeReceipt(state, { payload }) {
       if (!payload || !payload.txId) return;
-      const { amount, token, txUrl, type, isFastWithdraw } = payload;
+      const { amount, token, txUrl, bridgeReceiptsKey } = payload;
 
       const renderBridgeLink = (text, link) => {
         return (
@@ -302,18 +294,42 @@ export const apiSlice = createSlice({
         );
       };
 
+      let successMsg, targetMsg, extraInfoLink;
+      switch (bridgeReceiptsKey) {
+        case "deposit":
+          successMsg = "deposited";
+          targetMsg = "in your zkSync wallet";
+          extraInfoLink = null;
+          break;
+        case "withdraw":
+          successMsg = "withdrew";
+          targetMsg = "into your Ethereum wallet. Withdraws can take up to 7 hours to complete";
+          extraInfoLink = { text: "Bridge FAQ", link: "https://docs.zigzag.exchange/zksync/bridge-guide" };
+          break;
+        case "withdraw_fast":
+          successMsg = "withdrew";
+          targetMsg = "into your Ethereum wallet. Fast withdrawals should be confirmed within a few minutes";
+          extraInfoLink = { text: "Fast Bridge FAQ", link: "https://docs.zigzag.exchange/zksync/fast-withdraw-bridge" };
+          break;
+        case "bridge_to_zksync":
+          successMsg = "transferred";
+          targetMsg = "to your zkSync wallet";
+          extraInfoLink = null;
+          break;
+        case "bridge_to_polygon":
+          successMsg = "transferred";
+          targetMsg = "to your Polygon wallet";
+          extraInfoLink = null;
+          break;
+        default: "transferd"; break;
+      }
+
       const renderToastContent = () => {
         return (
           <>
-            Successfully {type === "deposit" ? "deposited" : "withdrew"}{" "}
+            Successfully {successMsg}{" "}
             {amount} {token}{" "}
-            {type === "deposit"
-              ? "in your zkSync wallet"
-              : `into your Ethereum wallet. ${
-                  isFastWithdraw
-                    ? "Fast withdrawals should be confirmed within a few minutes"
-                    : "Withdraws can take up to 7 hours to complete"
-                }`}
+            {targetMsg}
             .
             <br />
             <br />
@@ -330,15 +346,10 @@ export const apiSlice = createSlice({
               View transaction
             </a>
             {" • "}
-            {!isFastWithdraw &&
+            {extraInfoLink &&
               renderBridgeLink(
-                "Bridge FAQ",
-                "https://docs.zigzag.exchange/zksync/bridge-guide"
-              )}
-            {isFastWithdraw &&
-              renderBridgeLink(
-                "Fast Bridge FAQ",
-                "https://docs.zigzag.exchange/zksync/fast-withdraw-bridge"
+                extraInfoLink.text,
+                extraInfoLink.link
               )}
           </>
         );
@@ -346,7 +357,7 @@ export const apiSlice = createSlice({
 
       toast.success(
         renderToastContent(),
-        { 
+        {
           closeOnClick: false,
           autoClose: 15000,
         },
