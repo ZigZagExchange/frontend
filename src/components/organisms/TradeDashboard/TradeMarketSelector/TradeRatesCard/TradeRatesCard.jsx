@@ -67,7 +67,11 @@ class TradeRatesCard extends React.Component {
           </div>
           <div className="rates_box rb_text_2">
             <h1>{this.props.marketSummary.price}</h1>
-            <p>${this.props.marketSummary.price}</p>
+            <p>$ {
+              (this.props.marketInfo?.baseAsset?.usdPrice)
+                ? this.props.marketInfo.baseAsset.usdPrice
+                : "--"
+            }</p>
           </div>
           <div
             className={

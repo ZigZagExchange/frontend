@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from "react";
+import {
+  constants as ethersConstants,
+  utils as ethersUtils
+} from 'ethers';
 import { useSelector } from "react-redux";
+import isEmpty from "lodash/isEmpty";
 import { SwapButton, Button, useCoinEstimator } from "components";
 import {
   networkSelector,
@@ -9,7 +14,7 @@ import Loader from "react-loader-spinner";
 import { userSelector } from "lib/store/features/auth/authSlice";
 import api from "lib/api";
 import { MAX_ALLOWANCE } from "lib/api/constants";
-import { formatUSD } from "lib/utils";
+import { formatUSD, formatPrice } from "lib/utils";
 import cx from "classnames";
 import { BiError } from "react-icons/bi";
 import { MdSwapCalls } from "react-icons/md";
@@ -21,6 +26,7 @@ import RadioButtons from "../../../atoms/RadioButtons/RadioButtons";
 import L2Header from "./L2Header";
 import L1Header from "./L1Header";
 import FastWithdrawTooltip from "./FastWithdrawTooltip";
+import {MAX_ALLOWANCE} from 'lib/api/constants';
 import {
   NETWORKS,
   ZKSYNC_ETHEREUM_FAST_BRIDGE,
@@ -45,6 +51,8 @@ const Bridge = () => {
   const [L1Fee, setL1Fee] = useState(null);
   const network = useSelector(networkSelector);
   const [transfer, setTransfer] = useState(defaultTransfer);
+  const [allowance, setAllowance] = useState(ethersConstants.Zero);
+  const [hasAllowance, setHasAllowance] = useState(false); 
   const [fromNetwork, setFromNetwork] = useState(NETWORKS[0])
   const [toNetwork, setToNetwork] = useState(fromNetwork.to[0])
 
@@ -94,6 +102,27 @@ const Bridge = () => {
     balances[swapDetails.currency].allowance.gte(MAX_ALLOWANCE.div(3));
   const hasError = formErr && formErr.length > 0;
   const isSwapAmountEmpty = swapDetails.amount === "";
+
+  useEffect(() => {
+    if (swapDetails.currency === "ETH") {
+      setAllowance(MAX_ALLOWANCE);
+      setHasAllowance(true);
+      return;
+    }
+    if (isEmpty(balances) || !swapDetails.currency) {
+      return;
+    }
+    const swapCurrencyInfo = api.getCurrencyInfo(swapDetails.currency);
+    setSwapCurrencyInfo(swapCurrencyInfo);
+
+    const swapAmountBN = ethersUtils.parseUnits(
+      isSwapAmountEmpty ? '0.0' : swapDetails.amount,
+      swapCurrencyInfo.decimals
+    );
+    const allowanceBN = balances[swapDetails.currency]?.allowance ?? ethersConstants.Zero;      
+    setAllowance(allowanceBN);
+    setHasAllowance(allowanceBN.gte(swapAmountBN));
+  }, [balances, swapDetails, isSwapAmountEmpty]);
 
   useEffect(() => {
     if (user.address) {
@@ -203,8 +232,7 @@ const Bridge = () => {
         setFee(null);
       });
 
-    api
-      .withdrawL2FastBridgeFee(details.currency)
+    api.withdrawL2FastBridgeFee(details.currency)
       .then((res) => setL1Fee(res))
       .catch((e) => {
         console.error(e);
@@ -213,9 +241,8 @@ const Bridge = () => {
   };
 
   const setNormalWithdrawFees = (setFee, details) => {
-    api
-      .withdrawL2GasFee(details.currency)
-      .then(({ feeToken, amount }) => {
+    api.withdrawL2GasFee(details.currency)
+      .then(({ amount, feeToken }) => {
         setFee(amount, feeToken);
       })
       .catch((err) => {
@@ -385,6 +412,18 @@ const Bridge = () => {
               <h5>Estimated value</h5>
               <span>~${formatUSD(estimatedValue)}</span>
             </div>
+            {(
+              swapDetails.currency !== "ETH" &&
+              (swapDetails.amount * 10 ** swapCurrencyInfo.decimals) > allowance
+            ) ? (
+              <div className="bridge_coin_stat">
+                <h5>Available allowance</h5>
+                <span>
+                    {ethersUtils.formatUnits(allowance, swapCurrencyInfo.decimals)}
+                  {` ${swapDetails.currency}`}
+                  </span>
+              </div>
+            ): null}
             <div className="bridge_coin_stat">
               <h5>Available balance</h5>
               <span>
@@ -508,55 +547,41 @@ const Bridge = () => {
           )}
 
           <div className="bridge_button">
-            {!user.address && <ConnectWalletButton />}
+            {!user.address && <ConnectWalletButton/>}
 
-            {user.address && (
-              <>
-                {balances[swapDetails.currency] && !hasAllowance && (
-                  <Button
-                    loading={isApproving}
-                    className={cx("bg_btn", {
-                      zig_disabled:
-                        formErr.length > 0 || swapDetails.amount === 0,
-                    })}
-                    text="APPROVE"
-                    style={{ marginBottom: 10 }}
-                    onClick={approveSpend}
-                  />
-                )}
+            {user.address && <>
+              {balances[swapDetails.currency] && !hasAllowance && <Button
+                loading={isApproving}
+                className={cx("bg_btn", {
+                  zig_disabled: 
+                    formErr.length > 0 ||
+                    Number(swapDetails.amount) === 0 ||
+                    swapDetails.currency === "ETH"
+                  })}
+                text="APPROVE"
+                style={{marginBottom: 10}}
+                onClick={approveSpend}
+              />}
 
-                {hasError && (
-                  <Button
-                    className="bg_btn zig_btn_disabled bg_err"
-                    text={formErr}
-                    icon={<BiError />}
-                  />
-                )}
+              {hasError && <Button
+                className="bg_btn zig_btn_disabled bg_err"
+                text={formErr}
+                icon={<BiError/>}
+              />}
 
-                {!hasError && (
-                  // <Button
-                  //   loading={loading}
-                  //   className={cx("bg_btn", {
-                  //     zig_disabled:
-                  //       (L2Fee === null && L1Fee === null) ||
-                  //       !hasAllowance ||
-                  //       swapDetails.amount == 0,
-                  //   })}
-                  //   text="TRANSFER"
-                  //   icon={<MdSwapCalls />}
-                  //   onClick={doTransfer}
-                  // />
-                  //For work only, remove later
-                  <Button
-                    loading={loading}
-                    className={cx("bg_btn")}
-                    text="TRANSFER"
-                    icon={<MdSwapCalls />}
-                    onClick={doTransfer}
-                  />
-                )}
-              </>
-            )}
+              {!hasError && <Button
+                loading={loading}
+                className={cx("bg_btn", {
+                  zig_disabled: 
+                    (L2Fee === null && L1Fee === null) ||
+                    !hasAllowance ||
+                    Number(swapDetails.amount) === 0
+                  })}
+                text="TRANSFER"
+                icon={<MdSwapCalls/>}
+                onClick={doTransfer}
+              />}
+            </>}
           </div>
         </Pane>
       </div>
