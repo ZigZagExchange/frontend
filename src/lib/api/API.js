@@ -416,17 +416,13 @@ export default class API extends Emitter {
     return this.apiProvider.depositL2(amount, token);
   };
 
-  withdrawL2Normal = async (amount, token) => {
-    return this.apiProvider.withdrawL2Normal(amount, token);
+  withdrawL2 = async (amount, token) => {
+    return this.apiProvider.withdrawL2(amount, token);
   };
 
-  withdrawL2Fast = (amount, token) => {
-    return this.apiProvider.withdrawL2Fast(amount, token);
+  transferToBridge = (amount, token, address) => {
+    return this.apiProvider.transferToBridge(amount, token, address);
   };
-
-  zk2Polygon = (amount, token) => {
-    return this.apiProvider.zk2Polygon(amount, token)
-  }
 
   depositL2Fee = async (token) => {
     return this.apiProvider.depositL2Fee(token);
