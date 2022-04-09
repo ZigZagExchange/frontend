@@ -47,6 +47,7 @@ const Bridge = () => {
   const [L1Fee, setL1Fee] = useState(null);
   const network = useSelector(networkSelector);
   const [transfer, setTransfer] = useState(defaultTransfer);
+  const [swapCurrencyInfo, setSwapCurrencyInfo] = useState({decimals: 0});
   const [allowance, setAllowance] = useState(ethersConstants.Zero);
   const [hasAllowance, setHasAllowance] = useState(false); 
   const [fromNetwork, setFromNetwork] = useState(NETWORKS[0])
