@@ -205,6 +205,17 @@ export default class APIStarknetProvider extends APIProvider {
     return null;
   }
 
+  cacheMarketInfoFromNetwork = async (pairs) => {
+    if (pairs.length === 0) return;
+    if (!this.network) return;
+    const pairText = pairs.join(",");
+    const url = `https://secret-thicket-93345.herokuapp.com/api/v1/marketinfos?chain_id=${this.network}&market=${pairText}`;
+    const marketInfoArray = await fetch(url).then((r) => r.json());
+    if (!(marketInfoArray instanceof Array)) return;
+    marketInfoArray.forEach((info) => (this.marketInfo[info.alias] = info));
+    return;
+  };
+
   _checkAccountInitialized = async (userWalletContractAddress) => {
     try {
       await starknet.defaultProvider.callContract({
