@@ -45,7 +45,7 @@ const SuccessModal = ({ txid, show, onClose }) => {
   const [quoteAsset, setQuoteAsset] = useState();
   const [alias, setAlias] = useState();
 
-  const viewMarketURL = `https://zigzag-exchange.herokuapp.com/api/v1/marketinfos?market=${txid}`;
+  const viewMarketURL = `https://zigzag-markets.herokuapp.com/markets?id=${txid}`;
 
   useEffect(() => {
     if (show) {
