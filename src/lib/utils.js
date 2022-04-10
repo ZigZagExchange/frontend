@@ -30,7 +30,9 @@ export function formatPrice(input) {
   } else if (inputNumber > 1) {
     return inputNumber.toFixed(5);
   } else {
-    return inputNumber.toPrecision(6);
+    let outputNumber = inputNumber.toPrecision(6);
+    // remove trailing zero's
+    return Number(outputNumber).toString();    
   }
 }
 
