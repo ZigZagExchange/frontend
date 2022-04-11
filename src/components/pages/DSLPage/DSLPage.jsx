@@ -9,6 +9,7 @@ import TextDemo from "../../atoms/Text/Text.demo";
 import SvgDemo from "../../atoms/Svg/Svg.demo";
 import ButtonDemo from "../../molecules/Button/Button.demo";
 import InputFieldDemo from "../../atoms/InputField/InputField.demo";
+import CheckBoxDemo from "../../atoms/CheckBox/CheckBox.demo";
 import { Button } from "../../atoms/Form/Submit";
 import { toast } from "react-toastify";
 
@@ -67,6 +68,9 @@ const DSLPage = () => {
             </DSLItem>
             <DSLItem title={"Input Demo"}>
               <InputFieldDemo />
+            </DSLItem>
+            <DSLItem title={"CheckBox Demo"}>
+              <CheckBoxDemo />
             </DSLItem>
             <DSLItem title={"Toast"}>
               <Button
