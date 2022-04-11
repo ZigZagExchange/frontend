@@ -24,6 +24,50 @@ export const apiSlice = createSlice({
     arweaveAllocation: 0,
   },
   reducers: {
+    _error(state, { payload }) {
+      const op = payload[0];
+      const errorMessage = payload[1];
+      const renderToastContent = () => {
+        return (
+          <>
+            An unknown error has occurred while processing '{op}' ({errorMessage}). Please{" "}
+            <a
+              href={"https://info.zigzag.exchange/#contact"}
+              style={{
+                color: "white",
+                textDecoration: "underline",
+                fontWeight: "bold",
+              }}
+              target="_blank"
+              rel="noreferrer"
+            >
+              contact us
+            </a>
+            {" "}or join the{" "}
+            <a
+              href={"https://discord.gg/zigzag"}
+              style={{
+                color: "white",
+                textDecoration: "underline",
+                fontWeight: "bold",
+              }}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Discord
+            </a>
+            {" "}to report and solve this bug.
+          </>
+        );
+      };
+      const toastContent = renderToastContent(op, errorMessage)
+      toast.error(toastContent,
+        { toastId: toastContent,
+          closeOnClick: false,
+          autoClose: false,
+        },
+      );
+    },
     _marketinfo(state, { payload }) {
       if (payload[0].error) {
         console.error(payload[0]);
@@ -70,7 +114,7 @@ export const apiSlice = createSlice({
           if (txhash) state.userFills[fillid][7] = txhash;
           if (feeamount) state.userFills[fillid][10] = feeamount;
           if (feetoken) state.userFills[fillid][11] = feetoken;
-          
+
           if (newstatus === 'f') {
             const fillDetails = state.userFills[fillid];
             const baseCurrency = fillDetails[2].split("-")[0];
@@ -119,7 +163,7 @@ export const apiSlice = createSlice({
         // Sometimes lastprice doesn't have volume data
         // Keep the old data if it doesn't
         if (update[3]) {
-            state.lastPrices[market].quoteVolume = update[3];
+          state.lastPrices[market].quoteVolume = update[3];
         }
         if (update[0] === state.currentMarket) {
           state.marketSummary.price = price;
@@ -191,17 +235,13 @@ export const apiSlice = createSlice({
               filledOrder[10] = txHash;
               const noFeeOrder = api.getOrderDetailsWithoutFee(filledOrder);
               toast.error(
-                `Your ${sideText} order for ${
-                  noFeeOrder.baseQuantity.toPrecision(4) / 1
-                } ${baseCurrency} @ ${
-                  noFeeOrder.price.toPrecision(4) / 1
+                `Your ${sideText} order for ${noFeeOrder.baseQuantity.toPrecision(4) / 1
+                } ${baseCurrency} @ ${noFeeOrder.price.toPrecision(4) / 1
                 } was rejected: ${error}`,
                 {
-                  toastId: `Your ${sideText} order for ${
-                    noFeeOrder.baseQuantity.toPrecision(4) / 1
-                  } ${baseCurrency} @ ${
-                    noFeeOrder.price.toPrecision(4) / 1
-                  } was rejected: ${error}`,
+                  toastId: `Your ${sideText} order for ${noFeeOrder.baseQuantity.toPrecision(4) / 1
+                    } ${baseCurrency} @ ${noFeeOrder.price.toPrecision(4) / 1
+                    } was rejected: ${error}`,
                 }
               );
               toast.info(
@@ -307,11 +347,10 @@ export const apiSlice = createSlice({
             {amount} {token}{" "}
             {type === "deposit"
               ? "in your zkSync wallet"
-              : `into your Ethereum wallet. ${
-                  isFastWithdraw
-                    ? "Fast withdrawals should be confirmed within a few minutes"
-                    : "Withdraws can take up to 7 hours to complete"
-                }`}
+              : `into your Ethereum wallet. ${isFastWithdraw
+                ? "Fast withdrawals should be confirmed within a few minutes"
+                : "Withdraws can take up to 7 hours to complete"
+              }`}
             .
             <br />
             <br />
