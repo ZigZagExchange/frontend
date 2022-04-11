@@ -82,9 +82,13 @@ const Bridge = () => {
     {}
   );
 
-  let walletBalances = balanceData.wallet || {};
-  let zkBalances = balanceData[network] || {};
-  let polygonBalances = balanceData.polygon || {};
+  const [walletBalances, setWalletBalances] = useState({})
+  const [zkBalances, setZkBalances] = useState({})
+  const [polygonBalances, setPolygonBalances] = useState({})
+
+  // let walletBalances = balanceData.wallet || {};
+  // let zkBalances = balanceData[network] || {};
+  // let polygonBalances = balanceData.polygon || {};
 
   const [withdrawSpeed, setWithdrawSpeed] = useState("fast");
   const isFastWithdraw =
@@ -94,12 +98,22 @@ const Bridge = () => {
 
   const balances = getBalances(fromNetwork.from.key);
   const altBalances = getBalances(toNetwork.key);
-  setHasAllowance(
-    balances[swapDetails.currency] &&
-    balances[swapDetails.currency].allowance.gte(MAX_ALLOWANCE.div(3))
-  );
+ 
   const hasError = formErr && formErr.length > 0;
   const isSwapAmountEmpty = swapDetails.amount === "";
+
+  useEffect(()=>{
+    setWalletBalances(balanceData.wallet || {})
+    setZkBalances(balanceData[network] || {})
+    setPolygonBalances(balanceData.polygon || {})
+  }, [balanceData, network])
+
+  useEffect(()=>{
+    setHasAllowance(
+      balances[swapDetails.currency] &&
+      balances[swapDetails.currency].allowance.gte(MAX_ALLOWANCE.div(3))
+    );
+  }, [fromNetwork, swapDetails])
 
   useEffect(() => {
     if (swapDetails.currency === "ETH") {
@@ -110,12 +124,12 @@ const Bridge = () => {
     if (isEmpty(balances) || !swapDetails.currency) {
       return;
     }
-    const swapCurrencyInfo = api.getCurrencyInfo(swapDetails.currency);
-    setSwapCurrencyInfo(swapCurrencyInfo);
+    const _swapCurrencyInfo = api.getCurrencyInfo(swapDetails.currency);
+    setSwapCurrencyInfo(_swapCurrencyInfo);
 
     const swapAmountBN = ethersUtils.parseUnits(
       isSwapAmountEmpty ? '0.0' : swapDetails.amount,
-      swapCurrencyInfo.decimals
+      _swapCurrencyInfo?.decimals
     );
     const allowanceBN = balances[swapDetails.currency]?.allowance ?? ethersConstants.Zero;
     setAllowance(allowanceBN);
@@ -139,7 +153,7 @@ const Bridge = () => {
 
   useEffect(() => {
     if (
-      !api.apiProvider.eligibleFastWithdrawTokens.includes(swapDetails.currency)
+      !api.apiProvider.eligibleFastWithdrawTokens?.includes(swapDetails.currency)
     ) {
       setWithdrawSpeed("normal");
     } else {
@@ -154,10 +168,10 @@ const Bridge = () => {
   }, [transfer.type]);
 
   const validateInput = (inputValue, swapCurrency) => {
-    const swapCurrencyInfo = api.getCurrencyInfo(swapCurrency);
+    // const swapCurrencyInfo = api.getCurrencyInfo(swapCurrency);
     const balance = getBalances(fromNetwork.from.key);
     if (balance.length === 0) return false;
-    const getCurrencyBalance = (cur) => (balance[cur] && balance[cur].value / (10 ** swapCurrencyInfo.decimals));
+    const getCurrencyBalance = (cur) => (balance[cur] && swapCurrencyInfo?.decimals && balance[cur].value / (10 ** (swapCurrencyInfo.decimals)));
     const detailBalance = getCurrencyBalance(swapCurrency);
 
     let error = null;
@@ -411,12 +425,12 @@ const Bridge = () => {
             </div>
             {(
               swapDetails.currency !== "ETH" &&
-              (swapDetails.amount * 10 ** swapCurrencyInfo.decimals) > allowance
+              (swapCurrencyInfo?.decimals ? swapDetails.amount * 10 ** swapCurrencyInfo?.decimals : 0) > allowance
             ) ? (
               <div className="bridge_coin_stat">
                 <h5>Available allowance</h5>
                 <span>
-                  {ethersUtils.formatUnits(allowance, swapCurrencyInfo.decimals)}
+                  {ethersUtils.formatUnits(allowance, swapCurrencyInfo?.decimals)}
                   {` ${swapDetails.currency}`}
                 </span>
               </div>
@@ -473,7 +487,7 @@ const Bridge = () => {
                       id: "fast",
                       name: "Fast",
                       disabled:
-                        !api.apiProvider.eligibleFastWithdrawTokens.includes(
+                        !api.apiProvider.eligibleFastWithdrawTokens?.includes(
                           swapDetails.currency
                         ),
                     },

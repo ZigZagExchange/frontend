@@ -693,6 +693,7 @@ export default class API extends Emitter {
   async getL2FastWithdrawLiquidity() {
     if (this.ethersProvider) {
       const currencyMaxes = {};
+      if(!this.apiProvider.eligibleFastWithdrawTokens) return currencyMaxes;
       for (const currency of this.apiProvider.eligibleFastWithdrawTokens) {
         let max = 0;
         try {
