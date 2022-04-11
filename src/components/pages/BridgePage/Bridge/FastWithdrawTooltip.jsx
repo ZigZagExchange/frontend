@@ -9,13 +9,13 @@ const FastWithdrawTooltip = () => {
   const renderLabel = () => {
     return <x.div>
       <x.div mb={2}>
-        Fast: receive ETH and FRAX within a few minutes through ZigZag's Fast Withdrawal bridge.
+        Fast: receive ETH, UST and FRAX within seconds through ZigZag's Fast Withdrawal bridge.
       </x.div>
       <x.div mb={2}>
-        Normal: use zkSync bridge and receive funds after a few hours.
+        Normal: use zkSync's bridge and receive funds after a few hours.
       </x.div>
       <x.div><ExternalLink href={"https://docs.zigzag.exchange/zksync/fast-withdraw-bridge"}>
-        Learn more <HiExternalLink/>
+        Learn more<HiExternalLink/>
       </ExternalLink></x.div>
     </x.div>
   }

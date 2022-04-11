@@ -2,7 +2,7 @@ import React from "react";
 import "./TradePriceBtcTable.css";
 import CategorizeBox from "../CategorizeBox/CategorizeBox";
 import SearchBox from "../SearchBox/SearchBox";
-import { getStables } from "../../../../../lib/helpers/categories/index.js";
+import { getStables } from "../../../../../lib/helpers/categories";
 import {
   addFavourite,
   removeFavourite,
@@ -196,17 +196,12 @@ class TradePriceBtcTable extends React.Component {
     var toggled = !this.state.changeDirection;
     var sorted_pairs = [...this.state.pairs];
 
-    sorted_pairs.sort((frstEl, secondEl) => {
-      var firstRow =  this.props.rowData.find((row => row.td1.includes(frstEl) && row));
-      var secondRow =  this.props.rowData.find((row => row.td1.includes(secondEl) && row));
+    sorted_pairs.sort((firstEl, secondEl) => {
       
       if (toggled) {
-        //console.log(firstEl.td3, secondEl.td3, (parseInt(secondEl.td3) - parseInt(firstEl.td3)))
-        return parseInt(firstRow.td3) - parseInt(secondRow.td3);
+        return parseInt(firstEl.td3) - parseInt(secondEl.td3);
       } else {
-        //reverse
-        //console.log(secondEl.td3, firstEl.td3, (parseInt(secondEl.td3) - parseInt(firstEl.td3)))
-        return parseInt(secondRow.td3) - parseInt(firstRow.td3);
+        return parseInt(secondEl.td3) - parseInt(firstEl.td3);
       }
     });
 
