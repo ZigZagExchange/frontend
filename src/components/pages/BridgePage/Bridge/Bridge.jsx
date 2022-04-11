@@ -82,13 +82,9 @@ const Bridge = () => {
     {}
   );
 
-  const [walletBalances, setWalletBalances] = useState({})
-  const [zkBalances, setZkBalances] = useState({})
-  const [polygonBalances, setPolygonBalances] = useState({})
-
-  // let walletBalances = balanceData.wallet || {};
-  // let zkBalances = balanceData[network] || {};
-  // let polygonBalances = balanceData.polygon || {};
+  const walletBalances = useMemo(()=> (balanceData.wallet) ? balanceData.wallet : {}, [balanceData.wallet])
+  const zkBalances = useMemo(()=> (balanceData[network]) ? balanceData[network] : {} , [balanceData, network])
+  const polygonBalances = useMemo(()=> (balanceData.polygon) ? balanceData.polygon : {}, [balanceData.polygon])
 
   const [withdrawSpeed, setWithdrawSpeed] = useState("fast");
   const isFastWithdraw =
@@ -101,12 +97,6 @@ const Bridge = () => {
  
   const hasError = formErr && formErr.length > 0;
   const isSwapAmountEmpty = swapDetails.amount === "";
-
-  useEffect(()=>{
-    setWalletBalances(balanceData.wallet || {})
-    setZkBalances(balanceData[network] || {})
-    setPolygonBalances(balanceData.polygon || {})
-  }, [balanceData, network])
 
   useEffect(()=>{
     setHasAllowance(
@@ -168,7 +158,6 @@ const Bridge = () => {
   }, [transfer.type]);
 
   const validateInput = (inputValue, swapCurrency) => {
-    // const swapCurrencyInfo = api.getCurrencyInfo(swapCurrency);
     const balance = getBalances(fromNetwork.from.key);
     if (balance.length === 0) return false;
     const getCurrencyBalance = (cur) => (balance[cur] && swapCurrencyInfo?.decimals && balance[cur].value / (10 ** (swapCurrencyInfo.decimals)));
@@ -337,7 +326,7 @@ const Bridge = () => {
 
     setLoading(true);
 
-    if (fromNetwork.from.key === "polygon" && toNetwork.key === "polygon") {
+    if (fromNetwork.from.key === "polygon" && toNetwork.key === "zksync") {
       deferredXfer = api.transferPolygonWeth(`${swapDetails.amount}`)
     } else if (fromNetwork.from.key === "zksync" && toNetwork.key === "polygon") {
       deferredXfer = api.transferToBridge(
