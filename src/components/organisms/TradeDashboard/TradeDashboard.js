@@ -105,10 +105,12 @@ const TradeGrid = styled.article`
     grid-template-areas:
       "marketSelector"
       "chart"
+      "sidebar"
+
       "books"
       "tables"
       "footer";
-  }
+  }  
 
   > div,
   > aside,
