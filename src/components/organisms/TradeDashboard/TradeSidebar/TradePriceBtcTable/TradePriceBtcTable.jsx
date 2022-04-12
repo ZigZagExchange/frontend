@@ -261,21 +261,18 @@ class TradePriceBtcTable extends React.Component {
     var changeDirection = this.state.changeDirection;
     var priceDirection = this.state.priceDirection;
 
-    const shown_pairs = pairs
-      .map((pair) => [pair, this.props.rowData.find((row) => row.td1 === pair)])
-      .sort(([_, d], [__, d2]) => {
-        if (changeSorted) {
-          return changeDirection ? d.td3 - d2.td3 : d2.td3 - d.td3;
-        } else if (priceSorted) {
-          return priceDirection ? d.td2 - d2.td2 : d2.td2 - d.td2;
-        } else {
-          return 0;
-        }
-      })
-      .map(([pair, d], i) => {
-        if (!d) return "";
-        var selected = this.props.currentMarket === pair; //if current market selected
-        var isFavourited = this.state.favourites.includes(pair); //if contains, isFavourited
+    //make sure we skip invalid pairs
+    const tempPairs = pairs.filter((pair) => {
+      const d = this.props.rowData.find(row => row.td1 === pair);
+      if(!d) return false;
+      return true;
+    })
+
+    const shownPairs = tempPairs.map((pair, i) => {
+      const d = this.props.rowData.find(row => row.td1 === pair);
+
+      var selected = this.props.currentMarket === pair; //if current market selected
+      var isFavourited = this.state.favourites.includes(pair); //if contains, isFavourited
 
         return (
           <tr
@@ -339,7 +336,7 @@ class TradePriceBtcTable extends React.Component {
             </th>
           </tr>
         </thead>
-        <tbody>{shown_pairs}</tbody>
+        <tbody>{shownPairs}</tbody>
       </table>
     );
   }
