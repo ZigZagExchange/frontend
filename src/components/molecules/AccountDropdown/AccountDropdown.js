@@ -327,6 +327,8 @@ export const AccountDropdown = () => {
     } else return 0;
   };
 
+  const explorer = api.getExplorer(user.address, selectedLayer);
+
   return (
     <DropdownContainer
       onKeyDown={handleKeys}
