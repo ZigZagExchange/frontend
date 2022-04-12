@@ -64,7 +64,7 @@ export const apiSlice = createSlice({
       };
       const toastContent = renderToastContent(op, errorMessage)
       toast.error(toastContent,
-        { toastId: toastContent,
+        { toastId: op,
           closeOnClick: false,
           autoClose: false,
         },

@@ -362,6 +362,7 @@ export function TradeDashboard() {
           currentMarket={currentMarket}
           priceTableData={askBins}
           lastPrice={marketSummary.price}
+          marketInfo={marketInfo}
           bidBins={bidBins}
         />
         {/* TradeChartArea */}
