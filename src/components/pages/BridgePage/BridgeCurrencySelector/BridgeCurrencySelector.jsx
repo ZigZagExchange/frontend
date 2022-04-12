@@ -4,10 +4,11 @@ import { networkSelector } from "lib/store/features/api/apiSlice";
 import { userSelector } from "lib/store/features/auth/authSlice";
 import styled from "@xstyled/styled-components";
 import { FiChevronDown } from "react-icons/fi";
-import { useCoinEstimator, Modal } from "components";
+import { useCoinEstimator, Tooltip, Modal } from "components";
 import { formatUSD } from "lib/utils";
 import api from "lib/api";
 import SearchBox from "components/organisms/TradeDashboard/TradeSidebar/SearchBox/SearchBox";
+import { MdOutlineOfflineBolt } from "react-icons/md";
 
 const StyledBridgeCurrencySelector = styled.div`
   height: 46px;
@@ -58,11 +59,9 @@ const BridgeCurrencyWrapper = styled.div`
 `;
 
 const BridgeEligibleFastwithdraw = styled.div`
-  position: relative;
-  font-weight: 'bold';
-  
-  margin: 10px;
- 
+  font-size: 20px;
+  margin-top: -4px;
+  margin-left: 4px;
 `;
 
 const BridgeCurrencyOptions = styled.ul`
@@ -222,7 +221,11 @@ const BridgeCurrencySelector = ({ onChange, balances = {}, value }) => {
                   </div>
                   <div className="currencyName">{ticker}</div>
                   <BridgeEligibleFastwithdraw>
-                    {isFastWithdraw ? ("Eligible for fast withdrawals") : null}
+                    {isFastWithdraw ? 
+                      <Tooltip placement={"right"} label={"Available for Fast Withdrawal"}>
+                        <MdOutlineOfflineBolt />
+                      </Tooltip>
+                    : null}
                   </BridgeEligibleFastwithdraw>
 
 

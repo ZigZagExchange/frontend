@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import React, { useState, useEffect } from "react";
-import { IoMdLogOut } from "react-icons/io";
+import { IoMdLogOut, IoMdGrid, IoMdOpen } from "react-icons/io";
 import { AiOutlineCaretDown } from "react-icons/ai";
 import styled, { css } from "@xstyled/styled-components";
 import { useCoinEstimator } from "components";
@@ -13,9 +13,12 @@ import {
 } from "lib/store/features/api/apiSlice";
 import { formatUSD } from "lib/utils";
 import api from "lib/api";
-import { Modal } from "components/atoms/Modal/Modal";
 import { setLayout } from "lib/helpers/storage/layouts";
-import { FaTable } from "react-icons/fa";
+import { Modal, Tooltip } from "components";
+import FirstLayoutImage from "assets/images/layout/layout1.svg";
+import SecondLayoutImage from "assets/images/layout/layout2.svg";
+import ThirdLayoutImage from "assets/images/layout/layout3.svg";
+import FourthLayoutImage from "assets/images/layout/layout4.svg";
 
 const DropdownDisplay = styled.div`
   position: absolute;
@@ -181,29 +184,51 @@ const DropdownFooter = styled.div`
   width: 100%;
 `;
 
-const DropdownExplorer = styled.div`
+const LayoutButton = styled.div`
   display: flex;
-  flex-direction: row;
-
-
-  white-space: nowrap;
-  overflow: hidden;
-
-  text-overflow: ellipsis;
-
-  
+  flex: 1;
+  justify-content: center;
   padding: 15px;
   cursor: pointer;
   font-size: 13px;
   line-height: 1.1;
-
-  border-right: 1px solid rgba(0, 0, 0, 0.1);
   background: rgba(0, 0, 0, 0.04);
-  
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
+  svg {
+    font-size: 15px;
+  }
+
   &:hover {
     background: #4d76af;
+    color: #fff;
   }
-  &:hover > a {
+
+  &:active {
+    background: #36527a;
+    color: #fff;
+  }
+`;
+
+const DropdownExplorer = styled.a`
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  padding: 15px;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1.1;
+  background: rgba(0, 0, 0, 0.04);
+  color: inherit;
+  text-decoration: none;
+  svg {
+    font-size: 15px;
+  }
+  &:hover {
+    background: #4d76af;
+    color: #fff;
+  }
+  &:active {
+    background: #36527a;
     color: #fff;
   }
 `;
@@ -212,9 +237,9 @@ const DropdownExplorer = styled.div`
 
 const SignOutButton = styled.div`
   display: flex;
-  flex-direction: row;
-
-  padding: 15px 20px;
+  flex: 1;
+  justify-content: center;
+  padding: 15px;
   cursor: pointer;
   font-size: 13px;
   line-height: 1.1;
@@ -239,25 +264,34 @@ const LoaderContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100px;
 `;
 
-const LayoutItem = styled.ul`
-  width: 100%;
-  font-size: 15px;
-
-  padding: 5px;
-  margin: 5px;
-`;
-
-const LayoutList = styled.ul`
+const LayoutItem = styled.div`
   display: flex;
-  justify-content: space-between;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  font-size: 15px;
+  filter: invert(39%) sepia(14%) saturate(1522%) hue-rotate(172deg) brightness(94%) contrast(94%);
+  padding: 10px;
+  & img {
+    height: 150px;
+    width: auto;
+    user-drag: none;
+    -webkit-user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+  }
+`;
 
-  padding: 0;
+const LayoutList = styled.div`
+  display: grid;
+  grid-template-columns: 50% 50%;
 
   ${LayoutItem}:nth-child(${(props) => props.layout + 1}) {
-    color: gray;
+    filter: invert(92%) sepia(73%) saturate(0%) hue-rotate(145deg) brightness(89%) contrast(78%);
   }
 `;
 
@@ -333,7 +367,7 @@ export const AccountDropdown = () => {
       show={show}
       tabIndex="0"
     >
-      <DropdownButton onClick={() => setShow(!show)} tabIndex="0">
+      <DropdownButton onClick={() => {setShow(!show); setShowLayout(false);}} tabIndex="0">
         <AvatarImg src={profile.image} alt={profile.name} />
         {profile.name}
         <AiOutlineCaretDown />
@@ -341,52 +375,6 @@ export const AccountDropdown = () => {
       <DropdownDisplay>
         <DropdownHeader>
           <h3>Your Wallet</h3>
-          
-          <div>
-            
-              <div onClick={() => setShowLayout(!showLayout)} tabIndex="0">
-                Layouts
-                <AiOutlineCaretDown />
-              </div>
-
-
-              <Modal title="Layouts"
-                show={showLayout}
-                onClose={() => setShowLayout(!showLayout)}
-                >
-                  <LayoutList layout={selectedLayout}>
-                    <LayoutItem
-                      onClick={() => changeLayout(0)}>
-                      <FaTable size="2xl"/>
-                      <div>
-                        sidebar / books / chart
-                      </div>
-                    </LayoutItem>
-                    <LayoutItem
-                      onClick={() => changeLayout(1)}>
-                        <FaTable size="2xl"/>
-                        <div>
-                          sidebar / chart / books
-                        </div>
-                    </LayoutItem>
-                    <LayoutItem
-                      onClick={() => changeLayout(2)}>
-                      
-                        <div><FaTable size="2xl"/>
-                          books / chart / sidebar
-                        </div>
-                    </LayoutItem>
-                    <LayoutItem
-                      onClick={() => changeLayout(3)}>
-                        <div>
-                      <FaTable size="2xl"/>chart / books / sidebar</div>
-                    </LayoutItem>
-                  </LayoutList>
-              </Modal>
-          </div>
-
-
-
           <div>
             <WalletToggle>
 
@@ -443,29 +431,58 @@ export const AccountDropdown = () => {
           )}
         </DropdownContent>
         <DropdownFooter>
-            
-            <DropdownExplorer>
-              {selectedLayer === 1 ?
-              <a
-                target="_blank"
-                rel="noreferrer"
-                href={`https://etherscan.io/address/${user.address}`}>
-                  {`etherscan.io/address/${user.address}`}
-              </a> : 
-              <a
-                target="_blank"
-                rel="noreferrer"
-                href={`https://zkscan.io/explorer/accounts/${user.address}`}>
-                {`zkscan.io/explorer/accounts/${user.address}`}
-              </a> }
-              
-                
-            </DropdownExplorer>
 
-            <SignOutButton onClick={() => api.signOut()}>
-              <IoMdLogOut style={{ position: "relative", top: -1 }} /> Disconnect
-            </SignOutButton>
-            
+          <LayoutButton onClick={() => { setShowLayout(!showLayout); setShow(!show); }} tabIndex="0">
+            <IoMdGrid style={{ position: "relative", top: -1 }} /> Layouts
+          </LayoutButton>
+
+          <Modal
+          title="Select a Layout"
+          show={showLayout}
+          onClose={() => setShowLayout(!showLayout)}
+          >
+            <LayoutList layout={selectedLayout}>
+              <LayoutItem onClick={() => changeLayout(0)}>
+                <Tooltip placement={"bottom"} label={"Default Layout"}>
+                  <img src={FirstLayoutImage} alt="Default"/>
+                </Tooltip>
+              </LayoutItem>
+              <LayoutItem onClick={() => changeLayout(1)}>
+                <Tooltip placement={"bottom"} label={"Chart Focused Layout"}>
+                  <img src={ThirdLayoutImage} alt="Chart Focused"/>
+                </Tooltip>
+              </LayoutItem>
+              <LayoutItem onClick={() => changeLayout(2)}>
+                <Tooltip placement={"bottom"} label={"Chart Focused RTL Layout"}>
+                  <img src={FourthLayoutImage} alt="Chart Focused RTL"/>
+                </Tooltip>
+              </LayoutItem>
+              <LayoutItem onClick={() => changeLayout(3)}>
+                <Tooltip placement={"bottom"} label={"Default RTL Layout"}>
+                  <img src={SecondLayoutImage} alt="Default RTL"/>
+                </Tooltip>
+              </LayoutItem>
+            </LayoutList>
+          </Modal>
+
+          {selectedLayer === 1 ?
+          <DropdownExplorer
+            target="_blank"
+            rel="noreferrer"
+            href={`https://etherscan.io/address/${user.address}`}>
+              <IoMdOpen style={{ position: "relative", top: -1 }} /> {`Etherscan`}
+          </DropdownExplorer> : 
+          <DropdownExplorer
+            target="_blank"
+            rel="noreferrer"
+            href={`https://zkscan.io/explorer/accounts/${user.address}`}>
+              <IoMdOpen style={{ position: "relative", top: -1 }} /> {`zkScan`}
+          </DropdownExplorer> }
+
+          <SignOutButton onClick={() => api.signOut()}>
+            <IoMdLogOut style={{ position: "relative", top: -1 }} /> Disconnect
+          </SignOutButton>
+          
         </DropdownFooter>
       </DropdownDisplay>
     </DropdownContainer>
