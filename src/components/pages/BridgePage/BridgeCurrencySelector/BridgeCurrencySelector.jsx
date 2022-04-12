@@ -57,6 +57,14 @@ const BridgeCurrencyWrapper = styled.div`
   }
 `;
 
+const BridgeEligibleFastwithdraw = styled.div`
+  position: relative;
+  font-weight: 'bold';
+  
+  margin: 10px;
+ 
+`;
+
 const BridgeCurrencyOptions = styled.ul`
   width: 100%;
   overflow: auto;
@@ -111,7 +119,8 @@ const BridgeCurrencySelector = ({ onChange, balances = {}, value }) => {
   const network = useSelector(networkSelector);
   const user = useSelector(userSelector);
   const coinEstimator = useCoinEstimator();
-  var [tickers, setTickers] = useState(api.getCurrencies());
+  const tickers = api.getCurrencies();
+  const [availableTickers, setTickers] = useState(tickers);
 
   useEffect(() => {
     if (tickers.length !== 0) {
@@ -191,18 +200,12 @@ const BridgeCurrencySelector = ({ onChange, balances = {}, value }) => {
       >
         <SearchBox searchPair={(value)=>setSearchValue(value)} searchValue={searchValue} className="bridge_searchbox" />
         <BridgeCurrencyOptions>
-          {tickers
-            .filter((item) => {
-              if (!searchValue) return true;
-              if (
-                item.toLowerCase().includes(searchValue.toLowerCase())
-              ) {
-                return true;
-              }
-              return false;
-            })
-            .map((ticker, key) =>
-              ticker === value ? null : (
+          {availableTickers.map((ticker, key) => {
+              if(ticker === value) return (<></>);
+              
+              const isFastWithdraw = (api.apiProvider.eligibleFastWithdrawTokens.includes(ticker));
+                
+              return (
                 <li
                   key={key}
                   onClick={selectOption(ticker)}
@@ -211,11 +214,18 @@ const BridgeCurrencySelector = ({ onChange, balances = {}, value }) => {
                 >
                   <div className="currencyIcon">
                     <img
-                      src={api.getCurrencyLogo(ticker)}
+                      src={
+                        api.getCurrencyLogo(ticker)
+                      }
                       alt={currency && currency.symbol}
                     />
                   </div>
                   <div className="currencyName">{ticker}</div>
+                  <BridgeEligibleFastwithdraw>
+                    {isFastWithdraw ? ("Eligible for fast withdrawals") : null}
+                  </BridgeEligibleFastwithdraw>
+
+
                   {balances[ticker] && (
                     <div className="currencyBalance">
                       <strong>{balances[ticker].valueReadable}</strong>
@@ -228,8 +238,10 @@ const BridgeCurrencySelector = ({ onChange, balances = {}, value }) => {
                     </div>
                   )}
                 </li>
-              )
-            )}
+              );
+            })
+          }
+            
         </BridgeCurrencyOptions>
       </Modal>
     </BridgeCurrencyWrapper>

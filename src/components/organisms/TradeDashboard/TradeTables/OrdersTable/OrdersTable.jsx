@@ -46,7 +46,8 @@ export class OrdersTable extends React.Component {
             let price = order[4];
             let baseQuantity = order[5];
             let remaining = isNaN(Number(order[11])) ? order[5] : order[11];
-            const orderStatus = order[9];
+            let orderStatus = order[9];
+
             const baseCurrency = order[2].split("-")[0];
             const side = order[3] === "b" ? "buy" : "sell";
             const sideclassname = order[3] === "b" ? "up_value" : "down_value";
@@ -60,6 +61,10 @@ export class OrdersTable extends React.Component {
               expiryText = Math.floor(timeToExpiry / 3600) + "h";
             } else if (timeToExpiry > 0) {
               expiryText = Math.floor(timeToExpiry / 3600) + "m";
+
+              if(Math.floor(timeToExpiry / 3600) === 0){
+                expiryText = `${Math.floor(timeToExpiry / 60)}m`;
+              }
             } else {
               expiryText = "--";
             }
@@ -71,7 +76,7 @@ export class OrdersTable extends React.Component {
               remaining = orderWithoutFee.remaining;
             }
             let statusText, statusClass;
-            switch (order[9]) {
+            switch (orderStatus) {
               case "r":
                 statusText = "rejected";
                 statusClass = "rejected";
@@ -83,6 +88,7 @@ export class OrdersTable extends React.Component {
               case "f":
                 statusText = "filled";
                 statusClass = "filled";
+                expiryText = "--";
                 break;
               case "pm":
                 statusText = (
@@ -304,6 +310,7 @@ export class OrdersTable extends React.Component {
               case "e":
                 statusText = "expired";
                 statusClass = "expired";
+                feeText = "--";
                 break;
               default:
                 break;
