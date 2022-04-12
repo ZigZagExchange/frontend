@@ -291,7 +291,7 @@ const LayoutList = styled.div`
   grid-template-columns: 50% 50%;
 
   ${LayoutItem}:nth-child(${(props) => props.layout + 1}) {
-    filter: invert(92%) sepia(73%) saturate(0%) hue-rotate(145deg) brightness(89%) contrast(78%);
+    filter: invert(100%) sepia(3%) saturate(44%) hue-rotate(151deg) brightness(113%) contrast(87%);
   }
 `;
 
