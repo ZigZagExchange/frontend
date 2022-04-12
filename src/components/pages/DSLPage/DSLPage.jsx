@@ -2,9 +2,6 @@ import React from "react";
 import styled from "styled-components";
 import { DefaultTemplate } from "../../templates/DefaultTemplate";
 import Pane from "../../atoms/Pane/Pane";
-import FormDemo from "../../atoms/Form/Form.demo";
-import TooltipDemo from "../../atoms/Tooltip/Tooltip.demo";
-import RadioButtonsDemo from "../../atoms/RadioButtons/RadioButtons.demo";
 import TextDemo from "../../atoms/Text/Text.demo";
 import SvgDemo from "../../atoms/Svg/Svg.demo";
 import ButtonDemo from "../../molecules/Button/Button.demo";
@@ -47,15 +44,6 @@ const DSLPage = () => {
             DSL
           </DSLSpan>
           <DSLItemsWrapper>
-            <DSLItem title={"Form"}>
-              <FormDemo />
-            </DSLItem>
-            <DSLItem title={"Tooltip"}>
-              <TooltipDemo />
-            </DSLItem>
-            <DSLItem title={"Radio Buttons"}>
-              <RadioButtonsDemo />
-            </DSLItem>
             <DSLItem title={"Text Demo"}>
               <TextDemo />
             </DSLItem>
