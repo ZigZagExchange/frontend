@@ -371,9 +371,10 @@ export default class API extends Emitter {
       window.web3.currentProvider
     );
     const currentNetwork = await polygonProvider.getNetwork();
-    if (currentNetwork.chainId !== polygonChainId)
+    console.log(currentNetwork.chainId.toString(16))
+    if ("0x"+currentNetwork.chainId.toString(16) !== polygonChainId)
       throw new Error("Must approve network change");
-    const signer = polygonProvider.getSigner();
+    // const signer = polygonProvider.getSigner();
     const wethContractAddress = this.getPolygonWethContract(
       this.apiProvider.network
     );
@@ -382,7 +383,7 @@ export default class API extends Emitter {
       wethContractABI,
       wethContractAddress
     );
-    contract.connect(signer);
+    // contract.connect(signer);
     const [account] = await this.web3.eth.getAccounts();
     const result = await contract.methods
       .transfer(ZKSYNC_POLYGON_BRIDGE.address, "" + Math.round(amount * (10 ** 18)))

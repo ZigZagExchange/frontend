@@ -168,7 +168,7 @@ const Bridge = () => {
   }, [transfer.type]);
 
   const validateInput = (inputValue, swapCurrency) => {
-    // const swapCurrencyInfo = api.getCurrencyInfo(swapCurrency);
+    const swapCurrencyInfo = api.getCurrencyInfo(swapCurrency);
     const balance = getBalances(fromNetwork.from.key);
     if (balance.length === 0) return false;
     const getCurrencyBalance = (cur) => (balance[cur] && swapCurrencyInfo?.decimals && balance[cur].value / (10 ** (swapCurrencyInfo.decimals)));
@@ -337,7 +337,7 @@ const Bridge = () => {
 
     setLoading(true);
 
-    if (fromNetwork.from.key === "polygon" && toNetwork.key === "polygon") {
+    if (fromNetwork.from.key === "polygon" && toNetwork.key === "zksync") {
       deferredXfer = api.transferPolygonWeth(`${swapDetails.amount}`)
     } else if (fromNetwork.from.key === "zksync" && toNetwork.key === "polygon") {
       deferredXfer = api.transferToBridge(
