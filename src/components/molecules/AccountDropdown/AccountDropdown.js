@@ -172,16 +172,48 @@ const DropdownFooter = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   border-top: 1px solid rgba(0, 0, 0, 0.1);
   border-bottom-right-radius: 8px;
   border-bottom-left-radius: 8px;
   overflow: hidden;
-  width: 100%;
   flex-shrink: 0;
+  width: 100%;
 `;
 
+const DropdownExplorer = styled.div`
+  display: flex;
+  flex-direction: row;
+
+
+  white-space: nowrap;
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  
+  padding: 15px;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1.1;
+
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.04);
+  
+  &:hover {
+    background: #4d76af;
+  }
+  &:hover > a {
+    color: #fff;
+  }
+`;
+
+
+
 const SignOutButton = styled.div`
+  display: flex;
+  flex-direction: row;
+
   padding: 15px 20px;
   cursor: pointer;
   font-size: 13px;
@@ -411,9 +443,29 @@ export const AccountDropdown = () => {
           )}
         </DropdownContent>
         <DropdownFooter>
-          <SignOutButton onClick={() => api.signOut()}>
-            <IoMdLogOut style={{ position: "relative", top: -1 }} /> Disconnect
-          </SignOutButton>
+            
+            <DropdownExplorer>
+              {selectedLayer === 1 ?
+              <a
+                target="_blank"
+                rel="noreferrer"
+                href={`https://etherscan.io/address/${user.address}`}>
+                  {`etherscan.io/address/${user.address}`}
+              </a> : 
+              <a
+                target="_blank"
+                rel="noreferrer"
+                href={`https://zkscan.io/explorer/accounts/${user.address}`}>
+                {`zkscan.io/explorer/accounts/${user.address}`}
+              </a> }
+              
+                
+            </DropdownExplorer>
+
+            <SignOutButton onClick={() => api.signOut()}>
+              <IoMdLogOut style={{ position: "relative", top: -1 }} /> Disconnect
+            </SignOutButton>
+            
         </DropdownFooter>
       </DropdownDisplay>
     </DropdownContainer>
