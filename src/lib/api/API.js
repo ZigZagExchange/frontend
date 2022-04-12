@@ -119,7 +119,7 @@ export default class API extends Emitter {
         explorer = `https://${subdomain}etherscan.io/address/${address}`;
         return explorer;
       default:
-        explorer = `https://zkscan.io/explorer/accounts/${address}`
+        explorer = `https://${subdomain}zkscan.io/explorer/accounts/${address}`
         return explorer;
     }
   }

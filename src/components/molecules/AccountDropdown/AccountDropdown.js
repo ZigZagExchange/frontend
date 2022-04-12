@@ -310,14 +310,9 @@ export const AccountDropdown = () => {
 
   const filterSmallBalances = (currency) => {
     const balance = wallet[currency].valueReadable;
-
-    //filter out small balances L2 below 2 cents
-    if(selectedLayer !== 1) {
-      if(balance < 0.02) return 0; 
-    }
     if (balance) {
       return Number(balance) > 0;
-    }  else {
+    } else {
       return 0;
     }
   };
@@ -332,8 +327,6 @@ export const AccountDropdown = () => {
     } else return 0;
   };
 
-  let explorer = api.getExplorer(user.address, selectedLayer);
-  
   return (
     <DropdownContainer
       onKeyDown={handleKeys}
@@ -343,10 +336,7 @@ export const AccountDropdown = () => {
     >
       <DropdownButton onClick={() => setShow(!show)} tabIndex="0">
         <AvatarImg src={profile.image} alt={profile.name} />
-        <div style= {{display: 'flex', flexDirection: 'column', textAlign: 'center'}}>
-          <div>{profile.name}</div>
-          <div style={{color: '#fff'}}>Wallet</div>
-        </div>
+        {profile.name}
         <AiOutlineCaretDown />
       </DropdownButton>
       <DropdownDisplay>
@@ -429,7 +419,6 @@ export const AccountDropdown = () => {
                 .filter(filterSmallBalances)
                 .sort(sortByNotional)
                 .map((ticker, key) => {
-
                   return (
                     <CurrencyListItem key={key}>
                       <img
@@ -457,19 +446,14 @@ export const AccountDropdown = () => {
         <DropdownFooter>
             
             <DropdownExplorer>
-              {selectedLayer === 1 ?
+              
               <a
                 target="_blank"
                 rel="noreferrer"
-                href={`${explorer + user.address}`}>
-                  {`etherscan.io/address/${user.address}`}
-              </a> : 
-              <a
-                target="_blank"
-                rel="noreferrer"
-                href={`https://zkscan.io/explorer/accounts/${user.address}`}>
-                {`zkscan.io/explorer/accounts/${user.address}`}
-              </a>}                             
+                href={`${explorer}`}>
+                  {selectedLayer === 1 ? `etherscan.io/address/${user.address}` : `zkscan.io/explorer/accounts/${user.address}`}
+              </a>
+                
             </DropdownExplorer>
 
             <SignOutButton onClick={() => api.signOut()}>
