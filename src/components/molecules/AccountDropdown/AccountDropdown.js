@@ -310,9 +310,11 @@ export const AccountDropdown = () => {
 
   const filterSmallBalances = (currency) => {
     const balance = wallet[currency].valueReadable;
+    const usd_balance = coinEstimator(currency) * wallet[currency].valueReadable
+    
     //filter out small balances L2 below 2cents
     if(selectedLayer !== 1){
-      if(balance < 0.02) return false;
+      if(usd_balance < 0.02) return false;
     }
 
     if (balance) {
