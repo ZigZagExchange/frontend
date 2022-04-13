@@ -126,7 +126,7 @@ export default class API extends Emitter {
 
   getProfile = async (address) => {
     if (!this._profiles[address]) {
-      const profile = (this._profiles[address] = {
+      let profile = (this._profiles[address] = {
         description: null,
         website: null,
         image: null,
@@ -147,7 +147,8 @@ export default class API extends Emitter {
       );
 
       if (!profile.image) {
-        profile.image = createIcon({ seed: address }).toDataURL();
+        let image =  createIcon({ seed: address }).toDataURL();
+        profile.image =image;
       }
     }
 
