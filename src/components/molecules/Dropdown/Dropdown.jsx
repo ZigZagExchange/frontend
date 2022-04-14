@@ -1,6 +1,6 @@
 import React, { useState, cloneElement, isValidElement } from 'react'
 import styled from 'styled-components'
-import ExpandableButton from '../ExpandableButton/ExpandableButton'
+import { ExpandableButton } from '../ExpandableButton'
 import { IconButton as baseIcon } from "../IconButton";
 import Text from '../../atoms/Text/Text'
 

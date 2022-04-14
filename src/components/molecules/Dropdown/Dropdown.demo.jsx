@@ -1,6 +1,7 @@
 import React from "react";
 import styled from 'styled-components'
 import Dropdown from "./Dropdown";
+import AccountDropdown from "./AccountDropdown";
 import { DocumentIcon, FAQIcon, DiscordIcon, DeleteIcon } from '../../atoms/Svg'
 
 const Row = styled.div`
@@ -35,6 +36,7 @@ const DropdownDemo = () => {
             <Dropdown width ={242} item={data1} context="Simple" clickFunction={clickItem}/>
             <Dropdown width ={242} item={data2} leftIcon context="Left Icon Dropdown" clickFunction={clickItem}/>
             <Dropdown width ={242} item={data3} rightIcon context="Right Icon Dropdown" clickFunction={clickItem}/>
+            <AccountDropdown width ={242} item={data3} rightIcon clickFunction={clickItem}/>
         </Row>
     </>
   );
