@@ -1,3 +1,9 @@
+const primaryBoldDisplay = {
+  fontFamily: 'WorkSans-Bold',
+  fontSize: '12px',
+  lineHeight: '14px',
+}
+
 const primaryDisplay = {
   fontFamily: 'WorkSans-SemiBold',
   fontSize: '104px',
@@ -76,6 +82,12 @@ const primaryExtraSmallSemiBold = {
   lineHeight: '14px',
 }
 
+const primarySmallSemiBold = {
+  fontFamily: 'WorkSans-SemiBold',
+  fontSize: '16px',
+  lineHeight: '19px',
+}
+
 const primaryTiny = {
   fontFamily: 'WorkSans-Regular',
   fontSize: '10px',
@@ -120,6 +132,7 @@ const monospaceTiny = {
 }
 
 const typography = {
+  primaryBoldDisplay,
   primaryDisplay,
   primaryHeading1,
   primaryHeading2,
@@ -131,6 +144,7 @@ const typography = {
   primaryBody1,
   primaryBody2,
   primarySmall,
+  primarySmallSemiBold,
   primaryExtraSmall,
   primaryExtraSmallSemiBold,
   primaryTiny,
