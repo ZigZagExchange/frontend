@@ -51,11 +51,11 @@ const Dropdown = ({width, item, context, leftIcon, rightIcon, clickFunction}) =>
         setIsOpened(!isOpened)
     }
 
-    const handleClick = (url) => {
-        if(url){
+    const handleClick = (url, text) => {
+        if(url !== '#'){
             window.location.href = url
         }else{
-            clickFunction()
+            clickFunction(text)
         }
     }
 
@@ -67,7 +67,7 @@ const Dropdown = ({width, item, context, leftIcon, rightIcon, clickFunction}) =>
                         {item.map((items) => {
                             const {text, url, icon} = items
                         return (
-                        <DropdownListContainer key={items.text} leftIcon={leftIcon} onClick={()=>clickFunction? handleClick(url) : null}>
+                        <DropdownListContainer key={items.text} leftIcon={leftIcon} onClick={()=> handleClick(url, text)}>
                             {leftIcon && isValidElement(icon) && <IconButton variant="secondary" startIcon={cloneElement(icon)}></IconButton>}
                             <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{text}</Text>
 			                {rightIcon && isValidElement(icon) && <IconButton variant="secondary" endIcon={cloneElement(icon)}></IconButton>}

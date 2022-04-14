@@ -25,12 +25,16 @@ const data3 = [
 
 const DropdownDemo = () => {
 
+  const clickItem = (text) => {
+    alert(text)
+  }
+
   return (
     <>
         <Row>
-            <Dropdown width ={242} item={data1} context="Simple"/>
-            <Dropdown width ={242} item={data2} leftIcon context="Left Icon Dropdown"/>
-            <Dropdown width ={242} item={data3} rightIcon context="Right Icon Dropdown"/>
+            <Dropdown width ={242} item={data1} context="Simple" clickFunction={clickItem}/>
+            <Dropdown width ={242} item={data2} leftIcon context="Left Icon Dropdown" clickFunction={clickItem}/>
+            <Dropdown width ={242} item={data3} rightIcon context="Right Icon Dropdown" clickFunction={clickItem}/>
         </Row>
     </>
   );
