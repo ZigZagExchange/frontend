@@ -1,4 +1,5 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import { HiExternalLink } from "react-icons/hi";
 import styled from "@xstyled/styled-components";
 import {

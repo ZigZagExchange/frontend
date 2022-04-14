@@ -15,9 +15,9 @@ export const zksyncRinkebyChainName = "zksync-rinkeby";
 export const starknetGoerliChainName = "starknet-goerli";
 export const getMarketChainFromId = (chainId) => {
   if (chainId === 1) {
-    return mainnetChainName;
+    return zksyncMainnetChainName;
   } else if (chainId === 1000) {
-    return rinkebyChainName;
+    return zksyncRinkebyChainName;
   } else if (chainId === 1001) {
     return starknetGoerliChainName;
   } else {

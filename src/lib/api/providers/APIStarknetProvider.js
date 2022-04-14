@@ -10,7 +10,7 @@ export default class APIStarknetProvider extends APIProvider {
     "0x074f861a79865af1fb77af6197042e8c73147e28c55ac61e385ac756f89b33d6";
   _accountState = {};
   _marketInfo = {};
-
+  getCurrencies
   getAccountState = async () => {
     return this._accountState;
   };
@@ -20,7 +20,7 @@ export default class APIStarknetProvider extends APIProvider {
   };
 
   getBalances = async () => {
-    const state = await getAccountState();
+    const state = await this.getAccountState();
     return (state?.committed?.balance) ? state.committed.balance : {};
   };
 
@@ -108,22 +108,28 @@ export default class APIStarknetProvider extends APIProvider {
     const accountContract = await this._getUserAccount();
     const signature = await accountContract.signMessage(OrderMsg);
 
-    const ZZMessage = [
-      'StarkNet Message', // message_prefix
-      OrderMsg.domain.name, // domain_prefix name
-      OrderMsg.domain.version, // domain_prefix version
-      OrderMsg.domain.chainId, // domain_prefix chainId
-      this._accountState.address.toString(), // sender
-      OrderMsg.message.base_asset, // order
-      OrderMsg.message.quote_asset, // order
-      OrderMsg.message.side, // order
-      OrderMsg.message.base_quantity, // order
-      OrderMsg.message.price.numerator, // order price
-      OrderMsg.message.price.denominator, // order price
-      OrderMsg.message.expiration, // order
-      signature[0], // sig_r
-      signature[1] // sig_s
-    ]
+    const ZZMessage = {
+      message_prefix: 'StarkNet Message',
+      domain_prefix: {
+        name: OrderMsg.domain.name,
+        version: OrderMsg.domain.version,
+        chain_id: OrderMsg.domain.chainId
+      },
+      sender: this._accountState.address.toString(),
+      order: {
+        base_asset: OrderMsg.message.base_asset,
+        quote_asset: OrderMsg.message.quote_asset,
+        side: OrderMsg.message.side,
+        base_quantity: OrderMsg.message.base_quantity,
+        price: {
+          numerator: OrderMsg.message.price.numerator,
+          denominator: OrderMsg.message.price.denominator
+        },
+        expiration: OrderMsg.message.expiration    
+      },
+      sig_r: signature[0],
+      sig_s:  signature[1]
+    }
     this.api.send("submitorder2", [this.network, market, ZZMessage]);
   };
 
@@ -296,9 +302,9 @@ export default class APIStarknetProvider extends APIProvider {
 
   _getBalances = async () => {
     const balances = {};
-    const currencies = getCurrencies();
+    const currencies = this.getCurrencies();
     const results = currencies.map(async (currency) => {
-      const contractAddress = getCurrencyInfo(currency).address;
+      const contractAddress = this.getCurrencyInfo(currency).address;
       if (contractAddress) {
         let balance = await this._getBalance(contractAddress);
         balances[currency] = balance;
@@ -357,7 +363,7 @@ export default class APIStarknetProvider extends APIProvider {
 
   _setTokenApproval = async (
     erc20Address,
-    spenderContractAddress = STARKNET_CONTRACT_ADDRESS,
+    spenderContractAddress = APIStarknetProvider.STARKNET_CONTRACT_ADDRESS,
     amount
   ) => {
     const userWalletAddress = this._accountState.address;
