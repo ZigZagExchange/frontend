@@ -3,6 +3,9 @@ import { space, typography as baseTypography, border, color as baseColor } from 
 import typography from '../../../lib/theme/typography'
 
 const Text = styled.div`
+  display: grid;
+  grid-auto-flow: column;
+  gap: 10px;
   font-family: ${({ font }) => typography[font]?.fontFamily};
   font-size: ${({ font }) => typography[font]?.fontSize};
   line-height: ${({ font }) => typography[font]?.lineHeight};
