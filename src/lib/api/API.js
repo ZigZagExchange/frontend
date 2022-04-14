@@ -244,6 +244,10 @@ export default class API extends Emitter {
     });
   };
 
+  sleep=(ms)=>{
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
   signIn = async (network, ...args) => {
     if (!this._signInProgress) {
       this._signInProgress = Promise.resolve()
@@ -256,6 +260,7 @@ export default class API extends Emitter {
 
           await this.refreshNetwork();
           if (this.isZksyncChain()) {
+            await this.sleep(500);
             const web3Provider = await this.web3Modal.connect();
             this.web3.setProvider(web3Provider);
             this.ethersProvider = new ethers.providers.Web3Provider(
