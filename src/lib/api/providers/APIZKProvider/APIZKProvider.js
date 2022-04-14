@@ -12,6 +12,7 @@ import {
   ZKSYNC_POLYGON_BRIDGE,
   ZKSYNC_ETHEREUM_FAST_BRIDGE
 } from "components/pages/BridgePage/Bridge/constants";
+import _ from "lodash"
 
 export default class APIZKProvider extends APIProvider {
   static SEEDS_STORAGE_KEY = "@ZZ/ZKSYNC_SEEDS";
@@ -760,8 +761,9 @@ export default class APIZKProvider extends APIProvider {
       ? `https://zigzag-markets.herokuapp.com/markets?id=${pairText}&chainid=${this.network}`
       : `https://secret-thicket-93345.herokuapp.com/api/v1/marketinfos?chain_id=${this.network}&market=${pairText}`
     const marketInfoArray = await fetch(url).then((r) => r.json());
-    if (!(marketInfoArray instanceof Array)) return;
-    marketInfoArray.forEach((info) => (this.marketInfo[info.alias] = info));
+    // if (!(marketInfoArray instanceof Array)) return;
+    _.forEach(marketInfoArray, info=>(this.marketInfo[info.alias] = info))
+    // marketInfoArray.forEach((info) => (this.marketInfo[info.alias] = info));
     return;
   };
 

@@ -104,7 +104,7 @@ const BridgeCurrencyOptions = styled.ul`
   }
 `;
 
-const BridgeCurrencySelector = ({ onChange, balances = {}, value }) => {
+const BridgeCurrencySelector = ({ onChange, balances = {}, value, isOpenable }) => {
   const [show, setShow] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [showingOptions, setShowingOptions] = useState(false);
@@ -170,9 +170,14 @@ const BridgeCurrencySelector = ({ onChange, balances = {}, value }) => {
     }, 500);
   };
 
+  const openModal = () => {
+    if(!isOpenable) return;
+    setShow(true)
+  }
+
   return (
     <BridgeCurrencyWrapper>
-      <StyledBridgeCurrencySelector onClick={() => setShow(true)}>
+      <StyledBridgeCurrencySelector onClick={openModal}>
         <div className="currencyIcon">
           <img src={image && image} alt={currency && currency.symbol} />
         </div>

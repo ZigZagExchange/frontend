@@ -1,4 +1,4 @@
-import zksyncLogo from "../../../../assets/images/logo.png";
+import zksyncLogo from "../../../../assets/images/logo.svg";
 import ethLogo from "../../../../assets/images/currency/ETH.svg";
 import polygonLogo from "../../../../assets/images/polygon.png";
 

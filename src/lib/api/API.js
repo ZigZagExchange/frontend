@@ -343,6 +343,7 @@ export default class API extends Emitter {
     const polygonEthAddress = this.getPolygonWethContract(
       this.apiProvider.network
     );
+    if(!this.polygonProvider) return 0;
     const ethContract = new ethers.Contract(
       polygonEthAddress,
       erc20ContractABI,
@@ -388,7 +389,8 @@ export default class API extends Emitter {
     const result = await contract.methods
       .transfer(ZKSYNC_POLYGON_BRIDGE.address, "" + Math.round(amount * (10 ** 18)))
       .send({ from: account });
-    const txHash = await result.getTransactionHash();
+      console.log(result)
+    const txHash = result.transactionHash;
 
     let receipt = {
       date: +new Date(),

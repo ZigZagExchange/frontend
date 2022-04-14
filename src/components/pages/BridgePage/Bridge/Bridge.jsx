@@ -31,6 +31,7 @@ import {
   ZKSYNC_ETHEREUM_FAST_BRIDGE,
   ZKSYNC_POLYGON_BRIDGE
 } from "./constants"
+import _ from 'lodash';
 
 const defaultTransfer = {
   type: "deposit",
@@ -85,6 +86,12 @@ const Bridge = () => {
   const walletBalances = useMemo(()=> (balanceData.wallet) ? balanceData.wallet : {}, [balanceData.wallet])
   const zkBalances = useMemo(()=> (balanceData[network]) ? balanceData[network] : {} , [balanceData, network])
   const polygonBalances = useMemo(()=> (balanceData.polygon) ? balanceData.polygon : {}, [balanceData.polygon])
+  useEffect(async()=> {
+    console.log(balanceData.wallet)
+    if(!user.address) return;
+    if(fromNetwork.from.key !== "polygon") return;
+    api.getPolygonWethBalance()
+  }, [fromNetwork, user.address])
 
   const [withdrawSpeed, setWithdrawSpeed] = useState("fast");
   const isFastWithdraw =
@@ -104,6 +111,12 @@ const Bridge = () => {
       balances[swapDetails.currency].allowance.gte(MAX_ALLOWANCE.div(3))
     );
   }, [fromNetwork, swapDetails])
+
+  useEffect(()=>{
+    if (fromNetwork.from.key === "polygon" || fromNetwork.from.key === "zksync") {
+      setSwapDetails({values: ''}) 
+    }
+  },[fromNetwork])
 
   useEffect(() => {
     if (swapDetails.currency === "ETH") {
@@ -261,6 +274,11 @@ const Bridge = () => {
   }
 
   const setSwapDetails = (values) => {
+    if (fromNetwork.from.key === "polygon") {
+      _.set(values, "currency", 'WETH')
+    } else if (fromNetwork.from.key === "zksync") {
+      _.set(values, "currency", 'ETH')
+    }
     const details = {
       ...swapDetails,
       ...values,
@@ -406,6 +424,7 @@ const Bridge = () => {
             value={swapDetails}
             onChange={setSwapDetails}
             feeCurrency={L2FeeToken}
+            isOpenable={!(fromNetwork.from.key === "polygon" || fromNetwork.from.key === "zksync")}
           />
           <div className="bridge_coin_stats">
             <div className="bridge_coin_stat">
