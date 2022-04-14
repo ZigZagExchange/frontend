@@ -19,12 +19,12 @@ const Button = (props) => {
 			<>
 			{isValidElement(startIcon) &&
           cloneElement(startIcon, {
-            style: {marginRight: "11.33px"},
+            style: {marginRight: "8px"},
           })}
       {children}
 			{isValidElement(endIcon) &&
           cloneElement(endIcon, {
-            style: {marginLeft: "13px"},
+            style: {marginLeft: "8px"},
           })}
 			</>
     </StyledButton>
