@@ -1,4 +1,5 @@
 import React from "react";
+import { formatPrice } from "lib/utils";
 // css
 import api from "lib/api";
 import "./TradeRatesCard.css";
@@ -46,26 +47,31 @@ class TradeRatesCard extends React.Component {
       100
     ).toFixed(2);
 
+    if (!this.state.marketInfo) {
+      return null
+    }
+
     return (
       <>
         <div className="tl_rates">
           <div className="rates_box rb_text_1">
             <div>
-              <img src={api.getCurrencyLogo(this.state.marketInfo?.baseAsset.symbol).default} alt={this.state.marketInfo?.baseAsset.symbol} className="rates_box_symbol" />
+              <img src={api.getCurrencyLogo(this.state.marketInfo?.baseAsset.symbol)} alt={this.state.marketInfo?.baseAsset.symbol} className="rates_box_symbol" />
               <div>
                 <strong>{marketDisplay}</strong>
                 <p>
                   {marketInfo?.baseAsset && marketInfo.baseAsset.name}{" "}
-                  <span className="rates_box_label">
-                    {marketInfo && marketInfo.baseAsset.symbol}
-                  </span>
                 </p>
               </div>
             </div>
           </div>
           <div className="rates_box rb_text_2">
             <h1>{this.props.marketSummary.price}</h1>
-            <p>${this.props.marketSummary.price}</p>
+            <p>$ {
+              (this.props.marketInfo?.baseAsset?.usdPrice)
+                ? this.props.marketInfo.baseAsset.usdPrice
+                : "--"
+            }</p>
           </div>
           <div
             className={
@@ -77,11 +83,9 @@ class TradeRatesCard extends React.Component {
             <h2>24h Change</h2>
             <p>
               {this.props.marketSummary.priceChange &&
-                marketInfo &&
-                (this.props.marketSummary.priceChange / 1).toFixed(
-                  marketInfo.pricePrecisionDecimals
-                )}{" "}
-              {percentChange!=='NaN' && `${percentChange}%`}
+                formatPrice(this.props.marketSummary.priceChange / 1)
+              }{" "}
+              {percentChange !== 'NaN' && `${percentChange}%`}
             </p>
           </div>
           <div className="rates_box rb_text_4 hide_md">

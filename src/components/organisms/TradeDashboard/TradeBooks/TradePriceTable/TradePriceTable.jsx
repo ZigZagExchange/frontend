@@ -1,44 +1,55 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 // css
 import "./TradePriceTable.css";
-import { marketInfoSelector } from "lib/store/features/api/apiSlice";
+import { marketInfoSelector, currentMarketSelector } from "lib/store/features/api/apiSlice";
 import { numStringToSymbol } from "lib/utils";
 
 const TradePriceTable = (props) => {
   const marketInfo = useSelector(marketInfoSelector);
+  const currentMarket = useSelector(currentMarketSelector)
+  const ref = useRef(null)
+
   const scrollToBottom = () => {
     if (props.scrollToBottom) {
-      const tableDiv = document.getElementsByClassName(props.className);
-      if (tableDiv.length > 0) tableDiv[0].scrollTop = tableDiv[0].scrollHeight;
+      ref.current.scrollTo(0, ref.current.scrollHeight)
     }
   };
 
   useEffect(() => {
-    scrollToBottom();
-  }, [props.priceTableData]);
+    setTimeout(() => scrollToBottom(), 1000)
+  }, [currentMarket]);
 
-  const maxQuantity = Math.max(...props.priceTableData.map((d) => d.td2));
+  let total_total = 0;
+  props.priceTableData.map((d) => total_total += d.td2);
+  let total_step = (props.className === "trade_table_asks")
+    ? total_total
+    : 0
+
   let onClickRow;
   if (props.onClickRow) onClickRow = props.onClickRow;
   else onClickRow = () => null;
 
   return (
-    <>
-      <table className={`trade_price_table ${props.className}`}>
-        {props.head && (
-          <thead>
-            <tr>
-              <th>Price</th>
-              <th>Amount</th>
-              <th>Total ({marketInfo && marketInfo.quoteAsset.symbol})</th>
-            </tr>
-          </thead>
-        )}
-        <tbody>
-          {props.priceTableData.map((d, i) => {
+    <table className={`trade_price_table zig_scrollstyle ${props.className}`} ref={ref}>
+      {props.head && (
+        <thead>
+          <tr>
+            <th>Price</th>
+            <th>Amount</th>
+            <th>Total ({marketInfo && marketInfo.quoteAsset.symbol})</th>
+          </tr>
+        </thead>
+      )}
+      <tbody >
+        {
+          props.priceTableData.map((d, i) => {
             const color = d.side === "b" ? "#27302F" : "#2C232D";
-            const breakpoint = Math.round((d.td2 / maxQuantity) * 100);
+            if (props.className !== "trade_table_asks") {
+              total_step += d.td2;
+            }
+
+            const breakpoint = Math.round((total_step / total_total) * 100);
             let rowStyle;
             if (props.useGradient) {
               rowStyle = {
@@ -53,6 +64,11 @@ const TradePriceTable = (props) => {
               typeof d.td2 === "number" ? d.td2.toPrecision(6) : d.td2;
             const total =
               typeof d.td3 === "number" ? d.td3.toPrecision(6) : d.td3;
+
+            // reduce after, net one needs to be this percentage
+            if (props.className === "trade_table_asks") {
+              total_step -= d.td2;
+            }
             return (
               <tr key={i} style={rowStyle} onClick={() => onClickRow(d)}>
                 <td className={d.side === "b" ? "up_value" : "down_value"}>
@@ -63,9 +79,8 @@ const TradePriceTable = (props) => {
               </tr>
             );
           })}
-        </tbody>
-      </table>
-    </>
+      </tbody>
+    </table>
   );
 };
 

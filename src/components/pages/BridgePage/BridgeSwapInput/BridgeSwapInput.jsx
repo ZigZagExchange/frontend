@@ -1,6 +1,7 @@
 import React, { useCallback } from "react";
 import styled from "@xstyled/styled-components";
 import BridgeCurrencySelector from "../BridgeCurrencySelector/BridgeCurrencySelector";
+import api from "lib/api";
 
 const BridgeInputBox = styled.div`
   display: flex;
@@ -50,17 +51,28 @@ const BridgeInputBox = styled.div`
   }
 `;
 
-const BridgeSwapInput = ({ value = {}, onChange, bridgeFee, balances = {}, feeCurrency }) => {
+const BridgeSwapInput = ({ value = {}, onChange, balances = {}, gasFee, bridgeFee, feeCurrency }) => {
   const setCurrency = useCallback(currency => onChange({ currency, amount: '' }), [onChange])
   const setAmount = useCallback(e => onChange({ amount: e.target.value.replace(/[^0-9.]/g,'') }), [onChange])
 
   const setMax = () => {
-    let max = parseFloat((balances[value.currency] && balances[value.currency].valueReadable) || 0)
-    if (feeCurrency === value.currency) {
-      max -= parseFloat(bridgeFee)
+    let max = 0;
+    try {
+      const currencyInfo = api.getCurrencyInfo(value.currency);
+      const roundedDecimalDigits = Math.min(currencyInfo.decimals, 8);
+      let balance = balances[value.currency].value / (10 ** currencyInfo.decimals);
+      if (balance !== 0) {
+        if (feeCurrency === value.currency) {
+          balance -= (bridgeFee + gasFee);
+        }
+        // one number to protect against overflow
+        max = Math.round(balance * 10**roundedDecimalDigits - 1) / 10**roundedDecimalDigits;
+      }
+    } catch (e) {
+      max = parseFloat((balances[value.currency] && balances[value.currency].valueReadable) || 0)
     }
 
-    onChange({amount: max})
+    onChange({ amount: String(max) })
   }
 
   return (

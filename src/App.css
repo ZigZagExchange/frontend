@@ -4,6 +4,28 @@
   box-sizing: border-box;
 }
 
+.zig_scrollstyle::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  background-color: #171c28;
+  border-radius: 10px;
+}
+
+.zig_scrollstyle::-webkit-scrollbar {
+  width: 5px;
+  background-color: #171c28;
+}
+
+.zig_scrollstyle::-webkit-scrollbar-thumb {
+  background-image: -webkit-gradient(
+    linear,
+    left bottom,
+    left top,
+    color-stop(0, #1b2d52),
+    color-stop(0.44, rgb(19, 34, 80)),
+    color-stop(0.55, #1b2d52)
+  );
+}
+
 h1,
 h2,
 h3,
@@ -37,10 +59,6 @@ html {
   color: #c4384e !important;
 }
 
-.trade_price_active_tab {
-  color: #08aff3 !important;
-}
-
 .zig-dropdown .rc-dropdown-menu > .rc-dropdown-menu-item {
   font-size: 18px;
   padding: 15px;
@@ -66,3 +84,26 @@ html {
 .walletconnect-modal__base div:nth-child(3) {
   overflow-y: scroll;
 }
+
+.select-wrap {
+  position: relative;
+}
+
+.select-wrap::before {
+  content: "";
+  font-size: 1rem;
+  top: 45px;
+  right: 14px;
+  position: absolute;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  display: inline-block;
+  padding: 2px;
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+}
+
+.select-input {
+  appearance: none;
+}
+

@@ -1,5 +1,5 @@
-import { BigNumber } from 'ethers'
-import isString from 'lodash/isString'
+import { BigNumber } from "ethers";
+import isString from "lodash/isString";
 
 export function formatUSD(floatNum) {
   const num = parseFloat(floatNum || 0)
@@ -13,6 +13,28 @@ export function formatAmount(amount, currency) {
   return parseFloat(amount / Math.pow(10, currency.decimals)).toFixed(
     Math.min(5, currency.decimals)
   );
+}
+
+export function formatPrice(input) {
+  const inputNumber = Number(input)
+  let outputNumber;
+  if (inputNumber > 99999) {
+    outputNumber = inputNumber.toFixed(0);
+  } else if (inputNumber > 9999) {
+    outputNumber = inputNumber.toFixed(1);
+  } else if (inputNumber > 999) {
+    outputNumber = inputNumber.toFixed(2);
+  } else if (inputNumber > 99) {
+    outputNumber = inputNumber.toFixed(3);
+  } else if (inputNumber > 9) {
+    outputNumber = inputNumber.toFixed(4);
+  } else if (inputNumber > 1) {
+    outputNumber = inputNumber.toFixed(5);
+  } else {
+    outputNumber = inputNumber.toPrecision(6);
+  }
+  // remove trailing zero's
+  return Number(outputNumber).toString();    
 }
 
 export function toBaseUnit(value, decimals) {
@@ -29,7 +51,7 @@ export function toBaseUnit(value, decimals) {
   if (value === ".") {
     throw new Error(
       `Invalid value ${value} cannot be converted to` +
-        ` base unit with ${decimals} decimals.`
+      ` base unit with ${decimals} decimals.`
     );
   }
 
@@ -73,7 +95,35 @@ export function numStringToSymbol(str, decimals) {
   return (str / item.value).toFixed(decimals) + item.symbol;
 }
 
-
 export function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function padTo2Digits(num) {
+  return num.toString().padStart(2, "0");
+}
+
+function isLessThan24HourAgo(date) {
+  // 👇️                    hour  min  sec  milliseconds
+  const twentyFourHrInMs = 24 * 60 * 60 * 1000;
+
+  const twentyFourHoursAgo = Date.now() - twentyFourHrInMs;
+
+  return date > twentyFourHoursAgo;
+}
+
+export function formatDate(date) {
+  if (isLessThan24HourAgo(date)) {
+    return [
+      padTo2Digits(date.getHours()),
+      padTo2Digits(date.getMinutes()),
+      padTo2Digits(date.getSeconds()),
+    ].join(":");
+  } else {
+    return [
+      padTo2Digits(date.getDate()),
+      padTo2Digits(date.getMonth() + 1),
+      date.getFullYear(),
+    ].join("-");
+  }
 }

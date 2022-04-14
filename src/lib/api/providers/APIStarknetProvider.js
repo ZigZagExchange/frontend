@@ -21,7 +21,7 @@ export default class APIStarknetProvider extends APIProvider {
     return {};
   };
 
-  submitOrder = async (product, side, price, amount) => {
+  submitOrder = async (product, side, price, baseAmount, quoteAmount) => {
     // check allowance first
     const baseCurrency = product.split("-")[0];
     const quoteCurrency = product.split("-")[1];
@@ -31,6 +31,7 @@ export default class APIStarknetProvider extends APIProvider {
     const decimals = this.api.currencies[sellCurrency].decimals;
     const allowancesToast = toast.info("Checking and setting allowances", {
       autoClose: false,
+      toastId: "Checking and setting allowances",
     });
     const allowance = await this._getTokenAllowance(
       tokenAddress,
@@ -49,7 +50,10 @@ export default class APIStarknetProvider extends APIProvider {
     }
     toast.dismiss(allowancesToast);
 
-    const expiration = Date.now() + 86400;
+    if(!baseAmount && quoteAmount) {
+      baseAmount = quoteAmount / price;
+    }
+    const expiration = Date.now() + 86400;    
     const orderhash = this._createOrderHash(
       product,
       side,
@@ -91,7 +95,11 @@ export default class APIStarknetProvider extends APIProvider {
       const starkkeyint = bigInt(starkkey.slice(2), 16);
       const deployContractToast = toast.info(
         "First time using Zigzag Starknet. Deploying account contract...",
-        { autoClose: false }
+        {
+          autoClose: false,
+          toastId:
+            "First time using Zigzag Starknet. Deploying account contract...",
+        }
       );
       const deployContractResponse =
         await starknet.defaultProvider.deployContract(starknetAccountContract, [
@@ -115,6 +123,7 @@ export default class APIStarknetProvider extends APIProvider {
 
     const balanceWaitToast = toast.info("Waiting on balances to load...", {
       autoClose: false,
+      toastId: "Waiting on balances to load...",
     });
     let committedBalances;
     try {
@@ -128,7 +137,9 @@ export default class APIStarknetProvider extends APIProvider {
     // Mint some tokens if the account is blank
     for (let currency in committedBalances) {
       if (committedBalances[currency].compare(0) === 0) {
-        toast.info(`No ${currency} found. Minting you some`);
+        toast.info(`No ${currency} found. Minting you some`, {
+          toastId: `No ${currency} found. Minting you some`,
+        });
         let amount;
         if (currency === "ETH") {
           amount = bigInt(1e18).toString();
