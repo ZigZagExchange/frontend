@@ -2,6 +2,7 @@ import * as starknet from "starknet";
 import { toast } from "react-toastify";
 import bigInt from "big-integer";
 import starknetAccountContract from "lib/contracts/Account.json";
+import starknetERC20Contract from "lib/contracts/ERC20.json";
 import APIProvider from "./APIProvider";
 
 export default class APIStarknetProvider extends APIProvider {
@@ -19,7 +20,8 @@ export default class APIStarknetProvider extends APIProvider {
   };
 
   getBalances = async () => {
-    return {};
+    const state = await getAccountState();
+    return (state?.committed?.balance) ? state.committed.balance : {};
   };
 
   submitOrder = async (market, side, price, baseAmount, quoteAmount) => {
@@ -32,15 +34,13 @@ export default class APIStarknetProvider extends APIProvider {
     });
     const allowance = await this._getTokenAllowance(
       tokenInfo.address,
-      this._accountState.address,
       APIStarknetProvider.STARKNET_CONTRACT_ADDRESS
     );
     let minAmountInt = bigInt(1e20 * 10 ** tokenInfo.decimals);
-    let amountInt = bigInt(1e21 * 10 ** tokenInfo.decimals);
     if (allowance.compare(minAmountInt) === -1) {
+      let amountInt = bigInt(1e21 * 10 ** tokenInfo.decimals);
       await this._setTokenApproval(
         tokenInfo.address,
-        this._accountState.address,
         APIStarknetProvider.STARKNET_CONTRACT_ADDRESS,
         amountInt.toString()
       );
@@ -50,29 +50,81 @@ export default class APIStarknetProvider extends APIProvider {
     if (!baseAmount && quoteAmount) {
       baseAmount = quoteAmount / price;
     }
+    
+    // get values
+    const baseAssetAddress = marketInfo.baseAsset.address;
+    const quoteAssetAddress = marketInfo.quoteAsset.address;
+    const sideInt = side === "b" ? '0' : '1';
+    const amountBN = baseAmount * (10 ** marketInfo.baseAsset.decimals);
+    const getFraction = (decimals) => {
+      let denominator = 1;
+      for (; (decimals * denominator) % 1 !== 0; denominator++);
+      return { numerator: decimals * denominator, denominator }
+    }
+    const priceRatio = getFraction(price);
     const expiration = Date.now() + 86400;
-    const domainPrefix = this._createStarkNetDomainHash();
-    const order = this._createOrderHash(
-      marketInfo,
-      side,
-      price,
-      amount,
-      expiration
-    );
-    const ZZMessage = _createZZMessageHash(
-      domainPrefix,
-      order
-    );
 
-    const keypair = starknet.ec.ec.keyFromPrivate(
-      localStorage.getItem("starknet:privkey"),
-      "hex"
-    );
-    const sig = starknet.ec.sign(keypair, ZZMessage.hash);
+    // build order msg
+    const OrderMsg = {
+      "types": {
+        "StarkNetDomain": [
+          { "name": "name", "type": "felt" },
+          { "name": "version", "type": "felt" },
+          { "name": "chainId", "type": "felt" }
+        ],
+        "PriceRatio": [
+          { "name": "numerator", "type": "felt" },
+          { "name": "denominator", "type": "felt" }
+        ],
+        "Order": [
+          { "name": "base_asset", "type": "felt" },
+          { "name": "quote_asset", "type": "felt" },
+          { "name": "side", "type": "felt" },
+          { "name": "base_quantity", "type": "felt" },
+          { "name": "price", "type": "PriceRatio" },
+          { "name": "expiration", "type": "felt" },
+        ]
+      },
+      "primaryType": "Order",
+      "domain": {
+        "name": "zigzag.exchange",
+        "version": "1",
+        "chainId": "SN_GOERLI"
+      },
+      "message": {
+        "base_asset": baseAssetAddress.toString(),
+        "quote_asset": quoteAssetAddress.toString(),
+        "side": sideInt,
+        "base_quantity": amountBN.toString(),
+        "price": {
+          "numerator": priceRatio.numerator.toString(),
+          "denominator": priceRatio.denominator.toString()
+        },
+        "expiration": expiration.toString()
+      }
+    }
 
-    ZZMessage.message.push(sig.r.toString(), sig.s.toString());
+    // get starknet Account and sign
+    const accountContract = await this._getUserAccount();
+    const signature = await accountContract.signMessage(OrderMsg);
 
-    this.api.send("submitorder2", [this.network, market, ZZMessage.message]);
+    const ZZMessage = [
+      'StarkNet Message', // message_prefix
+      OrderMsg.domain.name, // domain_prefix name
+      OrderMsg.domain.version, // domain_prefix version
+      OrderMsg.domain.chainId, // domain_prefix chainId
+      this._accountState.address.toString(), // sender
+      OrderMsg.message.base_asset, // order
+      OrderMsg.message.quote_asset, // order
+      OrderMsg.message.side, // order
+      OrderMsg.message.base_quantity, // order
+      OrderMsg.message.price.numerator, // order price
+      OrderMsg.message.price.denominator, // order price
+      OrderMsg.message.expiration, // order
+      signature[0], // sig_r
+      signature[1] // sig_s
+    ]
+    this.api.send("submitorder2", [this.network, market, ZZMessage]);
   };
 
   signIn = async () => {
@@ -112,11 +164,9 @@ export default class APIStarknetProvider extends APIProvider {
     }
 
     // Check account initialized
-    const initialized = await this._checkAccountInitialized(
-      userWalletContractAddress
-    );
+    const initialized = await this._checkAccountInitialized();
     if (!initialized) {
-      await this._initializeAccount(userWalletContractAddress);
+      await this._initializeAccount(starknet.ec.getStarkKey(keypair));
     }
 
     this.api.send("login", [this.network, userWalletContractAddress]);
@@ -127,7 +177,7 @@ export default class APIStarknetProvider extends APIProvider {
     });
     let committedBalances;
     try {
-      committedBalances = await this._getBalances(userWalletContractAddress);
+      committedBalances = await this._getBalances();
     } catch (e) {
       toast.dismiss(balanceWaitToast);
       throw new Error(e);
@@ -135,8 +185,8 @@ export default class APIStarknetProvider extends APIProvider {
     toast.dismiss(balanceWaitToast);
 
     // Mint some tokens if the account is blank
-    for (let currency in committedBalances) {
-      if (committedBalances[currency].compare(0) === 0) {
+    const results = Object.keys(committedBalances).map(async (currency) => {
+      if (committedBalances[currency] === '0') {
         toast.info(`No ${currency} found. Minting you some`, {
           toastId: `No ${currency} found. Minting you some`,
         });
@@ -147,13 +197,13 @@ export default class APIStarknetProvider extends APIProvider {
           amount = bigInt(5e9).toString();
         }
         await this._mintBalance(
-          this.getCurrencyInfo().contractAddress,
-          userWalletContractAddress,
+          this.getCurrencyInfo(currency).address,
           amount
         );
         committedBalances[currency] = amount;
       }
-    }
+    });
+    await Promise.all(results);
 
     this._accountState = {
       address: userWalletContractAddress,
@@ -174,7 +224,7 @@ export default class APIStarknetProvider extends APIProvider {
     if (pairs.length === 0) return;
     if (!this.network) return;
     const pairText = pairs.join(",");
-    const url = `https://zigzag-markets.herokuapp.com/markets?id=${pairText}&chainid=${this.network}`;
+    const url = `https://secret-thicket-93345.herokuapp.com/api/v1/marketinfos?chain_id=${this.network}&market=${pairText}`;
     const marketInfoArray = await fetch(url).then((r) => r.json());
     if (!(marketInfoArray instanceof Array)) return;
     marketInfoArray.forEach((info) => (this._marketInfo[info.alias] = info));
@@ -190,7 +240,7 @@ export default class APIStarknetProvider extends APIProvider {
     return [...tickers];
   };
 
-  getCurrencyInfo(currency) {
+  getCurrencyInfo = (currency) => {
     const pairs = this.getPairs();
     for (let i = 0; i < pairs.length; i++) {
       const pair = pairs[i];
@@ -205,191 +255,123 @@ export default class APIStarknetProvider extends APIProvider {
     return null;
   }
 
-  cacheMarketInfoFromNetwork = async (pairs) => {
-    if (pairs.length === 0) return;
-    if (!this.network) return;
-    const pairText = pairs.join(",");
-    const url = `https://secret-thicket-93345.herokuapp.com/api/v1/marketinfos?chain_id=${this.network}&market=${pairText}`;
-    const marketInfoArray = await fetch(url).then((r) => r.json());
-    if (!(marketInfoArray instanceof Array)) return;
-    marketInfoArray.forEach((info) => (this.marketInfo[info.alias] = info));
-    return;
-  };
-
-  _checkAccountInitialized = async (userWalletContractAddress) => {
-    try {
-      await starknet.defaultProvider.callContract({
-        contract_address: userWalletContractAddress,
-        entry_point_selector:
-          starknet.stark.getSelectorFromName("assert_initialized"),
-        calldata: [],
-      });
-      return true;
-    } catch (e) {
-      return false;
-    }
-  };
-
-  _initializeAccount = async (userAddress) => {
-    const userAddressInt = bigInt(userAddress.slice(2), 16);
-    const result = await starknet.defaultProvider.addTransaction({
-      type: "INVOKE_FUNCTION",
-      contract_address: userAddress,
-      entry_point_selector: starknet.stark.getSelectorFromName("initialize"),
-      calldata: [userAddressInt.toString()],
-    });
-
-    return result;
-  };
-
-  _getBalances = async (userAddress) => {
-    const balances = {};
-    const currencies = this.getCurrencies();
-    for (let currency in currencies) {
-      const contractAddress = this.getCurrencyInfo().address;
-      if (contractAddress) {
-        let balance = await this._getBalance(contractAddress, userAddress);
-        balances[currency] = balance;
-      }
-    }
-    return balances;
-  };
-
-  _getBalance = async (contractAddress, userAddress) => {
-    const userAddressInt = bigInt(userAddress.slice(2), 16);
-    const balanceJson = await starknet.defaultProvider.callContract({
-      contract_address: contractAddress,
-      entry_point_selector: starknet.stark.getSelectorFromName("balance_of"),
-      calldata: [userAddressInt.toString()],
-    });
-    const balance = bigInt(balanceJson.result[0].slice(2), 16);
-    return balance;
-  };
-
-  _mintBalance = async (contractAddress, userAddress, amount) => {
-    const userAddressInt = bigInt(userAddress.slice(2), 16);
-    await starknet.defaultProvider.addTransaction({
-      type: "INVOKE_FUNCTION",
-      contract_address: contractAddress,
-      entry_point_selector: starknet.stark.getSelectorFromName("mint"),
-      calldata: [userAddressInt.toString(), amount, "0"],
-    });
-    return true;
-  };
-
-  _getAllowances = async (userAddress, spender) => {
-    const allowances = {};
-    const currencies = this.getCurrencies();
-    for (let currency in currencies) {
-      const contractAddress = this.getCurrencyInfo().address;
-      let allowance = await this._getTokenAllowance(
-        contractAddress,
-        userAddress,
-        spender
-      );
-      allowances[currency] = allowance;
-    }
-    return allowances;
-  };
-
-  _getTokenAllowance = async (tokenAddress, userAddress, spender) => {
-    const contractAddressInt = bigInt(spender.slice(2), 16);
-    const userAddressInt = bigInt(userAddress.slice(2), 16);
-    const allowanceJson = await starknet.defaultProvider.callContract({
-      contract_address: tokenAddress,
-      entry_point_selector: starknet.stark.getSelectorFromName("allowance"),
-      calldata: [userAddressInt.toString(), contractAddressInt],
-    });
-    const allowance = bigInt(allowanceJson.result[0].slice(2), 16);
-    return allowance;
-  };
-
-  _setTokenApproval = async (tokenAddress, userAddress, spender, amount) => {
-    const keypair = starknet.ec.ec.keyFromPrivate(
+  _getUserAccount = async () => {
+    const userWalletAddress = this._accountState.address;
+    const privateKey = starknet.ec.ec.keyFromPrivate(
       localStorage.getItem("starknet:privkey"),
       "hex"
     );
-    const spenderInt = bigInt(spender.slice(2), 16);
-    const localSigner = new starknet.Signer(
+    const starkKey = starknet.ec.ec.keyFromPrivate(privateKey.toString(), 'hex');
+    const accountContract = new starknet.Account(
       starknet.defaultProvider,
-      userAddress,
-      keypair
+      userWalletAddress,
+      starkKey
     );
-    return localSigner.addTransaction({
-      type: "INVOKE_FUNCTION",
-      contract_address: tokenAddress,
-      entry_point_selector: starknet.stark.getSelectorFromName("approve"),
-      calldata: [spenderInt.toString(), amount, "0"],
-    });
+    return accountContract;
   };
 
-  _createStarkNetDomainHash = () => {
-    const name = "zigzag.exchange";
-    const veriosn = 1;
-    const chianId = "SN_GOERLI";
+  _checkAccountInitialized = async () => {
+    const userWalletAddress = this._accountState.address;
+    const accountContract = new starknet.Contract(
+      starknetAccountContract.abi,
+      userWalletAddress
+    );
+    const signer = await accountContract.get_signer();
+    console.log(signer.toString());
+    return (signer.toString() !== '0');
+  };
 
-    let orderhash = starknet.hash.pedersen(name);
-    orderhash = starknet.hash.pedersen([orderhash, veriosn]);
-    orderhash = starknet.hash.pedersen([orderhash, chianId]);
+  _initializeAccount = async (starkKey) => {    
+    const userWalletAddress = this._accountState.address;
+    const accountContract = new starknet.Contract(
+      starknetAccountContract.abi,
+      userWalletAddress
+    );
+    const { transaction_hash: txHash }  = await accountContract.initialize (
+      starkKey,
+      "0"
+    );
+    return starknet.defaultProvider.waitForTransaction(txHash);
+  };
 
-    const starkNet_Domain = [
-      name,
-      veriosn,
-      chianId
-    ]
-    return { hash: orderhash, starkNet_Domain: starkNet_Domain };
-  }
+  _getBalances = async () => {
+    const balances = {};
+    const currencies = getCurrencies();
+    const results = currencies.map(async (currency) => {
+      const contractAddress = getCurrencyInfo(currency).address;
+      if (contractAddress) {
+        let balance = await this._getBalance(contractAddress);
+        balances[currency] = balance;
+      }
+    })
+    await Promise.all(results);
+    return balances;
+  };
 
-  _createOrderHash = (marketInfo, side, price, amount, expiration) => {
-    const baseAssetAddress = marketInfo.baseAsset.address;
-    const quoteAssetAddress = marketInfo.quoteAsset.address;
+  _getBalance = async (contractAddress) => {
+    const userWalletAddress = this._accountState.address;
+    const erc20 = new starknet.Contract(starknetERC20Contract, contractAddress);
+    const balance = await erc20.balance_of(userWalletAddress);
+    return starknet.number.toBN(balance.res, 16).toString();
+  };
 
-    const getFraction = (decimals) => {
-      let denominator = 1;
-      for (; (decimals * denominator) % 1 !== 0; denominator++);
-      return { numerator: decimals * denominator, denominator }
+  _mintBalance = async (contractAddress, amount) => {
+    const userWalletAddress = this._accountState.address;
+    const erc20 = new starknet.Contract(starknetERC20Contract, contractAddress);
+    const { transaction_hash: mintTxHash } = await erc20.mint(
+      userWalletAddress,
+      amount
+    );
+    await starknet.defaultProvider.waitForTransaction(mintTxHash);
+  };
+
+  _getAllowances = async (
+    spenderContractAddress = APIStarknetProvider.STARKNET_CONTRACT_ADDRESS
+  ) => {
+    const allowances = {};
+    const currencies = this.getCurrencies();
+    const results = currencies.map(async (currency) => {
+      const contractAddress = this.getCurrencyInfo(currency).address;
+      let allowance = await this._getTokenAllowance(
+        contractAddress,
+        spenderContractAddress
+      );
+      allowances[currency] = allowance;
+    })
+    await Promise.all(results);
+    return allowances;
+  };
+
+  _getTokenAllowance = async (
+    erc20Address,
+    spenderContractAddress = APIStarknetProvider.STARKNET_CONTRACT_ADDRESS
+  ) => {
+    const userWalletAddress = this._accountState.address;
+    const erc20 = new starknet.Contract(starknetERC20Contract, erc20Address);
+    const allowance = await erc20.allowance(
+      userWalletAddress,
+      spenderContractAddress
+    );
+    return starknet.number.toBN(allowance.res, 16).toString();
+  };
+
+  _setTokenApproval = async (
+    erc20Address,
+    spenderContractAddress = STARKNET_CONTRACT_ADDRESS,
+    amount
+  ) => {
+    const userWalletAddress = this._accountState.address;
+    const userAccount = await this._getUserAccount();
+    const call = {
+      contractAddress: erc20Address,
+      entrypoint: "approve",
+      calldata: [spenderContractAddress, amount.toString()],
     }
-    const priceRatio = getFraction(price);
-
-    const sideInt = side === "b" ? 0 : 1;
-    const baseQuantityInt = (
-      amount * (10 ** marketInfo.baseAsset.decimals)
-    ).toFixed(0);
-
-    let orderhash = starknet.hash.pedersen(baseAssetAddress);
-    orderhash = starknet.hash.pedersen([orderhash, quoteAssetAddress]);
-    orderhash = starknet.hash.pedersen([orderhash, sideInt]);
-    orderhash = starknet.hash.pedersen([orderhash, baseQuantityInt]);
-    orderhash = starknet.hash.pedersen([orderhash, priceRatio.numerator]);
-    orderhash = starknet.hash.pedersen([orderhash, priceRatio.denominator]);
-    orderhash = starknet.hash.pedersen([orderhash, expiration]);
-
-    const starknetOrder = [
-      baseAssetAddress,
-      quoteAssetAddress,
-      sideInt.toString(),
-      baseQuantityInt.toString(),
-      priceRatio.numerator.toString(),
-      priceRatio.denominator.toString(),
-      expiration.toString(),
-    ];
-    return { hash: orderhash, order: starknetOrder };
+    const { transaction_hash: txHash } = await userAccount.execute(
+      call,
+      undefined,
+      { maxFee: '0' }
+    );
+    return starknet.defaultProvider.waitForTransaction(txHash);
   };
-
-  _createZZMessageHash = (domainPrefix, order) => {
-    const sender = this._accountState.address;
-
-    let orderhash = starknet.hash.pedersen("StarkNet Message"); // message_prefix
-    orderhash = starknet.hash.pedersen([orderhash, domainPrefix.hash]);
-    orderhash = starknet.hash.pedersen([orderhash, sender]);
-    orderhash = starknet.hash.pedersen([orderhash, order.hash]);
-
-    const ZZMessage = [
-      "StarkNet Message",
-      ...domainPrefix.starkNet_Domain,
-      sender,
-      ...order.order
-    ]
-    return { hash: orderhash, message: ZZMessage };
-  }
 }
