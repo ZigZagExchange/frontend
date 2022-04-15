@@ -2,7 +2,7 @@ import Web3 from "web3";
 import { createIcon } from "@download/blockies";
 import Web3Modal from "web3modal";
 import Emitter from "tiny-emitter";
-import { ethers } from "ethers";
+import { ethers, constants as ethersConstants } from "ethers";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import { getENSName } from "lib/ens";
 import { formatAmount } from "lib/utils";
@@ -336,19 +336,19 @@ export default class API extends Emitter {
   };
 
   depositL2Fee = async (token) => {
-    return this.apiProvider.depositL2Fee(token);
+    return await this.apiProvider.depositL2Fee(token);
   };
 
   withdrawL2GasFee = async (token) => {
-    return this.apiProvider.withdrawL2GasFee(token);
+    return await this.apiProvider.withdrawL2GasFee(token);
   };
 
   withdrawL2FastGasFee = async (token) => {
-    return this.apiProvider.withdrawL2FastGasFee(token);
+    return await this.apiProvider.withdrawL2FastGasFee(token);
   };
 
   withdrawL2FastBridgeFee = async (token) => {
-    return this.apiProvider.withdrawL2FastBridgeFee(token);
+    return await this.apiProvider.withdrawL2FastBridgeFee(token);
   };
 
   cancelAllOrders = async () => {
@@ -382,7 +382,7 @@ export default class API extends Emitter {
 
   getBalanceOfCurrency = async (currency) => {
     const currencyInfo = this.getCurrencyInfo(currency);
-    let result = { balance: 0, allowance: MAX_ALLOWANCE };
+    let result = { balance: 0, allowance: ethersConstants.Zero };
     if (!this.ethersProvider || !currencyInfo) return result;
 
     try {

@@ -334,7 +334,10 @@ export default class APIZKProvider extends APIProvider {
 
   depositL2Fee = async (token = "ETH") => {
     // TODO: implement
-    return 0;
+    return { 
+      amount: 0.005, 
+      feeToken: 'ETH'
+    };
   };
 
   createWithdraw = async (
@@ -501,7 +504,11 @@ export default class APIZKProvider extends APIProvider {
         throw Error("Token not eligible for fast withdraw");
       }
       const feeData = await this.api.ethersProvider.getFeeData();
-      const bridgeFee = feeData.maxFeePerGas.mul(21000);
+      let bridgeFee = feeData.maxFeePerGas
+        .add(feeData.maxPriorityFeePerGas)
+        .mul(21000)
+
+      bridgeFee *= 1.5; // ZigZag fee
 
       if (token === "ETH") {
         return getNumberFormatted(bridgeFee);
@@ -730,7 +737,9 @@ export default class APIZKProvider extends APIProvider {
     if (pairs.length === 0) return;
     if (!this.network) return;
     const pairText = pairs.join(",");
-    const url = `https://zigzag-markets.herokuapp.com/markets?id=${pairText}&chainid=${this.network}`;
+    const url = (this.network === 1)
+      ? `https://zigzag-markets.herokuapp.com/markets?id=${pairText}&chainid=${this.network}`
+      : `https://secret-thicket-93345.herokuapp.com/api/v1/marketinfos?chain_id=${this.network}&market=${pairText}`
     const marketInfoArray = await fetch(url).then((r) => r.json());
     if (!(marketInfoArray instanceof Array)) return;
     marketInfoArray.forEach((info) => (this.marketInfo[info.alias] = info));
