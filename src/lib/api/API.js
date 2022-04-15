@@ -260,8 +260,9 @@ export default class API extends Emitter {
 
           await this.refreshNetwork();
           if (this.isZksyncChain()) {
-            await this.sleep(500);
+            await this.sleep(2000);
             const web3Provider = await this.web3Modal.connect();
+            await this.web3Modal.toggleModal();
             this.web3.setProvider(web3Provider);
             this.ethersProvider = new ethers.providers.Web3Provider(
               web3Provider
@@ -314,6 +315,7 @@ export default class API extends Emitter {
     this.setAPIProvider(this.apiProvider.network);
     this.emit("balanceUpdate", "wallet", {});
     this.emit("balanceUpdate", this.apiProvider.network, {});
+    this.emit("balanceUpdate", "polygon", {});
     this.emit("accountState", {});
     this.emit("signOut");
   };
@@ -369,6 +371,7 @@ export default class API extends Emitter {
 
   transferPolygonWeth = async (amount) => {
     const polygonChainId = this.getPolygonChainId(this.apiProvider.network);
+    console.log("===============",this.apiProvider.network)
     await window.ethereum.request({
       method: "wallet_switchEthereumChain",
       params: [{ chainId: polygonChainId }],
@@ -406,7 +409,9 @@ export default class API extends Emitter {
     };
     const subdomain = polygonProvider.getNetwork() === 1 ? "" : "mumbai.";
     receipt.txUrl = `https://${subdomain}polygonscan.com/tx/${txHash}`;
-    this.api.emit("bridgeReceipt", receipt);
+    this.emit("bridgeReceipt", receipt);
+    console.log("////////////////////",this.apiProvider.network)
+    this.signIn(this.apiProvider.network)
   };
 
   getNetworkName = (network) => {
@@ -448,6 +453,7 @@ export default class API extends Emitter {
   };
 
   withdrawL2GasFee = async (token) => {
+    console.log(token)
     return await this.apiProvider.withdrawL2GasFee(token);
   };
 

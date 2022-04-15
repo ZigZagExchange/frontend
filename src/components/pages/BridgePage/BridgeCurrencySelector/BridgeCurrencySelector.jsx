@@ -183,7 +183,7 @@ const BridgeCurrencySelector = ({ onChange, balances = {}, value, isOpenable }) 
         </div>
         <div className="currencyName">
           {value}
-          <FiChevronDown />
+          {isOpenable ? <FiChevronDown /> : <>&nbsp;&nbsp;</>}
         </div>
       </StyledBridgeCurrencySelector>
       <Modal

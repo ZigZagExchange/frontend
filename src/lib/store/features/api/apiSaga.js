@@ -36,7 +36,7 @@ export function* userPollingSaga() {
     const allSagas = [
       apply(api, api.getWalletBalances),
       apply(api, api.getBalances),
-      // apply(api, api.getPolygonWethBalance),
+      apply(api, api.getPolygonWethBalance),
     ];
 
     if (address) {

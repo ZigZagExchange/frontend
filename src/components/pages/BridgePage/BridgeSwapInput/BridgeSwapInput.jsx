@@ -60,7 +60,14 @@ const BridgeSwapInput = ({ value = {}, onChange, balances = {}, gasFee, bridgeFe
   const setMax = () => {
     let max = 0;
     try {
-      const currencyInfo = api.getCurrencyInfo(value.currency);
+      let currencyInfo = {};
+      if(value.currency === 'WETH'){
+        currencyInfo = api.getCurrencyInfo('ETH');
+      }
+      else {
+        currencyInfo = api.getCurrencyInfo(value.currency);
+      }
+      console.log(currencyInfo)
       const roundedDecimalDigits = Math.min(currencyInfo.decimals, 8);
       let balance = balances[value.currency].value / (10 ** currencyInfo.decimals);
       if (balance !== 0) {
