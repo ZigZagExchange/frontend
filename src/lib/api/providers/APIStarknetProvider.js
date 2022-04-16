@@ -2,7 +2,7 @@ import * as starknet from "starknet";
 import { toast } from "react-toastify";
 import bigInt from "big-integer";
 import starknetAccountContractV1 from "lib/contracts/Account_v1.json";
-import starknetERC20ContractABI_test from "lib/contracts/ERC20.json";
+import starknetERC20ContractABI_test from "lib/contracts/ERC20_test.json";
 import APIProvider from "./APIProvider";
 import { STARKNET_DOMAIN_TYPE_HASH, ORDER_TYPE_HASH } from "../constants";
 
@@ -314,8 +314,8 @@ export default class APIStarknetProvider extends APIProvider {
     const userWalletAddress = this._accountState.address;
     const erc20 = new starknet.Contract(starknetERC20ContractABI_test, contractAddress);
     const { transaction_hash: mintTxHash } = await erc20.mint(
-      userWalletAddress,
-      amount
+      userWalletAddress,      
+      starknet.uint256.bnToUint256(amount)
     );
     await starknet.defaultProvider.waitForTransaction(mintTxHash);
   };
@@ -364,6 +364,18 @@ export default class APIStarknetProvider extends APIProvider {
     }
     const { transaction_hash: txHash } = await userAccount.execute(
       call,
+      undefined,
+      { maxFee: '0' }
+    );
+    const { transaction_hash: txHash } = await userAccount.execute(
+      {
+        contractAddress: erc20Address,
+        entrypoint: 'approve',
+        calldata: [
+          spenderContractAddress,
+          starknet.uint256.bnToUint256(amount)
+        ],
+      },
       undefined,
       { maxFee: '0' }
     );
