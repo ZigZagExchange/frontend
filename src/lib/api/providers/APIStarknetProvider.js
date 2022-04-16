@@ -1,8 +1,8 @@
 import * as starknet from "starknet";
 import { toast } from "react-toastify";
 import bigInt from "big-integer";
-import starknetAccountContractV1 from "lib/contracts/Account_v1.json";
-import starknetERC20ContractABI_test from "lib/contracts/ERC20_test.json";
+import starknetAccountContractV1 from "lib/contracts/StarkNet_Account_v1.json";
+import starknetERC20ContractABI_test from "lib/contracts/StarkNet_ERC20_test.json";
 import APIProvider from "./APIProvider";
 import { STARKNET_DOMAIN_TYPE_HASH, ORDER_TYPE_HASH } from "../constants";
 

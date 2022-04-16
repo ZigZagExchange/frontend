@@ -6,7 +6,7 @@ import { ethers } from "ethers";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import { getENSName } from "lib/ens";
 import { formatAmount } from "lib/utils";
-import erc20ContractABI from "lib/contracts/ERC20.json";
+import erc20ContractABI from "lib/contracts/Ethereum_ERC20.json";
 import { MAX_ALLOWANCE } from "./constants";
 
 const chainMap = {
