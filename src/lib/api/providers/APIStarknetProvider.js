@@ -355,18 +355,7 @@ export default class APIStarknetProvider extends APIProvider {
     spenderContractAddress = APIStarknetProvider.STARKNET_CONTRACT_ADDRESS,
     amount
   ) => {
-    const userWalletAddress = this._accountState.address;
     const userAccount = await this._getUserAccount();
-    const call = {
-      contractAddress: erc20Address,
-      entrypoint: "approve",
-      calldata: [spenderContractAddress, amount.toString()],
-    }
-    const { transaction_hash: txHash } = await userAccount.execute(
-      call,
-      undefined,
-      { maxFee: '0' }
-    );
     const { transaction_hash: txHash } = await userAccount.execute(
       {
         contractAddress: erc20Address,
