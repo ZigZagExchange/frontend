@@ -8,6 +8,8 @@ import ButtonDemo from "../../molecules/Button/Button.demo";
 import InputFieldDemo from "../../atoms/InputField/InputField.demo";
 import CheckBoxDemo from "../../atoms/CheckBox/CheckBox.demo";
 import ToggleDemo from "../../molecules/Toggle/Toggle.demo";
+import DropdownDemo from "../../molecules/Dropdown/Dropdown.demo";
+import TabMenuDemo from "../../molecules/TabMenu/TabMenu.demo";
 import { Button } from "../../atoms/Form/Submit";
 import { toast } from "react-toastify";
 
@@ -63,6 +65,12 @@ const DSLPage = () => {
             </DSLItem>
             <DSLItem title={"Toggle Demo"}>
               <ToggleDemo />
+            </DSLItem>
+            <DSLItem title={"Dropdown Demo"}>
+              <DropdownDemo />
+            </DSLItem>
+            <DSLItem title={"TabMenu Demo"}>
+              <TabMenuDemo />
             </DSLItem>
             <DSLItem title={"Toast"}>
               <Button
