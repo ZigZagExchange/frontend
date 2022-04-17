@@ -68,7 +68,10 @@ export default function TradeBooks(props) {
               currentMarket={props.currentMarket}
               scrollToBottom={true}
             />
-            <TradePriceHeadSecond lastPrice={props.lastPrice} />
+            <TradePriceHeadSecond 
+              lastPrice={props.lastPrice}
+              marketInfo={props.marketInfo}
+           />
             <TradePriceTable
               useGradient="true"
               currentMarket={props.currentMarket}
