@@ -222,6 +222,8 @@ const AccountDropdown = ({width, item, leftIcon, rightIcon, clickFunction}) => {
     ]
 
     useEffect(() => {
+      if(wallet?.length === 0) return
+      if(wallet === null || wallet === undefined) return
       const sum_array = Object.keys(wallet)
       .filter(filterSmallBalances)
       .sort(sortByNotional)
