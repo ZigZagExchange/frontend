@@ -7,7 +7,8 @@ import { GoGlobe } from "react-icons/go";
 import { HiExternalLink } from "react-icons/hi";
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { Button, Dropdown, AccountDropdown, Menu, MenuItem } from "components";
+import styled from "styled-components";
+import { Menu, MenuItem } from "components";
 import { userSelector } from "lib/store/features/auth/authSlice";
 import { networkSelector } from "lib/store/features/api/apiSlice";
 import api from "lib/api";
@@ -16,6 +17,28 @@ import menu from "assets/icons/menu.png";
 import "./Header.css";
 import ConnectWalletButton from "../../atoms/ConnectWalletButton/ConnectWalletButton";
 import { Dev } from "../../../lib/helpers/env";
+import { TabMenu, Tab } from "components/molecules/TabMenu";
+import { Dropdown, AccountDropdown } from "components/molecules/Dropdown";
+import Button from "components/molecules/Button/Button";
+import { DiscordIcon, ExternalLinkIcon, TelegramIcon, TwitterIcon, DeleteIcon } from "components/atoms/Svg";
+import { toNumber } from "lodash";
+import ToggleTheme from "components/molecules/Toggle/ToggleTheme";
+import useTheme from "components/hooks/useTheme";
+
+const langList = [
+  {text:'EN',url:'#'},
+  {text:'FR',url:'#'}
+]
+
+const networkLists = [
+  {text:'zkSync - Mainnet', value: 1, url:'#'},
+  {text:'zkSync - Rinkeby', value: 1000, url:'#'}
+]
+
+const accountLists = [
+  {text:'0x83AD...83H4',url:'#', icon: <DeleteIcon />},
+  {text:'0x12BV...b89G',url:'#', icon: <DeleteIcon />}
+]
 
 export const Header = (props) => {
   // state to open or close the sidebar in mobile
@@ -26,6 +49,53 @@ export const Header = (props) => {
   const hasBridge = api.isImplemented("depositL2");
   const history = useHistory();
   const location = useLocation();
+  const [index, setIndex] = useState(toNumber(localStorage.getItem("tab_index")));
+  const [language, setLanguage] = useState(langList[0].text)
+  const [account, setAccount] = useState(accountLists[0].text)
+  const [networkName, setNetworkName] = useState(networkLists[0].text)
+  const { isDark, toggleTheme } = useTheme()
+
+  const changeLanguage = (text) => {
+    setLanguage(text)
+  }
+
+  const changeAccount = (text) => {
+    alert(text)
+  }
+
+  const changeNetwork = (text, value) => {
+    setNetworkName(text)
+    console.log("networkid: ", value)
+    api.setAPIProvider(value);
+    api.refreshNetwork().catch((err) => {
+      console.log(err);
+    });
+  }
+
+  const handleClick = (newIndex) => {
+    switch (newIndex) {
+      case 0:
+        setIndex(newIndex);
+        localStorage.setItem('tab_index', newIndex)
+        history.push('/')
+        break;
+      case 1:
+        setIndex(newIndex);
+        localStorage.setItem('tab_index', newIndex)
+        history.push('bridge')
+        break;
+      case 2:
+        setIndex(newIndex);
+        localStorage.setItem('tab_index', newIndex)
+        history.push('/list-pair')
+        break;
+      case 3:
+        window.open('https://docs.zigzag.exchange/', '_blank')
+        break;
+      default:
+        break;
+    }
+  }
 
   const handleMenu = ({ key }) => {
     switch (key) {
@@ -57,257 +127,81 @@ export const Header = (props) => {
   };
 
   return (
-    <>
-      <header>
-        <div className="mobile_header main_header mb_h">
-          <img src={logo} alt="logo" height="30" />
-          {/* open sidebar function */}
-          <img
-            onClick={() => {
-              setShow(!show);
-            }}
-            src={menu}
-            alt="..."
-          />
-        </div>
-        {/* mobile sidebar */}
-        {show ? (
-          <div className="mb_header_container mb_h">
-            <img src={logo} alt="logo" />
-            <div className="head_left">
-              <ul className="flex-column mt-4">
-                <li>
-                  <NavLink exact to="/" activeClassName="active_link">
-                    Trade
-                  </NavLink>
-                </li>
-                {hasBridge && (
-                  <li>
-                    <NavLink exact to="/bridge" activeClassName="active_link">
-                      Bridge
-                    </NavLink>
-                  </li>
-                )}
-                <li>
-                  <NavLink exact to="/list-pair" activeClassName="active_link">
-                    List Pair
-                  </NavLink>
-                </li>
-                {hasBridge && (
-                  <li>
-                    <a
-                      href="https://docs.zigzag.exchange/"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Docs <HiExternalLink />
-                    </a>
-                  </li>
-                )}
-                
-                <Dev>
-                  <li>
-                    <NavLink exact to="/pool" activeClassName="active_link">
-                      Pool
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink exact to="/dsl" activeClassName="active-link">
-                      DSL
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink exact to="/swap" activeClassName="active-link">
-                      Swap
-                    </NavLink>
-                  </li>
-                </Dev>
-              </ul>
-            </div>
-            <div className="head_right">
-              <div className="d-flex align-items-center justify-content-between">
-                {user.id && user.address ? (
-                  <Dropdown overlay={dropdownMenu}>
-                    <button className="address_button">
-                      {user.address.slice(0, 8)}···
-                      {user.address.slice(-4)}
-                    </button>
-                  </Dropdown>
-                ) : (
-                  <ConnectWalletButton />
-                )}
-              </div>
-              <div className="eu_text mt-3">
-                <GoGlobe className="eu_network" />
-                <select
-                  value={network.toString()}
-                  onChange={(e) => {
-                    api.setAPIProvider(parseInt(e.target.value));
-                    api.refreshNetwork().catch((err) => {
-                      console.log(err);
-                    });
-                  }}
-                >
-                  <option value="1">zkSync - Mainnet</option>
-                  <option value="1000">zkSync - Rinkeby</option>
-                </select>
-                <BiChevronDown className="eu_caret" />
-              </div>
-              <div className="head_left head_left_socials">
-                <ul>
-                  <li className="head_social_link">
-                    <a
-                      target="_blank"
-                      rel="noreferrer"
-                      href="https://discord.gg/zigzag"
-                    >
-                      <FaDiscord />
-                    </a>
-                  </li>
-                  <li className="head_social_link">
-                    <a
-                      target="_blank"
-                      rel="noreferrer"
-                      href="https://twitter.com/ZigZagExchange"
-                    >
-                      <FaTwitter />
-                    </a>
-                  </li>
-                  <li className="head_social_link">
-                    <a
-                      target="_blank"
-                      rel="noreferrer"
-                      href="https://t.me/zigzagexchange"
-                    >
-                      <FaTelegramPlane />
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        ) : null}
-
-        {/* desktop header */}
-        <div className="main_header head_wrapper_desktop dex_h">
-          <div className="head_left">
-            <Link to="/">
-              <a href="/" rel="noreferrer">
-                <img src={logo} alt="logo" height="30" />
-              </a>
-            </Link>
-            <ul>
-              <li>
-                <NavLink exact to="/" activeClassName="active_link">
-                  Trade
-                </NavLink>
-              </li>
-              {hasBridge && (
-                <li>
-                  <NavLink exact to="/bridge" activeClassName="active_link">
-                    Bridge
-                  </NavLink>
-                </li>
-              )}
-              <li>
-                <NavLink exact to="/list-pair" activeClassName="active_link">
-                  List Pair
-                </NavLink>
-              </li>
-              {hasBridge && (
-                <li>
-                  <a
-                    href="https://docs.zigzag.exchange/"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Docs <HiExternalLink />
-                  </a>
-                </li>
-              )}
-              <Dev>
-                <li>
-                  <NavLink exact to="/pool" activeClassName="active_link">
-                    Pool
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink exact to="/dsl" activeClassName="active_link">
-                    DSL
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink exact to="/swap" activeClassName="active-link">
-                    Swap
-                  </NavLink>
-                </li>
-              </Dev>
-            </ul>
-          </div>
-          <div className="head_right">
-            <div className="head_left head_left_socials">
-              <ul>
-                <li className="head_social_link">
-                  <a
-                    target="_blank"
-                    rel="noreferrer"
-                    href="https://discord.gg/zigzag"
-                  >
-                    <FaDiscord />
-                  </a>
-                </li>
-                <li className="head_social_link">
-                  <a
-                    target="_blank"
-                    rel="noreferrer"
-                    href="https://twitter.com/ZigZagExchange"
-                  >
-                    <FaTwitter />
-                  </a>
-                </li>
-                <li className="head_social_link">
-                  <a
-                    target="_blank"
-                    rel="noreferrer"
-                    href="https://t.me/zigzagexchange"
-                  >
-                    <FaTelegramPlane />
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <label htmlFor="networkSelector" className="eu_text">
-              <GoGlobe className="eu_network" />
-              <select
-                id="networkSelector"
-                value={network.toString()}
-                onChange={(e) => {
-                  api.setAPIProvider(parseInt(e.target.value));
-                  api.refreshNetwork().catch((err) => {
-                    console.log(err);
-                  });
-                }}
-              >
-                <option value="1">zkSync - Mainnet</option>
-                <option value="1000">zkSync - Rinkeby</option>
-              </select>
-              <BiChevronDown className="eu_caret" />
-            </label>
-            <div className="head_account_area">
-              {user.id && user.address ? (
-                <AccountDropdown />
-              ) : (
-                <Button
-                  className="bg_btn zig_btn_sm"
-                  loading={connecting}
-                  text="CONNECT WALLET"
-                  onClick={connect}
-                />
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
-    </>
+    <HeaderWrapper>
+      <Link to="/">
+        <a href="/" rel="noreferrer">
+          <img src={logo} alt="logo" height="32" />
+        </a>
+      </Link>
+      <TabMenu activeIndex={index} onItemClick={handleClick} style={{paddingTop: '22px'}}>
+        <Tab>TRADE</Tab>
+        <Tab>BRIDGE</Tab>
+        <Tab>LIST PAIR</Tab>
+        <Tab>DOCS<ExternalLinkIcon size={12} /></Tab>
+      </TabMenu>
+      <SocialLink
+        target="_blank"
+        rel="noreferrer"
+        href="https://discord.gg/zigzag"
+      >
+        <DiscordIcon />
+      </SocialLink>
+      <SocialLink
+        target="_blank"
+        rel="noreferrer"
+        href="https://twitter.com/ZigZagExchange"
+      >
+        <TwitterIcon />
+      </SocialLink>
+      <SocialLink
+        target="_blank"
+        rel="noreferrer"
+        href="https://t.me/zigzagexchange"
+      >
+        <TelegramIcon />
+      </SocialLink>
+      <VerticalDivider />
+      <StyledDropdown transparent item={langList} context={language} clickFunction={changeLanguage}/>
+      <ToggleTheme isDark={isDark} toggleTheme={toggleTheme} />
+      <VerticalDivider />
+      {user.id && user.address ? ( 
+        <>
+          <Dropdown width ={242} item={networkLists} context={networkName} clickFunction={changeNetwork}/>
+          <AccountDropdown width ={242} item={accountLists} rightIcon clickFunction={changeAccount}/>
+        </>
+      ) : (
+        <Button isLoading={connecting} scale="md" onClick={connect} style={{width: '143px'}}>CONNECT WALLET</Button>
+      )}
+    </HeaderWrapper>
   );
 };
+
+const HeaderWrapper = styled.div`
+  display: grid;
+  // grid-template-columns: 25.78px 462.22px 120px 1px 125px 1px 167px;
+  grid-auto-flow: column;
+  width: 100%;
+  height: 57px;
+  border-bottom: 1px solid ${({theme}) => theme.colors.foreground400};
+  align-items: center;
+  background-color: ${({theme}) => theme.colors.backgroundMediumEmphasis};
+  position: fixed;
+  padding: 0px 20px;
+  z-index: 100;
+`
+
+const SocialLink = styled.a`
+  svg path {
+    fill: ${({theme}) => theme.colors.foregroundLowEmphasis};
+  }
+`
+
+const StyledDropdown = styled(Dropdown)`
+  width: fit-content;
+`
+
+const VerticalDivider = styled.div`
+  width: 1px;
+  height: 32px;
+  background-color: ${({theme}) => theme.colors.foreground400};
+`
