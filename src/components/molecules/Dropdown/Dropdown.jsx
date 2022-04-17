@@ -44,30 +44,31 @@ const IconButton = styled(baseIcon)`
     }
 `
 
-const Dropdown = ({width, item, context, leftIcon, rightIcon, clickFunction}) => {
+const Dropdown = ({width, item, context, leftIcon, rightIcon, transparent, clickFunction}) => {
     const [isOpened, setIsOpened] = useState(false)
 
     const toggle = () => {
         setIsOpened(!isOpened)
     }
 
-    const handleClick = (url, text) => {
+    const handleClick = (url, text, value) => {
         if(url !== '#'){
             window.location.href = url
         }else{
-            clickFunction(text)
+            clickFunction(text, value)
+            toggle()
         }
     }
 
     return (
         <DropdownWrapper> 
-            <ExpandableButton expanded={isOpened} onClick={toggle}>{context}</ExpandableButton>
+            <ExpandableButton transparent={transparent} expanded={isOpened} onClick={toggle}>{context}</ExpandableButton>
             { isOpened &&
                 <Wrapper width={width}>
                         {item.map((items) => {
-                            const {text, url, icon} = items
+                            const {text, value, url, icon} = items
                         return (
-                        <DropdownListContainer key={items.text} leftIcon={leftIcon} onClick={()=> handleClick(url, text)}>
+                        <DropdownListContainer key={items.text} leftIcon={leftIcon} onClick={()=> handleClick(url, text, value)}>
                             {leftIcon && isValidElement(icon) && <IconButton variant="secondary" startIcon={cloneElement(icon)}></IconButton>}
                             <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{text}</Text>
 			                {rightIcon && isValidElement(icon) && <IconButton variant="secondary" endIcon={cloneElement(icon)}></IconButton>}
