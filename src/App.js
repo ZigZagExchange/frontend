@@ -6,7 +6,7 @@ import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 import "App.css";
 
 api.start();
-
+localStorage.setItem("tab_index", 0)
 class App extends React.Component {
   render() {
     return (
