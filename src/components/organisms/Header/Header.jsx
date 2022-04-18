@@ -20,7 +20,7 @@ import { Dev } from "../../../lib/helpers/env";
 import { TabMenu, Tab } from "components/molecules/TabMenu";
 import { Dropdown, AccountDropdown } from "components/molecules/Dropdown";
 import Button from "components/molecules/Button/Button";
-import { DiscordIcon, ExternalLinkIcon, TelegramIcon, TwitterIcon, DeleteIcon } from "components/atoms/Svg";
+import { DiscordIcon, ExternalLinkIcon, TelegramIcon, TwitterIcon, DeleteIcon, MenuIcon } from "components/atoms/Svg";
 import { toNumber } from "lodash";
 import ToggleTheme from "components/molecules/Toggle/ToggleTheme";
 import useTheme from "components/hooks/useTheme";
@@ -126,60 +126,88 @@ export const Header = (props) => {
       .catch(() => setConnecting(false));
   };
 
+  const isMobile = window.innerWidth < 1034
+
   return (
     <HeaderWrapper>
-      <NavWrapper>
-        <Link to="/">
-          <a href="/" rel="noreferrer">
-            <img src={logo} alt="logo" height="32" />
-          </a>
-        </Link>
-        <TabMenu activeIndex={index} onItemClick={handleClick} style={{paddingTop: '22px'}}>
-          <Tab>TRADE</Tab>
-          <Tab>BRIDGE</Tab>
-          <Tab>LIST PAIR</Tab>
-          <Tab>DOCS<ExternalLinkIcon size={12} /></Tab>
-        </TabMenu>
-      </NavWrapper>
-      <ActionsWrapper>
-        <SocialWrapper>
-          <SocialLink
-            target="_blank"
-            rel="noreferrer"
-            href="https://discord.gg/zigzag"
-          >
-            <DiscordIcon />
-          </SocialLink>
-          <SocialLink
-            target="_blank"
-            rel="noreferrer"
-            href="https://twitter.com/ZigZagExchange"
-          >
-            <TwitterIcon />
-          </SocialLink>
-          <SocialLink
-            target="_blank"
-            rel="noreferrer"
-            href="https://t.me/zigzagexchange"
-          >
-            <TelegramIcon />
-          </SocialLink>
-        </SocialWrapper>
-        <VerticalDivider />
-        <LanguageWrapper>
-          <StyledDropdown transparent item={langList} context={language} clickFunction={changeLanguage}/>
-          <ToggleTheme isDark={isDark} toggleTheme={toggleTheme} />
-        </LanguageWrapper>
-        <VerticalDivider />
-        {user.id && user.address ? ( 
-          <>
-            <Dropdown width ={242} item={networkLists} context={networkName} clickFunction={changeNetwork}/>
-            <AccountDropdown width ={242} item={accountLists} rightIcon clickFunction={changeAccount}/>
-          </>
-        ) : (
-          <Button isLoading={connecting} scale="md" onClick={connect} style={{width: '143px'}}>CONNECT WALLET</Button>
-        )}
-      </ActionsWrapper>
+      {
+        isMobile ?
+        <>
+          <LogoWrapper>
+            <Link to="/">
+              <a href="/" rel="noreferrer">
+                <img src={logo} alt="logo" height="32" />
+              </a>
+            </Link>
+          </LogoWrapper>
+          <ButtonWrapper>
+            {user.id && user.address ? ( 
+              <>
+                <AccountDropdown notext />
+              </>
+            ) : (
+              <Button isLoading={connecting} scale="md" onClick={connect} style={{width: '143px', marginRight: '19px', padding: connecting ? '8px 5px' : '8px 15px'}}>CONNECT WALLET</Button>
+            )}
+            <MenuButtonWrapper>
+              <MenuIcon />
+            </MenuButtonWrapper>
+          </ButtonWrapper>
+        </> :
+        <>
+          <NavWrapper>
+            <Link to="/">
+              <a href="/" rel="noreferrer">
+                <img src={logo} alt="logo" height="32" />
+              </a>
+            </Link>
+            <TabMenu activeIndex={index} onItemClick={handleClick} style={{paddingTop: '22px'}}>
+              <Tab>TRADE</Tab>
+              <Tab>BRIDGE</Tab>
+              <Tab>LIST PAIR</Tab>
+              <Tab>DOCS<ExternalLinkIcon size={12} /></Tab>
+            </TabMenu>
+          </NavWrapper>
+          <ActionsWrapper>
+            <SocialWrapper>
+              <SocialLink
+                target="_blank"
+                rel="noreferrer"
+                href="https://discord.gg/zigzag"
+              >
+                <DiscordIcon />
+              </SocialLink>
+              <SocialLink
+                target="_blank"
+                rel="noreferrer"
+                href="https://twitter.com/ZigZagExchange"
+              >
+                <TwitterIcon />
+              </SocialLink>
+              <SocialLink
+                target="_blank"
+                rel="noreferrer"
+                href="https://t.me/zigzagexchange"
+              >
+                <TelegramIcon />
+              </SocialLink>
+            </SocialWrapper>
+            <VerticalDivider />
+            <LanguageWrapper>
+              <StyledDropdown transparent item={langList} context={language} clickFunction={changeLanguage}/>
+              <ToggleTheme isDark={isDark} toggleTheme={toggleTheme} />
+            </LanguageWrapper>
+            <VerticalDivider />
+            {user.id && user.address ? ( 
+              <>
+                <Dropdown width ={242} item={networkLists} context={networkName} clickFunction={changeNetwork}/>
+                <AccountDropdown />
+              </>
+            ) : (
+              <Button isLoading={connecting} scale="md" onClick={connect} style={{width: '143px', padding: connecting ? '8px 5px' : '8px 15px'}}>CONNECT WALLET</Button>
+            )}
+          </ActionsWrapper>
+        </>
+      }
     </HeaderWrapper>
   );
 };
@@ -195,6 +223,20 @@ const HeaderWrapper = styled.div`
   position: fixed;
   padding: 0px 20px;
   z-index: 100;
+`
+
+const LogoWrapper = styled.div`
+`
+
+const ButtonWrapper = styled.div`
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  justify-content: end;
+`
+
+const MenuButtonWrapper = styled.div`
+  cursor: pointer;
 `
 
 const NavWrapper = styled.div`
