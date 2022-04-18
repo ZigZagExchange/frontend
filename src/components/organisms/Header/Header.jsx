@@ -1,22 +1,12 @@
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { useHistory, useLocation } from "react-router-dom";
-import { BiChevronDown } from "react-icons/bi";
-import { FaDiscord, FaTelegramPlane, FaTwitter } from "react-icons/fa";
-import { GoGlobe } from "react-icons/go";
-import { HiExternalLink } from "react-icons/hi";
 import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
 import styled from "styled-components";
-import { Menu, MenuItem } from "components";
 import { userSelector } from "lib/store/features/auth/authSlice";
 import { networkSelector } from "lib/store/features/api/apiSlice";
 import api from "lib/api";
 import logo from "assets/images/logo.png";
-import menu from "assets/icons/menu.png";
-import "./Header.css";
-import ConnectWalletButton from "../../atoms/ConnectWalletButton/ConnectWalletButton";
-import { Dev } from "../../../lib/helpers/env";
 import { TabMenu, Tab } from "components/molecules/TabMenu";
 import { Dropdown, AccountDropdown } from "components/molecules/Dropdown";
 import Button from "components/molecules/Button/Button";
@@ -97,22 +87,6 @@ export const Header = (props) => {
     }
   }
 
-  const handleMenu = ({ key }) => {
-    switch (key) {
-      case "signOut":
-        api.signOut();
-        return;
-      default:
-        throw new Error("Invalid dropdown option");
-    }
-  };
-
-  const dropdownMenu = (
-    <Menu onSelect={handleMenu}>
-      <MenuItem key="signOut">Disconnect</MenuItem>
-    </Menu>
-  );
-
   const connect = () => {
     setConnecting(true);
     api
@@ -129,7 +103,7 @@ export const Header = (props) => {
   const isMobile = window.innerWidth < 1034
 
   return (
-    <HeaderWrapper>
+    <HeaderWrapper isMobile={isMobile}>
       {
         isMobile ?
         <>
@@ -218,9 +192,9 @@ export const Header = (props) => {
           }
           <TabMenu row activeIndex={index} onItemClick={handleClick}>
             <Tab>TRADE</Tab>
-            <Tab>BRIDGE</Tab>
+            { hasBridge && (<Tab>BRIDGE</Tab>)}
             <Tab>LIST PAIR</Tab>
-            <Tab>DOCS<ExternalLinkIcon size={12} /></Tab>
+            { hasBridge && (<Tab>DOCS<ExternalLinkIcon size={12} /></Tab>)}
           </TabMenu>
           <HorizontalDivider />
           <ActionSideMenuWrapper>
@@ -273,6 +247,8 @@ const HeaderWrapper = styled.div`
   position: fixed;
   padding: 0px 20px;
   z-index: 100;
+  box-shadow: ${({isMobile}) => isMobile? '0px 8px 16px 0px #0101011A' : ''};
+  ${({isMobile}) => isMobile? 'backdrop-filter: blur(8px);' : ''}
 `
 
 const LogoWrapper = styled.div`
@@ -347,6 +323,7 @@ const SideMenuWrapper = styled.div`
   justify-content: center;
   align-items: center;
   border: 1px solid ${({theme}) => theme.colors.foreground400};
+  backdrop-filter: blur(8px);
 `
 
 const HorizontalDivider = styled.div`

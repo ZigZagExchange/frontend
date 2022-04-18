@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styled from 'styled-components'
 import Button from "../Button/Button";
 import { AccountButton } from '../ExpandableButton'
@@ -10,7 +10,7 @@ import {
   networkSelector,
   balancesSelector,
 } from "lib/store/features/api/apiSlice";
-import { formatUSD } from "lib/utils";
+import { formatUSD, HideMenuOnOutsideClicked } from "lib/utils";
 import api from "lib/api";
 import { IconButton as baseIcon } from "../IconButton";
 import Text from "components/atoms/Text/Text";
@@ -35,6 +35,7 @@ const DropdownDisplay = styled.div`
   opacity: 1;
   display: flex;
   flex-direction: column;
+  backdrop-filter: blur(8px);
 `
 
 const DropdownHeader = styled.div`
@@ -166,6 +167,9 @@ const AccountDropdown = ({notext}) => {
     const [selectedLayer, setSelectedLayer] = useState(2);
     const coinEstimator = useCoinEstimator();
     const isMobile = window.innerWidth < 430
+    const wrapperRef = useRef(null)
+
+    HideMenuOnOutsideClicked(wrapperRef, setIsOpened)
   
     const wallet =
       selectedLayer === 1 ? balanceData.wallet : balanceData[network];
@@ -236,7 +240,7 @@ const AccountDropdown = ({notext}) => {
     }, [wallet, filterSmallBalances, sortByNotional])
 
     return (
-        <DropdownWrapper> 
+        <DropdownWrapper ref={wrapperRef}> 
             <AccountButton notext={notext} expanded={isOpened} onClick={toggle}></AccountButton>
             { isOpened &&
               <DropdownDisplay isMobile={isMobile}>
