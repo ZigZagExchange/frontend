@@ -23,7 +23,7 @@ const Tab = ({ isActive = false, row = false, onClick, children }) => {
         <StyledText isActive row={row} font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">
           {children}
         </StyledText> : 
-        <Text style={{paddingBottom: '20px'}} font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">
+        <Text style={{paddingBottom: '16px'}} font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">
           {children}
         </Text>
       }

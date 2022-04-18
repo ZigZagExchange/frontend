@@ -183,7 +183,7 @@ export const Header = (props) => {
         </>
       }
       {
-        show ? 
+        show && isMobile ? 
         <SideMenuWrapper>
           {
           user.id && user.address ? 
