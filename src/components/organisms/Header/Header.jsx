@@ -128,57 +128,64 @@ export const Header = (props) => {
 
   return (
     <HeaderWrapper>
-      <Link to="/">
-        <a href="/" rel="noreferrer">
-          <img src={logo} alt="logo" height="32" />
-        </a>
-      </Link>
-      <TabMenu activeIndex={index} onItemClick={handleClick} style={{paddingTop: '22px'}}>
-        <Tab>TRADE</Tab>
-        <Tab>BRIDGE</Tab>
-        <Tab>LIST PAIR</Tab>
-        <Tab>DOCS<ExternalLinkIcon size={12} /></Tab>
-      </TabMenu>
-      <SocialLink
-        target="_blank"
-        rel="noreferrer"
-        href="https://discord.gg/zigzag"
-      >
-        <DiscordIcon />
-      </SocialLink>
-      <SocialLink
-        target="_blank"
-        rel="noreferrer"
-        href="https://twitter.com/ZigZagExchange"
-      >
-        <TwitterIcon />
-      </SocialLink>
-      <SocialLink
-        target="_blank"
-        rel="noreferrer"
-        href="https://t.me/zigzagexchange"
-      >
-        <TelegramIcon />
-      </SocialLink>
-      <VerticalDivider />
-      <StyledDropdown transparent item={langList} context={language} clickFunction={changeLanguage}/>
-      <ToggleTheme isDark={isDark} toggleTheme={toggleTheme} />
-      <VerticalDivider />
-      {user.id && user.address ? ( 
-        <>
-          <Dropdown width ={242} item={networkLists} context={networkName} clickFunction={changeNetwork}/>
-          <AccountDropdown width ={242} item={accountLists} rightIcon clickFunction={changeAccount}/>
-        </>
-      ) : (
-        <Button isLoading={connecting} scale="md" onClick={connect} style={{width: '143px'}}>CONNECT WALLET</Button>
-      )}
+      <NavWrapper>
+        <Link to="/">
+          <a href="/" rel="noreferrer">
+            <img src={logo} alt="logo" height="32" />
+          </a>
+        </Link>
+        <TabMenu activeIndex={index} onItemClick={handleClick} style={{paddingTop: '22px'}}>
+          <Tab>TRADE</Tab>
+          <Tab>BRIDGE</Tab>
+          <Tab>LIST PAIR</Tab>
+          <Tab>DOCS<ExternalLinkIcon size={12} /></Tab>
+        </TabMenu>
+      </NavWrapper>
+      <ActionsWrapper>
+        <SocialWrapper>
+          <SocialLink
+            target="_blank"
+            rel="noreferrer"
+            href="https://discord.gg/zigzag"
+          >
+            <DiscordIcon />
+          </SocialLink>
+          <SocialLink
+            target="_blank"
+            rel="noreferrer"
+            href="https://twitter.com/ZigZagExchange"
+          >
+            <TwitterIcon />
+          </SocialLink>
+          <SocialLink
+            target="_blank"
+            rel="noreferrer"
+            href="https://t.me/zigzagexchange"
+          >
+            <TelegramIcon />
+          </SocialLink>
+        </SocialWrapper>
+        <VerticalDivider />
+        <LanguageWrapper>
+          <StyledDropdown transparent item={langList} context={language} clickFunction={changeLanguage}/>
+          <ToggleTheme isDark={isDark} toggleTheme={toggleTheme} />
+        </LanguageWrapper>
+        <VerticalDivider />
+        {user.id && user.address ? ( 
+          <>
+            <Dropdown width ={242} item={networkLists} context={networkName} clickFunction={changeNetwork}/>
+            <AccountDropdown width ={242} item={accountLists} rightIcon clickFunction={changeAccount}/>
+          </>
+        ) : (
+          <Button isLoading={connecting} scale="md" onClick={connect} style={{width: '143px'}}>CONNECT WALLET</Button>
+        )}
+      </ActionsWrapper>
     </HeaderWrapper>
   );
 };
 
 const HeaderWrapper = styled.div`
   display: grid;
-  // grid-template-columns: 25.78px 462.22px 120px 1px 125px 1px 167px;
   grid-auto-flow: column;
   width: 100%;
   height: 57px;
@@ -188,6 +195,34 @@ const HeaderWrapper = styled.div`
   position: fixed;
   padding: 0px 20px;
   z-index: 100;
+`
+
+const NavWrapper = styled.div`
+  display: grid;
+  grid-template-columns: 32px 421px;
+  align-items: center;
+`
+
+const ActionsWrapper = styled.div`
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  justify-items: center;
+`
+
+const SocialWrapper = styled.div`
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  justify-items: center;
+  width: 120px;
+`
+
+const LanguageWrapper = styled.div`
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  // width: 80px;
 `
 
 const SocialLink = styled.a`
