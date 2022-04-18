@@ -146,10 +146,10 @@ export const Header = (props) => {
                 <AccountDropdown notext />
               </>
             ) : (
-              <Button isLoading={connecting} scale="md" onClick={connect} style={{width: '143px', marginRight: '19px', padding: connecting ? '8px 5px' : '8px 15px'}}>CONNECT WALLET</Button>
+              <Button isLoading={connecting} scale="md" onClick={connect} style={{width: '143px', padding: connecting ? '8px 5px' : '8px 15px'}}>CONNECT WALLET</Button>
             )}
             <MenuButtonWrapper>
-              <MenuIcon />
+              <MenuIcon onClick={() => setShow(!show)} />
             </MenuButtonWrapper>
           </ButtonWrapper>
         </> :
@@ -199,7 +199,7 @@ export const Header = (props) => {
             <VerticalDivider />
             {user.id && user.address ? ( 
               <>
-                <Dropdown width ={242} item={networkLists} context={networkName} clickFunction={changeNetwork}/>
+                <Dropdown width={242} item={networkLists} context={networkName} clickFunction={changeNetwork}/>
                 <AccountDropdown />
               </>
             ) : (
@@ -207,6 +207,56 @@ export const Header = (props) => {
             )}
           </ActionsWrapper>
         </>
+      }
+      {
+        show ? 
+        <SideMenuWrapper>
+          {
+          user.id && user.address ? 
+          <Dropdown style={{justifySelf: 'center'}} width={242} item={networkLists} context={networkName} clickFunction={changeNetwork}/> : 
+          <></>
+          }
+          <TabMenu row activeIndex={index} onItemClick={handleClick}>
+            <Tab>TRADE</Tab>
+            <Tab>BRIDGE</Tab>
+            <Tab>LIST PAIR</Tab>
+            <Tab>DOCS<ExternalLinkIcon size={12} /></Tab>
+          </TabMenu>
+          <HorizontalDivider />
+          <ActionSideMenuWrapper>
+            <span>Language: </span>
+            <StyledDropdown transparent item={langList} context={language} clickFunction={changeLanguage}/>
+          </ActionSideMenuWrapper>
+          <ActionSideMenuWrapper>
+            <span>Theme: </span>
+            <ToggleTheme isDark={isDark} toggleTheme={toggleTheme} />
+          </ActionSideMenuWrapper>
+          <HorizontalDivider />
+          <SocialWrapper style={{justifySelf: 'center'}}>
+            <SocialLink
+              target="_blank"
+              rel="noreferrer"
+              href="https://discord.gg/zigzag"
+            >
+              <DiscordIcon />
+            </SocialLink>
+            <SocialLink
+              target="_blank"
+              rel="noreferrer"
+              href="https://twitter.com/ZigZagExchange"
+            >
+              <TwitterIcon />
+            </SocialLink>
+            <SocialLink
+              target="_blank"
+              rel="noreferrer"
+              href="https://t.me/zigzagexchange"
+            >
+              <TelegramIcon />
+            </SocialLink>
+          </SocialWrapper>
+        </SideMenuWrapper> :
+        <></>
       }
     </HeaderWrapper>
   );
@@ -216,7 +266,7 @@ const HeaderWrapper = styled.div`
   display: grid;
   grid-auto-flow: column;
   width: 100%;
-  height: 57px;
+  height: 56px;
   border-bottom: 1px solid ${({theme}) => theme.colors.foreground400};
   align-items: center;
   background-color: ${({theme}) => theme.colors.backgroundMediumEmphasis};
@@ -233,7 +283,7 @@ const ButtonWrapper = styled.div`
   grid-auto-flow: column;
   align-items: center;
   justify-content: end;
-  gap: 23px;
+  gap: 19px;
 `
 
 const MenuButtonWrapper = styled.div`
@@ -282,4 +332,38 @@ const VerticalDivider = styled.div`
   width: 1px;
   height: 32px;
   background-color: ${({theme}) => theme.colors.foreground400};
+`
+
+const SideMenuWrapper = styled.div`
+  position: fixed;
+  width: 320px;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  background: ${({theme}) => theme.colors.backgroundLowEmphasis};
+  z-index: 9999;
+  display: grid;
+  grid-auto-flow: row;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid ${({theme}) => theme.colors.foreground400};
+`
+
+const HorizontalDivider = styled.div`
+  width: 229px;
+  height: 1px;
+  background: ${({theme}) => theme.colors.foreground400};
+`
+
+const ActionSideMenuWrapper = styled.div`
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  justify-content: space-between;
+  span {
+    font-family: WorkSans-SemiBold;
+    font-size: 12px;
+    line-height: 14px;
+    text-transform: uppercase;
+  }
 `

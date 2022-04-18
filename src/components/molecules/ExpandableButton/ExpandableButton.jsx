@@ -8,6 +8,7 @@ const IconButton = styled(baseIcon)`
     background-color: ${({ theme, transparent }) => transparent ? 'transparent' : theme.colors.foreground300};
 	padding: ${({ transparent }) => transparent ? '0px' : '8px 16px'};
 	height: 32px;
+	justify-content: space-between;
 `
 
 

@@ -3,27 +3,29 @@ import styled from "styled-components";
 import StyledTab from "./StyledTab";
 import Text from "../../atoms/Text/Text";
 
-const Divider = styled.div`
-    height: 4px;
-    width: 100%;
-    background: linear-gradient(93.46deg, ${({ theme }) => theme.colors.primaryHighEmphasis} 16.94%, ${({ theme }) => theme.colors.secondaryHighEmphasis} 97.24%);
+const StyledText = styled(Text)`
+  width: fit-content;
+  padding-bottom: ${({ row }) => row ? '8px' : '16px'};
+  background:
+    linear-gradient(93.46deg, ${({ theme }) => theme.colors.primaryHighEmphasis} 16.94%, ${({ theme }) => theme.colors.secondaryHighEmphasis} 97.24%)
+    left 
+    bottom
+    transparent    
+    no-repeat; 
+  background-size:100% 4px;
 `
 
-const Wrapper = styled.div`
-    width: 100%;
-    height: 4px;
-`
-
-const Tab = ({ isActive = false, onClick, children }) => {
+const Tab = ({ isActive = false, row = false, onClick, children }) => {
   return (
     <StyledTab onClick={onClick}>
-      <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">
-        {children}
-      </Text>
       {
         isActive ?
-        <Divider /> :
-        <Wrapper />
+        <StyledText isActive row={row} font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">
+          {children}
+        </StyledText> : 
+        <Text style={{paddingBottom: '20px'}} font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">
+          {children}
+        </Text>
       }
     </StyledTab>
   );
