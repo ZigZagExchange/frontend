@@ -26,7 +26,7 @@ const DropdownDisplay = styled.div`
   border-radius: 8px;
   transition: all 0.2s ease-in-out;
   box-shadow: 0px 8px 16px 0px #0101011A;
-  width: 400px;
+  width: ${({ isMobile }) => isMobile ? '250px' : '400px'};
   height: 331px;
   background: ${({ theme }) => theme.colors.backgroundLowEmphasis};
   border: 1px solid ${({ theme }) => theme.colors.foreground400};
@@ -157,7 +157,7 @@ const IconButton = styled(baseIcon)`
   }
 `
 
-const AccountDropdown = ({width, item, leftIcon, rightIcon, clickFunction}) => {
+const AccountDropdown = ({notext}) => {
     const [isOpened, setIsOpened] = useState(false)
     const network = useSelector(networkSelector);
     const balanceData = useSelector(balancesSelector);
@@ -165,6 +165,7 @@ const AccountDropdown = ({width, item, leftIcon, rightIcon, clickFunction}) => {
     const [totalBalance, setTotalBalance] = useState(0);
     const [selectedLayer, setSelectedLayer] = useState(2);
     const coinEstimator = useCoinEstimator();
+    const isMobile = window.innerWidth < 430
   
     const wallet =
       selectedLayer === 1 ? balanceData.wallet : balanceData[network];
@@ -236,9 +237,9 @@ const AccountDropdown = ({width, item, leftIcon, rightIcon, clickFunction}) => {
 
     return (
         <DropdownWrapper> 
-            <AccountButton expanded={isOpened} onClick={toggle}></AccountButton>
+            <AccountButton notext={notext} expanded={isOpened} onClick={toggle}></AccountButton>
             { isOpened &&
-              <DropdownDisplay>
+              <DropdownDisplay isMobile={isMobile}>
                 <DropdownHeader>
                   <Dropdown width ={242} item={accountData} rightIcon context="0x83AD...83H4" clickFunction={clickItem}/>
                   <IconButtonWrapper>

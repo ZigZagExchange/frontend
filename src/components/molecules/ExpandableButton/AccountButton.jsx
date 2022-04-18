@@ -14,21 +14,21 @@ const IconButton = styled(baseIcon)`
 
 const AvatarImg = styled.img`
     border: 1px solid ${({ theme }) => theme.colors.foreground400};
-    width: 15px;
-    height: 15px;
+    width: ${({ notext }) => notext ? '23px' : '15px'};
+    height: ${({ notext }) => notext ? '23px' : '15px'};
     border-radius: 35px;
-    margin-right: 10px;
+    margin-right: ${({ notext }) => notext ? '0px !important' : '10px !important'};
 `;
 
 const AccountButton = ({ ...props }) => {
     const user = useSelector(userSelector);
     const { profile } = user;
 
-	const { expanded, onClick } = props
+	const { expanded, notext, onClick } = props
 
 	return (
-		user.id && user.address ? <IconButton variant="secondary" onClick={onClick} startIcon={<AvatarImg src={profile.image} alt={profile.name} />} endIcon={expanded ? <CaretUpIcon /> : <CaretDownIcon />}>
-			<Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{profile.name}</Text>
+		user.id && user.address ? <IconButton variant="secondary" onClick={onClick} startIcon={<AvatarImg notext={notext} src={profile.image} alt={profile.name} />} endIcon={expanded ? <CaretUpIcon /> : <CaretDownIcon />}>
+			{ notext ? null : <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{profile.name}</Text>}
 		</IconButton> : null
 	)
 }
