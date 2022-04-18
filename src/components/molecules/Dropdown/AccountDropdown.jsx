@@ -30,8 +30,8 @@ const DropdownDisplay = styled.div`
   height: 331px;
   background: ${({ theme }) => theme.colors.backgroundLowEmphasis};
   border: 1px solid ${({ theme }) => theme.colors.foreground400};
-  top: 20;
-  right: 0;
+  top: 45px;
+  right: 0px;
   opacity: 1;
   display: flex;
   flex-direction: column;

@@ -8,7 +8,7 @@ import Text from '../../atoms/Text/Text'
 
 const IconButton = styled(baseIcon)`
     background-color: transparent;
-	padding: 8px 16px;
+	padding: 0px;
 	height: 32px;
 `
 

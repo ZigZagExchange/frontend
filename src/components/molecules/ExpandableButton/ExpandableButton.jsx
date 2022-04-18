@@ -6,7 +6,7 @@ import Text from '../../atoms/Text/Text'
 
 const IconButton = styled(baseIcon)`
     background-color: ${({ theme, transparent }) => transparent ? 'transparent' : theme.colors.foreground300};
-	padding: 8px 16px;
+	padding: ${({ transparent }) => transparent ? '0px' : '8px 16px'};
 	height: 32px;
 `
 

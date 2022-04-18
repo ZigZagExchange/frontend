@@ -233,6 +233,7 @@ const ButtonWrapper = styled.div`
   grid-auto-flow: column;
   align-items: center;
   justify-content: end;
+  gap: 23px;
 `
 
 const MenuButtonWrapper = styled.div`
@@ -264,7 +265,7 @@ const LanguageWrapper = styled.div`
   display: grid;
   grid-auto-flow: column;
   align-items: center;
-  // width: 80px;
+  gap: 27px;
 `
 
 const SocialLink = styled.a`
