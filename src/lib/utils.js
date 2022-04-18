@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { BigNumber } from "ethers";
 import isString from "lodash/isString";
 import get from "lodash/get";
@@ -129,4 +130,24 @@ export function formatDate(date) {
       date.getFullYear(),
     ].join("-");
   }
+}
+
+export function HideMenuOnOutsideClicked(ref, hideMenu) {
+  useEffect(() => {
+      /**
+       * Alert if clicked on outside of element
+       */
+      function handleClickOutside(event) {
+          if (ref.current && !ref.current.contains(event.target)) {
+              hideMenu(false)
+          }
+      }
+
+      // Bind the event listener
+      document.addEventListener("mousedown", handleClickOutside)
+      return () => {
+          // Unbind the event listener on clean up
+          document.removeEventListener("mousedown", handleClickOutside)
+      };
+  }, [ref, hideMenu])
 }
