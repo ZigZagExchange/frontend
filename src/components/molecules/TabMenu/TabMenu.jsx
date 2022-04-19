@@ -1,4 +1,4 @@
-import React, { cloneElement, Children } from "react";
+import React, { cloneElement, Children, useEffect } from "react";
 import styled from "styled-components";
 
 const Wrapper = styled.div`
@@ -10,6 +10,9 @@ const Wrapper = styled.div`
 `;
 
 const ButtonMenu = ({ activeIndex = 0, onItemClick, row, children, ...props }) => {
+  useEffect(() => {
+    localStorage.setItem("tab_index", activeIndex)
+  }, [])
   return (
     <Wrapper row={row} {...props}>
         {Children.map(children, (child, index) => {
