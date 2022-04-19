@@ -22,9 +22,15 @@ export default class APIProvider {
   constructor(api, network) {
       this.api = api
       this.network = network
+    if (network === 1) {
       this.websocketUrl = process.env.REACT_APP_ZIGZAG_WS;
-      if (network === 1000 && process.env.REACT_APP_ZIGZAG_WS_RINKEBY) {
-          this.websocketUrl = process.env.REACT_APP_ZIGZAG_WS_RINKEBY;
-      }
+    } else if (
+      [1000, 1001].includes(network) &&
+      process.env.REACT_APP_ZIGZAG_WS_RINKEBY
+    ) {
+      this.websocketUrl = process.env.REACT_APP_ZIGZAG_WS_RINKEBY;
+    } else {
+      throw new Error('APIProvider, wrong network')
+    }
   }
 }
