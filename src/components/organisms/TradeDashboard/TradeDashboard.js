@@ -115,6 +115,8 @@ export function TradeDashboard() {
       networkText = "zksync";
     } else if (network === 1000) {
       networkText = "zksync-rinkeby";
+    } else if (network === 1001) {
+      networkText = "starknet-goerli";
     }
     history.push(`/?market=${currentMarket}&network=${networkText}`);
   }, [network, currentMarket]);

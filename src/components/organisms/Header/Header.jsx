@@ -150,6 +150,7 @@ export const Header = (props) => {
                 >
                   <option value="1">zkSync - Mainnet</option>
                   <option value="1000">zkSync - Rinkeby</option>
+                  <option value="1001">StarkNet - Goerli</option>
                 </select>
                 <BiChevronDown className="eu_caret" />
               </div>
@@ -290,6 +291,7 @@ export const Header = (props) => {
               >
                 <option value="1">zkSync - Mainnet</option>
                 <option value="1000">zkSync - Rinkeby</option>
+                <option value="1001">StarkNet - Goerli</option>
               </select>
               <BiChevronDown className="eu_caret" />
             </label>
