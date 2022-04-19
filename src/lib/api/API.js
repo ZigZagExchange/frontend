@@ -19,8 +19,6 @@ export default class API extends Emitter {
   ws = null;
   apiProvider = null;
   ethersProvider = null;
-  marketInfo = {};
-  lastprices = {};
   _signInProgress = null;
   _profiles = {};
 

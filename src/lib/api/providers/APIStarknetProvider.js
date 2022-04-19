@@ -169,7 +169,16 @@ export default class APIStarknetProvider extends APIProvider {
     // Check account initialized
     const initialized = await this._checkAccountInitialized();
     if (!initialized) {
+      const initializeContractToast = toast.info(
+        "Your account contract is not yet initialized. Initializing account contract...",
+        {
+          autoClose: false,
+          toastId:
+            "Your account contract is not yet initialized. Initializing account contract...",
+        }
+      );
       await this._initializeAccount(starknet.ec.getStarkKey(keypair));
+      toast.dismiss(initializeContractToast);
     }
 
     this.api.send("login", [this.network, userWalletContractAddress]);
@@ -190,7 +199,7 @@ export default class APIStarknetProvider extends APIProvider {
     // Mint some tokens if the account is blank
     const results = Object.keys(committedBalances).map(async (currency) => {
       if (committedBalances[currency] === '0') {
-        toast.info(`No ${currency} found. Minting you some`, {
+        const mintWaitToast = toast.info(`No ${currency} found. Minting you some`, {
           toastId: `No ${currency} found. Minting you some`,
         });
         let amount;
@@ -204,6 +213,7 @@ export default class APIStarknetProvider extends APIProvider {
           amount
         );
         committedBalances[currency] = amount;
+        toast.dismiss(mintWaitToast);
       }
     });
     await Promise.all(results);
@@ -280,7 +290,6 @@ export default class APIStarknetProvider extends APIProvider {
       userWalletAddress
     );
     const signer = await accountContract.get_signer();
-    console.log(signer.toString());
     return (signer.toString() !== '0');
   };
 
