@@ -7,8 +7,10 @@ import APIProvider from "./APIProvider";
 import { STARKNET_DOMAIN_TYPE_HASH, ORDER_TYPE_HASH } from "../constants";
 
 export default class APIStarknetProvider extends APIProvider {
+  static VALID_SIDES = ["b", "s"];
   static STARKNET_CONTRACT_ADDRESS =
     "0x074f861a79865af1fb77af6197042e8c73147e28c55ac61e385ac756f89b33d6";
+
   _accountState = {};
   marketInfo = {};
   getCurrencies
@@ -26,6 +28,10 @@ export default class APIStarknetProvider extends APIProvider {
   };
 
   submitOrder = async (market, side, price, baseAmount, quoteAmount) => {
+    if (!APIStarknetProvider.VALID_SIDES.includes(side)) {
+      throw new Error("Invalid side");
+    }
+
     const marketInfo = this.marketInfo[market];
     // check allowance first
     const tokenInfo = side === "s" ? marketInfo.baseAsset : marketInfo.quoteAsset;
@@ -40,11 +46,12 @@ export default class APIStarknetProvider extends APIProvider {
     let minAmountInt = bigInt(1e20 * 10 ** tokenInfo.decimals);
     if (allowance.compare(minAmountInt) === -1) {
       let amountInt = bigInt(1e21 * 10 ** tokenInfo.decimals);
-      await this._setTokenApproval(
+      const success = await this._setTokenApproval(
         tokenInfo.address,
         APIStarknetProvider.STARKNET_CONTRACT_ADDRESS,
         amountInt.toString()
       );
+      if (!success) throw new Error("Error approving contract");
     }
     toast.dismiss(allowancesToast);
 
@@ -94,7 +101,7 @@ export default class APIStarknetProvider extends APIProvider {
     }
 
     let hash = starknet.hash.pedersen([
-      stringToFelt(sell_order_msg.message_prefix),
+      stringToFelt(ZZMessage.message_prefix),
       STARKNET_DOMAIN_TYPE_HASH 
     ])
     hash = starknet.hash.pedersen([hash, stringToFelt(ZZMessage.domain_prefix.name)])
@@ -356,18 +363,21 @@ export default class APIStarknetProvider extends APIProvider {
     amount
   ) => {
     const userAccount = await this._getUserAccount();
-    const { transaction_hash: txHash } = await userAccount.execute(
+    const { code, transaction_hash } = await userAccount.execute(
       {
         contractAddress: erc20Address,
         entrypoint: 'approve',
-        calldata: [
-          spenderContractAddress,
-          starknet.uint256.bnToUint256(amount)
-        ],
+        calldata: starknet.number.bigNumberishArrayToDecimalStringArray([
+          starknet.number.toBN(spenderContractAddress.toString()), // address decimal
+          Object.values(starknet.uint256.bnToUint256(amount.toString())),
+        ].flatMap((x) => x)),
       },
       undefined,
       { maxFee: '0' }
     );
-    return starknet.defaultProvider.waitForTransaction(txHash);
+    
+    if(code !== 'TRANSACTION_RECEIVED') return false;
+    await starknet.defaultProvider.waitForTransaction(transaction_hash);
+    return true;
   };
 }
