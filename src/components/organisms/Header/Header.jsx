@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { useHistory, useLocation } from "react-router-dom";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { userSelector } from "lib/store/features/auth/authSlice";
 import { networkSelector } from "lib/store/features/api/apiSlice";
@@ -39,11 +39,24 @@ export const Header = (props) => {
   const hasBridge = api.isImplemented("depositL2");
   const history = useHistory();
   const location = useLocation();
-  const [index, setIndex] = useState(toNumber(localStorage.getItem("tab_index")));
+  const [index, setIndex] = useState(0);
   const [language, setLanguage] = useState(langList[0].text)
   const [account, setAccount] = useState(accountLists[0].text)
-  const [networkName, setNetworkName] = useState(networkLists[0].text)
+  const [networkName, setNetworkName] = useState('')
   const { isDark, toggleTheme } = useTheme()
+
+  useEffect(() => {
+    const netName = networkLists.filter((item, i) => {
+      return item.value === network
+    })
+    setNetworkName(netName[0].text)
+  })
+
+
+  useEffect(() => {
+    const tabIndex = localStorage.getItem("tab_index")
+    if(tabIndex !== null) setIndex(toNumber(tabIndex))
+  }, [])
 
   const changeLanguage = (text) => {
     setLanguage(text)
@@ -81,6 +94,11 @@ export const Header = (props) => {
         break;
       case 3:
         window.open('https://docs.zigzag.exchange/', '_blank')
+        break;
+      case 4:
+        setIndex(newIndex);
+        localStorage.setItem('tab_index', newIndex)
+        history.push('/dsl')
         break;
       default:
         break;
@@ -134,11 +152,11 @@ export const Header = (props) => {
                 <img src={logo} alt="logo" height="32" />
               </a>
             </Link>
-            <TabMenu activeIndex={index} onItemClick={handleClick} style={{paddingTop: '22px'}}>
+            <TabMenu activeIndex={index} onItemClick={handleClick} style={{paddingTop: '20px'}}>
               <Tab>TRADE</Tab>
-              <Tab>BRIDGE</Tab>
+              { hasBridge && (<Tab>BRIDGE</Tab>)}
               <Tab>LIST PAIR</Tab>
-              <Tab>DOCS<ExternalLinkIcon size={12} /></Tab>
+              { hasBridge && (<Tab>DOCS<ExternalLinkIcon size={12} /></Tab>)}
             </TabMenu>
           </NavWrapper>
           <ActionsWrapper>
