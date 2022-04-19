@@ -55,7 +55,10 @@ const BridgeSwapInput = ({ value = {}, onChange, balances = {}, gasFee, bridgeFe
   const setCurrency = useCallback(currency => {
     onChange({ currency, amount: '' })
   }, [onChange])
-  const setAmount = useCallback(e => onChange({ amount: e.target.value.replace(/[^0-9.]/g,'') }), [onChange])
+  const setAmount = useCallback(e => {
+    if(e.target.value.length > 10) return;
+    onChange({ amount: e.target.value.replace(/[^0-9.]/g,'') })
+  }, [onChange])
 
   const setMax = () => {
     let max = 0;

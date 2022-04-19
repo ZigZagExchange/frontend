@@ -299,8 +299,6 @@ const Bridge = () => {
     console.log(details)
     _setSwapDetails(details);
 
-    if(fromNetwork.from.key === 'polygon' || toNetwork.key === 'polygon') return; //For polygon network, we have to call other function to calculate gas fee.
-
     const setFee = (bridgeFee, feeToken) => {
       setL2Fee(bridgeFee)
       setL2FeeToken(feeToken)
@@ -311,6 +309,12 @@ const Bridge = () => {
         setFormErr("");
       }
     };
+
+    if(fromNetwork.from.key === 'polygon' || toNetwork.key === 'polygon') {
+      setFee(null, null)
+      setL1Fee(0.005)
+      return; //For polygon network, we have to call other function to calculate gas fee.
+    }
 
     // setFee(null); setFee has two parameters. what is this?
     setL1Fee(null);
@@ -368,12 +372,14 @@ const Bridge = () => {
       deferredXfer = api.transferToBridge(
         `${swapDetails.amount}`,
         swapDetails.currency,
-        ZKSYNC_POLYGON_BRIDGE.address
+        ZKSYNC_POLYGON_BRIDGE.address,
+        user.address
       );
     } else if (fromNetwork.from.key === "ethereum" && toNetwork.key === "zksync") {
       deferredXfer = api.depositL2(
         `${swapDetails.amount}`,
-        swapDetails.currency
+        swapDetails.currency,
+        user.address
       );
     } else if (fromNetwork.from.key === "zksync" && toNetwork.key === "ethereum") {
       if (isFastWithdraw) {

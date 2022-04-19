@@ -402,10 +402,11 @@ export default class API extends Emitter {
 
     let receipt = {
       date: +new Date(),
-      network: polygonProvider.getNetwork(),
+      network: await polygonProvider.getNetwork(),
       amount,
       token: "WETH",
       type: ZKSYNC_POLYGON_BRIDGE.receiptKeyPolygon,
+      txId: txHash,
     };
     const subdomain = polygonProvider.getNetwork() === 1 ? "" : "mumbai.";
     receipt.txUrl = `https://${subdomain}polygonscan.com/tx/${txHash}`;
@@ -436,16 +437,16 @@ export default class API extends Emitter {
     return true;
   };
 
-  depositL2 = async (amount, token) => {
-    return this.apiProvider.depositL2(amount, token);
+  depositL2 = async (amount, token, address) => {
+    return this.apiProvider.depositL2(amount, token, address);
   };
 
   withdrawL2 = async (amount, token) => {
     return this.apiProvider.withdrawL2(amount, token);
   };
 
-  transferToBridge = (amount, token, address) => {
-    return this.apiProvider.transferToBridge(amount, token, address);
+  transferToBridge = (amount, token, address, userAddress) => {
+    return this.apiProvider.transferToBridge(amount, token, address, userAddress);
   };
 
   depositL2Fee = async (token) => {

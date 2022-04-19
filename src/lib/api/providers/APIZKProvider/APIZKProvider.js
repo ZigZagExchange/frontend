@@ -13,6 +13,7 @@ import {
   ZKSYNC_ETHEREUM_FAST_BRIDGE
 } from "components/pages/BridgePage/Bridge/constants";
 import _ from "lodash"
+// import wethContractABI from "lib/contracts/WETH.json";
 
 export default class APIZKProvider extends APIProvider {
   static SEEDS_STORAGE_KEY = "@ZZ/ZKSYNC_SEEDS";
@@ -27,6 +28,7 @@ export default class APIZKProvider extends APIProvider {
   zksyncCompatible = true;
   _tokenWithdrawFees = {};
   _tokenInfo = {};
+  eligibleFastWithdrawTokens = ["ETH", "FRAX", "UST"];
 
   getProfile = async (address) => {
     try {
@@ -59,13 +61,14 @@ export default class APIZKProvider extends APIProvider {
     return {};
   };
 
-  handleBridgeReceipt = (_receipt, amount, token, type, target) => {
+  handleBridgeReceipt = (_receipt, amount, token, type, target, walletAddress) => {
     let receipt = {
       date: +new Date(),
       network: this.network,
       amount,
       token,
       type,
+      walletAddress,
     };
     if (!_receipt) {
       return receipt;
@@ -307,7 +310,7 @@ export default class APIZKProvider extends APIProvider {
     return this.syncWallet ? this.syncWallet.getAccountState() : {};
   };
 
-  depositL2 = async (amountDecimals, token = "ETH") => {
+  depositL2 = async (amountDecimals, token = "ETH", address = "") => {
     let transfer;
 
     const currencyInfo = this.getCurrencyInfo(token);
@@ -322,7 +325,7 @@ export default class APIZKProvider extends APIProvider {
 
       this.api.emit(
         "bridgeReceipt",
-        this.handleBridgeReceipt(transfer, amountDecimals, token, "deposit", "ethereum")
+        this.handleBridgeReceipt(transfer, amountDecimals, token, ZKSYNC_POLYGON_BRIDGE.ethTozkSync, "ethereum", `https://zkscan.io/explorer/accounts/${address}`)
       );
       return transfer;
     } catch (err) {
@@ -395,7 +398,7 @@ export default class APIZKProvider extends APIProvider {
     return transfer;
   };
 
-  transferToBridge = async (amountDecimals, token, address) => {
+  transferToBridge = async (amountDecimals, token, address, userAddress) => {
     if (
       (ZKSYNC_POLYGON_BRIDGE.address === address && !ZKSYNC_POLYGON_BRIDGE.eligibleTokensZkSync.includes(token)) ||
       (ZKSYNC_ETHEREUM_FAST_BRIDGE.address === address && !ZKSYNC_ETHEREUM_FAST_BRIDGE.eligibleTokensZkSync.includes(token))
@@ -440,8 +443,9 @@ export default class APIZKProvider extends APIProvider {
           transfer,
           amountTransferred,
           token,
-          ZKSYNC_POLYGON_BRIDGE.receiptKeyZkSync,
-          "zksync"
+          ZKSYNC_POLYGON_BRIDGE.zkSyncToPolygon,
+          "zksync",
+          `https://polygonscan.com/address/${userAddress}`
         )
       );
     } else if (ZKSYNC_ETHEREUM_FAST_BRIDGE.address === address) {

@@ -319,7 +319,7 @@ export const apiSlice = createSlice({
     },
     addBridgeReceipt(state, { payload }) {
       if (!payload || !payload.txId) return;
-      const { amount, token, txUrl, bridgeReceiptsKey } = payload;
+      const { amount, token, txUrl, type, walletAddress } = payload;
 
       const renderBridgeLink = (text, link) => {
         return (
@@ -339,7 +339,7 @@ export const apiSlice = createSlice({
       };
 
       let successMsg, targetMsg, extraInfoLink;
-      switch (bridgeReceiptsKey) {
+      switch (type) {
         case "deposit":
           successMsg = "deposited";
           targetMsg = "in your zkSync wallet";
@@ -357,13 +357,15 @@ export const apiSlice = createSlice({
           break;
         case "bridge_to_zksync":
           successMsg = "transferred";
-          targetMsg = "to your zkSync wallet";
+          targetMsg = "to the bridge:";
           extraInfoLink = null;
           break;
         case "bridge_to_polygon":
           successMsg = "transferred";
           targetMsg = "to your Polygon wallet";
           extraInfoLink = null;
+          break;
+        case "zkSyncToPolygon":
           break;
         default:
           successMsg = "transferd";
@@ -379,8 +381,12 @@ export const apiSlice = createSlice({
             {amount} {token}{" "}
             {targetMsg}
             .
-            <br />
-            <br />
+            {type !== "zkSynv_to_polygon" && type !== "eth_to_zksync" &&
+              <>
+              <br />
+              <br />
+              </>
+            }
             <a
               href={txUrl}
               style={{
@@ -394,6 +400,20 @@ export const apiSlice = createSlice({
               View transaction
             </a>
             {" • "}
+            {type === "zkSynv_to_polygon" && 
+              <>
+                <br />
+                Confirm that your funds have arrived on Polygon:
+                <a href={walletAddress} target="_blank"> Polygon wallet </a>
+              </>
+            }
+            {type === "eth_to_zksync" && 
+              <>
+                <br />
+                Confirm that your funds have arrived on zkSync:
+                <a href={walletAddress} target="_blank"> zkSync wallet </a>
+              </>
+            }
             {extraInfoLink &&
               renderBridgeLink(
                 extraInfoLink.text,

@@ -8,7 +8,9 @@ export const ZKSYNC_POLYGON_BRIDGE = {
   eligibleTokensZkSync: ["ETH"],
   eligibleTokensPolygon: ["WETH"],
   receiptKeyZkSync: "bridge_to_zksync",
-  receiptKeyPolygon: "bridge_to_polygon"
+  receiptKeyPolygon: "bridge_to_polygon",
+  zkSyncToPolygon: "zkSynv_to_polygon",
+  ethTozkSync: "eth_to_zksync"
 }
 
 export const ZKSYNC_ETHEREUM_FAST_BRIDGE = {
