@@ -14,7 +14,6 @@ import api from "lib/api";
 import logo from "assets/images/logo.png";
 import menu from "assets/icons/menu.png";
 import "./Header.css";
-import ConnectWalletButton from "../../atoms/ConnectWalletButton/ConnectWalletButton";
 import { Dev } from "../../../lib/helpers/env";
 
 export const Header = (props) => {
@@ -62,6 +61,20 @@ export const Header = (props) => {
         <div className="mobile_header main_header mb_h">
           <img src={logo} alt="logo" height="30" />
           {/* open sidebar function */}
+            {user.id && user.address ? (
+              <Dropdown overlay={dropdownMenu}>
+                <button className="address_button">
+                  Connected: {user.address.slice(0, 8)}...{user.address.slice(-4)}
+                </button>
+              </Dropdown>
+            ) : (
+              <Button
+                className="bg_btn zig_btn_sm"
+                loading={connecting}
+                text="CONNECT WALLET"
+                onClick={connect}
+              />
+            )}
           <img
             onClick={() => {
               setShow(!show);
@@ -125,19 +138,7 @@ export const Header = (props) => {
               </ul>
             </div>
             <div className="head_right">
-              <div className="d-flex align-items-center justify-content-between">
-                {user.id && user.address ? (
-                  <Dropdown overlay={dropdownMenu}>
-                    <button className="address_button">
-                      {user.address.slice(0, 8)}···
-                      {user.address.slice(-4)}
-                    </button>
-                  </Dropdown>
-                ) : (
-                  <ConnectWalletButton />
-                )}
-              </div>
-              <div className="eu_text mt-3">
+              <div className="eu_text">
                 <GoGlobe className="eu_network" />
                 <select
                   value={network.toString()}
