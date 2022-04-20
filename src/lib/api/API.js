@@ -8,6 +8,7 @@ import { getENSName } from "lib/ens";
 import { formatAmount } from "lib/utils";
 import erc20ContractABI from "lib/contracts/ERC20.json";
 import { MAX_ALLOWANCE } from "./constants";
+import { isMobile } from "react-device-detect";
 
 const chainMap = {
   "0x1": 1,
@@ -92,6 +93,7 @@ export default class API extends Emitter {
         network: networkName,
         cacheProvider: true,
         theme: "dark",
+        disableInjectedProvider: isMobile,
         providerOptions: {
           walletconnect: {
             package: WalletConnectProvider,
