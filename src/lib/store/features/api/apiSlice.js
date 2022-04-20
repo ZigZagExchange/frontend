@@ -365,7 +365,16 @@ export const apiSlice = createSlice({
           targetMsg = "to your Polygon wallet";
           extraInfoLink = null;
           break;
-        case "zkSyncToPolygon":
+        case "zkSynv_to_polygon":
+          successMsg = "transferd";
+          targetMsg = "to Polygon:";
+          extraInfoLink = null;
+          break;
+        case "polygon_to_zkSync":
+        case "eth_to_zksync":
+          successMsg = "transferd";
+          targetMsg = "to zkSync:";
+          extraInfoLink = null;
           break;
         default:
           successMsg = "transferd";
@@ -380,8 +389,7 @@ export const apiSlice = createSlice({
             Successfully {successMsg}{" "}
             {amount} {token}{" "}
             {targetMsg}
-            .
-            {type !== "zkSynv_to_polygon" && type !== "eth_to_zksync" &&
+            {type !== "zkSynv_to_polygon" && type !== "eth_to_zksync" && type !== "polygon_to_zkSync" &&
               <>
               <br />
               <br />
@@ -400,18 +408,21 @@ export const apiSlice = createSlice({
               View transaction
             </a>
             {" • "}
-            {type === "zkSynv_to_polygon" && 
+            {(type === "eth_to_zksync" || type === "zkSynv_to_polygon" || type === "polygon_to_zkSync")&& 
               <>
                 <br />
-                Confirm that your funds have arrived on Polygon:
-                <a href={walletAddress} target="_blank"> Polygon wallet </a>
-              </>
-            }
-            {type === "eth_to_zksync" && 
-              <>
-                <br />
-                Confirm that your funds have arrived on zkSync:
-                <a href={walletAddress} target="_blank"> zkSync wallet </a>
+                Confirm that your funds have arrived {targetMsg}
+                <a 
+                  href={walletAddress} 
+                  rel="noreferrer" 
+                  target="_blank"
+                  style={{
+                    color: "white",
+                    textDecoration: "underline",
+                    fontWeight: "bold",
+                  }}
+                > {type === "zkSynv_to_polygon" ? 'Polygon wallet':' zkSync wallet'} </a>
+                {" • "}
               </>
             }
             {extraInfoLink &&

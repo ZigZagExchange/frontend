@@ -10,7 +10,8 @@ import { closestPackableTransactionAmount } from "zksync";
 import BatchTransferService from "./BatchTransferService";
 import {
   ZKSYNC_POLYGON_BRIDGE,
-  ZKSYNC_ETHEREUM_FAST_BRIDGE
+  ZKSYNC_ETHEREUM_FAST_BRIDGE,
+  ETH_ZKSYNC_BRIDGE
 } from "components/pages/BridgePage/Bridge/constants";
 import _ from "lodash"
 // import wethContractABI from "lib/contracts/WETH.json";
@@ -322,10 +323,10 @@ export default class APIZKProvider extends APIProvider {
         depositTo: this.syncWallet.address(),
         amount,
       });
-
+      console.log("adfasdf",this.network)
       this.api.emit(
         "bridgeReceipt",
-        this.handleBridgeReceipt(transfer, amountDecimals, token, ZKSYNC_POLYGON_BRIDGE.ethTozkSync, "ethereum", `https://zkscan.io/explorer/accounts/${address}`)
+        this.handleBridgeReceipt(transfer, amountDecimals, token, ETH_ZKSYNC_BRIDGE.ethTozkSync, "ethereum", this.network===1000 ? `https://rinkeby.zksync.io/explorer/accounts/${address}`:`https://zkscan.io/explorer/accounts/${address}`)
       );
       return transfer;
     } catch (err) {
@@ -391,6 +392,7 @@ export default class APIZKProvider extends APIProvider {
       onSameFeeToken,
       onDiffFeeToken
     );
+    
     this.api.emit(
       "bridgeReceipt",
       this.handleBridgeReceipt(transfer, amountTransferred, token, "withdraw", "zksync")
@@ -437,6 +439,7 @@ export default class APIZKProvider extends APIProvider {
     );
 
     if (ZKSYNC_POLYGON_BRIDGE.address === address) {
+      console.log("******************",this.network)
       this.api.emit(
         "bridgeReceipt",
         this.handleBridgeReceipt(
@@ -445,7 +448,7 @@ export default class APIZKProvider extends APIProvider {
           token,
           ZKSYNC_POLYGON_BRIDGE.zkSyncToPolygon,
           "zksync",
-          `https://polygonscan.com/address/${userAddress}`
+          this.network === 1000 ? `https://mumbai.polygonscan.com/address/${userAddress}`:`https://polygonscan.com/address/${userAddress}`
         )
       );
     } else if (ZKSYNC_ETHEREUM_FAST_BRIDGE.address === address) {

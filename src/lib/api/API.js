@@ -369,7 +369,7 @@ export default class API extends Emitter {
     return wethBalance;
   };
 
-  transferPolygonWeth = async (amount) => {
+  transferPolygonWeth = async (amount, walletAddress) => {
     const polygonChainId = this.getPolygonChainId(this.apiProvider.network);
     console.log("===============",this.apiProvider.network)
     await window.ethereum.request({
@@ -405,8 +405,9 @@ export default class API extends Emitter {
       network: await polygonProvider.getNetwork(),
       amount,
       token: "WETH",
-      type: ZKSYNC_POLYGON_BRIDGE.receiptKeyPolygon,
+      type: ZKSYNC_POLYGON_BRIDGE.polygonToZksSync,
       txId: txHash,
+      walletAddress: polygonChainId === "0x13881" ? `https://rinkeby.zksync.io/explorer/accounts/${walletAddress}` : `https://zkscan.io/explorer/accounts/${walletAddress}`
     };
     const subdomain = polygonProvider.getNetwork() === 1 ? "" : "mumbai.";
     receipt.txUrl = `https://${subdomain}polygonscan.com/tx/${txHash}`;

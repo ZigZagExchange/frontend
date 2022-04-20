@@ -10,6 +10,10 @@ export const ZKSYNC_POLYGON_BRIDGE = {
   receiptKeyZkSync: "bridge_to_zksync",
   receiptKeyPolygon: "bridge_to_polygon",
   zkSyncToPolygon: "zkSynv_to_polygon",
+  polygonToZksSync: "polygon_to_zkSync"
+}
+
+export const  ETH_ZKSYNC_BRIDGE = {
   ethTozkSync: "eth_to_zksync"
 }
 

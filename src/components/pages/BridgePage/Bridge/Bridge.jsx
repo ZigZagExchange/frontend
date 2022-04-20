@@ -31,6 +31,7 @@ import {
   ZKSYNC_ETHEREUM_FAST_BRIDGE,
   ZKSYNC_POLYGON_BRIDGE
 } from "./constants"
+import { toast } from "react-toastify";
 
 const defaultTransfer = {
   type: "deposit",
@@ -360,14 +361,28 @@ const Bridge = () => {
       });
   };
 
+  const renderGuidContent = () => {
+    return <div>
+      <p style={{fontSize: '14px', lineHeight:'24px'}}>1. Switch to Polygon network</p>
+      <p style={{fontSize: '14px', lineHeight:'24px'}}>2. Sign the transaction and wait for confirmation</p>
+      <p style={{fontSize: '14px', lineHeight:'24px'}}>3. Wait until "Switch Network" pops up</p>
+      <p style={{fontSize: '14px', lineHeight:'24px'}}>4. Switch back to Ethereum network and trade on ZigZag</p>
+    </div>
+  }
+
   const doTransfer = (e) => {
     e.preventDefault();
     let deferredXfer;
-
     setLoading(true);
-
     if (fromNetwork.from.key === "polygon" && toNetwork.key === "zksync") {
-      deferredXfer = api.transferPolygonWeth(`${swapDetails.amount}`)
+      deferredXfer = api.transferPolygonWeth(`${swapDetails.amount}`, user.address)
+      toast.success(
+        renderGuidContent(),
+        {
+          closeOnClick: false,
+          autoClose: 15000,
+        },
+      );
     } else if (fromNetwork.from.key === "zksync" && toNetwork.key === "polygon") {
       deferredXfer = api.transferToBridge(
         `${swapDetails.amount}`,
@@ -658,6 +673,7 @@ const Bridge = () => {
           Disconnected
         </div>
       )}
+      
     </>
   );
 };
