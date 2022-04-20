@@ -91,9 +91,9 @@ export default class API extends Emitter {
 
       this.web3Modal = new Web3Modal({
         network: networkName,
-        cacheProvider: true,
+        cacheProvider: false,
         theme: "dark",
-        disableInjectedProvider: isMobile,
+        disableInjectedProvider: false,
         providerOptions: {
           walletconnect: {
             package: WalletConnectProvider,
@@ -251,7 +251,10 @@ export default class API extends Emitter {
 
           await this.refreshNetwork();
           if (this.isZksyncChain()) {
-            const web3Provider = await this.web3Modal.connect();
+            const web3Provider = isMobile
+              ? await this.web3Modal.connectTo("walletconnect")
+              : await this.web3Modal.connect();
+
             this.web3.setProvider(web3Provider);
             this.ethersProvider = new ethers.providers.Web3Provider(
               web3Provider
@@ -290,7 +293,7 @@ export default class API extends Emitter {
     } else if (!this.apiProvider) {
       return;
     } else if (this.web3Modal) {
-      this.web3Modal.clearCachedProvider();
+      await this.web3Modal.clearCachedProvider();
     }
 
     this.web3 = null;
