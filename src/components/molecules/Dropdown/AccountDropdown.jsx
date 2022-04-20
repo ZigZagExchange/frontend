@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styled from 'styled-components'
 import Button from "../Button/Button";
 import { AccountButton } from '../ExpandableButton'
@@ -10,7 +10,7 @@ import {
   networkSelector,
   balancesSelector,
 } from "lib/store/features/api/apiSlice";
-import { formatUSD } from "lib/utils";
+import { formatUSD, HideMenuOnOutsideClicked } from "lib/utils";
 import api from "lib/api";
 import { IconButton as baseIcon } from "../IconButton";
 import Text from "components/atoms/Text/Text";
@@ -27,15 +27,16 @@ const DropdownDisplay = styled.div`
   border-radius: 8px;
   transition: all 0.2s ease-in-out;
   box-shadow: 0px 8px 16px 0px #0101011A;
-  width: 400px;
+  width: ${({ isMobile }) => isMobile ? '250px' : '400px'};
   height: 331px;
   background: ${({ theme }) => theme.colors.backgroundLowEmphasis};
   border: 1px solid ${({ theme }) => theme.colors.foreground400};
-  top: 20;
-  right: 0;
+  top: 45px;
+  right: 0px;
   opacity: 1;
   display: flex;
   flex-direction: column;
+  backdrop-filter: blur(8px);
 `
 
 const DropdownHeader = styled.div`
@@ -158,7 +159,7 @@ const IconButton = styled(baseIcon)`
   }
 `
 
-const AccountDropdown = ({width, item, leftIcon, rightIcon, clickFunction}) => {
+const AccountDropdown = ({notext}) => {
     const [isOpened, setIsOpened] = useState(false)
     const network = useSelector(networkSelector);
     const balanceData = useSelector(balancesSelector);
@@ -166,6 +167,10 @@ const AccountDropdown = ({width, item, leftIcon, rightIcon, clickFunction}) => {
     const [totalBalance, setTotalBalance] = useState(0);
     const [selectedLayer, setSelectedLayer] = useState(2);
     const coinEstimator = useCoinEstimator();
+    const isMobile = window.innerWidth < 430
+    const wrapperRef = useRef(null)
+
+    HideMenuOnOutsideClicked(wrapperRef, setIsOpened)
   
     const wallet =
       selectedLayer === 1 ? balanceData.wallet : balanceData[network];
@@ -223,6 +228,8 @@ const AccountDropdown = ({width, item, leftIcon, rightIcon, clickFunction}) => {
     ]
 
     useEffect(() => {
+      if(wallet?.length === 0) return
+      if(wallet === null || wallet === undefined) return
       const sum_array = Object.keys(wallet)
       .filter(filterSmallBalances)
       .sort(sortByNotional)
@@ -234,10 +241,10 @@ const AccountDropdown = ({width, item, leftIcon, rightIcon, clickFunction}) => {
     }, [wallet, filterSmallBalances, sortByNotional])
 
     return (
-        <DropdownWrapper> 
-            <AccountButton expanded={isOpened} onClick={toggle}></AccountButton>
+        <DropdownWrapper ref={wrapperRef}> 
+            <AccountButton notext={notext} expanded={isOpened} onClick={toggle}></AccountButton>
             { isOpened &&
-              <DropdownDisplay>
+              <DropdownDisplay isMobile={isMobile}>
                 <DropdownHeader>
                   <Dropdown width ={242} item={accountData} rightIcon context="0x83AD...83H4" clickFunction={clickItem}/>
                   <IconButtonWrapper>

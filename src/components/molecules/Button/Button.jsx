@@ -1,5 +1,5 @@
 import React, { cloneElement, isValidElement } from "react";
-import Loader from "react-loader-spinner";
+import { LoadingSpinner } from "components/atoms/LoadingSpinner";
 import StyledButton from "./StyledButton";
 import { scales, variants } from "./types";
 
@@ -15,7 +15,7 @@ const Button = (props) => {
       disabled={isDisabled}
       {...rest}
     >
-      {isLoading && <Loader type="TailSpin" color="#FFF" height={16} width={16} style={{marginRight: 8}} />}
+      {isLoading && <LoadingSpinner size={16} style={{paddingRight: '8px'}} />}
 			<>
 			{isValidElement(startIcon) &&
           cloneElement(startIcon, {

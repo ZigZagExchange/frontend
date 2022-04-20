@@ -20,7 +20,7 @@ export const scaleVariants = {
 	fontFamily: "WorkSans-Bold",
 	fontSize: "12px",
 	lineHeight: "13px",
-	padding: "8px 16px"
+	padding: "8px 15px"
   },
   [scales.SM]: {
     height: "21px",
@@ -49,6 +49,7 @@ export const styleVariants = (theme) => {
 				background: `${theme.colors.backgroundMediumEmphasis}`,
 				opacity: '0.5',
 				color:  theme.colors.foregroundMediumEmphasis,
+				boxShadow: theme.colors.gradientBtnBoxShadow,
 			},
 		},
 		[variants.OUTLINED]: {
@@ -72,9 +73,11 @@ export const styleVariants = (theme) => {
 			color:  theme.colors.backgroundMediumEmphasis,
 			textShadow: theme.colors.buyBtnBoxShadow,
 			":hover:not(:active):not(:disabled)": {
+				boxShadow: theme.colors.gradientBtnBoxShadow,
 				background: theme.colors.successMediumEmphasis,
 			},
 			":disabled": {
+				boxShadow: theme.colors.gradientBtnBoxShadow,
 				background: theme.colors.successDisabled,
 			},
 		},
@@ -84,9 +87,11 @@ export const styleVariants = (theme) => {
 			color:  theme.colors.foregroundHighEmphasis,
 			textShadow: theme.colors.buyBtnBoxShadow,
 			":hover:not(:active):not(:disabled)": {
+				boxShadow: theme.colors.gradientBtnBoxShadow,
 				background: theme.colors.dangerMediumEmphasis,
 			},
 			":disabled": {
+				boxShadow: theme.colors.gradientBtnBoxShadow,
 				color: theme.colors.foregroundDisabled,
 				background: theme.colors.dangerDisabled,
 			},
