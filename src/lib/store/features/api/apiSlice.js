@@ -355,29 +355,19 @@ export const apiSlice = createSlice({
           targetMsg = "into your Ethereum wallet. Fast withdrawals should be confirmed within a few minutes";
           extraInfoLink = { text: "Fast Bridge FAQ", link: "https://docs.zigzag.exchange/zksync/fast-withdraw-bridge" };
           break;
-        case "bridge_to_zksync":
+        case "zkSync_to_polygon":
           successMsg = "transferred";
-          targetMsg = "to the bridge:";
-          extraInfoLink = null;
-          break;
-        case "bridge_to_polygon":
-          successMsg = "transferred";
-          targetMsg = "to your Polygon wallet";
-          extraInfoLink = null;
-          break;
-        case "zkSynv_to_polygon":
-          successMsg = "transferd";
           targetMsg = "to Polygon:";
           extraInfoLink = null;
           break;
         case "polygon_to_zkSync":
         case "eth_to_zksync":
-          successMsg = "transferd";
+          successMsg = "transferred";
           targetMsg = "to zkSync:";
           extraInfoLink = null;
           break;
         default:
-          successMsg = "transferd";
+          successMsg = "transferred";
           targetMsg = "to your wallet";
           extraInfoLink = null;
           break;
@@ -389,7 +379,7 @@ export const apiSlice = createSlice({
             Successfully {successMsg}{" "}
             {amount} {token}{" "}
             {targetMsg}
-            {type !== "zkSynv_to_polygon" && type !== "eth_to_zksync" && type !== "polygon_to_zkSync" &&
+            {type !== "zkSync_to_polygon" && type !== "eth_to_zksync" && type !== "polygon_to_zkSync" &&
               <>
               <br />
               <br />
@@ -408,7 +398,7 @@ export const apiSlice = createSlice({
               View transaction
             </a>
             {" • "}
-            {(type === "eth_to_zksync" || type === "zkSynv_to_polygon" || type === "polygon_to_zkSync")&& 
+            {(type === "eth_to_zksync" || type === "zkSync_to_polygon" || type === "polygon_to_zkSync")&& 
               <>
                 <br />
                 Confirm that your funds have arrived {targetMsg}
@@ -421,7 +411,7 @@ export const apiSlice = createSlice({
                     textDecoration: "underline",
                     fontWeight: "bold",
                   }}
-                > {type === "zkSynv_to_polygon" ? 'Polygon wallet':' zkSync wallet'} </a>
+                > {type === "zkSync_to_polygon" ? 'Polygon wallet':' zkSync wallet'} </a>
                 {" • "}
               </>
             }

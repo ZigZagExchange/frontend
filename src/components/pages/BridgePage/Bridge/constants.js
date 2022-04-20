@@ -7,10 +7,8 @@ export const ZKSYNC_POLYGON_BRIDGE = {
   key: "zksync_polygon",
   eligibleTokensZkSync: ["ETH"],
   eligibleTokensPolygon: ["WETH"],
-  receiptKeyZkSync: "bridge_to_zksync",
-  receiptKeyPolygon: "bridge_to_polygon",
-  zkSyncToPolygon: "zkSynv_to_polygon",
-  polygonToZksSync: "polygon_to_zkSync"
+  zkSyncToPolygon: "zkSync_to_polygon",
+  polygonToZkSync: "polygon_to_zkSync"
 }
 
 export const  ETH_ZKSYNC_BRIDGE = {

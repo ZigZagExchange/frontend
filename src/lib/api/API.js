@@ -405,7 +405,7 @@ export default class API extends Emitter {
       network: await polygonProvider.getNetwork(),
       amount,
       token: "WETH",
-      type: ZKSYNC_POLYGON_BRIDGE.polygonToZksSync,
+      type: ZKSYNC_POLYGON_BRIDGE.polygonToZkSync,
       txId: txHash,
       walletAddress: polygonChainId === "0x13881" ? `https://rinkeby.zksync.io/explorer/accounts/${walletAddress}` : `https://zkscan.io/explorer/accounts/${walletAddress}`
     };
