@@ -8,7 +8,7 @@ const Icon = (props) => {
   const { size } = props
   return (
     <Svg width={size ?? 16} height={size ?? 16} viewBox="0 0 16 16" fill="none" {...props}>
-      <path fill-rule="evenodd" clip-rule="evenodd" d="M8 0.5C7.44772 0.5 7 0.947715 7 1.5V4.5C7 5.05228 7.44772 5.5 8 5.5C8.55229 5.5 9 5.05228 9 4.5V1.5C9 0.947715 8.55229 0.5 8 0.5Z" fill={theme.colors.foregroundHighEmphasis}/>
+      <path fill-rule="evenodd" clipRule="evenodd" d="M8 0.5C7.44772 0.5 7 0.947715 7 1.5V4.5C7 5.05228 7.44772 5.5 8 5.5C8.55229 5.5 9 5.05228 9 4.5V1.5C9 0.947715 8.55229 0.5 8 0.5Z" fill={theme.colors.foregroundHighEmphasis}/>
       <path opacity="0.01" d="M13.3035 2.6967C12.913 2.30618 12.2798 2.30618 11.8893 2.6967L9.76799 4.81802C9.37747 5.20855 9.37747 5.84171 9.76799 6.23224C10.1585 6.62276 10.7917 6.62276 11.1822 6.23224L13.3035 4.11092C13.694 3.72039 13.694 3.08723 13.3035 2.6967Z" fill={theme.colors.foregroundHighEmphasis}/>
       <path opacity="0.05" d="M14.5 7C15.0523 7 15.5 7.44772 15.5 8C15.5 8.55229 15.0523 9 14.5 9H11.5C10.9477 9 10.5 8.55228 10.5 8C10.5 7.44772 10.9477 7 11.5 7H14.5Z" fill={theme.colors.foregroundHighEmphasis}/>
       <path opacity="0.1" d="M13.3035 13.3033C13.694 12.9128 13.694 12.2796 13.3035 11.8891L11.1822 9.76776C10.7917 9.37724 10.1585 9.37724 9.76799 9.76776C9.37747 10.1583 9.37747 10.7915 9.76799 11.182L11.8893 13.3033C12.2798 13.6938 12.913 13.6938 13.3035 13.3033Z" fill={theme.colors.foregroundHighEmphasis}/>
