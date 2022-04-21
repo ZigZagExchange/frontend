@@ -113,11 +113,11 @@ const BridgeCurrencySelector = ({ onChange, balances = {}, value, isOpenable }) 
   const coinEstimator = useCoinEstimator();
   var [tickers, setTickers] = useState(api.getCurrencies());
 
-  useEffect(() => {
-    if (tickers.length !== 0) {
-      onChange(api.marketInfo["ETH"] ? "ETH" : tickers[0]);
-    }
-  }, [user.id, network]);
+  // useEffect(() => {
+  //   if (tickers.length !== 0) {
+  //     onChange(api.marketInfo["ETH"] ? "ETH" : tickers[0]);
+  //   }
+  // }, [user.id, network]);
 
   const hideOptions = (e) => {
     if (e) e.preventDefault();
