@@ -114,15 +114,12 @@ const Bridge = () => {
   useEffect(()=>{
     console.log(fromNetwork)
     if (fromNetwork.from.key === 'polygon') {
-      console.log('here1')
       setSwapDetails({ amount: '', currency: 'WETH' })
     }
     else if (fromNetwork.from.key === 'ethereum' && swapDetails.currency === 'WETH') {
-      console.log('here2')
       setSwapDetails({ amount: '', currency: 'ETH' })
     }
     else if (fromNetwork.from.key === 'zksync' && swapDetails.currency === 'WETH') {
-      console.log('here3')
       setSwapDetails({ amount: '', currency: 'ETH' })
     }
     if(fromNetwork.from.key === 'zksync' && toNetwork.key === 'ethereum'){    
@@ -175,7 +172,6 @@ const Bridge = () => {
   }, [user.address]);
 
   useEffect(() => {
-    console.log('here4')
     setSwapDetails({});
     if (withdrawSpeed === "normal") {
       setL1Fee(null);
@@ -195,7 +191,6 @@ const Bridge = () => {
   useEffect(() => {
     // since setSwapDetails uses state, instead of recalculating
     // swap details in switchTransferType we recalculate as an effect here.
-    console.log('here5')
     setSwapDetails({});
   }, [transfer.type]);
 
@@ -274,7 +269,9 @@ const Bridge = () => {
       });
 
     api.withdrawL2FastBridgeFee(details.currency)
-      .then((res) => setL1Fee(res))
+      .then((res) => {
+        setL1Fee(res);
+      })
       .catch((e) => {
         console.error(e);
         setL1Fee(null);
@@ -598,7 +595,7 @@ const Bridge = () => {
                     <x.div>
                       {isFastWithdraw && L1Fee && (
                         <div>
-                          Bridge Fee: {formatPrice(L1Fee.toPrecision)}{" "}
+                          Bridge Fee: {formatPrice(L1Fee)}{" "}
                           {swapDetails.currency}
                         </div>
                       )}

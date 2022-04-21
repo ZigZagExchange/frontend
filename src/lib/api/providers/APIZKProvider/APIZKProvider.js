@@ -30,7 +30,7 @@ export default class APIZKProvider extends APIProvider {
   _tokenWithdrawFees = {};
   _tokenInfo = {};
   eligibleFastWithdrawTokens = ["ETH", "FRAX", "UST"];
-
+  fastWithdrawContractAddress = "0xCC9557F04633d82Fb6A1741dcec96986cD8689AE";
   getProfile = async (address) => {
     try {
       const { data } = await axios.get(
