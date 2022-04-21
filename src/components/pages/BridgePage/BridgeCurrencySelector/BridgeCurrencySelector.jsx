@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { networkSelector } from "lib/store/features/api/apiSlice";
-import { userSelector } from "lib/store/features/auth/authSlice";
+// import { useSelector } from "react-redux";
+// import { networkSelector } from "lib/store/features/api/apiSlice";
+// import { userSelector } from "lib/store/features/auth/authSlice";
 import styled from "@xstyled/styled-components";
 import { FiChevronDown } from "react-icons/fi";
 import { useCoinEstimator, Modal } from "components";
@@ -108,8 +108,8 @@ const BridgeCurrencySelector = ({ onChange, balances = {}, value, isOpenable }) 
   const [show, setShow] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [showingOptions, setShowingOptions] = useState(false);
-  const network = useSelector(networkSelector);
-  const user = useSelector(userSelector);
+  // const network = useSelector(networkSelector);
+  // const user = useSelector(userSelector);
   const coinEstimator = useCoinEstimator();
   var [tickers, setTickers] = useState(api.getCurrencies());
 
