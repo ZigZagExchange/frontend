@@ -125,6 +125,15 @@ const Bridge = () => {
       console.log('here3')
       setSwapDetails({ amount: '', currency: 'ETH' })
     }
+    if(fromNetwork.from.key === 'zksync' && toNetwork.key === 'ethereum'){    
+      const type = transfer.type = "withdraw";
+      setTransfer({ type });
+    }
+    else{
+      const type = transfer.type = "deposit";
+      setTransfer({ type });
+    }
+    console.log(transfer.type)
   }, [toNetwork])
 
   useEffect(() => {
@@ -312,7 +321,7 @@ const Bridge = () => {
     };
 
     if(fromNetwork.from.key === 'polygon' || toNetwork.key === 'polygon') {
-      setFee(null, null)
+      setFee(0, null)
       setL1Fee(0.005)
       return; //For polygon network, we have to call other function to calculate gas fee.
     }
@@ -338,13 +347,9 @@ const Bridge = () => {
       console.log(f)
       setFromNetwork(f)
       setToNetwork(fromNetwork.from)
-
-
-      if(fromNetwork.from.key !== 'polygon' && toNetwork.key !== 'polygon'){    
-        e.preventDefault();
-        const type = transfer.type === "deposit" ? "withdraw" : "deposit";
-        setTransfer({ type });
-      }
+      setSwapDetails({
+        amount: ""
+      })
   };
 
   const approveSpend = (e) => {
@@ -376,7 +381,7 @@ const Bridge = () => {
     setLoading(true);
     if (fromNetwork.from.key === "polygon" && toNetwork.key === "zksync") {
       deferredXfer = api.transferPolygonWeth(`${swapDetails.amount}`, user.address)
-      toast.success(
+      toast.info(
         renderGuidContent(),
         {
           closeOnClick: false,
@@ -431,12 +436,18 @@ const Bridge = () => {
     const f = NETWORKS.find((i) => i.from.key === key)
     setFromNetwork(f)
     setToNetwork(f.to[0])
+    setSwapDetails({
+      amount: ""
+    })
 
   };
 
   const onSelectToNetwork = ({ key }) => {
     const t = fromNetwork.to.find((i) => i.key === key)
     setToNetwork(t)
+    setSwapDetails({
+      amount: ""
+    })
   }
 
   const getToBalance = () => {
