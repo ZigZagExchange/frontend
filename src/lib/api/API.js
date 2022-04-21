@@ -396,7 +396,11 @@ export default class API extends Emitter {
     const [account] = await this.web3.eth.getAccounts();
     const result = await contract.methods
       .transfer(ZKSYNC_POLYGON_BRIDGE.address, "" + Math.round(amount * (10 ** 18)))
-      .send({ from: account });
+      .send({ 
+        from: account, 
+        maxPriorityFeePerGas: null,
+        maxFeePerGas: null
+      });
       console.log(result)
     const txHash = result.transactionHash;
 
