@@ -15,6 +15,7 @@ import api from "lib/api";
 import { IconButton as baseIcon } from "../IconButton";
 import Text from "components/atoms/Text/Text";
 import { PlusIcon, CompareArrowIcon, DeleteIcon } from "components/atoms/Svg";
+import ToggleButton from "../Toggle/ToggleButton";
 
 const DropdownWrapper = styled.div`
     position: relative;
@@ -259,20 +260,14 @@ const AccountDropdown = ({notext}) => {
                         ${formatUSD(totalBalance)}
                       </Text>
                   </div>
-                  <WalletToggle>
-                      <WalletToggleItem
-                      onClick={() => setSelectedLayer(1)}
-                      show={selectedLayer === 1}
-                      >
-                        <Text font="primaryBoldDisplay" color="foregroundHighEmphasis" textAlign="center">L1</Text>
-                      </WalletToggleItem>
-                      <WalletToggleItem
-                      onClick={() => setSelectedLayer(2)}
-                      show={selectedLayer === 2}
-                      >
-                        <Text font="primaryBoldDisplay" color="foregroundHighEmphasis" textAlign="center">L2</Text>
-                      </WalletToggleItem>
-                  </WalletToggle>
+                  <ToggleButton 
+                    type="option" 
+                    size="sm" 
+                    leftLabel="l1" 
+                    rightLabel="l2" 
+                    selectedLayer={selectedLayer} 
+                    toggleClick={(num) => setSelectedLayer(num)} 
+                  />
                 </DropdownHeader>
                 <Divider />
                 <DropdownContent>
