@@ -166,6 +166,13 @@ export default class API extends Emitter {
       if (!marketInfo) return;
       this.apiProvider.marketInfo[marketInfo.alias] = marketInfo;
     }
+    if (msg.op === "marketinfo2") {
+      const marketInfos = msg.args[0];
+      marketInfos.forEach(marketInfo => {
+        if (!marketInfo) return;
+        this.apiProvider.marketInfo[marketInfo.alias] = marketInfo;
+      });
+    }
     if (msg.op === "lastprice") {
       const lastprices = msg.args[0];
       lastprices.forEach((l) => (this.apiProvider.lastPrices[l[0]] = l));
@@ -188,6 +195,9 @@ export default class API extends Emitter {
     this.ws.addEventListener("message", this._socketMsg);
     this.ws.addEventListener("error", this._socketError);
     this.emit("start");
+
+    // get initial marketinfos
+    this.send('marketsreq', [this.apiProvider.network, true])
   };
 
   stop = () => {

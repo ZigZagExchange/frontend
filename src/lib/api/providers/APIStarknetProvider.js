@@ -168,6 +168,7 @@ export default class APIStarknetProvider extends APIProvider {
 
     // Check account initialized
     const initialized = await this._checkAccountInitialized();
+    console.log(`initialized: ${initialized}`)
     if (!initialized) {
       const initializeContractToast = toast.info(
         "Your account contract is not yet initialized. Initializing account contract...",
@@ -290,6 +291,7 @@ export default class APIStarknetProvider extends APIProvider {
       userWalletAddress
     );
     const signer = await accountContract.get_signer();
+    console.log(`signer: ${signer}`)
     return (signer.toString() !== '0');
   };
 
