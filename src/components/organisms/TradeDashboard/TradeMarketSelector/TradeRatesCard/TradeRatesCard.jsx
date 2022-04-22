@@ -1,5 +1,9 @@
 import React from "react";
+import styled from "styled-components";
 import { formatPrice } from "lib/utils";
+import { SettingsIcon } from "components/atoms/Svg";
+import Button from "components/molecules/Button/Button";
+import Text from "components/atoms/Text/Text";
 // css
 import api from "lib/api";
 import "./TradeRatesCard.css";
@@ -52,62 +56,67 @@ class TradeRatesCard extends React.Component {
     }
 
     return (
-      <>
-        <div className="tl_rates">
-          <div className="rates_box rb_text_1">
-            <div>
-              <img src={api.getCurrencyLogo(this.state.marketInfo?.baseAsset.symbol)} alt={this.state.marketInfo?.baseAsset.symbol} className="rates_box_symbol" />
-              <div>
-                <strong>{marketDisplay}</strong>
-                <p>
-                  {marketInfo?.baseAsset && marketInfo.baseAsset.name}{" "}
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="rates_box rb_text_2">
-            <h1>{this.props.marketSummary.price}</h1>
-            <p>$ {
-              (this.props.marketInfo?.baseAsset?.usdPrice)
-                ? this.props.marketInfo.baseAsset.usdPrice
-                : "--"
-            }</p>
-          </div>
-          <div
-            className={
-              this.props.marketSummary.priceChange < 0
-                ? "rates_box rb_text_3_down_value hide_sm"
-                : "rates_box rb_text_3_up_value hide_sm"
-            }
-          >
-            <h2>24h Change</h2>
-            <p>
+      <Wrapper>
+        <RatesCardsWrapper>
+          <RatesCard>
+            <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Price</Text>
+            <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{this.props.marketSummary.price}</Text>
+          </RatesCard>
+          {/* <RatesCard>
+            <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h Change</Text>
+            <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">
               {this.props.marketSummary.priceChange &&
                 formatPrice(this.props.marketSummary.priceChange / 1)
               }{" "}
               {percentChange !== 'NaN' && `${percentChange}%`}
-            </p>
-          </div>
-          <div className="rates_box rb_text_4 hide_md">
-            <h2>24h High</h2>
-            <p>{this.props.marketSummary["24hi"]}</p>
-          </div>
-          <div className="rates_box rb_text_4 hide_md">
-            <h2>24h Low</h2>
-            <p>{this.props.marketSummary["24lo"]}</p>
-          </div>
-          <div className="rates_box rb_text_4 hide_sm">
-            <h2>24h Volume({marketInfo && marketInfo.baseAsset.symbol})</h2>
-            <p>{this.props.marketSummary.baseVolume}</p>
-          </div>
-          <div className="rates_box rb_text_4 hide_sm">
-            <h2>24h Volume({marketInfo && marketInfo.quoteAsset.symbol})</h2>
-            <p>{this.props.marketSummary.quoteVolume}</p>
-          </div>
-        </div>
-      </>
+            </Text>
+          </RatesCard> */}
+          <RatesCard>
+            <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h High</Text>
+            <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{this.props.marketSummary["24hi"]}</Text>
+          </RatesCard>
+          <RatesCard>
+            <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h Low</Text>
+            <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{this.props.marketSummary["24lo"]}</Text>
+          </RatesCard>
+          <RatesCard>
+            <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h Volume({marketInfo && marketInfo.baseAsset.symbol})</Text>
+            <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{this.props.marketSummary.baseVolume}</Text>
+          </RatesCard>
+          <RatesCard>
+            <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h Volume({marketInfo && marketInfo.quoteAsset.symbol})</Text>
+            <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{this.props.marketSummary.quoteVolume}</Text>
+          </RatesCard>
+        </RatesCardsWrapper>
+        <Button endIcon={<SettingsIcon/>} variant="outlined" scale="imd" mr="8px">
+            Settings
+        </Button>
+      </Wrapper>
     );
   }
 }
 
 export default TradeRatesCard;
+
+const Wrapper = styled.div`
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+`
+
+const RatesCardsWrapper = styled.div`
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  gap: 40px;
+`
+
+const RatesCard = styled.div`
+  display: grid;
+  grid-auto-flow: row;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+`

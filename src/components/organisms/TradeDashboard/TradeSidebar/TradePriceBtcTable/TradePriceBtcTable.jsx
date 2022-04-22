@@ -1,5 +1,8 @@
 import React from "react";
-import "./TradePriceBtcTable.css";
+import styled from "styled-components"
+import { Dropdown } from "components/molecules/Dropdown"
+import Text from "components/atoms/Text/Text";
+// import "./TradePriceBtcTable.css";
 import CategorizeBox from "../CategorizeBox/CategorizeBox";
 import SearchBox from "../SearchBox/SearchBox";
 import { getStables } from "../../../../../lib/helpers/categories";
@@ -10,6 +13,8 @@ import {
 } from "../../../../../lib/helpers/storage/favourites";
 import { BsStar, BsStarFill } from "react-icons/bs";
 import { FaSort, FaSortDown, FaSortUp } from "react-icons/fa";
+import { DiscordIcon, StarIcon } from "components/atoms/Svg";
+import Button from "components/molecules/Button/Button";
 
 class TradePriceBtcTable extends React.Component {
   constructor(props) {
@@ -19,6 +24,7 @@ class TradePriceBtcTable extends React.Component {
     this.state = {
       foundPairs: [],
       pairs: [],
+      pairList: [],
 
       categorySelected: "ALL",
       pairsByCategory: [],
@@ -343,28 +349,58 @@ class TradePriceBtcTable extends React.Component {
   componentDidMount() {
     var favourites = fetchFavourites();
     this.setState({ favourites: favourites });
+    this.setState({
+      pairList: this.props.rowData.map((r) => { 
+        return {text: r.td1, url: '#', icon: <StarIcon />}
+      })
+    })
   }
 
   render() {
     return (
-      <>
-        <SearchBox
-          searchPair={this.setSearchValue}
-          searchValue={this.state.searchValue}
-          className="pairs_searchbox"
-        />
-        <CategorizeBox
-          categories={["ALL", "ETH", "WBTC", "STABLES", "FAVOURITES"]}
-          categorizePairs={this.categorizePairs}
-          initialValue="ALL"
-        />
-
-        <div className="trade_price_btc_table zig_scrollstyle">
-          {this.renderPairs(this.state.pairs)}
-        </div>
-      </>
+      <Wrapper>
+        <TradePairSelectWrapper>
+          <Dropdown width ={250} transparent item={this.state.pairList} leftIcon context={this.props.currentMarket} clickFunction={() => null}/>
+        </TradePairSelectWrapper>
+        <InfoWrapper>
+          <Text font="primarySmall" color="foregroundHighEmphasis">Have a question? Need live support?</Text>
+          <Button width="150px" startIcon={<DiscordIcon />} variant="outlined" scale="imd" mr="8px">
+            <Text font="primaryBoldDisplay" color="foregroundHighEmphasis" textAlign="center">JOIN DISCORD</Text>
+          </Button>
+        </InfoWrapper>
+      </Wrapper>
     );
   }
 }
 
 export default TradePriceBtcTable;
+
+const Wrapper = styled.div`
+  display: grid;
+  grid-auto-flow: row;
+  align-items: center;
+  justify-content: center;
+  height: fit-content;
+`
+
+const TradePairSelectWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 74px;
+  background-color: ${({ theme }) => theme.colors.backgroundLowEmphasis};
+  padding: 0px 25px;
+`
+
+const InfoWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 98px;
+  background-color: ${({ theme }) => theme.colors.backgroundMediumEmphasis};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.foreground400};
+`
+
