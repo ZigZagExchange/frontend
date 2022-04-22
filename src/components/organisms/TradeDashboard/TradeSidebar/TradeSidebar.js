@@ -4,10 +4,11 @@ import TradePriceBtcTable from "./TradePriceBtcTable/TradePriceBtcTable";
 import SpotBox from "./SpotBox/SpotBox";
 
 const StyledTradeSidebar = styled.aside`
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-auto-flow: row;
   grid-area: sidebar;
   position: relative;
+  height: fit-content;
 `;
 
 export default function TradeSidebar(props) {
@@ -19,17 +20,15 @@ export default function TradeSidebar(props) {
         markets={props.markets}
         currentMarket={props.currentMarket}
       />
-      <div style={{ flex: 1 }}>
-        <SpotBox
-          lastPrice={props.lastPrice}
-          user={props.user}
-          activeOrderCount={props.activeOrderCount}
-          liquidity={props.liquidity}
-          currentMarket={props.currentMarket}
-          marketSummary={props.marketSummary}
-          marketInfo={props.marketInfo}
-        />
-      </div>
+      <SpotBox
+        lastPrice={props.lastPrice}
+        user={props.user}
+        activeOrderCount={props.activeOrderCount}
+        liquidity={props.liquidity}
+        currentMarket={props.currentMarket}
+        marketSummary={props.marketSummary}
+        marketInfo={props.marketInfo}
+      />
     </StyledTradeSidebar>
   );
 }

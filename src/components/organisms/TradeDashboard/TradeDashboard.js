@@ -34,17 +34,17 @@ import {
 const TradeContainer = styled.div`
   color: #aeaebf;
   height: calc(100vh - 48px);
-  background: ${(p) => p.theme.colors.zzLightBorder};
+  background: ${(p) => p.theme.colors.backgroundHighEmphasis};
 `;
 
 const TradeGrid = styled.article`
   display: grid;
-  grid-template-rows: 50px 4fr 3fr 50px;
-  grid-template-columns: 325px 300px 1fr;
+  grid-template-rows: 75px 498px 212px 57px;
+  grid-template-columns: 300px 511px 1fr;
   grid-template-areas:
-    "marketSelector marketSelector marketSelector"
+    "sidebar marketSelector marketSelector"
     "sidebar books chart"
-    "sidebar books tables"
+    "sidebar tables tables"
     "sidebar footer footer";
   min-height: calc(100vh - 48px);
   gap: 1px;

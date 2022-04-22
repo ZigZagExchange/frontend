@@ -1,10 +1,15 @@
 import React from "react";
+import styled from "styled-components"
 import { toast } from "react-toastify";
 import api from "lib/api";
 import { RangeSlider } from "components";
 import { formatPrice } from "lib/utils";
 import "./SpotForm.css";
-import ConnectWalletButton from "../../atoms/ConnectWalletButton/ConnectWalletButton";
+import { Button, ConnectWalletButton } from "components/molecules/Button"
+import InputField from "components/atoms/InputField/InputField";
+import Text from "components/atoms/Text/Text";
+import { IconButton as BaseIcon } from "../IconButton";
+import { MinusIcon, PlusIcon } from "components/atoms/Svg";
 
 export class SpotForm extends React.Component {
   constructor(props) {
@@ -435,40 +440,56 @@ export class SpotForm extends React.Component {
       quoteBalance = 0;
     }
 
-    const balanceHtml =
-      this.props.side === "b" ? (
-        <strong>
+    const balance1Html = (
+        <Text font="primaryExtraSmallSemiBold" color="foregroundMediumEmphasis">
           {quoteBalance.toPrecision(8)}{" "}
           {marketInfo && marketInfo.quoteAsset?.symbol}
-        </strong>
-      ) : (
-        <strong>
-          {baseBalance.toPrecision(8)}{" "}
-          {marketInfo && marketInfo.baseAsset?.symbol}
-        </strong>
+        </Text>
       );
 
-    let buySellBtnClass, buttonText;
+    
+    const balance2Html = (
+        <Text font="primaryExtraSmallSemiBold" color="foregroundMediumEmphasis">
+          {baseBalance.toPrecision(8)}{" "}
+          {marketInfo && marketInfo.baseAsset?.symbol}
+        </Text>
+      );
+
+    let buttonText, feeAmount;
     if (this.props.side === "b") {
-      buySellBtnClass = "bg_btn buy_btn";
       buttonText = "BUY";
+      feeAmount = (
+        <FormHeader>
+          <Text font="primaryTiny" color="foregroundMediumEmphasis">Buy Fee:</Text>
+          <Text font="primaryExtraSmallSemiBold" color="foregroundMediumEmphasis">
+            {marketInfo && marketInfo.quoteFee &&
+              Number(marketInfo.quoteFee).toPrecision(4)}{" "}
+            {marketInfo && marketInfo.quoteAsset.symbol}
+          </Text>
+        </FormHeader>
+      )
     } else if (this.props.side === "s") {
-      buySellBtnClass = "bg_btn sell_btn";
       buttonText = "SELL";
+      feeAmount = (
+        <FormHeader>
+          <Text font="primaryTiny" color="foregroundMediumEmphasis">Sell Fee:</Text>
+          <Text font="primaryExtraSmallSemiBold" color="foregroundMediumEmphasis">
+            {marketInfo && marketInfo.baseFee &&
+              Number(marketInfo.baseFee).toPrecision(4)}{" "}
+            {marketInfo && marketInfo.baseAsset.symbol}
+          </Text>
+        </FormHeader>
+      )
     }
 
     return (
       <>
-        <form className="spot_form">
-          <div className="spf_head">
-            <span>Available balance</span>
-            {balanceHtml}
-          </div>
-
-          <div className="spf_input_box">
-            <span className="spf_desc_text">Price</span>
-            <input
-              type="text"
+        <StyledForm>
+          <InputBox>
+            <IconButton variant="secondary" startIcon={<MinusIcon />}></IconButton>
+            <InputField 
+              type="text" 
+              placeholder={`Price (${marketInfo && marketInfo.quoteAsset?.symbol})`}
               value={
                 this.priceIsDisabled()
                   ? this.props.marketSummary && this.props.marketSummary?.price
@@ -477,64 +498,136 @@ export class SpotForm extends React.Component {
               onChange={this.updatePrice.bind(this)}
               disabled={this.priceIsDisabled()}
             />
-            <span className={this.priceIsDisabled() ? "text-disabled" : ""}>
+            <IconButton variant="secondary" startIcon={<PlusIcon />}></IconButton>
+            {/* <span className={this.priceIsDisabled() ? "text-disabled" : ""}>
               {marketInfo && marketInfo.quoteAsset.symbol}
-            </span>
-          </div>
-          <div className="spf_input_box">
-            <span className="spf_desc_text">Amount</span>
-            <input
-              type="text"
+            </span> */}
+          </InputBox>
+          <InputBox>
+            <IconButton variant="secondary" startIcon={<MinusIcon />}></IconButton>
+            <InputField 
+              type="text" 
+              placeholder={`Amount (${marketInfo && marketInfo.baseAsset?.symbol})`}
               value={this.state.baseAmount}
-              placeholder="0.00"
               onChange={this.updateAmount.bind(this)}
             />
-            <span>{marketInfo && marketInfo.baseAsset.symbol}</span>
-          </div>
-          <div className="spf_range">
+            <IconButton variant="secondary" startIcon={<PlusIcon />}></IconButton>
+            {/* <span>{marketInfo && marketInfo.baseAsset.symbol}</span> */}
+          </InputBox>
+          <RangeWrapper>
             <RangeSlider
               value={this.amountPercentOfMax()}
               onChange={this.rangeSliderHandler.bind(this)}
             />
-          </div>
+          </RangeWrapper>
+          <FormHeader>
+            <Text font="primaryTiny" color="foregroundMediumEmphasis">{marketInfo && marketInfo.quoteAsset?.symbol} balance</Text>
+            {balance1Html}
+          </FormHeader>
+          <FormHeader>
+            <Text font="primaryTiny" color="foregroundMediumEmphasis">{marketInfo && marketInfo.baseAsset?.symbol} balance</Text>
+            {balance2Html}
+          </FormHeader>
+          <InputBox>
+            <IconButton variant="secondary" startIcon={<MinusIcon />}></IconButton>
+            <InputField 
+              type="text" 
+              placeholder={`Total (${marketInfo && marketInfo.quoteAsset?.symbol})`}
+              value={this.state.baseAmount}
+              onChange={this.updateAmount.bind(this)}
+            />
+            <IconButton variant="secondary" startIcon={<PlusIcon />}></IconButton>
+            {/* <span>{marketInfo && marketInfo.baseAsset.symbol}</span> */}
+          </InputBox>
+          {feeAmount}
           {this.props.user.id ? (
             <div className="">
-              <div className="spf_head">
-                <span>Total</span>
-                <strong>
-                  {this.props.orderType === "limit" ? (
-                    <>
-                      {(this.currentPrice() * this.state.baseAmount).toPrecision(6)}{" "}
-                      {marketInfo && marketInfo.quoteAsset.symbol}
-                    </>
-                  ) : (
-                    <>
-                      {(
-                        this.props.marketSummary.price * this.state.baseAmount
-                      ).toPrecision(6)}{" "}
-                      {marketInfo && marketInfo.quoteAsset.symbol}
-                    </>
-                  )}
-                </strong>
-              </div>
-              <div className="spf_btn">
-                <button
-                  type="button"
-                  className={buySellBtnClass}
-                  onClick={this.buySellHandler.bind(this)}
-                  disabled={this.state.orderButtonDisabled}
-                >
-                  {buttonText}
-                </button>
-              </div>
+              <Button 
+                variant={buttonText.toLowerCase()} 
+                width="100%" 
+                scale="imd"
+                disabled={this.state.orderButtonDisabled} 
+                onClick={this.buySellHandler.bind(this)}
+              >
+              {buttonText}
+              </Button>
             </div>
           ) : (
-            <div className="spf_btn">
-              <ConnectWalletButton />
-            </div>
+            <ConnectWalletButton />
           )}
-        </form>
+        </StyledForm>
       </>
     );
   }
 }
+
+const StyledForm = styled.form`
+  display: grid;
+  grid-auto-flow: row;
+  align-items: center;
+  gap: 10px;
+  padding: 0px 20px 20px 20px;
+`
+
+const FormHeader = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`
+
+const InputBox = styled.div`
+  margin-top: 10px;
+  width: 100%;
+  height: 35px;
+  border-radius: 8px;
+  padding: 0 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: ${({ theme }) => theme.colors.foreground200};
+  border: 1px solid ${({ theme }) => theme.colors.foreground300};
+
+  div {
+    div {
+      input {
+        text-align: center;
+        background: transparent;
+        border: unset;
+        text-shadow: 0px 1px 4px rgba(0, 0, 0, 0.1);
+
+        &::placeholder {
+          color: ${({ theme }) => theme.colors.foregroundMediumEmphasis};
+        }
+        &:disabled {
+          color: ${({ theme }) => theme.colors.foregroundDisabled};
+        }
+        &:focus:not(:disabled) {
+          background: transparent;
+          border: unset;
+        }
+        &:hover {
+          background: transparent;
+          border: unset;
+        }
+      }
+    }
+  }
+`
+
+const RangeWrapper = styled.div`
+  width: 98%;
+  padding-left: 10px;
+`
+
+const IconButton = styled(BaseIcon)`
+  width: 24px;
+  height: 24px;
+  background-color: ${({ theme }) => theme.colors.foreground300};
+  border-radius: 4px;
+  padding: 0px !important;
+  svg {
+      margin-right: 0px !important;
+      margin-left: 0px !important;
+  }
+`
