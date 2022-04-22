@@ -46,6 +46,24 @@ const primaryHeading6 = {
   lineHeight: '21px',
 }
 
+const primarySmallSemiBold = {
+  fontFamily: 'WorkSans-SemiBold',
+  fontSize: '16px',
+  lineHeight: '19px',
+}
+
+const primaryMediumSmallSemiBold = {
+  fontFamily: 'WorkSans-SemiBold',
+  fontSize: '14px',
+  lineHeight: '16px',
+}
+
+const primaryExtraSmallSemiBold = {
+  fontFamily: 'WorkSans-SemiBold',
+  fontSize: '12px',
+  lineHeight: '14px',
+}
+
 const primarySubtitle = {
   fontFamily: 'WorkSans-Regular',
   fontSize: '24px',
@@ -74,18 +92,6 @@ const primaryExtraSmall = {
   fontFamily: 'WorkSans-Regular',
   fontSize: '12px',
   lineHeight: '13px',
-}
-
-const primaryExtraSmallSemiBold = {
-  fontFamily: 'WorkSans-SemiBold',
-  fontSize: '12px',
-  lineHeight: '14px',
-}
-
-const primarySmallSemiBold = {
-  fontFamily: 'WorkSans-SemiBold',
-  fontSize: '16px',
-  lineHeight: '19px',
 }
 
 const primaryTiny = {
@@ -147,6 +153,7 @@ const typography = {
   primarySmallSemiBold,
   primaryExtraSmall,
   primaryExtraSmallSemiBold,
+  primaryMediumSmallSemiBold,
   primaryTiny,
   monospace2XL,
   monospaceXL,
