@@ -145,6 +145,10 @@ export default class APIStarknetProvider extends APIProvider {
     }
     if (localStorage.getItem("starknet:account")) {
       userWalletContractAddress = localStorage.getItem("starknet:account");
+      this._accountState = {
+        address: userWalletContractAddress,
+        id: userWalletContractAddress
+      }
     } else {
       const starkkey = starknet.ec.getStarkKey(keypair);
       const deployContractToast = toast.info(
@@ -164,13 +168,14 @@ export default class APIStarknetProvider extends APIProvider {
       userWalletContractAddress = deployContractResponse.address;
       toast.success("Account contract deployed");
       localStorage.setItem("starknet:account", userWalletContractAddress);
-      // set _accountState for _checkAccountInitialized
-      this._accountState.address = userWalletContractAddress;
+      this._accountState = {
+        address: userWalletContractAddress,
+        id: userWalletContractAddress
+      }
     }
 
     // Check account initialized
     const initialized = await this._checkAccountInitialized();
-    console.log(`initialized: ${initialized}`)
     if (!initialized) {
       const initializeContractToast = toast.info(
         "Your account contract is not yet initialized. Initializing account contract...",
@@ -201,21 +206,19 @@ export default class APIStarknetProvider extends APIProvider {
 
     // Mint some tokens if the account is blank
     const results = Object.keys(committedBalances).map(async (currency) => {
-      if (committedBalances[currency] === '0') {
+      const minAmount = (currency === "ETH")
+        ? bigInt(1e18).toString()
+        : bigInt(5e9).toString()
+
+      if (committedBalances[currency] < minAmount)  {
         const mintWaitToast = toast.info(`No ${currency} found. Minting you some`, {
           toastId: `No ${currency} found. Minting you some`,
         });
-        let amount;
-        if (currency === "ETH") {
-          amount = bigInt(1e18).toString();
-        } else {
-          amount = bigInt(5e9).toString();
-        }
         await this._mintBalance(
           this.getCurrencyInfo(currency).address,
-          amount
+          minAmount
         );
-        committedBalances[currency] = amount;
+        committedBalances[currency] += minAmount;
         toast.dismiss(mintWaitToast);
       }
     });
@@ -294,7 +297,6 @@ export default class APIStarknetProvider extends APIProvider {
       userWalletAddress
     );
     const signer = await accountContract.get_signer();
-    console.log(`signer: ${signer}`)
     return (signer.toString() !== '0');
   };
 
@@ -314,6 +316,7 @@ export default class APIStarknetProvider extends APIProvider {
   _getBalances = async () => {
     const balances = {};
     const currencies = this.getCurrencies();
+    console.log(currencies)
     const results = currencies.map(async (currency) => {
       const contractAddress = this.getCurrencyInfo(currency).address;
       if (contractAddress) {
