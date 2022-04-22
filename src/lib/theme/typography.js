@@ -4,6 +4,12 @@ const primaryBoldDisplay = {
   lineHeight: '14px',
 }
 
+const primaryTitleDisplay = {
+  fontFamily: 'WorkSans-Bold',
+  fontSize: '16px',
+  lineHeight: '19px',
+}
+
 const primaryDisplay = {
   fontFamily: 'WorkSans-SemiBold',
   fontSize: '104px',
@@ -139,6 +145,7 @@ const monospaceTiny = {
 
 const typography = {
   primaryBoldDisplay,
+  primaryTitleDisplay,
   primaryDisplay,
   primaryHeading1,
   primaryHeading2,
