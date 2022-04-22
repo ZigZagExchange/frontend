@@ -6,34 +6,28 @@ import TradeRecentTable from "./TradeRecentTable/TradeRecentTable";
 import TradePriceHeadSecond from "./TradePriceHeadSecond/TradePriceHeadSecond";
 import { Tabs } from "components";
 import { marketFillsSelector } from "lib/store/features/api/apiSlice";
+import Text from "components/atoms/Text/Text";
 
 const StyledTradeBooks = styled.section`
   display: flex;
-  flex-direction: column;
-  grid-area: books;
-  & .tab-content {
-    display: flex;
-    flex-direction: column;
-    height: calc(100vh - 190px);
-    min-height: 400px;
-  }
-  & .trade_price_head_third {
-    display: flex;
-    align-items: center;
-    color: #798ec9;
-    height: 30px;
-    margin-bottom: 10px;
-    opacity: 0.85;
-    border-bottom: 1px solid #333;
-    & strong {
-      border-radius: 10px;
-      font-size: 12px;
-      text-transform: uppercase;
-      margin: 0 auto;
-      cursor: pointer;
-    }
-  }
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 21px 10px 12px 20px;
 `;
+
+const BooksWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 225px;
+  gap: 8px;
+`
+
+const TradesWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 225px;
+  gap: 8px;
+`
 
 export default function TradeBooks(props) {
   const marketFills = useSelector(marketFillsSelector);
@@ -58,8 +52,8 @@ export default function TradeBooks(props) {
   return (
     <>
       <StyledTradeBooks>
-        <Tabs className="booksOptions">
-          <div label="Books">
+          <BooksWrapper>
+            <Text font="primaryTitleDisplay" color="foregroundHighEmphasis">Order Book</Text>
             <TradePriceTable
               head
               className="trade_table_asks"
@@ -77,9 +71,10 @@ export default function TradeBooks(props) {
               currentMarket={props.currentMarket}
               priceTableData={props.bidBins}
             />
-          </div>
-          <div label="Trades">
+          </BooksWrapper>
+          <TradesWrapper>
             {/* TradePriceTable*/}
+            <Text font="primaryTitleDisplay" color="foregroundHighEmphasis">Market Trades</Text>
             <TradeRecentTable
               head
               className=""
@@ -87,8 +82,7 @@ export default function TradeBooks(props) {
               priceTableData={openOrdersLatestTradesData}
               currentMarket={props.currentMarket}
             />
-          </div>
-        </Tabs>
+          </TradesWrapper>
       </StyledTradeBooks>
     </>
   );
