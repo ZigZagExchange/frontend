@@ -26,9 +26,9 @@ export default class APIProvider {
       this.websocketUrl = process.env.REACT_APP_ZIGZAG_WS;
     } else if (
       [1000, 1001].includes(network) &&
-      process.env.REACT_APP_ZIGZAG_WS_RINKEBY
+      process.env.REACT_APP_ZIGZAG_WS_STAGING
     ) {
-      this.websocketUrl = process.env.REACT_APP_ZIGZAG_WS_RINKEBY;
+      this.websocketUrl = process.env.REACT_APP_ZIGZAG_WS_STAGING;
     } else {
       throw new Error('APIProvider, wrong network')
     }
