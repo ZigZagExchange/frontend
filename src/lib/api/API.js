@@ -170,8 +170,12 @@ export default class API extends Emitter {
   };
 
   _fetchENSName = async (address) => {
-    let name = await getENSName(address);
-    if (name) return { name };
+    try {
+      let name = await getENSName(address);
+      if (name) return { name };
+    } catch (err) {
+      console.log(`Error fetching ENSName: ${err.message}`)
+    }
     return {};
   };
 
