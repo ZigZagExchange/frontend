@@ -1,4 +1,3 @@
-import get from "lodash/get";
 import * as zksync from "zksync";
 import { ethers } from "ethers";
 import { toast } from "react-toastify";

@@ -6,6 +6,8 @@ import { ethers, constants as ethersConstants } from "ethers";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import { getENSName } from "lib/ens";
 import { formatAmount } from "lib/utils";
+import get from "lodash/get";
+import axios from "axios";
 import erc20ContractABI from "lib/contracts/Ethereum_ERC20.json";
 import { MAX_ALLOWANCE } from "./constants";
 
@@ -149,7 +151,7 @@ export default class API extends Emitter {
         }
         return {};
       }
-      
+
       profile.name = `${address.substr(0, 6)}…${address.substr(-6)}`;
       Object.assign(
         profile,
