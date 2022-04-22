@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { useHistory, useLocation } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { userSelector } from "lib/store/features/auth/authSlice";
@@ -9,7 +9,7 @@ import api from "lib/api";
 import logo from "assets/images/logo.png";
 import { TabMenu, Tab } from "components/molecules/TabMenu";
 import { Dropdown, AccountDropdown } from "components/molecules/Dropdown";
-import Button from "components/molecules/Button/Button";
+import { ConnectWalletButton } from "components/molecules/Button";
 import { DiscordIcon, ExternalLinkIcon, TelegramIcon, TwitterIcon, DeleteIcon, MenuIcon } from "components/atoms/Svg";
 import { toNumber } from "lodash";
 import ToggleTheme from "components/molecules/Toggle/ToggleTheme";
@@ -33,12 +33,10 @@ const accountLists = [
 export const Header = (props) => {
   // state to open or close the sidebar in mobile
   const [show, setShow] = useState(false);
-  const [connecting, setConnecting] = useState(false);
   const user = useSelector(userSelector);
   const network = useSelector(networkSelector);
   const hasBridge = api.isImplemented("depositL2");
   const history = useHistory();
-  const location = useLocation();
   const [index, setIndex] = useState(0);
   const [language, setLanguage] = useState(langList[0].text)
   const [account, setAccount] = useState(accountLists[0].text)
@@ -105,19 +103,6 @@ export const Header = (props) => {
     }
   }
 
-  const connect = () => {
-    setConnecting(true);
-    api
-      .signIn(network)
-      .then((state) => {
-        if (!state.id && !/^\/bridge(\/.*)?/.test(location.pathname)) {
-          history.push("/bridge");
-        }
-        setConnecting(false);
-      })
-      .catch(() => setConnecting(false));
-  };
-
   const isMobile = window.innerWidth < 1034
 
   return (
@@ -138,7 +123,7 @@ export const Header = (props) => {
                 <AccountDropdown notext />
               </>
             ) : (
-              <Button isLoading={connecting} scale="md" onClick={connect} style={{width: '143px', padding: connecting ? '8px 5px' : '8px 15px'}}>CONNECT WALLET</Button>
+              <ConnectWalletButton />
             )}
             <MenuButtonWrapper>
               <MenuIcon onClick={() => setShow(!show)} />
@@ -191,11 +176,11 @@ export const Header = (props) => {
             <VerticalDivider />
             {user.id && user.address ? ( 
               <>
-                <Dropdown width={242} item={networkLists} context={networkName} clickFunction={changeNetwork}/>
+                <Dropdown width={162} item={networkLists} context={networkName} clickFunction={changeNetwork}/>
                 <AccountDropdown />
               </>
             ) : (
-              <Button isLoading={connecting} scale="md" onClick={connect} style={{width: '143px', padding: connecting ? '8px 5px' : '8px 15px'}}>CONNECT WALLET</Button>
+              <ConnectWalletButton />
             )}
           </ActionsWrapper>
         </>

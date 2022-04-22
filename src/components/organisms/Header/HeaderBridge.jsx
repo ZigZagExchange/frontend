@@ -6,7 +6,7 @@ import { NavLink } from "react-router-dom";
 import { networkSelector } from "lib/store/features/api/apiSlice";
 import api from "lib/api";
 import logo from "assets/images/logo.png";
-import "./Header.css";
+// import "./Header.css";
 
 export const HeaderBridge = (props) => {
   // state to open or close the sidebar in mobile
