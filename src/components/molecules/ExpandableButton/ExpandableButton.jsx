@@ -8,16 +8,17 @@ const IconButton = styled(baseIcon)`
     background-color: ${({ theme, transparent }) => transparent ? 'transparent' : theme.colors.foreground300};
 	padding: ${({ transparent }) => transparent ? '0px' : '8px 16px'};
 	height: 32px;
+	width: ${({ width }) => width}px;
 	justify-content: space-between;
 `
 
 
 const ExpandableButton = ({ ...props }) => {
 
-	const { expanded, transparent, children, onClick } = props
+	const { expanded, transparent, children, width, onClick } = props
 
 	return (
-		<IconButton variant="secondary" transparent={transparent} onClick={onClick} endIcon={expanded ? <CaretUpIcon /> : <CaretDownIcon />}>
+		<IconButton width={width} variant="secondary" transparent={transparent} onClick={onClick} endIcon={expanded ? <CaretUpIcon /> : <CaretDownIcon />}>
 			<Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{children}</Text>
 		</IconButton>
 	)

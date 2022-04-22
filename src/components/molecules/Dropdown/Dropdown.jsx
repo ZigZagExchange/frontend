@@ -67,7 +67,7 @@ const Dropdown = ({width, item, context, leftIcon, rightIcon, transparent, click
 
     return (
         <DropdownWrapper ref={wrapperRef}> 
-            <ExpandableButton transparent={transparent} expanded={isOpened} onClick={toggle}>{context}</ExpandableButton>
+            <ExpandableButton width={width} transparent={transparent} expanded={isOpened} onClick={toggle}>{context}</ExpandableButton>
             { isOpened &&
                 <Wrapper width={width}>
                         {item.map((items) => {
