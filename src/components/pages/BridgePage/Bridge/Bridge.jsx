@@ -1,5 +1,10 @@
 import React, {useEffect, useState} from 'react'
+import {
+  constants as ethersConstants,
+  utils as ethersUtils
+} from 'ethers';
 import {useSelector} from "react-redux";
+import isEmpty from "lodash/isEmpty";
 import {SwapButton, Button, useCoinEstimator} from 'components'
 import {
   networkSelector,
@@ -8,7 +13,6 @@ import {
 import Loader from "react-loader-spinner"
 import {userSelector} from "lib/store/features/auth/authSlice";
 import api from 'lib/api';
-import {MAX_ALLOWANCE} from 'lib/api/constants';
 import {formatUSD} from 'lib/utils';
 import cx from 'classnames';
 import {BiError} from 'react-icons/bi';
@@ -21,6 +25,8 @@ import RadioButtons from "../../../atoms/RadioButtons/RadioButtons";
 import L2Header from "./L2Header";
 import L1Header from "./L1Header";
 import FastWithdrawTooltip from "./FastWithdrawTooltip";
+import { formatPrice } from "lib/utils";
+import {MAX_ALLOWANCE} from 'lib/api/constants';
 
 const defaultTransfer = {
   type: "deposit",
@@ -38,6 +44,9 @@ const Bridge = () => {
   const network = useSelector(networkSelector);
   const [transfer, setTransfer] = useState(defaultTransfer);
   const [swapDetails, _setSwapDetails] = useState(() => ({amount: '', currency: 'ETH'}));
+  const [swapCurrencyInfo, setSwapCurrencyInfo] = useState({decimals: 0});
+  const [allowance, setAllowance] = useState(ethersConstants.Zero);
+  const [hasAllowance, setHasAllowance] = useState(false);
   const coinEstimator = useCoinEstimator()
   const currencyValue = coinEstimator(swapDetails.currency)
   const activationFee = parseFloat((user.address && !user.id ? (15 / currencyValue) : 0).toFixed(5))
@@ -55,9 +64,29 @@ const Bridge = () => {
 
   const balances = transfer.type === 'deposit' ? walletBalances : zkBalances
   const altBalances = transfer.type === 'deposit' ? zkBalances : walletBalances
-  const hasAllowance = balances[swapDetails.currency] && balances[swapDetails.currency].allowance.gte(MAX_ALLOWANCE.div(3))
   const hasError = formErr && formErr.length > 0
   const isSwapAmountEmpty = swapDetails.amount === ""
+
+  useEffect(() => {
+    if (swapDetails.currency === "ETH") {
+      setAllowance(MAX_ALLOWANCE);
+      setHasAllowance(true);
+      return;
+    }
+    if (isEmpty(balances) || !swapDetails.currency) {
+      return;
+    }
+    const swapCurrencyInfo = api.getCurrencyInfo(swapDetails.currency);
+    setSwapCurrencyInfo(swapCurrencyInfo);
+
+    const swapAmountBN = ethersUtils.parseUnits(
+      isSwapAmountEmpty ? '0.0' : swapDetails.amount,
+      swapCurrencyInfo.decimals
+    );
+    const allowanceBN = balances[swapDetails.currency]?.allowance ?? ethersConstants.Zero;      
+    setAllowance(allowanceBN);
+    setHasAllowance(allowanceBN.gte(swapAmountBN));
+  }, [balances, swapDetails, isSwapAmountEmpty]);
 
   useEffect(() => {
     if (user.address) {
@@ -93,19 +122,19 @@ const Bridge = () => {
   const validateInput = (inputValue, swapCurrency) => {
     const swapCurrencyInfo = api.getCurrencyInfo(swapCurrency);
     const bals = transfer.type === 'deposit' ? walletBalances : zkBalances
-    const getCurrencyBalance = (cur) => (bals[cur] && bals[cur] / (10**swapCurrencyInfo.decimals));
+    const getCurrencyBalance = (cur) => (bals[cur] && bals[cur].value / (10**swapCurrencyInfo.decimals));
     const detailBalance = getCurrencyBalance(swapCurrency)
     let error = null
 
     if (inputValue > 0) {
       if (inputValue <= activationFee) {
         error = `Must be more than ${activationFee} ${swapCurrency}`
-      } else if (inputValue - L2Fee < 0) {
+      } else if (inputValue < L2Fee) {
         error = "Amount too small"
-      } else if (inputValue > detailBalance) {
+      } else if (inputValue >= detailBalance) {
         error = "Insufficient balance"
       } else if (isFastWithdraw) {
-        if (inputValue - L1Fee < 0) {
+        if (inputValue < L1Fee) {
           error = "Amount too small"
         }
 
@@ -113,19 +142,17 @@ const Bridge = () => {
           const maxAmount = fastWithdrawCurrencyMaxes[swapCurrency]
           if (inputValue > maxAmount) {
             error = `Max ${swapCurrency} liquidity for fast withdraw: ${maxAmount.toPrecision(4)}`
-          } else if (inputValue - (L2Fee + L1Fee) < 0) {
+          } else if (inputValue < (L2Fee + L1Fee)) {
             error = "Amount too small"
           }
         }
-      }
-
-      if (L2FeeToken === swapCurrency) {
-        if (detailBalance - (inputValue + L2Fee) < 0) {
+      } else if (L2FeeToken === swapCurrency) {
+        if ((inputValue + L2Fee) > detailBalance) {
           error = "Insufficient balance for fees"
         }
       } else {
         const feeCurrencyBalance = getCurrencyBalance(L2FeeToken)
-        if (feeCurrencyBalance - L2Fee < 0) {
+        if (feeCurrencyBalance < L1Fee) {
           error = "Insufficient balance for fees"
         }
       }
@@ -138,11 +165,14 @@ const Bridge = () => {
     return true
   }
 
-  const validateFees = (bridgeFee, feeToken) => {
+  const validateFees = (inputValue, bridgeFee, feeToken) => {
     const bals = transfer.type === 'deposit' ? walletBalances : zkBalances
     const feeTokenBalance = parseFloat(bals[feeToken] && bals[feeToken].valueReadable) || 0
 
-    if (bridgeFee > feeTokenBalance) {
+    if (
+      inputValue > 0 &&
+      bridgeFee > feeTokenBalance
+    ) {
       setFormErr("Not enough balance to pay for fees")
       return false
     }
@@ -160,7 +190,7 @@ const Bridge = () => {
         setFee(null)
       })
 
-    api.withdrawL2FastBridgeFee(details.currency)
+      api.withdrawL2FastBridgeFee(details.currency)
       .then(res => setL1Fee(res))
       .catch(e => {
           console.error(e)
@@ -170,7 +200,7 @@ const Bridge = () => {
 
   const setNormalWithdrawFees = (setFee, details) => {
     api.withdrawL2GasFee(details.currency)
-      .then(({feeToken, amount}) => {
+      .then(({amount, feeToken}) => {
         setFee(amount, feeToken)
       })
       .catch(err => {
@@ -182,8 +212,8 @@ const Bridge = () => {
 
   const setDepositFee = (setFee, details) => {
       api.depositL2Fee(details.currency).then(res => {
-        setFee(res)
-        setL1Fee(null)
+        setFee(null, null)
+        setL1Fee(res.amount)
       })
   }
 
@@ -199,8 +229,8 @@ const Bridge = () => {
       setL2Fee(bridgeFee)
       setL2FeeToken(feeToken)
       const input = parseFloat(details.amount) || 0
-      const isInputValid = validateInput(input, details.currency, feeToken)
-      const isFeesValid = validateFees(bridgeFee, feeToken)
+      const isInputValid = validateInput(input, details.currency)
+      const isFeesValid = validateFees(input, bridgeFee, feeToken)
       if (isFeesValid && isInputValid) {
         setFormErr("")
       }
@@ -297,6 +327,18 @@ const Bridge = () => {
               <h5>Estimated value</h5>
               <span>~${formatUSD(estimatedValue)}</span>
             </div>
+            {(
+              swapDetails.currency !== "ETH" &&
+              (swapDetails.amount * 10 ** swapCurrencyInfo.decimals) > allowance
+            ) ? (
+              <div className="bridge_coin_stat">
+                <h5>Available allowance</h5>
+                <span>
+                    {ethersUtils.formatUnits(allowance, swapCurrencyInfo.decimals)}
+                  {` ${swapDetails.currency}`}
+                  </span>
+              </div>
+            ): null}
             <div className="bridge_coin_stat">
               <h5>Available balance</h5>
               <span>
@@ -371,9 +413,12 @@ const Bridge = () => {
                   Bridge Fee: {L1Fee.toPrecision(4)} {swapDetails.currency}
                 </div>}
                 <x.div color={"blue-gray-300"}>
-                  You'll receive: ~{isFastWithdraw && L1Fee
-                  ? Number(swapDetails.amount - L1Fee).toPrecision(4)
-                  : Number(swapDetails.amount).toPrecision(4)}
+                  You'll receive: ~{                  
+                    formatPrice(swapDetails.amount
+                      - (L1Fee ? Number(L1Fee) : 0)
+                      - (L2Fee ? Number(L2Fee) : 0)
+                    )
+                  }
                   {" " + swapDetails.currency} on L1
                 </x.div>
               </x.div>}
@@ -390,7 +435,12 @@ const Bridge = () => {
             {user.address && <>
               {balances[swapDetails.currency] && !hasAllowance && <Button
                 loading={isApproving}
-                className={cx("bg_btn", {zig_disabled: formErr.length > 0 || swapDetails.amount.length === 0,})}
+                className={cx("bg_btn", {
+                  zig_disabled: 
+                    formErr.length > 0 ||
+                    Number(swapDetails.amount) === 0 ||
+                    swapDetails.currency === "ETH"
+                  })}
                 text="APPROVE"
                 style={{marginBottom: 10}}
                 onClick={approveSpend}
@@ -404,7 +454,12 @@ const Bridge = () => {
 
               {!hasError && <Button
                 loading={loading}
-                className={cx("bg_btn", {zig_disabled: L2Fee === null || !hasAllowance || swapDetails.amount.length === 0})}
+                className={cx("bg_btn", {
+                  zig_disabled: 
+                    (L2Fee === null && L1Fee === null) ||
+                    !hasAllowance ||
+                    Number(swapDetails.amount) === 0
+                  })}
                 text="TRANSFER"
                 icon={<MdSwapCalls/>}
                 onClick={doTransfer}

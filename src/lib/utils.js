@@ -17,21 +17,24 @@ export function formatAmount(amount, currency) {
 
 export function formatPrice(input) {
   const inputNumber = Number(input)
+  let outputNumber;
   if (inputNumber > 99999) {
-    return inputNumber.toFixed(0);
+    outputNumber = inputNumber.toFixed(0);
   } else if (inputNumber > 9999) {
-    return inputNumber.toFixed(1);
+    outputNumber = inputNumber.toFixed(1);
   } else if (inputNumber > 999) {
-    return inputNumber.toFixed(2);
+    outputNumber = inputNumber.toFixed(2);
   } else if (inputNumber > 99) {
-    return inputNumber.toFixed(3);
+    outputNumber = inputNumber.toFixed(3);
   } else if (inputNumber > 9) {
-    return inputNumber.toFixed(4);
+    outputNumber = inputNumber.toFixed(4);
   } else if (inputNumber > 1) {
-    return inputNumber.toFixed(5);
+    outputNumber = inputNumber.toFixed(5);
   } else {
-    return inputNumber.toPrecision(6);
+    outputNumber = inputNumber.toPrecision(6);
   }
+  // remove trailing zero's
+  return Number(outputNumber).toString();    
 }
 
 export function toBaseUnit(value, decimals) {
