@@ -198,7 +198,6 @@ export default class API extends Emitter {
   _socketMsg = (e) => {
     if (!e.data && e.data.length <= 0) return;
     const msg = JSON.parse(e.data);
-    console.log(`op: ${msg.op}, args: ${msg.args}`)
     this.emit("message", msg.op, msg.args);
 
     // Is there a better way to do this? Not sure.
@@ -215,6 +214,7 @@ export default class API extends Emitter {
       });
     }
     if (msg.op === "lastprice") {
+      console.log(`op: lastprice, args: ${msg.args[0]}`)
       const lastprices = msg.args[0];
       lastprices.forEach((l) => (this.apiProvider.lastPrices[l[0]] = l));
       const noInfoPairs = lastprices
