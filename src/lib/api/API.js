@@ -144,6 +144,9 @@ export default class API extends Emitter {
 
   _socketOpen = () => {
     this.emit("open");
+    
+    // get initial marketinfos
+    this.send("marketsreq", [this.apiProvider.network, true])
   };
 
   _socketClose = () => {
@@ -195,9 +198,6 @@ export default class API extends Emitter {
     this.ws.addEventListener("message", this._socketMsg);
     this.ws.addEventListener("error", this._socketError);
     this.emit("start");
-
-    // get initial marketinfos
-    this.send('marketsreq', [this.apiProvider.network, true])
   };
 
   stop = () => {
