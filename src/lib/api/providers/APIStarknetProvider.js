@@ -189,8 +189,6 @@ export default class APIStarknetProvider extends APIProvider {
       toast.dismiss(initializeContractToast);
     }
 
-    this.api.send("login", [this.network, userWalletContractAddress]);
-
     const balanceWaitToast = toast.info("Waiting on balances to load...", {
       autoClose: false,
       toastId: "Waiting on balances to load...",
