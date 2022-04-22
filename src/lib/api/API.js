@@ -145,9 +145,9 @@ export default class API extends Emitter {
     
           return profile;
         } catch (err) {
-          console.log(`Error fetching 3box image: ${err.message}`)
+          console.log(`Error fetching 3box image: ${err.message}`);
+          return (profile.name = address);
         }
-        return {};
       }
 
       profile.name = `${address.substr(0, 6)}…${address.substr(-6)}`;
