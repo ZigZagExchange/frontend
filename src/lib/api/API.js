@@ -148,6 +148,9 @@ export default class API extends Emitter {
 
   _socketOpen = () => {
     this.emit("open");
+    
+    // get initial marketinfos, returns lastprice and marketinfo2
+    this.send("marketsreq", [this.apiProvider.network, true])
   };
 
   _socketClose = () => {
@@ -169,6 +172,13 @@ export default class API extends Emitter {
       const marketInfo = msg.args[0];
       if (!marketInfo) return;
       this.apiProvider.marketInfo[marketInfo.alias] = marketInfo;
+    }
+    if (msg.op === "marketinfo2") {
+      const marketInfos = msg.args[0];
+      marketInfos.forEach(marketInfo => {
+        if (!marketInfo) return;
+        this.apiProvider.marketInfo[marketInfo.alias] = marketInfo;
+      });
     }
     if (msg.op === "lastprice") {
       const lastprices = msg.args[0];
