@@ -390,6 +390,7 @@ const TradePairSelectWrapper = styled.div`
   justify-content: center;
   height: 74px;
   background-color: ${({ theme }) => theme.colors.backgroundLowEmphasis};
+  border-bottom: 1px solid ${({theme}) => theme.colors.foreground400};
   padding: 0px 25px;
 `
 
