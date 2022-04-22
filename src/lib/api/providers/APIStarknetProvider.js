@@ -14,7 +14,7 @@ export default class APIStarknetProvider extends APIProvider {
   _accountState = {};
   marketInfo = {};
   lastPrices = {};
-  getCurrencies
+  
   getAccountState = async () => {
     return this._accountState;
   };
