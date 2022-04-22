@@ -164,6 +164,8 @@ export default class APIStarknetProvider extends APIProvider {
       userWalletContractAddress = deployContractResponse.address;
       toast.success("Account contract deployed");
       localStorage.setItem("starknet:account", userWalletContractAddress);
+      // set _accountState for _checkAccountInitialized
+      this._accountState.address = userWalletContractAddress;
     }
 
     // Check account initialized
@@ -286,6 +288,7 @@ export default class APIStarknetProvider extends APIProvider {
 
   _checkAccountInitialized = async () => {
     const userWalletAddress = this._accountState.address;
+    console.log(`userWalletAddress: ${userWalletAddress}`)
     const accountContract = new starknet.Contract(
       starknetAccountContractV1.abi,
       userWalletAddress
