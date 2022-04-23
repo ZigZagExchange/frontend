@@ -63,7 +63,7 @@ export default class APIStarknetProvider extends APIProvider {
     // get values
     const baseAssetAddress = marketInfo.baseAsset.address;
     const quoteAssetAddress = marketInfo.quoteAsset.address;
-    const sideInt = side === "b" ? '0' : '1';
+    const sideInt = (side === "b") ? '0' : '1';
     const amountBN = baseAmount * (10 ** marketInfo.baseAsset.decimals);
     const getFraction = (decimals) => {
       let denominator = 1;
@@ -209,9 +209,13 @@ export default class APIStarknetProvider extends APIProvider {
         : bigInt(5e9).toString()
 
       if (committedBalances[currency] < minAmount)  {
-        const mintWaitToast = toast.info(`No ${currency} found. Minting you some`, {
-          toastId: `No ${currency} found. Minting you some`,
-        });
+        const mintWaitToast = toast.info(
+          `No ${currency} found. Minting you some`,
+          {
+            autoClose: false,
+            toastId: `No ${currency} found. Minting you some`,
+          }
+        );
         await this._mintBalance(
           this.getCurrencyInfo(currency).address,
           minAmount
@@ -323,6 +327,13 @@ export default class APIStarknetProvider extends APIProvider {
       }
     })
     await Promise.all(results);
+
+    // update accountState
+    this._accountState = {
+      committed: {
+        balances: balances,
+      },
+    };
     return balances;
   };
 
