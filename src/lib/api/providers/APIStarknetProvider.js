@@ -9,7 +9,7 @@ import { STARKNET_DOMAIN_TYPE_HASH, ORDER_TYPE_HASH } from "../constants";
 export default class APIStarknetProvider extends APIProvider {
   static VALID_SIDES = ["b", "s"];
   static STARKNET_CONTRACT_ADDRESS =
-    "0x074f861a79865af1fb77af6197042e8c73147e28c55ac61e385ac756f89b33d6";
+    "0x02aa8af6fb8e6ab7d07ad94d0b3b9bb6010fe7258b8d23eced19ba0ccbb68d1a";
 
   _accountState = {};
   marketInfo = {};
@@ -210,17 +210,21 @@ export default class APIStarknetProvider extends APIProvider {
 
       if (committedBalances[currency] < minAmount)  {
         const mintWaitToast = toast.info(
-          `No ${currency} found. Minting you some`,
+          `No ${currency} found. Minting you some...`,
           {
             autoClose: false,
-            toastId: `No ${currency} found. Minting you some`,
+            toastId: `No ${currency} found. Minting you some...`,
           }
         );
-        await this._mintBalance(
-          this.getCurrencyInfo(currency).address,
-          minAmount
-        );
-        committedBalances[currency] += minAmount;
+        try {
+          await this._mintBalance(
+            this.getCurrencyInfo(currency).address,
+            minAmount
+          );
+          committedBalances[currency] += minAmount;
+        } catch (e) {
+          console.log(`Error while minting tokens: ${e.message}`)
+        }        
         toast.dismiss(mintWaitToast);
       }
     });
