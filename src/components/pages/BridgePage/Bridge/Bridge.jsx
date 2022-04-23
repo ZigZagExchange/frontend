@@ -376,7 +376,7 @@ const Bridge = () => {
       <p style={{fontSize: '14px', lineHeight:'24px'}}>1. Switch to Polygon network</p>
       <p style={{fontSize: '14px', lineHeight:'24px'}}>2. Sign the transaction and wait for confirmation</p>
       <p style={{fontSize: '14px', lineHeight:'24px'}}>3. Wait until "Switch Network" pops up</p>
-      <p style={{fontSize: '14px', lineHeight:'24px'}}>4. Switch back to Ethereum network and trade on ZigZag</p>
+      <p style={{fontSize: '14px', lineHeight:'24px'}}>4. Switch back to Ethereum mainnet. Activating a new zkSync wallet costs ~$5. Enjoy trading on ZigZag!</p>
     </div>
   }
 
