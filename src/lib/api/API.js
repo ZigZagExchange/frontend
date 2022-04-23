@@ -11,7 +11,7 @@ import axios from "axios";
 import erc20ContractABI from "lib/contracts/Ethereum_ERC20.json";
 import { MAX_ALLOWANCE } from "./constants";
 
-import altWalletZZLogo from "../../../../assets/images/logo.png";
+import altWalletZZLogo from "src/assets/images/logo.png";
 
 const chainMap = {
   "0x1": 1,
