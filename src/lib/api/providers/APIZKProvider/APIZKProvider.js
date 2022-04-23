@@ -30,7 +30,7 @@ export default class APIZKProvider extends APIProvider {
   _tokenWithdrawFees = {};
   _tokenInfo = {};
   eligibleFastWithdrawTokens = ["ETH", "FRAX", "UST"];
-  fastWithdrawContractAddress = "0xCC9557F04633d82Fb6A1741dcec96986cD8689AE";
+  fastWithdrawContractAddress = ZKSYNC_ETHEREUM_FAST_BRIDGE.address;
   getProfile = async (address) => {
     try {
       const { data } = await axios.get(
@@ -335,11 +335,11 @@ export default class APIZKProvider extends APIProvider {
   };
 
   depositL2Fee = async (token = "ETH") => {
-    // TODO: implement
-    return {
-      amount: 0.005,
-      feeToken: 'ETH'
-    };
+    if (this.api.ethersProvider) {
+      const feeData = await this.api.ethersProvider.getFeeData();
+      console.log(feeData);
+      return feeData;
+    }
   };
 
   createWithdraw = async (

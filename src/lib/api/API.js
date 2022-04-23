@@ -14,6 +14,7 @@ import {
   POLYGON_MUMBAI_WETH_ADDRESS,
   POLYGON_MAINNET_WETH_ADDRESS,
 } from "./constants";
+import axios from "axios";
 
 const chainMap = {
   "0x1": 1,
@@ -446,6 +447,12 @@ export default class API extends Emitter {
     return this.apiProvider.depositL2(amount, token, address);
   };
 
+  getPolygonFee = async () => {
+    const res = await axios.get("https://gasstation-mainnet.matic.network/v2");
+    console.log(res.data)
+    return res.data;
+  }
+
   withdrawL2 = async (amount, token) => {
     return this.apiProvider.withdrawL2(amount, token);
   };
@@ -455,7 +462,8 @@ export default class API extends Emitter {
   };
 
   depositL2Fee = async (token) => {
-    return await this.apiProvider.depositL2Fee(token);
+    console.log(await this.web3.eth.getGasPrice()/10**18);
+    return await this.apiProvider.depositL2Fee(token);;
   };
 
   withdrawL2GasFee = async (token) => {

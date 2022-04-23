@@ -231,6 +231,10 @@ const Bridge = () => {
         if (L1Fee != null && feeCurrencyBalance < L1Fee) {
           error = "Insufficient balance for fees";
         }
+      } else if (L1Fee !== null  && inputValue < L1Fee) {
+        error = "Amount too small";
+      } else if (inputValue < 0.0001 && (fromNetwork.from.key === 'polygon' || toNetwork.key === 'polygon')) {
+        error = "Insufficient amount";
       }
     }
 
@@ -290,14 +294,7 @@ const Bridge = () => {
       });
   };
 
-  const setDepositFee = (setFee, details) => {
-    api.depositL2Fee(details.currency).then(res => {
-      setFee(null, null)
-      setL1Fee(res.amount)
-    })
-  }
-
-  const setSwapDetails = (values) => {
+  const setSwapDetails = async (values) => {
     const details = {
       ...swapDetails,
       ...values,
@@ -317,16 +314,19 @@ const Bridge = () => {
       }
     };
 
-    if(fromNetwork.from.key === 'polygon' || toNetwork.key === 'polygon') {
-      setFee(0, null)
-      setL1Fee(0.005)
-      return; //For polygon network, we have to call other function to calculate gas fee.
-    }
 
     // setFee(null); setFee has two parameters. what is this?
     setL1Fee(null);
 
-    if (transfer.type === "withdraw") {
+    if(fromNetwork.from.key === 'polygon') {
+      const gasFee = await api.getPolygonFee();
+      if(gasFee){
+        setL1Fee(35000 * gasFee.fast.maxFee / 10**9);
+        setFee(0, null)
+      }
+      return;
+    }
+    else if (transfer.type === "withdraw") {
       if (api.apiProvider.syncWallet) {
         if (isFastWithdraw) {
           setFastWithdrawFees(setFee, details);
@@ -335,7 +335,15 @@ const Bridge = () => {
         }
       }
     } else {
-      setDepositFee(setFee, details);
+      const gasFee = await api.depositL2Fee(details.currency);
+      console.log(gasFee)
+      if(gasFee){
+        let fee = gasFee.maxFeePerGas
+          .add(gasFee.maxPriorityFeePerGas)
+          .mul(21000)
+        setFee(null, null)
+        setL1Fee(fee.toString() / 10**18)
+      }
     }
   };
 
@@ -605,6 +613,36 @@ const Bridge = () => {
                           ? formatPrice(swapDetails.amount - L1Fee)
                           : formatPrice(swapDetails.amount)}
                         {" " + swapDetails.currency} on L1
+                      </x.div>
+                    </x.div>
+                  )}
+                </x.div>
+              )}
+              {transfer.type === "deposit" && (
+                <x.div>
+                  {L1Fee && (
+                    <>
+                      gas fee: {formatPrice(L1Fee)} {swapDetails.currency}
+                    </>
+                  )}
+                  {!L1Fee && (
+                    <div style={{ display: "inline-flex", margin: "0 5px" }}>
+                      <Loader
+                        type="TailSpin"
+                        color="#444"
+                        height={16}
+                        width={16}
+                      />
+                    </div>
+                  )}
+                  {transfer.type === "deposit" && (
+                    <x.div>
+                      <x.div color={"blue-gray-300"}>
+                        You'll receive: ~
+                        {L1Fee
+                          ? formatPrice(swapDetails.amount - L1Fee)
+                          : formatPrice(swapDetails.amount)}
+                        {" " + swapDetails.currency} on {swapDetails.currency}
                       </x.div>
                     </x.div>
                   )}
