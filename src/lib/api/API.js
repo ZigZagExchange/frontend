@@ -11,6 +11,8 @@ import axios from "axios";
 import erc20ContractABI from "lib/contracts/Ethereum_ERC20.json";
 import { MAX_ALLOWANCE } from "./constants";
 
+import altWalletZZLogo from "../../../../assets/images/logo.png";
+
 const chainMap = {
   "0x1": 1,
   "0x4": 1000,
@@ -142,12 +144,12 @@ export default class API extends Emitter {
           if (profile.image) {
             profile.image = `https://gateway.ipfs.io/ipfs/${profile.image}`;
           }
-    
-          return profile;
         } catch (err) {
           console.log(`Error fetching 3box image: ${err.message}`);
-          return (profile.name = address);
+          profile.name = address;
+          profile.image = altWalletZZLogo;
         }
+        return profile;
       }
 
       profile.name = `${address.substr(0, 6)}…${address.substr(-6)}`;

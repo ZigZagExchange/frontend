@@ -261,9 +261,7 @@ export const AccountDropdown = () => {
       tabIndex="0"
     >
       <DropdownButton onClick={() => setShow(!show)} tabIndex="0">
-        if (profile?.image) {
-          <AvatarImg src={profile.image} alt={" "} />
-        }
+        <AvatarImg src={profile.image} alt={" "} />
         {profile.name}
         <AiOutlineCaretDown />
       </DropdownButton>
