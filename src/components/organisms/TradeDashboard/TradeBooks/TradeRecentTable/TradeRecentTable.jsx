@@ -30,14 +30,12 @@ const Table = styled.table`
     width: 100%;
     background-color: ${({theme}) => theme.colors.backgroundHighEmphasis};
   }
-  
+
   th {
-    font-size: 12px;
     text-transform: uppercase;
-    color: #94a2c9;
-    font-weight: 400;
     padding: 6px;
   }
+
   th:nth-child(1), td:nth-child(1) {
     width: 30%;
     text-align: start;
@@ -54,10 +52,6 @@ const Table = styled.table`
     text-align: right;
     white-space: nowrap;
     padding-right: 0px;
-  }
-
-  td {
-    padding-bottom: 4px;
   }
   
   @media screen and (min-width: 1800px) {
@@ -141,10 +135,10 @@ const TradeRecentTable = (props) => {
             return (
               <tr key={i} style={rowStyle} onClick={() => onClickRow(d)}>
                 <td>
-                  <Text font="tableContent" color="foregroundHighEmphasis">{numStringToSymbol(price, 2)}</Text>
+                  <Text font="tableContent" color={d.side === "b" ? "successHighEmphasis" : "dangerHighEmphasis"}>{numStringToSymbol(price, 2)}</Text>
                 </td>
                 <td>
-                  <Text font="tableContent" color={d.side === "b" ? "successHighEmphasis" : "dangerHighEmphasis"}>{numStringToSymbol(amount, 2)}</Text>
+                  <Text font="tableContent" color="foregroundHighEmphasis">{numStringToSymbol(amount, 2)}</Text>
                 </td>
                 <td> 
                   <Text font="tableContent" color="foregroundHighEmphasis">{time}</Text>

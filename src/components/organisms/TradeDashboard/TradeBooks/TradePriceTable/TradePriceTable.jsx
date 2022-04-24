@@ -32,30 +32,26 @@ const Table = styled.table`
   }
   
   th {
-    font-size: 12px;
     text-transform: uppercase;
-    color: #94a2c9;
-    font-weight: 400;
     padding: 6px;
   }
+
   th:nth-child(1), td:nth-child(1) {
     width: 30%;
     text-align: start;
     padding-left: 0px;
   }
+
   th:nth-child(2), td:nth-child(2) {
     width: 40%;
     text-align: center;
   }
+
   th:nth-child(3), td:nth-child(3) {
     width: 30%;
     text-align: right;
     white-space: nowrap;
     padding-right: 0px;
-  }
-
-  td {
-    padding-bottom: 4px;
   }
   
   @media screen and (min-width: 1800px) {
