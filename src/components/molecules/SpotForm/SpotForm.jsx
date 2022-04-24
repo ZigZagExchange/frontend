@@ -37,28 +37,30 @@ export class SpotForm extends React.Component {
     const marketInfo = this.props.marketInfo;
     if (!marketInfo) return 0;
 
-    if (this.props?.user?.committed?.balances?.[marketInfo.baseAsset.symbol]?.valueReadable) {
-      return Number(this.props.user.committed.balances[marketInfo.baseAsset.symbol].valueReadable);
-    }
+    const balance = this.props?.user?.committed?.balances?.[marketInfo.baseAsset.symbol];
+    if (!balance) return 0;
 
-    return (
-      this.props.user.committed.balances[marketInfo.baseAsset.symbol].value /
-      Math.pow(10, marketInfo.baseAsset.decimals)
-    );
+    if (balance.valueReadable) {
+      return Number(balance.valueReadable);
+    } else if (balance.value) {
+      return (balance.value / (10 ** marketInfo.baseAsset.decimals));
+    }
+    return 0;    
   }
 
   getQuoteBalance() {
     const marketInfo = this.props.marketInfo;
     if (!marketInfo) return 0;
 
-    if (this.props?.user?.committed?.balances?.[marketInfo.quoteAsset.symbol]?.valueReadable) {
-      return Number(this.props.user.committed.balances[marketInfo.quoteAsset.symbol].valueReadable);
+    const balance = this.props?.user?.committed?.balances?.[marketInfo.quoteAsset.symbol];
+    if (!balance) return 0;
+
+    if (balance.valueReadable) {
+      return Number(balance.valueReadable);
+    } else if (balance.value) {
+      return (balance.value / (10 ** marketInfo.quoteAsset.decimals));
     }
-    
-    return (
-      this.props.user.committed.balances[marketInfo.quoteAsset.symbol].value /
-      Math.pow(10, marketInfo.quoteAsset.decimals)
-    );
+    return 0;
   }
 
   getLadderPrice() {
