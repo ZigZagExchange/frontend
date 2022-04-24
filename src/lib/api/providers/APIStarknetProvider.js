@@ -211,7 +211,6 @@ export default class APIStarknetProvider extends APIProvider {
     }
     toast.dismiss(balanceWaitToast);
 
-    console.log(committedBalances)
     // Mint some tokens if the account is blank
     const results = Object.keys(committedBalances).map(async (currency) => {
       const minAmount = (currency === "ETH")
@@ -231,13 +230,14 @@ export default class APIStarknetProvider extends APIProvider {
           }
         );
         try {
+          const currencyInfo = this.getCurrencyInfo(currency);
           await this._mintBalance(
-            this.getCurrencyInfo(currency).address.toString(),
+            currencyInfo.address.toString(),
             minAmount.mul(25)
           );
           committedBalances[currency] = currentBalance.add(minAmount).toString();
         } catch (e) {
-          console.log(`Error while minting tokens: ${e.message}`)
+          console.log(`Error while minting tokens: ${e}`)
         }
         toast.dismiss(mintWaitToast);
       }
@@ -336,7 +336,6 @@ export default class APIStarknetProvider extends APIProvider {
   _getBalances = async () => {
     const balances = {};
     const currencies = this.getCurrencies();
-    console.log(currencies)
     const results = currencies.map(async (currency) => {
       const currencyInfo = this.getCurrencyInfo(currency).address;
       if (contractAddress) {
@@ -360,6 +359,7 @@ export default class APIStarknetProvider extends APIProvider {
     })
     await Promise.all(results);
 
+    console.log(balances)
     // update accountState
     this._accountState = {
       committed: {
@@ -371,8 +371,6 @@ export default class APIStarknetProvider extends APIProvider {
 
   _getBalance = async (contractAddress) => {
     const userWalletAddress = this._accountState.address;
-    console.log(userWalletAddress)
-    console.log(contractAddress)
     const erc20 = new starknet.Contract(starknetERC20ContractABI_test, contractAddress);
     const result = await erc20.balanceOf(userWalletAddress);
     const balance = starknet.uint256.uint256ToBN(result[0]);
