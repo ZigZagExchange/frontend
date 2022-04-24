@@ -211,17 +211,15 @@ export default class APIStarknetProvider extends APIProvider {
     }
     toast.dismiss(balanceWaitToast);
 
+    console.log(committedBalances)
     // Mint some tokens if the account is blank
     const results = Object.keys(committedBalances).map(async (currency) => {
-      const minAmount = (currency === "ETH")
-        ? ethers.BigNumber.from(1).mul((10 ** 18).toString())
-        : ethers.BigNumber.from(3000).mul((10 ** 6).toString())
-
-      const currentBalance = ethers.BigNumber.from(committedBalances[currency])
+      const minAmount = (currency === "ETH") ? 1 : 3000;
+      const currentBalance = committedBalances[currency].valueReadable;
 
       console.log(minAmount.toString())
       console.log(currentBalance.toString())
-      if (currentBalance.lte(minAmount)) {
+      if (Number(currentBalance) < minAmount) {
         const mintWaitToast = toast.info(
           `No ${currency} found. Minting you some...`,
           {
@@ -233,9 +231,13 @@ export default class APIStarknetProvider extends APIProvider {
           const currencyInfo = this.getCurrencyInfo(currency);
           await this._mintBalance(
             currencyInfo.address.toString(),
-            minAmount.mul(25)
+            (minAmount * 25).toString()
           );
-          committedBalances[currency] = currentBalance.add(minAmount).toString();
+          committedBalances[currency].valueReadable += minAmount * 25;
+          const oldAmount = ethers.BigNumber.from(committedBalances[currency].balance);
+          const newAmount = ethers.BigNumber.from(minAmount * 25)
+            .mul((10 ** currencyInfo.decimals).toString())
+          committedBalances[currency].balance = oldAmount.add(newAmount).toString();
         } catch (e) {
           console.log(`Error while minting tokens: ${e}`)
         }
