@@ -169,8 +169,8 @@ export default class APIStarknetProvider extends APIProvider {
       toast.success("Account contract deployed");
       localStorage.setItem("starknet:account", userWalletContractAddress);
       this._accountState = {
-        address: userWalletContractAddress,
-        id: userWalletContractAddress
+        address: userWalletContractAddress.toString(),
+        id: userWalletContractAddress.toString()
       }
     }
 
@@ -231,8 +231,8 @@ export default class APIStarknetProvider extends APIProvider {
     await Promise.all(results);
 
     this._accountState = {
-      address: userWalletContractAddress,
-      id: userWalletContractAddress,
+      address: userWalletContractAddress.toString(),
+      id: userWalletContractAddress.toString(),
       committed: {
         balances: committedBalances,
       },
@@ -343,6 +343,8 @@ export default class APIStarknetProvider extends APIProvider {
 
   _getBalance = async (contractAddress) => {
     const userWalletAddress = this._accountState.address;
+    console.log(userWalletAddress)
+    console.log(contractAddress)
     const erc20 = new starknet.Contract(starknetERC20ContractABI_test, contractAddress);
     const balance = await erc20.balanceOf(userWalletAddress);
     return starknet.number.toBN(balance.res, 16).toString();

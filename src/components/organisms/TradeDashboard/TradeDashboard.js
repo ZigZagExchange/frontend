@@ -12,7 +12,6 @@ import {
   networkSelector,
   userOrdersSelector,
   userFillsSelector,
-  allOrdersSelector,
   marketFillsSelector,
   lastPricesSelector,
   marketSummarySelector,
@@ -77,7 +76,6 @@ export function TradeDashboard() {
   const currentMarket = useSelector(currentMarketSelector);
   const userOrders = useSelector(userOrdersSelector);
   const userFills = useSelector(userFillsSelector);
-  const allOrders = useSelector(allOrdersSelector);
   const marketFills = useSelector(marketFillsSelector);
   const lastPrices = useSelector(lastPricesSelector);
   const marketSummary = useSelector(marketSummarySelector);
@@ -186,7 +184,7 @@ export function TradeDashboard() {
 
   const orderbookBids = [];
   const orderbookAsks = [];
-  
+
   liquidity.forEach((liq) => {
     const side = liq[0];
     const price = liq[1];

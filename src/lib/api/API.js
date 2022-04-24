@@ -11,8 +11,6 @@ import axios from "axios";
 import erc20ContractABI from "lib/contracts/Ethereum_ERC20.json";
 import { MAX_ALLOWANCE } from "./constants";
 
-import altWalletZZLogo from "../../assets/images/logo.png";
-
 const chainMap = {
   "0x1": 1,
   "0x4": 1000,
@@ -146,8 +144,6 @@ export default class API extends Emitter {
           }
         } catch (err) {
           console.log(`Error fetching 3box image: ${err.message}`);
-          profile.name = address;
-          profile.image = altWalletZZLogo;
         }
         return profile;
       }
@@ -163,6 +159,9 @@ export default class API extends Emitter {
 
       if (!profile.image) {
         profile.image = createIcon({ seed: address }).toDataURL();
+      }
+      if (!profile.name) {        
+        profile.name = address;
       }
     }
 
@@ -214,7 +213,6 @@ export default class API extends Emitter {
       });
     }
     if (msg.op === "lastprice") {
-      console.log(`op: lastprice, args: ${msg.args[0]}`)
       const lastprices = msg.args[0];
       lastprices.forEach((l) => (this.apiProvider.lastPrices[l[0]] = l));
       const noInfoPairs = lastprices
