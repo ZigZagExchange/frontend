@@ -70,6 +70,12 @@ const primaryExtraSmallSemiBold = {
   lineHeight: '14px',
 }
 
+const tableHeader = {
+  fontFamily: 'WorkSans-SemiBold',
+  fontSize: '10px',
+  lineHeight: '12px',
+}
+
 const primaryMediumBody = {
   fontFamily: 'WorkSans-Medium',
   fontSize: '12px',
@@ -149,6 +155,12 @@ const monospaceTiny = {
   letterSpacing: '0.20000000298023224px',
 }
 
+const tableContent = {
+  fontFamily: 'IBMPlexMono-Medium',
+  fontSize: '10px',
+  lineHeight: '13px',
+}
+
 const typography = {
   primaryBoldDisplay,
   primaryTitleDisplay,
@@ -174,7 +186,9 @@ const typography = {
   monospaceLarge,
   monospaceRegular,
   monospaceSmall,
-  monospaceTiny
+  monospaceTiny,
+  tableHeader,
+  tableContent,
 }
 
 export default typography
