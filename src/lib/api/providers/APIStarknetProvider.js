@@ -34,6 +34,8 @@ export default class APIStarknetProvider extends APIProvider {
     const marketInfo = this.marketInfo[market];
     // check allowance first
     const tokenInfo = side === "s" ? marketInfo.baseAsset : marketInfo.quoteAsset;
+    price = Number(price);
+    if (!price) throw new Error("Invalid price");
 
     if (!APIStarknetProvider.VALID_SIDES.includes(side)) {
       throw new Error("Invalid side");
@@ -50,23 +52,30 @@ export default class APIStarknetProvider extends APIProvider {
     }
     if (balance.valueReadable < baseAmount) throw new Error("Can't sell more than account balance")
 
-    const allowancesToast = toast.info("Checking and setting allowances", {
-      autoClose: false,
-      toastId: "Checking and setting allowances",
-    });
-
-    let amountBN = ethers.BigNumber.from(baseAmount)
-      .mul((10 ** tokenInfo.decimals).toFixed(0));
-
-    if (balance.allowance.lt(amountBN)) {
-      const success = await this._setTokenApproval(
-        tokenInfo.address,
-        APIStarknetProvider.STARKNET_CONTRACT_ADDRESS,
-        MAX_ALLOWANCE.toString()
+    let amountBN, allowancesToast;
+    try {
+      allowancesToast = toast.info("Checking and setting allowances", {
+        autoClose: false,
+        toastId: "Checking and setting allowances",
+      });
+  
+      amountBN = ethers.BigNumber.from(
+        (baseAmount * 10 ** tokenInfo.decimals).toFixed()
       );
-      if (!success) throw new Error("Error approving contract");
+  
+      if (balance.allowance.lt(amountBN)) {
+        const success = await this._setTokenApproval(
+          tokenInfo.address,
+          APIStarknetProvider.STARKNET_CONTRACT_ADDRESS,
+          MAX_ALLOWANCE.toString()
+        );
+        if (!success) throw new Error("Error approving contract");
+      }
+      toast.dismiss(allowancesToast);
+    } catch (e) {
+      toast.dismiss(allowancesToast);
+      throw new Error ('Failed to set allowance')
     }
-    toast.dismiss(allowancesToast);
 
     // get values
     const baseAssetAddress = marketInfo.baseAsset.address;
