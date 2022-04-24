@@ -34,12 +34,13 @@ export class SpotForm extends React.Component {
   }
 
   getBaseBalance() {
+    const marketInfo = this.props.marketInfo;
+    if (!marketInfo) return 0;
+
     if (this.props?.user?.committed?.balances?.[marketInfo.baseAsset.symbol]?.valueReadable) {
       return Number(this.props.user.committed.balances[marketInfo.baseAsset.symbol].valueReadable);
     }
 
-    const marketInfo = this.props.marketInfo;
-    if (!marketInfo) return 0;
     return (
       this.props.user.committed.balances[marketInfo.baseAsset.symbol].value /
       Math.pow(10, marketInfo.baseAsset.decimals)
@@ -47,11 +48,13 @@ export class SpotForm extends React.Component {
   }
 
   getQuoteBalance() {
+    const marketInfo = this.props.marketInfo;
+    if (!marketInfo) return 0;
+
     if (this.props?.user?.committed?.balances?.[marketInfo.quoteAsset.symbol]?.valueReadable) {
       return Number(this.props.user.committed.balances[marketInfo.quoteAsset.symbol].valueReadable);
     }
-    const marketInfo = this.props.marketInfo;
-    if (!marketInfo) return 0;
+    
     return (
       this.props.user.committed.balances[marketInfo.quoteAsset.symbol].value /
       Math.pow(10, marketInfo.quoteAsset.decimals)
