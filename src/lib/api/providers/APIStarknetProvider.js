@@ -27,11 +27,6 @@ export default class APIStarknetProvider extends APIProvider {
     return {};
   };
 
-  getBalances = async () => {
-    const state = await this.getAccountState();
-    return (state?.committed?.balance) ? state.committed.balance : {};
-  };
-
   submitOrder = async (market, side, price, baseAmount, quoteAmount) => {    
     const marketInfo = this.marketInfo[market];
     // check allowance first
@@ -47,7 +42,7 @@ export default class APIStarknetProvider extends APIProvider {
     // check account balance
     const balance = await this._accountState.committed.balances[tokenInfo.symbol];
     if (!balance) {
-      balance = await this._getBalances()[tokenInfo.symbol];
+      balance = await this.getBalances()[tokenInfo.symbol];
       if(!balance) throw new Error("Can't get token balance")
     }
     if (balance.valueReadable < baseAmount) throw new Error("Can't sell more than account balance")
@@ -204,7 +199,7 @@ export default class APIStarknetProvider extends APIProvider {
     });
     let committedBalances;
     try {
-      committedBalances = await this._getBalances();
+      committedBalances = await this.getBalances();
     } catch (e) {
       toast.dismiss(balanceWaitToast);
       throw new Error(e);
@@ -335,7 +330,7 @@ export default class APIStarknetProvider extends APIProvider {
     return starknet.defaultProvider.waitForTransaction(txHash);
   };
 
-  _getBalances = async () => {
+  getBalances = async () => {
     const balances = {};
     const currencies = this.getCurrencies();
     const results = currencies.map(async (currency) => {
@@ -355,7 +350,7 @@ export default class APIStarknetProvider extends APIProvider {
             currencyInfo &&
             balance / 10 ** currencyInfo.decimals
           ) || 0,
-          allowance: allowance,
+          allowance,
         };
       }
     })
