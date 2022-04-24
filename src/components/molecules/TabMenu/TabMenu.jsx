@@ -17,6 +17,7 @@ const ButtonMenu = ({ activeIndex = 0, onItemClick, row, left, children, ...prop
           return cloneElement(child, {
             isActive: activeIndex === index,
             row,
+            left,
             onClick: onItemClick ? () => onItemClick(index) : undefined,
           });
         })}

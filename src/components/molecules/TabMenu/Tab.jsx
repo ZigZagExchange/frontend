@@ -14,12 +14,13 @@ const StyledText = styled(Text)`
     transparent    
     no-repeat; 
   background-size:100% 4px;` : ''}
+  color: ${({left, isActive, theme}) => isActive && left ? `${theme.colors.foregroundHighEmphasis} !important` : !isActive && left ? `${theme.colors.foregroundMediumEmphasis} !important` : ''};
 `
 
-const Tab = ({ isActive = false, row = false, onClick, children }) => {
+const Tab = ({ isActive = false, row = false, left = false, onClick, children }) => {
   return (
     <StyledTab onClick={onClick}>
-      <StyledText isActive={isActive} row={row} font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">
+      <StyledText isActive={isActive} left={left} row={row} font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">
         {children}
       </StyledText>
     </StyledTab>
