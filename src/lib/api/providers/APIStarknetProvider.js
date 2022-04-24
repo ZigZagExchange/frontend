@@ -1,6 +1,6 @@
 import * as starknet from "starknet";
+import { ethers } from "ethers";
 import { toast } from "react-toastify";
-import bigInt from "big-integer";
 import starknetAccountContractV1 from "lib/contracts/StarkNet_Account_v1.json";
 import starknetERC20ContractABI_test from "lib/contracts/StarkNet_ERC20_test.json";
 import APIProvider from "./APIProvider";
@@ -51,9 +51,11 @@ export default class APIStarknetProvider extends APIProvider {
       tokenInfo.address,
       APIStarknetProvider.STARKNET_CONTRACT_ADDRESS
     );
-    let amountBN = starknet.number.toBN(baseAmount, tokenInfo.decimals)
 
-    bigInt(1e20 * 10 ** tokenInfo.decimals);
+    let amountBN = ethers.BigNumber.from(baseAmount)
+      .mul((10 ** tokenInfo.decimals).toFixed(0))
+      .mul('1.01');
+
     if (allowance.lt(amountBN)) {
       const success = await this._setTokenApproval(
         tokenInfo.address,
@@ -208,10 +210,10 @@ export default class APIStarknetProvider extends APIProvider {
     // Mint some tokens if the account is blank
     const results = Object.keys(committedBalances).map(async (currency) => {
       const minAmount = (currency === "ETH")
-        ? starknet.number.toBN(1, 18)
-        : starknet.number.toBN(3000, 6);
+        ? ethers.BigNumber.from(1).mul((10 ** 18).toString())
+        : ethers.BigNumber.from(3000).mul((10 ** 6).toString())
 
-      const currentBalance = starknet.number.toBN(committedBalances[currency])
+      const currentBalance = ethers.BigNumber.from(committedBalances[currency])
 
       if (minAmount.lte(currentBalance)) {
         const mintWaitToast = toast.info(
@@ -224,7 +226,7 @@ export default class APIStarknetProvider extends APIProvider {
         try {
           await this._mintBalance(
             this.getCurrencyInfo(currency).address.toString(),
-            minAmount.mul(10)
+            minAmount.mul(25)
           );
           committedBalances[currency] = currentBalance.add(minAmount).toString();
         } catch (e) {
@@ -377,7 +379,7 @@ export default class APIStarknetProvider extends APIProvider {
         contractAddress,
         spenderContractAddress
       );
-      allowances[currency] = allowance;
+      allowances[currency] = allowance.toString();
     })
     await Promise.all(results);
     return allowances;
