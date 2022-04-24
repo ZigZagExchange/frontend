@@ -32,7 +32,11 @@ export default class APIStarknetProvider extends APIProvider {
     return (state?.committed?.balance) ? state.committed.balance : {};
   };
 
-  submitOrder = async (market, side, price, baseAmount, quoteAmount) => {
+  submitOrder = async (market, side, price, baseAmount, quoteAmount) => {    
+    const marketInfo = this.marketInfo[market];
+    // check allowance first
+    const tokenInfo = side === "s" ? marketInfo.baseAsset : marketInfo.quoteAsset;
+
     if (!APIStarknetProvider.VALID_SIDES.includes(side)) {
       throw new Error("Invalid side");
     }
@@ -40,23 +44,23 @@ export default class APIStarknetProvider extends APIProvider {
       baseAmount = quoteAmount / price;
     }
 
-    const marketInfo = this.marketInfo[market];
-    // check allowance first
-    const tokenInfo = side === "s" ? marketInfo.baseAsset : marketInfo.quoteAsset;
+    // check account balance
+    const balance = await this._accountState.committed.balances[tokenInfo.symbol];
+    if (!balance) {
+      balance = await this._getBalances()[tokenInfo.symbol];
+      if(!balance) throw new Error("Can't get token balance")
+    }
+    if (balance.valueReadable < baseAmount) throw new Error("Can't sell more than account balance")
+
     const allowancesToast = toast.info("Checking and setting allowances", {
       autoClose: false,
       toastId: "Checking and setting allowances",
-    });
-    const allowance = await this._getTokenAllowance(
-      tokenInfo.address,
-      APIStarknetProvider.STARKNET_CONTRACT_ADDRESS
-    );
+    }); 
 
     let amountBN = ethers.BigNumber.from(baseAmount)
-      .mul((10 ** tokenInfo.decimals).toFixed(0))
-      .mul('1.01');
+      .mul((10 ** tokenInfo.decimals).toFixed(0));
 
-    if (allowance.lt(amountBN)) {
+    if (balance.allowance.lt(amountBN)) {
       const success = await this._setTokenApproval(
         tokenInfo.address,
         APIStarknetProvider.STARKNET_CONTRACT_ADDRESS,
