@@ -338,7 +338,7 @@ export default class APIStarknetProvider extends APIProvider {
     const currencies = this.getCurrencies();
     const results = currencies.map(async (currency) => {
       const currencyInfo = this.getCurrencyInfo(currency).address;
-      if (contractAddress) {
+      if (currencyInfo.address) {
         const [
           balance,
           allowance
