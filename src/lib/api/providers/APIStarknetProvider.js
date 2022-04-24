@@ -88,7 +88,7 @@ export default class APIStarknetProvider extends APIProvider {
       return { numerator: decimals * denominator, denominator }
     }
     const priceRatio = getFraction(price);
-    const expiration = Date.now() + 86400;
+    const expiration = (Date.now() / 1000 | 0) + 86400;
 
     // build order msg
     const ZZMessage = {
