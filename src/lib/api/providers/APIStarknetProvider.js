@@ -4,7 +4,11 @@ import bigInt from "big-integer";
 import starknetAccountContractV1 from "lib/contracts/StarkNet_Account_v1.json";
 import starknetERC20ContractABI_test from "lib/contracts/StarkNet_ERC20_test.json";
 import APIProvider from "./APIProvider";
-import { STARKNET_DOMAIN_TYPE_HASH, ORDER_TYPE_HASH } from "../constants";
+import {
+  STARKNET_DOMAIN_TYPE_HASH,
+  ORDER_TYPE_HASH,
+  MAX_ALLOWANCE
+} from "../constants";
 
 export default class APIStarknetProvider extends APIProvider {
   static VALID_SIDES = ["b", "s"];
@@ -32,6 +36,9 @@ export default class APIStarknetProvider extends APIProvider {
     if (!APIStarknetProvider.VALID_SIDES.includes(side)) {
       throw new Error("Invalid side");
     }
+    if (!baseAmount && quoteAmount) {
+      baseAmount = quoteAmount / price;
+    }
 
     const marketInfo = this.marketInfo[market];
     // check allowance first
@@ -44,27 +51,23 @@ export default class APIStarknetProvider extends APIProvider {
       tokenInfo.address,
       APIStarknetProvider.STARKNET_CONTRACT_ADDRESS
     );
-    let minAmountInt = bigInt(1e20 * 10 ** tokenInfo.decimals);
-    if (allowance.compare(minAmountInt) === -1) {
-      let amountInt = bigInt(1e21 * 10 ** tokenInfo.decimals);
+    let amountBN = starknet.number.toBN(baseAmount, tokenInfo.decimals)
+
+    bigInt(1e20 * 10 ** tokenInfo.decimals);
+    if (allowance.lt(amountBN)) {
       const success = await this._setTokenApproval(
         tokenInfo.address,
         APIStarknetProvider.STARKNET_CONTRACT_ADDRESS,
-        amountInt.toString()
+        MAX_ALLOWANCE.toString()
       );
       if (!success) throw new Error("Error approving contract");
     }
     toast.dismiss(allowancesToast);
 
-    if (!baseAmount && quoteAmount) {
-      baseAmount = quoteAmount / price;
-    }
-
     // get values
     const baseAssetAddress = marketInfo.baseAsset.address;
     const quoteAssetAddress = marketInfo.quoteAsset.address;
     const sideInt = (side === "b") ? '0' : '1';
-    const amountBN = baseAmount * (10 ** marketInfo.baseAsset.decimals);
     const getFraction = (decimals) => {
       let denominator = 1;
       for (; (decimals * denominator) % 1 !== 0; denominator++);
@@ -205,10 +208,12 @@ export default class APIStarknetProvider extends APIProvider {
     // Mint some tokens if the account is blank
     const results = Object.keys(committedBalances).map(async (currency) => {
       const minAmount = (currency === "ETH")
-        ? bigInt(1e18).toString()
-        : bigInt(5e9).toString()
+        ? starknet.number.toBN(1, 18)
+        : starknet.number.toBN(3000, 6);
 
-      if (committedBalances[currency] < minAmount) {
+      const currentBalance = starknet.number.toBN(committedBalances[currency])
+
+      if (minAmount.lte(currentBalance)) {
         const mintWaitToast = toast.info(
           `No ${currency} found. Minting you some...`,
           {
@@ -218,10 +223,10 @@ export default class APIStarknetProvider extends APIProvider {
         );
         try {
           await this._mintBalance(
-            this.getCurrencyInfo(currency).address,
-            minAmount
+            this.getCurrencyInfo(currency).address.toString(),
+            minAmount.mul(10)
           );
-          committedBalances[currency] += minAmount;
+          committedBalances[currency] = currentBalance.add(minAmount).toString();
         } catch (e) {
           console.log(`Error while minting tokens: ${e.message}`)
         }
@@ -327,6 +332,7 @@ export default class APIStarknetProvider extends APIProvider {
       const contractAddress = this.getCurrencyInfo(currency).address;
       if (contractAddress) {
         let balance = await this._getBalance(contractAddress);
+        console.log(`Balance for ${currency} is ${balance}`);
         balances[currency] = balance;
       }
     })
@@ -343,8 +349,6 @@ export default class APIStarknetProvider extends APIProvider {
 
   _getBalance = async (contractAddress) => {
     const userWalletAddress = this._accountState.address;
-    console.log(userWalletAddress)
-    console.log(contractAddress)
     const erc20 = new starknet.Contract(starknetERC20ContractABI_test, contractAddress);
     const balance = await erc20.balanceOf(userWalletAddress);
     return starknet.number.toBN(balance.res, 16).toString();
@@ -352,6 +356,8 @@ export default class APIStarknetProvider extends APIProvider {
 
   _mintBalance = async (contractAddress, amount) => {
     const userWalletAddress = this._accountState.address;
+    console.log(userWalletAddress)
+    console.log(amount)
     const erc20 = new starknet.Contract(starknetERC20ContractABI_test, contractAddress);
     const { transaction_hash: mintTxHash } = await erc20.mint(
       userWalletAddress,
@@ -387,7 +393,7 @@ export default class APIStarknetProvider extends APIProvider {
       userWalletAddress,
       spenderContractAddress
     );
-    return starknet.number.toBN(allowance.res, 16).toString();
+    return starknet.number.toBN(allowance.res, 16);
   };
 
   _setTokenApproval = async (
