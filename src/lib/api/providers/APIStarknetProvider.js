@@ -15,7 +15,9 @@ export default class APIStarknetProvider extends APIProvider {
   static STARKNET_CONTRACT_ADDRESS =
     "0x02aa8af6fb8e6ab7d07ad94d0b3b9bb6010fe7258b8d23eced19ba0ccbb68d1a";
 
-  _accountState = {};
+  _accountState = {
+    committed: {}
+  };
   marketInfo = {};
   lastPrices = {};
 
@@ -27,7 +29,7 @@ export default class APIStarknetProvider extends APIProvider {
     return {};
   };
 
-  submitOrder = async (market, side, price, baseAmount, quoteAmount) => {    
+  submitOrder = async (market, side, price, baseAmount, quoteAmount) => {
     const marketInfo = this.marketInfo[market];
     // check allowance first
     const tokenInfo = side === "s" ? marketInfo.baseAsset : marketInfo.quoteAsset;
@@ -43,14 +45,14 @@ export default class APIStarknetProvider extends APIProvider {
     const balance = await this._accountState.committed.balances[tokenInfo.symbol];
     if (!balance) {
       balance = await this.getBalances()[tokenInfo.symbol];
-      if(!balance) throw new Error("Can't get token balance")
+      if (!balance) throw new Error("Can't get token balance")
     }
     if (balance.valueReadable < baseAmount) throw new Error("Can't sell more than account balance")
 
     const allowancesToast = toast.info("Checking and setting allowances", {
       autoClose: false,
       toastId: "Checking and setting allowances",
-    }); 
+    });
 
     let amountBN = ethers.BigNumber.from(baseAmount)
       .mul((10 ** tokenInfo.decimals).toFixed(0));
@@ -172,10 +174,8 @@ export default class APIStarknetProvider extends APIProvider {
       userWalletContractAddress = deployContractResponse.address;
       toast.success("Account contract deployed");
       localStorage.setItem("starknet:account", userWalletContractAddress);
-      this._accountState = {
-        address: userWalletContractAddress.toString(),
-        id: userWalletContractAddress.toString()
-      }
+      this._accountState.address = userWalletContractAddress.toString();
+      this._accountState.id = userWalletContractAddress.toString();
     }
 
     // Check account initialized
@@ -241,14 +241,11 @@ export default class APIStarknetProvider extends APIProvider {
     });
     await Promise.all(results);
 
-    this._accountState = {
-      address: userWalletContractAddress.toString(),
-      id: userWalletContractAddress.toString(),
-      committed: {
-        balances: committedBalances,
-      },
-    };
-
+    this._accountState.address = userWalletContractAddress.toString();
+    this._accountState.id = userWalletContractAddress.toString();
+    this._accountState.committed = {
+      balances: committedBalances
+    }
     return await this.api.getAccountState();
   };
 
@@ -334,7 +331,7 @@ export default class APIStarknetProvider extends APIProvider {
     const balances = {};
     const currencies = this.getCurrencies();
     const results = currencies.map(async (currency) => {
-      const currencyInfo = this.getCurrencyInfo(currency).address;
+      const currencyInfo = this.getCurrencyInfo(currency);
       if (currencyInfo.address) {
         const [
           balance,
@@ -352,16 +349,19 @@ export default class APIStarknetProvider extends APIProvider {
           ) || 0,
           allowance,
         };
+
+        console.log(currency)
+        console.log(balance)
+        console.log(allowance)
+        console.log(balances[currency])
       }
     })
     await Promise.all(results);
 
     console.log(balances)
     // update accountState
-    this._accountState = {
-      committed: {
-        balances: balances,
-      },
+    this._accountState.committed = {
+      balances: balances,
     };
     return balances;
   };
