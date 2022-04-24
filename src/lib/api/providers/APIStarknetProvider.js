@@ -207,6 +207,7 @@ export default class APIStarknetProvider extends APIProvider {
     }
     toast.dismiss(balanceWaitToast);
 
+    console.log(committedBalances)
     // Mint some tokens if the account is blank
     const results = Object.keys(committedBalances).map(async (currency) => {
       const minAmount = (currency === "ETH")
@@ -215,6 +216,8 @@ export default class APIStarknetProvider extends APIProvider {
 
       const currentBalance = ethers.BigNumber.from(committedBalances[currency])
 
+      console.log(minAmount.toString())
+      console.log(currentBalance.toString())
       if (minAmount.lte(currentBalance)) {
         const mintWaitToast = toast.info(
           `No ${currency} found. Minting you some...`,
@@ -351,6 +354,8 @@ export default class APIStarknetProvider extends APIProvider {
 
   _getBalance = async (contractAddress) => {
     const userWalletAddress = this._accountState.address;
+    console.log(userWalletAddress)
+    console.log(contractAddress)
     const erc20 = new starknet.Contract(starknetERC20ContractABI_test, contractAddress);
     const balance = await erc20.balanceOf(userWalletAddress);
     return starknet.number.toBN(balance.res, 16).toString();
