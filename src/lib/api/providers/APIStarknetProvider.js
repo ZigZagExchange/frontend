@@ -33,7 +33,7 @@ export default class APIStarknetProvider extends APIProvider {
   submitOrder = async (market, side, price, baseAmount, quoteAmount) => {
     const marketInfo = this.marketInfo[market];
     // check allowance first
-    const tokenInfo = side === "s" ? marketInfo.baseAsset : marketInfo.quoteAsset;
+    const tokenInfo = (side === "s") ? marketInfo.baseAsset : marketInfo.quoteAsset;
     price = Number(price);
     if (!price) throw new Error("Invalid price");
 
@@ -59,11 +59,12 @@ export default class APIStarknetProvider extends APIProvider {
         toastId: "Checking and setting allowances",
       });
   
+      const allowanceBN = ethers.BigNumber.from(balance.allowance);
       amountBN = ethers.BigNumber.from(
         (baseAmount * 10 ** tokenInfo.decimals).toFixed()
       );
   
-      if (balance.allowance.lt(amountBN)) {
+      if (allowanceBN.lt(amountBN)) {
         const success = await this._setTokenApproval(
           tokenInfo.address,
           APIStarknetProvider.STARKNET_CONTRACT_ADDRESS,
@@ -73,6 +74,7 @@ export default class APIStarknetProvider extends APIProvider {
       }
       toast.dismiss(allowancesToast);
     } catch (e) {
+      console.log(e)
       toast.dismiss(allowancesToast);
       throw new Error ('Failed to set allowance')
     }
