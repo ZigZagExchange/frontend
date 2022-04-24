@@ -218,7 +218,7 @@ export default class APIStarknetProvider extends APIProvider {
 
       console.log(minAmount.toString())
       console.log(currentBalance.toString())
-      if (minAmount.lte(currentBalance)) {
+      if (currentBalance.lte(minAmount)) {
         const mintWaitToast = toast.info(
           `No ${currency} found. Minting you some...`,
           {
@@ -334,11 +334,24 @@ export default class APIStarknetProvider extends APIProvider {
     const currencies = this.getCurrencies();
     console.log(currencies)
     const results = currencies.map(async (currency) => {
-      const contractAddress = this.getCurrencyInfo(currency).address;
+      const currencyInfo = this.getCurrencyInfo(currency).address;
       if (contractAddress) {
-        let balance = await this._getBalance(contractAddress);
-        console.log(`Balance for ${currency} is ${balance}`);
-        balances[currency] = balance;
+        const [
+          balance,
+          allowance
+        ] = await Promise.all([
+          this._getBalance(currencyInfo.address),
+          this._getTokenAllowance(currencyInfo.address)
+        ]);
+        balances[currency] = {
+          value: balance,
+          valueReadable: (
+            balance &&
+            currencyInfo &&
+            balance / 10 ** currencyInfo.decimals
+          ) || 0,
+          allowance: allowance,
+        };
       }
     })
     await Promise.all(results);
