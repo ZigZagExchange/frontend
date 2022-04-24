@@ -22,7 +22,6 @@ export default class APIStarknetProvider extends APIProvider {
   lastPrices = {};
 
   getAccountState = async () => {
-    console.log(this._accountState)
     return this._accountState;
   };
 
@@ -145,7 +144,11 @@ export default class APIStarknetProvider extends APIProvider {
     ZZMessage.sig_r = signature[0]
     ZZMessage.sig_s = signature[1]
 
-    this.api.send("submitorder2", [this.network, market, ZZMessage]);
+    this.api.send("submitorder2", [
+      this.network,
+      market,
+      JSON.stringify(ZZMessage)
+    ]);
   };
 
   signIn = async () => {
@@ -298,10 +301,7 @@ export default class APIStarknetProvider extends APIProvider {
 
   _getUserAccount = async () => {
     const userWalletAddress = this._accountState.address;
-    const privateKey = this._accountState.privkey;
-    
-    console.log(userWalletAddress)
-    console.log(privateKey)
+    const privateKey = this._accountState.privkey;    
     const starkKey = starknet.ec.ec.keyFromPrivate(privateKey.toString(), 'hex');
     const accountContract = new starknet.Account(
       starknet.defaultProvider,
@@ -313,7 +313,6 @@ export default class APIStarknetProvider extends APIProvider {
 
   _checkAccountInitialized = async () => {
     const userWalletAddress = this._accountState.address;
-    console.log(`userWalletAddress: ${userWalletAddress}`)
     const accountContract = new starknet.Contract(
       starknetAccountContractV1.abi,
       userWalletAddress
