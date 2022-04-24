@@ -14,7 +14,7 @@ export default class APIStarknetProvider extends APIProvider {
   _accountState = {};
   marketInfo = {};
   lastPrices = {};
-  
+
   getAccountState = async () => {
     return this._accountState;
   };
@@ -59,7 +59,7 @@ export default class APIStarknetProvider extends APIProvider {
     if (!baseAmount && quoteAmount) {
       baseAmount = quoteAmount / price;
     }
-    
+
     // get values
     const baseAssetAddress = marketInfo.baseAsset.address;
     const quoteAssetAddress = marketInfo.quoteAsset.address;
@@ -103,13 +103,13 @@ export default class APIStarknetProvider extends APIProvider {
 
     let hash = starknet.hash.pedersen([
       stringToFelt(ZZMessage.message_prefix),
-      STARKNET_DOMAIN_TYPE_HASH 
+      STARKNET_DOMAIN_TYPE_HASH
     ])
     hash = starknet.hash.pedersen([hash, stringToFelt(ZZMessage.domain_prefix.name)])
     hash = starknet.hash.pedersen([hash, ZZMessage.domain_prefix.version])
     hash = starknet.hash.pedersen([hash, stringToFelt(ZZMessage.domain_prefix.chain_id)])
     hash = starknet.hash.pedersen([hash, ZZMessage.sender])
-    hash = starknet.hash.pedersen([hash, ORDER_TYPE_HASH ])
+    hash = starknet.hash.pedersen([hash, ORDER_TYPE_HASH])
     hash = starknet.hash.pedersen([hash, ZZMessage.order.base_asset])
     hash = starknet.hash.pedersen([hash, ZZMessage.order.quote_asset])
     hash = starknet.hash.pedersen([hash, ZZMessage.order.side])
@@ -160,9 +160,9 @@ export default class APIStarknetProvider extends APIProvider {
         }
       );
       const deployContractResponse = await starknet.defaultProvider.deployContract({
-          contract: starknetAccountContractV1,
-          addressSalt: starkkey,
-        });
+        contract: starknetAccountContractV1,
+        addressSalt: starkkey,
+      });
       await starknet.defaultProvider.waitForTransaction(deployContractResponse.transaction_hash);
       toast.dismiss(deployContractToast);
       userWalletContractAddress = deployContractResponse.address;
@@ -208,7 +208,7 @@ export default class APIStarknetProvider extends APIProvider {
         ? bigInt(1e18).toString()
         : bigInt(5e9).toString()
 
-      if (committedBalances[currency] < minAmount)  {
+      if (committedBalances[currency] < minAmount) {
         const mintWaitToast = toast.info(
           `No ${currency} found. Minting you some...`,
           {
@@ -224,7 +224,7 @@ export default class APIStarknetProvider extends APIProvider {
           committedBalances[currency] += minAmount;
         } catch (e) {
           console.log(`Error while minting tokens: ${e.message}`)
-        }        
+        }
         toast.dismiss(mintWaitToast);
       }
     });
@@ -238,7 +238,7 @@ export default class APIStarknetProvider extends APIProvider {
       },
     };
 
-    return this._accountState;
+    return await this.api.getAccountState();
   };
 
   getPairs = () => {
@@ -306,13 +306,13 @@ export default class APIStarknetProvider extends APIProvider {
     return (signer.toString() !== '0');
   };
 
-  _initializeAccount = async (starkKey) => {    
+  _initializeAccount = async (starkKey) => {
     const userWalletAddress = this._accountState.address;
     const accountContract = new starknet.Contract(
       starknetAccountContractV1.abi,
       userWalletAddress
     );
-    const { transaction_hash: txHash }  = await accountContract.initialize (
+    const { transaction_hash: txHash } = await accountContract.initialize(
       starkKey,
       "0"
     );
@@ -354,7 +354,7 @@ export default class APIStarknetProvider extends APIProvider {
     const userWalletAddress = this._accountState.address;
     const erc20 = new starknet.Contract(starknetERC20ContractABI_test, contractAddress);
     const { transaction_hash: mintTxHash } = await erc20.mint(
-      userWalletAddress,      
+      userWalletAddress,
       starknet.uint256.bnToUint256(amount)
     );
     await starknet.defaultProvider.waitForTransaction(mintTxHash);
@@ -408,8 +408,8 @@ export default class APIStarknetProvider extends APIProvider {
       undefined,
       { maxFee: '0' }
     );
-    
-    if(code !== 'TRANSACTION_RECEIVED') return false;
+
+    if (code !== 'TRANSACTION_RECEIVED') return false;
     await starknet.defaultProvider.waitForTransaction(transaction_hash);
     return true;
   };
