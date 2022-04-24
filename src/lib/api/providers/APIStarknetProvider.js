@@ -357,8 +357,9 @@ export default class APIStarknetProvider extends APIProvider {
     console.log(userWalletAddress)
     console.log(contractAddress)
     const erc20 = new starknet.Contract(starknetERC20ContractABI_test, contractAddress);
-    const balance = await erc20.balanceOf(userWalletAddress);
-    return starknet.number.toBN(balance.res, 16).toString();
+    const result = await erc20.balanceOf(userWalletAddress);
+    const balance = starknet.uint256.uint256ToBN(result[0]);
+    return balance.toString();
   };
 
   _mintBalance = async (contractAddress, amount) => {
@@ -396,11 +397,12 @@ export default class APIStarknetProvider extends APIProvider {
   ) => {
     const userWalletAddress = this._accountState.address;
     const erc20 = new starknet.Contract(starknetERC20ContractABI_test, erc20Address);
-    const allowance = await erc20.allowance(
+    const result = await erc20.allowance(
       userWalletAddress,
       spenderContractAddress
     );
-    return starknet.number.toBN(allowance.res, 16);
+    const allowance = starknet.uint256.uint256ToBN(result[0]);
+    return allowance.toString();
   };
 
   _setTokenApproval = async (
