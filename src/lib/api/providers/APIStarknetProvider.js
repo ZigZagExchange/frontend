@@ -22,6 +22,7 @@ export default class APIStarknetProvider extends APIProvider {
   lastPrices = {};
 
   getAccountState = async () => {
+    console.log(this._accountState)
     return this._accountState;
   };
 
@@ -206,14 +207,11 @@ export default class APIStarknetProvider extends APIProvider {
     }
     toast.dismiss(balanceWaitToast);
 
-    console.log(committedBalances)
     // Mint some tokens if the account is blank
     const results = Object.keys(committedBalances).map(async (currency) => {
       const minAmount = (currency === "ETH") ? 1 : 3000;
       const currentBalance = committedBalances[currency].valueReadable;
 
-      console.log(minAmount.toString())
-      console.log(currentBalance.toString())
       if (Number(currentBalance) < minAmount) {
         const mintWaitToast = toast.info(
           `No ${currency} found. Minting you some...`,
@@ -226,7 +224,7 @@ export default class APIStarknetProvider extends APIProvider {
           const currencyInfo = this.getCurrencyInfo(currency);
           await this._mintBalance(
             currencyInfo.address.toString(),
-            (minAmount * 25).toString()
+            (minAmount * 25 * (10 ** currencyInfo.decimals)).toString()
           );
           committedBalances[currency].valueReadable += minAmount * 25;
           const oldAmount = ethers.BigNumber.from(committedBalances[currency].balance);
@@ -329,6 +327,8 @@ export default class APIStarknetProvider extends APIProvider {
 
   getBalances = async () => {
     const balances = {};
+    if (!this._accountState.address) return balances;
+    
     const currencies = this.getCurrencies();
     const results = currencies.map(async (currency) => {
       const currencyInfo = this.getCurrencyInfo(currency);
@@ -349,16 +349,10 @@ export default class APIStarknetProvider extends APIProvider {
           ) || 0,
           allowance,
         };
-
-        console.log(currency)
-        console.log(balance)
-        console.log(allowance)
-        console.log(balances[currency])
       }
     })
     await Promise.all(results);
 
-    console.log(balances)
     // update accountState
     this._accountState.committed = {
       balances: balances,
@@ -368,6 +362,7 @@ export default class APIStarknetProvider extends APIProvider {
 
   _getBalance = async (contractAddress) => {
     const userWalletAddress = this._accountState.address;
+    if (!userWalletAddress) return '0';
     const erc20 = new starknet.Contract(starknetERC20ContractABI_test, contractAddress);
     const result = await erc20.balanceOf(userWalletAddress);
     const balance = starknet.uint256.uint256ToBN(result[0]);
@@ -376,8 +371,6 @@ export default class APIStarknetProvider extends APIProvider {
 
   _mintBalance = async (contractAddress, amount) => {
     const userWalletAddress = this._accountState.address;
-    console.log(userWalletAddress)
-    console.log(amount)
     const erc20 = new starknet.Contract(starknetERC20ContractABI_test, contractAddress);
     const { transaction_hash: mintTxHash } = await erc20.mint(
       userWalletAddress,
@@ -390,6 +383,8 @@ export default class APIStarknetProvider extends APIProvider {
     spenderContractAddress = APIStarknetProvider.STARKNET_CONTRACT_ADDRESS
   ) => {
     const allowances = {};
+    if (!this._accountState.address) return allowances;
+
     const currencies = this.getCurrencies();
     const results = currencies.map(async (currency) => {
       const contractAddress = this.getCurrencyInfo(currency).address;
@@ -408,6 +403,8 @@ export default class APIStarknetProvider extends APIProvider {
     spenderContractAddress = APIStarknetProvider.STARKNET_CONTRACT_ADDRESS
   ) => {
     const userWalletAddress = this._accountState.address;
+    if (!userWalletAddress) return '0';
+
     const erc20 = new starknet.Contract(starknetERC20ContractABI_test, erc20Address);
     const result = await erc20.allowance(
       userWalletAddress,
