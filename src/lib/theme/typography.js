@@ -70,6 +70,12 @@ const primaryExtraSmallSemiBold = {
   lineHeight: '14px',
 }
 
+const primaryMediumBody = {
+  fontFamily: 'WorkSans-Medium',
+  fontSize: '12px',
+  lineHeight: '14px',
+}
+
 const primarySubtitle = {
   fontFamily: 'WorkSans-Regular',
   fontSize: '24px',
@@ -154,6 +160,7 @@ const typography = {
   primaryHeading5,
   primaryHeading6,
   primarySubtitle,
+  primaryMediumBody,
   primaryBody1,
   primaryBody2,
   primarySmall,
