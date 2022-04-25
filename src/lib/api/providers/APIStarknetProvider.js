@@ -32,6 +32,18 @@ export default class APIStarknetProvider extends APIProvider {
 
   submitOrder = async (market, side, price, baseAmount, quoteAmount) => {
     const marketInfo = this.marketInfo[market];
+    let amountBN;
+    if (!baseAmount && quoteAmount) {
+      amountBN = ethers.BigNumber.from(
+        ((quoteAmount / price) * 10 ** marketInfo.quoteAsset.decimals).toFixed()
+      );
+    } else if (baseAmount) {
+      amountBN = ethers.BigNumber.from(
+        (baseAmount * 10 ** marketInfo.baseAsset.decimals).toFixed()
+      );
+    } else {
+      throw new Error("Invalid amount");
+    }
     // check allowance first
     const tokenInfo = (side === "s") ? marketInfo.baseAsset : marketInfo.quoteAsset;
     price = Number(price);
@@ -40,9 +52,6 @@ export default class APIStarknetProvider extends APIProvider {
     if (!APIStarknetProvider.VALID_SIDES.includes(side)) {
       throw new Error("Invalid side");
     }
-    if (!baseAmount && quoteAmount) {
-      baseAmount = quoteAmount / price;
-    }
 
     // check account balance
     let balance = await this._accountState.committed.balances[tokenInfo.symbol];
@@ -50,9 +59,10 @@ export default class APIStarknetProvider extends APIProvider {
       balance = await this.getBalances()[tokenInfo.symbol];
       if (!balance) throw new Error("Can't get token balance")
     }
-    if (balance.valueReadable < baseAmount) throw new Error("Can't sell more than account balance")
+    const balanceBN = ethers.BigNumber.from(balance.value);
+    if (balanceBN.lt(baseAmount)) throw new Error("Can't sell more than account balance")
 
-    let amountBN, allowancesToast;
+    let allowancesToast;
     try {
       allowancesToast = toast.info("Checking and setting allowances...", {
         autoClose: false,
@@ -60,10 +70,6 @@ export default class APIStarknetProvider extends APIProvider {
       });
 
       const allowanceBN = ethers.BigNumber.from(balance.allowance);
-      amountBN = ethers.BigNumber.from(
-        (baseAmount * 10 ** tokenInfo.decimals).toFixed()
-      );
-
       if (allowanceBN.lt(amountBN)) {
         const success = await this._setTokenApproval(
           tokenInfo.address,
