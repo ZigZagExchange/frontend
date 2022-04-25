@@ -48,7 +48,7 @@ export default class APIStarknetProvider extends APIProvider {
       throw new Error("Invalid amount");
     }
     const amountBN = ethers.utils.parseUnits(
-      amount,
+      amount.toString(),
       marketInfo.baseAsset.decimals
     );
     // check allowance first
@@ -254,7 +254,7 @@ export default class APIStarknetProvider extends APIProvider {
         try {
           const currencyInfo = this.getCurrencyInfo(currency);
           const newAmountBN = ethers.utils.parseUnits(
-            minAmount,
+            minAmount.toString(),
             currencyInfo.decimals
           ).mul(25);
           await this._mintBalance(
