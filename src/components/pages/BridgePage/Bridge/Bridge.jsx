@@ -231,9 +231,11 @@ const Bridge = () => {
         if (L1Fee != null && feeCurrencyBalance < L1Fee) {
           error = "Insufficient balance for fees";
         }
-      } else if (L1Fee !== null  && inputValue < L1Fee) {
+      }
+      /*else if (L1Fee !== null  && inputValue < L1Fee) {
         error = "Amount too small";
-      } else if (inputValue < 0.0001 && (fromNetwork.from.key === 'polygon' || toNetwork.key === 'polygon')) {
+      }*/
+      else if (inputValue < 0.0001 && (fromNetwork.from.key === 'polygon' || toNetwork.key === 'polygon')) {
         error = "Insufficient amount";
       }
     }
@@ -610,7 +612,8 @@ const Bridge = () => {
                         </div>
                       )}
                       <x.div color={"blue-gray-300"}>
-                        You'll receive: ~
+                        You'll receive:
+                        {isFastWithdraw?' ~':' '}
                         {isFastWithdraw && L1Fee
                           ? formatPrice(swapDetails.amount - L1Fee)
                           : formatPrice(swapDetails.amount)}
@@ -642,17 +645,14 @@ const Bridge = () => {
                   {transfer.type === "deposit" && (
                     <x.div>
                       <x.div color={"blue-gray-300"}>
-                      You'll receive: ~
-                        {formatPrice(swapDetails.amount)}
-                        {
-                          fromNetwork.from.key === "polygon" && toNetwork.key === "zksync" ? ` ETH on Ethereum L1`
-                          :
-                          (
-                            toNetwork.key === "polygon" ? ` WETH on Polygon`
-                            :
-                            ` ${swapDetails.currency} on Ethereum L1`
-                          )
-                        }
+                      You'll receive: 
+                        {fromNetwork.from.key === "polygon" && ` ~${formatPrice(swapDetails.amount)}`}
+                        {toNetwork.key === "polygon" && ` ~${formatPrice(swapDetails.amount)}`}
+                        {fromNetwork.from.key === "ethereum" && toNetwork.key === "zksync" && ` ${formatPrice(swapDetails.amount)}`}
+
+                        {fromNetwork.from.key === "polygon" && ` ETH on zkSync L2`}
+                        {toNetwork.key === "polygon" && ` WETH on Polygon`}
+                        {fromNetwork.from.key === "ethereum" && toNetwork.key === "zksync" && ` ${swapDetails.currency} on zkSync L2`}
                       </x.div>
                     </x.div>
                   )}
