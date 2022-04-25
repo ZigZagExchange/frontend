@@ -253,15 +253,14 @@ export default class APIStarknetProvider extends APIProvider {
         );
         try {
           const currencyInfo = this.getCurrencyInfo(currency);
+          const newAmountBN = ethers.BigNumber.from(minAmount * 25).mul(10 ** currencyInfo.decimals);
           await this._mintBalance(
             currencyInfo.address.toString(),
-            (minAmount * 25 * (10 ** currencyInfo.decimals)).toString()
+            newAmountBN.toString()
           );
           committedBalances[currency].valueReadable += minAmount * 25;
           const oldAmount = ethers.BigNumber.from(committedBalances[currency].balance);
-          const newAmount = ethers.BigNumber.from(minAmount * 25)
-            .mul((10 ** currencyInfo.decimals).toString())
-          committedBalances[currency].balance = oldAmount.add(newAmount).toString();
+          committedBalances[currency].balance = oldAmount.add(newAmountBN).toString();
         } catch (e) {
           console.log(`Error while minting tokens: ${e}`)
         }
