@@ -219,7 +219,7 @@ export class OrdersTable extends React.Component {
             const feeamount = fill[10];
             const feetoken = fill[11];
             let feeText = "1 USDC";
-            const marketInfo = api.marketInfo[market];
+            const marketInfo = this.props.marketInfo;
             if(feeamount && feetoken) {           
               const displayFee = (feeamount > 9999) ? feeamount.toFixed(0) : feeamount.toPrecision(4);
               feeText = (feeamount !== 0) ? `${displayFee} ${feetoken}` : "--";
