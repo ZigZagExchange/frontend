@@ -459,7 +459,8 @@ export default class APIZKProvider extends APIProvider {
           amountTransferred,
           token,
           ZKSYNC_ETHEREUM_FAST_BRIDGE.receiptKeyZkSync,
-          "zksync"
+          "zksync",
+          userAddress
         )
       );
     }

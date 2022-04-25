@@ -338,7 +338,7 @@ export const apiSlice = createSlice({
         );
       };
 
-      let successMsg, targetMsg, extraInfoLink;
+      let successMsg, targetMsg, extraInfoLink, ethWallet;
       switch (type) {
         case "deposit":
           successMsg = "deposited";
@@ -354,6 +354,7 @@ export const apiSlice = createSlice({
           successMsg = "withdrew";
           targetMsg = "into your Ethereum wallet. Fast withdrawals should be confirmed within a few minutes";
           extraInfoLink = { text: "Fast Bridge FAQ", link: "https://docs.zigzag.exchange/zksync/fast-withdraw-bridge" };
+          ethWallet = {text: "Ethereum wallet", link: state.network === 1?`https://etherscan.io/address/${walletAddress}`:`https://rinkeby.etherscan.io/address/${walletAddress}`}
           break;
         case "zkSync_to_polygon":
           successMsg = "transferred";
@@ -397,7 +398,7 @@ export const apiSlice = createSlice({
             >
               View transaction
             </a>
-            {" • "}
+            {type === "withdraw_fast" ? <br /> : " • "}
             {(type === "eth_to_zksync" || type === "zkSync_to_polygon" || type === "polygon_to_zkSync")&& 
               <>
                 <br />
@@ -415,11 +416,20 @@ export const apiSlice = createSlice({
                 {" • "}
               </>
             }
-            {extraInfoLink &&
+            { 
+              extraInfoLink &&
               renderBridgeLink(
                 extraInfoLink.text,
                 extraInfoLink.link
-              )}
+              )
+            }
+            <br />
+            { ethWallet && 
+              renderBridgeLink(
+                ethWallet.text,
+                ethWallet.link
+              )
+            }
           </>
         );
       };

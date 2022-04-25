@@ -414,7 +414,7 @@ export default class API extends Emitter {
       txId: txHash,
       walletAddress: polygonChainId === "0x13881" ? `https://rinkeby.zksync.io/explorer/accounts/${walletAddress}` : `https://zkscan.io/explorer/accounts/${walletAddress}`
     };
-    const subdomain = polygonProvider.getNetwork() === 1 ? "" : "mumbai.";
+    const subdomain = polygonChainId === "0x13881" ? "mumbai." : "";
     receipt.txUrl = `https://${subdomain}polygonscan.com/tx/${txHash}`;
     this.emit("bridgeReceipt", receipt);
     console.log("////////////////////",this.apiProvider.network)

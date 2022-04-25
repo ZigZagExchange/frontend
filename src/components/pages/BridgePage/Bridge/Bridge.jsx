@@ -411,7 +411,8 @@ const Bridge = () => {
         deferredXfer = api.transferToBridge(
           `${swapDetails.amount}`,
           swapDetails.currency,
-          ZKSYNC_ETHEREUM_FAST_BRIDGE.address
+          ZKSYNC_ETHEREUM_FAST_BRIDGE.address,
+          user.address
         );
       } else {
         deferredXfer = api.withdrawL2(
@@ -585,7 +586,8 @@ const Bridge = () => {
                 <x.div>
                   {L2Fee && (
                     <>
-                      L2 gas fee: {L2Fee} {L2FeeToken}
+                      {fromNetwork.from.key === "zksync" && toNetwork.key === "ethereum" && 'zkSync '}
+                      L2 gas fee: ~{L2Fee} {L2FeeToken}
                     </>
                   )}
                   {!L2Fee && (
@@ -603,7 +605,7 @@ const Bridge = () => {
                     <x.div>
                       {isFastWithdraw && L1Fee && (
                         <div>
-                          Bridge Fee: {formatPrice(L1Fee)}{" "}
+                          Ethereum L1 gas + bridge fee: ~{formatPrice(L1Fee)}{" "}
                           {swapDetails.currency}
                         </div>
                       )}
@@ -612,7 +614,7 @@ const Bridge = () => {
                         {isFastWithdraw && L1Fee
                           ? formatPrice(swapDetails.amount - L1Fee)
                           : formatPrice(swapDetails.amount)}
-                        {" " + swapDetails.currency} on L1
+                        {" " + swapDetails.currency} on Ethereum L1
                       </x.div>
                     </x.div>
                   )}
@@ -622,7 +624,9 @@ const Bridge = () => {
                 <x.div>
                   {L1Fee && (
                     <>
-                      gas fee: {formatPrice(L1Fee)} {swapDetails.currency}
+                     {fromNetwork.from.key === "polygon" && `Polygon gas fee: ~${formatPrice(L1Fee)} MATIC`}
+                     {fromNetwork.from.key === "zksync" && toNetwork.key === "polygon" && `zkSync gas fee: ~${formatPrice(L1Fee)} ETH`}
+                     {fromNetwork.from.key === "ethereum" && `Gas fee: ~${formatPrice(L1Fee)} ETH`}
                     </>
                   )}
                   {!L1Fee && (
@@ -638,11 +642,17 @@ const Bridge = () => {
                   {transfer.type === "deposit" && (
                     <x.div>
                       <x.div color={"blue-gray-300"}>
-                        You'll receive: ~
-                        {L1Fee
-                          ? formatPrice(swapDetails.amount - L1Fee)
-                          : formatPrice(swapDetails.amount)}
-                        {" " + swapDetails.currency} on {swapDetails.currency}
+                      You'll receive: ~
+                        {formatPrice(swapDetails.amount)}
+                        {
+                          fromNetwork.from.key === "polygon" && toNetwork.key === "zksync" ? ` ETH on Ethereum L1`
+                          :
+                          (
+                            toNetwork.key === "polygon" ? ` WETH on Polygon`
+                            :
+                            ` ${swapDetails.currency} on Ethereum L1`
+                          )
+                        }
                       </x.div>
                     </x.div>
                   )}
