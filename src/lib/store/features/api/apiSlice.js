@@ -128,11 +128,7 @@ export const apiSlice = createSlice({
                 Number(formatPrice(price))
               }!`,
               {
-                toastId: `Your ${sideText} order for ${
-                  Number(baseQuantity.toPrecision(4))
-                } ${baseCurrency} was filled @ ${
-                  Number(formatPrice(price))
-                }!`,
+                toastId: fillid, // use fillId in case two equal fills
               }
             );
           }
