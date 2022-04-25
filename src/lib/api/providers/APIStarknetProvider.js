@@ -54,9 +54,9 @@ export default class APIStarknetProvider extends APIProvider {
 
     let amountBN, allowancesToast;
     try {
-      allowancesToast = toast.info("Checking and setting allowances", {
+      allowancesToast = toast.info("Checking and setting allowances...", {
         autoClose: false,
-        toastId: "Checking and setting allowances",
+        toastId: "Checking and setting allowances...",
       });
 
       const allowanceBN = ethers.BigNumber.from(balance.allowance);
@@ -310,12 +310,12 @@ export default class APIStarknetProvider extends APIProvider {
     }
     const keypair = starknet.ec.getKeyPair(privateKey);
     console.log(`privateKeyB: ${keypair.getPrivate().toString()}`);
-    console.log(`starkKeyB: ${starknet.ec.getStarkKey(keypair).toString()}`);
     const accountContract = new starknet.Account(
       starknet.defaultProvider,
       userWalletAddress,
       keypair
     );
+    console.log(accountContract)
     return accountContract;
   };
 
@@ -437,6 +437,7 @@ export default class APIStarknetProvider extends APIProvider {
     amount
   ) => {
     const userAccount = await this._getUserAccount();
+    console.log(userAccount)
     const { code, transaction_hash } = await userAccount.execute(
       {
         contractAddress: erc20Address,
