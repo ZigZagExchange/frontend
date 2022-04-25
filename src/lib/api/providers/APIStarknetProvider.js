@@ -30,7 +30,14 @@ export default class APIStarknetProvider extends APIProvider {
     return {};
   };
 
-  submitOrder = async (market, side, price, baseAmount, quoteAmount) => {
+  submitOrder = async (
+    market,
+    side,
+    price,
+    baseAmount,
+    quoteAmount,
+    orderType
+  ) => {
     const marketInfo = this.marketInfo[market];
     let amountBN;
     if (!baseAmount && quoteAmount) {
@@ -60,7 +67,7 @@ export default class APIStarknetProvider extends APIProvider {
       if (!balance) throw new Error("Can't get token balance")
     }
     const balanceBN = ethers.BigNumber.from(balance.value);
-    if (balanceBN.lt(baseAmount)) throw new Error("Can't sell more than account balance")
+    if (balanceBN.lt(amountBN)) throw new Error("Can't sell more than account balance")
 
     let allowancesToast;
     try {
@@ -95,7 +102,12 @@ export default class APIStarknetProvider extends APIProvider {
       return { numerator: decimals * denominator, denominator }
     }
     const priceRatio = getFraction(price);
-    const expiration = (Date.now() / 1000 | 0) + 86400;
+    let expiration;
+    if (orderType === "limit") {
+      expiration = ((Date.now() / 1000) | 0) + 7 * 24 * 3600;;
+    } else {
+      expiration = ((Date.now() / 1000) | 0) + 30;
+    }
 
     // build order msg
     const ZZMessage = {
