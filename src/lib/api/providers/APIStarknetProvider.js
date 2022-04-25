@@ -302,13 +302,15 @@ export default class APIStarknetProvider extends APIProvider {
   _getUserAccount = async () => {
     const userWalletAddress = this._accountState.address;
     let privateKey = this._accountState.privkey;
+    console.log(`privateKeyA: ${privateKey}`);
+    console.log(`starkKeyA: ${userWalletAddress}`);
     if (!privateKey) {
       privateKey = localStorage.getItem("starknet:privkey");
       this._accountState.privkey = privateKey;
     }
-    console.log(privateKey)
     const keypair = starknet.ec.getKeyPair(privateKey);
-    console.log(keypair)
+    console.log(`privateKeyB: ${keypair.getPrivate().toString()}`);
+    console.log(`starkKeyB: ${starknet.ec.getStarkKey(keypair).toString()}`);
     const accountContract = new starknet.Account(
       starknet.defaultProvider,
       userWalletAddress,
