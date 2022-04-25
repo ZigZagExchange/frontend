@@ -253,7 +253,8 @@ export default class APIStarknetProvider extends APIProvider {
         );
         try {
           const currencyInfo = this.getCurrencyInfo(currency);
-          const minAmountParsed = minAmount * 10 ** currencyInfo.decimals
+          const minAmountParsed = (minAmount * 10 ** currencyInfo.decimals)
+            .toFixed(currencyInfo.decimals)
           const newAmountBN = ethers.BigNumber.from(minAmountParsed).mul(25);
           await this._mintBalance(
             currencyInfo.address.toString(),
