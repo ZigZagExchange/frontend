@@ -138,12 +138,11 @@ export default class APIStarknetProvider extends APIProvider {
 
     let privateKey = this._accountState.privkey;
     if (!privateKey) {
-      privateKey = this._accountState.privkey = starknet.ec.ec.keyFromPrivate(
-        localStorage.getItem("starknet:privkey"),
-        "hex"
-      );
+      privateKey = localStorage.getItem("starknet:privkey");
+      this._accountState.privkey = privateKey;
     }
-    const signature = starknet.ec.sign(privateKey, hash)
+    const keypair = starknet.ec.getKeyPair(privateKey);
+    const signature = starknet.ec.sign(keypair, hash)
     ZZMessage.sig_r = signature[0]
     ZZMessage.sig_s = signature[1]
 
@@ -157,17 +156,15 @@ export default class APIStarknetProvider extends APIProvider {
   signIn = async () => {
     let userWalletContractAddress;
     let keypair;
-
-    if (localStorage.getItem("starknet:privkey")) {
-      keypair = starknet.ec.ec.keyFromPrivate(
-        localStorage.getItem("starknet:privkey"),
-        "hex"
-      );
+    let privateKey = localStorage.getItem("starknet:privkey")
+    if (privateKey) {
+      keypair = starknet.ec.getKeyPair(privateKey);
     } else {
       keypair = starknet.ec.genKeyPair();
-      localStorage.setItem("starknet:privkey", keypair.getPrivate("hex"));
+      privateKey = keypair.getPrivate().toString()
+      localStorage.setItem("starknet:privkey", privateKey);
     }
-    this._accountState.privkey = keypair.getPrivate("hex");
+    this._accountState.privkey = privateKey;
     if (localStorage.getItem("starknet:account")) {
       userWalletContractAddress = localStorage.getItem("starknet:account");
       this._accountState.address = userWalletContractAddress;
@@ -306,15 +303,14 @@ export default class APIStarknetProvider extends APIProvider {
     const userWalletAddress = this._accountState.address;
     let privateKey = this._accountState.privkey;
     if (!privateKey) {
-      privateKey = this._accountState.privkey = starknet.ec.ec.keyFromPrivate(
-        localStorage.getItem("starknet:privkey"),
-        "hex"
-      );
+      privateKey = localStorage.getItem("starknet:privkey");
+      this._accountState.privkey = privateKey;
     }
+    const keypair = starknet.ec.getKeyPair(privateKey);
     const accountContract = new starknet.Account(
       starknet.defaultProvider,
       userWalletAddress,
-      privateKey
+      keypair
     );
     return accountContract;
   };
