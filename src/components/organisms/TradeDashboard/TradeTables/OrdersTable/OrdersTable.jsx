@@ -349,6 +349,11 @@ export class OrdersTable extends React.Component {
   render() {
     let explorerLink;
     switch (api.apiProvider.network) {
+      case 1001:
+        explorerLink = 
+          "https://goerli.voyager.online/contract/" +
+          this.props.user.address;
+        break;
       case 1000:
         explorerLink =
           "https://rinkeby.zkscan.io/explorer/accounts/" +
@@ -357,7 +362,8 @@ export class OrdersTable extends React.Component {
       case 1:
       default:
         explorerLink =
-          "https://zkscan.io/explorer/accounts/" + this.props.user.address;
+          "https://zkscan.io/explorer/accounts/" + 
+          this.props.user.address;
     }
     let footerContent,
       classNameOrders = "",
@@ -379,10 +385,7 @@ export class OrdersTable extends React.Component {
           )
             .sort()
             .map((token) => {
-              const currencyInfo = api.getCurrencyInfo(token);
-              if (!currencyInfo) return "";
-              let balance = this.props.user.committed.balances[token];
-              balance = parseInt(balance) / Math.pow(10, currencyInfo.decimals);
+              const balance = this.props.user.committed.balances[token].valueReadable;
               return (
                 <tr>
                   <td data-label="Token">{token}</td>
