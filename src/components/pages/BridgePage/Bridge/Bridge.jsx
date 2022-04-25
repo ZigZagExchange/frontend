@@ -320,6 +320,11 @@ const Bridge = () => {
     // setFee(null); setFee has two parameters. what is this?
     setL1Fee(null);
 
+    const input = parseFloat(details.amount) || 0
+    if (input < 0.0001 && (fromNetwork.from.key === 'polygon' || toNetwork.key === 'polygon')) {
+      setFormErr("Insufficient amount");
+    }
+
     if(fromNetwork.from.key === 'polygon') {
       const gasFee = await api.getPolygonFee();
       if(gasFee){
@@ -697,6 +702,7 @@ const Bridge = () => {
                     loading={loading}
                     className={cx("bg_btn", {
                       zig_disabled:
+                        formErr.length > 0 ||
                         (L2Fee === null && L1Fee === null) ||
                         !hasAllowance ||
                         Number(swapDetails.amount) === 0,
