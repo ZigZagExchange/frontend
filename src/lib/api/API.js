@@ -317,7 +317,7 @@ export default class API extends Emitter {
     } else if (!this.apiProvider) {
       return;
     } else if (this.web3Modal) {
-      this.web3Modal.clearCachedProvider();
+      await this.web3Modal.clearCachedProvider();
     }
 
     this.web3 = null;
