@@ -143,8 +143,7 @@ export default class APIStarknetProvider extends APIProvider {
         "hex"
       );
     }
-    const starkKey = starknet.ec.ec.keyFromPrivate(privateKey.toString(), 'hex');
-    const signature = starknet.ec.sign(starkKey, hash)
+    const signature = starknet.ec.sign(privateKey, hash)
     ZZMessage.sig_r = signature[0]
     ZZMessage.sig_s = signature[1]
 
@@ -312,11 +311,10 @@ export default class APIStarknetProvider extends APIProvider {
         "hex"
       );
     }
-    const starkKey = starknet.ec.ec.keyFromPrivate(privateKey.toString(), 'hex');
     const accountContract = new starknet.Account(
       starknet.defaultProvider,
       userWalletAddress,
-      starkKey
+      privateKey
     );
     return accountContract;
   };
