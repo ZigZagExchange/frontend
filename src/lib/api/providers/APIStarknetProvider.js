@@ -22,6 +22,7 @@ export default class APIStarknetProvider extends APIProvider {
   lastPrices = {};
 
   getAccountState = async () => {
+    console.log(this._accountState);
     return this._accountState;
   };
 
@@ -44,7 +45,7 @@ export default class APIStarknetProvider extends APIProvider {
     }
 
     // check account balance
-    const balance = await this._accountState.committed.balances[tokenInfo.symbol];
+    let balance = await this._accountState.committed.balances[tokenInfo.symbol];
     if (!balance) {
       balance = await this.getBalances()[tokenInfo.symbol];
       if (!balance) throw new Error("Can't get token balance")
@@ -57,12 +58,12 @@ export default class APIStarknetProvider extends APIProvider {
         autoClose: false,
         toastId: "Checking and setting allowances",
       });
-  
+
       const allowanceBN = ethers.BigNumber.from(balance.allowance);
       amountBN = ethers.BigNumber.from(
         (baseAmount * 10 ** tokenInfo.decimals).toFixed()
       );
-  
+
       if (allowanceBN.lt(amountBN)) {
         const success = await this._setTokenApproval(
           tokenInfo.address,
@@ -75,7 +76,7 @@ export default class APIStarknetProvider extends APIProvider {
     } catch (e) {
       console.log(e)
       toast.dismiss(allowancesToast);
-      throw new Error ('Failed to set allowance')
+      throw new Error('Failed to set allowance')
     }
 
     // get values
@@ -135,10 +136,13 @@ export default class APIStarknetProvider extends APIProvider {
     hash = starknet.hash.pedersen([hash, ZZMessage.order.price.denominator])
     hash = starknet.hash.pedersen([hash, ZZMessage.order.expiration])
 
-    const privateKey = starknet.ec.ec.keyFromPrivate(
-      localStorage.getItem("starknet:privkey"),
-      "hex"
-    );    
+    let privateKey = this._accountState.privkey;
+    if (!privateKey) {
+      privateKey = this._accountState.privkey = starknet.ec.ec.keyFromPrivate(
+        localStorage.getItem("starknet:privkey"),
+        "hex"
+      );
+    }
     const starkKey = starknet.ec.ec.keyFromPrivate(privateKey.toString(), 'hex');
     const signature = starknet.ec.sign(starkKey, hash)
     ZZMessage.sig_r = signature[0]
@@ -301,7 +305,13 @@ export default class APIStarknetProvider extends APIProvider {
 
   _getUserAccount = async () => {
     const userWalletAddress = this._accountState.address;
-    const privateKey = this._accountState.privkey;    
+    let privateKey = this._accountState.privkey;
+    if (!privateKey) {
+      privateKey = this._accountState.privkey = starknet.ec.ec.keyFromPrivate(
+        localStorage.getItem("starknet:privkey"),
+        "hex"
+      );
+    }
     const starkKey = starknet.ec.ec.keyFromPrivate(privateKey.toString(), 'hex');
     const accountContract = new starknet.Account(
       starknet.defaultProvider,
@@ -337,7 +347,7 @@ export default class APIStarknetProvider extends APIProvider {
   getBalances = async () => {
     const balances = {};
     if (!this._accountState.address) return balances;
-    
+
     const currencies = this.getCurrencies();
     const results = currencies.map(async (currency) => {
       const currencyInfo = this.getCurrencyInfo(currency);
