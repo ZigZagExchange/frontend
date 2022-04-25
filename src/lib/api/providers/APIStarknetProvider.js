@@ -302,20 +302,16 @@ export default class APIStarknetProvider extends APIProvider {
   _getUserAccount = async () => {
     const userWalletAddress = this._accountState.address;
     let privateKey = this._accountState.privkey;
-    console.log(`privateKeyA: ${privateKey}`);
-    console.log(`starkKeyA: ${userWalletAddress}`);
     if (!privateKey) {
       privateKey = localStorage.getItem("starknet:privkey");
       this._accountState.privkey = privateKey;
     }
     const keypair = starknet.ec.getKeyPair(privateKey);
-    console.log(`privateKeyB: ${keypair.getPrivate().toString()}`);
     const accountContract = new starknet.Account(
       starknet.defaultProvider,
       userWalletAddress,
       keypair
     );
-    console.log(accountContract)
     return accountContract;
   };
 
@@ -437,7 +433,6 @@ export default class APIStarknetProvider extends APIProvider {
     amount
   ) => {
     const userAccount = await this._getUserAccount();
-    console.log(userAccount)
     const { code, transaction_hash } = await userAccount.execute(
       {
         contractAddress: erc20Address,
