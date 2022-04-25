@@ -304,6 +304,7 @@ export class OrdersTable extends React.Component {
               case "e":
                 statusText = "expired";
                 statusClass = "expired";
+                feeText = "--";
                 break;
               default:
                 break;
