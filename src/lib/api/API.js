@@ -156,45 +156,57 @@ export default class API extends Emitter {
         }
 
         return this._profiles[address]
-    }
+  };
 
-    _fetchENSName = async (address) => {
-        let name = await getENSName(address)
-        if (name) return { name }
-        return {}
-    }
+  _fetchENSName = async (address) => {
+    let name = await getENSName(address);
+    if (name) return { name };
+    return {};
+  };
 
-    _socketOpen = () => {
-        this.emit('open')
-    }
+  _socketOpen = () => {
+    this.emit("open");
     
-    _socketClose = () => {
-        console.warn("Websocket dropped. Restarting");
-        this.ws = null;
-        setTimeout(() => {
-            this.start();
-        }, 3000);
-        this.emit('close')
-    }
+    // get initial marketinfos, returns lastprice and marketinfo2
+    this.send("marketsreq", [this.apiProvider.network, true])
+  };
 
-    _socketMsg = (e) => {
-        if (!e.data && e.data.length <= 0) return
-        const msg = JSON.parse(e.data)
-        this.emit('message', msg.op, msg.args)
+  _socketClose = () => {
+    console.warn("Websocket dropped. Restarting");
+    this.ws = null;
+    setTimeout(() => {
+      this.start();
+    }, 3000);
+    this.emit("close");
+  };
 
-        // Is there a better way to do this? Not sure. 
-        if (msg.op === "marketinfo") {
-            const marketInfo = msg.args[0];
-            if (!marketInfo) return;
-            this.apiProvider.marketInfo[marketInfo.alias] = marketInfo;
-        }
-        if (msg.op === "lastprice") {
-            const lastprices = msg.args[0];
-            lastprices.forEach(l => this.apiProvider.lastPrices[l[0]] = l);
-            const noInfoPairs = lastprices.map(l => l[0]).filter(pair => !this.apiProvider.marketInfo[pair]);
-            this.apiProvider.cacheMarketInfoFromNetwork(noInfoPairs);
-        }
+  _socketMsg = (e) => {
+    if (!e.data && e.data.length <= 0) return;
+    const msg = JSON.parse(e.data);
+    this.emit("message", msg.op, msg.args);
+
+    // Is there a better way to do this? Not sure.
+    if (msg.op === "marketinfo") {
+      const marketInfo = msg.args[0];
+      if (!marketInfo) return;
+      this.apiProvider.marketInfo[marketInfo.alias] = marketInfo;
     }
+    if (msg.op === "marketinfo2") {
+      const marketInfos = msg.args[0];
+      marketInfos.forEach(marketInfo => {
+        if (!marketInfo) return;
+        this.apiProvider.marketInfo[marketInfo.alias] = marketInfo;
+      });
+    }
+    if (msg.op === "lastprice") {
+      const lastprices = msg.args[0];
+      lastprices.forEach((l) => (this.apiProvider.lastPrices[l[0]] = l));
+      const noInfoPairs = lastprices
+        .map((l) => l[0])
+        .filter((pair) => !this.apiProvider.marketInfo[pair]);
+      this.apiProvider.cacheMarketInfoFromNetwork(noInfoPairs);
+    }
+  }
 
     _socketError = (e) => {
         console.warn("Zigzag websocket connection failed");
