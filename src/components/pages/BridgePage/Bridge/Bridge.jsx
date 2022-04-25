@@ -196,6 +196,10 @@ const Bridge = () => {
 
   const validateInput = (inputValue, swapCurrency) => {
     if (balances.length === 0) return false;
+    if (inputValue > 0 && inputValue < 0.0001 && (fromNetwork.from.key === 'polygon' || toNetwork.key === 'polygon')) {
+      setFormErr("Insufficient amount");
+      return false;
+    }
     const getCurrencyBalance = (cur) => (balances[cur] && swapCurrencyInfo?.decimals ? balances[cur].value / (10 ** (swapCurrencyInfo.decimals)) : 0);
     const detailBalance = getCurrencyBalance(swapCurrency);
 
@@ -235,9 +239,6 @@ const Bridge = () => {
       /*else if (L1Fee !== null  && inputValue < L1Fee) {
         error = "Amount too small";
       }*/
-      else if (inputValue < 0.0001 && (fromNetwork.from.key === 'polygon' || toNetwork.key === 'polygon')) {
-        error = "Insufficient amount";
-      }
     }
 
     if (error) {
@@ -321,10 +322,8 @@ const Bridge = () => {
     setL1Fee(null);
 
     const input = parseFloat(details.amount) || 0
-    if (input < 0.0001 && (fromNetwork.from.key === 'polygon' || toNetwork.key === 'polygon')) {
+    if (input > 0 && input < 0.0001 && (fromNetwork.from.key === 'polygon' || toNetwork.key === 'polygon')) {
       setFormErr("Insufficient amount");
-      setL1Fee(null);
-      setFee(null, null);
     }
 
     if(fromNetwork.from.key === 'polygon') {
