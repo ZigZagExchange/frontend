@@ -39,18 +39,18 @@ export default class APIStarknetProvider extends APIProvider {
     orderType
   ) => {
     const marketInfo = this.marketInfo[market];
-    let amountBN;
+    let amount;
     if (!baseAmount && quoteAmount) {
-      amountBN = ethers.BigNumber.from(
-        ((quoteAmount / price) * 10 ** marketInfo.quoteAsset.decimals).toFixed()
-      );
+      amount = quoteAmount / price;
     } else if (baseAmount) {
-      amountBN = ethers.BigNumber.from(
-        (baseAmount * 10 ** marketInfo.baseAsset.decimals).toFixed()
-      );
+      amount = baseAmount;
     } else {
       throw new Error("Invalid amount");
     }
+    const amountBN = ethers.utils.parseUnits(
+      amount,
+      marketInfo.baseAsset.decimals
+    );
     // check allowance first
     const tokenInfo = (side === "s") ? marketInfo.baseAsset : marketInfo.quoteAsset;
     price = Number(price);
@@ -253,9 +253,10 @@ export default class APIStarknetProvider extends APIProvider {
         );
         try {
           const currencyInfo = this.getCurrencyInfo(currency);
-          const minAmountParsed = (minAmount * 10 ** currencyInfo.decimals)
-            .toString()
-          const newAmountBN = ethers.BigNumber.from(minAmountParsed).mul(25);
+          const newAmountBN = ethers.utils.parseUnits(
+            minAmount,
+            currencyInfo.decimals
+          ).mul(25);
           await this._mintBalance(
             currencyInfo.address.toString(),
             newAmountBN.toString()
