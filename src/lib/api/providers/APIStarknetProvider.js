@@ -306,7 +306,9 @@ export default class APIStarknetProvider extends APIProvider {
       privateKey = localStorage.getItem("starknet:privkey");
       this._accountState.privkey = privateKey;
     }
+    console.log(privateKey)
     const keypair = starknet.ec.getKeyPair(privateKey);
+    console.log(keypair)
     const accountContract = new starknet.Account(
       starknet.defaultProvider,
       userWalletAddress,
