@@ -323,6 +323,8 @@ const Bridge = () => {
     const input = parseFloat(details.amount) || 0
     if (input < 0.0001 && (fromNetwork.from.key === 'polygon' || toNetwork.key === 'polygon')) {
       setFormErr("Insufficient amount");
+      setL1Fee(null);
+      setFee(null, null);
     }
 
     if(fromNetwork.from.key === 'polygon') {
