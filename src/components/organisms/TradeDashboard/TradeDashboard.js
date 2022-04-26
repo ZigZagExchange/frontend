@@ -21,6 +21,7 @@ import {
   marketInfoSelector,
   setCurrentMarket,
   resetData,
+  layoutSelector,
 } from "lib/store/features/api/apiSlice";
 import { userSelector } from "lib/store/features/auth/authSlice";
 import api from "lib/api";
@@ -40,12 +41,61 @@ const TradeContainer = styled.div`
 const TradeGrid = styled.article`
   display: grid;
   grid-template-rows: 50px 4fr 3fr 50px;
-  grid-template-columns: 325px 300px 1fr;
+  grid-template-columns: ${(props) => {
+    let layout = undefined;
+    switch (props.layout) {
+        case 1:
+          layout = "325px 1fr 300px";
+          break;
+        case 2:
+          layout = "300px 1fr 325px";
+          break;
+        case 3:
+          layout = "1fr 300px 325px";
+          break;
+        default:
+          layout = "325px 300px 1fr";
+          break;
+      }
+      return (layout);
+     } };
+    
   grid-template-areas:
     "marketSelector marketSelector marketSelector"
-    "sidebar books chart"
-    "sidebar books tables"
-    "sidebar footer footer";
+    ${(props) => {
+      let layout = undefined;
+      switch (props.layout) {
+        case 1:
+          layout = `
+          "sidebar chart books"
+          "sidebar tables books"
+          "sidebar footer footer"
+          `;          
+          break;
+        case 2:
+          layout = `
+          "books chart sidebar"
+          "books tables sidebar"
+          "footer footer sidebar"
+          `;          
+          break;
+        case 3:          
+          layout = `
+          "chart books sidebar"
+          "tables books sidebar"
+          "footer footer sidebar"
+          `;          
+          break;
+        default:
+          layout = `
+          "sidebar books chart"
+          "sidebar books tables"
+          "sidebar footer footer"
+          `;
+          break;
+      }
+      return (layout);
+     } };
   min-height: calc(100vh - 48px);
   gap: 1px;
 
@@ -82,6 +132,7 @@ export function TradeDashboard() {
   const lastPrices = useSelector(lastPricesSelector);
   const marketSummary = useSelector(marketSummarySelector);
   const liquidity = useSelector(liquiditySelector);
+  const layout = useSelector(layoutSelector);
   const marketInfo = useSelector(marketInfoSelector);
   const dispatch = useDispatch();
   const lastPriceTableData = [];
@@ -285,7 +336,7 @@ export function TradeDashboard() {
 
   return (
     <TradeContainer>
-      <TradeGrid>
+      <TradeGrid layout={layout}>
         <TradeMarketSelector
           updateMarketChain={updateMarketChain}
           marketSummary={marketSummary}
