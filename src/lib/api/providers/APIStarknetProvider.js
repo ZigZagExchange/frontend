@@ -104,9 +104,9 @@ export default class APIStarknetProvider extends APIProvider {
     const priceRatio = getFraction(price);
     let expiration; // starknet format unix * 100
     if (orderType === "limit") {
-      expiration = ((Date.now() / 10) + 7 * 24 * 3600).toFixed(0);
+      expiration = ((Date.now() / 10) + 7 * 24 * 360000).toFixed(0);
     } else {
-      expiration = ((Date.now() / 10) + 30).toFixed(0);
+      expiration = ((Date.now() / 10) + 3000).toFixed(0);
     }
 
     // build order msg
