@@ -430,7 +430,7 @@ export default class API extends Emitter {
   };
 
   isZksyncChain = () => {
-    return !!this.apiProvider.zksyncCompatible;
+    return !!this.apiProvider?.zksyncCompatible;
   };
 
   cancelOrder = async (orderId) => {
