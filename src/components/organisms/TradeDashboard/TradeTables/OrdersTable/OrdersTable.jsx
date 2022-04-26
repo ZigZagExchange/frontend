@@ -2,7 +2,7 @@ import React from "react";
 import "./OrdersTable.css";
 import loadingGif from "assets/icons/loading.svg";
 import api from "lib/api";
-import {formatDate} from 'lib/utils'
+import {formatDate, formatDateTime} from 'lib/utils'
 import { Tab } from "components/molecules/TabMenu";
 import Text from "components/atoms/Text/Text"
 import { SortUpIcon, SortDownIcon } from 'components/atoms/Svg'
@@ -43,7 +43,7 @@ export class OrdersTable extends React.Component {
           {orders.map((order, i) => {
             const orderId = order[1];
             const market = order[2];
-            const time = order[7] && formatDate(new Date(order[7]*1000));
+            const time = order[7] && formatDateTime(new Date(order[7]*1000));
             let price = order[4];
             let baseQuantity = order[5];
             let remaining = isNaN(Number(order[11])) ? order[5] : order[11];
@@ -151,13 +151,14 @@ export class OrdersTable extends React.Component {
                       </div>
                       <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{time}</Text>
                     </td>
-                    <td data-label="Order Status">
+                    <td data-label="Order Status" style={{textAlign: 'right'}}>
                       <div style={{display: "inline-flex", gap: '8px'}}>
-                        <Text font="primaryExtraSmallSemiBold" color={statusClass}>{statusText}</Text>
+                        <Text font="primaryExtraSmallSemiBold" color={statusClass} textAlign="right">{statusText}</Text>
                         {orderStatus === "o" ? (
                           <ActionWrapper
                             font="primaryExtraSmallSemiBold"
                             color="primaryHighEmphasis"
+                            textAlign="right"
                             onClick={() => api.cancelOrder(orderId)}
                           >
                             Cancel
@@ -173,7 +174,7 @@ export class OrdersTable extends React.Component {
                       <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Price</Text>
                     </td>
                     <td>
-                      <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{price.toPrecision(6) / 1}</Text>
+                      <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis" textAlign="right">{price.toPrecision(6) / 1}</Text>
                     </td>
                   </tr>
                   <tr>
@@ -181,7 +182,7 @@ export class OrdersTable extends React.Component {
                       <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Amount</Text>
                     </td>
                     <td>
-                      <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">
+                      <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis" textAlign="right">
                       {baseQuantity.toPrecision(6) / 1} {baseCurrency}
                       </Text>
                     </td>
@@ -191,7 +192,7 @@ export class OrdersTable extends React.Component {
                       <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Fee</Text>
                     </td>
                     <td>
-                      <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">
+                      <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis" textAlign="right">
                       {remaining.toPrecision(6) / 1} {baseCurrency}
                       </Text>
                     </td>
@@ -441,7 +442,7 @@ export class OrdersTable extends React.Component {
           {fills.map((fill, i) => {
             const fillid = fill[1];
             const market = fill[2];
-            const time = fill[12] && formatDate(new Date(fill[12]));
+            const time = fill[12] && formatDateTime(new Date(fill[12]));
             const side = fill[3];
             let price = fill[4];
             let baseQuantity = fill[5];
@@ -553,13 +554,14 @@ export class OrdersTable extends React.Component {
                       </div>
                       <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{time}</Text>
                     </td>
-                    <td data-label="Order Status">
+                    <td data-label="Order Status" style={{textAlign: 'right'}}>
                       <div style={{display: "inline-flex", gap: '8px'}}>
-                        <Text font="primaryExtraSmallSemiBold" color={statusClass}>{statusText}</Text>
+                        <Text font="primaryExtraSmallSemiBold" color={statusClass} textAlign="right">{statusText}</Text>
                         {txhash ? (
                           <ActionWrapper
                             font="primaryExtraSmallSemiBold"
                             color="primaryHighEmphasis" 
+                            textAlign="right"
                             onClick={() => window.open(baseExplorerUrl + txhash, '_blank')}
                           >
                             View Tx
@@ -575,7 +577,7 @@ export class OrdersTable extends React.Component {
                       <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Price</Text>
                     </td>
                     <td>
-                      <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{price.toPrecision(6) / 1}</Text>
+                      <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis" textAlign="right">{price.toPrecision(6) / 1}</Text>
                     </td>
                   </tr>
                   <tr>
@@ -583,7 +585,7 @@ export class OrdersTable extends React.Component {
                       <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Amount</Text>
                     </td>
                     <td>
-                      <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">
+                      <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis" textAlign="right">
                       {baseQuantity.toPrecision(6) / 1}{" "}
                       {marketInfo && marketInfo.baseAsset.symbol}
                       </Text>
@@ -594,7 +596,7 @@ export class OrdersTable extends React.Component {
                       <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Fee</Text>
                     </td>
                     <td>
-                      <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">
+                      <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis" textAlign="right">
                       {feeText}
                       </Text>
                     </td>
