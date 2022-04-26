@@ -102,11 +102,11 @@ export default class APIStarknetProvider extends APIProvider {
       return { numerator: decimals * denominator, denominator }
     }
     const priceRatio = getFraction(price);
-    let expiration;
+    let expiration; // starknet format unix * 100
     if (orderType === "limit") {
-      expiration = ((Date.now() / 1000) | 0) + 7 * 24 * 3600;;
+      expiration = ((Date.now() / 10) + 7 * 24 * 3600).toFixed(0);
     } else {
-      expiration = ((Date.now() / 1000) | 0) + 30;
+      expiration = ((Date.now() / 10) + 30).toFixed(0);
     }
 
     // build order msg
@@ -127,7 +127,7 @@ export default class APIStarknetProvider extends APIProvider {
           numerator: priceRatio.numerator.toString(),
           denominator: priceRatio.denominator.toString()
         },
-        expiration: expiration.toString()
+        expiration: expiration
       }
     }
 
