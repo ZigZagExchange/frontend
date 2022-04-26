@@ -3,15 +3,28 @@ import "./OrdersTable.css";
 import loadingGif from "assets/icons/loading.svg";
 import api from "lib/api";
 import {formatDate} from 'lib/utils'
+import { Tab } from "components/molecules/TabMenu";
+import Text from "components/atoms/Text/Text"
+import { SortUpIcon, SortDownIcon } from 'components/atoms/Svg'
+import { 
+  StyledTabMenu,
+  FooterWrapper,
+  FooterContainer,
+  LaptopWrapper,
+  MobileWrapper,
+  SortIconWrapper,
+  HeaderWrapper,
+  ActionWrapper
+} from "./StyledComponents"
 
 export class OrdersTable extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { tab: "orders" };
+    this.state = { tab: 0, isMobile: window.innerWidth < 1064 };
   }
 
-  setTab(value) {
-    this.setState({ tab: value });
+  setTab(newIndex) {
+    this.setState({ tab: newIndex });
   }
 
   getFills() {
@@ -24,20 +37,8 @@ export class OrdersTable extends React.Component {
 
   renderOrderTable(orders) {
     return (
+      this.state.isMobile ?
       <table>
-        <thead>
-          <tr>
-            <th scope="col">Market</th>
-            <th scope="col">Time</th>
-            <th scope="col">Price</th>
-            <th scope="col">Quantity</th>
-            <th scope="col">Remaining</th>
-            <th scope="col">Side</th>
-            <th scope="col">Expiry</th>
-            <th scope="col">Order Status</th>
-            <th scope="col">Action</th>
-          </tr>
-        </thead>
         <tbody>
           {orders.map((order, i) => {
             const orderId = order[1];
@@ -49,7 +50,7 @@ export class OrdersTable extends React.Component {
             const orderStatus = order[9];
             const baseCurrency = order[2].split("-")[0];
             const side = order[3] === "b" ? "buy" : "sell";
-            const sideclassname = order[3] === "b" ? "up_value" : "down_value";
+            const sideclassname = order[3] === "b" ? "successHighEmphasis" : "dangerHighEmphasis";
             const expiration = order[7];
             const now = (Date.now() / 1000) | 0;
             const timeToExpiry = expiration - now;
@@ -74,15 +75,15 @@ export class OrdersTable extends React.Component {
             switch (order[9]) {
               case "r":
                 statusText = "rejected";
-                statusClass = "rejected";
+                statusClass = "dangerHighEmphasis";
                 break;
               case "pf":
                 statusText = "partial fill";
-                statusClass = "filled";
+                statusClass = "successHighEmphasis";
                 break;
               case "f":
                 statusText = "filled";
-                statusClass = "filled";
+                statusClass = "successHighEmphasis";
                 break;
               case "pm":
                 statusText = (
@@ -95,7 +96,7 @@ export class OrdersTable extends React.Component {
                     />
                   </span>
                 );
-                statusClass = "matched";
+                statusClass = "warningHighEmphasis";
                 break;
               case "m":
                 statusText = (
@@ -108,7 +109,7 @@ export class OrdersTable extends React.Component {
                     />
                   </span>
                 );
-                statusClass = "matched";
+                statusClass = "warningHighEmphasis";
                 break;
               case "b":
                 statusText = (
@@ -121,19 +122,19 @@ export class OrdersTable extends React.Component {
                     />
                   </span>
                 );
-                statusClass = "committing";
+                statusClass = "warningHighEmphasis";
                 break;
               case "o":
                 statusText = "open";
-                statusClass = "open";
+                statusClass = "success500";
                 break;
               case "c":
                 statusText = "canceled";
-                statusClass = "canceled";
+                statusClass = "danger500";
                 break;
               case "e":
                 statusText = "expired";
-                statusClass = "expired";
+                statusClass = "warning500";
                 break;
               default:
                 break;
@@ -141,30 +142,273 @@ export class OrdersTable extends React.Component {
 
             return (
               <tr key={orderId}>
-                <td data-label="Market">{market}</td>
-                <td data-label="Time">{time}</td>
-                <td data-label="Price">{price.toPrecision(6) / 1}</td>
+                <table>
+                  <tr>
+                    <td data-label="Market">
+                      <div style={{display: "inline-flex", gap: '16px'}}>
+                        <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{market}</Text>
+                        <Text font="primaryExtraSmallSemiBold" color={sideclassname}>{side}</Text>
+                      </div>
+                      <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{time}</Text>
+                    </td>
+                    <td data-label="Order Status">
+                      <div style={{display: "inline-flex", gap: '8px'}}>
+                        <Text font="primaryExtraSmallSemiBold" color={statusClass}>{statusText}</Text>
+                        {orderStatus === "o" ? (
+                          <ActionWrapper
+                            font="primaryExtraSmallSemiBold"
+                            color="primaryHighEmphasis"
+                            onClick={() => api.cancelOrder(orderId)}
+                          >
+                            Cancel
+                          </ActionWrapper>
+                        ) : (
+                          ""
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Price</Text>
+                    </td>
+                    <td>
+                      <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{price.toPrecision(6) / 1}</Text>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Amount</Text>
+                    </td>
+                    <td>
+                      <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">
+                      {baseQuantity.toPrecision(6) / 1} {baseCurrency}
+                      </Text>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Fee</Text>
+                    </td>
+                    <td>
+                      <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">
+                      {remaining.toPrecision(6) / 1} {baseCurrency}
+                      </Text>
+                    </td>
+                  </tr>
+                  <tr><td colSpan={2}></td></tr>
+                </table>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table> :
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">
+              <HeaderWrapper>
+                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Market</Text>
+                <SortIconWrapper>
+                  <SortUpIcon /><SortDownIcon />
+                </SortIconWrapper>
+              </HeaderWrapper>
+            </th>
+            <th scope="col">
+              <HeaderWrapper>
+                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Price</Text>
+                <SortIconWrapper>
+                  <SortUpIcon /><SortDownIcon />
+                </SortIconWrapper>
+              </HeaderWrapper>
+            </th>
+            <th scope="col">
+              <HeaderWrapper>
+                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Side</Text>
+                <SortIconWrapper>
+                  <SortUpIcon /><SortDownIcon />
+                </SortIconWrapper>
+              </HeaderWrapper>
+            </th>
+            <th scope="col">
+              <HeaderWrapper>
+                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Amount</Text>
+                <SortIconWrapper>
+                  <SortUpIcon /><SortDownIcon />
+                </SortIconWrapper>
+              </HeaderWrapper>
+            </th>
+            <th scope="col">
+              <HeaderWrapper>
+                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Remaining</Text>
+                <SortIconWrapper>
+                  <SortUpIcon /><SortDownIcon />
+                </SortIconWrapper>
+              </HeaderWrapper>
+            </th>
+            <th scope="col">
+              <HeaderWrapper>
+                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Time</Text>
+                <SortIconWrapper>
+                  <SortUpIcon /><SortDownIcon />
+                </SortIconWrapper>
+              </HeaderWrapper>
+            </th>
+            <th scope="col">
+              <HeaderWrapper>
+                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Order Status</Text>
+                <SortIconWrapper>
+                  <SortUpIcon /><SortDownIcon />
+                </SortIconWrapper>
+              </HeaderWrapper>
+            </th>
+            <th scope="col">
+              <HeaderWrapper>
+                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Action</Text>
+                <SortIconWrapper>
+                  <SortUpIcon /><SortDownIcon />
+                </SortIconWrapper>
+              </HeaderWrapper>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {orders.map((order, i) => {
+            const orderId = order[1];
+            const market = order[2];
+            const time = order[7] && formatDate(new Date(order[7]*1000));
+            let price = order[4];
+            let baseQuantity = order[5];
+            let remaining = isNaN(Number(order[11])) ? order[5] : order[11];
+            const orderStatus = order[9];
+            const baseCurrency = order[2].split("-")[0];
+            const side = order[3] === "b" ? "buy" : "sell";
+            const sideclassname = order[3] === "b" ? "successHighEmphasis" : "dangerHighEmphasis";
+            const expiration = order[7];
+            const now = (Date.now() / 1000) | 0;
+            const timeToExpiry = expiration - now;
+            let expiryText;
+            if (timeToExpiry > 86400) {
+              expiryText = Math.floor(timeToExpiry / 86400) + "d";
+            } else if (timeToExpiry > 3600) {
+              expiryText = Math.floor(timeToExpiry / 3600) + "h";
+            } else if (timeToExpiry > 0) {
+              expiryText = Math.floor(timeToExpiry / 3600) + "m";
+            } else {
+              expiryText = "--";
+            }
+
+            const orderWithoutFee = api.getOrderDetailsWithoutFee(order);
+            if (api.isZksyncChain()) {
+              price = orderWithoutFee.price;
+              baseQuantity = orderWithoutFee.baseQuantity;
+              remaining = orderWithoutFee.remaining;
+            }
+            let statusText, statusClass;
+            switch (order[9]) {
+              case "r":
+                statusText = "rejected";
+                statusClass = "dangerHighEmphasis";
+                break;
+              case "pf":
+                statusText = "partial fill";
+                statusClass = "successHighEmphasis";
+                break;
+              case "f":
+                statusText = "filled";
+                statusClass = "successHighEmphasis";
+                break;
+              case "pm":
+                statusText = (
+                  <span>
+                    partial match
+                    <img
+                      className="loading-gif"
+                      src={loadingGif}
+                      alt="Pending"
+                    />
+                  </span>
+                );
+                statusClass = "warningHighEmphasis";
+                break;
+              case "m":
+                statusText = (
+                  <span>
+                    matched{" "}
+                    <img
+                      className="loading-gif"
+                      src={loadingGif}
+                      alt="Pending"
+                    />
+                  </span>
+                );
+                statusClass = "warningHighEmphasis";
+                break;
+              case "b":
+                statusText = (
+                  <span>
+                    committing{" "}
+                    <img
+                      className="loading-gif"
+                      src={loadingGif}
+                      alt="Pending"
+                    />
+                  </span>
+                );
+                statusClass = "warningHighEmphasis";
+                break;
+              case "o":
+                statusText = "open";
+                statusClass = "success500";
+                break;
+              case "c":
+                statusText = "canceled";
+                statusClass = "danger500";
+                break;
+              case "e":
+                statusText = "expired";
+                statusClass = "warning500";
+                break;
+              default:
+                break;
+            }
+
+            return (
+              <tr key={orderId}>
+                <td data-label="Market">
+                  <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{market}</Text>
+                </td>
+                <td data-label="Price">
+                  <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{price.toPrecision(6) / 1}</Text>
+                </td>
+                <td data-label="Side">
+                  <Text font="primaryExtraSmallSemiBold" color={sideclassname}>{side}</Text>
+                </td>
                 <td data-label="Quantity">
+                  <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">
                   {baseQuantity.toPrecision(6) / 1} {baseCurrency}
+                  </Text>
                 </td>
                 <td data-label="Remaining">
+                  <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">
                   {remaining.toPrecision(6) / 1} {baseCurrency}
+                  </Text>
                 </td>
-                <td className={sideclassname} data-label="Side">
-                  {side}
+                <td data-label="Time">
+                  <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{time}</Text>
                 </td>
-                <td data-label="Expiry">{expiryText}</td>
-                <td className={statusClass} data-label="Order Status">
-                  {statusText}
+                <td data-label="Order Status">
+                  <Text font="primaryExtraSmallSemiBold" color={statusClass}>{statusText}</Text>
                 </td>
                 <td data-label="Action">
                   {orderStatus === "o" ? (
-                    <span
-                      className="cancel_order_link"
+                    <ActionWrapper
+                      font="primaryExtraSmallSemiBold"
+                      color="primaryHighEmphasis"
                       onClick={() => api.cancelOrder(orderId)}
                     >
                       Cancel
-                    </span>
+                    </ActionWrapper>
                   ) : (
                     ""
                   )}
@@ -191,19 +435,8 @@ export class OrdersTable extends React.Component {
         baseExplorerUrl = "https://zkscan.io/explorer/transactions/";
     }
     return (
+      this.state.isMobile ?
       <table>
-        <thead>
-          <tr>
-            <th scope="col">Market</th>
-            <th scope="col">Time</th>
-            <th scope="col">Price</th>
-            <th scope="col">Quantity</th>
-            <th scope="col">Side</th>
-            <th scope="col">Fee</th>
-            <th scope="col">Order Status</th>
-            <th scope="col">Action</th>
-          </tr>
-        </thead>
         <tbody>
           {fills.map((fill, i) => {
             const fillid = fill[1];
@@ -214,7 +447,7 @@ export class OrdersTable extends React.Component {
             let baseQuantity = fill[5];
             const fillstatus = fill[6];
             const sidetext = fill[3] === "b" ? "buy" : "sell";
-            const sideclassname = fill[3] === "b" ? "up_value" : "down_value";
+            const sideclassname = fill[3] === "b" ? "successHighEmphasis" : "dangerHighEmphasis";
             const txhash = fill[7];
             const feeamount = fill[10];
             const feetoken = fill[11];
@@ -244,15 +477,15 @@ export class OrdersTable extends React.Component {
             switch (fillstatus) {
               case "r":
                 statusText = "rejected";
-                statusClass = "rejected";
+                statusClass = "dangerHighEmphasis";
                 break;
               case "pf":
                 statusText = "partial fill";
-                statusClass = "filled";
+                statusClass = "successHighEmphasis";
                 break;
               case "f":
                 statusText = "filled";
-                statusClass = "filled";
+                statusClass = "successHighEmphasis";
                 break;
               case "pm":
                 statusText = (
@@ -265,7 +498,7 @@ export class OrdersTable extends React.Component {
                     />
                   </span>
                 );
-                statusClass = "matched";
+                statusClass = "warningHighEmphasis";
                 break;
               case "m":
                 statusText = (
@@ -278,7 +511,7 @@ export class OrdersTable extends React.Component {
                     />
                   </span>
                 );
-                statusClass = "matched";
+                statusClass = "warningHighEmphasis";
                 break;
               case "b":
                 statusText = (
@@ -291,19 +524,19 @@ export class OrdersTable extends React.Component {
                     />
                   </span>
                 );
-                statusClass = "committing";
+                statusClass = "warningHighEmphasis";
                 break;
               case "o":
                 statusText = "open";
-                statusClass = "open";
+                statusClass = "success500";
                 break;
               case "c":
                 statusText = "canceled";
-                statusClass = "canceled";
+                statusClass = "danger500";
                 break;
               case "e":
                 statusText = "expired";
-                statusClass = "expired";
+                statusClass = "warning500";
                 break;
               default:
                 break;
@@ -311,29 +544,277 @@ export class OrdersTable extends React.Component {
 
             return (
               <tr key={fillid}>
-                <td data-label="Market">{market}</td>
-                <td data-label="Time">{time}</td>
-                <td data-label="Price">{price.toPrecision(6) / 1}</td>
+                <table>
+                  <tr>
+                    <td data-label="Market">
+                      <div style={{display: "inline-flex", gap: '16px'}}>
+                        <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{market}</Text>
+                        <Text font="primaryExtraSmallSemiBold" color={sideclassname}>{sidetext}</Text>
+                      </div>
+                      <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{time}</Text>
+                    </td>
+                    <td data-label="Order Status">
+                      <div style={{display: "inline-flex", gap: '8px'}}>
+                        <Text font="primaryExtraSmallSemiBold" color={statusClass}>{statusText}</Text>
+                        {txhash ? (
+                          <ActionWrapper
+                            font="primaryExtraSmallSemiBold"
+                            color="primaryHighEmphasis" 
+                            onClick={() => window.open(baseExplorerUrl + txhash, '_blank')}
+                          >
+                            View Tx
+                          </ActionWrapper>
+                        ) : (
+                          ""
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Price</Text>
+                    </td>
+                    <td>
+                      <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{price.toPrecision(6) / 1}</Text>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Amount</Text>
+                    </td>
+                    <td>
+                      <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">
+                      {baseQuantity.toPrecision(6) / 1}{" "}
+                      {marketInfo && marketInfo.baseAsset.symbol}
+                      </Text>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Fee</Text>
+                    </td>
+                    <td>
+                      <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">
+                      {feeText}
+                      </Text>
+                    </td>
+                  </tr>
+                  <tr><td colSpan={2}></td></tr>
+                </table>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table> :
+      <table>
+        <thead>
+          <tr>
+            <th>
+              <HeaderWrapper>
+                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Market</Text>
+                <SortIconWrapper>
+                  <SortUpIcon /><SortDownIcon />
+                </SortIconWrapper>
+              </HeaderWrapper>
+            </th>
+            <th>
+              <HeaderWrapper>
+                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Price</Text>
+                <SortIconWrapper>
+                  <SortUpIcon /><SortDownIcon />
+                </SortIconWrapper>
+              </HeaderWrapper>
+            </th>
+            <th>
+              <HeaderWrapper>
+                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Side</Text>
+                <SortIconWrapper>
+                  <SortUpIcon /><SortDownIcon />
+                </SortIconWrapper>
+              </HeaderWrapper>
+            </th>
+            <th>
+              <HeaderWrapper>
+                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Amount</Text>
+                <SortIconWrapper>
+                  <SortUpIcon /><SortDownIcon />
+                </SortIconWrapper>
+              </HeaderWrapper>
+            </th>
+            <th>
+              <HeaderWrapper>
+                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Fee</Text>
+                <SortIconWrapper>
+                  <SortUpIcon /><SortDownIcon />
+                </SortIconWrapper>
+              </HeaderWrapper>
+            </th>
+            <th>
+              <HeaderWrapper>
+                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Time</Text>
+                <SortIconWrapper>
+                  <SortUpIcon /><SortDownIcon />
+                </SortIconWrapper>
+              </HeaderWrapper>
+            </th>
+            <th>
+              <HeaderWrapper>
+                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Order Status</Text>
+                <SortIconWrapper>
+                  <SortUpIcon /><SortDownIcon />
+                </SortIconWrapper>
+              </HeaderWrapper>
+            </th>
+            <th>
+              <HeaderWrapper>
+                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Action</Text>
+                <SortIconWrapper>
+                  <SortUpIcon /><SortDownIcon />
+                </SortIconWrapper>
+              </HeaderWrapper>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {fills.map((fill, i) => {
+            const fillid = fill[1];
+            const market = fill[2];
+            const time = fill[12] && formatDate(new Date(fill[12]));
+            const side = fill[3];
+            let price = fill[4];
+            let baseQuantity = fill[5];
+            const fillstatus = fill[6];
+            const sidetext = fill[3] === "b" ? "buy" : "sell";
+            const sideclassname = fill[3] === "b" ? "successHighEmphasis" : "dangerHighEmphasis";
+            const txhash = fill[7];
+            const feeamount = fill[10];
+            const feetoken = fill[11];
+            let feeText = "1 USDC";
+            const marketInfo = api.marketInfo[market];
+            if(feeamount && feetoken) {           
+              const displayFee = (feeamount > 9999) ? feeamount.toFixed(0) : feeamount.toPrecision(4);
+              feeText = (feeamount !== 0) ? `${displayFee} ${feetoken}` : "--";
+            } else if(["b", "o", "m", "r"].includes(fillstatus)) {
+              feeText = "--";
+              // cases below make it backward compatible:
+            } else if (!marketInfo) {
+              feeText = "1 USDC";
+            } else if (fillstatus === "r" || !api.isZksyncChain()) {
+              feeText = "0 " + marketInfo.baseAsset.symbol;
+            } else if (side === "s") {
+              feeText = marketInfo.baseFee + " " + marketInfo.baseAsset.symbol;
+            } else if (side === "b") {
+              feeText =
+                marketInfo.quoteFee + " " + marketInfo.quoteAsset.symbol;
+            }
+            if (api.isZksyncChain()) {
+              price = Number(fill[4]);
+              baseQuantity = Number(fill[5]);
+            }
+            let statusText, statusClass;
+            switch (fillstatus) {
+              case "r":
+                statusText = "rejected";
+                statusClass = "dangerHighEmphasis";
+                break;
+              case "pf":
+                statusText = "partial fill";
+                statusClass = "successHighEmphasis";
+                break;
+              case "f":
+                statusText = "filled";
+                statusClass = "successHighEmphasis";
+                break;
+              case "pm":
+                statusText = (
+                  <span>
+                    partial match
+                    <img
+                      className="loading-gif"
+                      src={loadingGif}
+                      alt="Pending"
+                    />
+                  </span>
+                );
+                statusClass = "warningHighEmphasis";
+                break;
+              case "m":
+                statusText = (
+                  <span>
+                    matched{" "}
+                    <img
+                      className="loading-gif"
+                      src={loadingGif}
+                      alt="Pending"
+                    />
+                  </span>
+                );
+                statusClass = "warningHighEmphasis";
+                break;
+              case "b":
+                statusText = (
+                  <span>
+                    committing{" "}
+                    <img
+                      className="loading-gif"
+                      src={loadingGif}
+                      alt="Pending"
+                    />
+                  </span>
+                );
+                statusClass = "warningHighEmphasis";
+                break;
+              case "o":
+                statusText = "open";
+                statusClass = "success500";
+                break;
+              case "c":
+                statusText = "canceled";
+                statusClass = "danger500";
+                break;
+              case "e":
+                statusText = "expired";
+                statusClass = "warning500";
+                break;
+              default:
+                break;
+            }
+
+            return (
+              <tr key={fillid}>
+                <td data-label="Market">
+                  <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{market}</Text>
+                </td>
+                <td data-label="Price">
+                  <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{price.toPrecision(6) / 1}</Text>
+                </td>
+                <td data-label="Side">
+                  <Text font="primaryExtraSmallSemiBold" color={sideclassname}>{sidetext}</Text>
+                </td>
                 <td data-label="Quantity">
+                  <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">
                   {baseQuantity.toPrecision(6) / 1}{" "}
                   {marketInfo && marketInfo.baseAsset.symbol}
+                  </Text>
                 </td>
-                <td className={sideclassname} data-label="Side">
-                  {sidetext}
+                <td data-label="Fee">
+                  <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{feeText}</Text>
                 </td>
-                <td data-label="Fee">{feeText}</td>
-                <td className={statusClass} data-label="Order Status">
-                  {statusText}
+                <td data-label="Time">
+                  <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{time}</Text>
+                </td>
+                <td data-label="Order Status">
+                  <Text font="primaryExtraSmallSemiBold" color={statusClass}>{statusText}</Text>
                 </td>
                 <td data-label="Action">
                   {txhash ? (
-                    <a
-                      href={baseExplorerUrl + txhash}
-                      target="_blank"
-                      rel="noreferrer"
+                    <ActionWrapper
+                      font="primaryExtraSmallSemiBold"
+                      color="primaryHighEmphasis" 
+                      onClick={() => window.open(baseExplorerUrl + txhash, '_blank')}
                     >
                       View Tx
-                    </a>
+                    </ActionWrapper>
                   ) : (
                     ""
                   )}
@@ -359,20 +840,15 @@ export class OrdersTable extends React.Component {
         explorerLink =
           "https://zkscan.io/explorer/accounts/" + this.props.user.address;
     }
-    let footerContent,
-      classNameOrders = "",
-      classNameBalances = "",
-      classNameFills = "";
+    let footerContent
     switch (this.state.tab) {
-      case "orders":
+      case 0:
         footerContent = this.renderOrderTable(this.getUserOrders());
-        classNameOrders = "selected";
         break;
-      case "fills":
+      case 1:
         footerContent = this.renderFillTable(this.getFills());
-        classNameFills = "selected";
         break;
-      case "balances":
+      case 2:
         if (this.props.user.committed) {
           const balancesContent = Object.keys(
             this.props.user.committed.balances
@@ -416,7 +892,6 @@ export class OrdersTable extends React.Component {
             </div>
           );
         }
-        classNameBalances = "selected";
         break;
       default:
         break;
@@ -424,33 +899,22 @@ export class OrdersTable extends React.Component {
 
     return (
       <>
-        <div className="footer">
-          <div className="footer_container">
+        <FooterWrapper>
+          <FooterContainer>
             <div>
-              <div className="ft_tabs">
-                <strong
-                  className={classNameOrders}
-                  onClick={() => this.setTab("orders")}
-                >
-                  Orders ({this.getUserOrders().length})
-                </strong>
-                <strong
-                  className={classNameFills}
-                  onClick={() => this.setTab("fills")}
-                >
-                  Fills ({this.getFills().length})
-                </strong>
-                <strong
-                  className={classNameBalances}
-                  onClick={() => this.setTab("balances")}
-                >
-                  Balances
-                </strong>
-              </div>
+              <StyledTabMenu left activeIndex={this.state.tab} onItemClick={(newIndex) => this.setTab(newIndex)} >
+                <Tab>Open Orders ({this.getUserOrders().length})</Tab>
+                <Tab>Order History ({this.getFills().length})</Tab>
+                <Tab>Balances</Tab>
+              </StyledTabMenu>
             </div>
-            <div className="footer_orders">{footerContent}</div>
-          </div>
-        </div>
+            {
+              this.state.isMobile ?
+              <MobileWrapper>{footerContent}</MobileWrapper> :
+              <LaptopWrapper>{footerContent}</LaptopWrapper>
+            }
+          </FooterContainer>
+        </FooterWrapper>
       </>
     );
   }
