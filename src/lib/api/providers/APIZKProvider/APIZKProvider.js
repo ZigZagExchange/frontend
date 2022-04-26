@@ -272,13 +272,19 @@ export default class APIZKProvider extends APIProvider {
     const sellQuantityBN = ethers.BigNumber.from(fullSellQuantity);
     const packedSellQuantity =
       zksync.utils.closestPackableTransactionAmount(sellQuantityBN);
-    const order = await this.syncWallet.getOrder({
+    const order = await this.syncWallet.signOrder({
       tokenSell,
       tokenBuy,
       amount: packedSellQuantity.toString(),
       ratio: zksync.utils.tokenRatio(tokenRatio),
       validUntil,
     });
+    
+    if (order.ethereumSignature && !order.ethSignature) {
+      order.ethSignature = order.ethereumSignature;
+      delete order.ethereumSignature;
+    }
+    
     this.api.send("submitorder2", [this.network, market, order]);
 
     return order;
@@ -567,16 +573,20 @@ export default class APIZKProvider extends APIProvider {
     }
 
     try {
-      this.ethWallet = this.api.ethersProvider.getSigner();
-      const { seed, ethSignatureType } = await this.getSeed(this.ethWallet);
-      const syncSigner = await zksync.Signer.fromSeed(seed);
-      this.syncWallet = await zksync.Wallet.fromEthSigner(
-        this.ethWallet,
-        this.syncProvider,
-        syncSigner,
-        undefined,
-        ethSignatureType
-      );
+      if (this.api.isArgent) {
+        this.syncWallet = await zksync.RemoteWallet.fromEthSigner(this.api.ethersProvider, this.syncProvider);
+      } else {
+        this.ethWallet = this.api.ethersProvider.getSigner();
+        const { seed, ethSignatureType } = await this.getSeed(this.ethWallet);
+        const syncSigner = await zksync.Signer.fromSeed(seed);
+        this.syncWallet = await zksync.Wallet.fromEthSigner(
+          this.ethWallet,
+          this.syncProvider,
+          syncSigner,
+          undefined,
+          ethSignatureType
+        );
+      }
     } catch (err) {
       console.log(err);
       throw err;
