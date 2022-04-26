@@ -297,7 +297,6 @@ const Bridge = () => {
   };
 
   const setSwapDetails = async (values) => {
-    setLoading(true);
     const details = {
       ...swapDetails,
       ...values,
@@ -306,20 +305,15 @@ const Bridge = () => {
     console.log(details)
     _setSwapDetails(details);
 
-    const setFee = async(bridgeFee, feeToken) => {
+    const setFee = (bridgeFee, feeToken) => {
       setL2Fee(bridgeFee)
       setL2FeeToken(feeToken)
       const input = parseFloat(details.amount) || 0
       const isInputValid = validateInput(input, details.currency)
       const isFeesValid = validateFees(input, bridgeFee, feeToken)
-      if (isFeesValid && isInputValid && input !== 0) {
-        setTimeout(()=>{setLoading(false)},3000)
+      if (isFeesValid && isInputValid) {
         setFormErr("");
       } 
-      else 
-      {
-        setLoading(false);
-      }
     };
 
 
@@ -351,9 +345,6 @@ const Bridge = () => {
           .mul(21000)
         setFee(null, null)
         setL1Fee(fee.toString() / 10**18)
-      }
-      else {
-        setLoading(false);
       }
     }
   };
