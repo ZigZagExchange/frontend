@@ -132,6 +132,20 @@ export function formatDate(date) {
   }
 }
 
+export function formatDateTime(date) {
+  const timestr = [
+      padTo2Digits(date.getHours()),
+      padTo2Digits(date.getMinutes()),
+      padTo2Digits(date.getSeconds()),
+    ].join(":");
+  const datestr = [
+      padTo2Digits(date.getMonth() + 1),
+      padTo2Digits(date.getDate()),
+      date.getFullYear(),
+    ].join("-");
+  return datestr + ' ' + timestr;
+}
+
 export function HideMenuOnOutsideClicked(ref, hideMenu) {
   useEffect(() => {
       /**
