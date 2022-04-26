@@ -196,10 +196,6 @@ const Bridge = () => {
 
   const validateInput = (inputValue, swapCurrency) => {
     if (balances.length === 0) return false;
-    if (inputValue > 0 && inputValue < 0.0001 && (fromNetwork.from.key === 'polygon' || toNetwork.key === 'polygon')) {
-      setFormErr("Insufficient amount");
-      return false;
-    }
     const getCurrencyBalance = (cur) => (balances[cur] && swapCurrencyInfo?.decimals ? balances[cur].value / (10 ** (swapCurrencyInfo.decimals)) : 0);
     const detailBalance = getCurrencyBalance(swapCurrency);
 
@@ -239,6 +235,9 @@ const Bridge = () => {
       /*else if (L1Fee !== null  && inputValue < L1Fee) {
         error = "Amount too small";
       }*/
+      else if (inputValue < 0.0001 && (fromNetwork.from.key === 'polygon' || toNetwork.key === 'polygon')) {
+        error = "Insufficient amount";
+      }
     }
 
     if (error) {
@@ -298,6 +297,7 @@ const Bridge = () => {
   };
 
   const setSwapDetails = async (values) => {
+    setLoading(true);
     const details = {
       ...swapDetails,
       ...values,
@@ -306,25 +306,25 @@ const Bridge = () => {
     console.log(details)
     _setSwapDetails(details);
 
-    const setFee = (bridgeFee, feeToken) => {
+    const setFee = async(bridgeFee, feeToken) => {
       setL2Fee(bridgeFee)
       setL2FeeToken(feeToken)
       const input = parseFloat(details.amount) || 0
       const isInputValid = validateInput(input, details.currency)
       const isFeesValid = validateFees(input, bridgeFee, feeToken)
-      if (isFeesValid && isInputValid) {
+      if (isFeesValid && isInputValid && input !== 0) {
+        setTimeout(()=>{setLoading(false)},3000)
         setFormErr("");
+      } 
+      else 
+      {
+        setLoading(false);
       }
     };
 
 
     // setFee(null); setFee has two parameters. what is this?
     setL1Fee(null);
-
-    const input = parseFloat(details.amount) || 0
-    if (input > 0 && input < 0.0001 && (fromNetwork.from.key === 'polygon' || toNetwork.key === 'polygon')) {
-      setFormErr("Insufficient amount");
-    }
 
     if(fromNetwork.from.key === 'polygon') {
       const gasFee = await api.getPolygonFee();
@@ -351,6 +351,9 @@ const Bridge = () => {
           .mul(21000)
         setFee(null, null)
         setL1Fee(fee.toString() / 10**18)
+      }
+      else {
+        setLoading(false);
       }
     }
   };
@@ -691,6 +694,7 @@ const Bridge = () => {
                     onClick={approveSpend}
                   />
                 )}
+                {console.log("******************************",hasError)}
                 {hasError && (
                   <Button
                     className="bg_btn zig_btn_disabled bg_err"
