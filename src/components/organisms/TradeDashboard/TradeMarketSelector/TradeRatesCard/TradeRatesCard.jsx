@@ -15,6 +15,7 @@ class TradeRatesCard extends React.Component {
 
     this.state = {
       marketInfo: null,
+      isMobile: window.innerWidth < 800
     };
   }
 
@@ -71,24 +72,29 @@ class TradeRatesCard extends React.Component {
               {percentChange !== 'NaN' && `${percentChange}%`}
             </Text>
           </RatesCard> */}
-          <RatesCard>
-            <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h High</Text>
-            <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{this.props.marketSummary["24hi"]}</Text>
-          </RatesCard>
-          <RatesCard>
-            <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h Low</Text>
-            <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{this.props.marketSummary["24lo"]}</Text>
-          </RatesCard>
-          <RatesCard>
-            <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h Volume({marketInfo && marketInfo.baseAsset.symbol})</Text>
-            <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{this.props.marketSummary.baseVolume}</Text>
-          </RatesCard>
-          <RatesCard>
-            <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h Volume({marketInfo && marketInfo.quoteAsset.symbol})</Text>
-            <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{this.props.marketSummary.quoteVolume}</Text>
-          </RatesCard>
+          {
+            this.state.isMobile ? <></> :
+            <>
+              <RatesCard>
+                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h High</Text>
+                <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{this.props.marketSummary["24hi"]}</Text>
+              </RatesCard>
+              <RatesCard>
+                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h Low</Text>
+                <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{this.props.marketSummary["24lo"]}</Text>
+              </RatesCard>
+              <RatesCard>
+                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h Volume({marketInfo && marketInfo.baseAsset.symbol})</Text>
+                <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{this.props.marketSummary.baseVolume}</Text>
+              </RatesCard>
+              <RatesCard>
+                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h Volume({marketInfo && marketInfo.quoteAsset.symbol})</Text>
+                <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{this.props.marketSummary.quoteVolume}</Text>
+              </RatesCard>
+            </>
+          }
         </RatesCardsWrapper>
-        <Button endIcon={<SettingsIcon/>} variant="outlined" scale="imd" mr="8px">
+        <Button endIcon={<SettingsIcon/>} variant="outlined" scale="imd">
             Settings
         </Button>
       </Wrapper>
