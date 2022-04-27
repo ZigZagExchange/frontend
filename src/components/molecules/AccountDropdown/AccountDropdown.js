@@ -309,14 +309,15 @@ export const AccountDropdown = () => {
 
     setSelectedLayout(l);
   }
-
+  
   const [selectedLayer, setSelectedLayer] = useState(2);
   const coinEstimator = useCoinEstimator();
   const { profile } = user;
 
   const wallet =
     selectedLayer === 1 ? balanceData.wallet : balanceData[network];
-
+  const explorer = user.address ? api.getExplorer(user.address, selectedLayer) : null;
+  
   useEffect(() => {
     const hideDisplay = () => setShow(false);
     document.addEventListener("click", hideDisplay, false);
@@ -451,25 +452,15 @@ export const AccountDropdown = () => {
               </LayoutItem>
             </LayoutList>
           </Modal>
-
-        {selectedLayer === 1 ?
-          <DropdownExplorer>
-            <a 
-              target="_blank"
-              rel="noreferrer"
-              href={`https://etherscan.io/address/${user.address}`}>
-                <IoMdOpen style={{ position: "relative", top: -1 }} /> {`Etherscan`}
-            </a>
-          </DropdownExplorer> : 
+          
           <DropdownExplorer>
             <a target="_blank"
               rel="noreferrer"
-              href={`https://zkscan.io/explorer/accounts/${user.address}`}>
-                <IoMdOpen style={{ position: "relative", top: -1 }} /> {`zkScan`}
+              href={explorer}>
+                <IoMdOpen style={{ position: "relative", top: -1 }} /> {selectedLayer === 1 ? 'Etherscan' : `zkScan`} 
             </a>
-          </DropdownExplorer> }
-
-
+          </DropdownExplorer> 
+          
           <SignOutButton onClick={() => api.signOut()}>
             <IoMdLogOut style={{ position: "relative", top: -1 }} /> Disconnect
           </SignOutButton>
