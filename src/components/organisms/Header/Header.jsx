@@ -7,14 +7,13 @@ import { GoGlobe } from "react-icons/go";
 import { HiExternalLink } from "react-icons/hi";
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { Button, Dropdown, AccountDropdown, Menu, MenuItem } from "components";
+import { Button, AccountDropdown } from "components";
 import { userSelector } from "lib/store/features/auth/authSlice";
 import { networkSelector } from "lib/store/features/api/apiSlice";
 import api from "lib/api";
 import logo from "assets/images/logo.png";
 import menu from "assets/icons/menu.png";
 import "./Header.css";
-import ConnectWalletButton from "../../atoms/ConnectWalletButton/ConnectWalletButton";
 import { Dev } from "../../../lib/helpers/env";
 
 export const Header = (props) => {
@@ -26,22 +25,6 @@ export const Header = (props) => {
   const hasBridge = api.isImplemented("depositL2");
   const history = useHistory();
   const location = useLocation();
-
-  const handleMenu = ({ key }) => {
-    switch (key) {
-      case "signOut":
-        api.signOut();
-        return;
-      default:
-        throw new Error("Invalid dropdown option");
-    }
-  };
-
-  const dropdownMenu = (
-    <Menu onSelect={handleMenu}>
-      <MenuItem key="signOut">Disconnect</MenuItem>
-    </Menu>
-  );
 
   const connect = () => {
     setConnecting(true);
@@ -60,7 +43,19 @@ export const Header = (props) => {
     <>
       <header>
         <div className="mobile_header main_header mb_h">
-          <img src={logo} alt="logo" height="30" />
+          <img src={logo} alt="logo" height="30" /> 
+          <div className="head_account_area">
+            {user.id && user.address ? (
+              <AccountDropdown />
+            ) : (
+              <Button
+                className="bg_btn zig_btn_sm"
+                loading={connecting}
+                text="CONNECT WALLET"
+                onClick={connect}
+              />
+            )}
+          </div>
           {/* open sidebar function */}
           <img
             onClick={() => {
@@ -125,19 +120,7 @@ export const Header = (props) => {
               </ul>
             </div>
             <div className="head_right">
-              <div className="d-flex align-items-center justify-content-between">
-                {user.id && user.address ? (
-                  <Dropdown overlay={dropdownMenu}>
-                    <button className="address_button">
-                      {user.address.slice(0, 8)}···
-                      {user.address.slice(-4)}
-                    </button>
-                  </Dropdown>
-                ) : (
-                  <ConnectWalletButton />
-                )}
-              </div>
-              <div className="eu_text mt-3">
+              <div className="eu_text">
                 <GoGlobe className="eu_network" />
                 <select
                   value={network.toString()}

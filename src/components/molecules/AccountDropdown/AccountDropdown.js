@@ -31,6 +31,13 @@ const DropdownDisplay = styled.div`
   pointer-events: none;
   display: flex;
   flex-direction: column;
+  
+  @media screen and (max-width: 991px) {
+    position: fixed;
+    margin-top: 0;
+    width: 100%;
+    border-radius: 0;
+  }
 `;
 
 const DropdownButton = styled.div`
@@ -102,7 +109,6 @@ const WalletToggle = styled.ul`
   list-style-type: none;
   border: 1px solid #666;
   border-radius: 33px;
-  height: 33px;
   padding: 3px;
 `;
 
@@ -176,6 +182,9 @@ const DropdownFooter = styled.div`
   overflow: hidden;
   width: 100%;
   flex-shrink: 0;
+  @media screen and (max-width: 991px) {
+    border-radius: 0;
+  }
 `;
 
 const SignOutButton = styled.div`
