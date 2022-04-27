@@ -112,7 +112,6 @@ const Bridge = () => {
   }, [toNetwork, swapDetails])
 
   useEffect(()=>{
-    console.log(fromNetwork)
     if (fromNetwork.from.key === 'polygon') {
       setSwapDetails({ amount: '', currency: 'WETH' })
     }
@@ -130,7 +129,6 @@ const Bridge = () => {
       const type = transfer.type = "deposit";
       setTransfer({ type });
     }
-    console.log(transfer.type)
   }, [toNetwork])
 
   useEffect(() => {
@@ -302,7 +300,6 @@ const Bridge = () => {
       ...values,
     };
 
-    console.log(details)
     _setSwapDetails(details);
 
     const setFee = (bridgeFee, feeToken) => {
@@ -338,7 +335,6 @@ const Bridge = () => {
       }
     } else {
       const gasFee = await api.depositL2Fee(details.currency);
-      console.log(gasFee)
       if(gasFee){
         let fee = gasFee.maxFeePerGas
           .add(gasFee.maxPriorityFeePerGas)
@@ -351,7 +347,6 @@ const Bridge = () => {
 
   const switchTransferType = (e) => {    
       const f = NETWORKS.find(i => i.from.key === toNetwork.key)
-      console.log(f)
       setFromNetwork(f)
       setToNetwork(fromNetwork.from)
       setSwapDetails({
@@ -685,7 +680,6 @@ const Bridge = () => {
                     onClick={approveSpend}
                   />
                 )}
-                {console.log("******************************",hasError)}
                 {hasError && (
                   <Button
                     className="bg_btn zig_btn_disabled bg_err"

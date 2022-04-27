@@ -329,7 +329,7 @@ export default class APIZKProvider extends APIProvider {
         depositTo: this.syncWallet.address(),
         amount,
       });
-      console.log("adfasdf",this.network)
+
       this.api.emit(
         "bridgeReceipt",
         this.handleBridgeReceipt(transfer, amountDecimals, token, ETH_ZKSYNC_BRIDGE.ethTozkSync, "ethereum", this.network===1000 ? `https://rinkeby.zksync.io/explorer/accounts/${address}`:`https://zkscan.io/explorer/accounts/${address}`)
@@ -343,7 +343,6 @@ export default class APIZKProvider extends APIProvider {
   depositL2Fee = async (token = "ETH") => {
     if (this.api.ethersProvider) {
       const feeData = await this.api.ethersProvider.getFeeData();
-      console.log(feeData);
       return feeData;
     }
   };
@@ -445,7 +444,7 @@ export default class APIZKProvider extends APIProvider {
     );
 
     if (ZKSYNC_POLYGON_BRIDGE.address === address) {
-      console.log("******************",this.network)
+
       this.api.emit(
         "bridgeReceipt",
         this.handleBridgeReceipt(

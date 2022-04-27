@@ -251,7 +251,6 @@ export default class PolygonProvider extends APIProvider {
   };
 
   withdrawL2GasFee = async (token) => {
-    console.log(token)
     const feeToken = await this.getWithdrawFeeToken(token);
     const currencyInfo = this.getCurrencyInfo(feeToken);
     if (!this._tokenWithdrawFees[token]) {

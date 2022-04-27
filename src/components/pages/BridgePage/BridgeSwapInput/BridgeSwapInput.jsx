@@ -70,7 +70,6 @@ const BridgeSwapInput = ({ value = {}, onChange, balances = {}, gasFee, bridgeFe
       else {
         currencyInfo = api.getCurrencyInfo(value.currency);
       }
-      console.log(currencyInfo)
       const roundedDecimalDigits = Math.min(currencyInfo.decimals, 8);
       let balance = balances[value.currency].value / (10 ** currencyInfo.decimals);
       if (balance !== 0) {

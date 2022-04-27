@@ -359,7 +359,6 @@ export default class API extends Emitter {
   }
 
   getPolygonChainId(network) {
-    console.log(network)
     if (network === 1000) {
       return "0x13881";
     } else {
@@ -401,7 +400,6 @@ export default class API extends Emitter {
 
   transferPolygonWeth = async (amount, walletAddress) => {
     const polygonChainId = this.getPolygonChainId(this.apiProvider.network);
-    console.log("===============",this.apiProvider.network)
     await window.ethereum.request({
       method: "wallet_switchEthereumChain",
       params: [{ chainId: polygonChainId }],
@@ -410,14 +408,14 @@ export default class API extends Emitter {
       window.web3.currentProvider
     );
     const currentNetwork = await polygonProvider.getNetwork();
-    console.log(currentNetwork.chainId.toString(16))
+
     if ("0x"+currentNetwork.chainId.toString(16) !== polygonChainId)
       throw new Error("Must approve network change");
     // const signer = polygonProvider.getSigner();
     const wethContractAddress = this.getPolygonWethContract(
       this.apiProvider.network
     );
-    console.log(wethContractAddress);
+
     const contract = new this.web3.eth.Contract(
       wethContractABI,
       wethContractAddress
@@ -431,7 +429,7 @@ export default class API extends Emitter {
         maxPriorityFeePerGas: null,
         maxFeePerGas: null
       });
-      console.log(result)
+
     const txHash = result.transactionHash;
 
     let receipt = {
@@ -446,7 +444,7 @@ export default class API extends Emitter {
     const subdomain = polygonChainId === "0x13881" ? "mumbai." : "";
     receipt.txUrl = `https://${subdomain}polygonscan.com/tx/${txHash}`;
     this.emit("bridgeReceipt", receipt);
-    console.log("////////////////////",this.apiProvider.network)
+
     this.signIn(this.apiProvider.network)
   };
 
@@ -478,7 +476,6 @@ export default class API extends Emitter {
 
   getPolygonFee = async () => {
     const res = await axios.get("https://gasstation-mainnet.matic.network/v2");
-    console.log(res.data)
     return res.data;
   }
 
@@ -491,12 +488,10 @@ export default class API extends Emitter {
   };
 
   depositL2Fee = async (token) => {
-    console.log(await this.web3.eth.getGasPrice()/10**18);
     return await this.apiProvider.depositL2Fee(token);;
   };
 
   withdrawL2GasFee = async (token) => {
-    console.log(token)
     return await this.apiProvider.withdrawL2GasFee(token);
   };
 
@@ -572,7 +567,6 @@ export default class API extends Emitter {
     const getBalance = async (ticker) => {
       const currencyInfo = this.getCurrencyInfo(ticker);
       const { balance, allowance } = await this.getBalanceOfCurrency(ticker);
-      // console.log(balance);
       balances[ticker] = {
         value: balance,
         allowance,

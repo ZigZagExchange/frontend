@@ -42,7 +42,6 @@ const Swap = () => {
 
   useEffect(() => {
     api.getBalances().then((newBalances) => {
-      console.log(newBalances)
       setBalances(newBalances);
     });
   }, [user]);
