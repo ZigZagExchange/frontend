@@ -73,6 +73,7 @@
     "react-app-polyfill": "^2.0.0",
     "react-bootstrap": "^2.0.0-beta.6",
     "react-dev-utils": "^11.0.3",
+    "react-device-detect": "^2.2.2",
     "react-dom": "^17.0.2",
     "react-icons": "^4.3.1",
     "react-loader-spinner": "^4.0.0",
@@ -108,7 +109,7 @@
     "webpack-manifest-plugin": "2.2.0",
     "workbox-webpack-plugin": "5.1.4",
     "ws": "^8.2.2",
-    "zksync": "^0.11.3"
+    "zksync": "^0.12.0-alpha.6"
   },
   "scripts": {
     "analyze": "source-map-explorer 'build/static/js/*.js'",
