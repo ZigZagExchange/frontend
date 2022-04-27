@@ -15,6 +15,7 @@ import {
   POLYGON_MAINNET_WETH_ADDRESS,
 } from "./constants";
 import axios from "axios";
+import { isMobile } from "react-device-detect";
 
 const chainMap = {
   "0x1": 1,
@@ -97,7 +98,7 @@ export default class API extends Emitter {
     
             this.web3Modal = new Web3Modal({
                 network: networkName,
-                cacheProvider: true,
+                cacheProvider: false,
                 theme: "dark",
                 providerOptions: {
                     walletconnect: {
@@ -290,7 +291,9 @@ export default class API extends Emitter {
           await this.refreshNetwork();
           if (this.isZksyncChain()) {
             await this.sleep(2000);
-            const web3Provider = await this.web3Modal.connect();
+            const web3Provider = isMobile
+              ? await this.web3Modal.connectTo("walletconnect")
+              : await this.web3Modal.connect();
             await this.web3Modal.toggleModal();
             this.web3.setProvider(web3Provider);
             this.ethersProvider = new ethers.providers.Web3Provider(
@@ -335,7 +338,7 @@ export default class API extends Emitter {
     } else if (!this.apiProvider) {
       return;
     } else if (this.web3Modal) {
-      this.web3Modal.clearCachedProvider();
+      await this.web3Modal.clearCachedProvider();
     }
 
     this.web3 = null;
