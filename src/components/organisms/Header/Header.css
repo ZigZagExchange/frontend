@@ -224,6 +224,7 @@ header.bridge_header {
     top: 0;
     left: 0;
     height: 100vh;
+    height: -webkit-fill-available;
     background: rgb(32, 39, 55);
     background: linear-gradient(
       162deg,
