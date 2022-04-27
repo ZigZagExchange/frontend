@@ -8,12 +8,13 @@ import { getENSName } from "lib/ens";
 import { formatAmount } from "lib/utils";
 import erc20ContractABI from "lib/contracts/ERC20.json";
 import wethContractABI from "lib/contracts/WETH.json";
-import { ZKSYNC_POLYGON_BRIDGE } from "components/pages/BridgePage/Bridge/constants";
-import {
+import { 
+  ZKSYNC_POLYGON_BRIDGE,
   MAX_ALLOWANCE,
   POLYGON_MUMBAI_WETH_ADDRESS,
   POLYGON_MAINNET_WETH_ADDRESS,
-} from "./constants";
+} from "components/pages/BridgePage/Bridge/constants";
+
 import axios from "axios";
 import { isMobile } from "react-device-detect";
 

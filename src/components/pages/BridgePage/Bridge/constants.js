@@ -1,6 +1,13 @@
 import zksyncLogo from "../../../../assets/images/logo.svg";
 import ethLogo from "../../../../assets/images/currency/ETH.svg";
 import polygonLogo from "../../../../assets/images/polygon.png";
+import { ethers } from "ethers";
+
+export const MAX_ALLOWANCE = ethers.BigNumber.from(
+  "3402823669209384634633746074310"
+);
+export const POLYGON_MUMBAI_WETH_ADDRESS = "0xA6FA4fB5f76172d178d61B04b0ecd319C5d1C0aa";
+export const POLYGON_MAINNET_WETH_ADDRESS = "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619";
 
 export const ZKSYNC_POLYGON_BRIDGE = {
   address: "0xbb256f544b8087596e8e6cdd7fe9726cc98cb400",
