@@ -870,34 +870,57 @@ export class OrdersTable extends React.Component {
               balance = parseInt(balance) / Math.pow(10, currencyInfo.decimals);
               return (
                 <tr>
-                  <td data-label="Token">{token}</td>
-                  <td data-label="Balance">{balance}</td>
+                  <td data-label="Token"><Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{token}</Text></td>
+                  <td data-label="Balance"><Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{balance}</Text></td>
                 </tr>
               );
             });
           footerContent = (
-            <div>
-              <table className="balances_table">
+            <div style={{textAlign: 'center'}}>
+              <table>
                 <thead>
                   <tr>
-                    <th scope="col">Token</th>
-                    <th scope="col">Balance</th>
+                    <th scope="col">
+                      <HeaderWrapper>
+                        <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Token</Text>
+                        <SortIconWrapper>
+                          <SortUpIcon /><SortDownIcon />
+                        </SortIconWrapper>
+                      </HeaderWrapper>
+                    </th>
+                    <th scope="col">
+                      <HeaderWrapper>
+                        <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Balance</Text>
+                        <SortIconWrapper>
+                          <SortUpIcon /><SortDownIcon />
+                        </SortIconWrapper>
+                      </HeaderWrapper>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>{balancesContent}</tbody>
               </table>
-
-              <a href={explorerLink} target="_blank" rel="noreferrer">
+              <ActionWrapper
+                font="primaryExtraSmallSemiBold"
+                color="primaryHighEmphasis" 
+                textAlign="center"
+                onClick={() => window.open(explorerLink, '_blank')}
+              >
                 View Account on Explorer
-              </a>
+              </ActionWrapper>
             </div>
           );
         } else {
           footerContent = (
-            <div>
-              <a href={explorerLink} target="_blank" rel="noreferrer">
+            <div style={{textAlign: 'center'}}>
+              <ActionWrapper
+                font="primaryExtraSmallSemiBold"
+                color="primaryHighEmphasis" 
+                textAlign="center"
+                onClick={() => window.open(explorerLink, '_blank')}
+              >
                 View Account on Explorer
-              </a>
+              </ActionWrapper>
             </div>
           );
         }

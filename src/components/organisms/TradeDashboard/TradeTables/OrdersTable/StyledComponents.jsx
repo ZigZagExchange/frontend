@@ -55,6 +55,12 @@ export const FooterContainer = styled.div`
     align-content: center;
     width: 100%;
     margin: 0 auto;
+
+    div > div > table {
+        padding: 20px;
+        max-width: 500px;
+        margin-bottom: 30px;
+    }
 `
 
 export const LaptopWrapper = styled.div`
