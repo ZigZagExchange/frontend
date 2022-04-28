@@ -8,6 +8,8 @@ import { useCoinEstimator, Modal } from "components";
 import { formatUSD } from "lib/utils";
 import api from "lib/api";
 import SearchBox from "components/organisms/TradeDashboard/TradeSidebar/SearchBox/SearchBox";
+import { Tooltip } from "components/atoms/Tooltip";
+import { MdOfflineBolt } from "react-icons/md";
 
 const StyledBridgeCurrencySelector = styled.div`
   height: 46px;
@@ -55,6 +57,12 @@ const BridgeCurrencyWrapper = styled.div`
       margin-left: 5px;
     }
   }
+`;
+
+const BridgeEligibleFastwithdraw = styled.div`
+  font-size: 20px;
+  margin-top: -4px;
+  margin-left: 4px;
 `;
 
 const BridgeCurrencyOptions = styled.ul`
@@ -201,8 +209,12 @@ const BridgeCurrencySelector = ({ onChange, balances = {}, value }) => {
               }
               return false;
             })
-            .map((ticker, key) =>
-              ticker === value ? null : (
+            .map((ticker, key) => {
+              if(ticker === value) return (<></>);
+              
+              const isFastWithdraw = (api.apiProvider.eligibleFastWithdrawTokens.includes(ticker));
+                
+              return (
                 <li
                   key={key}
                   onClick={selectOption(ticker)}
@@ -216,6 +228,13 @@ const BridgeCurrencySelector = ({ onChange, balances = {}, value }) => {
                     />
                   </div>
                   <div className="currencyName">{ticker}</div>
+                  <BridgeEligibleFastwithdraw>
+                    {isFastWithdraw ? 
+                      <Tooltip placement={"right"} label={"Available for Fast Withdrawal"}>
+                        <MdOfflineBolt />
+                      </Tooltip>
+                    : null}
+                  </BridgeEligibleFastwithdraw>
                   {balances[ticker] && (
                     <div className="currencyBalance">
                       <strong>{balances[ticker].valueReadable}</strong>
@@ -227,9 +246,8 @@ const BridgeCurrencySelector = ({ onChange, balances = {}, value }) => {
                       </small>
                     </div>
                   )}
-                </li>
-              )
-            )}
+                </li>);
+            })}
         </BridgeCurrencyOptions>
       </Modal>
     </BridgeCurrencyWrapper>
