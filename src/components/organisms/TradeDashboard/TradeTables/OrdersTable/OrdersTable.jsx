@@ -551,62 +551,64 @@ export class OrdersTable extends React.Component {
             return (
               <tr key={fillid}>
                 <table>
-                  <tr>
-                    <td data-label="Market">
-                      <div style={{display: "inline-flex", gap: '16px'}}>
-                        <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{market}</Text>
-                        <Text font="primaryExtraSmallSemiBold" color={sideclassname}>{sidetext}</Text>
-                      </div>
-                      <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{time}</Text>
-                    </td>
-                    <td data-label="Order Status" style={{textAlign: 'right'}}>
-                      <div style={{display: "inline-flex", gap: '8px'}}>
-                        <Text font="primaryExtraSmallSemiBold" color={statusClass} textAlign="right">{statusText}</Text>
-                        {txhash ? (
-                          <ActionWrapper
-                            font="primaryExtraSmallSemiBold"
-                            color="primaryHighEmphasis" 
-                            textAlign="right"
-                            onClick={() => window.open(baseExplorerUrl + txhash, '_blank')}
-                          >
-                            View Tx
-                          </ActionWrapper>
-                        ) : (
-                          ""
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Price</Text>
-                    </td>
-                    <td>
-                      <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis" textAlign="right">{price.toPrecision(6) / 1}</Text>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Amount</Text>
-                    </td>
-                    <td>
-                      <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis" textAlign="right">
-                      {baseQuantity.toPrecision(6) / 1}{" "}
-                      {marketInfo && marketInfo.baseAsset.symbol}
-                      </Text>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Fee</Text>
-                    </td>
-                    <td>
-                      <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis" textAlign="right">
-                      {feeText}
-                      </Text>
-                    </td>
-                  </tr>
-                  <tr><td colSpan={2}></td></tr>
+                  <tbody>
+                    <tr>
+                      <td data-label="Market">
+                        <div style={{display: "inline-flex", gap: '16px'}}>
+                          <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{market}</Text>
+                          <Text font="primaryExtraSmallSemiBold" color={sideclassname}>{sidetext}</Text>
+                        </div>
+                        <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{time}</Text>
+                      </td>
+                      <td data-label="Order Status" style={{textAlign: 'right'}}>
+                        <div style={{display: "inline-flex", gap: '8px'}}>
+                          <Text font="primaryExtraSmallSemiBold" color={statusClass} textAlign="right">{statusText}</Text>
+                          {txhash ? (
+                            <ActionWrapper
+                              font="primaryExtraSmallSemiBold"
+                              color="primaryHighEmphasis" 
+                              textAlign="right"
+                              onClick={() => window.open(baseExplorerUrl + txhash, '_blank')}
+                            >
+                              View Tx
+                            </ActionWrapper>
+                          ) : (
+                            ""
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Price</Text>
+                      </td>
+                      <td>
+                        <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis" textAlign="right">{price.toPrecision(6) / 1}</Text>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Amount</Text>
+                      </td>
+                      <td>
+                        <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis" textAlign="right">
+                        {baseQuantity.toPrecision(6) / 1}{" "}
+                        {marketInfo && marketInfo.baseAsset.symbol}
+                        </Text>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Fee</Text>
+                      </td>
+                      <td>
+                        <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis" textAlign="right">
+                        {feeText}
+                        </Text>
+                      </td>
+                    </tr>
+                    <tr><td colSpan={2}></td></tr>
+                  </tbody>
                 </table>
               </tr>
             );
