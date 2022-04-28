@@ -282,7 +282,7 @@ export default class API extends Emitter {
             // const web3Provider = isMobile
             //   ? await this.web3Modal.connectTo("walletconnect")
             //   : await this.web3Modal.connect();
-            const web3Provider = await this.web3Modal.toggleModal();
+            const web3Provider = await this.web3Modal.connect();
             this.web3.setProvider(web3Provider);
             this.ethersProvider = new ethers.providers.Web3Provider(
               web3Provider
