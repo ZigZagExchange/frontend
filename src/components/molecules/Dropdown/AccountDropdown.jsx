@@ -53,30 +53,6 @@ const Divider = styled.div`
   height: 1px;
 `
 
-const WalletToggle = styled.ul`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  background: ${({ theme }) => theme.colors.backgroundHighEmphasis};
-  border: 1px solid ${({ theme }) => theme.colors.foreground300};
-  border-radius: 12px;
-  width: 99px;
-  height: 29px;
-  padding: 4px;
-`
-
-const WalletToggleItem = styled.li`
-  display: block;
-  width: 44px;
-  height: 21px;
-  border-radius: 8px;
-  padding: 4px;
-  text-align: center;
-  user-select: none;
-  cursor: pointer;
-  background: ${({ show, theme }) => show ? `linear-gradient(93.46deg, ${theme.colors.primaryHighEmphasis} 16.94%, ${theme.colors.secondaryHighEmphasis} 97.24%)` : 'transparent'};
-`
-
 const CurrencyImg = styled.img`
   width: 24px;
   height: 24px;
@@ -163,7 +139,6 @@ const AccountDropdown = ({notext}) => {
     const [isOpened, setIsOpened] = useState(false)
     const network = useSelector(networkSelector);
     const balanceData = useSelector(balancesSelector);
-    const [show, setShow] = useState(false);
     const [totalBalance, setTotalBalance] = useState(0);
     const [selectedLayer, setSelectedLayer] = useState(2);
     const coinEstimator = useCoinEstimator();
@@ -174,25 +149,10 @@ const AccountDropdown = ({notext}) => {
   
     const wallet =
       selectedLayer === 1 ? balanceData.wallet : balanceData[network];
-  
-    useEffect(() => {
-      const hideDisplay = () => setShow(false);
-      document.addEventListener("click", hideDisplay, false);
-      return () => {
-        document.removeEventListener("click", hideDisplay);
-      };
-    }, []);
 
     const toggle = () => {
         setIsOpened(!isOpened)
     }
-  
-    const handleKeys = (e) => {
-      if (~[32, 13, 27].indexOf(e.which)) {
-        e.preventDefault();
-        setShow(!show);
-      }
-    };
 
     const disconnect = () => {
       api.signOut()

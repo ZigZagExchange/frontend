@@ -2,10 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import "./SpotBox.css";
 // assets
-import { SpotForm, Tabs, Tooltip } from "components";
-import { HiExternalLink } from "react-icons/hi";
-import { AiOutlineQuestionCircle } from "react-icons/all";
-import ExternalLink from "../../../../pages/ListPairPage/ExternalLink";
+import { SpotForm } from "components";
 import { ToggleButton } from "components/molecules/Toggle";
 import { IconButton as baseIcon } from "components/molecules/IconButton";
 import { CalculatorIcon } from "components/atoms/Svg";
@@ -120,13 +117,6 @@ const IconButton = styled(baseIcon)`
 const StyledTabMenu = styled(TabMenu)`
   margin: 0px 20px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.foreground400};
-`
-
-const FormHeader = styled.div`
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
 `
 
 const SpotFormWrapper = styled.div`

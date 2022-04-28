@@ -1,5 +1,4 @@
 import React from "react";
-import { HiExternalLink } from "react-icons/hi";
 import styled from "@xstyled/styled-components";
 import { DiscordIcon, TelegramIcon, TwitterIcon } from "components/atoms/Svg";
 import Text from "components/atoms/Text/Text";

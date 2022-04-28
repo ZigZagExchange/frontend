@@ -4,7 +4,6 @@ import { useTheme } from "styled-components"
 import "./RangeSlider.css";
 // library
 import { Slider, makeStyles } from "@material-ui/core";
-import { borderRadius } from "@xstyled/styled-components";
 
 const marks = [
   {

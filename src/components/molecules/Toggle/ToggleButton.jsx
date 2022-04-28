@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import styled, { css } from "@xstyled/styled-components";
+import React from "react";
+import styled from "@xstyled/styled-components";
 import Text from "components/atoms/Text/Text";
 
 const ToggleButtonWrapper = styled.ul`

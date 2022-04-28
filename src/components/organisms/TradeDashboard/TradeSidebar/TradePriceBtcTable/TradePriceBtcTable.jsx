@@ -2,9 +2,6 @@ import React from "react";
 import styled from "styled-components"
 import { Dropdown } from "components/molecules/Dropdown"
 import Text from "components/atoms/Text/Text";
-// import "./TradePriceBtcTable.css";
-import CategorizeBox from "../CategorizeBox/CategorizeBox";
-import SearchBox from "../SearchBox/SearchBox";
 import { getStables } from "../../../../../lib/helpers/categories";
 import {
   addFavourite,
