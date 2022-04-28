@@ -8,9 +8,11 @@ import TradeRatesCard from "../TradeRatesCard/TradeRatesCard";
 const TradeHead = (props) => {
   return (
     <TradeRatesCard
+      updateMarketChain={props.updateMarketChain}
       marketSummary={props.marketSummary}
       currentMarket={props.currentMarket}
       marketInfo={props.marketInfo}
+      markets={props.markets}
     />
   );
 };

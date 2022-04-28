@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { formatPrice } from "lib/utils";
 import { SettingsIcon } from "components/atoms/Svg";
@@ -7,61 +7,43 @@ import Text from "components/atoms/Text/Text";
 // css
 import api from "lib/api";
 import "./TradeRatesCard.css";
+import { Dropdown } from "components/molecules/Dropdown";
+import { StarIcon } from "components/atoms/Svg";
 
-class TradeRatesCard extends React.Component {
-  constructor(props) {
-    super(props);
-    this.props = props;
+const TradeRatesCard = ({updateMarketChain, marketSummary, markets, currentMarket, marketInfo}) => {
+  const [pairs, setPairs] = useState([])
 
-    this.state = {
-      marketInfo: null,
-      isMobile: window.innerWidth < 800
-    };
+  useEffect(() => {
+    setPairs(markets.map((r) => { 
+      return {text: r, url: '#', icon: <StarIcon />}
+    }))
+  }, [markets])
+
+  const changeMarket = (pair) => {
+    if (pair === currentMarket) return;
+    updateMarketChain(pair);
   }
 
-  componentDidUpdate() {
-    if (
-      this.props.marketInfo &&
-      this.props.marketInfo !== this.state.marketInfo
-    ) {
-      var marketInfo = this.props.marketInfo;
+  const isMobile = window.innerWidth < 800
 
-      //add ticker name
-      var state = {
-        marketInfo: marketInfo,
-      };
-
-      this.setState(state);
-    }
-  }
-
-  componentDidMount() {
-    //get token name
-  }
-
-  render() {
-    var marketInfo = this.state.marketInfo;
-
-    let marketDisplay = "--/--";
-    if (this.state.marketInfo) {
-      marketInfo = this.state.marketInfo;
-      marketDisplay = <div>{marketInfo.baseAsset.symbol}/{marketInfo.quoteAsset.symbol}</div>;
-    }
-    const percentChange = (
-      (this.props.marketSummary.priceChange / this.props.marketSummary.price) *
-      100
-    ).toFixed(2);
-
-    if (!this.state.marketInfo) {
-      return null
-    }
-
-    return (
-      <Wrapper>
+  return (
+    <Wrapper>
+      <LeftWrapper>
+        <MarketSelector>
+          <StarIcon />
+          <Dropdown 
+            width ={isMobile ? 83 : 223} 
+            transparent 
+            item={pairs} 
+            leftIcon 
+            context={currentMarket} 
+            clickFunction={changeMarket}
+          />
+        </MarketSelector>
         <RatesCardsWrapper>
           <RatesCard>
             <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Price</Text>
-            <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{this.props.marketSummary.price}</Text>
+            <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{marketSummary.price}</Text>
           </RatesCard>
           {/* <RatesCard>
             <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h Change</Text>
@@ -73,33 +55,33 @@ class TradeRatesCard extends React.Component {
             </Text>
           </RatesCard> */}
           {
-            this.state.isMobile ? <></> :
+            isMobile ? <></> :
             <>
               <RatesCard>
                 <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h High</Text>
-                <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{this.props.marketSummary["24hi"]}</Text>
+                <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{marketSummary["24hi"]}</Text>
               </RatesCard>
               <RatesCard>
                 <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h Low</Text>
-                <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{this.props.marketSummary["24lo"]}</Text>
+                <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{marketSummary["24lo"]}</Text>
               </RatesCard>
               <RatesCard>
                 <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h Volume({marketInfo && marketInfo.baseAsset.symbol})</Text>
-                <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{this.props.marketSummary.baseVolume}</Text>
+                <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{marketSummary.baseVolume}</Text>
               </RatesCard>
               <RatesCard>
                 <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h Volume({marketInfo && marketInfo.quoteAsset.symbol})</Text>
-                <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{this.props.marketSummary.quoteVolume}</Text>
+                <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{marketSummary.quoteVolume}</Text>
               </RatesCard>
             </>
           }
         </RatesCardsWrapper>
-        <Button endIcon={<SettingsIcon/>} variant="outlined" scale="imd">
-            Settings
-        </Button>
-      </Wrapper>
-    );
-  }
+      </LeftWrapper>
+      <Button endIcon={<SettingsIcon/>} variant="outlined" scale="imd" mr="20px">
+          Settings
+      </Button>
+    </Wrapper>
+  )
 }
 
 export default TradeRatesCard;
@@ -111,12 +93,28 @@ const Wrapper = styled.div`
   justify-content: space-between;
   width: 100%;
 `
+const LeftWrapper = styled.div`
+display: grid;
+grid-auto-flow: column;
+align-items: center;
+`
 
 const RatesCardsWrapper = styled.div`
   display: grid;
   grid-auto-flow: column;
   align-items: center;
   gap: 40px;
+  padding-left: 20px;
+`
+
+const MarketSelector = styled.div`
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  gap: 10px;
+  background-color: ${({ theme }) => theme.colors.backgroundLowEmphasis};
+  padding: 0px 24px;
+  height: 74px;
 `
 
 const RatesCard = styled.div`
