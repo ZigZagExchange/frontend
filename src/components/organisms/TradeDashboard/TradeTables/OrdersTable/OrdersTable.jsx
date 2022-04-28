@@ -877,29 +877,33 @@ export class OrdersTable extends React.Component {
             });
           footerContent = (
             <div style={{textAlign: 'center'}}>
-              <table>
-                <thead>
-                  <tr>
-                    <th scope="col">
-                      <HeaderWrapper>
-                        <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Token</Text>
-                        <SortIconWrapper>
-                          <SortUpIcon /><SortDownIcon />
-                        </SortIconWrapper>
-                      </HeaderWrapper>
-                    </th>
-                    <th scope="col">
-                      <HeaderWrapper>
-                        <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Balance</Text>
-                        <SortIconWrapper>
-                          <SortUpIcon /><SortDownIcon />
-                        </SortIconWrapper>
-                      </HeaderWrapper>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>{balancesContent}</tbody>
-              </table>
+              {
+                this.state.isMobile ? 
+                <table><tbody>{balancesContent}</tbody></table> :
+                <table>
+                  <thead>
+                    <tr>
+                      <th scope="col">
+                        <HeaderWrapper>
+                          <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Token</Text>
+                          <SortIconWrapper>
+                            <SortUpIcon /><SortDownIcon />
+                          </SortIconWrapper>
+                        </HeaderWrapper>
+                      </th>
+                      <th scope="col">
+                        <HeaderWrapper>
+                          <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Balance</Text>
+                          <SortIconWrapper>
+                            <SortUpIcon /><SortDownIcon />
+                          </SortIconWrapper>
+                        </HeaderWrapper>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>{balancesContent}</tbody>
+                </table>
+              }
               <ActionWrapper
                 font="primaryExtraSmallSemiBold"
                 color="primaryHighEmphasis" 

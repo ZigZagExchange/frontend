@@ -61,9 +61,49 @@ export const FooterContainer = styled.div`
         max-width: 500px;
         margin-bottom: 30px;
     }
+
+    div > div> table tbody {
+        display: block;
+        height: 65px;
+        overflow: auto;
+    }
 `
 
 export const LaptopWrapper = styled.div`
+    tbody {
+        display: block;
+        height: 111px;
+        overflow: overlay;
+
+        ::-webkit-scrollbar {
+            width: 5px;
+            position: relative;
+            z-index: 20;
+        }
+    
+        ::-webkit-scrollbar-track {
+            border-radius: 0px;
+            background: hsla(0, 0%, 100%, 0.15);
+            height: 23px;
+        }
+    
+        ::-webkit-scrollbar-thumb {
+            border-radius: 0px;
+            background: hsla(0, 0%, 100%, 0.4);
+        }
+    
+        ::-webkit-scrollbar-thumb:window-inactive {
+            background: #fff;
+        }
+    }
+    thead, tbody tr {
+        display: table;
+        width: 100%;
+        table-layout: fixed;
+    }
+    // thead {
+    //     width: calc( 100% - 1em )/* scrollbar is average 1em/16px width, remove it from thead width */
+    // }
 
     table {
         width: 100%;
