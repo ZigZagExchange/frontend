@@ -42,7 +42,7 @@ const DSLItemTitle = styled.div`
 const DSLPage = () => {
   return (
     <DefaultTemplate>
-      <div style={{ minHeight: "calc(100vh - 48px)" }}>
+      <div style={{ minHeight: "calc(100vh - 56px)" }}>
         <DSLWrapper>
           <DSLSpan>
             DSL

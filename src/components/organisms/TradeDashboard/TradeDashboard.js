@@ -33,7 +33,7 @@ import {
 
 const TradeContainer = styled.div`
   color: #aeaebf;
-  height: calc(100vh - 48px);
+  height: calc(100vh - 56px);
   background: ${(p) => p.theme.colors.backgroundHighEmphasis};
 `;
 
@@ -46,7 +46,7 @@ const TradeGrid = styled.article`
     "sidebar books chart"
     "sidebar tables tables"
     "sidebar footer footer";
-  min-height: calc(100vh - 48px);
+  min-height: calc(100vh - 56px);
   gap: 1px;
 
   @media screen and (max-width: 991px) {
