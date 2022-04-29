@@ -35,9 +35,9 @@ export const Header = (props) => {
         setShow(false)
       }
     }
-    document.addEventListener("mousedown", detectOutside)
+    document.addEventListener("touchmove", detectOutside)
     return () => {
-      document.removeEventListener("mousedown", detectOutside)
+      document.removeEventListener("touchmove", detectOutside)
     }
   }, [show])
 
@@ -98,8 +98,7 @@ export const Header = (props) => {
           />
         </div>
         {/* mobile sidebar */}
-        {show ? (
-          <div className="mb_header_container mb_h" ref={mobileRef}>
+          <div className={show ? "mb_header_container active mb_h" : "mb_header_container mb_h"} ref={mobileRef}>
             <img src={logo} alt="logo" />
             <div className="head_left">
               <ul className="flex-column mt-4">
@@ -201,8 +200,6 @@ export const Header = (props) => {
               </div>
             </div>
           </div>
-        ) : null}
-
         {/* desktop header */}
         <div className="main_header head_wrapper_desktop dex_h">
           <div className="head_left">
