@@ -2,12 +2,14 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { useHistory, useLocation } from "react-router-dom";
 import { BiChevronDown } from "react-icons/bi";
+import { AiOutlineCaretDown } from "react-icons/ai";
 import { FaDiscord, FaTelegramPlane, FaTwitter } from "react-icons/fa";
 import { GoGlobe } from "react-icons/go";
 import { HiExternalLink } from "react-icons/hi";
 import React, { useState, useRef, useEffect } from "react";
 import { NavLink } from "react-router-dom";
-import { Button, AccountDropdown } from "components";
+import { Button, Dropdown, AccountDropdown, Menu, MenuItem } from "components";
+import ConnectWalletButton from "../../atoms/ConnectWalletButton/ConnectWalletButton";
 import { userSelector } from "lib/store/features/auth/authSlice";
 import { networkSelector } from "lib/store/features/api/apiSlice";
 import api from "lib/api";
@@ -53,22 +55,38 @@ export const Header = (props) => {
       .catch(() => setConnecting(false));
   };
 
+  const handleMenu = ({ key }) => {
+    switch (key) {
+      case "signOut":
+        api.signOut();
+        return;
+      default:
+        throw new Error("Invalid dropdown option");
+    }
+  };
+
+  const dropdownMenu = (
+    <Menu onSelect={handleMenu}>
+      <MenuItem key="signOut">Disconnect</MenuItem>
+    </Menu>
+  );
   return (
     <>
       <header>
         <div className="mobile_header main_header mb_h">
           <img src={logo} alt="logo" height="30" /> 
           <div className="head_account_area">
-            {user.id && user.address ? (
-              <AccountDropdown />
-            ) : (
-              <Button
-                className="bg_btn zig_btn_sm"
-                loading={connecting}
-                text="CONNECT WALLET"
-                onClick={connect}
-              />
-            )}
+          {user.id && user.address ? (
+            <Dropdown overlay={dropdownMenu}>
+              <button className="address_button">
+                {user.address.slice(0, 8)}···
+                {user.address.slice(-4)}
+                <AiOutlineCaretDown />
+              </button>
+            </Dropdown>
+          ) : (
+            <ConnectWalletButton />
+          )}
           </div>
           {/* open sidebar function */}
           <img

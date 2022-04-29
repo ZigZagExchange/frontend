@@ -166,12 +166,31 @@ header.bridge_header {
 }
 
 .address_button {
-  border: 2px solid white;
-  border-radius: 15px;
-  padding: 10px;
-  background: none;
-  color: white;
-  letter-spacing: 1px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 47px;
+  transition: all 0.12s ease-in-out;
+  color: rgba(255, 255, 255, 0.4);
+  background: rgba(0, 0, 0, 0.5);
+  user-select: none;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 0 16px;
+  border: none;
+}
+.address_button:focus {
+  outline: 0;
+}
+
+.address_button:hover {
+  background: rgba(0, 0, 0, 0.9);
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.address_button svg {
+  margin-left: 5px;
+  font-size: 13px;
 }
 
 .head_left_socials ul li a {
