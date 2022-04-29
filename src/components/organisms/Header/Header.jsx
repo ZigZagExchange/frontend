@@ -5,7 +5,7 @@ import { BiChevronDown } from "react-icons/bi";
 import { FaDiscord, FaTelegramPlane, FaTwitter } from "react-icons/fa";
 import { GoGlobe } from "react-icons/go";
 import { HiExternalLink } from "react-icons/hi";
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import { Button, AccountDropdown } from "components";
 import { userSelector } from "lib/store/features/auth/authSlice";
@@ -18,6 +18,7 @@ import { Dev } from "../../../lib/helpers/env";
 
 export const Header = (props) => {
   // state to open or close the sidebar in mobile
+  const mobileRef = useRef();
   const [show, setShow] = useState(false);
   const [connecting, setConnecting] = useState(false);
   const user = useSelector(userSelector);
@@ -25,6 +26,19 @@ export const Header = (props) => {
   const hasBridge = api.isImplemented("depositL2");
   const history = useHistory();
   const location = useLocation();
+
+  useEffect(() => {
+    const detectOutside = e => {
+      if (show && mobileRef.current && !mobileRef.current.contains(e.target)) {
+        setShow(false)
+      }
+    }
+    document.addEventListener("mousedown", detectOutside)
+    return () => {
+      document.removeEventListener("mousedown", detectOutside)
+    }
+  }, [show])
+
 
   const connect = () => {
     setConnecting(true);
@@ -67,7 +81,7 @@ export const Header = (props) => {
         </div>
         {/* mobile sidebar */}
         {show ? (
-          <div className="mb_header_container mb_h">
+          <div className="mb_header_container mb_h" ref={mobileRef}>
             <img src={logo} alt="logo" />
             <div className="head_left">
               <ul className="flex-column mt-4">
