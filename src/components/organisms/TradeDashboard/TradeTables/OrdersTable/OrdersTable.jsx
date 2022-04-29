@@ -223,7 +223,7 @@ export class OrdersTable extends React.Component {
             if(feeamount && feetoken) {           
               const displayFee = (feeamount > 9999) ? feeamount.toFixed(0) : feeamount.toPrecision(4);
               feeText = (feeamount !== 0) ? `${displayFee} ${feetoken}` : "--";
-            } else if(["b", "o", "m", "r"].includes(fillstatus)) {
+            } else if(["b", "o", "m", "r", "e"].includes(fillstatus)) {
               feeText = "--";
               // cases below make it backward compatible:
             } else if (!marketInfo) {
@@ -304,7 +304,6 @@ export class OrdersTable extends React.Component {
               case "e":
                 statusText = "expired";
                 statusClass = "expired";
-                feeText = "--";
                 break;
               default:
                 break;
