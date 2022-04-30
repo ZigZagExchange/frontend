@@ -126,7 +126,7 @@ export const Header = (props) => {
             </div>
             <div className="head_right">
               <div className="d-flex align-items-center justify-content-between">
-                {user.id && user.address ? (
+                {user.address ? (
                   <Dropdown overlay={dropdownMenu}>
                     <button className="address_button">
                       {user.address.slice(0, 8)}···
@@ -294,7 +294,7 @@ export const Header = (props) => {
               <BiChevronDown className="eu_caret" />
             </label>
             <div className="head_account_area">
-              {user.id && user.address ? (
+              {user.address ? (
                 <AccountDropdown />
               ) : (
                 <Button
