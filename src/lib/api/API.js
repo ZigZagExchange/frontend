@@ -16,7 +16,7 @@ import {
 } from "components/pages/BridgePage/Bridge/constants";
 
 import axios from "axios";
-import { isMobile } from "react-device-detect";
+// import { isMobile } from "react-device-detect";
 
 const chainMap = {
   "0x1": 1,
@@ -291,9 +291,10 @@ export default class API extends Emitter {
 
           await this.refreshNetwork();
           if (this.isZksyncChain()) {
-            const web3Provider = isMobile
-            ? await this.web3Modal.connectTo("walletconnect")
-            : await this.web3Modal.connect();
+            // const web3Provider = isMobile
+            //   ? await this.web3Modal.connectTo("walletconnect")
+            //   : await this.web3Modal.connect();
+            const web3Provider = await this.web3Modal.connect();
             this.web3.setProvider(web3Provider);
             this.ethersProvider = new ethers.providers.Web3Provider(
               web3Provider
