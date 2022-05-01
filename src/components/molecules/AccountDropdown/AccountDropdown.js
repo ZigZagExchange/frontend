@@ -12,6 +12,9 @@ import {
 } from "lib/store/features/api/apiSlice";
 import { formatUSD } from "lib/utils";
 import api from "lib/api";
+import { Modal } from "components/atoms/Modal";
+import { Tooltip } from "components/atoms/Tooltip";
+import { Toggle } from "components/atoms/Toggle";
 
 const DropdownDisplay = styled.div`
   position: absolute;
@@ -178,6 +181,18 @@ const DropdownFooter = styled.div`
   flex-shrink: 0;
 `;
 
+const SignOutForm = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  align-items: center;
+  margin: 15px;
+`;
+
+const FormItem = styled.div`
+  flex-grow: 1;
+`;
+
 const SignOutButton = styled.div`
   padding: 15px 20px;
   cursor: pointer;
@@ -212,6 +227,10 @@ export const AccountDropdown = () => {
   const network = useSelector(networkSelector);
   const balanceData = useSelector(balancesSelector);
   const [show, setShow] = useState(false);
+  //sign out confirmation so we can optionally disconnect all connections
+  const [signoutShow, setSignoutShow] = useState(false); 
+  const [disconnectAll, setDisconnectAll] = useState(false); 
+
   const [selectedLayer, setSelectedLayer] = useState(2);
   const coinEstimator = useCoinEstimator();
   const { profile } = user;
@@ -253,6 +272,16 @@ export const AccountDropdown = () => {
     } else return 0;
   };
 
+  
+  const disconnect = () => {
+    //forget about connected wallet instances
+    if(disconnectAll){
+      localStorage.removeItem('walletconnect');
+    }
+    
+    api.signOut();
+  }
+
   return (
     <DropdownContainer
       onKeyDown={handleKeys}
@@ -260,6 +289,27 @@ export const AccountDropdown = () => {
       show={show}
       tabIndex="0"
     >
+      <Modal 
+        show={signoutShow} 
+        title="Disconnect" 
+        onClose={() => setSignoutShow(false)}
+        >
+        <SignOutForm>  
+          <FormItem>
+            <Tooltip placement={"top"} label={"Forget about existing wallet connections."}>
+              <span>
+                Disconnect all connected wallets?    
+              </span>
+            </Tooltip>
+          </FormItem>
+          <FormItem>
+            <Toggle value={disconnectAll} toggle={() => setDisconnectAll(!disconnectAll)}/>
+          </FormItem>
+        </SignOutForm>
+        <SignOutButton onClick={() => disconnect()}>
+          <IoMdLogOut style={{ position: "relative", top: -1 }} /> { disconnectAll ? 'Disconnect Wallets' : 'Disconnect Wallet'}
+        </SignOutButton>
+      </Modal>
       <DropdownButton onClick={() => setShow(!show)} tabIndex="0">
         <AvatarImg src={profile.image} alt={profile.name} />
         {profile.name}
@@ -320,7 +370,7 @@ export const AccountDropdown = () => {
           )}
         </DropdownContent>
         <DropdownFooter>
-          <SignOutButton onClick={() => api.signOut()}>
+          <SignOutButton onClick={() => setSignoutShow(!signoutShow)}>
             <IoMdLogOut style={{ position: "relative", top: -1 }} /> Disconnect
           </SignOutButton>
         </DropdownFooter>
