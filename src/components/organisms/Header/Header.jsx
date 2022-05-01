@@ -2,23 +2,25 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { useHistory, useLocation } from "react-router-dom";
 import { BiChevronDown } from "react-icons/bi";
+import { AiOutlineCaretDown } from "react-icons/ai";
 import { FaDiscord, FaTelegramPlane, FaTwitter } from "react-icons/fa";
 import { GoGlobe } from "react-icons/go";
 import { HiExternalLink } from "react-icons/hi";
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import { Button, Dropdown, AccountDropdown, Menu, MenuItem } from "components";
+import ConnectWalletButton from "../../atoms/ConnectWalletButton/ConnectWalletButton";
 import { userSelector } from "lib/store/features/auth/authSlice";
 import { networkSelector } from "lib/store/features/api/apiSlice";
 import api from "lib/api";
 import logo from "assets/images/logo.png";
 import menu from "assets/icons/menu.png";
 import "./Header.css";
-import ConnectWalletButton from "../../atoms/ConnectWalletButton/ConnectWalletButton";
 import { Dev } from "../../../lib/helpers/env";
 
 export const Header = (props) => {
   // state to open or close the sidebar in mobile
+  const mobileRef = useRef();
   const [show, setShow] = useState(false);
   const [connecting, setConnecting] = useState(false);
   const user = useSelector(userSelector);
@@ -26,6 +28,32 @@ export const Header = (props) => {
   const hasBridge = api.isImplemented("depositL2");
   const history = useHistory();
   const location = useLocation();
+
+  useEffect(() => {
+    const detectOutside = e => {
+      if (show && mobileRef.current && !mobileRef.current.contains(e.target)) {
+        setShow(false)
+      }
+    }
+    document.addEventListener("touchmove", detectOutside)
+    return () => {
+      document.removeEventListener("touchmove", detectOutside)
+    }
+  }, [show])
+
+
+  const connect = () => {
+    setConnecting(true);
+    api
+      .signIn(network)
+      .then((state) => {
+        if (!state.id && !/^\/bridge(\/.*)?/.test(location.pathname)) {
+          history.push("/bridge");
+        }
+        setConnecting(false);
+      })
+      .catch(() => setConnecting(false));
+  };
 
   const handleMenu = ({ key }) => {
     switch (key) {
@@ -42,25 +70,24 @@ export const Header = (props) => {
       <MenuItem key="signOut">Disconnect</MenuItem>
     </Menu>
   );
-
-  const connect = () => {
-    setConnecting(true);
-    api
-      .signIn(network)
-      .then((state) => {
-        if (!state.id && !/^\/bridge(\/.*)?/.test(location.pathname)) {
-          history.push("/bridge");
-        }
-        setConnecting(false);
-      })
-      .catch(() => setConnecting(false));
-  };
-
   return (
     <>
       <header>
         <div className="mobile_header main_header mb_h">
-          <img src={logo} alt="logo" height="30" />
+          <img src={logo} alt="logo" height="30" /> 
+          <div className="head_account_area">
+          {user.address ? (
+            <Dropdown overlay={dropdownMenu}>
+              <button className="address_button">
+                {user.address.slice(0, 8)}···
+                {user.address.slice(-4)}
+                <AiOutlineCaretDown />
+              </button>
+            </Dropdown>
+          ) : (
+            <ConnectWalletButton />
+          )}
+          </div>
           {/* open sidebar function */}
           <img
             onClick={() => {
@@ -71,8 +98,7 @@ export const Header = (props) => {
           />
         </div>
         {/* mobile sidebar */}
-        {show ? (
-          <div className="mb_header_container mb_h">
+          <div className={show ? "mb_header_container active mb_h" : "mb_header_container mb_h"} ref={mobileRef}>
             <img src={logo} alt="logo" />
             <div className="head_left">
               <ul className="flex-column mt-4">
@@ -125,19 +151,7 @@ export const Header = (props) => {
               </ul>
             </div>
             <div className="head_right">
-              <div className="d-flex align-items-center justify-content-between">
-                {user.id && user.address ? (
-                  <Dropdown overlay={dropdownMenu}>
-                    <button className="address_button">
-                      {user.address.slice(0, 8)}···
-                      {user.address.slice(-4)}
-                    </button>
-                  </Dropdown>
-                ) : (
-                  <ConnectWalletButton />
-                )}
-              </div>
-              <div className="eu_text mt-3">
+              <div className="eu_text">
                 <GoGlobe className="eu_network" />
                 <select
                   value={network.toString()}
@@ -186,8 +200,6 @@ export const Header = (props) => {
               </div>
             </div>
           </div>
-        ) : null}
-
         {/* desktop header */}
         <div className="main_header head_wrapper_desktop dex_h">
           <div className="head_left">
@@ -294,7 +306,7 @@ export const Header = (props) => {
               <BiChevronDown className="eu_caret" />
             </label>
             <div className="head_account_area">
-              {user.id && user.address ? (
+              {user.address ? (
                 <AccountDropdown />
               ) : (
                 <Button
