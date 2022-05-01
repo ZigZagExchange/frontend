@@ -46,7 +46,7 @@ export class OrdersTable extends React.Component {
             let price = order[4];
             let baseQuantity = order[5];
             let remaining = isNaN(Number(order[11])) ? order[5] : order[11];
-            const orderStatus = order[9];
+            let orderStatus = order[9];
             const baseCurrency = order[2].split("-")[0];
             const side = order[3] === "b" ? "buy" : "sell";
             const sideclassname = order[3] === "b" ? "up_value" : "down_value";
@@ -60,8 +60,13 @@ export class OrdersTable extends React.Component {
               expiryText = Math.floor(timeToExpiry / 3600) + "h";
             } else if (timeToExpiry > 0) {
               expiryText = Math.floor(timeToExpiry / 3600) + "m";
+
+              if(Math.floor(timeToExpiry / 3600) === 0){
+                expiryText = `${Math.floor(timeToExpiry / 60)}m`;
+              }
             } else {
               expiryText = "--";
+              orderStatus = "e";
             }
 
             const orderWithoutFee = api.getOrderDetailsWithoutFee(order);
@@ -71,7 +76,7 @@ export class OrdersTable extends React.Component {
               remaining = orderWithoutFee.remaining;
             }
             let statusText, statusClass;
-            switch (order[9]) {
+            switch (orderStatus) {
               case "r":
                 statusText = "rejected";
                 statusClass = "rejected";
@@ -223,7 +228,7 @@ export class OrdersTable extends React.Component {
             if(feeamount && feetoken) {           
               const displayFee = (feeamount > 9999) ? feeamount.toFixed(0) : feeamount.toPrecision(4);
               feeText = (feeamount !== 0) ? `${displayFee} ${feetoken}` : "--";
-            } else if(["b", "o", "m", "r"].includes(fillstatus)) {
+            } else if(["b", "o", "m", "r", "e"].includes(fillstatus)) {
               feeText = "--";
               // cases below make it backward compatible:
             } else if (!marketInfo) {

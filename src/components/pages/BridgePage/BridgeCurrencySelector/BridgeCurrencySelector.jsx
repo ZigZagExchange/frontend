@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { networkSelector } from "lib/store/features/api/apiSlice";
-import { userSelector } from "lib/store/features/auth/authSlice";
+// import { useSelector } from "react-redux";
+// import { networkSelector } from "lib/store/features/api/apiSlice";
+// import { userSelector } from "lib/store/features/auth/authSlice";
 import styled from "@xstyled/styled-components";
 import { FiChevronDown } from "react-icons/fi";
 import { useCoinEstimator, Modal } from "components";
@@ -104,20 +104,20 @@ const BridgeCurrencyOptions = styled.ul`
   }
 `;
 
-const BridgeCurrencySelector = ({ onChange, balances = {}, value }) => {
+const BridgeCurrencySelector = ({ onChange, balances = {}, value, isOpenable }) => {
   const [show, setShow] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [showingOptions, setShowingOptions] = useState(false);
-  const network = useSelector(networkSelector);
-  const user = useSelector(userSelector);
+  // const network = useSelector(networkSelector);
+  // const user = useSelector(userSelector);
   const coinEstimator = useCoinEstimator();
   var [tickers, setTickers] = useState(api.getCurrencies());
 
-  useEffect(() => {
-    if (tickers.length !== 0) {
-      onChange(api.marketInfo["ETH"] ? "ETH" : tickers[0]);
-    }
-  }, [user.id, network]);
+  // useEffect(() => {
+  //   if (tickers.length !== 0) {
+  //     onChange(api.marketInfo["ETH"] ? "ETH" : tickers[0]);
+  //   }
+  // }, [user.id, network]);
 
   const hideOptions = (e) => {
     if (e) e.preventDefault();
@@ -170,15 +170,20 @@ const BridgeCurrencySelector = ({ onChange, balances = {}, value }) => {
     }, 500);
   };
 
+  const openModal = () => {
+    if(!isOpenable) return;
+    setShow(true)
+  }
+
   return (
     <BridgeCurrencyWrapper>
-      <StyledBridgeCurrencySelector onClick={() => setShow(true)}>
+      <StyledBridgeCurrencySelector onClick={openModal}>
         <div className="currencyIcon">
           <img src={image && image} alt={currency && currency.symbol} />
         </div>
         <div className="currencyName">
           {value}
-          <FiChevronDown />
+          {isOpenable ? <FiChevronDown /> : <>&nbsp;&nbsp;</>}
         </div>
       </StyledBridgeCurrencySelector>
       <Modal
