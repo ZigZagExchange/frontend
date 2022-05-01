@@ -59,6 +59,8 @@ const Bridge = () => {
     amount: "",
     currency: "ETH",
   }));
+  const [hasError, setHasError] = useState(false);
+
   const coinEstimator = useCoinEstimator();
   const currencyValue = coinEstimator(swapDetails.currency);
   const activationFee = parseFloat(
@@ -101,7 +103,10 @@ const Bridge = () => {
     transfer.type === "withdraw" &&
     api.apiProvider.eligibleFastWithdrawTokens.includes(swapDetails.currency);
  
-  const hasError = formErr && formErr.length > 0;
+  useEffect(()=>{
+    setHasError(formErr && formErr.length > 0);
+  }, [formErr])
+
   const isSwapAmountEmpty = swapDetails.amount === "";
 
   useEffect(()=>{
@@ -197,6 +202,11 @@ const Bridge = () => {
     const getCurrencyBalance = (cur) => (balances[cur] && swapCurrencyInfo?.decimals ? balances[cur].value / (10 ** (swapCurrencyInfo.decimals)) : 0);
     const detailBalance = getCurrencyBalance(swapCurrency);
 
+    if ((swapDetails.amount.includes('0.0000') || (inputValue > 0 && inputValue < 0.0001)) && (fromNetwork.from.key === 'polygon' || toNetwork.key === 'polygon')) {
+      setFormErr("Insufficient amount");
+      return false;
+    }
+
     let error = null;
     if (inputValue > 0) {
       if (inputValue <= activationFee) {
@@ -260,16 +270,16 @@ const Bridge = () => {
     return true;
   };
 
-  const setFastWithdrawFees = (setFee, details) => {
+  const setFastWithdrawFees = (details) => {
     api
       .withdrawL2FastGasFee(details.currency)
       .then(({ amount, feeToken }) => {
-        setFee(amount, feeToken);
+        setFee(details, amount, feeToken);
       })
       .catch((e) => {
         console.error(e);
         setL2FeeToken(null);
-        setFee(null);
+        setFee(details, null, null);
       });
 
     api.withdrawL2FastBridgeFee(details.currency)
@@ -282,16 +292,27 @@ const Bridge = () => {
       });
   };
 
-  const setNormalWithdrawFees = (setFee, details) => {
+  const setNormalWithdrawFees = (details) => {
     api.withdrawL2GasFee(details.currency)
       .then(({ amount, feeToken }) => {
-        setFee(amount, feeToken);
+        setFee(details, amount, feeToken);
       })
       .catch((err) => {
         console.log(err);
         setL2FeeToken(null);
-        setFee(null);
+        setFee(details, null, null);
       });
+  };
+
+  const setFee = (details, bridgeFee, feeToken) => {
+    setL2Fee(bridgeFee)
+    setL2FeeToken(feeToken)
+    const input = parseFloat(details.amount) || 0
+    const isInputValid = validateInput(input, details.currency)
+    const isFeesValid = validateFees(input, bridgeFee, feeToken)
+    if (isFeesValid && isInputValid) {
+      setFormErr("");
+    } 
   };
 
   const setSwapDetails = async (values) => {
@@ -302,35 +323,26 @@ const Bridge = () => {
 
     _setSwapDetails(details);
 
-    const setFee = (bridgeFee, feeToken) => {
-      setL2Fee(bridgeFee)
-      setL2FeeToken(feeToken)
-      const input = parseFloat(details.amount) || 0
-      const isInputValid = validateInput(input, details.currency)
-      const isFeesValid = validateFees(input, bridgeFee, feeToken)
-      if (isFeesValid && isInputValid) {
-        setFormErr("");
-      } 
-    };
+    const input = parseFloat(details.amount) || 0
+    if ((swapDetails.amount.includes('0.0000') || (input > 0 && input < 0.0001)) && (fromNetwork.from.key === 'polygon' || toNetwork.key === 'polygon')) {
+      setFormErr("Insufficient amount");
+    }
 
-
-    // setFee(null); setFee has two parameters. what is this?
     setL1Fee(null);
 
     if(fromNetwork.from.key === 'polygon') {
       const gasFee = await api.getPolygonFee();
       if(gasFee){
         setL1Fee(35000 * gasFee.fast.maxFee / 10**9);
-        setFee(0, null)
+        setFee(details, 0, null)
       }
-      return;
     }
     else if (transfer.type === "withdraw") {
       if (api.apiProvider.syncWallet) {
         if (isFastWithdraw) {
-          setFastWithdrawFees(setFee, details);
+          setFastWithdrawFees(details);
         } else {
-          setNormalWithdrawFees(setFee, details);
+          setNormalWithdrawFees(details);
         }
       }
     } else {
@@ -339,7 +351,7 @@ const Bridge = () => {
         let fee = gasFee.maxFeePerGas
           .add(gasFee.maxPriorityFeePerGas)
           .mul(21000)
-        setFee(null, null)
+        setFee(details, null, null)
         setL1Fee(fee.toString() / 10**18)
       }
     }
@@ -627,7 +639,7 @@ const Bridge = () => {
                      {fromNetwork.from.key === "ethereum" && `Gas fee: ~${formatPrice(L1Fee)} ETH`}
                     </>
                   )}
-                  {!L1Fee && (
+                  {!L1Fee && !hasError && (
                     <div style={{ display: "inline-flex", margin: "0 5px" }}>
                       <Loader
                         type="TailSpin"
