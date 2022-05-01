@@ -76,7 +76,7 @@ export const Header = (props) => {
         <div className="mobile_header main_header mb_h">
           <img src={logo} alt="logo" height="30" /> 
           <div className="head_account_area">
-          {user.id && user.address ? (
+          {user.address ? (
             <Dropdown overlay={dropdownMenu}>
               <button className="address_button">
                 {user.address.slice(0, 8)}···
@@ -306,7 +306,7 @@ export const Header = (props) => {
               <BiChevronDown className="eu_caret" />
             </label>
             <div className="head_account_area">
-              {user.id && user.address ? (
+              {user.address ? (
                 <AccountDropdown />
               ) : (
                 <Button
