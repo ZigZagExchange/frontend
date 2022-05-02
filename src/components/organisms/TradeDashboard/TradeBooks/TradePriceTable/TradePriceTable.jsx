@@ -29,6 +29,7 @@ const Table = styled.table`
     top: 0;
     display: table;
     width: 100%;
+    background: ${(p) => p.theme.colors.backgroundHighEmphasis};
   }
   
   th {
