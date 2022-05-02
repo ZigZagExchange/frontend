@@ -4,10 +4,10 @@ import { DiscordIcon, TelegramIcon, TwitterIcon } from "components/atoms/Svg";
 import Text from "components/atoms/Text/Text";
 
 const StyledTradeFooter = styled.footer`
-  display: flex;
+  display: ${({isMobile}) => isMobile ? 'grid' : 'flex'};
   align-items: center;
   padding: 0 20px;
-  justify-content: space-between;
+  justify-content: ${({isMobile}) => isMobile ? 'center' : 'space-between'};
   grid-area: footer;
   background: ${({theme}) => theme.colors.backgroundDisabled};
   border-top: 1px solid ${({theme}) => theme.colors.foreground400};
@@ -35,9 +35,10 @@ const StyledLinkBox = styled.div`
 `;
 
 export default function TradeFooter() {
+  const isMobile = window.innerWidth < 430
   return (
-    <StyledTradeFooter>
-      <Text font="primaryMediumBody" color="foregroundLowEmphasis">ZigZag Exchange © 2022</Text>
+    <StyledTradeFooter isMobile={isMobile}>
+      <Text font="primaryMediumBody" color="foregroundLowEmphasis" textAlign={isMobile ? 'center' : 'left'}>ZigZag Exchange © 2022</Text>
       <StyledLinkBox>
         <SocialWrapper>
           <SocialLink
