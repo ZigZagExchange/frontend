@@ -59,19 +59,19 @@ const TradeRatesCard = ({updateMarketChain, marketSummary, markets, currentMarke
             <>
               <RatesCard>
                 <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h High</Text>
-                <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{marketSummary["24hi"]}</Text>
+                <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{marketSummary["24hi"] ?? '--'}</Text>
               </RatesCard>
               <RatesCard>
                 <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h Low</Text>
-                <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{marketSummary["24lo"]}</Text>
+                <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{marketSummary["24lo"] ?? '--'}</Text>
               </RatesCard>
               <RatesCard>
                 <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h Volume({marketInfo && marketInfo.baseAsset.symbol})</Text>
-                <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{marketSummary.baseVolume}</Text>
+                <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{marketSummary.baseVolume ?? '--'}</Text>
               </RatesCard>
               <RatesCard>
                 <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h Volume({marketInfo && marketInfo.quoteAsset.symbol})</Text>
-                <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{marketSummary.quoteVolume}</Text>
+                <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{marketSummary.quoteVolume ?? '--'}</Text>
               </RatesCard>
             </>
           }
