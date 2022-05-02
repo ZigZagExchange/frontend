@@ -225,6 +225,7 @@ const AccountDropdown = ({notext}) => {
                     size="sm" 
                     leftLabel="l1" 
                     rightLabel="l2" 
+                    width="40"
                     selectedLayer={selectedLayer} 
                     toggleClick={(num) => setSelectedLayer(num)} 
                   />

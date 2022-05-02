@@ -441,7 +441,7 @@ export class SpotForm extends React.Component {
     }
 
     const balance1Html = (
-        <Text font="primaryExtraSmallSemiBold" color="foregroundMediumEmphasis">
+        <Text font="primaryExtraSmallSemiBold" color="foregroundMediumEmphasis" textAlign="right">
           {quoteBalance.toPrecision(8)}{" "}
           {marketInfo && marketInfo.quoteAsset?.symbol}
         </Text>
@@ -449,15 +449,16 @@ export class SpotForm extends React.Component {
 
     
     const balance2Html = (
-        <Text font="primaryExtraSmallSemiBold" color="foregroundMediumEmphasis">
+        <Text font="primaryExtraSmallSemiBold" color="foregroundMediumEmphasis" textAlign="right">
           {baseBalance.toPrecision(8)}{" "}
           {marketInfo && marketInfo.baseAsset?.symbol}
         </Text>
       );
 
-    let buttonText, feeAmount;
+    let buttonText, feeAmount, buttonType;
     if (this.props.side === "b") {
-      buttonText = "BUY";
+      buttonType = "BUY"
+      buttonText = buttonType + " " + (marketInfo && marketInfo.baseAsset?.symbol);
       feeAmount = (
         <FormHeader>
           <Text font="primaryTiny" color="foregroundMediumEmphasis">Buy Fee:</Text>
@@ -469,7 +470,8 @@ export class SpotForm extends React.Component {
         </FormHeader>
       )
     } else if (this.props.side === "s") {
-      buttonText = "SELL";
+      buttonType = "SELL"
+      buttonText = buttonType + " " + (marketInfo && marketInfo.quoteAsset?.symbol);
       feeAmount = (
         <FormHeader>
           <Text font="primaryTiny" color="foregroundMediumEmphasis">Sell Fee:</Text>
@@ -543,7 +545,7 @@ export class SpotForm extends React.Component {
           {this.props.user.id ? (
             <div className="">
               <Button 
-                variant={buttonText.toLowerCase()} 
+                variant={buttonType.toLowerCase()} 
                 width="100%" 
                 scale="imd"
                 disabled={this.state.orderButtonDisabled} 
@@ -565,7 +567,7 @@ const StyledForm = styled.form`
   display: grid;
   grid-auto-flow: row;
   align-items: center;
-  gap: 10px;
+  gap: 5px;
   padding: 0px 20px 20px 20px;
 `
 

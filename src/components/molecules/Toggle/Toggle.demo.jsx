@@ -36,14 +36,14 @@ const ToggleDemo = () => {
             <ToggleTheme isDark={isDark} toggleTheme={toggleTheme} />
         </Row>
         <Row>
-            <ToggleButton type="option" size="sm" leftLabel="l1" rightLabel="l2" />
-            <ToggleButton type="option" size="sm" leftLabel="Option 1" rightLabel="Option 2" />
-            <ToggleButton size="sm" leftLabel="BUY" rightLabel="SELL" />
+            <ToggleButton type="option" size="sm" width="40" leftLabel="l1" rightLabel="l2" />
+            <ToggleButton type="option" size="sm" width="100" leftLabel="Option 1" rightLabel="Option 2" />
+            <ToggleButton size="sm" width="68" leftLabel="BUY" rightLabel="SELL" />
         </Row>
         <Row>
-            <ToggleButton type="option" leftLabel="l1" rightLabel="l2" />
-            <ToggleButton type="option" leftLabel="Option1" rightLabel="Option2" />
-            <ToggleButton leftLabel="BUY" rightLabel="SELL" selectedLayer={selectedLayer} toggleClick={toggleClick} />
+            <ToggleButton type="option" width="40" leftLabel="l1" rightLabel="l2" />
+            <ToggleButton type="option" width="100" leftLabel="Option1" rightLabel="Option2" />
+            <ToggleButton width="100" leftLabel="BUY" rightLabel="SELL" selectedLayer={selectedLayer} toggleClick={toggleClick} />
         </Row>
     </>
   );
