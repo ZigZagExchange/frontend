@@ -218,7 +218,7 @@ export default class APIZKProvider extends APIProvider {
         tokenRatio[marketInfo.quoteAsset.id] = sellQuantityWithFee;
       }
       sellQuantityBN = ethers.utils.parseUnits (
-        sellQuantityWithFee.toFixed(marketInfo.quoteAsset.decimals),
+        sellQuantityWithFee,
         marketInfo.quoteAsset.decimals
       )
     } else {
@@ -245,7 +245,7 @@ export default class APIZKProvider extends APIProvider {
         tokenRatio[marketInfo.quoteAsset.id] = quoteAmount;
       }
       sellQuantityBN = ethers.utils.parseUnits (
-        sellQuantityWithFee.toFixed(marketInfo.baseAsset.decimals),
+        sellQuantityWithFee,
         marketInfo.baseAsset.decimals
       )
     }
