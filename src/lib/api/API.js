@@ -99,7 +99,7 @@ export default class API extends Emitter {
     
             this.web3Modal = new Web3Modal({
                 network: networkName,
-                cacheProvider: false,
+                cacheProvider: true,
                 theme: "dark",
                 providerOptions: {
                     walletconnect: {
