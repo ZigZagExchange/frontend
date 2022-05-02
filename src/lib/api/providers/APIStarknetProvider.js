@@ -48,7 +48,7 @@ export default class APIStarknetProvider extends APIProvider {
       throw new Error("Invalid amount");
     }
     const amountBN = ethers.utils.parseUnits(
-      amount.toString(),
+      amount.toFixed(marketInfo.baseAsset.decimals),
       marketInfo.baseAsset.decimals
     );
     // check allowance first
@@ -164,11 +164,13 @@ export default class APIStarknetProvider extends APIProvider {
     ZZMessage.sig_r = signature[0]
     ZZMessage.sig_s = signature[1]
 
-    this.api.send("submitorder2", [
+    await this.api.send("submitorder2", [
       this.network,
       market,
       JSON.stringify(ZZMessage)
     ]);
+
+    await new Promise(resolve => setTimeout(resolve, 250)); 
   };
 
   signIn = async () => {
