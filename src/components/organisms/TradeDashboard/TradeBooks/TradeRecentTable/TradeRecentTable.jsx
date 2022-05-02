@@ -33,7 +33,7 @@ const Table = styled.table`
 
   th {
     text-transform: uppercase;
-    padding: 6px;
+    padding: 6px 0px;
   }
 
   th:nth-child(1), td:nth-child(1) {
@@ -109,8 +109,8 @@ const TradeRecentTable = (props) => {
           <thead>
             <tr>
               <th><Text font="tableHeader" color="foregroundLowEmphasis">Price</Text></th>
-              <th><Text font="tableHeader" color="foregroundLowEmphasis">Amount</Text></th>
-              <th><Text font="tableHeader" color="foregroundLowEmphasis">Time</Text></th>
+              <th><Text font="tableHeader" color="foregroundLowEmphasis" textAlign="right">Amount</Text></th>
+              <th><Text font="tableHeader" color="foregroundLowEmphasis" textAlign="right">Time</Text></th>
             </tr>
           </thead>
         )}
@@ -138,10 +138,10 @@ const TradeRecentTable = (props) => {
                   <Text font="tableContent" color={d.side === "b" ? "successHighEmphasis" : "dangerHighEmphasis"}>{numStringToSymbol(price, 2)}</Text>
                 </td>
                 <td>
-                  <Text font="tableContent" color="foregroundHighEmphasis">{numStringToSymbol(amount, 2)}</Text>
+                  <Text font="tableContent" color="foregroundHighEmphasis" textAlign="right">{numStringToSymbol(amount, 2)}</Text>
                 </td>
                 <td> 
-                  <Text font="tableContent" color="foregroundHighEmphasis">{time}</Text>
+                  <Text font="tableContent" color="foregroundHighEmphasis" textAlign="right">{time}</Text>
                 </td>
               </tr>
             );
