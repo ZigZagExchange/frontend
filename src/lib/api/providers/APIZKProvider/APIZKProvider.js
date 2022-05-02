@@ -8,6 +8,13 @@ import { MAX_ALLOWANCE } from "../../constants";
 import axios from "axios";
 import { closestPackableTransactionAmount } from "zksync";
 import BatchTransferService from "./BatchTransferService";
+import {
+  ZKSYNC_POLYGON_BRIDGE,
+  ZKSYNC_ETHEREUM_FAST_BRIDGE,
+  ETH_ZKSYNC_BRIDGE
+} from "components/pages/BridgePage/Bridge/constants";
+import _ from "lodash"
+// import wethContractABI from "lib/contracts/WETH.json";
 
 export default class APIZKProvider extends APIProvider {
   static SEEDS_STORAGE_KEY = "@ZZ/ZKSYNC_SEEDS";
@@ -20,11 +27,10 @@ export default class APIZKProvider extends APIProvider {
   syncProvider = null;
   batchTransferService = null;
   zksyncCompatible = true;
-  fastWithdrawContractAddress = "0xCC9557F04633d82Fb6A1741dcec96986cD8689AE";
-  eligibleFastWithdrawTokens = ["ETH", "FRAX", "UST"];
   _tokenWithdrawFees = {};
   _tokenInfo = {};
-
+  eligibleFastWithdrawTokens = ["ETH", "FRAX", "UST"];
+  fastWithdrawContractAddress = ZKSYNC_ETHEREUM_FAST_BRIDGE.address;
   getProfile = async (address) => {
     try {
       const { data } = await axios.get(
@@ -56,32 +62,28 @@ export default class APIZKProvider extends APIProvider {
     return {};
   };
 
-  handleBridgeReceipt = (_receipt, amount, token, type) => {
+  handleBridgeReceipt = (_receipt, amount, token, type, target, walletAddress) => {
     let receipt = {
       date: +new Date(),
       network: this.network,
       amount,
       token,
       type,
+      walletAddress,
     };
-    const subdomain = this.network === 1 ? "" : "rinkeby.";
     if (!_receipt) {
       return receipt;
     }
-    if (_receipt.ethTx) {
+    if (target === "ethereum") {
+      const subdomain = this.network === 1 ? "" : "rinkeby.";
       receipt.txId = _receipt.ethTx.hash;
       receipt.txUrl = `https://${subdomain}etherscan.io/tx/${receipt.txId}`;
-    } else if (_receipt.txHash) {
+    } else if (target === "zksync") {
+      const subdomain = this.network === 1 ? "" : "rinkeby.";
       receipt.txId = _receipt.txHash.split(":")[1];
       receipt.txUrl = `https://${subdomain}zkscan.io/explorer/transactions/${receipt.txId}`;
     }
 
-    return receipt;
-  };
-
-  handleFastBridgeReceipt = (_receipt, amount, token, type) => {
-    const receipt = this.handleBridgeReceipt(_receipt, amount, token, type);
-    receipt.isFastWithdraw = true;
     return receipt;
   };
 
@@ -306,7 +308,7 @@ export default class APIZKProvider extends APIProvider {
     return this.syncWallet ? this.syncWallet.getAccountState() : {};
   };
 
-  depositL2 = async (amountDecimals, token = "ETH") => {
+  depositL2 = async (amountDecimals, token = "ETH", address = "") => {
     let transfer;
 
     const currencyInfo = this.getCurrencyInfo(token);
@@ -321,7 +323,7 @@ export default class APIZKProvider extends APIProvider {
 
       this.api.emit(
         "bridgeReceipt",
-        this.handleBridgeReceipt(transfer, amountDecimals, token, "deposit")
+        this.handleBridgeReceipt(transfer, amountDecimals, token, ETH_ZKSYNC_BRIDGE.ethTozkSync, "ethereum", this.network===1000 ? `https://rinkeby.zksync.io/explorer/accounts/${address}`:`https://zkscan.io/explorer/accounts/${address}`)
       );
       return transfer;
     } catch (err) {
@@ -330,11 +332,10 @@ export default class APIZKProvider extends APIProvider {
   };
 
   depositL2Fee = async (token = "ETH") => {
-    // TODO: implement
-    return { 
-      amount: 0.005, 
-      feeToken: 'ETH'
-    };
+    if (this.api.ethersProvider) {
+      const feeData = await this.api.ethersProvider.getFeeData();
+      return feeData;
+    }
   };
 
   createWithdraw = async (
@@ -357,7 +358,7 @@ export default class APIZKProvider extends APIProvider {
     return { amountTransferred: amountDecimals, transfer };
   };
 
-  withdrawL2Normal = async (amountDecimals, token) => {
+  withdrawL2 = async (amountDecimals, token) => {
     const onSameFeeToken = async (amount) => {
       const transfer = await this.syncWallet.withdrawFromSyncToEthereum({
         token,
@@ -387,21 +388,25 @@ export default class APIZKProvider extends APIProvider {
       onSameFeeToken,
       onDiffFeeToken
     );
+    
     this.api.emit(
       "bridgeReceipt",
-      this.handleBridgeReceipt(transfer, amountTransferred, token, "withdraw")
+      this.handleBridgeReceipt(transfer, amountTransferred, token, "withdraw", "zksync")
     );
     return transfer;
   };
 
-  withdrawL2Fast = async (amountDecimals, token) => {
-    if (!this.eligibleFastWithdrawTokens.includes(token)) {
-      throw Error("Token not supported for fast withdraw");
+  transferToBridge = async (amountDecimals, token, address, userAddress) => {
+    if (
+      (ZKSYNC_POLYGON_BRIDGE.address === address && !ZKSYNC_POLYGON_BRIDGE.eligibleTokensZkSync.includes(token)) ||
+      (ZKSYNC_ETHEREUM_FAST_BRIDGE.address === address && !ZKSYNC_ETHEREUM_FAST_BRIDGE.eligibleTokensZkSync.includes(token))
+    ) {
+      throw Error("Token not supported for fast withdraw")
     }
 
     const onSameFeeToken = async (amount) => {
       const transfer = await this.syncWallet.syncTransfer({
-        to: this.fastWithdrawContractAddress,
+        to: address,
         token,
         amount,
       });
@@ -412,7 +417,7 @@ export default class APIZKProvider extends APIProvider {
     const onDiffFeeToken = async (amount, feeToken) => {
       const hashes = await this.batchTransferService.sendTransfer(
         {
-          to: this.fastWithdrawContractAddress,
+          to: address,
           token: token,
           amount: amount,
           fee: 0,
@@ -428,15 +433,33 @@ export default class APIZKProvider extends APIProvider {
       onSameFeeToken,
       onDiffFeeToken
     );
-    this.api.emit(
-      "bridgeReceipt",
-      this.handleFastBridgeReceipt(
-        transfer,
-        amountTransferred,
-        token,
-        "withdraw"
-      )
-    );
+
+    if (ZKSYNC_POLYGON_BRIDGE.address === address) {
+
+      this.api.emit(
+        "bridgeReceipt",
+        this.handleBridgeReceipt(
+          transfer,
+          amountTransferred,
+          token,
+          ZKSYNC_POLYGON_BRIDGE.zkSyncToPolygon,
+          "zksync",
+          this.network === 1000 ? `https://mumbai.polygonscan.com/address/${userAddress}`:`https://polygonscan.com/address/${userAddress}`
+        )
+      );
+    } else if (ZKSYNC_ETHEREUM_FAST_BRIDGE.address === address) {
+      this.api.emit(
+        "bridgeReceipt",
+        this.handleBridgeReceipt(
+          transfer,
+          amountTransferred,
+          token,
+          ZKSYNC_ETHEREUM_FAST_BRIDGE.receiptKeyZkSync,
+          "zksync",
+          userAddress
+        )
+      );
+    }
   };
 
   getWithdrawFeeToken = async (tokenToWithdraw) => {
@@ -463,6 +486,7 @@ export default class APIZKProvider extends APIProvider {
   withdrawL2FastGasFee = async (token) => {
     const feeToken = await this.getWithdrawFeeToken(token);
     const feeCurrencyInfo = this.getCurrencyInfo(feeToken);
+    const address = this.syncWallet.address();
 
     let totalFee;
     if (feeToken !== token) {
@@ -470,13 +494,13 @@ export default class APIZKProvider extends APIProvider {
       // send batch transactions. we estimate those fees here.
       totalFee = await this.syncProvider.getTransactionsBatchFee(
         ["Transfer", "Transfer"],
-        [this.fastWithdrawContractAddress, this.syncWallet.address()],
+        [address, address],
         feeToken
       );
     } else {
       const fee = await this.syncProvider.getTransactionFee(
         "Transfer",
-        this.fastWithdrawContractAddress,
+        address,
         token
       );
       totalFee = fee.totalFee;
@@ -497,7 +521,10 @@ export default class APIZKProvider extends APIProvider {
     };
 
     if (this.api.ethersProvider) {
-      if (!this.eligibleFastWithdrawTokens.includes(token)) {
+      if (
+        !ZKSYNC_ETHEREUM_FAST_BRIDGE.eligibleTokensZkSync.includes(token) &&
+        !ZKSYNC_POLYGON_BRIDGE.eligibleTokensZkSync.includes(token)
+      ) {
         throw Error("Token not eligible for fast withdraw");
       }
       const feeData = await this.api.ethersProvider.getFeeData();
@@ -742,8 +769,9 @@ export default class APIZKProvider extends APIProvider {
       ? `https://zigzag-markets.herokuapp.com/markets?id=${pairText}&chainid=${this.network}`
       : `https://secret-thicket-93345.herokuapp.com/api/v1/marketinfos?chain_id=${this.network}&market=${pairText}`
     const marketInfoArray = await fetch(url).then((r) => r.json());
-    if (!(marketInfoArray instanceof Array)) return;
-    marketInfoArray.forEach((info) => (this.marketInfo[info.alias] = info));
+    // if (!(marketInfoArray instanceof Array)) return;
+    _.forEach(marketInfoArray, info=>(this.marketInfo[info.alias] = info))
+    // marketInfoArray.forEach((info) => (this.marketInfo[info.alias] = info));
     return;
   };
 
