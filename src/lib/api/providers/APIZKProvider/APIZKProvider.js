@@ -193,7 +193,7 @@ export default class APIZKProvider extends APIProvider {
       sellQuantity,
       sellQuantityWithFee,
       tokenRatio = {},
-      fullSellQuantity;
+      sellQuantityBN;
     if (side === "b") {
       // quoteAmount is first choice for buy
       if (quoteAmount) {
@@ -207,10 +207,6 @@ export default class APIZKProvider extends APIProvider {
           marketInfo.baseAsset.decimals
         );
         tokenRatio[marketInfo.quoteAsset.id] = sellQuantityWithFee;
-        fullSellQuantity = (
-          sellQuantityWithFee *
-          10 ** marketInfo.quoteAsset.decimals
-        ).toLocaleString("fullwide", { useGrouping: false });
       } else {
         sellQuantity = parseFloat(baseAmount * price);
         sellQuantityWithFee = (sellQuantity + marketInfo.quoteFee).toFixed(
@@ -220,11 +216,11 @@ export default class APIZKProvider extends APIProvider {
         tokenBuy = marketInfo.baseAsset.id;
         tokenRatio[marketInfo.baseAsset.id] = baseAmount;
         tokenRatio[marketInfo.quoteAsset.id] = sellQuantityWithFee;
-        fullSellQuantity = (
-          sellQuantityWithFee *
-          10 ** marketInfo.quoteAsset.decimals
-        ).toLocaleString("fullwide", { useGrouping: false });
       }
+      sellQuantityBN = ethers.utils.parseUnits (
+        sellQuantityWithFee.toFixed(marketInfo.quoteAsset.decimals),
+        marketInfo.quoteAsset.decimals
+      )
     } else {
       // baseAmount is first choice for sell
       if (baseAmount) {
@@ -238,10 +234,6 @@ export default class APIZKProvider extends APIProvider {
         tokenRatio[marketInfo.quoteAsset.id] = (baseAmount * price).toFixed(
           marketInfo.quoteAsset.decimals
         );
-        fullSellQuantity = (
-          sellQuantityWithFee *
-          10 ** marketInfo.baseAsset.decimals
-        ).toLocaleString("fullwide", { useGrouping: false });
       } else {
         sellQuantity = parseFloat(quoteAmount / price);
         sellQuantityWithFee = (sellQuantity + marketInfo.baseFee).toFixed(
@@ -251,11 +243,11 @@ export default class APIZKProvider extends APIProvider {
         tokenBuy = marketInfo.quoteAsset.id;
         tokenRatio[marketInfo.baseAsset.id] = sellQuantityWithFee;
         tokenRatio[marketInfo.quoteAsset.id] = quoteAmount;
-        fullSellQuantity = (
-          sellQuantityWithFee *
-          10 ** marketInfo.baseAsset.decimals
-        ).toLocaleString("fullwide", { useGrouping: false });
       }
+      sellQuantityBN = ethers.utils.parseUnits (
+        sellQuantityWithFee.toFixed(marketInfo.baseAsset.decimals),
+        marketInfo.baseAsset.decimals
+      )
     }
 
     const now_unix = (Date.now() / 1000) | 0;
@@ -267,7 +259,6 @@ export default class APIZKProvider extends APIProvider {
     } else {
       validUntil = two_minute_expiry;
     }
-    const sellQuantityBN = ethers.BigNumber.from(fullSellQuantity);
     const packedSellQuantity =
       zksync.utils.closestPackableTransactionAmount(sellQuantityBN);
     const order = await this.syncWallet.signOrder({
