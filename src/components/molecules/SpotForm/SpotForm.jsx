@@ -11,6 +11,7 @@ import Text from "components/atoms/Text/Text";
 import { IconButton as BaseIcon } from "../IconButton";
 import { MinusIcon, PlusIcon } from "components/atoms/Svg";
 
+const rx_live = /^\d*(?:[.,]\d*)?$/;
 export class SpotForm extends React.Component {
   constructor(props) {
     super(props);
@@ -26,14 +27,46 @@ export class SpotForm extends React.Component {
 
   updatePrice(e) {
     const newState = { ...this.state };
-    newState.price = e.target.value;
+    newState.price = (rx_live.test(e.target.value)) ? e.target.value : this.state.price;
+    newState.userHasEditedPrice = true;
+    this.setState(newState);
+  }
+
+  increasePrice(e) {
+    e.preventDefault()
+    const newState = { ...this.state };
+    newState.price = (Number(this.state.price)+1).toString();
+    newState.userHasEditedPrice = true;
+    this.setState(newState);
+  }
+
+  decreasePrice(e) {
+    e.preventDefault()
+    const newState = { ...this.state };
+    newState.price = Number(this.state.price)-1 < 0 ? '0' : (Number(this.state.price)-1).toString();
     newState.userHasEditedPrice = true;
     this.setState(newState);
   }
 
   updateAmount(e) {
     const newState = { ...this.state };
-    newState.baseAmount = e.target.value;
+    newState.baseAmount = (rx_live.test(e.target.value)) ? e.target.value : this.state.baseAmount;
+    newState.quoteAmount = "";
+    this.setState(newState);
+  }
+
+  increaseAmount(e) {
+    e.preventDefault()
+    const newState = { ...this.state };
+    newState.baseAmount = (Number(this.state.baseAmount)+1).toString();
+    newState.quoteAmount = "";
+    this.setState(newState);
+  }
+
+  decreaseAmount(e) {
+    e.preventDefault()
+    const newState = { ...this.state };
+    newState.baseAmount = Number(this.state.baseAmount)-1 < 0 ? '0' : (Number(this.state.baseAmount)-1).toString();
     newState.quoteAmount = "";
     this.setState(newState);
   }
@@ -488,9 +521,10 @@ export class SpotForm extends React.Component {
       <>
         <StyledForm>
           <InputBox>
-            <IconButton variant="secondary" startIcon={<MinusIcon />}></IconButton>
+            <IconButton variant="secondary" startIcon={<MinusIcon />} disabled={this.priceIsDisabled()} onClick={this.decreasePrice.bind(this)}></IconButton>
             <InputField 
               type="text" 
+              pattern="\d+(?:[.,]\d+)?"
               placeholder={`Price (${marketInfo && marketInfo.quoteAsset?.symbol})`}
               value={
                 this.priceIsDisabled()
@@ -500,20 +534,21 @@ export class SpotForm extends React.Component {
               onChange={this.updatePrice.bind(this)}
               disabled={this.priceIsDisabled()}
             />
-            <IconButton variant="secondary" startIcon={<PlusIcon />}></IconButton>
+            <IconButton variant="secondary" startIcon={<PlusIcon />} disabled={this.priceIsDisabled()} onClick={this.increasePrice.bind(this)}></IconButton>
             {/* <span className={this.priceIsDisabled() ? "text-disabled" : ""}>
               {marketInfo && marketInfo.quoteAsset.symbol}
             </span> */}
           </InputBox>
           <InputBox>
-            <IconButton variant="secondary" startIcon={<MinusIcon />}></IconButton>
+            <IconButton variant="secondary" startIcon={<MinusIcon />} onClick={this.decreaseAmount.bind(this)}></IconButton>
             <InputField 
               type="text" 
+              pattern="\d+(?:[.,]\d+)?"
               placeholder={`Amount (${marketInfo && marketInfo.baseAsset?.symbol})`}
               value={this.state.baseAmount}
               onChange={this.updateAmount.bind(this)}
             />
-            <IconButton variant="secondary" startIcon={<PlusIcon />}></IconButton>
+            <IconButton variant="secondary" startIcon={<PlusIcon />} onClick={this.increaseAmount.bind(this)}></IconButton>
             {/* <span>{marketInfo && marketInfo.baseAsset.symbol}</span> */}
           </InputBox>
           <RangeWrapper>
@@ -531,14 +566,18 @@ export class SpotForm extends React.Component {
             {balance2Html}
           </FormHeader>
           <InputBox>
-            <IconButton variant="secondary" startIcon={<MinusIcon />}></IconButton>
+            {/* <IconButton variant="secondary" startIcon={<MinusIcon />}></IconButton> */}
             <InputField 
               type="text" 
               placeholder={`Total (${marketInfo && marketInfo.quoteAsset?.symbol})`}
-              value={this.state.baseAmount}
-              onChange={this.updateAmount.bind(this)}
+              value={
+                this.props.orderType === "limit" ? 
+                (this.currentPrice() * this.state.baseAmount).toPrecision(6) + ' ' + (marketInfo && marketInfo.quoteAsset?.symbol) :
+                (this.props.marketSummary.price * this.state.baseAmount).toPrecision(6) + ' ' + (marketInfo && marketInfo.quoteAsset?.symbol)
+              }
+              disabled
             />
-            <IconButton variant="secondary" startIcon={<PlusIcon />}></IconButton>
+            {/* <IconButton variant="secondary" startIcon={<PlusIcon />}></IconButton> */}
             {/* <span>{marketInfo && marketInfo.baseAsset.symbol}</span> */}
           </InputBox>
           {feeAmount}
