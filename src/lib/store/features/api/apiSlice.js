@@ -109,8 +109,8 @@ export const apiSlice = createSlice({
           if (feeamount) state.marketFills[fillid][10] = feeamount;
           if (feetoken) state.marketFills[fillid][11] = feetoken;
         }
+        if (update[0] === state.currentMarket) console.log(update)        
         if (state.userFills[fillid]) {
-          console.log(update)
           state.userFills[fillid][6] = newstatus;
           state.userFills[fillid][12] = timestamp;
           if (txhash) state.userFills[fillid][7] = txhash;
