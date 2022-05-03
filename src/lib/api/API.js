@@ -62,156 +62,70 @@ export default class API extends Emitter {
     const networkName = this.getNetworkName(network)
 
     if (!networkName) {
-      this.signOut()
-      return
+        this.signOut()
+        return
     }
 
-    // Change WebSocket if necessary
-    if (this.ws) {
-      const oldUrl = new URL(this.ws.url);
-      const newUrl = new URL(this.apiProvider.websocketUrl);
-      if (oldUrl.host !== newUrl.host) {
-        // Stopping the WebSocket will trigger an auto-restart in 3 seconds
-        this.stop();
-      }
-    }
-
-    if (this.isZksyncChain()) {
-      this.web3 = new Web3(
-        window.ethereum || new Web3.providers.HttpProvider(
-          `https://${networkName}.infura.io/v3/${this.infuraId}`
-        )
-      )
-
-      this.web3Modal = new Web3Modal({
-        network: networkName,
-        cacheProvider: false,
-        theme: "dark",
-        providerOptions: {
-          walletconnect: {
-            package: WalletConnectProvider,
-            options: {
-              infuraId: this.infuraId,
-            }
-          },
-          "custom-argent": {
-            display: {
-              logo: "https://images.prismic.io/argentwebsite/313db37e-055d-42ee-9476-a92bda64e61d_logo.svg?auto=format%2Ccompress&fit=max&q=50",
-              name: "Argent zkSync",
-              description: "Connect to your Argent zkSync wallet"
-            },
-            package: WalletConnectProvider,
-            options: {
-              infuraId: this.infuraId,
-            },
-            connector: async (ProviderPackage, options) => {
-              const provider = new ProviderPackage(options);
-              await provider.enable();
-              this.isArgent = true;
-              return provider;
-            }
-          }
-        }
-        
-        if (this.isZksyncChain()) {
-            this.web3 = new Web3(
-                window.ethereum || new Web3.providers.HttpProvider(
-                    `https://${networkName}.infura.io/v3/${this.infuraId}`
-                )
-            )
-    
-            this.web3Modal = new Web3Modal({
-                network: networkName,
-                cacheProvider: true,
-                theme: "dark",
-                providerOptions: {
-                    walletconnect: {
-                        package: WalletConnectProvider,
-                        options: {
-                            infuraId: this.infuraId,
-                        }
-                    },
-                    "custom-argent": {
-                        display: {
-                            logo: "https://images.prismic.io/argentwebsite/313db37e-055d-42ee-9476-a92bda64e61d_logo.svg?auto=format%2Ccompress&fit=max&q=50",
-                            name: "Argent zkSync",
-                            description: "Connect to your Argent zkSync wallet"
-                        },
-                        package: WalletConnectProvider,
-                        options: {
-                            infuraId: this.infuraId,
-                        },
-                        connector: async (ProviderPackage, options) => {
-                            const provider = new ProviderPackage(options);
-                            await provider.enable();
-                            this.isArgent = true;
-                            return provider;
-                        }
-                    }
-                }
-            })
-        }
-    }
-
-    const apiProvider = this.getAPIProvider(network)
+    const apiProvider = this.getAPIProvider(network) 
     this.apiProvider = apiProvider
 
     // Change WebSocket if necessary
     if (this.ws) {
-      const oldUrl = new URL(this.ws.url);
-      const newUrl = new URL(this.apiProvider.websocketUrl);
-      if (oldUrl.host !== newUrl.host) {
-        // Stopping the WebSocket will trigger an auto-restart in 3 seconds
-        this.stop();
-      }
-    }
-
-    if (this.isZksyncChain()) {
-      this.web3 = new Web3(
-        window.ethereum || new Web3.providers.HttpProvider(
-          `https://${networkName}.infura.io/v3/${this.infuraId}`
-        )
-      )
-
-      this.web3Modal = new Web3Modal({
-        network: networkName,
-        cacheProvider: true,
-        theme: "dark",
-        providerOptions: {
-          walletconnect: {
-            package: WalletConnectProvider,
-            options: {
-              infuraId: this.infuraId,
-            }
-          },
-          "custom-argent": {
-            display: {
-              logo: "https://images.prismic.io/argentwebsite/313db37e-055d-42ee-9476-a92bda64e61d_logo.svg?auto=format%2Ccompress&fit=max&q=50",
-              name: "Argent zkSync",
-              description: "Connect to your Argent zkSync wallet"
-            },
-            package: WalletConnectProvider,
-            options: {
-              infuraId: this.infuraId,
-            },
-            connector: async (ProviderPackage, options) => {
-              const provider = new ProviderPackage(options);
-              await provider.enable();
-              this.isArgent = true;
-              return provider;
-            }
-          }
+        const oldUrl = new URL(this.ws.url);
+        const newUrl = new URL(this.apiProvider.websocketUrl);
+        if (oldUrl.host !== newUrl.host) {
+            // Stopping the WebSocket will trigger an auto-restart in 3 seconds
+            this.stop();
         }
-      })
+    }
+    
+    if (this.isZksyncChain()) {
+        this.web3 = new Web3(
+            window.ethereum || new Web3.providers.HttpProvider(
+                `https://${networkName}.infura.io/v3/${this.infuraId}`
+            )
+        )
+
+        this.web3Modal = new Web3Modal({
+            network: networkName,
+            cacheProvider: true,
+            theme: "dark",
+            providerOptions: {
+                walletconnect: {
+                    package: WalletConnectProvider,
+                    options: {
+                        infuraId: this.infuraId,
+                    }
+                },
+                "custom-argent": {
+                    display: {
+                        logo: "https://images.prismic.io/argentwebsite/313db37e-055d-42ee-9476-a92bda64e61d_logo.svg?auto=format%2Ccompress&fit=max&q=50",
+                        name: "Argent zkSync",
+                        description: "Connect to your Argent zkSync wallet"
+                    },
+                    package: WalletConnectProvider,
+                    options: {
+                        infuraId: this.infuraId,
+                    },
+                    connector: async (ProviderPackage, options) => {
+                        const provider = new ProviderPackage(options);
+                        await provider.enable();
+                        this.isArgent = true;
+                        return provider;
+                    }
+                }
+            }
+        })
     }
 
     this.getAccountState()
-      .catch(err => {
-        console.log('Failed to switch providers', err)
-      })
+        .catch(err => {
+            console.log('Failed to switch providers', err)
+        })
 
     this.emit('providerChange', network)
-  }
+}
+
 
   getProfile = async (address) => {
     if (!this._profiles[address]) {
