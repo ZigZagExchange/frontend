@@ -15,6 +15,7 @@ import api from "lib/api";
 import { Modal } from "components/atoms/Modal";
 import { Tooltip } from "components/atoms/Tooltip";
 import { Toggle } from "components/atoms/Toggle";
+import { Button } from "components/atoms/Button";
 
 const DropdownDisplay = styled.div`
   position: absolute;
@@ -186,7 +187,11 @@ const SignOutForm = styled.div`
   flex: 1;
   flex-direction: row;
   align-items: center;
-  margin: 15px;
+  margin: 10px 5px 25px 5px;
+  @media only screen and (max-width: 991px) {
+    flex-direction: column;
+    gap: 10px;
+  }
 `;
 
 const FormItem = styled.div`
@@ -298,7 +303,7 @@ export const AccountDropdown = () => {
           <FormItem>
             <Tooltip placement={"top"} label={"Forget about existing wallet connections."}>
               <span>
-                Disconnect all connected wallets?    
+                Disconnect all connected wallets?
               </span>
             </Tooltip>
           </FormItem>
@@ -306,9 +311,9 @@ export const AccountDropdown = () => {
             <Toggle value={disconnectAll} toggle={() => setDisconnectAll(!disconnectAll)}/>
           </FormItem>
         </SignOutForm>
-        <SignOutButton onClick={() => disconnect()}>
+        <Button className="bg_btn" onClick={() => disconnect()}>
           <IoMdLogOut style={{ position: "relative", top: -1 }} /> { disconnectAll ? 'Disconnect Wallets' : 'Disconnect Wallet'}
-        </SignOutButton>
+        </Button>
       </Modal>
       <DropdownButton onClick={() => setShow(!show)} tabIndex="0">
         <AvatarImg src={profile.image} alt={profile.name} />
@@ -370,7 +375,7 @@ export const AccountDropdown = () => {
           )}
         </DropdownContent>
         <DropdownFooter>
-          <SignOutButton onClick={() => setSignoutShow(!signoutShow)}>
+          <SignOutButton onClick={() => { setSignoutShow(!signoutShow); setShow(false) }}>
             <IoMdLogOut style={{ position: "relative", top: -1 }} /> Disconnect
           </SignOutButton>
         </DropdownFooter>
