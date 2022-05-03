@@ -229,6 +229,15 @@ export default class API extends Emitter {
         this.ws.addEventListener('message', this._socketMsg)
         this.ws.addEventListener('error', this._socketError)
         this.emit('start')
+
+        // login after reconnect
+        const accountState = this.getAccountState();
+        if (accountState && accountState.id) {
+          this.send("login", [
+            this.apiProvider.network,
+            accountState.id && accountState.id.toString(),
+          ]);
+        }
     }
 
     stop = () => {
