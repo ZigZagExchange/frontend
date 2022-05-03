@@ -110,6 +110,7 @@ export const apiSlice = createSlice({
           if (feetoken) state.marketFills[fillid][11] = feetoken;
         }
         if (state.userFills[fillid]) {
+          console.log(update)
           state.userFills[fillid][6] = newstatus;
           state.userFills[fillid][12] = timestamp;
           if (txhash) state.userFills[fillid][7] = txhash;
@@ -127,28 +128,6 @@ export const apiSlice = createSlice({
               } ${baseCurrency} was filled @ ${Number(formatPrice(price))}!`,
               {
                 toastId: fillid, // use fillId in case two equal fills
-              }
-            );
-          } else if (newstatus === 'r') {
-            const fillDetails = state.userFills[fillid];
-            const baseCurrency = fillDetails[2].split("-")[0];
-            const sideText = fillDetails[3] === "b" ? "buy" : "sell";
-            const price = Number(fillDetails[4]);
-            const baseQuantity = Number(fillDetails[5]);
-            const error = update[8];
-
-            toast.error(
-              `Your ${sideText} order for ${baseQuantity.toPrecision(4) / 1
-              } ${baseCurrency} @ ${price.toPrecision(4) / 1
-              } was rejected: ${error}`,
-              {
-                toastId: fillid,
-              }
-            );
-            toast.info(
-              `This happens occasionally. Run the transaction again and you should be fine.`,
-              {
-                toastId: `This happens occasionally. Run the transaction again and you should be fine.`,
               }
             );
           }
@@ -244,8 +223,26 @@ export const apiSlice = createSlice({
           case "r":
             filledOrder = state.userOrders[orderId];
             if (filledOrder) {
+              const sideText = filledOrder[3] === "b" ? "buy" : "sell";
+              const error = update[4];
+              const baseCurrency = filledOrder[2].split("-")[0];
               filledOrder[9] = "r";
               filledOrder[10] = txHash;
+              const noFeeOrder = api.getOrderDetailsWithoutFee(filledOrder);
+              toast.error(
+                `Your ${sideText} order for ${noFeeOrder.baseQuantity.toPrecision(4) / 1
+                } ${baseCurrency} @ ${noFeeOrder.price.toPrecision(4) / 1
+                } was rejected: ${error}`,
+                {
+                  toastId: orderId,
+                }
+              );
+              toast.info(
+                `This happens occasionally. Run the transaction again and you should be fine.`,
+                {
+                  toastId: `This happens occasionally. Run the transaction again and you should be fine.`,
+                }
+              );
             }
             break;
           case "e":
