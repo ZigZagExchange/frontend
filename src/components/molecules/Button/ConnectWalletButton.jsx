@@ -5,7 +5,7 @@ import Button from "./Button";
 import api from "../../../lib/api";
 import { useHistory, useLocation } from "react-router-dom";
 
-const ConnectWalletButton = () => {
+const ConnectWalletButton = ({width = '100%'}) => {
   const network = useSelector(networkSelector);
   const [isLoading, setIsLoading] = useState(false);
   const history = useHistory();
@@ -30,7 +30,7 @@ const ConnectWalletButton = () => {
           })
           .finally(() => setIsLoading(false));
       }} 
-      style={{width: '100%', padding: isLoading ? '8px 5px' : '8px 15px'}}
+      style={{width, padding: isLoading ? '8px 5px' : '8px 15px'}}
     >
     CONNECT WALLET
     </Button>
