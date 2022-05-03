@@ -151,6 +151,7 @@ export default class API extends Emitter {
                 }
             })
         }
+    }
 
     const apiProvider = this.getAPIProvider(network)
     this.apiProvider = apiProvider
