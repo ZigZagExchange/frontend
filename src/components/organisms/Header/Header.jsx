@@ -151,7 +151,19 @@ export const Header = (props) => {
               </ul>
             </div>
             <div className="head_right">
-              <div className="eu_text">
+              <div className="d-flex align-items-center justify-content-between">
+                {user.address ? (
+                  <Dropdown overlay={dropdownMenu}>
+                    <button className="address_button">
+                      {user.address.slice(0, 8)}···
+                      {user.address.slice(-4)}
+                    </button>
+                  </Dropdown>
+                ) : (
+                  <ConnectWalletButton />
+                )}
+              </div>
+              <div className="eu_text mt-3">
                 <GoGlobe className="eu_network" />
                 <select
                   value={network.toString()}
