@@ -27,6 +27,9 @@ const InfoWrapper = styled.div`
 
 export default function TradeSidebar(props) {
   const isMobile = window.innerWidth < 800
+  const joinDiscord = () => {
+    window.open('https://discord.gg/zigzag', '_blank')
+  }
   return (
     <StyledTradeSidebar>
       {
@@ -36,7 +39,7 @@ export default function TradeSidebar(props) {
             {props.user.id ? 'Have a question? Need live support?' : 'You have not connected your wallet.'}
           </Text>
           {props.user.id ? (
-            <Button width="150px" startIcon={<DiscordIcon />} variant="outlined" scale="imd" mr="8px">
+            <Button width="150px" startIcon={<DiscordIcon />} variant="outlined" scale="imd" mr="8px" onClick={joinDiscord}>
               <Text font="primaryBoldDisplay" color="foregroundHighEmphasis" textAlign="center">JOIN DISCORD</Text>
             </Button>
           ) : (
