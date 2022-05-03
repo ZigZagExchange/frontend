@@ -3,7 +3,7 @@ import styled from "@xstyled/styled-components";
 import SpotBox from "./SpotBox/SpotBox";
 import Text from "components/atoms/Text/Text";
 import { DiscordIcon } from "components/atoms/Svg";
-import Button from "components/molecules/Button/Button";
+import { Button, ConnectWalletButton } from "components/molecules/Button"
 
 const StyledTradeSidebar = styled.aside`
   display: grid;
@@ -32,10 +32,16 @@ export default function TradeSidebar(props) {
       {
         isMobile ? <></> : 
         <InfoWrapper>
-          <Text font="primarySmall" color="foregroundHighEmphasis">Have a question? Need live support?</Text>
-          <Button width="150px" startIcon={<DiscordIcon />} variant="outlined" scale="imd" mr="8px">
-            <Text font="primaryBoldDisplay" color="foregroundHighEmphasis" textAlign="center">JOIN DISCORD</Text>
-          </Button>
+          <Text font="primarySmall" color="foregroundHighEmphasis">
+            {props.user.id ? 'Have a question? Need live support?' : 'You have not connected your wallet.'}
+          </Text>
+          {props.user.id ? (
+            <Button width="150px" startIcon={<DiscordIcon />} variant="outlined" scale="imd" mr="8px">
+              <Text font="primaryBoldDisplay" color="foregroundHighEmphasis" textAlign="center">JOIN DISCORD</Text>
+            </Button>
+          ) : (
+            <ConnectWalletButton width="fit-content" />
+          )}
         </InfoWrapper>
       }
       <SpotBox
