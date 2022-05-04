@@ -68,7 +68,7 @@ const SpotBox = ({
   return (
     <Wrapper>
       <ToggleWrapper>
-        <StyledToggleButton width={isMobile ? 68 : 106} leftLabel="BUY" rightLabel="SELL" selectedLayer={selectedLayer} toggleClick={toggleClick} />
+        <StyledToggleButton width={isMobile ? 60 : 106} leftLabel="BUY" rightLabel="SELL" selectedLayer={selectedLayer} toggleClick={toggleClick} />
         <IconButton variant="secondary" startIcon={<CalculatorIcon />}></IconButton>
       </ToggleWrapper>
       <StyledTabMenu left activeIndex={index} onItemClick={handleTabClick}>
