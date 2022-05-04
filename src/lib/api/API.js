@@ -299,6 +299,7 @@ export default class API extends Emitter {
           }
 
           await this.refreshNetwork();
+          await this.sleep(1000);
           if (this.isZksyncChain()) {
             // const web3Provider = isMobile
             //   ? await this.web3Modal.connectTo("walletconnect")
