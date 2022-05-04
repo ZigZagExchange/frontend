@@ -275,7 +275,10 @@ export default class API extends Emitter {
                 return
         }
 
-        await window.ethereum.request({ method: 'eth_requestAccounts' });
+        await window.ethereum.request({
+           method: 'eth_requestAccounts',
+           params: [{eth_accounts: {}}]
+        });
 
         await window.ethereum.request({
             method: "wallet_switchEthereumChain",
@@ -343,13 +346,13 @@ export default class API extends Emitter {
   };
 
   signOut = async () => {
-    if (this._signInProgress) {
-      return;
-    } else if (!this.apiProvider) {
+    if (!this.apiProvider) {
       return;
     } else if (this.web3Modal) {
       await this.web3Modal.clearCachedProvider();
     }
+
+    window.localStorage.clear();
 
     this.web3 = null;
     this.web3Modal = null;
