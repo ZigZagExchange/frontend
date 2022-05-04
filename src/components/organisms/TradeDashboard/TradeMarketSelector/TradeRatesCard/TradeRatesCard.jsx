@@ -7,16 +7,26 @@ import Text from "components/atoms/Text/Text";
 // css
 import api from "lib/api";
 import "./TradeRatesCard.css";
+import SettingsModal from "./SettingsModal";
 import { Dropdown } from "components/molecules/Dropdown";
 import {
   addFavourite,
   removeFavourite,
   fetchFavourites,
 } from "../../../../../lib/helpers/storage/favourites";
+import useModal from "components/hooks/useModal";
 
 const TradeRatesCard = ({updateMarketChain, marketSummary, markets, currentMarket, marketInfo}) => {
   const [pairs, setPairs] = useState([])
   const [favourites, setFavourites] = useState(fetchFavourites())
+
+  const handleOnModalClose = () => {
+    onSettingsModalClose()
+  }
+
+  const [onSettingsModal, onSettingsModalClose] = useModal(
+    <SettingsModal onDismiss={() => handleOnModalClose()} />
+  )
 
   useEffect(() => {
     setPairs(markets.map((r) => { 
@@ -41,6 +51,11 @@ const TradeRatesCard = ({updateMarketChain, marketSummary, markets, currentMarke
     }
 
     setFavourites(favouritesArray)
+  }
+
+  const handleSettings = () => {
+    console.log("asdfsdfsdf")
+    onSettingsModal()
   }
 
   const isMobile = window.innerWidth < 800
@@ -97,7 +112,7 @@ const TradeRatesCard = ({updateMarketChain, marketSummary, markets, currentMarke
           }
         </RatesCardsWrapper>
       </LeftWrapper>
-      <Button endIcon={<SettingsIcon/>} variant="outlined" scale="imd" mr="20px">
+      <Button endIcon={<SettingsIcon/>} variant="outlined" scale="imd" mr="20px" onClick={handleSettings}>
           Settings
       </Button>
     </Wrapper>
