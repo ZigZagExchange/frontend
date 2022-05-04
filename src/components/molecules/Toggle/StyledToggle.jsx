@@ -38,11 +38,11 @@ export const ToggleWrapper = styled.div`
 `
 
 export const Handle = styled.div`
-  background: ${({ theme, notChecked }) => !notChecked ? theme.colors.foregroundHighEmphasis : theme.colors.primaryHighEmphasis};
+  background: ${({ theme, isChecked }) => !isChecked ? theme.colors.foregroundHighEmphasis : theme.colors.primaryHighEmphasis};
   border-radius: 50%;
   cursor: pointer;
   height: ${getScale('handleWidth')};
-  left: 0px;
+  left: ${({ isChecked }) => !isChecked ?  '0px' : getScale('checkedLeft')};
   top: ${getScale('handleTop')};
   position: absolute;
   transition: left 200ms ease-in;
@@ -58,14 +58,14 @@ export const Input = styled.input`
   width: 100%;
   z-index: 3;
 
-  &:checked + ${Handle} {
-    left: ${getScale('checkedLeft')};
-  }
+  // &:checked + ${Handle} {
+  //   left: ${getScale('checkedLeft')};
+  // }
 `
 
 const StyledToggle = styled.div`
   align-items: center;
-  background-color: ${({ theme, notChecked }) => !notChecked ? theme.colors.foreground500 : theme.colors.primaryLowEmphasis};
+  background-color: ${({ theme, isChecked }) => !isChecked ? theme.colors.foreground500 : theme.colors.primaryLowEmphasis};
   border-radius: 40px;
   cursor: pointer;
   height: ${getScale('toggleHeight')};
