@@ -1,36 +1,56 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { formatPrice } from "lib/utils";
-import { SettingsIcon } from "components/atoms/Svg";
+import { SettingsIcon, StarIcon, ActivatedStarIcon } from "components/atoms/Svg";
 import Button from "components/molecules/Button/Button";
 import Text from "components/atoms/Text/Text";
 // css
 import api from "lib/api";
 import "./TradeRatesCard.css";
 import { Dropdown } from "components/molecules/Dropdown";
-import { StarIcon } from "components/atoms/Svg";
+import {
+  addFavourite,
+  removeFavourite,
+  fetchFavourites,
+} from "../../../../../lib/helpers/storage/favourites";
 
 const TradeRatesCard = ({updateMarketChain, marketSummary, markets, currentMarket, marketInfo}) => {
   const [pairs, setPairs] = useState([])
+  const [favourites, setFavourites] = useState(fetchFavourites())
 
   useEffect(() => {
     setPairs(markets.map((r) => { 
-      return {text: r, url: '#', icon: <StarIcon />}
+      const isSelected = favourites.includes(r)
+      return {text: r, url: '#', icon: <StarIcon />, selectedIcon: <ActivatedStarIcon />, iconSelected: isSelected}
     }))
-  }, [markets])
+  }, [markets, favourites])
 
   const changeMarket = (pair) => {
     if (pair === currentMarket) return;
     updateMarketChain(pair);
   }
 
+  const favouritePair = () => {
+    const isFavourited = favourites.includes(currentMarket);
+
+    let favouritesArray = [];
+    if (!isFavourited) {
+      favouritesArray = addFavourite(currentMarket);
+    } else {
+      favouritesArray = removeFavourite(currentMarket);
+    }
+
+    setFavourites(favouritesArray)
+  }
+
   const isMobile = window.innerWidth < 800
+  const isFavourited = favourites.includes(currentMarket);
 
   return (
     <Wrapper>
       <LeftWrapper>
         <MarketSelector>
-          <StarIcon />
+          { isFavourited ? <ActivatedStarIcon style={{cursor: 'pointer'}} onClick={favouritePair} /> : <StarIcon style={{cursor: 'pointer'}} onClick={favouritePair} />}
           <Dropdown 
             width ={isMobile ? 83 : 223} 
             transparent 

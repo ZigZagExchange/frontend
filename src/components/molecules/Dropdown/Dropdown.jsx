@@ -72,12 +72,13 @@ const Dropdown = ({width, item, context, leftIcon, rightIcon, transparent, click
             { isOpened &&
                 <Wrapper width={width}>
                         {item.map((items) => {
-                            const {text, value, url, icon} = items
+                            const {text, value, url, icon, selectedIcon, iconSelected} = items
+                            const menuIcon = iconSelected ? selectedIcon : icon
                         return (
                         <DropdownListContainer key={items.text} leftIcon={leftIcon} onClick={()=> handleClick(url, text, value)}>
-                            {leftIcon && isValidElement(icon) && <IconButton variant="secondary" startIcon={cloneElement(icon)}></IconButton>}
+                            {leftIcon && isValidElement(menuIcon) && <IconButton variant="secondary" startIcon={cloneElement(menuIcon)}></IconButton>}
                             <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{text}</Text>
-			                {rightIcon && isValidElement(icon) && <IconButton variant="secondary" endIcon={cloneElement(icon)}></IconButton>}
+			                {rightIcon && isValidElement(menuIcon) && <IconButton variant="secondary" endIcon={cloneElement(menuIcon)}></IconButton>}
                         </DropdownListContainer>
                         )
                     })}     
