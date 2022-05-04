@@ -6,6 +6,7 @@ import store, { persistor } from "lib/store";
 // import ThemeProvider from 'lib/ThemeProvider';
 import { ThemeContextProvider } from "components/contexts/ThemeContext";
 import { GlobalStyle } from '../global_style';
+import ModalContext from 'components/contexts/ModalContext'
 
 import "react-toastify/dist/ReactToastify.css";
 
@@ -15,7 +16,9 @@ function Provider({ children }) {
         <GlobalStyle/>
         <PersistGate loading={null} persistor={persistor}>
           <ReduxProvider store={store}>
-            {children}
+            <ModalContext>
+              {children}
+            </ModalContext>
             <ToastContainer position="bottom-right" theme="colored" />
           </ReduxProvider>
         </PersistGate>
