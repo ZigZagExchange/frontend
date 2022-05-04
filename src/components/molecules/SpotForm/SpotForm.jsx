@@ -2,14 +2,14 @@ import React from "react";
 import styled from "styled-components"
 import { toast } from "react-toastify";
 import api from "lib/api";
-import { RangeSlider } from "components";
+import { RangeSlider, QuestionHelper } from "components";
 import { formatPrice } from "lib/utils";
 import "./SpotForm.css";
 import { Button, ConnectWalletButton } from "components/molecules/Button"
 import InputField from "components/atoms/InputField/InputField";
 import Text from "components/atoms/Text/Text";
 import { IconButton as BaseIcon } from "../IconButton";
-import { MinusIcon, PlusIcon } from "components/atoms/Svg";
+import { InfoIcon, MinusIcon, PlusIcon } from "components/atoms/Svg";
 
 const rx_live = /^\d*(?:[.,]\d*)?$/;
 export class SpotForm extends React.Component {
@@ -494,7 +494,10 @@ export class SpotForm extends React.Component {
       buttonText = buttonType + " " + (marketInfo && marketInfo.baseAsset?.symbol);
       feeAmount = (
         <FormHeader>
-          <Text font="primaryTiny" color="foregroundMediumEmphasis">Buy Fee:</Text>
+          <InfoWrapper>
+            <Text font="primaryTiny" color="foregroundMediumEmphasis">Buy Fee</Text>
+            <QuestionHelper text="zkSync's network swap fees are dynamic and sit around ~$0.50 covered by the market maker, but paid by the trader"/>
+          </InfoWrapper>
           <Text font="primaryExtraSmallSemiBold" color="foregroundMediumEmphasis">
             {marketInfo && marketInfo.quoteFee &&
               Number(marketInfo.quoteFee).toPrecision(4)}{" "}
@@ -507,7 +510,10 @@ export class SpotForm extends React.Component {
       buttonText = buttonType + " " + (marketInfo && marketInfo.quoteAsset?.symbol);
       feeAmount = (
         <FormHeader>
-          <Text font="primaryTiny" color="foregroundMediumEmphasis">Sell Fee:</Text>
+          <InfoWrapper>
+            <Text font="primaryTiny" color="foregroundMediumEmphasis">Sell Fee</Text>
+            <InfoIcon />
+          </InfoWrapper>
           <Text font="primaryExtraSmallSemiBold" color="foregroundMediumEmphasis">
             {marketInfo && marketInfo.baseFee &&
               Number(marketInfo.baseFee).toPrecision(4)}{" "}
@@ -612,9 +618,17 @@ const StyledForm = styled.form`
 
 const FormHeader = styled.div`
   width: 100%;
-  display: flex;
+  display: grid;
+  grid-auto-flow: column;
   align-items: center;
   justify-content: space-between;
+`
+
+const InfoWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 7px;
 `
 
 const InputBox = styled.div`
