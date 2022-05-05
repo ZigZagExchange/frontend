@@ -51,14 +51,25 @@ const BridgeInputBox = styled.div`
   }
 `;
 
-const BridgeSwapInput = ({ value = {}, onChange, balances = {}, gasFee, bridgeFee, feeCurrency }) => {
-  const setCurrency = useCallback(currency => onChange({ currency, amount: '' }), [onChange])
-  const setAmount = useCallback(e => onChange({ amount: e.target.value.replace(/[^0-9.]/g,'') }), [onChange])
+const BridgeSwapInput = ({ value = {}, onChange, balances = {}, gasFee, bridgeFee, feeCurrency, isOpenable }) => {
+  const setCurrency = useCallback(currency => {
+    onChange({ currency, amount: '' })
+  }, [onChange])
+  const setAmount = useCallback(e => {
+    if(e.target.value.length > 10) return;
+    onChange({ amount: e.target.value.replace(/[^0-9.]/g,'') })
+  }, [onChange])
 
   const setMax = () => {
     let max = 0;
     try {
-      const currencyInfo = api.getCurrencyInfo(value.currency);
+      let currencyInfo = {};
+      if(value.currency === 'WETH'){
+        currencyInfo = api.getCurrencyInfo('ETH');
+      }
+      else {
+        currencyInfo = api.getCurrencyInfo(value.currency);
+      }
       const roundedDecimalDigits = Math.min(currencyInfo.decimals, 8);
       let balance = balances[value.currency].value / (10 ** currencyInfo.decimals);
       if (balance !== 0) {
@@ -78,7 +89,7 @@ const BridgeSwapInput = ({ value = {}, onChange, balances = {}, gasFee, bridgeFe
   return (
     <BridgeInputBox>
       <div className="currencySelector">
-        <BridgeCurrencySelector balances={balances} onChange={setCurrency} value={value.currency} />
+        <BridgeCurrencySelector balances={balances} onChange={setCurrency} value={value.currency} isOpenable={isOpenable} />
       </div>
       <input onChange={setAmount} value={value.amount} placeholder="0.00" type="text" />
       <a className="maxLink" href="#max" onClick={setMax}>
