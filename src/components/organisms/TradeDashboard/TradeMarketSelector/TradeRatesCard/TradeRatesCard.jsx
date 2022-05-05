@@ -78,9 +78,13 @@ const TradeRatesCard = ({updateMarketChain, marketSummary, rowData, currentMarke
           }
         </RatesCardsWrapper>
       </LeftWrapper>
-      <Button endIcon={<SettingsIcon/>} variant="outlined" scale="imd" mr="20px" onClick={handleSettings}>
-          Settings
-      </Button>
+      {
+        isMobile ?
+        <SettingsIcon style={{marginRight: '20px'}} onClick={handleSettings}/> :
+        <Button endIcon={<SettingsIcon/>} variant="outlined" scale="imd" mr="20px" onClick={handleSettings}>
+            Settings
+        </Button>
+      }
     </Wrapper>
   )
 }
