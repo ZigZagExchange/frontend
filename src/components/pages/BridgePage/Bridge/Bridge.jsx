@@ -361,8 +361,18 @@ const Bridge = () => {
       const f = NETWORKS.find(i => i.from.key === toNetwork.key)
       setFromNetwork(f)
       setToNetwork(fromNetwork.from)
+      let currency;
+      switch (f.from.key) {
+        case "polygon":
+          currency = "WETH";
+          break;
+        default:
+          currency = swapDetails.currency;
+          break;
+      }
       setSwapDetails({
-        amount: ""
+        amount: "",
+        currency
       })
   };
 
@@ -451,8 +461,18 @@ const Bridge = () => {
     const f = NETWORKS.find((i) => i.from.key === key)
     setFromNetwork(f)
     setToNetwork(f.to[0])
+    let currency;
+    switch (key) {
+      case "polygon":
+        currency = "WETH";
+        break;
+      default:
+        currency = "ETH";
+        break;
+    }
     setSwapDetails({
-      amount: ""
+      amount: "",
+      currency
     })
 
   };
@@ -460,8 +480,18 @@ const Bridge = () => {
   const onSelectToNetwork = ({ key }) => {
     const t = fromNetwork.to.find((i) => i.key === key)
     setToNetwork(t)
+    let currency;
+    switch (key) {
+      case "polygon":
+        currency = "WETH";
+        break;
+      default:
+        currency = "ETH";
+        break;
+    }
     setSwapDetails({
-      amount: ""
+      amount: "",
+      currency
     })
   }
 
