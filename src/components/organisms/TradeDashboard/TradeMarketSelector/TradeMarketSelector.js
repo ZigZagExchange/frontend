@@ -14,7 +14,7 @@ export default function TradeMarketSelector(props) {
       <TradeHead
         updateMarketChain={props.updateMarketChain}
         marketSummary={props.marketSummary}
-        markets={props.markets}
+        rowData={props.lastPriceTableData}
         currentMarket={props.currentMarket}
         marketInfo={props.marketInfo}
       />

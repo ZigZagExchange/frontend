@@ -1,24 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import styled from "styled-components";
 import { formatPrice } from "lib/utils";
-import { SettingsIcon, StarIcon, ActivatedStarIcon } from "components/atoms/Svg";
+import { SettingsIcon } from "components/atoms/Svg";
 import Button from "components/molecules/Button/Button";
 import Text from "components/atoms/Text/Text";
 // css
 import api from "lib/api";
 import "./TradeRatesCard.css";
 import SettingsModal from "./SettingsModal";
-import { Dropdown } from "components/molecules/Dropdown";
-import {
-  addFavourite,
-  removeFavourite,
-  fetchFavourites,
-} from "../../../../../lib/helpers/storage/favourites";
+import { TokenPairDropdown } from "components/molecules/Dropdown";
 import useModal from "components/hooks/useModal";
 
-const TradeRatesCard = ({updateMarketChain, marketSummary, markets, currentMarket, marketInfo}) => {
-  const [pairs, setPairs] = useState([])
-  const [favourites, setFavourites] = useState(fetchFavourites())
+const TradeRatesCard = ({updateMarketChain, marketSummary, rowData, currentMarket, marketInfo}) => {
 
   const handleOnModalClose = () => {
     onSettingsModalClose()
@@ -28,50 +21,24 @@ const TradeRatesCard = ({updateMarketChain, marketSummary, markets, currentMarke
     <SettingsModal onDismiss={() => handleOnModalClose()} />
   )
 
-  useEffect(() => {
-    setPairs(markets.map((r) => { 
-      const isSelected = favourites.includes(r)
-      return {text: r, url: '#', icon: <StarIcon />, selectedIcon: <ActivatedStarIcon />, iconSelected: isSelected}
-    }))
-  }, [markets, favourites])
-
-  const changeMarket = (pair) => {
-    if (pair === currentMarket) return;
-    updateMarketChain(pair);
-  }
-
-  const favouritePair = () => {
-    const isFavourited = favourites.includes(currentMarket);
-
-    let favouritesArray = [];
-    if (!isFavourited) {
-      favouritesArray = addFavourite(currentMarket);
-    } else {
-      favouritesArray = removeFavourite(currentMarket);
-    }
-
-    setFavourites(favouritesArray)
-  }
-
   const handleSettings = () => {
     onSettingsModal()
   }
 
   const isMobile = window.innerWidth < 800
-  const isFavourited = favourites.includes(currentMarket);
 
   return (
     <Wrapper>
       <LeftWrapper>
         <MarketSelector>
-          { isFavourited ? <ActivatedStarIcon style={{cursor: 'pointer'}} onClick={favouritePair} /> : <StarIcon style={{cursor: 'pointer'}} onClick={favouritePair} />}
-          <Dropdown 
-            width ={isMobile ? 83 : 223} 
-            transparent 
-            item={pairs} 
-            leftIcon 
-            context={currentMarket} 
-            clickFunction={changeMarket}
+          <TokenPairDropdown 
+          width ={isMobile ? 83 : 223} 
+          transparent 
+          context={currentMarket}
+          rowData={rowData}
+          updateMarketChain={updateMarketChain}
+          currentMarket={currentMarket}
+          marketInfo={marketInfo}
           />
         </MarketSelector>
         <RatesCardsWrapper>
