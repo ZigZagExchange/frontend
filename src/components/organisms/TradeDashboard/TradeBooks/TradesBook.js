@@ -1,34 +1,26 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import styled from "@xstyled/styled-components";
-import TradePriceTable from "./TradePriceTable/TradePriceTable";
 import TradeRecentTable from "./TradeRecentTable/TradeRecentTable";
-import TradePriceHeadSecond from "./TradePriceHeadSecond/TradePriceHeadSecond";
 import { marketFillsSelector } from "lib/store/features/api/apiSlice";
 import Text from "components/atoms/Text/Text";
 
 const StyledTradeBooks = styled.section`
   display: flex;
+  grid-area: trades;
   flex-direction: row;
   justify-content: space-between;
-  padding: 21px 10px 12px 20px;
+  padding: 21px 20px 12px 10px;
 `;
-
-const BooksWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 225px;
-  gap: 8px;
-`
 
 const TradesWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  width: 225px;
+  width: 100%;
   gap: 8px;
 `
 
-export default function TradeBooks(props) {
+export default function TradesBook(props) {
   const marketFills = useSelector(marketFillsSelector);
 
   // Only display recent trades
@@ -51,26 +43,6 @@ export default function TradeBooks(props) {
   return (
     <>
       <StyledTradeBooks>
-          <BooksWrapper>
-            <Text font="primaryTitleDisplay" color="foregroundHighEmphasis">Order Book</Text>
-            <TradePriceTable
-              head
-              className="trade_table_asks"
-              useGradient="true"
-              priceTableData={props.priceTableData}
-              currentMarket={props.currentMarket}
-              scrollToBottom={true}
-            />
-            <TradePriceHeadSecond 
-              lastPrice={props.lastPrice}
-              marketInfo={props.marketInfo}
-           />
-            <TradePriceTable
-              useGradient="true"
-              currentMarket={props.currentMarket}
-              priceTableData={props.bidBins}
-            />
-          </BooksWrapper>
           <TradesWrapper>
             {/* TradePriceTable*/}
             <Text font="primaryTitleDisplay" color="foregroundHighEmphasis">Market Trades</Text>

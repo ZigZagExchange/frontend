@@ -14,6 +14,7 @@ const Text = styled.div`
   text-transform: ${({ font }) => typography[font]?.textTransform || 'inherit'};
   text-align: ${({ align }) => align || 'left'};
   word-break: ${({ breakWords }) => breakWords && 'break-word'};
+  white-space: pre-wrap;
   ${space}
   ${baseTypography}
   ${border}

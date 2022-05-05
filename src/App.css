@@ -85,6 +85,12 @@ html {
   font-style: normal;
 }
 @font-face {
+  font-family: 'WorkSans-Medium';
+  src: url('./assets/fonts/WorkSans-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+@font-face {
   font-family: 'WorkSans-SemiBold';
   src: url('./assets/fonts/WorkSans-SemiBold.ttf') format('truetype');
   font-weight: 600;

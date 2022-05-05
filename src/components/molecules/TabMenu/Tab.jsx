@@ -6,27 +6,23 @@ import Text from "../../atoms/Text/Text";
 const StyledText = styled(Text)`
   width: fit-content;
   padding-bottom: ${({ row }) => row ? '8px' : '16px'};
-  background:
-    linear-gradient(93.46deg, ${({ theme }) => theme.colors.primaryHighEmphasis} 16.94%, ${({ theme }) => theme.colors.secondaryHighEmphasis} 97.24%)
+  ${({ isActive, theme }) => isActive ? 
+  `background:
+    linear-gradient(93.46deg, ${theme.colors.primaryHighEmphasis} 16.94%, ${theme.colors.secondaryHighEmphasis} 97.24%)
     left 
     bottom
     transparent    
     no-repeat; 
-  background-size:100% 4px;
+  background-size:100% 4px;` : ''}
+  color: ${({left, isActive, theme}) => isActive && left ? `${theme.colors.foregroundHighEmphasis} !important` : !isActive && left ? `${theme.colors.foregroundMediumEmphasis} !important` : ''};
 `
 
-const Tab = ({ isActive = false, row = false, onClick, children }) => {
+const Tab = ({ isActive = false, row = false, left = false, onClick, children }) => {
   return (
     <StyledTab onClick={onClick}>
-      {
-        isActive ?
-        <StyledText isActive row={row} font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">
-          {children}
-        </StyledText> : 
-        <Text style={{paddingBottom: '16px'}} font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">
-          {children}
-        </Text>
-      }
+      <StyledText isActive={isActive} left={left} row={row} font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">
+        {children}
+      </StyledText>
     </StyledTab>
   );
 };

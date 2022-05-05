@@ -5,6 +5,7 @@ import { OrdersTable } from "./OrdersTable/OrdersTable";
 const StyledTradeTables = styled.section`
   display: flex;
   grid-area: tables;
+  background-color: ${({theme}) => theme.colors.backgroundMediumEmphasis};
 `;
 
 export default function TradeTables(props) {

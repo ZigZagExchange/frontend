@@ -3,8 +3,8 @@ import StyledToggle, { Input, Handle, ToggleWrapper } from "./StyledToggle";
 import { scales } from "./types";
 import Text from '../../atoms/Text/Text'
 
-const Toggle = ({ notChecked = true, scale = scales.MD, leftLabel, rightLabel, ...props }) => {
-  const [ checked, setChecked ] = useState(notChecked)
+const Toggle = ({ isChecked = false, scale = scales.MD, leftLabel, rightLabel, ...props }) => {
+  const [ checked, setChecked ] = useState(isChecked)
   const toggle = (e) => {
     props.onChange(e);
     setChecked(!checked)
@@ -12,9 +12,9 @@ const Toggle = ({ notChecked = true, scale = scales.MD, leftLabel, rightLabel, .
   return (
     <ToggleWrapper>
         {leftLabel && <Text font="primarySmall" color={leftLabel && rightLabel && !checked ? 'foregroundDisabled' : 'foregroundHighEmphasis'}>{leftLabel}</Text>}
-        <StyledToggle notChecked={!checked} scale={scale}>
+        <StyledToggle isChecked={checked} scale={scale}>
             <Input scale={scale} {...props} type="checkbox" onChange={toggle}/>
-            <Handle scale={scale} notChecked={!checked}/>
+            <Handle scale={scale} isChecked={checked}/>
         </StyledToggle>
         {rightLabel && <Text font="primarySmall" color={leftLabel && rightLabel && checked ? 'foregroundDisabled' : 'foregroundHighEmphasis'}>{rightLabel}</Text>}
     </ToggleWrapper>

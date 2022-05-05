@@ -1,11 +1,92 @@
 import React, { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
-// css
-import "./TradePriceTable.css";
+import styled from "styled-components";
+import useTheme from "components/hooks/useTheme";
 import { marketInfoSelector, currentMarketSelector } from "lib/store/features/api/apiSlice";
 import { numStringToSymbol } from "lib/utils";
+import Text from "components/atoms/Text/Text";
+
+const Table = styled.table`
+  display: flex;
+  flex: auto;
+  overflow: auto;
+  height: 194px;
+  padding: 0px;
+  flex-direction: column;
+  justify-content: space-between;
+
+  tbody {
+    width: 100%;
+    display: table;
+    background-position: top right;
+    background-size: 70% 100%;
+    background-repeat: no-repeat;
+    margin-top: 0;
+  }
+  
+  thead {
+    position: sticky;
+    top: 0;
+    display: table;
+    width: 100%;
+    background: ${(p) => p.theme.colors.backgroundHighEmphasis};
+  }
+  
+  th {
+    text-transform: uppercase;
+    padding: 6px 0px;
+  }
+
+  th:nth-child(1), td:nth-child(1) {
+    width: 25%;
+    text-align: start;
+    padding-left: 0px;
+  }
+
+  th:nth-child(2), td:nth-child(2) {
+    width: 40%;
+    text-align: center;
+  }
+
+  th:nth-child(3), td:nth-child(3) {
+    width: 35%;
+    text-align: right;
+    white-space: nowrap;
+    padding-right: 0px;
+  }
+  
+  @media screen and (min-width: 1800px) {
+    width: 100%;
+  }
+  
+  @media screen and (max-width: 991px) {
+    width: 100%;
+  }
+  
+  ::-webkit-scrollbar {
+    width: 5px;
+    position: relative;
+    z-index: 20;
+  }
+  
+  ::-webkit-scrollbar-track {
+    border-radius: 0px;
+    background: hsla(0, 0%, 100%, 0.15);
+    height: 23px;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    border-radius: 0px;
+    background: hsla(0, 0%, 100%, 0.4);
+  }
+  
+  ::-webkit-scrollbar-thumb:window-inactive {
+    background: #fff;
+  }
+`
 
 const TradePriceTable = (props) => {
+  const { theme } = useTheme()
   const marketInfo = useSelector(marketInfoSelector);
   const currentMarket = useSelector(currentMarketSelector)
   const ref = useRef(null)
@@ -31,20 +112,20 @@ const TradePriceTable = (props) => {
   else onClickRow = () => null;
 
   return (
-    <table className={`trade_price_table zig_scrollstyle ${props.className}`} ref={ref}>
+    <Table ref={ref}>
       {props.head && (
         <thead>
           <tr>
-            <th>Price</th>
-            <th>Amount</th>
-            <th>Total ({marketInfo && marketInfo.quoteAsset.symbol})</th>
+            <th><Text font="tableHeader" color="foregroundLowEmphasis">Price</Text></th>
+            <th><Text font="tableHeader" color="foregroundLowEmphasis" textAlign="right">Amount</Text></th>
+            <th><Text font="tableHeader" color="foregroundLowEmphasis" textAlign="right">Total ({marketInfo && marketInfo.quoteAsset.symbol})</Text></th>
           </tr>
         </thead>
       )}
       <tbody >
         {
           props.priceTableData.map((d, i) => {
-            const color = d.side === "b" ? "#27302F" : "#2C232D";
+            const color = d.side === "b" ? theme.colors.success400 : theme.colors.danger400;
             if (props.className !== "trade_table_asks") {
               total_step += d.td2;
             }
@@ -53,7 +134,7 @@ const TradePriceTable = (props) => {
             let rowStyle;
             if (props.useGradient) {
               rowStyle = {
-                backgroundImage: `linear-gradient(to left, ${color}, ${color} ${breakpoint}%, #171c28 0%)`,
+                background: `linear-gradient(to right, ${color}, ${color} ${breakpoint}%, ${theme.colors.backgroundHighEmphasis} 0%)`,
               };
             } else {
               rowStyle = {};
@@ -71,16 +152,20 @@ const TradePriceTable = (props) => {
             }
             return (
               <tr key={i} style={rowStyle} onClick={() => onClickRow(d)}>
-                <td className={d.side === "b" ? "up_value" : "down_value"}>
-                  {price}
+                <td>
+                  <Text font="tableContent" color={d.side === "b" ? "successHighEmphasis" : "dangerHighEmphasis"}>{price}</Text>
                 </td>
-                <td>{numStringToSymbol(amount, 2)}</td>
-                <td>{numStringToSymbol(total, 2)}</td>
+                <td>
+                  <Text font="tableContent" color="foregroundHighEmphasis" textAlign="right">{numStringToSymbol(amount, 2)}</Text>
+                </td>
+                <td>
+                  <Text font="tableContent" color="foregroundHighEmphasis" textAlign="right">{numStringToSymbol(total, 2)}</Text>
+                </td>
               </tr>
             );
           })}
       </tbody>
-    </table>
+    </Table>
   );
 };
 

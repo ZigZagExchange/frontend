@@ -1,63 +1,70 @@
 import React from "react";
-import { HiExternalLink } from "react-icons/hi";
 import styled from "@xstyled/styled-components";
+import { DiscordIcon, TelegramIcon, TwitterIcon } from "components/atoms/Svg";
+import Text from "components/atoms/Text/Text";
 
 const StyledTradeFooter = styled.footer`
-  display: flex;
+  display: ${({isMobile}) => isMobile ? 'grid' : 'flex'};
   align-items: center;
   padding: 0 20px;
-  justify-content: space-between;
+  justify-content: ${({isMobile}) => isMobile ? 'center' : 'space-between'};
   grid-area: footer;
-  background: #171c28;
+  background: ${({theme}) => theme.colors.backgroundDisabled};
+  border-top: 1px solid ${({theme}) => theme.colors.foreground400};
   font-size: 12px;
 `;
 
-const StyledStatus = styled.a`
-  font-size: 12px;
-  color: #94a2c9;
-  text-decoration: none;
-  display: flex;
+const SocialWrapper = styled.div`
+  display: grid;
+  grid-auto-flow: column;
   align-items: center;
-  &:hover {
-    color: white;
-    text-decoration: underline;
-  }
-`;
+  justify-items: center;
+  width: 120px;
+`
 
-const StyledTokenInfo = styled.a`
-  font-size: 12px;
-  color: #94a2c9;
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  margin-left: 1rem;
-  &:hover {
-    color: white;
-    text-decoration: underline;
+const SocialLink = styled.a`
+  svg path {
+    fill: ${({theme}) => theme.colors.foregroundLowEmphasis};
   }
-`;
+`
 
 const StyledLinkBox = styled.div`
   display: flex;
+  align-items: center;
+  gap: 10px;
 `;
 
 export default function TradeFooter() {
+  const isMobile = window.innerWidth < 430
   return (
-    <StyledTradeFooter>
+    <StyledTradeFooter isMobile={isMobile}>
+      <Text font="primaryMediumBody" color="foregroundLowEmphasis" textAlign={isMobile ? 'center' : 'left'}>ZigZag Exchange © 2022</Text>
       <StyledLinkBox>
-        <StyledStatus href="https://status.zigzag.exchange/" target="_blank">
-          Uptime Status
-          <HiExternalLink />
-        </StyledStatus>
-        <StyledTokenInfo
-          href="https://docs.zigzag.exchange/zksync/token-info"
-          target="_blank"
-        >
-          Token Info
-          <HiExternalLink />
-        </StyledTokenInfo>
+        <SocialWrapper>
+          <SocialLink
+            target="_blank"
+            rel="noreferrer"
+            href="https://discord.gg/zigzag"
+          >
+            <DiscordIcon />
+          </SocialLink>
+          <SocialLink
+            target="_blank"
+            rel="noreferrer"
+            href="https://twitter.com/ZigZagExchange"
+          >
+            <TwitterIcon />
+          </SocialLink>
+          <SocialLink
+            target="_blank"
+            rel="noreferrer"
+            href="https://t.me/zigzagexchange"
+          >
+            <TelegramIcon />
+          </SocialLink>
+        </SocialWrapper>
+        <Text font="primaryMediumBody" color="foregroundLowEmphasis">Powered By zkSync</Text>
       </StyledLinkBox>
-      <div>Powered By zkSync</div>
     </StyledTradeFooter>
   );
 }

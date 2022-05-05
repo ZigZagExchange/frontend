@@ -4,6 +4,12 @@ const primaryBoldDisplay = {
   lineHeight: '14px',
 }
 
+const primaryTitleDisplay = {
+  fontFamily: 'WorkSans-Bold',
+  fontSize: '16px',
+  lineHeight: '19px',
+}
+
 const primaryDisplay = {
   fontFamily: 'WorkSans-SemiBold',
   fontSize: '104px',
@@ -46,6 +52,36 @@ const primaryHeading6 = {
   lineHeight: '21px',
 }
 
+const primarySmallSemiBold = {
+  fontFamily: 'WorkSans-SemiBold',
+  fontSize: '16px',
+  lineHeight: '19px',
+}
+
+const primaryMediumSmallSemiBold = {
+  fontFamily: 'WorkSans-SemiBold',
+  fontSize: '14px',
+  lineHeight: '16px',
+}
+
+const primaryExtraSmallSemiBold = {
+  fontFamily: 'WorkSans-SemiBold',
+  fontSize: '12px',
+  lineHeight: '14px',
+}
+
+const tableHeader = {
+  fontFamily: 'WorkSans-SemiBold',
+  fontSize: '10px',
+  lineHeight: '12px',
+}
+
+const primaryMediumBody = {
+  fontFamily: 'WorkSans-Medium',
+  fontSize: '12px',
+  lineHeight: '14px',
+}
+
 const primarySubtitle = {
   fontFamily: 'WorkSans-Regular',
   fontSize: '24px',
@@ -74,18 +110,6 @@ const primaryExtraSmall = {
   fontFamily: 'WorkSans-Regular',
   fontSize: '12px',
   lineHeight: '13px',
-}
-
-const primaryExtraSmallSemiBold = {
-  fontFamily: 'WorkSans-SemiBold',
-  fontSize: '12px',
-  lineHeight: '14px',
-}
-
-const primarySmallSemiBold = {
-  fontFamily: 'WorkSans-SemiBold',
-  fontSize: '16px',
-  lineHeight: '19px',
 }
 
 const primaryTiny = {
@@ -131,8 +155,15 @@ const monospaceTiny = {
   letterSpacing: '0.20000000298023224px',
 }
 
+const tableContent = {
+  fontFamily: 'IBMPlexMono-Medium',
+  fontSize: '10px',
+  lineHeight: '13px',
+}
+
 const typography = {
   primaryBoldDisplay,
+  primaryTitleDisplay,
   primaryDisplay,
   primaryHeading1,
   primaryHeading2,
@@ -141,19 +172,23 @@ const typography = {
   primaryHeading5,
   primaryHeading6,
   primarySubtitle,
+  primaryMediumBody,
   primaryBody1,
   primaryBody2,
   primarySmall,
   primarySmallSemiBold,
   primaryExtraSmall,
   primaryExtraSmallSemiBold,
+  primaryMediumSmallSemiBold,
   primaryTiny,
   monospace2XL,
   monospaceXL,
   monospaceLarge,
   monospaceRegular,
   monospaceSmall,
-  monospaceTiny
+  monospaceTiny,
+  tableHeader,
+  tableContent,
 }
 
 export default typography

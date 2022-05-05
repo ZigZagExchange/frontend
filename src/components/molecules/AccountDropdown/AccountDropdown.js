@@ -162,7 +162,6 @@ const CurrencyListItem = styled.li`
 
 const DropdownContent = styled.div`
   flex: 1 1 auto;
-  overflow-y: auto;
 `;
 
 const DropdownFooter = styled.div`

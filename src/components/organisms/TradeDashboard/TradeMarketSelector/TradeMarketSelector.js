@@ -5,7 +5,7 @@ import styled from "@xstyled/styled-components";
 const StyledTradeMarketSelector = styled.header`
   display: flex;
   grid-area: marketSelector;
-  padding: 0 20px;
+  border-bottom: 1px solid ${({theme}) => theme.colors.foreground400};
 `;
 
 export default function TradeMarketSelector(props) {

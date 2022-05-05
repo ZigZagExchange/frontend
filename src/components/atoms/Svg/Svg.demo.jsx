@@ -15,6 +15,8 @@ import {
   ArrowRightIcon,
   ArrowLeftIcon,
   ArrowUpIcon,
+  SortUpIcon,
+  SortDownIcon,
   DiscordIcon,
   TelegramIcon,
   GithubIcon,
@@ -72,6 +74,8 @@ const IconDemo = () => {
         <ArrowRightIcon />
         <ArrowLeftIcon />
         <ArrowUpIcon />
+        <SortUpIcon />
+        <SortDownIcon />
         <DiscordIcon />
         <TelegramIcon />
         <GithubIcon />

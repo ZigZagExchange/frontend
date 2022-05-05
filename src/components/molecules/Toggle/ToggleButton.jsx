@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import styled, { css } from "@xstyled/styled-components";
+import React from "react";
+import styled from "@xstyled/styled-components";
 import Text from "components/atoms/Text/Text";
 
 const ToggleButtonWrapper = styled.ul`
@@ -15,12 +15,12 @@ const ToggleButtonWrapper = styled.ul`
 
 const ToggleItem = styled.li`
     display: block;
-    width: fit-content;
+    width: ${({ width }) => width}px;
     border-radius: 8px;
     padding-top: ${({ size }) => size === 'sm' ? '4px' : '8px'};
     padding-bottom: ${({ size }) => size === 'sm' ? '4px' : '8px'};
-    padding-left: ${({ type }) => type === 'option' ? '16px' : '51px'};
-    padding-right: ${({ type }) => type === 'option' ? '16px' : '51px'};
+    // padding-left: ${({ type }) => type === 'option' ? '16px' : '40.5px'};
+    // padding-right: ${({ type }) => type === 'option' ? '16px' : '40.5px'};
     box-shadow: ${({ theme, show }) =>  show ? theme.colors.gradientBtnBoxShadow : 'unset'};
     text-align: center;
     text-transform: uppercase;
@@ -34,18 +34,19 @@ const ToggleItem = styled.li`
 `;
 
 const ToggleButton = ({...props}) => {
-  const {type, leftLabel, size, rightLabel, selectedLayer=1, toggleClick = () => {}} = props
+  const {type, leftLabel, size, width, rightLabel, selectedLayer=1, toggleClick = () => {}} = props
 
   return (
-    <ToggleButtonWrapper>
+    <ToggleButtonWrapper {...props}>
         <ToggleItem
             onClick={() => toggleClick(1)}
             show={selectedLayer === 1}
             type={type}
             size={size}
+            width={width}
             leftLabel={leftLabel}
         >
-            <Text font="primaryBoldDisplay" color="foregroundHighEmphasis" textAlign="center">
+            <Text font="primaryBoldDisplay" color={selectedLayer === 1 && leftLabel === 'BUY' ? 'backgroundMediumEmphasis' : 'foregroundHighEmphasis'} textAlign="center">
             {leftLabel}
             </Text>
         </ToggleItem>
@@ -54,6 +55,7 @@ const ToggleButton = ({...props}) => {
             show={selectedLayer === 2}
             type={type}
             size={size}
+            width={width}
             rightLabel={rightLabel}
         >
             <Text font="primaryBoldDisplay" color="foregroundHighEmphasis" textAlign="center">

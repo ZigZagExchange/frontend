@@ -1,7 +1,7 @@
 .custom_range {
   top: 50%;
-  width: 12px !important;
-  height: 12px !important;
+  width: 5px !important;
+  height: 5px !important;
   opacity: 1 !important;
   position: absolute !important;
   transform: translate(-50%, -50%) !important;
@@ -15,8 +15,8 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 6px !important;
-  height: 6px !important;
+  width: 3px !important;
+  height: 3px !important;
   transform: translate(-50%, -50%) !important;
   border-radius: 50% !important;
   background-color: #212f44 !important;

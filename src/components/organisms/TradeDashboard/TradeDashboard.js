@@ -7,6 +7,8 @@ import TradeTables from "./TradeTables/TradeTables";
 import TradeFooter from "./TradeFooter/TradeFooter";
 import TradeChartArea from "./TradeChartArea/TradeChartArea";
 import TradeBooks from "./TradeBooks/TradeBooks";
+import OrdersBook from "./TradeBooks/OrdersBook";
+import TradesBook from "./TradeBooks/TradesBook";
 import "react-toastify/dist/ReactToastify.css";
 import {
   networkSelector,
@@ -33,32 +35,32 @@ import {
 
 const TradeContainer = styled.div`
   color: #aeaebf;
-  height: calc(100vh - 48px);
-  background: ${(p) => p.theme.colors.zzLightBorder};
+  height: calc(100vh - 56px);
+  background: ${(p) => p.theme.colors.backgroundHighEmphasis};
 `;
 
 const TradeGrid = styled.article`
   display: grid;
-  grid-template-rows: 50px 4fr 3fr 50px;
-  grid-template-columns: 325px 300px 1fr;
+  grid-template-rows: 75px 498px 212px 57px;
+  grid-template-columns: 300px 253.5px 253.5px 1fr;
   grid-template-areas:
-    "marketSelector marketSelector marketSelector"
-    "sidebar books chart"
-    "sidebar books tables"
-    "sidebar footer footer";
-  min-height: calc(100vh - 48px);
+    "marketSelector marketSelector marketSelector marketSelector"
+    "sidebar orders trades chart"
+    "sidebar tables tables tables"
+    "sidebar footer footer footer";
+  min-height: calc(100vh - 56px);
   gap: 1px;
 
   @media screen and (max-width: 991px) {
-    grid-template-rows: 50px 300px auto 2fr 2fr 50px;
-    grid-template-columns: 100%;
+    grid-template-rows: 74px 410px 427px 508px 362px 111px;
+    grid-template-columns: 1fr 1fr;
     grid-template-areas:
-      "marketSelector"
-      "chart"
-      "sidebar"
-      "books"
-      "tables"
-      "footer";
+      "marketSelector marketSelector"
+      "chart chart"
+      "sidebar orders"
+      "trades trades"
+      "tables tables"
+      "footer footer";
   }
 
   > div,
@@ -307,12 +309,15 @@ export function TradeDashboard() {
           marketSummary={marketSummary}
         />
         {/* TradePriceTable, TradePriceHeadSecond */}
-        <TradeBooks
+        <OrdersBook
           currentMarket={currentMarket}
           priceTableData={askBins}
           lastPrice={marketSummary.price}
           marketInfo={marketInfo}
           bidBins={bidBins}
+        />
+        <TradesBook
+          currentMarket={currentMarket}
         />
         {/* TradeChartArea */}
         <TradeChartArea marketInfo={marketInfo} />

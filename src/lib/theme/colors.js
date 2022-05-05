@@ -53,7 +53,7 @@ export const baseColors = {
 
 export const lightColors = {
   ...baseColors,
-  backgroundHighEmphasis: '#FFFFFF',
+  backgroundHighEmphasis: '#ddf1f7',
   backgroundMediumEmphasis: '#FFFFFFB8',
   backgroundLowEmphasis: '#FFFFFF7A',
   backgroundDisabled: '#FFFFFF52',
