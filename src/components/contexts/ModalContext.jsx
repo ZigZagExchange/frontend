@@ -10,7 +10,6 @@ const ModalContext = ({ children }) => {
   const [modalNode, setModalNode] = useState(null)
 
   const openHandler = (node) => {
-      console.log(node)
     setModalNode(node)
     setIsOpen(true)
   }

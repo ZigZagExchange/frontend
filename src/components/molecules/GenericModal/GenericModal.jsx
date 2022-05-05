@@ -49,7 +49,6 @@ const GenericModal = ({
     children,
     ...props
 }) => {
-    console.log(isOpened)
     return isOpened ? (
         <>
                 <ModalOverlay>

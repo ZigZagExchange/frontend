@@ -54,7 +54,6 @@ const TradeRatesCard = ({updateMarketChain, marketSummary, markets, currentMarke
   }
 
   const handleSettings = () => {
-    console.log("asdfsdfsdf")
     onSettingsModal()
   }
 
