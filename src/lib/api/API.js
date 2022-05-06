@@ -551,7 +551,7 @@ export default class API extends Emitter {
   getBalanceOfCurrency = async (currency) => {
     const currencyInfo = this.getCurrencyInfo(currency);
     let result = { balance: 0, allowance: ethersConstants.Zero };
-    if (!this.ethersProvider || !currencyInfo) return result;
+    if (!this.ethersProvider) return result;
 
     try {
       const netContract = this.getNetworkContract();
@@ -560,6 +560,8 @@ export default class API extends Emitter {
         result.balance = await this.web3.eth.getBalance(account);
         return result;
       }
+
+      if (!currencyInfo) return result;
       const contract = new this.web3.eth.Contract(
         erc20ContractABI,
         currencyInfo.address
@@ -590,12 +592,16 @@ export default class API extends Emitter {
       };
       if (currencyInfo) {
         balances[ticker].valueReadable = formatAmount(balance, currencyInfo);
+      } else if (ticker === "ETH") {
+        balances[ticker].valueReadable = formatAmount(balance, { decimals: 18 });
       }
 
       this.emit("balanceUpdate", "wallet", { ...balances });
     };
 
     const tickers = this.getCurrencies();
+    // allways fetch ETH for Etherum wallet
+    if(!tickers.includes("ETH")) { tickers.push("ETH"); }
 
     await Promise.all(tickers.map((ticker) => getBalance(ticker)));
 
