@@ -48,7 +48,7 @@ const TradeGrid = styled.article`
     "sidebar tables tables tables"
     "sidebar footer footer footer";
   min-height: calc(100vh - 56px);
-  gap: 1px;
+  gap: 0px;
 
   @media screen and (max-width: 991px) {
     grid-template-rows: 74px 410px 427px 508px 362px 111px;

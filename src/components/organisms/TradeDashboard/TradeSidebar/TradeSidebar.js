@@ -26,7 +26,7 @@ const InfoWrapper = styled.div`
 `
 
 export default function TradeSidebar(props) {
-  const isMobile = window.innerWidth < 800
+  const isMobile = window.innerWidth < 992
   const joinDiscord = () => {
     window.open('https://discord.gg/zigzag', '_blank')
   }
