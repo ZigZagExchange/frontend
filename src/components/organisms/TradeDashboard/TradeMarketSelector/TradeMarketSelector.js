@@ -5,7 +5,6 @@ import styled from "@xstyled/styled-components";
 const StyledTradeMarketSelector = styled.header`
   display: flex;
   grid-area: marketSelector;
-  border-bottom: 1px solid ${({theme}) => theme.colors.foreground400};
 `;
 
 export default function TradeMarketSelector(props) {
@@ -14,7 +13,7 @@ export default function TradeMarketSelector(props) {
       <TradeHead
         updateMarketChain={props.updateMarketChain}
         marketSummary={props.marketSummary}
-        markets={props.markets}
+        rowData={props.lastPriceTableData}
         currentMarket={props.currentMarket}
         marketInfo={props.marketInfo}
       />

@@ -10,6 +10,7 @@ const StyledTradeBooks = styled.section`
   flex-direction: row;
   justify-content: space-between;
   padding: 21px 10px 12px 20px;
+  border-top: 1px solid ${({theme}) => theme.colors.foreground400};
 `;
 
 const BooksWrapper = styled.div`

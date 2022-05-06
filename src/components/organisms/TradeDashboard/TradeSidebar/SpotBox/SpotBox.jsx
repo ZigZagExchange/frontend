@@ -63,12 +63,12 @@ const SpotBox = ({
       ? BuyForm
       : SellForm
   }
-  const isMobile = window.innerWidth < 800
+  const isMobile = window.innerWidth < 992
     
   return (
-    <Wrapper>
+    <Wrapper isMobile={isMobile}>
       <ToggleWrapper>
-        <StyledToggleButton width={isMobile ? 60 : 106} leftLabel="BUY" rightLabel="SELL" selectedLayer={selectedLayer} toggleClick={toggleClick} />
+        <StyledToggleButton width={window.innerWidth < 600 ? 60 : 106} leftLabel="BUY" rightLabel="SELL" selectedLayer={selectedLayer} toggleClick={toggleClick} />
         <IconButton variant="secondary" startIcon={<CalculatorIcon />}></IconButton>
       </ToggleWrapper>
       <StyledTabMenu left activeIndex={index} onItemClick={handleTabClick}>
@@ -88,6 +88,7 @@ const Wrapper = styled.div`
   display: grid;
   grid-auto-flow: row;
   background-color: ${({ theme }) => theme.colors.backgroundMediumEmphasis};
+  height: ${({ isMobile }) => isMobile ? '427px' : '398px'};
 `
 
 const ToggleWrapper = styled.div`

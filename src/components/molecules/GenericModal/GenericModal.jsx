@@ -18,7 +18,7 @@ const Modal = styled.div`
   max-width: ${({ width }) => `${width}px`};
   width: 100%;
   height: ${({ height }) => `${height}px`};
-  background: ${({ theme }) => theme.colors.backgroundLowEmphasis};
+  background: ${({ theme }) => theme.colors.backgroundHighEmphasis};
   border: 1px solid ${({ theme }) => theme.colors.foreground400};
   box-shadow: 0px 8px 16px 0px #0101011A;
   padding: 20px;
@@ -49,7 +49,6 @@ const GenericModal = ({
     children,
     ...props
 }) => {
-    console.log(isOpened)
     return isOpened ? (
         <>
                 <ModalOverlay>

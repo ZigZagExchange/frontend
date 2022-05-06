@@ -11,6 +11,7 @@ const StyledTradeBooks = styled.section`
   flex-direction: row;
   justify-content: space-between;
   padding: 21px 20px 12px 10px;
+  border-top: 1px solid ${({theme}) => theme.colors.foreground400};
 `;
 
 const TradesWrapper = styled.div`

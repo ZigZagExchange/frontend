@@ -6,7 +6,6 @@ import TradeMarketSelector from "./TradeMarketSelector/TradeMarketSelector";
 import TradeTables from "./TradeTables/TradeTables";
 import TradeFooter from "./TradeFooter/TradeFooter";
 import TradeChartArea from "./TradeChartArea/TradeChartArea";
-import TradeBooks from "./TradeBooks/TradeBooks";
 import OrdersBook from "./TradeBooks/OrdersBook";
 import TradesBook from "./TradeBooks/TradesBook";
 import "react-toastify/dist/ReactToastify.css";
@@ -49,7 +48,7 @@ const TradeGrid = styled.article`
     "sidebar tables tables tables"
     "sidebar footer footer footer";
   min-height: calc(100vh - 56px);
-  gap: 1px;
+  gap: 0px;
 
   @media screen and (max-width: 991px) {
     grid-template-rows: 74px 410px 427px 508px 362px 111px;
@@ -157,7 +156,7 @@ export function TradeDashboard() {
       quoteCurrencyPrice = lastPrices[quoteCurrencyUSDC].price;
     }
     let usdVolume = 0;
-    usdVolume = lastPrices[market].quoteVolume * quoteCurrencyPrice;
+    usdVolume = parseFloat(lastPrices[market].quoteVolume) * quoteCurrencyPrice;
     lastPriceTableData.push({
       td1: market,
       td2: price,
@@ -291,9 +290,9 @@ export function TradeDashboard() {
         <TradeMarketSelector
           updateMarketChain={updateMarketChain}
           marketSummary={marketSummary}
-          markets={markets}
           currentMarket={currentMarket}
           marketInfo={marketInfo}
+          lastPriceTableData={lastPriceTableData}
         />
         {/* TradePriceBtcTable, Spotbox */}
         <TradeSidebar
