@@ -596,6 +596,8 @@ export default class API extends Emitter {
     };
 
     const tickers = this.getCurrencies();
+    // allways fetch ETH for Etherum wallet
+    if(!tickers.includes("ETH")) { tickers.push("ETH"); }
 
     await Promise.all(tickers.map((ticker) => getBalance(ticker)));
 
