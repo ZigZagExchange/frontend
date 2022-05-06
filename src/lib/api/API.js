@@ -585,9 +585,6 @@ export default class API extends Emitter {
     const getBalance = async (ticker) => {
       const currencyInfo = this.getCurrencyInfo(ticker);
       const { balance, allowance } = await this.getBalanceOfCurrency(ticker);
-      console.log(ticker)
-      console.log(balance)
-      console.log(allowance)
       balances[ticker] = {
         value: balance,
         allowance,
@@ -604,9 +601,7 @@ export default class API extends Emitter {
 
     const tickers = this.getCurrencies();
     // allways fetch ETH for Etherum wallet
-    console.log(tickers)
     if(!tickers.includes("ETH")) { tickers.push("ETH"); }
-    console.log(tickers)
 
     await Promise.all(tickers.map((ticker) => getBalance(ticker)));
 
