@@ -595,6 +595,8 @@ export default class API extends Emitter {
       };
       if (currencyInfo) {
         balances[ticker].valueReadable = formatAmount(balance, currencyInfo);
+      } else if (ticker === "ETH") {
+        balances[ticker].valueReadable = formatAmount(balance, { decimals: 18 });
       }
 
       this.emit("balanceUpdate", "wallet", { ...balances });
