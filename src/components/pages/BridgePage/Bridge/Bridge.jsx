@@ -708,7 +708,8 @@ const Bridge = () => {
             {!user.address && <ConnectWalletButton />}
             {user.address && (
               <>
-                {balances[swapDetails.currency] && !hasAllowance && !hasError &&(
+                {balances[swapDetails.currency] && !hasAllowance && !hasError 
+                && fromNetwork.from.key !== "polygon" &&(
                   <Button
                     loading={isApproving}
                     className={cx("bg_btn", {
