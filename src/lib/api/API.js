@@ -552,6 +552,9 @@ export default class API extends Emitter {
       await contract.methods
         .approve(netContract, MAX_ALLOWANCE)
         .send({ from: account });
+
+      // update allowances after successfull approve
+      this.getWalletBalances();
     }
   };
 
