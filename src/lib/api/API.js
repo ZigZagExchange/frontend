@@ -391,7 +391,8 @@ export default class API extends Emitter {
   }
 
   getPolygonWethBalance = async () => {
-    const [account] = await this.web3.eth.getAccounts();    
+    const [account] = await this.web3.eth.getAccounts();
+    if (!account) return;
     console.log(`fetch polygon balance of account: ${account}`)
     const polygonEthAddress = this.getPolygonWethContract(
       this.apiProvider.network
