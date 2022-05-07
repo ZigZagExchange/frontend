@@ -199,8 +199,9 @@ const Bridge = () => {
       !user.id &&
       api.apiProvider?.zksyncCompatible
     ) {
-      setUsdFee(await api.apiProvider.changePubKeyFee());
-      setActivationFee((this.usdFee / currencyValue).toFixed(5));
+      const usdFee = await api.apiProvider.changePubKeyFee();
+      setUsdFee(usdFee);
+      setActivationFee((usdFee / currencyValue).toFixed(5));
     }
   }, [swapDetails.currency]);
 
