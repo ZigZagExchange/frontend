@@ -181,6 +181,7 @@ export default class API extends Emitter {
   };
 
   _socketClose = () => {
+    console.warn("Websocket dropped. Restarting");
     this.ws = null;
     setTimeout(() => {
       this.start();
