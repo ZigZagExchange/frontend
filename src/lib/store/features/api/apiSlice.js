@@ -27,6 +27,12 @@ export const apiSlice = createSlice({
     _error(state, { payload }) {
       const op = payload[0];
       const errorMessage = payload[1];
+      // we dont want to show some errors
+      if (errorMessage.includes('Order is no longer open')) {
+        console.error(`Error at ${op}: ${errorMessage}`);
+        return;
+      };
+
       const renderToastContent = () => {
         return (
           <>
@@ -153,7 +159,9 @@ export const apiSlice = createSlice({
         state.lastPrices[market] = {
           price: update[1],
           change: update[2],
-          quoteVolume: state.lastPrices[market] ? state.lastPrices[market].quoteVolume : 0
+          quoteVolume: state.lastPrices[market]
+            ? state.lastPrices[market].quoteVolume
+            : 0,
         };
         // Sometimes lastprice doesn't have volume data
         // Keep the old data if it doesn't
@@ -314,7 +322,7 @@ export const apiSlice = createSlice({
     },
     addBridgeReceipt(state, { payload }) {
       if (!payload || !payload.txId) return;
-      const { amount, token, txUrl, type, isFastWithdraw } = payload;
+      const { amount, token, txUrl, type, walletAddress } = payload;
 
       const renderBridgeLink = (text, link) => {
         return (
@@ -333,20 +341,54 @@ export const apiSlice = createSlice({
         );
       };
 
+      let successMsg, targetMsg, extraInfoLink, ethWallet;
+      switch (type) {
+        case "deposit":
+          successMsg = "deposited";
+          targetMsg = "in your zkSync wallet";
+          extraInfoLink = null;
+          break;
+        case "withdraw":
+          successMsg = "withdrew";
+          targetMsg = "into your Ethereum wallet. Withdraws can take up to 7 hours to complete";
+          extraInfoLink = { text: "Bridge FAQ", link: "https://docs.zigzag.exchange/zksync/bridge-guide" };
+          break;
+        case "withdraw_fast":
+          successMsg = "withdrew";
+          targetMsg = "into your Ethereum wallet. Fast withdrawals should be confirmed within a few minutes";
+          extraInfoLink = { text: "Fast Bridge FAQ", link: "https://docs.zigzag.exchange/zksync/fast-withdraw-bridge" };
+          ethWallet = {text: "Ethereum wallet", link: state.network === 1?`https://etherscan.io/address/${walletAddress}`:`https://rinkeby.etherscan.io/address/${walletAddress}`}
+          break;
+        case "zkSync_to_polygon":
+          successMsg = "transferred";
+          targetMsg = "to Polygon:";
+          extraInfoLink = null;
+          break;
+        case "polygon_to_zkSync":
+        case "eth_to_zksync":
+          successMsg = "transferred";
+          targetMsg = "to zkSync:";
+          extraInfoLink = null;
+          break;
+        default:
+          successMsg = "transferred";
+          targetMsg = "to your wallet";
+          extraInfoLink = null;
+          break;
+      }
+
       const renderToastContent = () => {
         return (
           <>
-            Successfully {type === "deposit" ? "deposited" : "withdrew"}{" "}
+            Successfully {successMsg}{" "}
             {amount} {token}{" "}
-            {type === "deposit"
-              ? "in your zkSync wallet"
-              : `into your Ethereum wallet. ${isFastWithdraw
-                ? "Fast withdrawals should be confirmed within a few minutes"
-                : "Withdraws can take up to 7 hours to complete"
-              }`}
-            .
-            <br />
-            <br />
+            {targetMsg}
+            {type !== "zkSync_to_polygon" && type !== "eth_to_zksync" && type !== "polygon_to_zkSync" &&
+              <>
+              <br />
+              <br />
+              </>
+            }
             <a
               href={txUrl}
               style={{
@@ -359,17 +401,38 @@ export const apiSlice = createSlice({
             >
               View transaction
             </a>
-            {" • "}
-            {!isFastWithdraw &&
+            {type === "withdraw_fast" ? <br /> : " • "}
+            {(type === "eth_to_zksync" || type === "zkSync_to_polygon" || type === "polygon_to_zkSync")&& 
+              <>
+                <br />
+                Confirm that your funds have arrived {targetMsg}
+                <a 
+                  href={walletAddress} 
+                  rel="noreferrer" 
+                  target="_blank"
+                  style={{
+                    color: "white",
+                    textDecoration: "underline",
+                    fontWeight: "bold",
+                  }}
+                > {type === "zkSync_to_polygon" ? 'Polygon wallet':' zkSync wallet'} </a>
+                {" • "}
+              </>
+            }
+            { 
+              extraInfoLink &&
               renderBridgeLink(
-                "Bridge FAQ",
-                "https://docs.zigzag.exchange/zksync/bridge-guide"
-              )}
-            {isFastWithdraw &&
+                extraInfoLink.text,
+                extraInfoLink.link
+              )
+            }
+            <br />
+            { ethWallet && 
               renderBridgeLink(
-                "Fast Bridge FAQ",
-                "https://docs.zigzag.exchange/zksync/fast-withdraw-bridge"
-              )}
+                ethWallet.text,
+                ethWallet.link
+              )
+            }
           </>
         );
       };

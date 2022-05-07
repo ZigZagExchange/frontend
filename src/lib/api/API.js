@@ -9,7 +9,16 @@ import { formatAmount } from "lib/utils";
 import get from "lodash/get";
 import axios from "axios";
 import erc20ContractABI from "lib/contracts/Ethereum_ERC20.json";
+import erc20ContractABI from "lib/contracts/ERC20.json";
+import wethContractABI from "lib/contracts/WETH.json";
 import { MAX_ALLOWANCE } from "./constants";
+import { 
+  ZKSYNC_POLYGON_BRIDGE,
+  POLYGON_MUMBAI_WETH_ADDRESS,
+  POLYGON_MAINNET_WETH_ADDRESS,
+} from "components/pages/BridgePage/Bridge/constants";
+
+import axios from "axios";
 // import { isMobile } from "react-device-detect";
 
 const chainMap = {
@@ -252,6 +261,15 @@ export default class API extends Emitter {
     this.ws.addEventListener('message', this._socketMsg)
     this.ws.addEventListener('error', this._socketError)
     this.emit('start')
+    
+    // login after reconnect
+    const accountState = this.getAccountState();
+    if (accountState && accountState.id) {
+      this.send("login", [
+        this.apiProvider.network,
+        accountState.id && accountState.id.toString(),
+      ]);
+    }
   }
 
   stop = () => {
@@ -292,7 +310,10 @@ export default class API extends Emitter {
         return;
     }
 
-    await window.ethereum.request({ method: 'eth_requestAccounts' });
+    await window.ethereum.request({
+       method: 'eth_requestAccounts',
+       params: [{eth_accounts: {}}]
+    });
 
     await window.ethereum.request({
       method: "wallet_switchEthereumChain",
@@ -300,6 +321,10 @@ export default class API extends Emitter {
     });
   };
 
+
+  sleep=(ms)=>{
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
 
   signIn = async (network, ...args) => {
     if (!this._signInProgress) {
@@ -312,6 +337,7 @@ export default class API extends Emitter {
           }
 
           await this.refreshNetwork();
+          await this.sleep(1000);
           if (this.isZksyncChain()) {
             // const web3Provider = isMobile
             //   ? await this.web3Modal.connectTo("walletconnect")
@@ -322,6 +348,11 @@ export default class API extends Emitter {
               web3Provider
             );
           }
+
+          // set up polygon providers. mumbai for testnet. polygon for mainnet
+          this.polygonProvider = new ethers.providers.JsonRpcProvider(
+            this.getPolygonUrl(network)
+          );
 
           let accountState;
           try {
@@ -339,6 +370,12 @@ export default class API extends Emitter {
           }
 
           this.emit("signIn", accountState);
+
+          // fetch blances
+          await this.getBalances();
+          await this.getWalletBalances();
+          await this.getPolygonWethBalance();
+
           return accountState;
         })
         .finally(() => {
@@ -350,13 +387,13 @@ export default class API extends Emitter {
   };
 
   signOut = async () => {
-    if (this._signInProgress) {
-      return;
-    } else if (!this.apiProvider) {
+    if (!this.apiProvider) {
       return;
     } else if (this.web3Modal) {
       await this.web3Modal.clearCachedProvider();
     }
+
+    window.localStorage.clear();
 
     this.web3 = null;
     this.web3Modal = null;
@@ -365,8 +402,108 @@ export default class API extends Emitter {
     this.setAPIProvider(this.apiProvider.network);
     this.emit("balanceUpdate", "wallet", {});
     this.emit("balanceUpdate", this.apiProvider.network, {});
+    this.emit("balanceUpdate", "polygon", {});
     this.emit("accountState", {});
     this.emit("signOut");
+  };
+
+  getPolygonUrl(network) {
+    if (network === 1000) {
+      return `https://polygon-mumbai.infura.io/v3/${this.infuraId}`;
+    } else {
+      return `https://polygon-mainnet.infura.io/v3/${this.infuraId}`;
+    }
+  }
+
+  getPolygonChainId(network) {
+    if (network === 1000) {
+      return "0x13881";
+    } else {
+      return "0x89";
+    }
+  }
+
+  getPolygonWethContract(network) {
+    if (network === 1000) {
+      return POLYGON_MUMBAI_WETH_ADDRESS;
+    } else if (network === 1) {
+      return POLYGON_MAINNET_WETH_ADDRESS;
+    }
+  }
+
+  getPolygonWethBalance = async () => {
+    const [account] = await this.web3.eth.getAccounts();
+    if (!account) return;
+    const polygonEthAddress = this.getPolygonWethContract(
+      this.apiProvider.network
+    );
+    if(!this.polygonProvider) return 0;
+    const ethContract = new ethers.Contract(
+      polygonEthAddress,
+      erc20ContractABI,
+      this.polygonProvider
+    );
+    const wethBalance = await ethContract.balanceOf(account);
+    let p = formatAmount(wethBalance, { decimals: 18 });
+
+    this.emit("balanceUpdate", "polygon", {
+      WETH: {
+        value: wethBalance.toString(),
+        allowance: wethBalance,
+        valueReadable: p,
+      },
+    });
+    return wethBalance;
+  };
+
+  transferPolygonWeth = async (amount, walletAddress) => {
+    const polygonChainId = this.getPolygonChainId(this.apiProvider.network);
+    await window.ethereum.request({
+      method: "wallet_switchEthereumChain",
+      params: [{ chainId: polygonChainId }],
+    });
+    const polygonProvider = new ethers.providers.Web3Provider(
+      window.web3.currentProvider
+    );
+    const currentNetwork = await polygonProvider.getNetwork();
+
+    if ("0x"+currentNetwork.chainId.toString(16) !== polygonChainId)
+      throw new Error("Must approve network change");
+    // const signer = polygonProvider.getSigner();
+    const wethContractAddress = this.getPolygonWethContract(
+      this.apiProvider.network
+    );
+
+    const contract = new this.web3.eth.Contract(
+      wethContractABI,
+      wethContractAddress
+    );
+    // contract.connect(signer);
+    const [account] = await this.web3.eth.getAccounts();
+    const result = await contract.methods
+      .transfer(ZKSYNC_POLYGON_BRIDGE.address, "" + Math.round(amount * (10 ** 18)))
+      .send({ 
+        from: account, 
+        maxPriorityFeePerGas: null,
+        maxFeePerGas: null
+      });
+
+    const txHash = result.transactionHash;
+
+    let receipt = {
+      date: +new Date(),
+      network: await polygonProvider.getNetwork(),
+      amount,
+      token: "WETH",
+      type: ZKSYNC_POLYGON_BRIDGE.polygonToZkSync,
+      txId: txHash,
+      walletAddress: polygonChainId === "0x13881" ? `https://rinkeby.zksync.io/explorer/accounts/${walletAddress}` : `https://zkscan.io/explorer/accounts/${walletAddress}`
+    };
+    const subdomain = polygonChainId === "0x13881" ? "mumbai." : "";
+    receipt.txUrl = `https://${subdomain}polygonscan.com/tx/${txHash}`;
+    this.emit("bridgeReceipt", receipt);
+
+    this.signIn(this.apiProvider.network)
   };
 
   getNetworkName = (network) => {
@@ -391,20 +528,25 @@ export default class API extends Emitter {
     return true;
   };
 
-  depositL2 = async (amount, token) => {
-    return this.apiProvider.depositL2(amount, token);
+  depositL2 = async (amount, token, address) => {
+    return this.apiProvider.depositL2(amount, token, address);
   };
 
-  withdrawL2Normal = async (amount, token) => {
-    return this.apiProvider.withdrawL2Normal(amount, token);
+  getPolygonFee = async () => {
+    const res = await axios.get("https://gasstation-mainnet.matic.network/v2");
+    return res.data;
+  }
+
+  withdrawL2 = async (amount, token) => {
+    return this.apiProvider.withdrawL2(amount, token);
   };
 
-  withdrawL2Fast = (amount, token) => {
-    return this.apiProvider.withdrawL2Fast(amount, token);
+  transferToBridge = (amount, token, address, userAddress) => {
+    return this.apiProvider.transferToBridge(amount, token, address, userAddress);
   };
 
   depositL2Fee = async (token) => {
-    return await this.apiProvider.depositL2Fee(token);
+    return await this.apiProvider.depositL2Fee(token);;
   };
 
   withdrawL2GasFee = async (token) => {
@@ -451,7 +593,7 @@ export default class API extends Emitter {
   getBalanceOfCurrency = async (currency) => {
     const currencyInfo = this.getCurrencyInfo(currency);
     let result = { balance: 0, allowance: ethersConstants.Zero };
-    if (!this.ethersProvider || !currencyInfo) return result;
+    if (!this.ethersProvider) return result;
 
     try {
       const netContract = this.getNetworkContract();
@@ -460,6 +602,8 @@ export default class API extends Emitter {
         result.balance = await this.web3.eth.getBalance(account);
         return result;
       }
+
+      if (!currencyInfo) return result;
       const contract = new this.web3.eth.Contract(
         erc20ContractABI,
         currencyInfo.address
@@ -490,12 +634,16 @@ export default class API extends Emitter {
       };
       if (currencyInfo) {
         balances[ticker].valueReadable = formatAmount(balance, currencyInfo);
+      } else if (ticker === "ETH") {
+        balances[ticker].valueReadable = formatAmount(balance, { decimals: 18 });
       }
 
       this.emit("balanceUpdate", "wallet", { ...balances });
     };
 
     const tickers = this.getCurrencies();
+    // allways fetch ETH for Etherum wallet
+    if(!tickers.includes("ETH")) { tickers.push("ETH"); }
 
     await Promise.all(tickers.map((ticker) => getBalance(ticker)));
 
@@ -660,6 +808,7 @@ export default class API extends Emitter {
   async getL2FastWithdrawLiquidity() {
     if (this.ethersProvider) {
       const currencyMaxes = {};
+      if(!this.apiProvider.eligibleFastWithdrawTokens) return currencyMaxes;
       for (const currency of this.apiProvider.eligibleFastWithdrawTokens) {
         let max = 0;
         try {
