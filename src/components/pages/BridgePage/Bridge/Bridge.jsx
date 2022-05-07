@@ -32,6 +32,7 @@ import {
   ZKSYNC_POLYGON_BRIDGE
 } from "./constants"
 import { toast } from "react-toastify";
+import axios from "axios";
 
 const defaultTransfer = {
   type: "deposit",
@@ -63,9 +64,21 @@ const Bridge = () => {
 
   const coinEstimator = useCoinEstimator();
   const currencyValue = coinEstimator(swapDetails.currency);
-  const activationFee = parseFloat(
-    (user.address && !user.id ? 15 / currencyValue : 0).toFixed(5)
-  );
+  let activationFee = 0;
+  if (user.address && !user.id) {
+    axios.post("https://api.zksync.io/api/v0.2/fee",
+      {
+        txType: { ChangePubKey: "ECDSA" },
+        address: user.address,
+        tokenLike: "USDC",
+      },
+      { headers: { "Content-Type": "application/json", }, }
+    ).then((res) => {
+      const usdFee = res.data.result.totalFee;
+      activationFee = (usdFee / currencyValue).toFixed(5);
+    });
+  }
+    
   const estimatedValue =
     +swapDetails.amount * coinEstimator(swapDetails.currency) || 0;
   const [fastWithdrawCurrencyMaxes, setFastWithdrawCurrencyMaxes] = useState(
