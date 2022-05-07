@@ -87,45 +87,40 @@ export default class APIZKProvider extends APIProvider {
     return receipt;
   };
 
+  changePubKeyFee = async () => {
+    const { data } = await axios.post(this.getZkSyncBaseUrl(this.network) + "/fee",
+      {
+        txType: { ChangePubKey: "ECDSA" },
+        address: "0x5364ff0cecb1d44efd9e4c7e4fe16bf5774530e3",
+        tokenLike: "USDC",
+      },
+      { headers: { "Content-Type": "application/json", }, }
+    );
+    return (data.result.totalFee / 10 ** 6);
+  }
+
   changePubKey = async () => {
-    if (this.network === 1) {
-      try {
-        const { data } = await axios.post(this.getZkSyncBaseUrl(1) + "/fee",
-          {
-            txType: { ChangePubKey: "ECDSA" },
-            address: "0x5364ff0cecb1d44efd9e4c7e4fe16bf5774530e3",
-            tokenLike: "USDC",
-          },
-          { headers: { "Content-Type": "application/json", }, }
-        );
-        const feeUSD = data.result.totalFee / 10 ** 6;
-        toast.info(
-          `You need to sign a one-time transaction to activate your zksync account. The fee for this tx will be $${feeUSD.toFixed(
+    try {
+      const feeUSD = await this.changePubKeyFee();
+      toast.info(
+        `You need to sign a one-time transaction to activate your zksync account. The fee for this tx will be $${feeUSD.toFixed(
+          2
+        )}`,
+        {
+          toastId: `You need to sign a one-time transaction to activate your zksync account. The fee for this tx will be $${feeUSD.toFixed(
             2
           )}`,
-          {
-            toastId: `You need to sign a one-time transaction to activate your zksync account. The fee for this tx will be $${feeUSD.toFixed(
-              2
-            )}`,
-          }
-        );
-      } catch (err) {
-        toast.info(
-          `You need to sign a one-time transaction to activate your zksync account. The fee for this tx will be ~$2.5`,
-          {
-            toastId: `You need to sign a one-time transaction to activate your zksync account. The fee for this tx will be ~$2.5`,
-          }
-        );
-      }
-    } else if (this.network === 1000) {
+        }
+      );
+    } catch (err) {
       toast.info(
-        "You need to sign a one-time transaction to activate your zksync account.",
+        `You need to sign a one-time transaction to activate your zksync account. The fee for this tx will be ~$2.5`,
         {
-          toastId:
-            "You need to sign a one-time transaction to activate your zksync account.",
+          toastId: `You need to sign a one-time transaction to activate your zksync account. The fee for this tx will be ~$2.5`,
         }
       );
     }
+    
     let feeToken = "ETH";
     const accountState = await this.syncWallet.getAccountState();
     const balances = accountState.committed.balances;
