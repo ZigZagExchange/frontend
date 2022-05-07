@@ -60,12 +60,12 @@ const Bridge = () => {
     currency: "ETH",
   }));
   const [hasError, setHasError] = useState(false);
+  const [activationFee, setActivationFee] = useState(0);
+  const [usdFee, setUsdFee] = useState(0);
 
   const coinEstimator = useCoinEstimator();
   const currencyValue = coinEstimator(swapDetails.currency);
-  const activationFee = parseFloat(
-    (user.address && !user.id ? 15 / currencyValue : 0).toFixed(5)
-  );
+
   const estimatedValue =
     +swapDetails.amount * coinEstimator(swapDetails.currency) || 0;
   const [fastWithdrawCurrencyMaxes, setFastWithdrawCurrencyMaxes] = useState(
@@ -184,13 +184,23 @@ const Bridge = () => {
     }
   }, [withdrawSpeed]);
 
-  useEffect(() => {
+  useEffect(async () => {
     if (
       !api.apiProvider.eligibleFastWithdrawTokens?.includes(swapDetails.currency)
     ) {
       setWithdrawSpeed("normal");
     } else {
       setWithdrawSpeed("fast");
+    }
+
+    // update changePubKeyFee fee if needed
+    if (
+      user.address &&
+      !user.id &&
+      api.apiProvider?.zksyncCompatible
+    ) {
+      setUsdFee(await api.apiProvider.changePubKeyFee());
+      setActivationFee((this.usdFee / currencyValue).toFixed(5));
     }
   }, [swapDetails.currency]);
 
@@ -619,7 +629,7 @@ const Bridge = () => {
           {transfer.type === "deposit" && user.address && !user.id && (
             <div className="bridge_transfer_fee">
               One-Time Activation Fee: {activationFee} {swapDetails.currency}{" "}
-              (~$15.00)
+              (~${usdFee})
             </div>
           )}
           {user.address && user.id && !isSwapAmountEmpty && (
