@@ -9,7 +9,7 @@ const DropdownWrapper = styled.div`
     position: relative;
 `
 
-const Wrapper = styled.div`
+export const Wrapper = styled.div`
     position: absolute;
     width: ${({ width }) => `${width*2}px`};
     max-width: 250px;

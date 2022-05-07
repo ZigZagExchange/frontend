@@ -93,7 +93,7 @@ const TradePriceTable = (props) => {
 
   const scrollToBottom = () => {
     if (props.scrollToBottom) {
-      ref.current.scrollTo(0, ref.current.scrollHeight)
+      ref.current?.scrollTo(0, ref.current.scrollHeight)
     }
   };
 

@@ -98,6 +98,11 @@ export const Header = (props) => {
         localStorage.setItem('tab_index', newIndex)
         history.push('/dsl')
         break;
+      case 5:
+        setIndex(newIndex);
+        localStorage.setItem('tab_index', newIndex)
+        history.push('/swap')
+        break;
       default:
         break;
     }
@@ -142,6 +147,8 @@ export const Header = (props) => {
               { hasBridge && (<Tab>BRIDGE</Tab>)}
               <Tab>LIST PAIR</Tab>
               { hasBridge && (<Tab>DOCS<ExternalLinkIcon size={12} /></Tab>)}
+              {hasBridge && <Tab>DSL</Tab>}
+              {hasBridge && <Tab>SWAP</Tab>}
             </TabMenu>
           </NavWrapper>
           <ActionsWrapper>
