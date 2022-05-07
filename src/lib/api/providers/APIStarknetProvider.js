@@ -15,6 +15,8 @@ export default class APIStarknetProvider extends APIProvider {
   static STARKNET_CONTRACT_ADDRESS =
     "0x02aa8af6fb8e6ab7d07ad94d0b3b9bb6010fe7258b8d23eced19ba0ccbb68d1a";
 
+  zksyncCompatible = false;
+
   _accountState = {
     committed: {}
   };
