@@ -9,7 +9,6 @@ import { formatAmount } from "lib/utils";
 import get from "lodash/get";
 import axios from "axios";
 import erc20ContractABI from "lib/contracts/Ethereum_ERC20.json";
-import erc20ContractABI from "lib/contracts/ERC20.json";
 import wethContractABI from "lib/contracts/WETH.json";
 import { MAX_ALLOWANCE } from "./constants";
 import { 
@@ -18,14 +17,12 @@ import {
   POLYGON_MAINNET_WETH_ADDRESS,
 } from "components/pages/BridgePage/Bridge/constants";
 
-import axios from "axios";
-// import { isMobile } from "react-device-detect";
-
 const chainMap = {
   "0x1": 1,
   "0x4": 1000,
   "0x5": 1001
 };
+
 export default class API extends Emitter {
   networks = {};
   ws = null;
