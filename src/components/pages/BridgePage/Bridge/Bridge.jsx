@@ -32,7 +32,6 @@ import {
   ZKSYNC_POLYGON_BRIDGE
 } from "./constants"
 import { toast } from "react-toastify";
-import axios from "axios";
 
 const defaultTransfer = {
   type: "deposit",
@@ -61,24 +60,12 @@ const Bridge = () => {
     currency: "ETH",
   }));
   const [hasError, setHasError] = useState(false);
+  const [activationFee, setActivationFee] = useState(0);
+  const [usdFee, setUsdFee] = useState(0);
 
   const coinEstimator = useCoinEstimator();
   const currencyValue = coinEstimator(swapDetails.currency);
-  let activationFee = 0;
-  if (user.address && !user.id) {
-    axios.post("https://api.zksync.io/api/v0.2/fee",
-      {
-        txType: { ChangePubKey: "ECDSA" },
-        address: user.address,
-        tokenLike: "USDC",
-      },
-      { headers: { "Content-Type": "application/json", }, }
-    ).then((res) => {
-      const usdFee = res.data.result.totalFee;
-      activationFee = (usdFee / currencyValue).toFixed(5);
-    });
-  }
-    
+
   const estimatedValue =
     +swapDetails.amount * coinEstimator(swapDetails.currency) || 0;
   const [fastWithdrawCurrencyMaxes, setFastWithdrawCurrencyMaxes] = useState(
@@ -194,13 +181,23 @@ const Bridge = () => {
     }
   }, [withdrawSpeed]);
 
-  useEffect(() => {
+  useEffect(async () => {
     if (
       !api.apiProvider.eligibleFastWithdrawTokens?.includes(swapDetails.currency)
     ) {
       setWithdrawSpeed("normal");
     } else {
       setWithdrawSpeed("fast");
+    }
+
+    // update changePubKeyFee fee if needed
+    if (
+      user.address &&
+      !user.id &&
+      api.apiProvider?.zksyncCompatible
+    ) {
+      setUsdFee(await api.apiProvider.changePubKeyFee());
+      setActivationFee((this.usdFee / currencyValue).toFixed(5));
     }
   }, [swapDetails.currency]);
 
@@ -629,7 +626,7 @@ const Bridge = () => {
           {transfer.type === "deposit" && user.address && !user.id && (
             <div className="bridge_transfer_fee">
               One-Time Activation Fee: {activationFee} {swapDetails.currency}{" "}
-              (~$15.00)
+              (~${usdFee})
             </div>
           )}
           {user.address && user.id && !isSwapAmountEmpty && (
