@@ -118,9 +118,11 @@ const Bridge = () => {
 
   useEffect(()=>{
     if (fromNetwork.from.key === 'polygon') {
+      api.getPolygonWethBalance()
       setSwapDetails({ amount: '', currency: 'WETH' })
     }
     else if (fromNetwork.from.key === 'ethereum' && swapDetails.currency === 'WETH') {
+      api.getWalletBalances()
       setSwapDetails({ amount: '', currency: 'ETH' })
     }
     else if (fromNetwork.from.key === 'zksync' && swapDetails.currency === 'WETH') {
@@ -131,10 +133,11 @@ const Bridge = () => {
       setTransfer({ type });
     }
     else{
+      api.getWalletBalances()
       const type = transfer.type = "deposit";
       setTransfer({ type });
     }
-  }, [toNetwork])
+  }, [toNetwork, fromNetwork])
 
   useEffect(() => {
     let _swapCurrencyInfo = {}

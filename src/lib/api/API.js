@@ -335,6 +335,12 @@ export default class API extends Emitter {
           }
 
           this.emit("signIn", accountState);
+
+          // fetch blances
+          await this.getBalances();
+          await this.getWalletBalances();
+          await this.getPolygonWethBalance();
+
           return accountState;
         })
         .finally(() => {
@@ -392,6 +398,7 @@ export default class API extends Emitter {
 
   getPolygonWethBalance = async () => {
     const [account] = await this.web3.eth.getAccounts();
+    if (!account) return;
     const polygonEthAddress = this.getPolygonWethContract(
       this.apiProvider.network
     );
