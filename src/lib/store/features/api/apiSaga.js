@@ -33,14 +33,11 @@ export function* userPollingSaga() {
       return state.auth.user && state.auth.user.address;
     });
 
-    const allSagas = [
-      apply(api, api.getWalletBalances),
-      apply(api, api.getBalances),
-      apply(api, api.getPolygonWethBalance),
-    ];
+    const allSagas = [];
 
     if (address) {
       allSagas.push(apply(api, api.getAccountState));
+      allSagas.push(apply(api, api.getBalances));
     }
 
     try {
