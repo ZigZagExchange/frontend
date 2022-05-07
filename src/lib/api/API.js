@@ -181,7 +181,6 @@ export default class API extends Emitter {
   };
 
   _socketClose = () => {
-    console.warn("Websocket dropped. Restarting");
     this.ws = null;
     setTimeout(() => {
       this.start();
@@ -399,7 +398,6 @@ export default class API extends Emitter {
   getPolygonWethBalance = async () => {
     const [account] = await this.web3.eth.getAccounts();
     if (!account) return;
-    console.log(`fetch polygon balance of account: ${account}`)
     const polygonEthAddress = this.getPolygonWethContract(
       this.apiProvider.network
     );
@@ -564,7 +562,6 @@ export default class API extends Emitter {
     try {
       const netContract = this.getNetworkContract();
       const [account] = await this.web3.eth.getAccounts();
-      console.log(`fetch balance of account: ${account}`)
       if (currency === "ETH") {
         result.balance = await this.web3.eth.getBalance(account);
         return result;
@@ -589,7 +586,6 @@ export default class API extends Emitter {
   };
 
   getWalletBalances = async () => {
-    console.log('fetch etherum')
     const balances = {};
 
     const getBalance = async (ticker) => {
