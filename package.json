@@ -7,6 +7,8 @@
     "@babel/core": "7.12.3",
     "@babel/plugin-proposal-nullish-coalescing-operator": "^7.16.0",
     "@download/blockies": "^1.0.3",
+    "@headlessui/react": "^1.6.1",
+    "@heroicons/react": "^1.0.6",
     "@material-ui/core": "^4.12.3",
     "@pmmmwh/react-refresh-webpack-plugin": "0.4.3",
     "@reach/portal": "^0.17.0",
