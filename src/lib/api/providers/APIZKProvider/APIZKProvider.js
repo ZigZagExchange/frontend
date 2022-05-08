@@ -14,7 +14,6 @@ import {
   ETH_ZKSYNC_BRIDGE
 } from "components/pages/BridgePage/Bridge/constants";
 import _ from "lodash"
-// import wethContractABI from "lib/contracts/WETH.json";
 
 export default class APIZKProvider extends APIProvider {
   static SEEDS_STORAGE_KEY = "@ZZ/ZKSYNC_SEEDS";
@@ -96,7 +95,8 @@ export default class APIZKProvider extends APIProvider {
       },
       { headers: { "Content-Type": "application/json", }, }
     );
-    return (data.result.totalFee / 10 ** 6);
+    // somehow the fee is ~50% too low
+    return ((data.result.totalFee / 10 ** 6) * 2);
   }
 
   changePubKey = async () => {
