@@ -419,7 +419,6 @@ const Bridge = () => {
     let deferredXfer;
     setLoading(true);
     if (fromNetwork.from.key === "polygon" && toNetwork.key === "zksync") {
-      console.log("start")
       setPolygonLoading(true)
       deferredXfer = api.transferPolygonWeth(`${swapDetails.amount}`, user.address)
       toast.info(
@@ -470,7 +469,6 @@ const Bridge = () => {
         console.error("error sending transaction::", e);
       })
       .finally(() => {
-        console.log("end")
         setPolygonLoading(false)
         setLoading(false);
       });
