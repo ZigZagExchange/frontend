@@ -467,6 +467,7 @@ const Bridge = () => {
       })
       .catch((e) => {
         console.error("error sending transaction::", e);
+        setTimeout(() => api.getAccountState(), 1000);
       })
       .finally(() => {
         setPolygonLoading(false)

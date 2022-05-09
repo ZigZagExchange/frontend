@@ -422,6 +422,7 @@ export default class API extends Emitter {
   };
 
   transferPolygonWeth = async (amount, walletAddress) => {
+    let networkSwitched = false;
     try{
       const polygonChainId = this.getPolygonChainId(this.apiProvider.network);
       await window.ethereum.request({
@@ -436,6 +437,9 @@ export default class API extends Emitter {
       if ("0x"+currentNetwork.chainId.toString(16) !== polygonChainId)
         throw new Error("Must approve network change");
       // const signer = polygonProvider.getSigner();
+
+      networkSwitched = true;
+
       const wethContractAddress = this.getPolygonWethContract(
         this.apiProvider.network
       );
@@ -470,9 +474,10 @@ export default class API extends Emitter {
       this.emit("bridgeReceipt", receipt);
 
       await this.signIn(this.apiProvider.network)
-      return true;
     } catch(e) {
-      return false;
+      if (networkSwitched)
+        await this.signIn(this.apiProvider.network);
+      throw e;
     }
   };
 
