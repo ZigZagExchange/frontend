@@ -16,7 +16,7 @@ import {
 } from "components/pages/BridgePage/Bridge/constants";
 
 import axios from "axios";
-// import { isMobile } from "react-device-detect";
+import { isMobile } from "react-device-detect";
 
 const chainMap = {
   "0x1": 1,
@@ -358,7 +358,8 @@ export default class API extends Emitter {
       await this.web3Modal.clearCachedProvider();
     }
 
-    window.localStorage.clear();
+    if(this.isMobile)
+      window.localStorage.clear();
 
     this.web3 = null;
     this.web3Modal = null;
