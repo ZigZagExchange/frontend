@@ -55,6 +55,7 @@ const Bridge = () => {
   const [toNetwork, setToNetwork] = useState(fromNetwork.to[0])
   const [balances, setBalances] = useState([]);
   const [altBalances, setAltBalances] = useState([]);
+  const [polygonLoding, setPolygonLoading] = useState(false)
   const [swapDetails, _setSwapDetails] = useState(() => ({
     amount: "",
     currency: "ETH",
@@ -128,7 +129,7 @@ const Bridge = () => {
     else if (fromNetwork.from.key === 'zksync' && swapDetails.currency === 'WETH') {
       setSwapDetails({ amount: '', currency: 'ETH' })
     }
-    if(fromNetwork.from.key === 'zksync' && toNetwork.key === 'ethereum'){    
+    if(fromNetwork.from.key === 'zksync'){    
       const type = transfer.type = "withdraw";
       setTransfer({ type });
     }
@@ -230,7 +231,7 @@ const Bridge = () => {
       } else if (inputValue >= detailBalance) {
         error = "Insufficient balance";
       } else if (isFastWithdraw) {
-        if (L1Fee !== null  && inputValue < L1Fee) {
+        if (toNetwork.key !== 'polygon' && L1Fee !== null  && inputValue < L1Fee) {
           error = "Amount too small";
         }
 
@@ -240,7 +241,7 @@ const Bridge = () => {
             error = `Max ${swapCurrency} liquidity for fast withdraw: ${maxAmount.toPrecision(
               4
             )}`;
-          } else if (L1Fee !== null && L2Fee !== null && inputValue < (L2Fee + L1Fee)) {
+          } else if (toNetwork.key !== 'polygon' && L1Fee !== null && L2Fee !== null && inputValue < (L2Fee + L1Fee)) {
             error = "Amount too small";
           }
         }
@@ -418,6 +419,7 @@ const Bridge = () => {
     let deferredXfer;
     setLoading(true);
     if (fromNetwork.from.key === "polygon" && toNetwork.key === "zksync") {
+      setPolygonLoading(true)
       deferredXfer = api.transferPolygonWeth(`${swapDetails.amount}`, user.address)
       toast.info(
         renderGuidContent(),
@@ -465,8 +467,10 @@ const Bridge = () => {
       })
       .catch((e) => {
         console.error("error sending transaction::", e);
+        setTimeout(() => api.getAccountState(), 1000);
       })
       .finally(() => {
+        setPolygonLoading(false)
         setLoading(false);
       });
   };
@@ -639,8 +643,7 @@ const Bridge = () => {
                 <x.div>
                   {L2Fee && (
                     <>
-                      {fromNetwork.from.key === "zksync" && toNetwork.key === "ethereum" && 'zkSync '}
-                      L2 gas fee: ~{L2Fee} {L2FeeToken}
+                      {fromNetwork.from.key === "zksync" && `zkSync L2 gas fee: ~${L2Fee} ${L2FeeToken}`}
                     </>
                   )}
                   {!L2Fee && (
@@ -654,7 +657,7 @@ const Bridge = () => {
                     </div>
                   )}
 
-                  {transfer.type === "withdraw" && (
+                  {transfer.type === "withdraw" && toNetwork.key === "ethereum" && (
                     <x.div>
                       {isFastWithdraw && L1Fee && (
                         <div>
@@ -679,7 +682,6 @@ const Bridge = () => {
                   {L1Fee && (
                     <>
                      {fromNetwork.from.key === "polygon" && `Polygon gas fee: ~${formatPrice(L1Fee)} MATIC`}
-                     {fromNetwork.from.key === "zksync" && toNetwork.key === "polygon" && `zkSync gas fee: ~${formatPrice(L1Fee)} ETH`}
                      {fromNetwork.from.key === "ethereum" && `Gas fee: ~${formatPrice(L1Fee)} ETH`}
                     </>
                   )}
@@ -712,14 +714,14 @@ const Bridge = () => {
             </div>
           )}
 
-          {!user.address && (
+          {!user.address && !polygonLoding && (
             <div className="bridge_transfer_fee">
               🔗 &nbsp;Please connect your wallet
             </div>
           )}
 
           <div className="bridge_button">
-            {!user.address && <ConnectWalletButton />}
+            {!user.address && <ConnectWalletButton isLoading={polygonLoding} />}
             {user.address && (
               <>
                 {balances[swapDetails.currency] && !hasAllowance && !hasError 
