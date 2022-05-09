@@ -129,7 +129,7 @@ const Bridge = () => {
     else if (fromNetwork.from.key === 'zksync' && swapDetails.currency === 'WETH') {
       setSwapDetails({ amount: '', currency: 'ETH' })
     }
-    if(fromNetwork.from.key === 'zksync' && toNetwork.key === 'ethereum'){    
+    if(fromNetwork.from.key === 'zksync'){    
       const type = transfer.type = "withdraw";
       setTransfer({ type });
     }
@@ -231,7 +231,7 @@ const Bridge = () => {
       } else if (inputValue >= detailBalance) {
         error = "Insufficient balance";
       } else if (isFastWithdraw) {
-        if (L1Fee !== null  && inputValue < L1Fee) {
+        if (toNetwork.key !== 'polygon' && L1Fee !== null  && inputValue < L1Fee) {
           error = "Amount too small";
         }
 
@@ -241,7 +241,7 @@ const Bridge = () => {
             error = `Max ${swapCurrency} liquidity for fast withdraw: ${maxAmount.toPrecision(
               4
             )}`;
-          } else if (L1Fee !== null && L2Fee !== null && inputValue < (L2Fee + L1Fee)) {
+          } else if (toNetwork.key !== 'polygon' && L1Fee !== null && L2Fee !== null && inputValue < (L2Fee + L1Fee)) {
             error = "Amount too small";
           }
         }
@@ -643,8 +643,7 @@ const Bridge = () => {
                 <x.div>
                   {L2Fee && (
                     <>
-                      {fromNetwork.from.key === "zksync" && toNetwork.key === "ethereum" && 'zkSync '}
-                      L2 gas fee: ~{L2Fee} {L2FeeToken}
+                      {fromNetwork.from.key === "zksync" && `zkSync L2 gas fee: ~${L2Fee} ${L2FeeToken}`}
                     </>
                   )}
                   {!L2Fee && (
@@ -658,7 +657,7 @@ const Bridge = () => {
                     </div>
                   )}
 
-                  {transfer.type === "withdraw" && (
+                  {transfer.type === "withdraw" && toNetwork.key === "ethereum" && (
                     <x.div>
                       {isFastWithdraw && L1Fee && (
                         <div>
@@ -683,7 +682,6 @@ const Bridge = () => {
                   {L1Fee && (
                     <>
                      {fromNetwork.from.key === "polygon" && `Polygon gas fee: ~${formatPrice(L1Fee)} MATIC`}
-                     {fromNetwork.from.key === "zksync" && toNetwork.key === "polygon" && `zkSync gas fee: ~${formatPrice(L1Fee)} ETH`}
                      {fromNetwork.from.key === "ethereum" && `Gas fee: ~${formatPrice(L1Fee)} ETH`}
                     </>
                   )}
