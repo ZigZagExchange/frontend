@@ -358,7 +358,7 @@ export default class API extends Emitter {
       await this.web3Modal.clearCachedProvider();
     }
 
-    if(this.isMobile)
+    if(isMobile)
       window.localStorage.clear();
 
     this.web3 = null;
