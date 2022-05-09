@@ -5718,7 +5718,7 @@ css-has-pseudo@^0.10.0:
 
 css-loader@4.3.0:
   version "4.3.0"
-  resolved "https://registry.npmjs.org/css-loader/-/css-loader-4.3.0.tgz"
+  resolved "https://registry.yarnpkg.com/css-loader/-/css-loader-4.3.0.tgz#c888af64b2a5b2e85462c72c0f4a85c7e2e0821e"
   integrity sha512-rdezjCjScIrsL8BSYszgT4s476IcNKt6yX69t0pHjJVnPUTDpn4WfIpDQTN3wCJvUvfsz/mFjuGOekf3PY3NUg==
   dependencies:
     camelcase "^6.0.0"
@@ -8469,7 +8469,7 @@ iconv-lite@0.4.24:
 
 icss-utils@^4.0.0, icss-utils@^4.1.1:
   version "4.1.1"
-  resolved "https://registry.npmjs.org/icss-utils/-/icss-utils-4.1.1.tgz"
+  resolved "https://registry.yarnpkg.com/icss-utils/-/icss-utils-4.1.1.tgz#21170b53789ee27447c2f47dd683081403f9a467"
   integrity sha512-4aFq7wvWyMHKgxsH8QQtGpvbASCf+eM3wPRLI6R+MgAnTCZ6STYsRvttLvRWK0Nfif5piF394St3HeJDaljGPA==
   dependencies:
     postcss "^7.0.14"
@@ -8525,7 +8525,7 @@ immer@^9.0.6:
 
 import-cwd@^2.0.0:
   version "2.1.0"
-  resolved "https://registry.npmjs.org/import-cwd/-/import-cwd-2.1.0.tgz"
+  resolved "https://registry.yarnpkg.com/import-cwd/-/import-cwd-2.1.0.tgz#aa6cf36e722761285cb371ec6519f53e2435b0a9"
   integrity sha1-qmzzbnInYShcs3HsZRn1PiQ1sKk=
   dependencies:
     import-from "^2.1.0"
@@ -8548,7 +8548,7 @@ import-fresh@^3.0.0, import-fresh@^3.1.0, import-fresh@^3.2.1:
 
 import-from@^2.1.0:
   version "2.1.0"
-  resolved "https://registry.npmjs.org/import-from/-/import-from-2.1.0.tgz"
+  resolved "https://registry.yarnpkg.com/import-from/-/import-from-2.1.0.tgz#335db7f2a7affd53aaa471d4b8021dee36b7f3b1"
   integrity sha1-M1238qev/VOqpHHUuAId7ja387E=
   dependencies:
     resolve-from "^3.0.0"
@@ -8967,7 +8967,7 @@ is-path-inside@^2.1.0:
 
 is-plain-obj@^1.0.0, is-plain-obj@^1.1.0:
   version "1.1.0"
-  resolved "https://registry.npmjs.org/is-plain-obj/-/is-plain-obj-1.1.0.tgz"
+  resolved "https://registry.yarnpkg.com/is-plain-obj/-/is-plain-obj-1.1.0.tgz#71a50c8429dfca773c92a390a4a03b39fcd51d3e"
   integrity sha1-caUMhCnfync8kqOQpKA7OfzVHT4=
 
 is-plain-object@^2.0.3, is-plain-object@^2.0.4:
@@ -10526,7 +10526,7 @@ mini-create-react-context@^0.4.0:
 
 mini-css-extract-plugin@0.11.3:
   version "0.11.3"
-  resolved "https://registry.npmjs.org/mini-css-extract-plugin/-/mini-css-extract-plugin-0.11.3.tgz"
+  resolved "https://registry.yarnpkg.com/mini-css-extract-plugin/-/mini-css-extract-plugin-0.11.3.tgz#15b0910a7f32e62ffde4a7430cfefbd700724ea6"
   integrity sha512-n9BA8LonkOkW1/zn+IbLPQmovsL0wMb9yx75fMJQZf2X1Zoec9yTZtyMePcyu19wPkmFbzZZA6fLTotpFhQsOA==
   dependencies:
     loader-utils "^1.1.0"
@@ -11007,7 +11007,7 @@ normalize-range@^0.1.2:
 
 normalize-url@1.9.1:
   version "1.9.1"
-  resolved "https://registry.npmjs.org/normalize-url/-/normalize-url-1.9.1.tgz"
+  resolved "https://registry.yarnpkg.com/normalize-url/-/normalize-url-1.9.1.tgz#2cc0d66b31ea23036458436e3620d85954c66c3c"
   integrity sha1-LMDWazHqIwNkWENuNiDYWVTGbDw=
   dependencies:
     object-assign "^4.0.1"
@@ -11884,7 +11884,7 @@ postcss-lab-function@^2.0.1:
 
 postcss-load-config@^2.0.0:
   version "2.1.2"
-  resolved "https://registry.npmjs.org/postcss-load-config/-/postcss-load-config-2.1.2.tgz"
+  resolved "https://registry.yarnpkg.com/postcss-load-config/-/postcss-load-config-2.1.2.tgz#c5ea504f2c4aef33c7359a34de3573772ad7502a"
   integrity sha512-/rDeGV6vMUo3mwJZmeHfEDvwnTKKqQ0S7OHUi/kJvvtx3aWtyWG2/0ZWnzCt2keEclwN6Tf0DST2v9kITdOKYw==
   dependencies:
     cosmiconfig "^5.0.0"
@@ -11892,7 +11892,7 @@ postcss-load-config@^2.0.0:
 
 postcss-loader@3.0.0:
   version "3.0.0"
-  resolved "https://registry.npmjs.org/postcss-loader/-/postcss-loader-3.0.0.tgz"
+  resolved "https://registry.yarnpkg.com/postcss-loader/-/postcss-loader-3.0.0.tgz#6b97943e47c72d845fa9e03f273773d4e8dd6c2d"
   integrity sha512-cLWoDEY5OwHcAjDnkyRQzAXfs2jrKjXpO/HQFcc5b5u/r7aa471wdmChmwfnv7x2u840iat/wi0lQ5nbRgSkUA==
   dependencies:
     loader-utils "^1.1.0"
@@ -11978,14 +11978,14 @@ postcss-minify-selectors@^4.0.2:
 
 postcss-modules-extract-imports@^2.0.0:
   version "2.0.0"
-  resolved "https://registry.npmjs.org/postcss-modules-extract-imports/-/postcss-modules-extract-imports-2.0.0.tgz"
+  resolved "https://registry.yarnpkg.com/postcss-modules-extract-imports/-/postcss-modules-extract-imports-2.0.0.tgz#818719a1ae1da325f9832446b01136eeb493cd7e"
   integrity sha512-LaYLDNS4SG8Q5WAWqIJgdHPJrDDr/Lv775rMBFUbgjTz6j34lUznACHcdRWroPvXANP2Vj7yNK57vp9eFqzLWQ==
   dependencies:
     postcss "^7.0.5"
 
 postcss-modules-local-by-default@^3.0.3:
   version "3.0.3"
-  resolved "https://registry.npmjs.org/postcss-modules-local-by-default/-/postcss-modules-local-by-default-3.0.3.tgz"
+  resolved "https://registry.yarnpkg.com/postcss-modules-local-by-default/-/postcss-modules-local-by-default-3.0.3.tgz#bb14e0cc78279d504dbdcbfd7e0ca28993ffbbb0"
   integrity sha512-e3xDq+LotiGesympRlKNgaJ0PCzoUIdpH0dj47iWAui/kyTgh3CiAr1qP54uodmJhl6p9rN6BoNcdEDVJx9RDw==
   dependencies:
     icss-utils "^4.1.1"
@@ -11995,7 +11995,7 @@ postcss-modules-local-by-default@^3.0.3:
 
 postcss-modules-scope@^2.2.0:
   version "2.2.0"
-  resolved "https://registry.npmjs.org/postcss-modules-scope/-/postcss-modules-scope-2.2.0.tgz"
+  resolved "https://registry.yarnpkg.com/postcss-modules-scope/-/postcss-modules-scope-2.2.0.tgz#385cae013cc7743f5a7d7602d1073a89eaae62ee"
   integrity sha512-YyEgsTMRpNd+HmyC7H/mh3y+MeFWevy7V1evVhJWewmMbjDHIbZbOXICC2y+m1xI1UVfIT1HMW/O04Hxyu9oXQ==
   dependencies:
     postcss "^7.0.6"
@@ -12003,7 +12003,7 @@ postcss-modules-scope@^2.2.0:
 
 postcss-modules-values@^3.0.0:
   version "3.0.0"
-  resolved "https://registry.npmjs.org/postcss-modules-values/-/postcss-modules-values-3.0.0.tgz"
+  resolved "https://registry.yarnpkg.com/postcss-modules-values/-/postcss-modules-values-3.0.0.tgz#5b5000d6ebae29b4255301b4a3a54574423e7f10"
   integrity sha512-1//E5jCBrZ9DmRX+zCtmQtRSV6PV42Ix7Bzj9GbwJceduuf7IqP8MgeTXuRDHOWj2m0VzZD5+roFWDuU8RQjcg==
   dependencies:
     icss-utils "^4.0.0"
@@ -12258,7 +12258,15 @@ postcss-selector-parser@^5.0.0-rc.3, postcss-selector-parser@^5.0.0-rc.4:
     indexes-of "^1.0.1"
     uniq "^1.0.1"
 
-postcss-selector-parser@^6.0.0, postcss-selector-parser@^6.0.2:
+postcss-selector-parser@^6.0.0:
+  version "6.0.10"
+  resolved "https://registry.yarnpkg.com/postcss-selector-parser/-/postcss-selector-parser-6.0.10.tgz#79b61e2c0d1bfc2602d549e11d0876256f8df88d"
+  integrity sha512-IQ7TZdoaqbT+LCpShg46jnZVlhWD2w6iQYAcYXfHARZ7X1t/UGhhceQDs5X0cGqKvYlHNOuv7Oa1xmb0oQuA3w==
+  dependencies:
+    cssesc "^3.0.0"
+    util-deprecate "^1.0.2"
+
+postcss-selector-parser@^6.0.2:
   version "6.0.6"
   resolved "https://registry.npmjs.org/postcss-selector-parser/-/postcss-selector-parser-6.0.6.tgz"
   integrity sha512-9LXrvaaX3+mcv5xkg5kFwqSzSH1JIObIx51PrndZwlmznwXRfxMddDvo9gve3gVR8ZTKgoFDdWkbRFmEhT4PMg==
@@ -12358,7 +12366,7 @@ prelude-ls@~1.1.2:
 
 prepend-http@^1.0.0, prepend-http@^1.0.1:
   version "1.0.4"
-  resolved "https://registry.npmjs.org/prepend-http/-/prepend-http-1.0.4.tgz"
+  resolved "https://registry.yarnpkg.com/prepend-http/-/prepend-http-1.0.4.tgz#d4f4562b0ce3696e41ac52d0e002e57a635dc6dc"
   integrity sha1-1PRWKwzjaW5BrFLQ4ALlemNdxtw=
 
 prepend-http@^2.0.0:
@@ -12615,7 +12623,7 @@ query-string@7.0.1, query-string@^7.0.0:
 
 query-string@^4.1.0:
   version "4.3.4"
-  resolved "https://registry.npmjs.org/query-string/-/query-string-4.3.4.tgz"
+  resolved "https://registry.yarnpkg.com/query-string/-/query-string-4.3.4.tgz#bbb693b9ca915c232515b228b1a02b609043dbeb"
   integrity sha1-u7aTucqRXCMlFbIosaArYJBD2+s=
   dependencies:
     object-assign "^4.1.0"
@@ -13989,7 +13997,7 @@ sockjs@^0.3.21:
 
 sort-keys@^1.0.0:
   version "1.1.2"
-  resolved "https://registry.npmjs.org/sort-keys/-/sort-keys-1.1.2.tgz"
+  resolved "https://registry.yarnpkg.com/sort-keys/-/sort-keys-1.1.2.tgz#441b6d4d346798f1b4e49e8920adfba0e543f9ad"
   integrity sha1-RBttTTRnmPG05J6JIK37oOVD+a0=
   dependencies:
     is-plain-obj "^1.0.0"

@@ -2,7 +2,6 @@ import React, { Fragment, useState } from "react";
 import { Dialog, Combobox, Transition } from "@headlessui/react";
 import {
   ChevronDownIcon,
-  SelectorIcon,
   CheckIcon,
 } from "@heroicons/react/solid";
 import api from "lib/api";
@@ -37,11 +36,11 @@ const TokenDropDownModal = () => {
     setIsOpen(false);
   }
 
-  const filteredPeople =
+  const filteredToken =
     query === ""
       ? tickers
-      : tickers.filter((person) =>
-          person.name
+      : tickers.filter((token) =>
+          token.name
             .toLowerCase()
             .replace(/\s+/g, "")
             .includes(query.toLowerCase().replace(/\s+/g, ""))
@@ -53,7 +52,7 @@ const TokenDropDownModal = () => {
         <button
           type="button"
           onClick={openModal}
-          className="rounded-md flex items-center text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75"
+          className="flex items-center text-sm font-medium rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75"
         >
           {
             <img
@@ -62,7 +61,7 @@ const TokenDropDownModal = () => {
               className="w-4"
             />
           }
-          <p className=" text-lg ml-3">{selected.name}</p>
+          <p className="ml-3 text-lg ">{selected.name}</p>
           <ChevronDownIcon className="w-5 h-5 ml-1 -mr-1" aria-hidden="true" />
         </button>
       </div>
@@ -82,7 +81,7 @@ const TokenDropDownModal = () => {
           </Transition.Child>
 
           <div className="fixed inset-0 overflow-y-auto">
-            <div className="flex min-h-full items-center justify-center p-5 text-center">
+            <div className="flex items-center justify-center min-h-full p-5 text-center">
               <Transition.Child
                 as={Fragment}
                 enter="ease-out duration-300"
@@ -95,18 +94,18 @@ const TokenDropDownModal = () => {
                 <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-md bg-foreground-900 bg-[#2B2E4A] text-left align-middle shadow-xl transition-all">
                   <Dialog.Title
                     as="h3"
-                    className="text-lg font-semibold leading-6 pt-4 pl-5 divide-y"
+                    className="pt-4 pl-5 text-lg font-semibold leading-6 divide-y font-work"
                   >
                     Select a token to Bridge
                     
                   </Dialog.Title>
-                  <div className="h-px my-3 bg-foreground-400 mx-3"></div>
+                  <div className="h-px mx-3 my-3 bg-foreground-400"></div>
                   <Combobox value={selected} onChange={onSelectedToken}>
                     <div className="relative mt-2">
-                      <div className="relative cursor-default overflow-hidden text-left shadow-md rounded-md focus:outline-none mx-3 ">
+                      <div className="relative mx-3 overflow-hidden text-left rounded-md shadow-md cursor-default focus:outline-none ">
                         <Combobox.Input
-                          className="w-full border-none py-2.5 pl-3 pr-10 text-base leading-5 focus:ring-0 bg-foreground-100"
-                          displayValue={(person) => person.name}
+                          className="w-full border-none py-2.5 pl-3 pr-10 text-base leading-5 focus:ring-0 bg-foreground-100 font-work"
+                          displayValue={(token) => token.name}
                           onChange={(event) => setQuery(event.target.value)}
                           placeholder="Search..."
                         />
@@ -123,16 +122,16 @@ const TokenDropDownModal = () => {
                           open
                           className=" mt-1 max-h-60 w-full overflow-auto rounded-md bg-[#2B2E4A] py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none "
                         >
-                          {filteredPeople.length === 0 && query !== "" ? (
-                            <div className="relative cursor-default select-none py-2 px-4">
+                          {filteredToken.length === 0 && query !== "" ? (
+                            <div className="relative px-4 py-2 cursor-default select-none font-work">
                               Nothing found.
                             </div>
                           ) : (
-                            filteredPeople.map((item) => (
+                            filteredToken.map((item) => (
                               <Combobox.Option
                                 key={item.id}
                                 className={({ active }) =>
-                                  `relative cursor-default select-none py-2 pl-10 pr-4 mx-3 bg-foreground-100 rounded-md mb-2 border-t border-l border-r border-b border-foreground-400 ${
+                                  `relative cursor-default select-none py-2 font-work pl-10 pr-4 mx-3 bg-foreground-100 rounded-md mb-2 border-t border-l border-r border-b border-foreground-400 ${
                                     active ? "bg-teal-600" : ""
                                   }`
                                 }
@@ -161,7 +160,7 @@ const TokenDropDownModal = () => {
                                         }`}
                                       >
                                         <CheckIcon
-                                          className="h-5 w-5"
+                                          className="w-5 h-5"
                                           aria-hidden="true"
                                         />
                                       </span>

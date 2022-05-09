@@ -11,8 +11,6 @@ const StyledButton = styled.button`
   display: inline-flex;
   font-family: inherit;
 	font-family: Inter;
-	font-style: normal;
-	font-weight: 600;
   justify-content: center;
   letter-spacing: 0.01em;
   line-height: 1;

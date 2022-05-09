@@ -7,9 +7,9 @@ const networkLists = [
     {id: 2, name:'zkSync - Rinkeby', value: 1000, url:'#'}
   ]
 
-const NetworkSelection = () => {
+const NetworkSelection = ({className}) => {
   return (
-    <div>
+    <div className={className}>
         <ListBox options= {networkLists} />
     </div>
   )

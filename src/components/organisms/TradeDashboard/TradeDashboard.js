@@ -10,6 +10,7 @@ import TradeBooks from "./TradeBooks/TradeBooks";
 import OrdersBook from "./TradeBooks/OrdersBook";
 import TradesBook from "./TradeBooks/TradesBook";
 import "react-toastify/dist/ReactToastify.css";
+
 import {
   networkSelector,
   userOrdersSelector,
@@ -316,9 +317,7 @@ export function TradeDashboard() {
           marketInfo={marketInfo}
           bidBins={bidBins}
         />
-        <TradesBook
-          currentMarket={currentMarket}
-        />
+        <TradesBook currentMarket={currentMarket} />
         {/* TradeChartArea */}
         <TradeChartArea marketInfo={marketInfo} />
         {/* OrdersTable */}
