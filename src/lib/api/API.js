@@ -422,53 +422,58 @@ export default class API extends Emitter {
   };
 
   transferPolygonWeth = async (amount, walletAddress) => {
-    const polygonChainId = this.getPolygonChainId(this.apiProvider.network);
-    await window.ethereum.request({
-      method: "wallet_switchEthereumChain",
-      params: [{ chainId: polygonChainId }],
-    });
-    const polygonProvider = new ethers.providers.Web3Provider(
-      window.web3.currentProvider
-    );
-    const currentNetwork = await polygonProvider.getNetwork();
-
-    if ("0x"+currentNetwork.chainId.toString(16) !== polygonChainId)
-      throw new Error("Must approve network change");
-    // const signer = polygonProvider.getSigner();
-    const wethContractAddress = this.getPolygonWethContract(
-      this.apiProvider.network
-    );
-
-    const contract = new this.web3.eth.Contract(
-      wethContractABI,
-      wethContractAddress
-    );
-    // contract.connect(signer);
-    const [account] = await this.web3.eth.getAccounts();
-    const result = await contract.methods
-      .transfer(ZKSYNC_POLYGON_BRIDGE.address, "" + Math.round(amount * (10 ** 18)))
-      .send({ 
-        from: account, 
-        maxPriorityFeePerGas: null,
-        maxFeePerGas: null
+    try{
+      const polygonChainId = this.getPolygonChainId(this.apiProvider.network);
+      await window.ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: polygonChainId }],
       });
+      const polygonProvider = new ethers.providers.Web3Provider(
+        window.web3.currentProvider
+      );
+      const currentNetwork = await polygonProvider.getNetwork();
 
-    const txHash = result.transactionHash;
+      if ("0x"+currentNetwork.chainId.toString(16) !== polygonChainId)
+        throw new Error("Must approve network change");
+      // const signer = polygonProvider.getSigner();
+      const wethContractAddress = this.getPolygonWethContract(
+        this.apiProvider.network
+      );
 
-    let receipt = {
-      date: +new Date(),
-      network: await polygonProvider.getNetwork(),
-      amount,
-      token: "WETH",
-      type: ZKSYNC_POLYGON_BRIDGE.polygonToZkSync,
-      txId: txHash,
-      walletAddress: polygonChainId === "0x13881" ? `https://rinkeby.zksync.io/explorer/accounts/${walletAddress}` : `https://zkscan.io/explorer/accounts/${walletAddress}`
-    };
-    const subdomain = polygonChainId === "0x13881" ? "mumbai." : "";
-    receipt.txUrl = `https://${subdomain}polygonscan.com/tx/${txHash}`;
-    this.emit("bridgeReceipt", receipt);
+      const contract = new this.web3.eth.Contract(
+        wethContractABI,
+        wethContractAddress
+      );
+      // contract.connect(signer);
+      const [account] = await this.web3.eth.getAccounts();
+      const result = await contract.methods
+        .transfer(ZKSYNC_POLYGON_BRIDGE.address, "" + Math.round(amount * (10 ** 18)))
+        .send({ 
+          from: account, 
+          maxPriorityFeePerGas: null,
+          maxFeePerGas: null
+        });
 
-    this.signIn(this.apiProvider.network)
+      const txHash = result.transactionHash;
+
+      let receipt = {
+        date: +new Date(),
+        network: await polygonProvider.getNetwork(),
+        amount,
+        token: "WETH",
+        type: ZKSYNC_POLYGON_BRIDGE.polygonToZkSync,
+        txId: txHash,
+        walletAddress: polygonChainId === "0x13881" ? `https://rinkeby.zksync.io/explorer/accounts/${walletAddress}` : `https://zkscan.io/explorer/accounts/${walletAddress}`
+      };
+      const subdomain = polygonChainId === "0x13881" ? "mumbai." : "";
+      receipt.txUrl = `https://${subdomain}polygonscan.com/tx/${txHash}`;
+      this.emit("bridgeReceipt", receipt);
+
+      await this.signIn(this.apiProvider.network)
+      return true;
+    } catch(e) {
+      return false;
+    }
   };
 
   getNetworkName = (network) => {
