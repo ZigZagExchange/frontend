@@ -55,6 +55,7 @@ const Bridge = () => {
   const [toNetwork, setToNetwork] = useState(fromNetwork.to[0])
   const [balances, setBalances] = useState([]);
   const [altBalances, setAltBalances] = useState([]);
+  const [polygonLoding, setPolygonLoading] = useState(false)
   const [swapDetails, _setSwapDetails] = useState(() => ({
     amount: "",
     currency: "ETH",
@@ -418,6 +419,7 @@ const Bridge = () => {
     let deferredXfer;
     setLoading(true);
     if (fromNetwork.from.key === "polygon" && toNetwork.key === "zksync") {
+      setPolygonLoading(true)
       deferredXfer = api.transferPolygonWeth(`${swapDetails.amount}`, user.address)
       toast.info(
         renderGuidContent(),
@@ -465,8 +467,10 @@ const Bridge = () => {
       })
       .catch((e) => {
         console.error("error sending transaction::", e);
+        setTimeout(() => api.getAccountState(), 1000);
       })
       .finally(() => {
+        setPolygonLoading(false)
         setLoading(false);
       });
   };
@@ -712,14 +716,14 @@ const Bridge = () => {
             </div>
           )}
 
-          {!user.address && (
+          {!user.address && !polygonLoding && (
             <div className="bridge_transfer_fee">
               🔗 &nbsp;Please connect your wallet
             </div>
           )}
 
           <div className="bridge_button">
-            {!user.address && <ConnectWalletButton />}
+            {!user.address && <ConnectWalletButton isLoading={polygonLoding} />}
             {user.address && (
               <>
                 {balances[swapDetails.currency] && !hasAllowance && !hasError 
