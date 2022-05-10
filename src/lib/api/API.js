@@ -262,7 +262,7 @@ export default class API extends Emitter {
         if (!window.ethereum) return
         let ethereumChainId
 
-        await this.signOut();
+        // await this.signOut();
 
         switch (this.apiProvider.network) {
             case 1:
@@ -276,8 +276,8 @@ export default class API extends Emitter {
         }
 
         await window.ethereum.request({
-           method: 'eth_requestAccounts',
-           params: [{eth_accounts: {}}]
+          method: 'eth_requestAccounts',
+          params: [{eth_accounts: {}}]
         });
 
         await window.ethereum.request({
@@ -304,9 +304,6 @@ export default class API extends Emitter {
           await this.refreshNetwork();
           await this.sleep(1000);
           if (this.isZksyncChain()) {
-            // const web3Provider = isMobile
-            //   ? await this.web3Modal.connectTo("walletconnect")
-            //   : await this.web3Modal.connect();
             const web3Provider = await this.web3Modal.connect();
             this.web3.setProvider(web3Provider);
             this.ethersProvider = new ethers.providers.Web3Provider(
