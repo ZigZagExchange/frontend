@@ -306,7 +306,7 @@ export const Header = (props) => {
               <BiChevronDown className="eu_caret" />
             </label>
             <div className="head_account_area">
-              {user.id && user.address ? (
+              {user.address ? (
                 <AccountDropdown />
               ) : (
                 <Button

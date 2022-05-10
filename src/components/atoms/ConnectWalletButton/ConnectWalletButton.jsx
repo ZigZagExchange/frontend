@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { networkSelector } from "../../../lib/store/features/api/apiSlice";
 import { Button } from "../Button";
@@ -6,11 +6,17 @@ import darkPlugHead from "../../../assets/icons/dark-plug-head.png";
 import api from "../../../lib/api";
 import { useHistory, useLocation } from "react-router-dom";
 
-const ConnectWalletButton = () => {
+const ConnectWalletButton = (props) => {
   const network = useSelector(networkSelector);
   const [isLoading, setIsLoading] = useState(false);
   const history = useHistory();
   const location = useLocation();
+
+  useEffect(()=>{
+    if(props.isLoading) {
+      setIsLoading(props.isLoading)
+    }
+  }, [props.isLoading])
 
   const pushToBridgeMaybe = (state) => {
     if (!state.id && !/^\/bridge(\/.*)?/.test(location.pathname)) {
