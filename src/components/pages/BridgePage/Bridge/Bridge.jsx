@@ -175,6 +175,7 @@ const Bridge = () => {
       api.getL2FastWithdrawLiquidity().then((maxes) => {
         setFastWithdrawCurrencyMaxes(maxes);
       });
+      setSwapDetails({});
     }
   }, [user.address]);
 
@@ -297,14 +298,19 @@ const Bridge = () => {
         setFee(details, null, null);
       });
 
-    api.withdrawL2FastBridgeFee(details.currency)
-      .then((res) => {
-        setL1Fee(res);
-      })
-      .catch((e) => {
-        console.error(e);
-        setL1Fee(null);
-      });
+    if(toNetwork.key !== 'polygon'){
+      api.withdrawL2FastBridgeFee(details.currency)
+        .then((res) => {
+          setL1Fee(res);
+        })
+        .catch((e) => {
+          console.error(e);
+          setL1Fee(null);
+        });
+    }
+    else {
+      setL1Fee(null);
+    }
   };
 
   const setNormalWithdrawFees = (details) => {

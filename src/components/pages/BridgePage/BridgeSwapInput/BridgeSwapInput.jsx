@@ -76,6 +76,10 @@ const BridgeSwapInput = ({ value = {}, onChange, balances = {}, gasFee, bridgeFe
         if (feeCurrency === value.currency) {
           balance -= (bridgeFee + gasFee);
         }
+        else if(value.currency === 'ETH') {
+          balance -= gasFee;
+        }
+        if(balance < 0) balance = 0;
         // one number to protect against overflow
         max = Math.round(balance * 10**roundedDecimalDigits - 1) / 10**roundedDecimalDigits;
       }
