@@ -439,7 +439,7 @@ export default class APIZKProvider extends APIProvider {
           token,
           ZKSYNC_POLYGON_BRIDGE.zkSyncToPolygon,
           "zksync",
-          this.network === 1000 ? `https://mumbai.polygonscan.com/address/${userAddress}`:`https://polygonscan.com/address/${userAddress}`
+          this.network === 1000 ? `https://mumbai.polygonscan.com/address/${userAddress}#tokentxns`:`https://polygonscan.com/address/${userAddress}#tokentxns`
         )
       );
     } else if (ZKSYNC_ETHEREUM_FAST_BRIDGE.address === address) {
