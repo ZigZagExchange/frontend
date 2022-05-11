@@ -21,7 +21,7 @@ const L2Header = ({ networks, onSelect, selectedNetwork }) => {
     <div className="bridge_coin_details">
       <Dropdown overlay={dropdownMenu} overlayClassName="bridge_menu">
         <div className="d-flex align-items-center">
-          <div className="bridge_coin_image" style={{ background: "#fff" }}>
+          <div className="bridge_coin_image">
             <img alt="Ethereum logo" src={selectedNetwork.icon} />
           </div>
           <h4 className="bridge_coin_name">{selectedNetwork.network}<span><br />Mainnet</span></h4>
