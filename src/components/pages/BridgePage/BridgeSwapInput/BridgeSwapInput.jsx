@@ -25,7 +25,7 @@ export const BridgeInputBox = styled.div`
     border: none;
     outline: none;
     text-align: right;
-    color: #fff;
+    color: ${(p) => p.theme.colors.foregroundHighEmphasis};
     -webkit-appearance: none;
     appearance: none;
   }

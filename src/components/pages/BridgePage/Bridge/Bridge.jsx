@@ -52,8 +52,15 @@ const BridgeBox = styled.div`
       justify-content: flex-end;
       
       p {
-        color: rgba(255, 255, 255, 0.72);
+        color: ${(p) => p.theme.colors.foregroundHighEmphasis};
+        opacity: 0.72;
       }
+    }
+  }
+
+  .bridge_coin_details {
+    .svg {
+      color: ${(p) => p.theme.colors.foregroundHighEmphasis};
     }
   }
 
@@ -63,12 +70,13 @@ const BridgeBox = styled.div`
     text-align: center;
     overflow: hidden;
     border-radius: 50%;
+    // background: ${(p) => p.theme.colors.foreground400};
   }
 
   .bridge_coin_name {
     font-size: 16px;
     font-weight: 600;
-    color: #fff;
+    color: ${(p) => p.theme.colors.foregroundHighEmphasis};
 
     span {
       font-size: 12px;
@@ -82,22 +90,30 @@ const BridgeBox = styled.div`
   .maxLink {
     font-size: 10px;
   }
+  
+  .bridge_bubble_connected, .bridge_bubble_disconnected {
+    border: 1px solid ${(p) => p.theme.colors.foregroundHighEmphasis}
+  }
 
   h3 {
-    color: #fff;
+    color: ${(p) => p.theme.colors.foregroundHighEmphasis};
     font-size: 14px;
     font-weight: 600;
   }
 
   h4 {
-    color: #fff;
+    color: ${(p) => p.theme.colors.foregroundHighEmphasis};
     font-size: 12px;
   }
 
   p {
     font-size: 10px;
     font-weight: 400;
-    color: #fff;
+    color: ${(p) => p.theme.colors.foregroundHighEmphasis}
+  }
+
+  span {
+    color: ${(p) => p.theme.colors.foregroundHighEmphasis}
   }
 `;
 

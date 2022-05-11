@@ -21,11 +21,11 @@ const L1Header = ({ networks, onSelect, selectedNetwork }) => {
     <div className="bridge_coin_details">
       <Dropdown overlay={dropdownMenu} overlayClassName="bridge_menu">
         <div className="d-flex align-items-center">
-          <div className="bridge_coin_image" style={{ background: "#fff" }}>
+          <div className="bridge_coin_image">
             <img alt="Ethereum logo" src={selectedNetwork.from.icon} />
           </div>
           <h4 className="bridge_coin_name">{selectedNetwork.from.network}<span><br />Mainnet</span></h4>
-          <BiChevronDown size={25} className="ml-2" color="#FFF" />
+          <BiChevronDown size={25} className="ml-2" />
         </div>
       </Dropdown>
     </div>

@@ -4,7 +4,7 @@ import { useParams, Link } from "react-router-dom";
 import { Box } from "@material-ui/core";
 import styled from "@xstyled/styled-components";
 import { networkSelector } from "lib/store/features/api/apiSlice";
-import { DefaultTemplate } from "components";
+import { BridgeTemplate } from "components";
 import cx from "classnames";
 import api from "lib/api";
 import Bridge from "./Bridge/Bridge";
@@ -29,7 +29,7 @@ const BrideHeadTabs = styled.div`
     font-weight: 500;
     font-size: 13px;
     background: transparent;
-    color: rgba(255, 255, 255, 0.7);
+    color: foregroundHighEmphasis;
     transition: all 0.15s ease-in-out;
 
     &:first-child {
@@ -50,7 +50,7 @@ const BrideHeadTabs = styled.div`
 
     &:active, &.bridge_head_tab_active {
       text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
-      color: #fff;
+      color: ${(p) => p.theme.colors.foregroundHighEmphasis};
       
       &::after {
         transform: scale(1, 1);
@@ -71,6 +71,28 @@ const BrideHeadTabs = styled.div`
   }
 `;
 
+const BridgeSection = styled.div`
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-height: calc(100vh - 48px);
+  padding: 2rem 0;
+  background-color: ${(p) => p.theme.colors.bridgeBackground};
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  flex-direction: column;
+  justify-content: center;
+
+  a:hover {
+    color: #09aaf5;
+  }
+
+  h3 {
+    color: ${(p) => p.theme.colors.foregroundHighEmphasis}
+  }
+`;
+
 export default function BridgePage() {
   const network = useSelector(networkSelector);
   const isBridgeCompatible = useMemo(
@@ -80,10 +102,10 @@ export default function BridgePage() {
   const tab = useParams().tab || "bridge";
 
   return (
-    <DefaultTemplate>
-      <div className="bridge_section">
+    <BridgeTemplate>
+      <BridgeSection>
         <div className="bridge_container">
-          <Box component="h3" className="text-white">ZigZag Bridge</Box>
+          <Box component="h3">ZigZag Bridge</Box>
           <BrideHeadTabs>
             <Link
               className={cx({ bridge_head_tab_active: tab === "bridge" })}
@@ -110,7 +132,7 @@ export default function BridgePage() {
             <BridgeIncompatible />
           )}
         </div>
-      </div>
-    </DefaultTemplate>
+      </BridgeSection>
+    </BridgeTemplate>
   );
 }
