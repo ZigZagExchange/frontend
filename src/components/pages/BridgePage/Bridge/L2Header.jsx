@@ -1,8 +1,11 @@
+import { useSelector } from "react-redux";
 import { Dropdown, Menu, MenuItem } from "components";
 import { BiChevronDown } from "react-icons/bi";
 import React from "react";
+import { networkSelector } from "lib/store/features/api/apiSlice";
 
 const L2Header = ({ networks, onSelect, selectedNetwork }) => {
+  const network = useSelector(networkSelector);
   const dropdownMenu = () => {
     return (
       <Menu className="bridge_menu" onSelect={onSelect} selectedKeys={[selectedNetwork.key]}>
@@ -24,7 +27,10 @@ const L2Header = ({ networks, onSelect, selectedNetwork }) => {
           <div className="bridge_coin_image" style={{ background: "#fff" }}>
             <img alt="Ethereum logo" src={selectedNetwork.icon} />
           </div>
-          <h4 className="bridge_coin_name">{selectedNetwork.network}<span><br />Mainnet</span></h4>
+          <h4 className="bridge_coin_name">
+            {selectedNetwork.network}
+            <span><br />{ network === 1 ? 'Mainnet' : 'Testnet'}</span>
+          </h4>
           <BiChevronDown size={25} className="ml-2" />
         </div>
       </Dropdown>
