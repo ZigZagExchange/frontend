@@ -51,7 +51,7 @@ const BridgeInputBox = styled.div`
   }
 `;
 
-const BridgeSwapInput = ({ value = {}, onChange, balances = {}, gasFee, bridgeFee, feeCurrency, isOpenable }) => {
+const BridgeSwapInput = ({ value = {}, onChange, balances = {}, L1Fee, L2Fee, feeCurrency, isOpenable }) => {
   const setCurrency = useCallback(currency => {
     onChange({ currency, amount: '' })
   }, [onChange])
@@ -71,17 +71,25 @@ const BridgeSwapInput = ({ value = {}, onChange, balances = {}, gasFee, bridgeFe
         currencyInfo = api.getCurrencyInfo(value.currency);
       }
       const roundedDecimalDigits = Math.min(currencyInfo.decimals, 8);
-      let balance = balances[value.currency].value / (10 ** currencyInfo.decimals);
-      if (balance !== 0) {
-        if (feeCurrency === value.currency) {
-          balance -= (bridgeFee + gasFee);
+      let actualBalance = balances[value.currency].value / (10 ** currencyInfo.decimals);
+      if (actualBalance !== 0) {
+        let receiveAmount = 0;
+        if (feeCurrency === 'ETH' && value.currency === 'ETH') {
+          receiveAmount = actualBalance - L2Fee - L1Fee;
+          max = actualBalance - L2Fee;
         }
-        else if(value.currency === 'ETH') {
-          balance -= gasFee;
+        else if (feeCurrency === value.currency) {
+          receiveAmount = actualBalance - L2Fee;
+          max = actualBalance - L2Fee;
         }
-        if(balance < 0) balance = 0;
+        else {
+          max = actualBalance;
+        }
         // one number to protect against overflow
-        max = Math.round(balance * 10**roundedDecimalDigits - 1) / 10**roundedDecimalDigits;
+        if(receiveAmount < 0) max = 0;
+        else {
+          max = Math.round(max * 10**roundedDecimalDigits - 1) / 10**roundedDecimalDigits;
+        }
       }
     } catch (e) {
       max = parseFloat((balances[value.currency] && balances[value.currency].valueReadable) || 0)

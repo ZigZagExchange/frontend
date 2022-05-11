@@ -63,6 +63,7 @@ const Bridge = () => {
   const [hasError, setHasError] = useState(false);
   const [activationFee, setActivationFee] = useState(0);
   const [usdFee, setUsdFee] = useState(0);
+  const [switchClicking, setSwitchClicking] = useState(false);
 
   const coinEstimator = useCoinEstimator();
   const currencyValue = coinEstimator(swapDetails.currency);
@@ -99,10 +100,11 @@ const Bridge = () => {
   }, [toNetwork, user.address, walletBalances, zkBalances, polygonBalances])
 
   const [withdrawSpeed, setWithdrawSpeed] = useState("fast");
-  const isFastWithdraw =
-    withdrawSpeed === "fast" &&
-    transfer.type === "withdraw" &&
-    api.apiProvider.eligibleFastWithdrawTokens.includes(swapDetails.currency);
+  const isFastWithdraw = () => {
+    return (withdrawSpeed === "fast" &&
+      transfer.type === "withdraw" &&
+      api.apiProvider.eligibleFastWithdrawTokens.includes(swapDetails.currency));
+  }
  
   useEffect(()=>{
     setHasError(formErr && formErr.length > 0);
@@ -118,17 +120,6 @@ const Bridge = () => {
   }, [toNetwork, swapDetails])
 
   useEffect(()=>{
-    if (fromNetwork.from.key === 'polygon') {
-      api.getPolygonWethBalance()
-      setSwapDetails({ amount: '', currency: 'WETH' })
-    }
-    else if (fromNetwork.from.key === 'ethereum' && swapDetails.currency === 'WETH') {
-      api.getWalletBalances()
-      setSwapDetails({ amount: '', currency: 'ETH' })
-    }
-    else if (fromNetwork.from.key === 'zksync' && swapDetails.currency === 'WETH') {
-      setSwapDetails({ amount: '', currency: 'ETH' })
-    }
     if(fromNetwork.from.key === 'zksync'){    
       const type = transfer.type = "withdraw";
       setTransfer({ type });
@@ -138,7 +129,26 @@ const Bridge = () => {
       const type = transfer.type = "deposit";
       setTransfer({ type });
     }
-  }, [toNetwork, fromNetwork])
+
+    if (fromNetwork.from.key === 'polygon') {
+      api.getPolygonWethBalance()
+      setSwapDetails({ amount: '', currency: 'WETH' })
+    }
+    else if (fromNetwork.from.key === 'ethereum') {
+      api.getWalletBalances()
+      const currency = switchClicking? swapDetails.currency: 'ETH';
+      setSwapDetails({ amount: '', currency });
+      
+    }
+    else if (fromNetwork.from.key === 'zksync' && toNetwork.key === 'ethereum') {
+      const currency = switchClicking? swapDetails.currency: 'ETH';
+      setSwapDetails({ amount: '', currency });
+    }
+    else if (fromNetwork.from.key === 'zksync' && toNetwork.key === 'polygon') {
+      setSwapDetails({ amount: '', currency: 'ETH' });
+    }
+    setSwitchClicking(false);
+  }, [toNetwork])
 
   useEffect(() => {
     let _swapCurrencyInfo = {}
@@ -207,11 +217,6 @@ const Bridge = () => {
     }
   }, [swapDetails.currency]);
 
-  useEffect(() => {
-    // since setSwapDetails uses state, instead of recalculating
-    // swap details in switchTransferType we recalculate as an effect here.
-    setSwapDetails({});
-  }, [transfer.type]);
 
   const validateInput = (inputValue, swapCurrency) => {
     if (balances.length === 0) return false;
@@ -231,7 +236,7 @@ const Bridge = () => {
         error = "Amount too small";
       } else if (inputValue >= detailBalance) {
         error = "Insufficient balance";
-      } else if (isFastWithdraw) {
+      } else if (isFastWithdraw()) {
         if (toNetwork.key !== 'polygon' && L1Fee !== null  && inputValue < L1Fee) {
           error = "Amount too small";
         }
@@ -360,7 +365,7 @@ const Bridge = () => {
     }
     else if (transfer.type === "withdraw") {
       if (api.apiProvider.syncWallet) {
-        if (isFastWithdraw) {
+        if (isFastWithdraw()) {
           setFastWithdrawFees(details);
         } else {
           setNormalWithdrawFees(details);
@@ -382,19 +387,7 @@ const Bridge = () => {
       const f = NETWORKS.find(i => i.from.key === toNetwork.key)
       setFromNetwork(f)
       setToNetwork(fromNetwork.from)
-      let currency;
-      switch (f.from.key) {
-        case "polygon":
-          currency = "WETH";
-          break;
-        default:
-          currency = swapDetails.currency;
-          break;
-      }
-      setSwapDetails({
-        amount: "",
-        currency
-      })
+      setSwitchClicking(true);
   };
 
   const approveSpend = (e) => {
@@ -448,7 +441,7 @@ const Bridge = () => {
         user.address
       );
     } else if (fromNetwork.from.key === "zksync" && toNetwork.key === "ethereum") {
-      if (isFastWithdraw) {
+      if (isFastWithdraw()) {
         deferredXfer = api.transferToBridge(
           `${swapDetails.amount}`,
           swapDetails.currency,
@@ -485,38 +478,11 @@ const Bridge = () => {
     const f = NETWORKS.find((i) => i.from.key === key)
     setFromNetwork(f)
     setToNetwork(f.to[0])
-    let currency;
-    switch (key) {
-      case "polygon":
-        currency = "WETH";
-        break;
-      default:
-        currency = "ETH";
-        break;
-    }
-    setSwapDetails({
-      amount: "",
-      currency
-    })
-
   };
 
   const onSelectToNetwork = ({ key }) => {
     const t = fromNetwork.to.find((i) => i.key === key)
     setToNetwork(t)
-    let currency;
-    switch (key) {
-      case "polygon":
-        currency = "WETH";
-        break;
-      default:
-        currency = "ETH";
-        break;
-    }
-    setSwapDetails({
-      amount: "",
-      currency
-    })
   }
 
   const getToBalance = () => {
@@ -546,8 +512,8 @@ const Bridge = () => {
             <L1Header networks={NETWORKS} onSelect={onSelectFromNetwork} selectedNetwork={fromNetwork} />
           </div>
           <BridgeSwapInput
-            gasFee={L1Fee}
-            bridgeFee={L2Fee}
+            L1Fee={L1Fee}
+            L2Fee={L2Fee}
             balances={balances}
             value={swapDetails}
             onChange={setSwapDetails}
@@ -665,7 +631,7 @@ const Bridge = () => {
 
                   {transfer.type === "withdraw" && toNetwork.key === "ethereum" && (
                     <x.div>
-                      {isFastWithdraw && L1Fee && (
+                      {isFastWithdraw() && L1Fee && (
                         <div>
                           Ethereum L1 gas + bridge fee: ~{formatPrice(L1Fee)}{" "}
                           {swapDetails.currency}
@@ -673,8 +639,8 @@ const Bridge = () => {
                       )}
                       <x.div color={"blue-gray-300"}>
                         You'll receive:
-                        {isFastWithdraw?' ~':' '}
-                        {isFastWithdraw && L1Fee
+                        {isFastWithdraw()?' ~':' '}
+                        {isFastWithdraw() && L1Fee
                           ? formatPrice(swapDetails.amount - L1Fee)
                           : formatPrice(swapDetails.amount)}
                         {" " + swapDetails.currency} on Ethereum L1
