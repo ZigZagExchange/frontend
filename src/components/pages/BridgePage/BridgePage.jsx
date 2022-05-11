@@ -13,24 +13,6 @@ import "./BridgePage.style.css";
 import Text from "components/atoms/Text/Text";
 import { TabMenu, Tab } from "components/molecules/TabMenu";
 
-const BridgeSection = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-height: calc(100vh - 48px);
-  height: 100%;
-  background-color: ${({ theme }) => theme.colors.backgroundHighEmphasis};
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
-  padding: 2rem 0;
-
-  a:hover {
-    color: ${({ theme }) => theme.colors.primaryHighEmphasis};
-  }
-`
-
 const BridgeContainer = styled.div`
   width: 100%;
   max-width: 400px;
@@ -49,6 +31,28 @@ const StyledTabMenu = styled(TabMenu)`
   margin: 16px 0px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.foreground400};
 `
+
+const BridgeSection = styled.div`
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-height: calc(100vh - 48px);
+  padding: 2rem 0;
+  background-color: ${(p) => p.theme.colors.bridgeBackground};
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  flex-direction: column;
+  justify-content: center;
+
+  a:hover {
+    color: #09aaf5;
+  }
+
+  h3 {
+    color: ${(p) => p.theme.colors.foregroundHighEmphasis}
+  }
+`;
 
 export default function BridgePage() {
   const [index, setIndex] = useState(0);

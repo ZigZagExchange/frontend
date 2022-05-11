@@ -44,7 +44,7 @@ const BridgeCurrencyWrapper = styled.div`
     flex: 1 1 auto;
     margin-left: 8px;
     font-size: 15px;
-    color: #fff;
+    color: ${(p) => p.theme.colors.foregroundHighEmphasis};
 
     svg {
       position: relative;
