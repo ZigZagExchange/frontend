@@ -24,7 +24,7 @@ const L2Header = ({ networks, onSelect, selectedNetwork }) => {
           <div className="bridge_coin_image" style={{ background: "#fff" }}>
             <img alt="Ethereum logo" src={selectedNetwork.icon} />
           </div>
-          <div className="bridge_coin_name">{selectedNetwork.network}</div>
+          <h4 className="bridge_coin_name">{selectedNetwork.network}<span><br />Mainnet</span></h4>
           <BiChevronDown size={25} className="ml-2" color="#FFF" />
         </div>
       </Dropdown>

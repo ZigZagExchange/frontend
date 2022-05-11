@@ -12,13 +12,10 @@ import SearchBox from "components/organisms/TradeDashboard/TradeSidebar/SearchBo
 const StyledBridgeCurrencySelector = styled.div`
   height: 46px;
   padding: 0 10px;
-  background: #fff;
   border-radius: 15px;
   display: inline-flex;
   flex-direction: row;
   align-items: center;
-  border: 1px solid #fff;
-  box-shadow: 2px 2px 2px 0 rgba(0, 0, 0, 0.2);
   cursor: pointer;
   user-select: none;
 
@@ -47,7 +44,7 @@ const BridgeCurrencyWrapper = styled.div`
     flex: 1 1 auto;
     margin-left: 8px;
     font-size: 15px;
-    color: #333;
+    color: #fff;
 
     svg {
       position: relative;
@@ -171,7 +168,7 @@ const BridgeCurrencySelector = ({ onChange, balances = {}, value, isOpenable }) 
   };
 
   const openModal = () => {
-    if(!isOpenable) return;
+    if (!isOpenable) return;
     setShow(true)
   }
 
@@ -194,7 +191,7 @@ const BridgeCurrencySelector = ({ onChange, balances = {}, value, isOpenable }) 
         }}
         show={show}
       >
-        <SearchBox searchPair={(value)=>setSearchValue(value)} searchValue={searchValue} className="bridge_searchbox" />
+        <SearchBox searchPair={(value) => setSearchValue(value)} searchValue={searchValue} className="bridge_searchbox" />
         <BridgeCurrencyOptions>
           {tickers
             .filter((item) => {

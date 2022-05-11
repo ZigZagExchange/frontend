@@ -1,16 +1,16 @@
 .bridge_section {
   width: 100%;
+  max-width: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
-  min-height: calc(100vh - 56px);
+  min-height: calc(100vh - 48px);
   height: 100%;
   background-color: #1c2231;
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
-  padding-bottom: 2rem;
+  padding: 2rem 0;
 }
 
 .bridge_incompatible {
@@ -35,11 +35,6 @@
   margin-top: 15px;
   font-size: 15px;
   font-weight: normal;
-}
-
-.bridge_section a {
-  color: #1c4fa8;
-  text-decoration: none;
 }
 
 .bridge_coin_stats {
@@ -70,27 +65,6 @@
 
 .bridge_section a:hover {
   color: #09aaf5;
-}
-
-.bridge_head_tabs {
-  display: inline-flex;
-  flex-direction: row;
-  margin: 20px 0;
-}
-
-.bridge_head_tabs > a {
-  display: block;
-  transition: all 0.15s ease-in-out;
-  text-transform: uppercase;
-  padding: 9px 30px;
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  color: rgba(255, 255, 255, 0.7);
-  text-shadow: 0 0 4px rgba(255, 255, 255, 0.3);
-  box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.01);
-  font-weight: 500;
-  font-size: 13px;
-  margin-left: -1px;
 }
 
 .bridge_link {
@@ -133,7 +107,7 @@
   justify-content: flex-start;
 }
 
-.bridge_contain > *:not(:last-child) {
+.bridge_contain>*:not(:last-child) {
   margin-right: 12px;
 }
 
@@ -171,41 +145,13 @@
   background: #848;
 }
 
-.bridge_head_tabs > a:hover {
-  border-color: #fff;
-  background: rgba(255, 255, 255, 0.5);
-  color: #000;
-}
-
-.bridge_head_tabs > a:active,
-.bridge_head_tabs > a.bridge_head_tab_active {
-  border-color: #fff;
-  background: rgba(255, 255, 255, 0.6);
-  box-shadow: 0 0 3px 0 rgba(255, 255, 255, 0.9);
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
-  color: #fff;
-}
-
-.bridge_head_tabs > a:first-child {
-  border-top-left-radius: 10px;
-  border-bottom-left-radius: 10px;
-  margin-left: 0;
-}
-
-.bridge_head_tabs > a:last-child {
-  border-top-right-radius: 10px;
-  border-bottom-right-radius: 10px;
-}
-
 .bridge_connected_as {
   font-size: 12px;
   margin-top: auto;
-  margin-bottom: 10px;
-  padding: 10px 15px;
   display: flex;
   justify-content: center;
   flex: 0 0 auto;
-  color: rgba(255, 255, 255, 0.5);
+  color: #fff;
   align-items: center;
 }
 
@@ -216,48 +162,49 @@
   margin-left: 6px;
 }
 
-.bridge_disconnect > a {
+.bridge_disconnect>a {
   display: inline-block;
   margin-left: 2px;
   font-size: 12px;
   color: #69f;
 }
 
-.bridge_disconnect > a:hover {
+.bridge_disconnect>a:hover {
   color: #09aaf5;
 }
 
 .bridge_bubble_connected,
 .bridge_bubble_disconnected {
-  width: 6px;
-  height: 6px;
-  border-radius: 6px;
-  background: #c00;
   display: inline-block;
-  margin-right: 8px;
+  position: relative;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  margin-left: 8px;
+  border: 1px solid #fff;
 }
 
-.bridge_bubble_connected {
-  background: #0c0;
+.bridge_bubble_connected::before,
+.bridge_bubble_disconnected::before {
+  content: '';
+  display: block;
+  position: absolute;
+  inset: 1px;
+  background: linear-gradient(93.46deg, #2AABEE 16.94%, #0CCFCF 97.24%);
+}
+
+.bridge_bubble_disconnected::before {
+  background: linear-gradient(93.46deg, #ee372a 16.94%, #cf0c0c 97.24%);
 }
 
 .bridge_container {
   width: 100%;
+  max-width: 400px;
   margin: 0 auto;
   position: relative;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  align-items: center;
-}
-
-.bridge_box {
-  width: 509px;
-  max-width: 90%;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 24px;
-  color: #94a2c9;
-  margin-bottom: 15px;
 }
 
 .bridge_box_bottom,
@@ -281,12 +228,8 @@
   color: rgba(185, 205, 255, 0.3);
 }
 
-.bridge_coin_name {
-  font-size: 20px;
-  color: #fff;
-}
 
-.bridge_menu .rc-dropdown-menu > .rc-dropdown-menu-item {
+.bridge_menu .rc-dropdown-menu>.rc-dropdown-menu-item {
   padding: 3px;
 }
 
@@ -307,7 +250,6 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  width: 100%;
   cursor: pointer;
 }
 
@@ -321,16 +263,12 @@
   border-radius: 32px;
 }
 
-.bridge_coin_image {
-  width: 32px;
-  height: 32px;
-  text-align: center;
-  overflow: hidden;
-  border-radius: 32px;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 2px;
+.rc-dropdown-menu>.rc-dropdown-menu-item-selected:after {
+  top: 15px;
 }
 
-.rc-dropdown-menu > .rc-dropdown-menu-item-selected:after {
-  top: 15px;
+@media screen and (max-width: 480px) {
+  .bridge_container {
+    padding: 0 10px;
+  }
 }
