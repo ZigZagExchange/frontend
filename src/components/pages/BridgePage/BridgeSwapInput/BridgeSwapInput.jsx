@@ -16,18 +16,25 @@ export const BridgeInputBox = styled.div`
 
   input,
   input:focus {
-    font-family: "Iceland", sans-serif;
+    font-family: WorkSans-SemiBold;
     width: calc(100% - 148px);
     height: 20px;
     background: transparent;
     padding: 20px 20px 20px 7px;
-    font-size: 28px;
+    font-size: 20px;
+    line-height: 23px;
     border: none;
     outline: none;
     text-align: right;
     color: ${(p) => p.theme.colors.foregroundHighEmphasis};
     -webkit-appearance: none;
     appearance: none;
+  }
+
+  .address-input {
+    font-family: WorkSans-Regular;
+    font-size: 14px;
+    line-height: 15px;
   }
 
   .maxLink {
