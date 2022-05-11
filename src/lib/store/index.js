@@ -16,6 +16,7 @@ import apiReducer, {
   clearUserOrders,
   clearLastPrices,
   setArweaveAllocation,
+  setCurrentMarket,
 } from "lib/store/features/api/apiSlice";
 import autoMergeLevel2 from "redux-persist/lib/stateReconciler/autoMergeLevel2";
 import api from "lib/api";
@@ -92,6 +93,7 @@ api.on("signOut", (accountState) => {
 api.on("providerChange", (network) => {
   store.dispatch(clearLastPrices());
   store.dispatch(setNetwork(network));
+  store.dispatch(setCurrentMarket('ETH-USDC'));
 });
 
 api.on("message", (operation, args) => {

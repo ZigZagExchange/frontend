@@ -48,6 +48,7 @@
 
 .rb_text_1 p {
   color: #94a2c9;
+  white-space: nowrap;
 }
 
 .rb_text_2 h1 {
