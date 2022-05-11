@@ -12,6 +12,7 @@ const StyledTradeFooter = styled.footer`
   background: ${({theme}) => theme.colors.backgroundDisabled};
   border-top: 1px solid ${({theme}) => theme.colors.foreground400};
   font-size: 12px;
+  height: 57px;
 `;
 
 const SocialWrapper = styled.div`
