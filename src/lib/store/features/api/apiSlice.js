@@ -364,7 +364,7 @@ export const apiSlice = createSlice({
           break;
         case "zkSync_to_polygon":
           successMsg = "transferred";
-          targetMsg = "to Polygon:";
+          targetMsg = "on Polygon:";
           extraInfoLink = null;
           break;
         case "polygon_to_zkSync":

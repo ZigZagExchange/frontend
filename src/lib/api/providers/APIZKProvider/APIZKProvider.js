@@ -14,7 +14,6 @@ import {
   ETH_ZKSYNC_BRIDGE
 } from "components/pages/BridgePage/Bridge/constants";
 import _ from "lodash"
-// import wethContractABI from "lib/contracts/WETH.json";
 
 export default class APIZKProvider extends APIProvider {
   static SEEDS_STORAGE_KEY = "@ZZ/ZKSYNC_SEEDS";
@@ -86,6 +85,19 @@ export default class APIZKProvider extends APIProvider {
 
     return receipt;
   };
+
+  changePubKeyFee = async () => {
+    const { data } = await axios.post(this.getZkSyncBaseUrl(this.network) + "/fee",
+      {
+        txType: { ChangePubKey: "ECDSA" },
+        address: "0x5364ff0cecb1d44efd9e4c7e4fe16bf5774530e3",
+        tokenLike: "USDC",
+      },
+      { headers: { "Content-Type": "application/json", }, }
+    );
+    // somehow the fee is ~50% too low
+    return ((data.result.totalFee / 10 ** 6) * 2);
+  }
 
   changePubKey = async () => {
     try {
@@ -427,7 +439,7 @@ export default class APIZKProvider extends APIProvider {
           token,
           ZKSYNC_POLYGON_BRIDGE.zkSyncToPolygon,
           "zksync",
-          this.network === 1000 ? `https://mumbai.polygonscan.com/address/${userAddress}`:`https://polygonscan.com/address/${userAddress}`
+          this.network === 1000 ? `https://mumbai.polygonscan.com/address/${userAddress}#tokentxns`:`https://polygonscan.com/address/${userAddress}#tokentxns`
         )
       );
     } else if (ZKSYNC_ETHEREUM_FAST_BRIDGE.address === address) {
