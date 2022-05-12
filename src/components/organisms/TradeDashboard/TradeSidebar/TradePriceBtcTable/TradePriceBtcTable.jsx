@@ -264,8 +264,8 @@ class TradePriceBtcTable extends React.Component {
           return changeDirection ? d.td3 - d2.td3 : d2.td3 - d.td3;
         } else if (priceSorted) {
           return priceDirection ? d.td2 - d2.td2 : d2.td2 - d.td2;
-        } else {
-          return 0;
+        } else {//default sort is usdVolumn
+          return d.usdVolumn - d2.usdVolumn;
         }
       })
       .map(([pair, d], i) => {
