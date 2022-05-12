@@ -51,7 +51,7 @@ const BridgeInputBox = styled.div`
   }
 `;
 
-const BridgeSwapInput = ({ value = {}, onChange, balances = {}, L1Fee, L2Fee, feeCurrency, isOpenable }) => {
+const BridgeSwapInput = ({ value = {}, onChange, balances = {}, L1Fee, L2Fee, feeCurrency, isOpenable, gasFetching }) => {
   const setCurrency = useCallback(currency => {
     onChange({ currency, amount: '' })
   }, [onChange])
@@ -61,6 +61,7 @@ const BridgeSwapInput = ({ value = {}, onChange, balances = {}, L1Fee, L2Fee, fe
   }, [onChange])
 
   const setMax = () => {
+    if(gasFetching) return;
     let max = 0;
     try {
       let currencyInfo = {};
@@ -81,6 +82,10 @@ const BridgeSwapInput = ({ value = {}, onChange, balances = {}, L1Fee, L2Fee, fe
         else if (feeCurrency === value.currency) {
           receiveAmount = actualBalance - L2Fee;
           max = actualBalance - L2Fee;
+        }
+        else if (value.currency === 'ETH' && feeCurrency === null) {
+          receiveAmount = actualBalance - L1Fee;
+          max = actualBalance - L1Fee;
         }
         else {
           max = actualBalance;
