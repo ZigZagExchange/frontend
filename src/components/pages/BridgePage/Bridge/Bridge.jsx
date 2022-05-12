@@ -37,7 +37,7 @@ const defaultTransfer = {
   type: "deposit",
 };
 
-const BridgeBox = styled.div`
+export const BridgeBox = styled.div`
   padding: 2rem;
   border: 1px solid ${({ theme }) => theme.colors.foreground400};
   border-radius: 1rem;
@@ -764,10 +764,10 @@ const Bridge = () => {
                     )}
                     <Box className="layer">
                       <Box component="h4" color={"blue-gray-300"}>
-                        You'll receive: 
+                        You'll receive:
                       </Box>
                       <Box component="h4" color={"blue-gray-300"}>
-                        {isFastWithdraw?' ~':' '}
+                        {isFastWithdraw ? ' ~' : ' '}
                         {isFastWithdraw && L1Fee
                           ? formatPrice(swapDetails.amount - L1Fee)
                           : formatPrice(swapDetails.amount)}
@@ -822,21 +822,21 @@ const Bridge = () => {
       {!user.address && <ConnectWalletButton isLoading={polygonLoding} />}
       {user.address && (
         <>
-          {balances[swapDetails.currency] && !hasAllowance && !hasError 
-          && fromNetwork.from.key !== "polygon" &&(
-            <Button
-              isLoading={isApproving}
-              scale="md"
-              disabled={
-                  formErr.length > 0 || 
-                  Number(swapDetails.amount) === 0 || 
+          {balances[swapDetails.currency] && !hasAllowance && !hasError
+            && fromNetwork.from.key !== "polygon" && (
+              <Button
+                isLoading={isApproving}
+                scale="md"
+                disabled={
+                  formErr.length > 0 ||
+                  Number(swapDetails.amount) === 0 ||
                   swapDetails.currency === "ETH"
-              }
-              onClick={approveSpend}
-            >
-              APPROVE
-            </Button>
-          )}
+                }
+                onClick={approveSpend}
+              >
+                APPROVE
+              </Button>
+            )}
           {hasError && (
             <Button
               variant="sell"
@@ -849,15 +849,15 @@ const Bridge = () => {
             <Button
               isLoading={loading}
               disabled={
-                  formErr.length > 0 ||
-                  (L2Fee === null && L1Fee === null) ||
-                  !hasAllowance ||
-                  Number(swapDetails.amount) === 0
+                formErr.length > 0 ||
+                (L2Fee === null && L1Fee === null) ||
+                !hasAllowance ||
+                Number(swapDetails.amount) === 0
               }
               onClick={doTransfer}
             >
               TRANSFER
-            </Button>                
+            </Button>
           )}
         </>
       )}

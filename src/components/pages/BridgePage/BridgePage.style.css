@@ -65,12 +65,12 @@
   justify-content: flex-start;
 }
 
-.bridge_box_transactions {
+/* .bridge_box_transactions {
   margin: 0 0 25px;
   overflow-y: auto;
   overflow-x: hidden;
   width: 100%;
-}
+} */
 
 .bridge_box_receipt_head {
   padding: 26px 20px 12px;

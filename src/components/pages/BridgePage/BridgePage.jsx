@@ -4,7 +4,7 @@ import { useParams, Link, useHistory } from "react-router-dom";
 import { Box } from "@material-ui/core";
 import styled from "@xstyled/styled-components";
 import { networkSelector } from "lib/store/features/api/apiSlice";
-import { DefaultTemplate } from "components";
+import { BridgeT, BridgeTemplate } from "components";
 import api from "lib/api";
 import Bridge from "./Bridge/Bridge";
 import BridgeReceipts from "./BridgeReceipts/BridgeReceipts";
@@ -66,14 +66,14 @@ export default function BridgePage() {
   const tab = useParams().tab || "bridge";
   const handleTabClick = (newIndex) => {
     setIndex(newIndex);
-    if(newIndex === 0)
+    if (newIndex === 0)
       history.push('/bridge')
     else
       history.push('/bridge/receipts')
   }
 
   return (
-    <DefaultTemplate>
+    <BridgeTemplate>
       <BridgeSection>
         <BridgeContainer>
           <Text font="primaryHeading4" color="foregroundHighEmphasis">ZigZag Bridge</Text>
@@ -95,6 +95,6 @@ export default function BridgePage() {
         </BridgeContainer>
       </BridgeSection>
       <TradeFooter />
-    </DefaultTemplate>
+    </BridgeTemplate>
   );
 }

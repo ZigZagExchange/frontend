@@ -1,25 +1,55 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { userSelector } from "lib/store/features/auth/authSlice";
-import api from "lib/api";
-import { DefaultTemplate } from "components";
 import { RiErrorWarningLine } from "react-icons/all";
+import { userSelector } from "lib/store/features/auth/authSlice";
+import { arweaveAllocationSelector, networkSelector } from "lib/store/features/api/apiSlice";
+import api from "lib/api";
+import { x } from "@xstyled/styled-components";
+import styled from "styled-components";
 import "bootstrap";
+
+import { DefaultTemplate } from "components";
 import ConnectWalletButton from "../../atoms/ConnectWalletButton/ConnectWalletButton";
 import Pane from "../../atoms/Pane/Pane";
 import AllocationModal from "./AllocationModal";
-import { x } from "@xstyled/styled-components";
 import Submit, { Button } from "../../atoms/Form/Submit";
 import { jsonify } from "../../../lib/helpers/strings";
 import { Dev } from "../../../lib/helpers/env";
 import SuccessModal from "./SuccessModal";
-import {arweaveAllocationSelector, networkSelector} from "lib/store/features/api/apiSlice";
-import {HiExternalLink} from "react-icons/hi";
+import { HiExternalLink } from "react-icons/hi";
 import ExternalLink from "./ExternalLink";
 import ListPairForm from "./ListPairForm";
-import {sleep} from "../../../lib/utils";
+import { sleep } from "../../../lib/utils";
 
 export const TRADING_VIEW_CHART_KEY = "tradingViewChart";
+
+const ListPage = styled.div`
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-height: calc(100vh - 113px);
+  padding: 2rem 0;
+  background-color: ${(p) => p.theme.colors.bridgeBackground};
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  flex-direction: column;
+  justify-content: center;
+`;
+
+const ListContainer = styled.div`
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+
+  @media screen and (max-width: 480px) {
+    padding: 0 10px;
+  }
+`
 
 export default function ListPairPage() {
   const user = useSelector(userSelector);
@@ -115,23 +145,13 @@ export default function ListPairPage() {
 
   return (
     <DefaultTemplate>
-      <x.div
-        p={{xs: '2'}}
-        backgroundColor={"blue-400"}
-        w={"full"}
-        h={"full"}
-        style={{ minHeight: "calc(100vh - 48px)" }}
-        color={"white"}
-        display={"flex"}
-        alignItems={"center"}
-        justifyContent={"center"}
-      >
-        <Pane size={'sm'} variant={"light"} maxWidth={"500px"} margin={"auto"}>
+      <ListPage>
+        <ListContainer>
           <x.div display={"flex"} justifyContent={"space-between"} mb={4}>
-            <x.div fontSize={{xs: 'lg', md: '2xl'}} mb={2}>
+            <x.div fontSize={{ xs: 'lg', md: '2xl' }} mb={2}>
               List New Pair
             </x.div>
-            <x.div fontSize={{xs: 'xs', md: '12px'}} color={"blue-gray-400"} textAlign={"center"}>
+            <x.div fontSize={{ xs: 'xs', md: '12px' }} color={"blue-gray-400"} textAlign={"center"}>
               <x.div>No Internal ID?</x.div>
               <x.div>
                 <ExternalLink href={"https://zkscan.io/explorer/tokens"}>
@@ -192,8 +212,9 @@ export default function ListPairPage() {
               }
             })()}
           </ListPairForm>
-        </Pane>
-      </x.div>
+        </ListContainer>
+      </ListPage>
+
       <AllocationModal
         onClose={() => setIsAllocationModalOpen(false)}
         show={isAllocationModalOpen}
