@@ -30,6 +30,7 @@ export class SpotForm extends React.Component {
     const newState = { ...this.state };
     newState.baseAmount = e.target.value;
     newState.quoteAmount = "";
+    newState.maxSizeSelected = false;
     this.setState(newState);
   }
 
