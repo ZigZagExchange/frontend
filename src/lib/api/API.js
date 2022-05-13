@@ -357,6 +357,8 @@ export default class API extends Emitter {
 
     if(isMobile)
       window.localStorage.clear();
+    else
+      window.localStorage.removeItem('walletconnect');
 
     this.web3 = null;
     this.web3Modal = null;
