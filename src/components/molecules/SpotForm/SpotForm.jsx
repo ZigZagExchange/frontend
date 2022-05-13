@@ -512,7 +512,7 @@ export class SpotForm extends React.Component {
         <FormHeader>
           <InfoWrapper>
             <Text font="primaryTiny" color="foregroundMediumEmphasis">Sell Fee</Text>
-            <InfoIcon />
+            <QuestionHelper text="zkSync's network swap fees are dynamic and sit around ~$0.50 covered by the market maker, but paid by the trader"/>
           </InfoWrapper>
           <Text font="primaryExtraSmallSemiBold" color="foregroundMediumEmphasis">
             {marketInfo && marketInfo.baseFee &&
