@@ -79,8 +79,11 @@ export const Header = (props) => {
           {user.address ? (
             <Dropdown overlay={dropdownMenu}>
               <button className="address_button">
-                {user.address.slice(0, 8)}···
-                {user.address.slice(-4)}
+                <span>
+                  {user.address.slice(0, 8)}···
+                  {user.address.slice(-4)}
+                  <h4>WALLET</h4>
+                </span>
                 <AiOutlineCaretDown />
               </button>
             </Dropdown>

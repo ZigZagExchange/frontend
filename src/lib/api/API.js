@@ -16,6 +16,7 @@ import {
   POLYGON_MUMBAI_WETH_ADDRESS,
   POLYGON_MAINNET_WETH_ADDRESS,
 } from "components/pages/BridgePage/Bridge/constants";
+import { isMobile } from "react-device-detect";
 
 const chainMap = {
   "0x1": 1,
@@ -291,7 +292,7 @@ export default class API extends Emitter {
     if (!window.ethereum) return
     let ethereumChainId
 
-    await this.signOut();
+    // await this.signOut();
 
     switch (this.apiProvider.network) {
       case 1:
@@ -336,9 +337,6 @@ export default class API extends Emitter {
           await this.refreshNetwork();
           await this.sleep(1000);
           if (this.isZksyncChain()) {
-            // const web3Provider = isMobile
-            //   ? await this.web3Modal.connectTo("walletconnect")
-            //   : await this.web3Modal.connect();
             const web3Provider = await this.web3Modal.connect();
             this.web3.setProvider(web3Provider);
             this.ethersProvider = new ethers.providers.Web3Provider(
@@ -390,7 +388,10 @@ export default class API extends Emitter {
       await this.web3Modal.clearCachedProvider();
     }
 
-    window.localStorage.clear();
+    if(isMobile)
+      window.localStorage.clear();
+    else
+      window.localStorage.removeItem('walletconnect');
 
     this.web3 = null;
     this.web3Modal = null;
@@ -454,53 +455,63 @@ export default class API extends Emitter {
   };
 
   transferPolygonWeth = async (amount, walletAddress) => {
-    const polygonChainId = this.getPolygonChainId(this.apiProvider.network);
-    await window.ethereum.request({
-      method: "wallet_switchEthereumChain",
-      params: [{ chainId: polygonChainId }],
-    });
-    const polygonProvider = new ethers.providers.Web3Provider(
-      window.web3.currentProvider
-    );
-    const currentNetwork = await polygonProvider.getNetwork();
-
-    if ("0x"+currentNetwork.chainId.toString(16) !== polygonChainId)
-      throw new Error("Must approve network change");
-    // const signer = polygonProvider.getSigner();
-    const wethContractAddress = this.getPolygonWethContract(
-      this.apiProvider.network
-    );
-
-    const contract = new this.web3.eth.Contract(
-      wethContractABI,
-      wethContractAddress
-    );
-    // contract.connect(signer);
-    const [account] = await this.web3.eth.getAccounts();
-    const result = await contract.methods
-      .transfer(ZKSYNC_POLYGON_BRIDGE.address, "" + Math.round(amount * (10 ** 18)))
-      .send({ 
-        from: account, 
-        maxPriorityFeePerGas: null,
-        maxFeePerGas: null
+    let networkSwitched = false;
+    try{
+      const polygonChainId = this.getPolygonChainId(this.apiProvider.network);
+      await window.ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: polygonChainId }],
       });
+      const polygonProvider = new ethers.providers.Web3Provider(
+        window.web3.currentProvider
+      );
+      const currentNetwork = await polygonProvider.getNetwork();
 
-    const txHash = result.transactionHash;
+      if ("0x"+currentNetwork.chainId.toString(16) !== polygonChainId)
+        throw new Error("Must approve network change");
+      // const signer = polygonProvider.getSigner();
 
-    let receipt = {
-      date: +new Date(),
-      network: await polygonProvider.getNetwork(),
-      amount,
-      token: "WETH",
-      type: ZKSYNC_POLYGON_BRIDGE.polygonToZkSync,
-      txId: txHash,
-      walletAddress: polygonChainId === "0x13881" ? `https://rinkeby.zksync.io/explorer/accounts/${walletAddress}` : `https://zkscan.io/explorer/accounts/${walletAddress}`
-    };
-    const subdomain = polygonChainId === "0x13881" ? "mumbai." : "";
-    receipt.txUrl = `https://${subdomain}polygonscan.com/tx/${txHash}`;
-    this.emit("bridgeReceipt", receipt);
+      networkSwitched = true;
 
-    this.signIn(this.apiProvider.network)
+      const wethContractAddress = this.getPolygonWethContract(
+        this.apiProvider.network
+      );
+
+      const contract = new this.web3.eth.Contract(
+        wethContractABI,
+        wethContractAddress
+      );
+      // contract.connect(signer);
+      const [account] = await this.web3.eth.getAccounts();
+      const result = await contract.methods
+        .transfer(ZKSYNC_POLYGON_BRIDGE.address, "" + Math.round(amount * (10 ** 18)))
+        .send({ 
+          from: account, 
+          maxPriorityFeePerGas: null,
+          maxFeePerGas: null
+        });
+
+      const txHash = result.transactionHash;
+
+      let receipt = {
+        date: +new Date(),
+        network: await polygonProvider.getNetwork(),
+        amount,
+        token: "WETH",
+        type: ZKSYNC_POLYGON_BRIDGE.polygonToZkSync,
+        txId: txHash,
+        walletAddress: polygonChainId === "0x13881" ? `https://rinkeby.zksync.io/explorer/accounts/${walletAddress}` : `https://zkscan.io/explorer/accounts/${walletAddress}`
+      };
+      const subdomain = polygonChainId === "0x13881" ? "mumbai." : "";
+      receipt.txUrl = `https://${subdomain}polygonscan.com/tx/${txHash}`;
+      this.emit("bridgeReceipt", receipt);
+
+      await this.signIn(this.apiProvider.network)
+    } catch(e) {
+      if (networkSwitched)
+        await this.signIn(this.apiProvider.network);
+      throw e;
+    }
   };
 
   getNetworkName = (network) => {
@@ -584,6 +595,9 @@ export default class API extends Emitter {
       await contract.methods
         .approve(netContract, MAX_ALLOWANCE)
         .send({ from: account });
+
+      // update allowances after successfull approve
+      this.getWalletBalances();
     }
   };
 

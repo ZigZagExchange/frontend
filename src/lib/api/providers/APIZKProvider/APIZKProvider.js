@@ -14,7 +14,6 @@ import {
   ETH_ZKSYNC_BRIDGE
 } from "components/pages/BridgePage/Bridge/constants";
 import _ from "lodash"
-// import wethContractABI from "lib/contracts/WETH.json";
 
 export default class APIZKProvider extends APIProvider {
   static SEEDS_STORAGE_KEY = "@ZZ/ZKSYNC_SEEDS";
@@ -97,7 +96,8 @@ export default class APIZKProvider extends APIProvider {
       },
       { headers: { "Content-Type": "application/json", }, }
     );
-    return (data.result.totalFee / 10 ** 6);
+    // somehow the fee is ~50% too low
+    return ((data.result.totalFee / 10 ** 6) * 2);
   }
 
   changePubKey = async () => {
@@ -440,7 +440,7 @@ export default class APIZKProvider extends APIProvider {
           token,
           ZKSYNC_POLYGON_BRIDGE.zkSyncToPolygon,
           "zksync",
-          this.network === 1000 ? `https://mumbai.polygonscan.com/address/${userAddress}`:`https://polygonscan.com/address/${userAddress}`
+          this.network === 1000 ? `https://mumbai.polygonscan.com/address/${userAddress}#tokentxns`:`https://polygonscan.com/address/${userAddress}#tokentxns`
         )
       );
     } else if (ZKSYNC_ETHEREUM_FAST_BRIDGE.address === address) {
