@@ -65,6 +65,13 @@ const DropdownButton = styled.div`
     margin-left: 5px;
     font-size: 13px;
   }
+
+  & h4 {
+    margin: 0;
+    font-size: 10px;
+    text-align: center;
+    text-transform: uppercase;
+  }
 `;
 
 const AvatarImg = styled.img`
@@ -285,8 +292,12 @@ export const AccountDropdown = () => {
     >
       <DropdownButton onClick={() => setShow(!show)} tabIndex="0">
         <AvatarImg src={profile.image} alt={profile.name} />
-        {profile.name}
+        <span>
+          {profile.name}
+          <h4>Wallet</h4>
+        </span>
         <AiOutlineCaretDown />
+        
       </DropdownButton>
       <DropdownDisplay>
         <DropdownHeader>
