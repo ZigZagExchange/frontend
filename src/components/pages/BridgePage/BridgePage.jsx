@@ -1,10 +1,9 @@
 import React, { useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { useParams, Link, useHistory } from "react-router-dom";
-import { Box } from "@material-ui/core";
+import { useParams, useHistory } from "react-router-dom";
 import styled from "@xstyled/styled-components";
 import { networkSelector } from "lib/store/features/api/apiSlice";
-import { BridgeT, BridgeTemplate } from "components";
+import { BridgeTemplate } from "components";
 import api from "lib/api";
 import Bridge from "./Bridge/Bridge";
 import BridgeReceipts from "./BridgeReceipts/BridgeReceipts";

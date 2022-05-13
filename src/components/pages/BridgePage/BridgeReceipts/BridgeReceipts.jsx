@@ -156,7 +156,7 @@ const BridgeReceipts = () => {
             <div className="layer-wrapper">
             {
               item.items.map((rr) => {
-                const mtime = format(rr.date, 'h:mm')
+                const mtime = format(rr.date, 'H:mm')
                 const currency = api.getCurrencyInfo(rr.token);
                 const image = api.getCurrencyLogo(rr.token);
                 return (

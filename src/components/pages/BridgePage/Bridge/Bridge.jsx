@@ -23,9 +23,6 @@ import {
   ZKSYNC_ETHEREUM_FAST_BRIDGE,
   ZKSYNC_POLYGON_BRIDGE
 } from "./constants"
-
-// import custom components
-// import { Button } from "../../../atoms/Button";
 import RadioButtons from "components/atoms/RadioButtons/RadioButtons";
 import { Button, ConnectWalletButton } from "components/molecules/Button";
 import BridgeSwapInput from "../BridgeSwapInput/BridgeSwapInput";
@@ -33,8 +30,8 @@ import L2Header from "./L2Header";
 import L1Header from "./L1Header";
 import { BridgeInputBox } from '../BridgeSwapInput/BridgeSwapInput';
 import { LoadingSpinner } from "components/atoms/LoadingSpinner";
-import ExternalLink from "../../ListPairPage/ExternalLink";
-import {HiExternalLink} from "react-icons/hi";
+import { ExternalLinkIcon } from "components/atoms/Svg";
+import Text from "components/atoms/Text/Text";
 
 const defaultTransfer = {
   type: "deposit",
@@ -56,6 +53,7 @@ export const BridgeBox = styled.div`
 
     &.layer-end {
       justify-content: flex-end;
+      align-items: center;
       
       p {
         color: ${(p) => p.theme.colors.foregroundHighEmphasis};
@@ -132,6 +130,11 @@ export const BridgeBox = styled.div`
 const CustomSwapButton = styled(SwapButton)`
   width: 34px;
   height: 34px;
+`
+
+const ActionWrapper = styled(Text)`
+    text-decoration: underline;
+    cursor: pointer;
 `
 
 const Bridge = () => {
@@ -629,17 +632,24 @@ const Bridge = () => {
   }
   
   const renderLabel = () => {
-    return <div>
-      <div mb={2}>
+    return <>
+      <Text font="primaryExtraSmall" color="foregroundHighEmphasis" mb={2}>
         Fast: receive ETH, UST and FRAX within seconds through ZigZag's Fast Withdrawal bridge.
-      </div>
-      <div mb={2}>
+      </Text>
+      <Text font="primaryExtraSmall" color="foregroundHighEmphasis" mb={2}>
         Normal: use zkSync's bridge and receive funds after a few hours.
+      </Text>
+      <div style={{display: 'flex', flexDirection: 'row', gap: 4, alignItems: 'center'}}>
+        <ActionWrapper
+          font="primaryExtraSmallSemiBold"
+          color="primaryHighEmphasis" 
+          onClick={() => window.open("https://docs.zigzag.exchange/zksync/fast-withdraw-bridge", '_blank')}
+        >
+          Learn more
+        </ActionWrapper>
+        <ExternalLinkIcon size={10} />
       </div>
-      <div><ExternalLink href={"https://docs.zigzag.exchange/zksync/fast-withdraw-bridge"}>
-        Learn more<HiExternalLink/>
-      </ExternalLink></div>
-    </div>
+    </>
   }
 
   return (
@@ -751,8 +761,8 @@ const Bridge = () => {
             {transfer.type === "withdraw" && (
               <>
                 {fromNetwork.from.key === 'zksync' && toNetwork.key === 'ethereum' && (
-                  <>
-                    <Box className="layer layer-end">
+                  <Box className="layer">
+                    <Box>
                       <RadioButtons
                         horizontal
                         value={withdrawSpeed}
@@ -771,7 +781,7 @@ const Bridge = () => {
                         ]}
                       />
                     </Box>
-                    <Box className="layer layer-end">
+                    <Box>
                       <div style={{display: 'flex', marginTop: 2}}>
                         <div fontSize={12} color={"blue-gray-500"}>
                           Withdraw speed
@@ -779,7 +789,7 @@ const Bridge = () => {
                         <QuestionHelper text={renderLabel()}/>
                       </div>
                     </Box>
-                  </>
+                  </Box>
                 )}
                 {L2Fee && (
                   <Box className="layer">
