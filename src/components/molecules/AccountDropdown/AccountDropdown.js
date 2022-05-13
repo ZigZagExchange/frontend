@@ -69,6 +69,7 @@ const DropdownButton = styled.div`
   & h4 {
     margin: 0;
     font-size: 10px;
+    text-align: center;
     text-transform: uppercase;
   }
 `;
