@@ -5,7 +5,7 @@ import {
 } from 'ethers';
 import { useSelector } from "react-redux";
 import isEmpty from "lodash/isEmpty";
-import { SwapButton, useCoinEstimator } from "components";
+import { SwapButton, useCoinEstimator, QuestionHelper } from "components";
 import {
   networkSelector,
   balancesSelector,
@@ -26,12 +26,15 @@ import {
 
 // import custom components
 // import { Button } from "../../../atoms/Button";
+import RadioButtons from "components/atoms/RadioButtons/RadioButtons";
 import { Button, ConnectWalletButton } from "components/molecules/Button";
 import BridgeSwapInput from "../BridgeSwapInput/BridgeSwapInput";
 import L2Header from "./L2Header";
 import L1Header from "./L1Header";
 import { BridgeInputBox } from '../BridgeSwapInput/BridgeSwapInput';
 import { LoadingSpinner } from "components/atoms/LoadingSpinner";
+import ExternalLink from "../../ListPairPage/ExternalLink";
+import {HiExternalLink} from "react-icons/hi";
 
 const defaultTransfer = {
   type: "deposit",
@@ -624,6 +627,20 @@ const Bridge = () => {
 
     return balance + " " + unit;
   }
+  
+  const renderLabel = () => {
+    return <div>
+      <div mb={2}>
+        Fast: receive ETH, UST and FRAX within seconds through ZigZag's Fast Withdrawal bridge.
+      </div>
+      <div mb={2}>
+        Normal: use zkSync's bridge and receive funds after a few hours.
+      </div>
+      <div><ExternalLink href={"https://docs.zigzag.exchange/zksync/fast-withdraw-bridge"}>
+        Learn more<HiExternalLink/>
+      </ExternalLink></div>
+    </div>
+  }
 
   return (
     <>
@@ -733,6 +750,37 @@ const Bridge = () => {
           <>
             {transfer.type === "withdraw" && (
               <>
+                {fromNetwork.from.key === 'zksync' && toNetwork.key === 'ethereum' && (
+                  <>
+                    <Box className="layer layer-end">
+                      <RadioButtons
+                        horizontal
+                        value={withdrawSpeed}
+                        onChange={setWithdrawSpeed}
+                        name={"withdrawSpeed"}
+                        items={[
+                          {
+                            id: "fast",
+                            name: "Fast",
+                            disabled:
+                              !api.apiProvider.eligibleFastWithdrawTokens?.includes(
+                                swapDetails.currency
+                              ),
+                          },
+                          { id: "normal", name: "Normal" },
+                        ]}
+                      />
+                    </Box>
+                    <Box className="layer layer-end">
+                      <div style={{display: 'flex', marginTop: 2}}>
+                        <div fontSize={12} color={"blue-gray-500"}>
+                          Withdraw speed
+                        </div>
+                        <QuestionHelper text={renderLabel()}/>
+                      </div>
+                    </Box>
+                  </>
+                )}
                 {L2Fee && (
                   <Box className="layer">
                     <Box component="h4">
@@ -845,7 +893,7 @@ const Bridge = () => {
               {formErr}
             </Button>
           )}
-          {!hasError && (
+          {hasAllowance && !hasError && (
             <Button
               isLoading={loading}
               disabled={

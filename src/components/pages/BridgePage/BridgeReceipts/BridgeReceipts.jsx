@@ -1,11 +1,12 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import styled from "styled-components";
+import { format } from "date-fns";
 import {
   bridgeReceiptsSelector,
   clearBridgeReceipts,
 } from "lib/store/features/api/apiSlice";
-import { formatDistance } from "date-fns";
-import styled from "styled-components";
+import api from "lib/api";
 
 const RecepitHeader = styled.div`
   display: flex;
@@ -51,9 +52,11 @@ const ReceiptBox = styled.div`
   }
 
   .layer {
-    display: flex;
-    padding: 1.5rem 1rem;
+    display: grid;
+    grid-template-columns: 222px 138px;
+    padding: 20px;
     justify-content: space-between;
+    cursor: pointer;
 
     &:not(:last-child) {
       border-bottom: 1px solid ${(p) => p.theme.colors.foreground400}
@@ -66,24 +69,40 @@ const ReceiptBox = styled.div`
 
     .layer-left {
       h3 {
-        margin-right: 20px;
-
-        &.first-child {
-          padding: 3px;
-          border: 1px solid ${(p) => p.theme.colors.foreground400}
+        font-size: 12px;
+        &:first-child {
+          padding: 4px 8px;
+          border: 1px solid ${(p) => p.theme.colors.foreground400};
+          border-radius: 8px;
         }
 
-        &.last-child {
-          margin-left: 8px;
+        &:last-child {
+          line-height: 25px;
+          padding-right: 20px;
+        }
+      }
+      .amountWrapper {
+        display: flex;
+        flex-direction: row;
+        gap: 8px;
+        
+        .currencyIcon > img {
+          width: 16px;
+          height: 16px;
+          object-fit: contain;
         }
       }
     }
 
     .layer-right {
-      opacity: .48;
-
+      color: ${(p) => p.theme.colors.foregroundLowEmphasis};
       h5 {
-        margin-right: 1rem;
+        line-height: 25px;
+        padding-left: 10px;
+      }
+
+      h4 {
+        line-height: 25px;
       }
     }
   }
@@ -92,6 +111,28 @@ const ReceiptBox = styled.div`
 const BridgeReceipts = () => {
   const receipts = useSelector(bridgeReceiptsSelector);
   const dispatch = useDispatch();
+  const [groupArray, setGroupArray] = useState([])
+
+  useEffect(() => {
+    let tempArray = []
+    let tempObj = {date: '', items: []}
+    receipts.forEach((item, key) => {
+      const mdate = format(item.date, 'MMM d, Y')
+      if ( tempObj.date === '' ) {
+        tempObj = {date: mdate, items: []}
+      }
+      if ( tempObj.date !== mdate ) {
+        tempArray.push(tempObj)
+        tempObj = {date: mdate, items: []}
+      }
+      tempObj.items.push(item)
+      if (key === receipts.length-1) {
+        tempArray.push(tempObj)
+      }
+    })
+    setGroupArray(tempArray)
+  }, [])
+
   return (
     <RecepitSection>
       <RecepitHeader>
@@ -104,100 +145,45 @@ const BridgeReceipts = () => {
         </h5>
       </RecepitHeader>
 
-      {/* {receipts.length === 0 && (
+      {receipts.length === 0 && (
         <h3>No bridge receipts yet.</h3>
-      )} */}
-
-      <ReceiptBox>
-        <h3 className="receipt-header">March 13, 2022</h3>
-
-        <div className="layer-wrapper">
-          <div className="layer">
-            <div className="layer-left">
-              <h3>Deposit</h3>
-
-              <h3>0.01ETH</h3>
+      )}
+      {groupArray.map((item) => {
+        return (
+          <>
+          <ReceiptBox>
+            <h3 className="receipt-header">{item.date}</h3>
+            <div className="layer-wrapper">
+            {
+              item.items.map((rr) => {
+                const mtime = format(rr.date, 'h:mm')
+                const currency = api.getCurrencyInfo(rr.token);
+                const image = api.getCurrencyLogo(rr.token);
+                return (
+                  <div className="layer" onClick={() => window.open(rr.txUrl)}>
+                    <div className="layer-left">
+                      <h3>{rr.type === 'eth_to_zksync' ? 'Deposit' : 'Withdraw'}</h3>
+                      <div className="amountWrapper">
+                        <div className="currencyIcon">
+                          <img src={image && image} alt={currency && currency.symbol} />
+                        </div>
+                        <h3>{rr.amount} {rr.token}</h3>
+                      </div>
+                    </div>
+    
+                    <div className="layer-right">
+                      <h5>{`${rr.txId.substr(0, 6)}...${rr.txId.substr(-6)}`}</h5>
+    
+                      <h4>{mtime}</h4>
+                    </div>
+                  </div>
+                )
+              })
+            }
             </div>
-
-            <div className="layer-right">
-              <h5>0x3ad7...eaa331</h5>
-
-              <h4>2:03 PM</h4>
-            </div>
-          </div>
-
-          <div className="layer">
-            <div className="layer-left">
-              <h3>Deposit</h3>
-
-              <h3>0.01ETH</h3>
-            </div>
-
-            <div className="layer-right">
-              <h5>0x3ad7...eaa331</h5>
-
-              <h4>2:03 PM</h4>
-            </div>
-          </div>
-        </div>
-      </ReceiptBox>
-
-      <ReceiptBox>
-        <h3 className="receipt-header">March 13, 2022</h3>
-
-        <div className="layer-wrapper">
-          <div className="layer">
-            <div className="layer-left">
-              <h3>Deposit</h3>
-
-              <h3>0.01ETH</h3>
-            </div>
-
-            <div className="layer-right">
-              <h5>0x3ad7...eaa331</h5>
-
-              <h4>2:03 PM</h4>
-            </div>
-          </div>
-
-          <div className="layer">
-            <div className="layer-left">
-              <h3>Deposit</h3>
-
-              <h3>0.01ETH</h3>
-            </div>
-
-            <div className="layer-right">
-              <h5>0x3ad7...eaa331</h5>
-
-              <h4>2:03 PM</h4>
-            </div>
-          </div>
-        </div>
-      </ReceiptBox>
-
-      {/* <div className="bridge_box_transactions">
-      {receipts.map((r) => (
-        <div
-          onClick={() => window.open(r.txUrl)}
-          key={r.txId}
-          className="bridge_box_transaction"
-        >
-          <div className="bridge_contain">
-            <div className={`bridge_box_transaction_txType_${r.type}`}>
-              {r.type} {r.isFastWithdraw && "(FAST)"}
-            </div>
-            <div className="bridge_box_transaction_amount">
-              {r.amount} {r.token}
-            </div>
-          </div>
-          <div className="bridge_box_transaction_txId">
-            {formatDistance(r.date, new Date(), { addSuffix: true })} &bull;{" "}
-            {`${r.txId.substr(0, 6)}...${r.txId.substr(-6)}`}
-          </div>
-        </div>
-      ))}
-      </div> */}
+          </ReceiptBox>
+          </>
+      )})}
     </RecepitSection>
   );
 };
