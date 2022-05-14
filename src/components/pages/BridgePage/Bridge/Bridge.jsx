@@ -216,7 +216,7 @@ const Bridge = () => {
       setUsdFee(usdFee);
       setActivationFee((usdFee / currencyValue).toFixed(5));
     }
-  }, [swapDetails.currency]);
+  }, [swapDetails.currency, user.address]);
 
   useEffect(()=>{
     calculateFees();
