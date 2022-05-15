@@ -291,7 +291,7 @@ export const AccountDropdown = () => {
       tabIndex="0"
     >
       <DropdownButton onClick={() => setShow(!show)} tabIndex="0">
-        <AvatarImg src={profile.image} alt={profile.name} />
+        <AvatarImg src={profile.image}/>
         <span>
           {profile.name}
           <h4>Wallet</h4>
