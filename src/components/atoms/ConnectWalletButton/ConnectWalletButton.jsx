@@ -20,11 +20,10 @@ const ConnectWalletButton = (props) => {
   }, [props.isLoading])
 
   const pushToBridgeMaybe = async (state) => {
-    const walletBalance = await api.getBalanceOfCurrency('ETH');
-    const balance = formatAmount(walletBalance.balance, { decimals: 18 });
+    const walletBalance = formatAmount(state.committed.balances['ETH'], { decimals: 18 });
     const activationFee = await api.apiProvider.changePubKeyFee('ETH');
 
-    if (!state.id && (!/^\/bridge(\/.*)?/.test(location.pathname)) && balance < activationFee) {
+    if (!state.id && (!/^\/bridge(\/.*)?/.test(location.pathname)) && walletBalance < activationFee) {
       history.push("/bridge");
     }
   };
