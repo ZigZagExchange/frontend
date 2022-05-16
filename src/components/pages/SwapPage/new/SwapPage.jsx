@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import useTheme from "components/hooks/useTheme";
 
@@ -17,17 +17,30 @@ import { Button } from "components/molecules/Button";
 
 export default function SwapPage() {
   const network = useSelector(networkSelector);
-  const isSwapCompatible = useMemo(
-    () => network && api.isImplemented("depositL2"),
-    [network]
-  );
-  const tab = useParams().tab || "swap";
+  // const isSwapCompatible = useMemo(
+  //   () => network && api.isImplemented("depositL2"),
+  //   [network]
+  // );
+  // const tab = useParams().tab || "swap";
 
-  const { isDark, theme } = useTheme();
+  const { isDark } = useTheme();
+  const [tickers, setTicker] = useState([])
 
-  console.log(theme);
+  useEffect(()=> {
+    const timer = setInterval(()=> { setTicker(api.getCurrencies()) } , 500)
+    if(tickers.length>0) {
+      clearInterval(timer);
+    }
+    return () => {
+      clearInterval(timer)
+    }
+  }, [tickers])
 
-  return (
+  const tokens = useMemo(()=> {
+    return tickers.map((item, index)=> { return {id: index, name: item}})
+  }, [tickers])
+  
+ return (
     <DefaultTemplate>
       <div className={classNames("flex justify-center", { dark: isDark })}>
         <div>
@@ -48,7 +61,7 @@ export default function SwapPage() {
             <InfoIcon size={16} />
           </div>
           <NetworkSelection className="mt-2" />
-          <SwapContianer />
+          <SwapContianer tickers = {tokens} />
           <TransactionSettings />
           <Button
             isLoading={false}

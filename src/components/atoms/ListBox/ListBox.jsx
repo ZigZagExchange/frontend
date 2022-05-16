@@ -12,7 +12,7 @@ const ListBox = ({options}) => {
 
   return (
     <ListBoxSelect value={selectedPerson} onChange={setSelectedPerson}>
-      <ListBoxSelect.Button className="relative bg-foreground-200 w-full text-left py-2 pl-3 pr-10  rounded-lg text-sm">
+      <ListBoxSelect.Button className="relative dark:bg-foreground-200 bg-primary-300 w-full text-left py-2 pl-3 pr-10  rounded-lg text-sm">
         <span>{selectedPerson.name}</span>
         <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
           <SelectorIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
@@ -26,7 +26,7 @@ const ListBox = ({options}) => {
         leaveFrom="transform scale-100 opacity-100"
         leaveTo="transform scale-95 opacity-0"
       >
-        <ListBoxSelect.Options className="absolute mt-1 border-l border-r border-t border-b max-h-60 w-full overflow-auto rounded-md  py-1 text-base shadow-lg focus:outline-none dark:bg-[#2B2E4A] dark:border-foreground-400">
+        <ListBoxSelect.Options className="absolute mt-1 border-l border-r border-t border-b max-h-60 w-full overflow-auto rounded-md  py-1 text-base shadow-lg focus:outline-none dark:bg-[#2B2E4A] bg-sky-100 dark:border-foreground-400">
           {options.map((person, personIdx) => (
             <ListBoxSelect.Option
               key={personIdx}

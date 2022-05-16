@@ -88,13 +88,14 @@ export default class APIZKProvider extends APIProvider {
   changePubKey = async () => {
     if (this.network === 1) {
       try {
-        const { data } = await axios.post(this.getZkSyncBaseUrl(1) + "/fee",
+        const { data } = await axios.post(
+          this.getZkSyncBaseUrl(1) + "/fee",
           {
             txType: { ChangePubKey: "ECDSA" },
             address: "0x5364ff0cecb1d44efd9e4c7e4fe16bf5774530e3",
             tokenLike: "USDC",
           },
-          { headers: { "Content-Type": "application/json", }, }
+          { headers: { "Content-Type": "application/json" } }
         );
         const feeUSD = data.result.totalFee / 10 ** 6;
         toast.info(
@@ -147,14 +148,15 @@ export default class APIZKProvider extends APIProvider {
         const tokenInfo = await this.getTokenInfo(token);
         if (tokenInfo.enabledForFees) {
           const priceInfo = await this.tokenPrice(token);
-          const usdValue = priceInfo.price * balances[token] / 10 ** tokenInfo.decimals;
+          const usdValue =
+            (priceInfo.price * balances[token]) / 10 ** tokenInfo.decimals;
           if (usdValue > maxValue) {
             maxValue = usdValue;
             feeToken = token;
           }
         }
-      })
-      await Promise.all(result)
+      });
+      await Promise.all(result);
     }
 
     const signingKey = await this.syncWallet.setSigningKey({
@@ -277,12 +279,12 @@ export default class APIZKProvider extends APIProvider {
       ratio: zksync.utils.tokenRatio(tokenRatio),
       validUntil,
     });
-    
+
     if (order.ethereumSignature && !order.ethSignature) {
       order.ethSignature = order.ethereumSignature;
       delete order.ethereumSignature;
     }
-    
+
     this.api.send("submitorder2", [this.network, market, order]);
 
     return order;
@@ -340,9 +342,9 @@ export default class APIZKProvider extends APIProvider {
 
   depositL2Fee = async (token = "ETH") => {
     // TODO: implement
-    return { 
-      amount: 0.005, 
-      feeToken: 'ETH'
+    return {
+      amount: 0.005,
+      feeToken: "ETH",
     };
   };
 
@@ -512,7 +514,7 @@ export default class APIZKProvider extends APIProvider {
       const feeData = await this.api.ethersProvider.getFeeData();
       let bridgeFee = feeData.maxFeePerGas
         .add(feeData.maxPriorityFeePerGas)
-        .mul(21000)
+        .mul(21000);
 
       bridgeFee *= 1.5; // ZigZag fee
 
@@ -546,7 +548,10 @@ export default class APIZKProvider extends APIProvider {
 
     try {
       if (this.api.isArgent) {
-        this.syncWallet = await zksync.RemoteWallet.fromEthSigner(this.api.ethersProvider, this.syncProvider);
+        this.syncWallet = await zksync.RemoteWallet.fromEthSigner(
+          this.api.ethersProvider,
+          this.syncProvider
+        );
       } else {
         this.ethWallet = this.api.ethersProvider.getSigner();
         const { seed, ethSignatureType } = await this.getSeed(this.ethWallet);
@@ -747,9 +752,10 @@ export default class APIZKProvider extends APIProvider {
     if (pairs.length === 0) return;
     if (!this.network) return;
     const pairText = pairs.join(",");
-    const url = (this.network === 1)
-      ? `https://zigzag-markets.herokuapp.com/markets?id=${pairText}&chainid=${this.network}`
-      : `https://secret-thicket-93345.herokuapp.com/api/v1/marketinfos?chain_id=${this.network}&market=${pairText}`
+    const url =
+      this.network === 1
+        ? `https://zigzag-markets.herokuapp.com/markets?id=${pairText}&chainid=${this.network}`
+        : `https://secret-thicket-93345.herokuapp.com/api/v1/marketinfos?chain_id=${this.network}&market=${pairText}`;
     const marketInfoArray = await fetch(url).then((r) => r.json());
     if (!(marketInfoArray instanceof Array)) return;
     marketInfoArray.forEach((info) => (this.marketInfo[info.alias] = info));
