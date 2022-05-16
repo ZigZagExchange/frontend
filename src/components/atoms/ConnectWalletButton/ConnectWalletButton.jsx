@@ -5,6 +5,7 @@ import { Button } from "../Button";
 import darkPlugHead from "../../../assets/icons/dark-plug-head.png";
 import api from "../../../lib/api";
 import { useHistory, useLocation } from "react-router-dom";
+import { formatAmount } from "../../../lib/utils";
 
 const ConnectWalletButton = (props) => {
   const network = useSelector(networkSelector);
@@ -18,8 +19,12 @@ const ConnectWalletButton = (props) => {
     }
   }, [props.isLoading])
 
-  const pushToBridgeMaybe = (state) => {
-    if (!state.id && !/^\/bridge(\/.*)?/.test(location.pathname)) {
+  const pushToBridgeMaybe = async (state) => {
+    const walletBalance = await api.getBalanceOfCurrency('ETH');
+    const balance = formatAmount(walletBalance.balance, { decimals: 18 });
+    const activationFee = await api.apiProvider.changePubKeyFee('ETH');
+
+    if (!state.id && (!/^\/bridge(\/.*)?/.test(location.pathname)) && balance < activationFee) {
       history.push("/bridge");
     }
   };
