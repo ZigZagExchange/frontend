@@ -12,6 +12,7 @@ import "./BridgePage.style.css";
 import Text from "components/atoms/Text/Text";
 import { TabMenu, Tab } from "components/molecules/TabMenu";
 import TradeFooter from "components/organisms/TradeDashboard/TradeFooter/TradeFooter";
+import ConnectNotification from "./ConnectNotification/ConnectNotification";
 
 const BridgeContainer = styled.div`
   width: 100%;
@@ -75,6 +76,8 @@ export default function BridgePage() {
     <BridgeTemplate>
       <BridgeSection>
         <BridgeContainer>
+          <ConnectNotification />
+
           <Text font="primaryHeading4" color="foregroundHighEmphasis">ZigZag Bridge</Text>
           <StyledTabMenu left activeIndex={index} onItemClick={handleTabClick}>
             <Tab>BRIDGE</Tab>

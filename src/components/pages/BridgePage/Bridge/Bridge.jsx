@@ -80,7 +80,6 @@ export const BridgeBox = styled.div`
     text-align: center;
     overflow: hidden;
     border-radius: 50%;
-    // background: ${(p) => p.theme.colors.foreground400};
   }
 
   .bridge_coin_name {
@@ -630,7 +629,7 @@ const Bridge = () => {
 
     return balance + " " + unit;
   }
-  
+
   const renderLabel = () => {
     return <>
       <Text font="primaryExtraSmall" color="foregroundHighEmphasis" mb={2}>
@@ -639,10 +638,10 @@ const Bridge = () => {
       <Text font="primaryExtraSmall" color="foregroundHighEmphasis" mb={2}>
         Normal: use zkSync's bridge and receive funds after a few hours.
       </Text>
-      <div style={{display: 'flex', flexDirection: 'row', gap: 4, alignItems: 'center'}}>
+      <div style={{ display: 'flex', flexDirection: 'row', gap: 4, alignItems: 'center' }}>
         <ActionWrapper
           font="primaryExtraSmallSemiBold"
-          color="primaryHighEmphasis" 
+          color="primaryHighEmphasis"
           onClick={() => window.open("https://docs.zigzag.exchange/zksync/fast-withdraw-bridge", '_blank')}
         >
           Learn more
@@ -666,7 +665,7 @@ const Bridge = () => {
         </Box>
 
         <Box className="layer">
-          <L1Header networks={NETWORKS} onSelect={onSelectFromNetwork} selectedNetwork={fromNetwork} />
+          <L1Header netorks={NETWORKS} onSelect={onSelectFromNetwork} selectedNetwork={fromNetwork} />
 
           <Box>
             <CustomSwapButton onClick={switchTransferType} />
@@ -782,11 +781,11 @@ const Bridge = () => {
                       />
                     </Box>
                     <Box>
-                      <div style={{display: 'flex', marginTop: 2}}>
+                      <div style={{ display: 'flex', marginTop: 2 }}>
                         <div fontSize={12} color={"blue-gray-500"}>
                           Withdraw speed
                         </div>
-                        <QuestionHelper text={renderLabel()}/>
+                        <QuestionHelper text={renderLabel()} />
                       </div>
                     </Box>
                   </Box>
