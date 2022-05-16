@@ -310,9 +310,11 @@ export const Header = (props) => {
                 value={network.toString()}
                 onChange={(e) => {
                   api.setAPIProvider(parseInt(e.target.value));
-                  api.refreshNetwork().catch((err) => {
-                    console.log(err);
-                  });
+                  if(user.address){
+                    api.refreshNetwork().catch((err) => {
+                      console.log(err);
+                    });
+                  }
                 }}
               >
                 <option value="1">zkSync - Mainnet</option>
