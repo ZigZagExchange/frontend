@@ -665,7 +665,7 @@ const Bridge = () => {
         </Box>
 
         <Box className="layer">
-          <L1Header netorks={NETWORKS} onSelect={onSelectFromNetwork} selectedNetwork={fromNetwork} />
+          <L1Header networks={NETWORKS} onSelect={onSelectFromNetwork} selectedNetwork={fromNetwork} />
 
           <Box>
             <CustomSwapButton onClick={switchTransferType} />
