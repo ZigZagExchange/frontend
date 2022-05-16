@@ -17,6 +17,7 @@ import logo from "assets/images/logo.png";
 import menu from "assets/icons/menu.png";
 import "./Header.css";
 import { Dev } from "../../../lib/helpers/env";
+import { formatAmount } from "../../../lib/utils";
 
 export const Header = (props) => {
   // state to open or close the sidebar in mobile
@@ -42,17 +43,21 @@ export const Header = (props) => {
   }, [show])
 
 
-  const connect = () => {
-    setConnecting(true);
-    api
-      .signIn(network)
-      .then((state) => {
-        if (!state.id && !/^\/bridge(\/.*)?/.test(location.pathname)) {
-          history.push("/bridge");
-        }
-        setConnecting(false);
-      })
-      .catch(() => setConnecting(false));
+  const connect = async () => {
+    try {
+      setConnecting(true);
+      const state = await api.signIn(network);
+      const walletBalance = formatAmount(state.committed.balances['ETH'], { decimals: 18 });
+      const activationFee = await api.apiProvider.changePubKeyFee('ETH');
+
+      if (!state.id && (!/^\/bridge(\/.*)?/.test(location.pathname)) && (isNaN(walletBalance) || walletBalance < activationFee)) {
+        history.push("/bridge");
+      }
+      setConnecting(false);
+    } catch (e) {
+      console.error(e);
+      setConnecting(false);
+    }
   };
 
   const handleMenu = ({ key }) => {
