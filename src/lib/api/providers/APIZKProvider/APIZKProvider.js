@@ -588,17 +588,26 @@ export default class APIZKProvider extends APIProvider {
 
     const accountState = await this.api.getAccountState();
     if (!accountState.id) {
-      const walletBalance = await this.api.getBalanceOfCurrency('ETH');
-      const balance = formatAmount(walletBalance.balance, { decimals: 18 });
+      const walletBalance = formatAmount(accountState.committed.balances['ETH'], { decimals: 18 });
       const activationFee = await this.changePubKeyFee('ETH');
 
-      if ((!/^\/bridge(\/.*)?$/.test(window.location.pathname)) && balance < activationFee) {
-        toast.error(
-          "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
-          {
-            autoClose: 60000
-          }
-        );
+      if (!/^\/bridge(\/.*)?$/.test(window.location.pathname)){
+        if(isNaN(walletBalance) || walletBalance < activationFee) {
+          toast.error(
+            "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
+            {
+              autoClose: 60000
+            }
+          );
+        }
+        else {
+          toast.error(
+            "Your zkSync account is not activated. Please activate your zkSync wallet.",
+            {
+              autoClose: false
+            }
+          );
+        }
       }
     } else {
       const signingKeySet = await this.syncWallet.isSigningKeySet();

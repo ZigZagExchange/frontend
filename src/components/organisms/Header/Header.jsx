@@ -47,11 +47,10 @@ export const Header = (props) => {
     try {
       setConnecting(true);
       const state = await api.signIn(network);
-      const walletBalance = await api.getBalanceOfCurrency('ETH');
-      const balance = formatAmount(walletBalance.balance, { decimals: 18 });
+      const walletBalance = formatAmount(state.committed.balances['ETH'], { decimals: 18 });
       const activationFee = await api.apiProvider.changePubKeyFee('ETH');
 
-      if (!state.id && (!/^\/bridge(\/.*)?/.test(location.pathname)) && balance < activationFee) {
+      if (!state.id && (!/^\/bridge(\/.*)?/.test(location.pathname)) && (isNaN(walletBalance) || walletBalance < activationFee)) {
         history.push("/bridge");
       }
       setConnecting(false);
