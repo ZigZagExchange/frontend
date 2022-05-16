@@ -477,6 +477,7 @@ const Bridge = () => {
       .finally(() => {
         setPolygonLoading(false)
         setLoading(false);
+        setSwapDetails({amount: ''});
       });
   };
 
