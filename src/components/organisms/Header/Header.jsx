@@ -50,7 +50,7 @@ export const Header = (props) => {
       const walletBalance = formatAmount(state.committed.balances['ETH'], { decimals: 18 });
       const activationFee = await api.apiProvider.changePubKeyFee('ETH');
 
-      if (!state.id && (!/^\/bridge(\/.*)?/.test(location.pathname)) && walletBalance < activationFee) {
+      if (!state.id && (!/^\/bridge(\/.*)?/.test(location.pathname)) && (isNaN(walletBalance) || walletBalance < activationFee)) {
         history.push("/bridge");
       }
       setConnecting(false);

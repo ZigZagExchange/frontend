@@ -587,13 +587,12 @@ export default class APIZKProvider extends APIProvider {
     );
 
     const accountState = await this.api.getAccountState();
-    console.log(accountState);
     if (!accountState.id) {
       const walletBalance = formatAmount(accountState.committed.balances['ETH'], { decimals: 18 });
       const activationFee = await this.changePubKeyFee('ETH');
 
       if (!/^\/bridge(\/.*)?$/.test(window.location.pathname)){
-        if(walletBalance < activationFee) {
+        if(isNaN(walletBalance) || walletBalance < activationFee) {
           toast.error(
             "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
             {
