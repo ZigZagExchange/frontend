@@ -139,7 +139,7 @@ export default class API extends Emitter {
 
     getExplorer = (address, layer) => {
       let explorer = "https://etherscan.io/address/";
-      let subdomain = this.network === 1 ? "" : "rinkeby.";
+      let subdomain = this.apiProvider.network === 1 ? "" : "rinkeby.";
   
       switch(layer){
         case 1:
