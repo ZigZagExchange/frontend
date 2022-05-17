@@ -31,6 +31,7 @@ export default class APIZKProvider extends APIProvider {
   _tokenInfo = {};
   eligibleFastWithdrawTokens = ["ETH", "FRAX", "UST"];
   fastWithdrawContractAddress = ZKSYNC_ETHEREUM_FAST_BRIDGE.address;
+  
   getProfile = async (address) => {
     try {
       const { data } = await axios.get(

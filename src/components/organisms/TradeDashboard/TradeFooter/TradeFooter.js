@@ -1,6 +1,10 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import { HiExternalLink } from "react-icons/hi";
 import styled from "@xstyled/styled-components";
+import {
+  networkSelector
+} from "lib/store/features/api/apiSlice"
 
 const StyledTradeFooter = styled.footer`
   display: flex;
@@ -42,6 +46,8 @@ const StyledLinkBox = styled.div`
 `;
 
 export default function TradeFooter() {
+  const network = useSelector(networkSelector);
+
   return (
     <StyledTradeFooter>
       <StyledLinkBox>
@@ -57,7 +63,11 @@ export default function TradeFooter() {
           <HiExternalLink />
         </StyledTokenInfo>
       </StyledLinkBox>
-      <div>Powered By zkSync</div>
+      <div>{
+        (network === 1 || network === 1000)
+          ? "Powered by zkSync"
+          : "Powered by StarkNet"
+      }</div>
     </StyledTradeFooter>
   );
 }

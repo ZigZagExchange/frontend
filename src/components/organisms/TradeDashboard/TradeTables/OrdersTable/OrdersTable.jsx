@@ -224,7 +224,7 @@ export class OrdersTable extends React.Component {
             const feeamount = fill[10];
             const feetoken = fill[11];
             let feeText = "1 USDC";
-            const marketInfo = api.marketInfo[market];
+            const marketInfo = this.props.marketInfo;
             if(feeamount && feetoken) {           
               const displayFee = (feeamount > 9999) ? feeamount.toFixed(0) : feeamount.toPrecision(4);
               feeText = (feeamount !== 0) ? `${displayFee} ${feetoken}` : "--";
@@ -354,6 +354,11 @@ export class OrdersTable extends React.Component {
   render() {
     let explorerLink;
     switch (api.apiProvider.network) {
+      case 1001:
+        explorerLink = 
+          "https://goerli.voyager.online/contract/" +
+          this.props.user.address;
+        break;
       case 1000:
         explorerLink =
           "https://rinkeby.zkscan.io/explorer/accounts/" +
@@ -362,7 +367,8 @@ export class OrdersTable extends React.Component {
       case 1:
       default:
         explorerLink =
-          "https://zkscan.io/explorer/accounts/" + this.props.user.address;
+          "https://zkscan.io/explorer/accounts/" + 
+          this.props.user.address;
     }
     let footerContent,
       classNameOrders = "",
@@ -384,10 +390,7 @@ export class OrdersTable extends React.Component {
           )
             .sort()
             .map((token) => {
-              const currencyInfo = api.getCurrencyInfo(token);
-              if (!currencyInfo) return "";
-              let balance = this.props.user.committed.balances[token];
-              balance = parseInt(balance) / Math.pow(10, currencyInfo.decimals);
+              const balance = this.props.user.committed.balances[token].valueReadable;
               return (
                 <tr>
                   <td data-label="Token">{token}</td>

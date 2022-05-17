@@ -6,7 +6,9 @@ import { ethers, constants as ethersConstants } from "ethers";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import { getENSName } from "lib/ens";
 import { formatAmount } from "lib/utils";
-import erc20ContractABI from "lib/contracts/ERC20.json";
+import get from "lodash/get";
+import axios from "axios";
+import erc20ContractABI from "lib/contracts/Ethereum_ERC20.json";
 import wethContractABI from "lib/contracts/WETH.json";
 import { MAX_ALLOWANCE } from "./constants";
 import { 
@@ -14,168 +16,196 @@ import {
   POLYGON_MUMBAI_WETH_ADDRESS,
   POLYGON_MAINNET_WETH_ADDRESS,
 } from "components/pages/BridgePage/Bridge/constants";
-
-import axios from "axios";
 import { isMobile } from "react-device-detect";
 
 const chainMap = {
   "0x1": 1,
   "0x4": 1000,
+  "0x5": 1001
 };
+
 export default class API extends Emitter {
-    networks = {}
-    ws = null
-    apiProvider = null
-    ethersProvider = null
-    currencies = null
-    isArgent = false
-    marketInfo = {}
-    lastprices = {}
-    _signInProgress = null
-    _profiles = {}
+  networks = {};
+  ws = null;
+  apiProvider = null;
+  ethersProvider = null;
+  _signInProgress = null;
+  _profiles = {};
 
-    constructor({ infuraId, networks, currencies, validMarkets }) {
-        super()
-        
-        if (networks) {
-            Object.keys(networks).forEach(k => {
-                this.networks[k] = [
-                    networks[k][0],
-                    new networks[k][1](this, networks[k][0]),
-                    networks[k][2],
-                ]
-            })
-        }
-        
-        this.infuraId = infuraId
-        this.currencies = currencies
-        this.validMarkets = validMarkets
+  constructor({ infuraId, networks }) {
+    super();
 
-        if (window.ethereum) {
-            window.ethereum.on('accountsChanged', this.signOut)
-            window.ethereum.on('chainChanged', chainId => {
-                this.signOut().then(() => {
-                    this.setAPIProvider(chainMap[chainId])
-                })
-            })
-
-            this.setAPIProvider(chainMap[window.ethereum.chainId] || 1)
-        } else {
-            this.setAPIProvider(this.networks.mainnet[0])
-        }
+    if (networks) {
+      Object.keys(networks).forEach((k) => {
+        this.networks[k] = [
+          networks[k][0],
+          new networks[k][1](this, networks[k][0]),
+          networks[k][2],
+        ];
+      });
     }
 
-    getAPIProvider = (network) => {
-        return this.networks[this.getNetworkName(network)][1]
+    this.infuraId = infuraId;
+
+    if (window.ethereum) {
+      window.ethereum.on("accountsChanged", this.signOut);
+      window.ethereum.on("chainChanged", (chainId) => {
+        this.signOut().then(() => {
+          this.setAPIProvider(chainMap[chainId]);
+        });
+      });
+
+      this.setAPIProvider(chainMap[window.ethereum.chainId] || 1);
+    } else {
+      this.setAPIProvider(this.networks.mainnet[0]);
+    }
+  }
+
+  getAPIProvider = (network) => {
+    return this.networks[this.getNetworkName(network)][1]
+  }
+
+  setAPIProvider = (network) => {
+    const networkName = this.getNetworkName(network)
+
+    if (!networkName) {
+        this.signOut()
+        return
     }
 
-    setAPIProvider = (network) => {
-        const networkName = this.getNetworkName(network)
-        
-        if (!networkName) {
-            this.signOut()
-            return
-        }
+    const apiProvider = this.getAPIProvider(network) 
+    this.apiProvider = apiProvider
 
-        const apiProvider = this.getAPIProvider(network) 
-        this.apiProvider = apiProvider
-
-        // Change WebSocket if necessary
-        if (this.ws) {
-            const oldUrl = new URL(this.ws.url);
-            const newUrl = new URL(this.apiProvider.websocketUrl);
-            if (oldUrl.host !== newUrl.host) {
-                // Stopping the WebSocket will trigger an auto-restart in 3 seconds
-                this.stop();
-            }
+    // Change WebSocket if necessary
+    if (this.ws) {
+        const oldUrl = new URL(this.ws.url);
+        const newUrl = new URL(this.apiProvider.websocketUrl);
+        if (oldUrl.host !== newUrl.host) {
+            // Stopping the WebSocket will trigger an auto-restart in 3 seconds
+            this.stop();
         }
-        
-        if (this.isZksyncChain()) {
-            this.web3 = new Web3(
-                window.ethereum || new Web3.providers.HttpProvider(
-                    `https://${networkName}.infura.io/v3/${this.infuraId}`
-                )
-            )
+    }
     
-            this.web3Modal = new Web3Modal({
-                network: networkName,
-                cacheProvider: true,
-                theme: "dark",
-                providerOptions: {
-                    walletconnect: {
-                        package: WalletConnectProvider,
-                        options: {
-                            infuraId: this.infuraId,
-                        }
+    if (this.isZksyncChain()) {
+        this.web3 = new Web3(
+            window.ethereum || new Web3.providers.HttpProvider(
+                `https://${networkName}.infura.io/v3/${this.infuraId}`
+            )
+        )
+
+        this.web3Modal = new Web3Modal({
+            network: networkName,
+            cacheProvider: true,
+            theme: "dark",
+            providerOptions: {
+                walletconnect: {
+                    package: WalletConnectProvider,
+                    options: {
+                        infuraId: this.infuraId,
+                    }
+                },
+                "custom-argent": {
+                    display: {
+                        logo: "https://images.prismic.io/argentwebsite/313db37e-055d-42ee-9476-a92bda64e61d_logo.svg?auto=format%2Ccompress&fit=max&q=50",
+                        name: "Argent zkSync",
+                        description: "Connect to your Argent zkSync wallet"
                     },
-                    "custom-argent": {
-                        display: {
-                            logo: "https://images.prismic.io/argentwebsite/313db37e-055d-42ee-9476-a92bda64e61d_logo.svg?auto=format%2Ccompress&fit=max&q=50",
-                            name: "Argent zkSync",
-                            description: "Connect to your Argent zkSync wallet"
-                        },
-                        package: WalletConnectProvider,
-                        options: {
-                            infuraId: this.infuraId,
-                        },
-                        connector: async (ProviderPackage, options) => {
-                            const provider = new ProviderPackage(options);
-                            await provider.enable();
-                            this.isArgent = true;
-                            return provider;
-                        }
+                    package: WalletConnectProvider,
+                    options: {
+                        infuraId: this.infuraId,
+                    },
+                    connector: async (ProviderPackage, options) => {
+                        const provider = new ProviderPackage(options);
+                        await provider.enable();
+                        this.isArgent = true;
+                        return provider;
                     }
                 }
-            })
-        }
-
-        this.getAccountState()
-            .catch(err => {
-                console.log('Failed to switch providers', err)
-            })
-
-        this.emit('providerChange', network)
+            }
+        })
     }
 
-    getProfile = async (address) => {
-        if (!this._profiles[address]) {
-            const profile = this._profiles[address] = {
-                description: null,
-                website: null,
-                image: null,
-                address,
-            }
+    this.getAccountState()
+        .catch(err => {
+            console.log('Failed to switch providers', err)
+        })
 
-            if (!address) {
-                return profile
-            }
+    this.emit('providerChange', network)
+}
 
-            profile.name = `${address.substr(0, 6)}…${address.substr(-6)}`
-            Object.assign(
-                profile,
-                ...(await Promise.all([
-                    this._fetchENSName(address),
-                    this.apiProvider.getProfile(address),
-                ]))
-            )
 
-            if (!profile.image) {
-                profile.image = createIcon({ seed: address }).toDataURL()
-            }
+  getProfile = async (address) => {
+    if (!this._profiles[address]) {
+      const profile = (this._profiles[address] = {
+        description: null,
+        website: null,
+        image: null,
+        address,
+      });
+
+      if (!address) {
+        return profile;
+      }
+
+      const getProfileFromIPFS = async (address) => {
+        try {
+          const { data } = await axios.get(
+            `https://ipfs.3box.io/profile?address=${address}`
+          );
+          const profile = {
+            coverPhoto: get(data, "coverPhoto.0.contentUrl./"),
+            image: get(data, "image.0.contentUrl./"),
+            description: data.description,
+            emoji: data.emoji,
+            website: data.website,
+            location: data.location,
+            twitter_proof: data.twitter_proof,
+          };
+
+          if (data.name) {
+            profile.name = data.name;
+          }
+          if (profile.image) {
+            profile.image = `https://gateway.ipfs.io/ipfs/${profile.image}`;
+          }
+        } catch (err) {
+          console.log(`Error fetching 3box image: ${err.message}`);
         }
+        return profile;
+      }
 
-        return this._profiles[address]
+      profile.name = `${address.substr(0, 6)}…${address.substr(-6)}`;
+      Object.assign(
+        profile,
+        ...(await Promise.all([
+          this._fetchENSName(address),
+          getProfileFromIPFS(address),
+        ]))
+      );
+
+      if (!profile.image) {
+        profile.image = createIcon({ seed: address }).toDataURL();
+      }
+      if (!profile.name) {
+        profile.name = address;
+      }
+    }
+    return this._profiles[address]
   };
 
   _fetchENSName = async (address) => {
-    let name = await getENSName(address);
-    if (name) return { name };
+    try {
+      let name = await getENSName(address);
+      if (name) return { name };
+    } catch (err) {
+      console.log(`Error fetching ENSName: ${err.message}`)
+    }
     return {};
   };
 
   _socketOpen = () => {
     this.emit("open");
-    
+
     // get initial marketinfos, returns lastprice and marketinfo2
     this.send("marketsreq", [this.apiProvider.network, true])
   };
@@ -217,75 +247,78 @@ export default class API extends Emitter {
     }
   }
 
-    _socketError = (e) => {
-        console.warn("Zigzag websocket connection failed");
+  _socketError = (e) => {
+    console.warn("Zigzag websocket connection failed");
+  }
+
+  start = () => {
+    if (this.ws) this.stop()
+    this.ws = new WebSocket(this.apiProvider.websocketUrl)
+    this.ws.addEventListener('open', this._socketOpen)
+    this.ws.addEventListener('close', this._socketClose)
+    this.ws.addEventListener('message', this._socketMsg)
+    this.ws.addEventListener('error', this._socketError)
+    this.emit('start')
+    
+    // login after reconnect
+    const accountState = this.getAccountState();
+    if (accountState && accountState.id) {
+      this.send("login", [
+        this.apiProvider.network,
+        accountState.id && accountState.id.toString(),
+      ]);
+    }
+  }
+
+  stop = () => {
+    if (!this.ws) return
+    this.ws.close()
+    this.emit('stop')
+  }
+
+  getAccountState = async () => {
+    const accountState = { ...(await this.apiProvider.getAccountState()) }
+    accountState.profile = await this.getProfile(accountState.address)
+    this.emit('accountState', accountState)
+    return accountState
+  }
+
+  send = (op, args) => {
+    if (!this.ws) return;
+    return this.ws.send(JSON.stringify({ op, args }))
+  }
+
+  refreshNetwork = async () => {
+    if (!window.ethereum) return
+    let ethereumChainId
+
+    // await this.signOut();
+
+    switch (this.apiProvider.network) {
+      case 1:
+        ethereumChainId = "0x1";
+        break;
+      case 1000:
+        ethereumChainId = "0x4";
+        break;
+      case 1001:
+        ethereumChainId = "0x5";
+        break;
+      default:
+        return;
     }
 
-    start = () => {
-        if (this.ws) this.stop()
-        this.ws = new WebSocket(this.apiProvider.websocketUrl)
-        this.ws.addEventListener('open', this._socketOpen)
-        this.ws.addEventListener('close', this._socketClose)
-        this.ws.addEventListener('message', this._socketMsg)
-        this.ws.addEventListener('error', this._socketError)
-        this.emit('start')
+    await window.ethereum.request({
+       method: 'eth_requestAccounts',
+       params: [{eth_accounts: {}}]
+    });
 
-        // login after reconnect
-        const accountState = this.getAccountState();
-        if (accountState && accountState.id) {
-          this.send("login", [
-            this.apiProvider.network,
-            accountState.id && accountState.id.toString(),
-          ]);
-        }
-    }
-
-    stop = () => {
-        if (!this.ws) return
-        this.ws.close()
-        this.emit('stop')
-    }
-
-    getAccountState = async () => {
-        const accountState = { ...(await this.apiProvider.getAccountState()) }
-        accountState.profile = await this.getProfile(accountState.address)
-        this.emit('accountState', accountState)
-        return accountState
-    }
-
-    send = (op, args) => {
-        if (!this.ws) return;
-        return this.ws.send(JSON.stringify({ op, args }))
-    }
-
-    refreshNetwork = async () => {
-        if (!window.ethereum) return
-        let ethereumChainId
-
-        // await this.signOut();
-
-        switch (this.apiProvider.network) {
-            case 1:
-                ethereumChainId = "0x1";
-            break;
-            case 1000:
-                ethereumChainId = "0x4";
-            break;
-            default:
-                return
-        }
-
-        await window.ethereum.request({
-          method: 'eth_requestAccounts',
-          params: [{eth_accounts: {}}]
-        });
-
-        await window.ethereum.request({
-            method: "wallet_switchEthereumChain",
-            params: [{ chainId: ethereumChainId }],
-        });
+    await window.ethereum.request({
+      method: "wallet_switchEthereumChain",
+      params: [{ chainId: ethereumChainId }],
+    });
   };
-          
+
 
   sleep=(ms)=>{
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -495,7 +528,7 @@ export default class API extends Emitter {
   };
 
   isZksyncChain = () => {
-    return !!this.apiProvider.zksyncCompatible;
+    return !!this.apiProvider?.zksyncCompatible;
   };
 
   cancelOrder = async (orderId) => {

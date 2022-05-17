@@ -68,7 +68,8 @@ export const apiSlice = createSlice({
       };
       const toastContent = renderToastContent(op, errorMessage)
       toast.error(toastContent,
-        { toastId: op,
+        {
+          toastId: op,
           closeOnClick: false,
           autoClose: false,
         },
@@ -114,6 +115,7 @@ export const apiSlice = createSlice({
           if (feeamount) state.marketFills[fillid][10] = feeamount;
           if (feetoken) state.marketFills[fillid][11] = feetoken;
         }
+            
         if (state.userFills[fillid]) {
           state.userFills[fillid][6] = newstatus;
           state.userFills[fillid][12] = timestamp;
@@ -129,12 +131,9 @@ export const apiSlice = createSlice({
             const baseQuantity = Number(fillDetails[5]);
             toast.success(
               `Your ${sideText} order for ${Number(baseQuantity.toPrecision(4))
-              } ${baseCurrency} was filled @ ${Number(formatPrice(price))
-              }!`,
+              } ${baseCurrency} was filled @ ${Number(formatPrice(price))}!`,
               {
-                toastId: `Your ${sideText} order for ${Number(baseQuantity.toPrecision(4))
-                  } ${baseCurrency} was filled @ ${Number(formatPrice(price))
-                  }!`,
+                toastId: fillid, // use fillId in case two equal fills
               }
             );
           }
@@ -243,9 +242,7 @@ export const apiSlice = createSlice({
                 } ${baseCurrency} @ ${noFeeOrder.price.toPrecision(4) / 1
                 } was rejected: ${error}`,
                 {
-                  toastId: `Your ${sideText} order for ${noFeeOrder.baseQuantity.toPrecision(4) / 1
-                    } ${baseCurrency} @ ${noFeeOrder.price.toPrecision(4) / 1
-                    } was rejected: ${error}`,
+                  toastId: orderId,
                 }
               );
               toast.info(
