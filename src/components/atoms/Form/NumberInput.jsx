@@ -12,6 +12,8 @@ const NumberInput = ({
   onChange,
   hideValidation,
   rightOfLabel,
+  borderRadius = 4,
+  fontSize = 18
 }) => {
   return (
     <Input
@@ -25,6 +27,8 @@ const NumberInput = ({
       rightOfLabel={rightOfLabel}
       type={"number"}
       w={block ? "100%" : "inherit"}
+      fontSize={fontSize}
+      borderRadius={borderRadius}
       {...BaseInputStyle}
     />
   );

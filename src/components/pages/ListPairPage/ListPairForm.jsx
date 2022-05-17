@@ -1,8 +1,10 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { x } from "@xstyled/styled-components";
-import { Tooltip } from "components";
+import { Toggle, Tooltip } from "components";
 import NumberInput from "../../atoms/Form/NumberInput";
 import { model } from "../../atoms/Form/helpers";
+import styled from "styled-components";
+
 import {
   forceValidation,
   max,
@@ -12,11 +14,18 @@ import {
 import SelectInput from "../../atoms/Form/SelectInput";
 import { Button } from "../../atoms/Form/Submit";
 import TextInput from "../../atoms/Form/TextInput";
-import { AiOutlineQuestionCircle } from "react-icons/all";
+import { BsExclamationCircle } from "react-icons/all";
 import Form from "../../atoms/Form/Form";
 import { TRADING_VIEW_CHART_KEY } from "./ListPairPage";
 import api from "../../../lib/api";
 import { debounce } from "lodash";
+
+const ListPairContainer = styled.div`
+  margin-top: 10px;
+  padding: 1rem 18px;
+  border: 1px solid ${(p) => p.theme.colors.foreground400};
+  border-radius: 8px;
+`
 
 const ListPairForm = ({
   onSubmit,
@@ -107,7 +116,7 @@ const ListPairForm = ({
   }, [quoteAssetId, zigZagChainId]);
 
   return (
-    <x.div>
+    <ListPairContainer>
       <PairPreview
         baseAssetId={baseAssetId}
         quoteAssetId={quoteAssetId}
@@ -129,16 +138,16 @@ const ListPairForm = ({
         <x.div
           display={"grid"}
           gridTemplateColumns={2}
-          rowGap={5}
-          columnGap={6}
-          mb={5}
+          rowGap={21}
+          columnGap={24}
+          mb={16}
           alignItems="flex-end"
         >
           <NumberInput
             block
             {...model(baseAssetId, setBaseAssetId)}
             label={
-              <x.span fontSize={{xs: 'xs', md: '14px'}}>
+              <x.span fontSize={{ xs: 'xs', md: '10px' }} col>
                 Base Asset{" "}
                 <x.a
                   color={{ _: "blue-gray-500", hover: "teal-200" }}
@@ -154,6 +163,8 @@ const ListPairForm = ({
               </x.span>
             }
             name={"baseAssetId"}
+            fontSize={14}
+            borderRadius={8}
             validate={[
               required,
               min(0),
@@ -170,7 +181,7 @@ const ListPairForm = ({
             block
             {...model(quoteAssetId, setQuoteAssetId)}
             label={
-              <x.span fontSize={{xs: 'xs', md: '14px'}}>
+              <x.span fontSize={{ xs: 'xs', md: '10px' }}>
                 Quote Asset{" "}
                 <x.a
                   color={{ _: "blue-gray-500", hover: "teal-200" }}
@@ -186,6 +197,8 @@ const ListPairForm = ({
               </x.span>
             }
             name={"quoteAssetId"}
+            fontSize={14}
+            borderRadius={8}
             validate={[
               required,
               min(0),
@@ -202,8 +215,12 @@ const ListPairForm = ({
             <NumberInput
               block
               name={"baseFee"}
+              fontSize={14}
+              borderRadius={8}
               {...model(baseFee, setBaseFee)}
-              label={baseSymbol ? `${baseSymbol} Swap Fee` : "Base Swap Fee"}
+              label={baseSymbol ?
+                <x.span fontSize={{ xs: 'xs', md: '10px' }}>`${baseSymbol} Swap Fee`</x.span> :
+                <x.span fontSize={{ xs: 'xs', md: '10px' }}>Base Swap Fee</x.span>}
               validate={[required, min(0)]}
               rightOfLabel={
                 <TooltipHelper>
@@ -216,9 +233,12 @@ const ListPairForm = ({
           <x.div display={"flex"} flexDirection={"column"}>
             <NumberInput
               block
+              fontSize={14}
+              borderRadius={8}
               name={"quoteFee"}
               {...model(quoteFee, setQuoteFee)}
-              label={quoteSymbol ? `${quoteSymbol} Swap Fee` : "Quote Swap Fee"}
+              label={quoteSymbol ? <x.span fontSize={{ xs: 'xs', md: '10px' }}>`${quoteSymbol} Swap Fee`</x.span> :
+                <x.span fontSize={{ xs: 'xs', md: '10px' }}>Quote Swap Fee</x.span>}
               validate={[required, min(0)]}
               rightOfLabel={
                 <TooltipHelper>
@@ -230,8 +250,10 @@ const ListPairForm = ({
           </x.div>
           <NumberInput
             block
+            fontSize={14}
+            borderRadius={8}
             name={"pricePrecisionDecimals"}
-            label={"Price Precision Decimals"}
+            label={<x.span fontSize={{ xs: 'xs', md: '10px' }}>Price Precision Decimals</x.span>}
             validate={[required, max(10), min(0)]}
             rightOfLabel={
               <TooltipHelper>
@@ -249,9 +271,12 @@ const ListPairForm = ({
             }
           />
           <SelectInput
+            fontSize={10}
+            padding={5}
+            borderRadius={8}
             {...model(zigZagChainId, setZigZagChainId)}
             name={"zigzagChainId"}
-            label={"Network"}
+            label={<x.span fontSize={{ xs: 'xs', md: '10px' }}>Network</x.span>}
             items={[
               { name: "zkSync - Mainnet", id: 1 },
               { name: "zkSync - Rinkeby", id: 1000 },
@@ -265,37 +290,36 @@ const ListPairForm = ({
           />
         </x.div>
 
-        <x.div mb={4}>
+        <x.div
+          h={"1px"}
+          w={"full"}
+          bg={"blue-gray-800"}
+          borderRadius={10}
+          mb={21}
+        />
+        <x.div mb={4}
+          ml={5}>
           <x.div
             display={"flex"}
             alignItems={"center"}
-            justifyContent={"flex-end"}
+            mb={21}
           >
-            <x.div fontSize={12} mr={2} color={"blue-gray-400"}>
-              advanced settings
-            </x.div>
-            <Button
-              size={"xs"}
-              variant={"secondary"}
-              onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}
-            >
-              {showAdvancedSettings ? "-" : "+"}
-            </Button>
+            <Toggle scale="md" font="primaryTiny" leftLabel="Advanced Settings" onChange={() => setShowAdvancedSettings(!showAdvancedSettings)} />
           </x.div>
           {showAdvancedSettings && (
             <>
-              <x.div
-                h={"2px"}
+              {/* <x.div
+                h={"1px"}
                 w={"full"}
                 bg={"blue-gray-800"}
                 borderRadius={10}
-                my={4}
-              />
-              <x.div display={"grid"} gridTemplateColumns={2} columnGap={6}>
+                mt={21}
+              /> */}
+              <x.div display={"grid"} gridTemplateColumns={2} columnGap={6} mb={21}>
                 <TextInput
                   block
                   name={TRADING_VIEW_CHART_KEY}
-                  label={"Default Chart Ticker"}
+                  label={<x.span fontSize={{ xs: 'xs', md: '10px' }}>Default Chart Ticker</x.span>}
                   rightOfLabel={
                     <TooltipHelper>
                       <x.div>
@@ -313,7 +337,7 @@ const ListPairForm = ({
         </x.div>
         {children}
       </Form>
-    </x.div>
+    </ListPairContainer>
   );
 };
 
@@ -350,12 +374,11 @@ const TooltipHelper = ({ children }) => {
   return (
     <Tooltip placement={"right"} label={children}>
       <x.div
-        display={"inline-flex"}
         color={"blue-gray-600"}
-        ml={2}
+        ml={-13}
         alignItems={"center"}
       >
-        <AiOutlineQuestionCircle size={14} />
+        <BsExclamationCircle size={10} color={"primaryHighEmphasis"} />
       </x.div>
     </Tooltip>
   );
@@ -371,7 +394,7 @@ const renderFeeHint = (assetPrice, assetFee, symbol, feeSetter) => {
     const notional = (Number(assetPrice) * Number(assetFee)).toFixed(2)
     if (notional > 0) {
       return <x.div pl={2} fontSize={12} color={"blue-gray-500"} mt={1} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
-        <x.div style={{wordBreak: "break-all"}}>
+        <x.div style={{ wordBreak: "break-all" }}>
           {assetFee} {symbol} = ${notional}
         </x.div>
         {notional > 1 && <x.div>
@@ -382,9 +405,10 @@ const renderFeeHint = (assetPrice, assetFee, symbol, feeSetter) => {
             onClick={() => feeSetter(getAmountForTargetNotional(assetPrice))}>
             set to $1
           </Button>
-          <x.div/>
+          <x.div />
         </x.div>}
-      </x.div>}
+      </x.div>
+    }
   }
   return null
 }

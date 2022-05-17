@@ -17,14 +17,12 @@
 }
 
 .zig_scrollstyle::-webkit-scrollbar-thumb {
-  background-image: -webkit-gradient(
-    linear,
-    left bottom,
-    left top,
-    color-stop(0, #1b2d52),
-    color-stop(0.44, rgb(19, 34, 80)),
-    color-stop(0.55, #1b2d52)
-  );
+  background-image: -webkit-gradient(linear,
+      left bottom,
+      left top,
+      color-stop(0, #1b2d52),
+      color-stop(0.44, rgb(19, 34, 80)),
+      color-stop(0.55, #1b2d52));
 }
 
 h1,
@@ -61,15 +59,15 @@ html {
   color: #c4384e !important;
 }
 
-.zig-dropdown .rc-dropdown-menu > .rc-dropdown-menu-item {
+.zig-dropdown .rc-dropdown-menu>.rc-dropdown-menu-item {
   font-size: 18px;
   padding: 15px;
   cursor: pointer;
 }
 
-.zig-dropdown .rc-dropdown-menu > .rc-dropdown-menu-item:hover,
-.zig-dropdown .rc-dropdown-menu > .rc-dropdown-menu-item-active,
-.zig-dropdown .rc-dropdown-menu > .rc-dropdown-menu-item-selected {
+.zig-dropdown .rc-dropdown-menu>.rc-dropdown-menu-item:hover,
+.zig-dropdown .rc-dropdown-menu>.rc-dropdown-menu-item-active,
+.zig-dropdown .rc-dropdown-menu>.rc-dropdown-menu-item-selected {
   background-color: #c0cff8;
   color: #43f;
 }
@@ -81,30 +79,35 @@ html {
   font-weight: normal;
   font-style: normal;
 }
+
 @font-face {
   font-family: 'WorkSans-Regular';
   src: url('./assets/fonts/WorkSans-Regular.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
 }
+
 @font-face {
   font-family: 'WorkSans-Medium';
   src: url('./assets/fonts/WorkSans-Medium.ttf') format('truetype');
   font-weight: 500;
   font-style: normal;
 }
+
 @font-face {
   font-family: 'WorkSans-SemiBold';
   src: url('./assets/fonts/WorkSans-SemiBold.ttf') format('truetype');
   font-weight: 600;
   font-style: normal;
 }
+
 @font-face {
   font-family: 'WorkSans-Bold';
   src: url('./assets/fonts/WorkSans-Bold.ttf') format('truetype');
   font-weight: 700;
   font-style: normal;
 }
+
 @font-face {
   font-family: 'IBMPlexMono-Medium';
   src: url('./assets/fonts/IBMPlexMono-Medium.ttf') format('truetype');
@@ -124,7 +127,7 @@ html {
 .select-wrap::before {
   content: "";
   font-size: 1rem;
-  top: 45px;
+  top: 32px;
   right: 14px;
   position: absolute;
   border: solid white;
@@ -138,4 +141,3 @@ html {
 .select-input {
   appearance: none;
 }
-

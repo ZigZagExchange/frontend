@@ -11,6 +11,9 @@ const SelectInput = ({
   value,
   items,
   rightOfLabel,
+  borderRadius = 3,
+  fontSize = 18,
+  padding = 8
 }) => {
   return (
     <div className="select-wrap">
@@ -24,13 +27,13 @@ const SelectInput = ({
         rightOfLabel={rightOfLabel}
         type={"select"}
         borderWidth={2}
-        borderRadius={3}
+        borderRadius={borderRadius}
         borderColor={"blue-gray-800"}
         background={"none"}
         color={"white"}
-        fontSize={18}
+        fontSize={fontSize}
         className="select-input"
-        p={'8px'}
+        p={`${padding}px`}
         w={"full"}
         h={"full"}
       >

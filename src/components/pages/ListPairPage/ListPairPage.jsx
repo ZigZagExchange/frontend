@@ -8,16 +8,14 @@ import { x } from "@xstyled/styled-components";
 import styled from "styled-components";
 import "bootstrap";
 
-import { DefaultTemplate } from "components";
+import { BridgeTemplate } from "components";
 import ConnectWalletButton from "../../atoms/ConnectWalletButton/ConnectWalletButton";
-import Pane from "../../atoms/Pane/Pane";
+import Text from "../../atoms/Text/Text";
 import AllocationModal from "./AllocationModal";
 import Submit, { Button } from "../../atoms/Form/Submit";
 import { jsonify } from "../../../lib/helpers/strings";
-import { Dev } from "../../../lib/helpers/env";
 import SuccessModal from "./SuccessModal";
 import { HiExternalLink } from "react-icons/hi";
-import ExternalLink from "./ExternalLink";
 import ListPairForm from "./ListPairForm";
 import { sleep } from "../../../lib/utils";
 
@@ -34,7 +32,6 @@ const ListPage = styled.div`
   background-size: cover;
   background-position: center;
   flex-direction: column;
-  justify-content: center;
 `;
 
 const ListContainer = styled.div`
@@ -144,19 +141,24 @@ export default function ListPairPage() {
   }, [arweaveAllocation]);
 
   return (
-    <DefaultTemplate>
+    <BridgeTemplate>
       <ListPage>
         <ListContainer>
-          <x.div display={"flex"} justifyContent={"space-between"} mb={4}>
-            <x.div fontSize={{ xs: 'lg', md: '2xl' }} mb={2}>
+          <x.div mb={4}>
+            <Text font="primaryHeading4" marginBottom="1rem">
               List New Pair
-            </x.div>
-            <x.div fontSize={{ xs: 'xs', md: '12px' }} color={"blue-gray-400"} textAlign={"center"}>
+            </Text>
+
+            <x.div fontSize={{ xs: 'xs', md: '10px' }} lineHeight={1} color={"blue-gray-400"}>
               <x.div>No Internal ID?</x.div>
               <x.div>
-                <ExternalLink href={"https://zkscan.io/explorer/tokens"}>
-                  List your token on zkSync <HiExternalLink />
-                </ExternalLink>
+                <x.a
+                  target={"_blank"}
+                  color={{ _: "foregroundHighEmphasis", hover: "blue-100" }}
+                  href={"https://zkscan.io/explorer/tokens"}>
+                  List your token on zkSync
+                  <HiExternalLink size="14px" style={{ marginLeft: "6px", marginBottom: "2px" }} />
+                </x.a>
               </x.div>
             </x.div>
           </x.div>
@@ -179,7 +181,7 @@ export default function ListPairPage() {
               </x.div>
             )}
 
-            <Dev>
+            {/* <Dev>
               <x.div
                 fontSize={12}
                 color={"blue-gray-500"}
@@ -188,7 +190,7 @@ export default function ListPairPage() {
               >
                 arweave allocation: {arweaveAllocationKB} kB
               </x.div>
-            </Dev>
+            </Dev> */}
 
             {(() => {
               if (!isUserLoggedIn) {
@@ -236,6 +238,6 @@ export default function ListPairPage() {
           setTxId(null);
         }}
       />
-    </DefaultTemplate>
+    </BridgeTemplate>
   );
 }
