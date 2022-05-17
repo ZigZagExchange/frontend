@@ -38,6 +38,13 @@ const DropdownDisplay = styled.div`
   pointer-events: none;
   display: flex;
   flex-direction: column;
+  
+  @media screen and (max-width: 991px) {
+    position: fixed;
+    margin-top: 0;
+    width: 100%;
+    border-radius: 0;
+  }
 `;
 
 const DropdownButton = styled.div`
@@ -64,6 +71,13 @@ const DropdownButton = styled.div`
   svg {
     margin-left: 5px;
     font-size: 13px;
+  }
+
+  & h4 {
+    margin: 0;
+    font-size: 10px;
+    text-align: center;
+    text-transform: uppercase;
   }
 `;
 
@@ -109,7 +123,6 @@ const WalletToggle = styled.ul`
   list-style-type: none;
   border: 1px solid #666;
   border-radius: 33px;
-  height: 33px;
   padding: 3px;
 `;
 
@@ -196,6 +209,8 @@ const LayoutButton = styled.div`
   border-right: 1px solid rgba(0, 0, 0, 0.1);
   svg {
     font-size: 15px;
+    position: relative;
+    top: -1px;
   }
   &:hover {
     background: #4d76af;
@@ -206,27 +221,25 @@ const LayoutButton = styled.div`
     color: #fff;
   }
 `;
-const DropdownExplorer = styled.a`
+const DropdownExplorer = styled.div`
   display: flex;
   flex-direction: row;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  
   padding: 15px;
   cursor: pointer;
   font-size: 13px;
   line-height: 1.1;
-  border-right: 1px solid rgba(0, 0, 0, 0.1);
   background: rgba(0, 0, 0, 0.04);
 
   a {
     color: inherit;
+    text-decoration: none;
   }
 
   &:hover {
     background: #4d76af;
   }
+  
   &:hover > a {
     color: #fff;
   }
@@ -267,7 +280,7 @@ const LayoutItem = styled.div`
   justify-content: center;
   align-items: center;
   font-size: 15px;
-  filter: invert(39%) sepia(14%) saturate(1522%) hue-rotate(172deg) brightness(94%) contrast(94%);
+  filter: invert(52%) sepia(5%) saturate(958%) hue-rotate(167deg) brightness(97%) contrast(82%);
   padding: 10px;
   & img {
     height: 150px;
@@ -285,7 +298,7 @@ const LayoutList = styled.div`
   display: grid;
   grid-template-columns: 50% 50%;
   ${LayoutItem}:nth-child(${(props) => props.layout + 1}) {
-    filter: invert(100%) sepia(3%) saturate(44%) hue-rotate(151deg) brightness(113%) contrast(87%);
+    filter: invert(84%) sepia(18%) saturate(211%) hue-rotate(186deg) brightness(107%) contrast(106%);
   }
 `;
 
@@ -326,6 +339,13 @@ export const AccountDropdown = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (show) {
+      // update Ethereum balance
+      api.getWalletBalances();
+    }
+  }, [show]);
+
   const handleKeys = (e) => {
     if (~[32, 13, 27].indexOf(e.which)) {
       e.preventDefault();
@@ -335,6 +355,13 @@ export const AccountDropdown = () => {
 
   const filterSmallBalances = (currency) => {
     const balance = wallet[currency].valueReadable;
+    const usdBalance = coinEstimator(currency) * wallet[currency].valueReadable;
+
+    //filter out small balances L2 below 2cents
+    if (selectedLayer !== 1) {
+      if (usdBalance < 0.02) return false;
+    }
+
     if (balance) {
       return Number(balance) > 0;
     } else {
@@ -360,9 +387,13 @@ export const AccountDropdown = () => {
       tabIndex="0"
     >
       <DropdownButton onClick={() => setShow(!show)} tabIndex="0">
-        <AvatarImg src={profile.image} alt={profile.name} />
-        {profile.name}
+        <AvatarImg src={profile.image}/>
+        <span>
+          {profile.name}
+          <h4>Wallet</h4>
+        </span>
         <AiOutlineCaretDown />
+        
       </DropdownButton>
       <DropdownDisplay>
         <DropdownHeader>
@@ -421,7 +452,7 @@ export const AccountDropdown = () => {
         <DropdownFooter>
 
           <LayoutButton onClick={() => { setShowLayout(!showLayout); setShow(!show); }} tabIndex="0">
-            <IoMdGrid style={{ position: "relative", top: -1 }} /> Layouts
+            <IoMdGrid style={{ position: "relative", marginTop: 1, marginRight: 3 }} /> Layouts
           </LayoutButton>
 
           <Modal
@@ -457,7 +488,7 @@ export const AccountDropdown = () => {
             <a target="_blank"
               rel="noreferrer"
               href={explorer}>
-                <IoMdOpen style={{ position: "relative", top: -1 }} /> {selectedLayer === 1 ? 'Etherscan' : `zkScan`} 
+                <IoMdOpen style={{ position: "relative", top: -2 }} /> {selectedLayer === 1 ? 'Etherscan' : `zkScan`} 
             </a>
           </DropdownExplorer> 
           

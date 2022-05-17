@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { networkSelector } from "lib/store/features/api/apiSlice";
-import { userSelector } from "lib/store/features/auth/authSlice";
+// import { useSelector } from "react-redux";
+// import { networkSelector } from "lib/store/features/api/apiSlice";
+// import { userSelector } from "lib/store/features/auth/authSlice";
 import styled from "@xstyled/styled-components";
 import { FiChevronDown } from "react-icons/fi";
 import { useCoinEstimator, Modal } from "components";
 import { formatUSD } from "lib/utils";
 import api from "lib/api";
 import SearchBox from "components/organisms/TradeDashboard/TradeSidebar/SearchBox/SearchBox";
+import { Tooltip } from "components/atoms/Tooltip";
+import { MdOfflineBolt } from "react-icons/md";
 
 const StyledBridgeCurrencySelector = styled.div`
   height: 46px;
@@ -57,6 +59,12 @@ const BridgeCurrencyWrapper = styled.div`
   }
 `;
 
+const BridgeEligibleFastwithdraw = styled.div`
+  font-size: 20px;
+  margin-top: -4px;
+  margin-left: 4px;
+`;
+
 const BridgeCurrencyOptions = styled.ul`
   width: 100%;
   overflow: auto;
@@ -104,20 +112,20 @@ const BridgeCurrencyOptions = styled.ul`
   }
 `;
 
-const BridgeCurrencySelector = ({ onChange, balances = {}, value }) => {
+const BridgeCurrencySelector = ({ onChange, balances = {}, value, isOpenable }) => {
   const [show, setShow] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [showingOptions, setShowingOptions] = useState(false);
-  const network = useSelector(networkSelector);
-  const user = useSelector(userSelector);
+  // const network = useSelector(networkSelector);
+  // const user = useSelector(userSelector);
   const coinEstimator = useCoinEstimator();
   var [tickers, setTickers] = useState(api.getCurrencies());
 
-  useEffect(() => {
-    if (tickers.length !== 0) {
-      onChange(api.marketInfo["ETH"] ? "ETH" : tickers[0]);
-    }
-  }, [user.id, network]);
+  // useEffect(() => {
+  //   if (tickers.length !== 0) {
+  //     onChange(api.marketInfo["ETH"] ? "ETH" : tickers[0]);
+  //   }
+  // }, [user.id, network]);
 
   const hideOptions = (e) => {
     if (e) e.preventDefault();
@@ -170,15 +178,20 @@ const BridgeCurrencySelector = ({ onChange, balances = {}, value }) => {
     }, 500);
   };
 
+  const openModal = () => {
+    if(!isOpenable) return;
+    setShow(true)
+  }
+
   return (
     <BridgeCurrencyWrapper>
-      <StyledBridgeCurrencySelector onClick={() => setShow(true)}>
+      <StyledBridgeCurrencySelector onClick={openModal}>
         <div className="currencyIcon">
           <img src={image && image} alt={currency && currency.symbol} />
         </div>
         <div className="currencyName">
           {value}
-          <FiChevronDown />
+          {isOpenable ? <FiChevronDown /> : <>&nbsp;&nbsp;</>}
         </div>
       </StyledBridgeCurrencySelector>
       <Modal
@@ -201,8 +214,12 @@ const BridgeCurrencySelector = ({ onChange, balances = {}, value }) => {
               }
               return false;
             })
-            .map((ticker, key) =>
-              ticker === value ? null : (
+            .map((ticker, key) => {
+              if(ticker === value) return (<></>);
+              
+              const isFastWithdraw = (api.apiProvider.eligibleFastWithdrawTokens.includes(ticker));
+                
+              return (
                 <li
                   key={key}
                   onClick={selectOption(ticker)}
@@ -216,6 +233,13 @@ const BridgeCurrencySelector = ({ onChange, balances = {}, value }) => {
                     />
                   </div>
                   <div className="currencyName">{ticker}</div>
+                  <BridgeEligibleFastwithdraw>
+                    {isFastWithdraw ? 
+                      <Tooltip placement={"right"} label={"Available for Fast Withdrawal"}>
+                        <MdOfflineBolt />
+                      </Tooltip>
+                    : null}
+                  </BridgeEligibleFastwithdraw>
                   {balances[ticker] && (
                     <div className="currencyBalance">
                       <strong>{balances[ticker].valueReadable}</strong>
@@ -227,9 +251,8 @@ const BridgeCurrencySelector = ({ onChange, balances = {}, value }) => {
                       </small>
                     </div>
                   )}
-                </li>
-              )
-            )}
+                </li>);
+            })}
         </BridgeCurrencyOptions>
       </Modal>
     </BridgeCurrencyWrapper>
