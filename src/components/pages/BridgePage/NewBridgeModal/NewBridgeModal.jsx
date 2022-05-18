@@ -1,10 +1,6 @@
 import { useRef, useState } from "react";
-import { Link } from "@material-ui/core";
 import styled from "styled-components";
-
 import Text from "components/atoms/Text/Text";
-import GenericModal from "components/molecules/GenericModal/GenericModal";
-
 import { DiscordIcon } from "components/atoms/Svg";
 import { CloseIcon } from '../../../atoms/Svg';
 import PlayBtn from "assets/images/play-btn.svg";
@@ -82,7 +78,7 @@ const NewBridgeModalComponent = () => {
                     <Text font="primaryHeading6" mb={1}>Introduction Video</Text>
                     <div className="video">
                         <video src="1.mp4" style={{ width: "100%" }} ref={videoRef} />
-                        <img src={PlayBtn} onClick={playVideo} />
+                        <img src={PlayBtn} onClick={playVideo} alt="play video" />
                     </div>
                 </div>
 
@@ -97,7 +93,7 @@ const NewBridgeModalComponent = () => {
                         <a target="_blank" rel="noreferrer" href="https://discord.gg/zigzag">discord</a> for live support.</Text>
                 </div>
 
-                <a className="ml-auto">Dismiss and don't show again.</a>
+                <a className="ml-auto" href="/">Dismiss and don't show again.</a>
             </NewBridgeModal >
             : ""
     )
