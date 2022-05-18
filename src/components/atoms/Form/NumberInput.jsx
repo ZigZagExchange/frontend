@@ -1,6 +1,17 @@
 import React from "react";
+import styled from "styled-components";
 import Input from "./Input";
-import BaseInputStyle from "./BaseInput.style";
+
+const InputField = styled(Input)`
+  padding: 2px;
+  border: 1px solid;
+  border-color: ${({theme}) => theme.colors.foreground300};
+  &:focus {
+    outline: none;
+  }
+  background: none;
+  color: ${({theme}) => theme.colors.foregroundHighEmphasis};
+`
 
 const NumberInput = ({
   name,
@@ -16,7 +27,7 @@ const NumberInput = ({
   fontSize = 18,
 }) => {
   return (
-    <Input
+    <InputField
       name={name}
       placeholder={placeholder}
       validate={validate}
@@ -29,7 +40,6 @@ const NumberInput = ({
       w={block ? "100%" : "inherit"}
       fontSize={fontSize}
       borderRadius={borderRadius}
-      {...BaseInputStyle}
     />
   );
 };

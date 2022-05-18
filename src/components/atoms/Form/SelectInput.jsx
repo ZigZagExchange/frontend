@@ -1,6 +1,41 @@
 import React from "react";
+import styled from "styled-components";
 import Input from "./Input";
 import { x } from "@xstyled/styled-components";
+
+
+const InputField = styled(Input)`
+  cursor: pointer;
+  padding: 5px;
+  border: 1px solid;
+  border-color: ${({theme}) => theme.colors.foreground300};
+  &:focus {
+    outline: none;
+  }
+  &::before {
+    border: solid ${({theme}) => theme.colors.foregroundHighEmphasis};
+  }
+  background: none;
+  color: ${({theme}) => theme.colors.foregroundHighEmphasis};
+`
+
+const SelectWrapper = styled.div`
+  position: relative;
+  height: 100%;
+  &::before {
+    content: "";
+    font-size: 1rem;
+    top: 32px;
+    right: 14px;
+    position: absolute;
+    border: solid ${({theme}) => theme.colors.foregroundHighEmphasis};
+    border-width: 0 2px 2px 0;
+    display: inline-block;
+    padding: 2px;
+    transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+  }
+`
 
 const SelectInput = ({
   name,
@@ -11,13 +46,12 @@ const SelectInput = ({
   value,
   items,
   rightOfLabel,
-  borderRadius = 3,
   fontSize = 18,
-  padding = 8
+  borderRadius = 3,
 }) => {
   return (
-    <div className="select-wrap" style={{ height: "100%" }}>
-      <Input
+    <SelectWrapper>
+      <InputField
         name={name}
         validate={validate}
         label={label}
@@ -25,15 +59,10 @@ const SelectInput = ({
         onChange={onChange}
         hideValidation={hideValidation}
         rightOfLabel={rightOfLabel}
-        type={"select"}
-        borderWidth={2}
-        borderRadius={borderRadius}
-        borderColor={"blue-gray-800"}
-        background={"none"}
-        color={"white"}
         fontSize={fontSize}
+        borderRadius={borderRadius}
+        type={"select"}
         className="select-input"
-        p={`${padding}px`}
         w={"full"}
         h={"full"}
       >
@@ -42,8 +71,8 @@ const SelectInput = ({
             {item.name}
           </x.option>
         ))}
-      </Input>
-    </div>
+      </InputField>
+    </SelectWrapper>
   );
 };
 
