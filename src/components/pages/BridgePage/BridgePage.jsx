@@ -40,7 +40,7 @@ const BridgeSection = styled.div`
   height: 100%;
   min-height: calc(100vh - 113px);
   padding: 2rem 0;
-  background-color: ${(p) => p.theme.colors.backgroundMediumEmphasis};
+  background-color: ${(p) => p.theme.colors.backgroundHighEmphasis};
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;

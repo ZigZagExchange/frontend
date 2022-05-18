@@ -321,6 +321,9 @@ const ListPairForm = ({
               <x.div display={"grid"} gridTemplateColumns={2} columnGap={6} mb={21}>
                 <TextInput
                   block
+                  fontSize={10}
+                  padding={5}
+                  borderRadius={8}
                   name={TRADING_VIEW_CHART_KEY}
                   label={<x.span fontSize={{ xs: 'xs', md: '10px' }}>Default Chart Ticker</x.span>}
                   rightOfLabel={
