@@ -32,6 +32,11 @@ const ListPage = styled.div`
   background-size: cover;
   background-position: center;
   flex-direction: column;
+
+  .bg_btn {
+    height: 29px;
+    font-size: 12px;
+  }
 `;
 
 const ListContainer = styled.div`
