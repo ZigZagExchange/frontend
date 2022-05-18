@@ -17,6 +17,7 @@ import SuccessModal from "./SuccessModal";
 import { HiExternalLink } from "react-icons/hi";
 import ListPairForm from "./ListPairForm";
 import { sleep } from "../../../lib/utils";
+import TradeFooter from "components/organisms/TradeDashboard/TradeFooter/TradeFooter";
 
 export const TRADING_VIEW_CHART_KEY = "tradingViewChart";
 
@@ -242,6 +243,7 @@ export default function ListPairPage() {
           setTxId(null);
         }}
       />
+      <TradeFooter />
     </BridgeTemplate>
   );
 }
