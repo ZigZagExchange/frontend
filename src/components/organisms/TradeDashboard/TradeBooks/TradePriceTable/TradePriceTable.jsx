@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
 import useTheme from "components/hooks/useTheme";
-import { marketInfoSelector, currentMarketSelector } from "lib/store/features/api/apiSlice";
+import { marketInfoSelector } from "lib/store/features/api/apiSlice";
 import { numStringToSymbol } from "lib/utils";
 import Text from "components/atoms/Text/Text";
 
@@ -88,18 +88,14 @@ const Table = styled.table`
 const TradePriceTable = (props) => {
   const { theme } = useTheme()
   const marketInfo = useSelector(marketInfoSelector);
-  const currentMarket = useSelector(currentMarketSelector)
   const ref = useRef(null)
 
-  const scrollToBottom = () => {
+  useEffect(()=>{
+    if(!ref.current) return;
     if (props.scrollToBottom) {
       ref.current?.scrollTo(0, ref.current.scrollHeight)
     }
-  };
-
-  useEffect(() => {
-    setTimeout(() => scrollToBottom(), 1000)
-  }, [currentMarket]);
+  }, [props.priceTableData.length])
 
   let total_total = 0;
   props.priceTableData.map((d) => total_total += d.td2);
