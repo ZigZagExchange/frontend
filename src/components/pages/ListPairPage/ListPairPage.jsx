@@ -9,10 +9,9 @@ import styled from "styled-components";
 import "bootstrap";
 
 import { BridgeTemplate } from "components";
-import ConnectWalletButton from "../../atoms/ConnectWalletButton/ConnectWalletButton";
 import Text from "../../atoms/Text/Text";
 import AllocationModal from "./AllocationModal";
-import Submit, { Button } from "../../atoms/Form/Submit";
+import { Button, ConnectWalletButton } from "components/molecules/Button";
 import { jsonify } from "../../../lib/helpers/strings";
 import SuccessModal from "./SuccessModal";
 import { HiExternalLink } from "react-icons/hi";
@@ -203,15 +202,15 @@ export default function ListPairPage() {
               } else {
                 if (isUserConnectedToMainnet) {
                   return (
-                    <Submit block mt={5}>
+                    <Button width="100%">
                       {!isArweaveAllocationSufficient && hasAttemptedSubmit
                         ? "PURCHASE ALLOCATION"
-                        : "LIST"}
-                    </Submit>
+                        : "SUBMIT"}
+                    </Button>
                   );
                 } else {
                   return (
-                    <Button block isDisabled>
+                    <Button width="100%" variant="outlined" disabled>
                       Please connect to Mainnet
                     </Button>
                   );

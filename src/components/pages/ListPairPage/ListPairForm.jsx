@@ -143,8 +143,7 @@ const ListPairForm = ({
           mb={16}
           alignItems="flex-end"
         >
-          <x.div display={"flex"} flexDirection={"column"}
-            h={"100%"}>
+          <x.div display={"flex"} flexDirection={"column"} h={"100%"}>
             <NumberInput
               block
               {...model(baseAssetId, setBaseAssetId)}
@@ -180,8 +179,7 @@ const ListPairForm = ({
             />
           </x.div>
 
-          <x.div display={"flex"} flexDirection={"column"}
-            h={"100%"}>
+          <x.div display={"flex"} flexDirection={"column"} h={"100%"}>
             <NumberInput
               block
               {...model(quoteAssetId, setQuoteAssetId)}
@@ -216,8 +214,7 @@ const ListPairForm = ({
               }
             />
           </x.div>
-          <x.div display={"flex"} flexDirection={"column"}
-            h={"100%"}>
+          <x.div display={"flex"} flexDirection={"column"} h={"100%"}>
             <NumberInput
               block
               name={"baseFee"}
@@ -235,8 +232,7 @@ const ListPairForm = ({
             />
             {renderFeeHint(basePrice, baseFee, baseSymbol, setBaseFee)}
           </x.div>
-          <x.div display={"flex"} flexDirection={"column"} h={"100%"}
-            h={"100%"}>
+          <x.div display={"flex"} flexDirection={"column"} h={"100%"}>
             <NumberInput
               block
               fontSize={14}
