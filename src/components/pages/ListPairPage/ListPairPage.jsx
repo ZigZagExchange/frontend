@@ -199,7 +199,7 @@ export default function ListPairPage() {
 
             {(() => {
               if (!isUserLoggedIn) {
-                return <ConnectWalletButton />;
+                return <ConnectWalletButton width="100%" />;
               } else {
                 if (isUserConnectedToMainnet) {
                   return (
