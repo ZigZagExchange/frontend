@@ -286,6 +286,10 @@
   color: #fff;
 }
 
+.bridge_menu .rc-dropdown-menu > .rc-dropdown-menu-item {
+  padding: 3px;
+}
+
 .bridge_coin_title {
   margin-bottom: 24px;
 }
@@ -304,6 +308,7 @@
   flex-direction: row;
   align-items: center;
   width: 100%;
+  cursor: pointer;
 }
 
 .bridge_coin_details .bridge_coin_image {
@@ -324,4 +329,8 @@
   border-radius: 32px;
   background: rgba(255, 255, 255, 0.1);
   padding: 2px;
+}
+
+.rc-dropdown-menu > .rc-dropdown-menu-item-selected:after {
+  top: 15px;
 }

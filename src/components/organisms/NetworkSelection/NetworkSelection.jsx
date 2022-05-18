@@ -1,5 +1,7 @@
-import React from 'react'
-
+import React, {useState} from 'react'
+import { useSelector } from 'react-redux';
+import api from "lib/api";
+import { networkSelector } from "lib/store/features/api/apiSlice";
 import ListBox from 'components/atoms/ListBox'
 
 const networkLists = [
@@ -8,9 +10,20 @@ const networkLists = [
   ]
 
 const NetworkSelection = ({className}) => {
+  const network = useSelector(networkSelector);
+
+  const [selectedItem, setSelectedItem] = useState(networkLists.find(item=>item.value===network));
+
+  const onChangeNetwork = (item) => {
+    setSelectedItem(item)
+    api.setAPIProvider(parseInt(item.value));
+    api.refreshNetwork().catch((err) => {
+      console.log(err);
+    });
+  }
   return (
     <div className={className}>
-        <ListBox options= {networkLists} />
+        <ListBox options= {networkLists} setSelectedItem={onChangeNetwork} selectedItem={selectedItem} />
     </div>
   )
 }

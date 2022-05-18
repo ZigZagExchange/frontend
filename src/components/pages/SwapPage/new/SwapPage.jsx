@@ -1,9 +1,7 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect, useMemo, useState } from "react";
 import useTheme from "components/hooks/useTheme";
 
-import { useParams, Link } from "react-router-dom";
-import { networkSelector } from "lib/store/features/api/apiSlice";
+import { Link } from "react-router-dom";
 import { DefaultTemplate } from "components";
 import { ExternalLinkIcon, InfoIcon } from "components/atoms/Svg";
 import NetworkSelection from "components/organisms/NetworkSelection";
@@ -16,7 +14,6 @@ import TransactionSettings from "./TransationSettings";
 import { Button } from "components/molecules/Button";
 
 export default function SwapPage() {
-  const network = useSelector(networkSelector);
   // const isSwapCompatible = useMemo(
   //   () => network && api.isImplemented("depositL2"),
   //   [network]
@@ -24,23 +21,73 @@ export default function SwapPage() {
   // const tab = useParams().tab || "swap";
 
   const { isDark } = useTheme();
-  const [tickers, setTicker] = useState([])
+  const [pairs, setGetPairs] = useState([]);
+  const [fromTokenList, setFromTokenList] = useState([]);
+  const [fromToken, setFromToken] = useState();
+  const [toToken, setToToken] = useState();
 
-  useEffect(()=> {
-    const timer = setInterval(()=> { setTicker(api.getCurrencies()) } , 500)
-    if(tickers.length>0) {
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setFromTokenList(api.getCurrencies());
+      setGetPairs(api.getPairs());
+    }, 500);
+    if (fromTokenList.length > 0) {
       clearInterval(timer);
     }
     return () => {
-      clearInterval(timer)
-    }
-  }, [tickers])
+      clearInterval(timer);
+    };
+  }, [fromTokenList]);
 
-  const tokens = useMemo(()=> {
-    return tickers.map((item, index)=> { return {id: index, name: item}})
-  }, [tickers])
-  
- return (
+  const fromTokenOptions = useMemo(() => {
+    if (fromTokenList.length > 0) {
+      const p = fromTokenList.map((item, index) => {
+        return { id: index, name: item };
+      });
+      setFromToken(p[0]);
+      return p;
+    } else {
+      return [];
+    }
+  }, [fromTokenList]);
+
+  const toTokenOptions = useMemo(() => {
+    const p = pairs.map((item) => {
+      const a = item.split("-")[0];
+      const b = item.split("-")[1];
+      if (a === fromToken.name) {
+        return b;
+      } else if (b === fromToken.name) {
+        return a;
+      } else {
+        return null;
+      }
+    });
+    var filtered = p
+      .filter(function (el) {
+        return el != null;
+      })
+      .map((item, index) => {
+        return { id: index, name: item };
+      });
+    setToToken(filtered[0]);
+    return filtered;
+  }, [fromToken, pairs]);
+
+  const onChangeFromToken = (option) => {
+    setFromToken(option);
+  };
+
+  const onChangeToToken = (option) => {
+    setToToken(option);
+  };
+
+  const onSwitchTokenBtn = () => {
+    const p = fromTokenOptions.find((item) => item.name === toToken.name);
+    setFromToken(p);
+  };
+
+  return (
     <DefaultTemplate>
       <div className={classNames("flex justify-center", { dark: isDark })}>
         <div>
@@ -61,7 +108,15 @@ export default function SwapPage() {
             <InfoIcon size={16} />
           </div>
           <NetworkSelection className="mt-2" />
-          <SwapContianer tickers = {tokens} />
+          <SwapContianer
+            fromTokenOptions={fromTokenOptions}
+            onSelectedFromToken={onChangeFromToken}
+            selectedFromToken={fromToken}
+            toTokenOptions={toTokenOptions}
+            onSelectedToToken={onChangeToToken}
+            selectedToToken={toToken}
+            onSwitchTokenBtn={onSwitchTokenBtn}
+          />
           <TransactionSettings />
           <Button
             isLoading={false}

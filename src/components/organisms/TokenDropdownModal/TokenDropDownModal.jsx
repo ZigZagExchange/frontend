@@ -17,9 +17,9 @@ import api from "lib/api";
 //   { id: 6, name: "MATIC" },
 // ];
 
-const TokenDropDownModal = ({tickers=[]}) => {
+const TokenDropDownModal = ({tickers=[], onSelectedOption, selectedOption}) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selected, setSelected] = useState(tickers[0]);
+  // const [selected, setSelected] = useState(tickers[0]);
   const { isDark, theme } = useTheme();
 
   console.log(isDark);
@@ -37,7 +37,8 @@ const TokenDropDownModal = ({tickers=[]}) => {
   const [query, setQuery] = useState("");
 
   const onSelectedToken = (e) => {
-    setSelected(e);
+    // setSelected(e);
+    onSelectedOption(e);
     setIsOpen(false);
   }
 
@@ -61,12 +62,12 @@ const TokenDropDownModal = ({tickers=[]}) => {
         >
           {
             <img
-              src={api.getCurrencyLogo(selected.name)}
-              alt={selected}
+              src={api.getCurrencyLogo(selectedOption.name)}
+              alt={selectedOption}
               style={{width: 25, height: 25}}
             />
           }
-          <p className="ml-3 text-lg ">{selected.name}</p>
+          <p className="ml-3 text-lg ">{selectedOption.name}</p>
           <ChevronDownIcon className="w-5 h-5 ml-1 -mr-1" aria-hidden="true" />
         </button>
       </div>
@@ -105,7 +106,7 @@ const TokenDropDownModal = ({tickers=[]}) => {
                     
                   </Dialog.Title>
                   <div className="h-px mx-3 my-3 dark:bg-foreground-400 bg-primary-500"></div>
-                  <Combobox value={selected} onChange={onSelectedToken}>
+                  <Combobox value={selectedOption} onChange={onSelectedToken}>
                     <div className="relative mt-2">
                       <div className="relative mx-3 overflow-hidden text-left rounded-md shadow-md cursor-default focus:outline-none ">
                         <Combobox.Input

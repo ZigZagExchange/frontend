@@ -11,8 +11,8 @@ const DropdownWrapper = styled.div`
 
 export const Wrapper = styled.div`
     position: absolute;
-    width: ${({ width }) => `${width*2}px`};
-    max-width: 250px;
+    min-width: ${({ width }) => `${width}px`};
+    width: 100%;
     background-color: ${({ theme }) => theme.colors.backgroundMediumEmphasis};
     border: 1px solid ${({ theme }) => theme.colors.foreground400};
     box-shadow: 0px 8px 16px 0px #0101011A;

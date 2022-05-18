@@ -5,7 +5,6 @@ const useModal = (modal) => {
   const { onShow, onClose } = useContext(Context)
 
   const onShowHandler = useCallback(() => {
-      console.log("show")
     onShow(modal)
   }, [modal, onShow])
 

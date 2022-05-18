@@ -12,7 +12,7 @@ const TradeHead = (props) => {
       marketSummary={props.marketSummary}
       currentMarket={props.currentMarket}
       marketInfo={props.marketInfo}
-      markets={props.markets}
+      rowData={props.rowData}
     />
   );
 };
