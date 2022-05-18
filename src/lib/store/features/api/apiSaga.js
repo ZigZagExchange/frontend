@@ -33,20 +33,17 @@ export function* userPollingSaga() {
       return state.auth.user && state.auth.user.address;
     });
 
-    const allSagas = [
-      apply(api, api.getWalletBalances),
-      apply(api, api.getBalances),
-      apply(api, api.getPolygonWethBalance),
-    ];
-
     if (address) {
-      allSagas.push(apply(api, api.getAccountState));
-    }
+      try {
+        const allSagas = [
+          apply(api, api.getAccountState),
+          apply(api, api.getBalances),
+        ];
 
-    try {
-      yield all(allSagas);
-    } catch (err) {
-      console.log(err);
+        yield all(allSagas);
+      } catch (err) {
+        console.log(err);
+      }
     }
 
     yield delay(4000);

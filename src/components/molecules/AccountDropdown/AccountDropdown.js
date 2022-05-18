@@ -65,6 +65,13 @@ const DropdownButton = styled.div`
     margin-left: 5px;
     font-size: 13px;
   }
+
+  & h4 {
+    margin: 0;
+    font-size: 10px;
+    text-align: center;
+    text-transform: uppercase;
+  }
 `;
 
 const AvatarImg = styled.img`
@@ -235,6 +242,13 @@ export const AccountDropdown = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (show) {
+      // update Ethereum balance
+      api.getWalletBalances();
+    }
+  }, [show]);
+
   const handleKeys = (e) => {
     if (~[32, 13, 27].indexOf(e.which)) {
       e.preventDefault();
@@ -247,8 +261,8 @@ export const AccountDropdown = () => {
     const usdBalance = coinEstimator(currency) * wallet[currency].valueReadable;
 
     //filter out small balances L2 below 2cents
-    if(selectedLayer !== 1){
-      if(usdBalance < 0.02) return false;
+    if (selectedLayer !== 1) {
+      if (usdBalance < 0.02) return false;
     }
 
     if (balance) {
@@ -276,9 +290,13 @@ export const AccountDropdown = () => {
       tabIndex="0"
     >
       <DropdownButton onClick={() => setShow(!show)} tabIndex="0">
-        <AvatarImg src={profile.image} alt={profile.name} />
-        {profile.name}
+        <AvatarImg src={profile.image}/>
+        <span>
+          {profile.name}
+          <h4>Wallet</h4>
+        </span>
         <AiOutlineCaretDown />
+        
       </DropdownButton>
       <DropdownDisplay>
         <DropdownHeader>

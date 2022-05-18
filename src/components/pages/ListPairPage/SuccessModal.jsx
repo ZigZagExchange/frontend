@@ -52,7 +52,7 @@ const SuccessModal = ({ txid, show, onClose }) => {
       axios
         .get(viewMarketURL)
         .then((res) => {
-          const data = res.data[0];
+          const data = Object.values(res.data)[0]
           setAlias(data.alias);
           setBaseAsset(data.baseAsset.symbol);
           setQuoteAsset(data.quoteAsset.symbol);

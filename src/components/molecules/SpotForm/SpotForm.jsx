@@ -68,6 +68,7 @@ export class SpotForm extends React.Component {
     const newState = { ...this.state };
     newState.baseAmount = Number(this.state.baseAmount)-1 < 0 ? '0' : (Number(this.state.baseAmount)-1).toString();
     newState.quoteAmount = "";
+    newState.maxSizeSelected = false;
     this.setState(newState);
   }
 
@@ -452,6 +453,13 @@ export class SpotForm extends React.Component {
     }
   }
 
+  showLabel() {
+    return <div>
+      <p>zkSync's network swap fees are dynamic and sit around ~$0.50</p>
+      <p>covered by the market maker, but paid by the trader</p>
+    </div>
+  }
+
   render() {
     const marketInfo = this.props.marketInfo;
 
@@ -496,7 +504,7 @@ export class SpotForm extends React.Component {
         <FormHeader>
           <InfoWrapper>
             <Text font="primaryTiny" color="foregroundMediumEmphasis">Buy Fee</Text>
-            <QuestionHelper text="zkSync's network swap fees are dynamic and sit around ~$0.50 covered by the market maker, but paid by the trader"/>
+            <QuestionHelper text={this.showLabel()}/>
           </InfoWrapper>
           <Text font="primaryExtraSmallSemiBold" color="foregroundMediumEmphasis">
             {marketInfo && marketInfo.quoteFee &&
@@ -512,7 +520,7 @@ export class SpotForm extends React.Component {
         <FormHeader>
           <InfoWrapper>
             <Text font="primaryTiny" color="foregroundMediumEmphasis">Sell Fee</Text>
-            <InfoIcon />
+            <QuestionHelper text={this.showLabel()}/>
           </InfoWrapper>
           <Text font="primaryExtraSmallSemiBold" color="foregroundMediumEmphasis">
             {marketInfo && marketInfo.baseFee &&

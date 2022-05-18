@@ -460,7 +460,7 @@ const TokenPairDropdown = ({width, transparent, context, currentMarket, marketIn
             } else if (pairSorted) {
                 return pairDirection ? (d.td1 < d2.td1 ? -1 : 1) : (d.td1 < d2.td1 ? 1 : -1);
             } else {
-                return 0;
+                return d && d2? d.usdVolumn - d2.usdVolumn : 0;
             }
         })
         .map(([pair, d], i) => {

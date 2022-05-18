@@ -27,6 +27,12 @@ export const apiSlice = createSlice({
     _error(state, { payload }) {
       const op = payload[0];
       const errorMessage = payload[1];
+      // we dont want to show some errors
+      if (errorMessage.includes('Order is no longer open')) {
+        console.error(`Error at ${op}: ${errorMessage}`);
+        return;
+      };
+
       const renderToastContent = () => {
         return (
           <>
@@ -358,7 +364,7 @@ export const apiSlice = createSlice({
           break;
         case "zkSync_to_polygon":
           successMsg = "transferred";
-          targetMsg = "to Polygon:";
+          targetMsg = "on Polygon:";
           extraInfoLink = null;
           break;
         case "polygon_to_zkSync":

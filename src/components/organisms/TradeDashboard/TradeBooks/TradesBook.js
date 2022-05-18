@@ -11,7 +11,7 @@ const StyledTradeBooks = styled.section`
   flex-direction: row;
   justify-content: space-between;
   padding: 21px 20px 12px 10px;
-  border-top: 1px solid ${({theme}) => theme.colors.foreground400};
+  border-top: 1px solid ${({ theme }) => theme.colors.foreground400};
 `;
 
 const TradesWrapper = styled.div`
@@ -44,17 +44,17 @@ export default function TradesBook(props) {
   return (
     <>
       <StyledTradeBooks>
-          <TradesWrapper>
-            {/* TradePriceTable*/}
-            <Text font="primaryTitleDisplay" color="foregroundHighEmphasis">Market Trades</Text>
-            <TradeRecentTable
-              head
-              className=""
-              value="up_value"
-              priceTableData={openOrdersLatestTradesData}
-              currentMarket={props.currentMarket}
-            />
-          </TradesWrapper>
+        <TradesWrapper>
+          {/* TradePriceTable*/}
+          <Text font="primaryTitleDisplay" color="foregroundHighEmphasis">Market Trades</Text>
+          <TradeRecentTable
+            head
+            className=""
+            value="up_value"
+            priceTableData={openOrdersLatestTradesData}
+            currentMarket={props.currentMarket}
+          />
+        </TradesWrapper>
       </StyledTradeBooks>
     </>
   );

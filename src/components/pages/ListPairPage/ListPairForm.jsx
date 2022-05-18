@@ -1,8 +1,10 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { x } from "@xstyled/styled-components";
-import { Tooltip } from "components";
+import { Toggle, QuestionHelper } from "components";
 import NumberInput from "../../atoms/Form/NumberInput";
 import { model } from "../../atoms/Form/helpers";
+import styled from "styled-components";
+
 import {
   forceValidation,
   max,
@@ -12,11 +14,18 @@ import {
 import SelectInput from "../../atoms/Form/SelectInput";
 import { Button } from "../../atoms/Form/Submit";
 import TextInput from "../../atoms/Form/TextInput";
-import { AiOutlineQuestionCircle } from "react-icons/all";
+import { BsExclamationCircle } from "react-icons/all";
 import Form from "../../atoms/Form/Form";
 import { TRADING_VIEW_CHART_KEY } from "./ListPairPage";
 import api from "../../../lib/api";
 import { debounce } from "lodash";
+
+const ListPairContainer = styled.div`
+  margin-top: 10px;
+  padding: 1rem 18px;
+  border: 1px solid ${(p) => p.theme.colors.foreground400};
+  border-radius: 8px;
+`
 
 const ListPairForm = ({
   onSubmit,
@@ -107,7 +116,7 @@ const ListPairForm = ({
   }, [quoteAssetId, zigZagChainId]);
 
   return (
-    <x.div>
+    <ListPairContainer>
       <PairPreview
         baseAssetId={baseAssetId}
         quoteAssetId={quoteAssetId}
@@ -129,182 +138,205 @@ const ListPairForm = ({
         <x.div
           display={"grid"}
           gridTemplateColumns={2}
-          rowGap={5}
-          columnGap={6}
-          mb={5}
+          rowGap={21}
+          columnGap={24}
+          mb={16}
           alignItems="flex-end"
         >
-          <NumberInput
-            block
-            {...model(baseAssetId, setBaseAssetId)}
-            label={
-              <x.span fontSize={{xs: 'xs', md: '14px'}}>
-                Base Asset{" "}
-                <x.a
-                  color={{ _: "blue-gray-500", hover: "teal-200" }}
-                  target={"_blank"}
-                  href={
-                    zigZagChainId === 1
-                      ? "https://zkscan.io/explorer/tokens"
-                      : "https://rinkeby.zkscan.io/explorer/tokens"
-                  }
-                >
-                  Internal ID
-                </x.a>
-              </x.span>
-            }
-            name={"baseAssetId"}
-            validate={[
-              required,
-              min(0),
-              forceValidation(isBaseAssetIdInvalid, "invalid asset on zksync"),
-            ]}
-            rightOfLabel={
-              <TooltipHelper>
-                zkSync token ID of the first asset appearing in the pair
-                (BASE/QUOTE)
-              </TooltipHelper>
-            }
-          />
-          <NumberInput
-            block
-            {...model(quoteAssetId, setQuoteAssetId)}
-            label={
-              <x.span fontSize={{xs: 'xs', md: '14px'}}>
-                Quote Asset{" "}
-                <x.a
-                  color={{ _: "blue-gray-500", hover: "teal-200" }}
-                  target={"_blank"}
-                  href={
-                    zigZagChainId === 1
-                      ? "https://zkscan.io/explorer/tokens"
-                      : "https://rinkeby.zkscan.io/explorer/tokens"
-                  }
-                >
-                  Internal ID
-                </x.a>
-              </x.span>
-            }
-            name={"quoteAssetId"}
-            validate={[
-              required,
-              min(0),
-              forceValidation(isQuoteAssetIdInvalid, "invalid asset on zksync"),
-            ]}
-            rightOfLabel={
-              <TooltipHelper>
-                zkSync token ID of the second asset appearing in the pair
-                (BASE/QUOTE)
-              </TooltipHelper>
-            }
-          />
-          <x.div display={"flex"} flexDirection={"column"}>
+          <x.div display={"flex"} flexDirection={"column"} h={"100%"}>
+            <NumberInput
+              block
+              {...model(baseAssetId, setBaseAssetId)}
+              label={
+                <x.span fontSize={{ xs: 'xs', md: '10px' }} col>
+                  Base Asset{" "}
+                  <x.a
+                    color={{ _: "blue-gray-500", hover: "teal-200" }}
+                    target={"_blank"}
+                    href={
+                      zigZagChainId === 1
+                        ? "https://zkscan.io/explorer/tokens"
+                        : "https://rinkeby.zkscan.io/explorer/tokens"
+                    }
+                  >
+                    Internal ID
+                  </x.a>
+                </x.span>
+              }
+              name={"baseAssetId"}
+              fontSize={14}
+              borderRadius={8}
+              validate={[
+                required,
+                min(0),
+                forceValidation(isBaseAssetIdInvalid, "invalid asset on zksync"),
+              ]}
+              rightOfLabel={
+                <QuestionHelper text="zkSync token ID of the first asset appearing in the pair
+                (BASE/QUOTE)">
+                </QuestionHelper>
+              }
+            />
+          </x.div>
+
+          <x.div display={"flex"} flexDirection={"column"} h={"100%"}>
+            <NumberInput
+              block
+              {...model(quoteAssetId, setQuoteAssetId)}
+              label={
+                <x.span fontSize={{ xs: 'xs', md: '10px' }}>
+                  Quote Asset{" "}
+                  <x.a
+                    color={{ _: "blue-gray-500", hover: "teal-200" }}
+                    target={"_blank"}
+                    href={
+                      zigZagChainId === 1
+                        ? "https://zkscan.io/explorer/tokens"
+                        : "https://rinkeby.zkscan.io/explorer/tokens"
+                    }
+                  >
+                    Internal ID
+                  </x.a>
+                </x.span>
+              }
+              name={"quoteAssetId"}
+              fontSize={14}
+              borderRadius={8}
+              validate={[
+                required,
+                min(0),
+                forceValidation(isQuoteAssetIdInvalid, "invalid asset on zksync"),
+              ]}
+              rightOfLabel={
+                <QuestionHelper text="zkSync token ID of the second asset appearing in the pair
+                (BASE/QUOTE)">
+                </QuestionHelper>
+              }
+            />
+          </x.div>
+          <x.div display={"flex"} flexDirection={"column"} h={"100%"}>
             <NumberInput
               block
               name={"baseFee"}
+              fontSize={14}
+              borderRadius={8}
               {...model(baseFee, setBaseFee)}
-              label={baseSymbol ? `${baseSymbol} Swap Fee` : "Base Swap Fee"}
+              label={baseSymbol ?
+                <x.span fontSize={{ xs: 'xs', md: '10px' }}>`${baseSymbol} Swap Fee`</x.span> :
+                <x.span fontSize={{ xs: 'xs', md: '10px' }}>Base Swap Fee</x.span>}
               validate={[required, min(0)]}
               rightOfLabel={
-                <TooltipHelper>
-                  Swap fee collected by market makers
-                </TooltipHelper>
+                <QuestionHelper text="Swap fee collected by market makers">
+                </QuestionHelper>
               }
             />
             {renderFeeHint(basePrice, baseFee, baseSymbol, setBaseFee)}
           </x.div>
-          <x.div display={"flex"} flexDirection={"column"}>
+          <x.div display={"flex"} flexDirection={"column"} h={"100%"}>
             <NumberInput
               block
+              fontSize={14}
+              borderRadius={8}
               name={"quoteFee"}
               {...model(quoteFee, setQuoteFee)}
-              label={quoteSymbol ? `${quoteSymbol} Swap Fee` : "Quote Swap Fee"}
+              label={quoteSymbol ? <x.span fontSize={{ xs: 'xs', md: '10px' }}>`${quoteSymbol} Swap Fee`</x.span> :
+                <x.span fontSize={{ xs: 'xs', md: '10px' }}>Quote Swap Fee</x.span>}
               validate={[required, min(0)]}
               rightOfLabel={
-                <TooltipHelper>
-                  Swap fee collected by market makers
-                </TooltipHelper>
+                <QuestionHelper text="Swap fee collected by market makers">
+                </QuestionHelper>
               }
             />
             {renderFeeHint(quotePrice, quoteFee, quoteSymbol, setQuoteFee)}
           </x.div>
           <NumberInput
             block
+            fontSize={14}
+            borderRadius={8}
             name={"pricePrecisionDecimals"}
-            label={"Price Precision Decimals"}
+            label={<x.span fontSize={{ xs: 'xs', md: '10px' }}>Price Precision Decimals</x.span>}
             validate={[required, max(10), min(0)]}
             rightOfLabel={
-              <TooltipHelper>
-                <x.div>
-                  Number of decimal places in the price of the asset pair.
-                </x.div>
+              <QuestionHelper text={
+                <>
+                  <x.div>
+                    Number of decimal places in the price of the asset pair.
+                  </x.div>
 
-                <x.div display={"grid"} gridTemplateColumns={2} mt={2} gap={0}>
-                  <x.div>ex: ETH/USDC has '2'</x.div>
-                  <x.div>($3250.61)</x.div>
-                  <x.div>ex: ETH/WBTC has '6'</x.div>
-                  <x.div>(0.075225)</x.div>
-                </x.div>
-              </TooltipHelper>
+                  <x.div display={"grid"} gridTemplateColumns={2} mt={2} gap={0}>
+                    <x.div>ex: ETH/USDC has '2'</x.div>
+                    <x.div>($3250.61)</x.div>
+                    <x.div>ex: ETH/WBTC has '6'</x.div>
+                    <x.div>(0.075225)</x.div>
+                  </x.div>
+                </>
+              }>
+              </QuestionHelper>
             }
           />
           <SelectInput
+            fontSize={10}
+            padding={5}
+            borderRadius={8}
             {...model(zigZagChainId, setZigZagChainId)}
             name={"zigzagChainId"}
-            label={"Network"}
+            label={<x.span fontSize={{ xs: 'xs', md: '10px' }}>Network</x.span>}
             items={[
               { name: "zkSync - Mainnet", id: 1 },
               { name: "zkSync - Rinkeby", id: 1000 },
             ]}
             validate={required}
             rightOfLabel={
-              <TooltipHelper>
-                zkSync network on which the pair will be listed
-              </TooltipHelper>
+              <QuestionHelper text="zkSync network on which the pair will be listed">
+              </QuestionHelper>
             }
           />
         </x.div>
 
-        <x.div mb={4}>
+        <x.div
+          h={"1px"}
+          w={"full"}
+          bg={"blue-gray-800"}
+          borderRadius={10}
+          mb={21}
+        />
+        <x.div mb={4}
+          ml={5}>
           <x.div
             display={"flex"}
             alignItems={"center"}
-            justifyContent={"flex-end"}
+            mb={21}
           >
-            <x.div fontSize={12} mr={2} color={"blue-gray-400"}>
-              advanced settings
-            </x.div>
-            <Button
-              size={"xs"}
-              variant={"secondary"}
-              onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}
-            >
-              {showAdvancedSettings ? "-" : "+"}
-            </Button>
+            <Toggle scale="md" font="primaryTiny" leftLabel="Advanced Settings" onChange={() => setShowAdvancedSettings(!showAdvancedSettings)} />
           </x.div>
           {showAdvancedSettings && (
             <>
-              <x.div
-                h={"2px"}
+              {/* <x.div
+                h={"1px"}
                 w={"full"}
                 bg={"blue-gray-800"}
                 borderRadius={10}
-                my={4}
-              />
-              <x.div display={"grid"} gridTemplateColumns={2} columnGap={6}>
+                mt={21}
+              /> */}
+              <x.div display={"grid"} gridTemplateColumns={2} columnGap={6} mb={21}>
                 <TextInput
                   block
+                  fontSize={10}
+                  padding={5}
+                  borderRadius={8}
                   name={TRADING_VIEW_CHART_KEY}
-                  label={"Default Chart Ticker"}
+                  label={<x.span fontSize={{ xs: 'xs', md: '10px' }}>Default Chart Ticker</x.span>}
                   rightOfLabel={
-                    <TooltipHelper>
-                      <x.div>
-                        Default TradingView chart to be seen on the trade page
-                      </x.div>
-                      <x.div mt={2}>
-                        (ex: show COINBASE:BTCUSD for WBTC-USD)
-                      </x.div>
-                    </TooltipHelper>
+                    <QuestionHelper text={
+                      <div>
+                        <x.div>
+                          Default TradingView chart to be seen on the trade page
+                        </x.div>
+                        <x.div mt={2}>
+                          (ex: show COINBASE:BTCUSD for WBTC-USD)
+                        </x.div>
+                      </div>}>
+                    </QuestionHelper>
                   }
                 />
               </x.div>
@@ -313,7 +345,7 @@ const ListPairForm = ({
         </x.div>
         {children}
       </Form>
-    </x.div>
+    </ListPairContainer >
   );
 };
 
@@ -346,20 +378,19 @@ const PairPreview = ({
   );
 };
 
-const TooltipHelper = ({ children }) => {
-  return (
-    <Tooltip placement={"right"} label={children}>
-      <x.div
-        display={"inline-flex"}
-        color={"blue-gray-600"}
-        ml={2}
-        alignItems={"center"}
-      >
-        <AiOutlineQuestionCircle size={14} />
-      </x.div>
-    </Tooltip>
-  );
-};
+// const QuestionHelper = ({ children }) => {
+//   return (
+//     <Tooltip placement={"right"} label={children}>
+//       <x.div
+//         color={"blue-gray-600"}
+//         ml={-13}
+//         alignItems={"center"}
+//       >
+//         <BsExclamationCircle size={10} color={"primaryHighEmphasis"} />
+//       </x.div>
+//     </Tooltip>
+//   );
+// };
 
 const getAmountForTargetNotional = (price) => {
   const targetUSDFeeAmount = 1
@@ -371,7 +402,7 @@ const renderFeeHint = (assetPrice, assetFee, symbol, feeSetter) => {
     const notional = (Number(assetPrice) * Number(assetFee)).toFixed(2)
     if (notional > 0) {
       return <x.div pl={2} fontSize={12} color={"blue-gray-500"} mt={1} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
-        <x.div style={{wordBreak: "break-all"}}>
+        <x.div style={{ wordBreak: "break-all" }}>
           {assetFee} {symbol} = ${notional}
         </x.div>
         {notional > 1 && <x.div>
@@ -382,9 +413,10 @@ const renderFeeHint = (assetPrice, assetFee, symbol, feeSetter) => {
             onClick={() => feeSetter(getAmountForTargetNotional(assetPrice))}>
             set to $1
           </Button>
-          <x.div/>
+          <x.div />
         </x.div>}
-      </x.div>}
+      </x.div>
+    }
   }
   return null
 }

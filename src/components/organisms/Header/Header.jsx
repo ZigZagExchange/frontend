@@ -14,6 +14,7 @@ import { DiscordIcon, ExternalLinkIcon, TelegramIcon, TwitterIcon, DeleteIcon, M
 import { toNumber } from "lodash";
 import ToggleTheme from "components/molecules/Toggle/ToggleTheme";
 import useTheme from "components/hooks/useTheme";
+import { formatAmount } from "../../../lib/utils";
 
 const langList = [
   {text:'EN',url:'#'},

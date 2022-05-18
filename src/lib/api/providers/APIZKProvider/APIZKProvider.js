@@ -14,7 +14,7 @@ import {
   ETH_ZKSYNC_BRIDGE
 } from "components/pages/BridgePage/Bridge/constants";
 import _ from "lodash"
-// import wethContractABI from "lib/contracts/WETH.json";
+import { formatAmount } from "lib/utils";
 
 export default class APIZKProvider extends APIProvider {
   static SEEDS_STORAGE_KEY = "@ZZ/ZKSYNC_SEEDS";
@@ -87,45 +87,44 @@ export default class APIZKProvider extends APIProvider {
     return receipt;
   };
 
+  changePubKeyFee = async ( currency = "USDC" ) => {
+    const { data } = await axios.post(this.getZkSyncBaseUrl(this.network) + "/fee",
+      {
+        txType: { ChangePubKey: "ECDSA" },
+        address: "0x5364ff0cecb1d44efd9e4c7e4fe16bf5774530e3",
+        tokenLike: currency,
+      },
+      { headers: { "Content-Type": "application/json", }, }
+    );
+    // somehow the fee is ~50% too low
+    if ( currency === "USDC" )
+      return ((data.result.totalFee / 10 ** 6) * 2);
+    else 
+      return ((data.result.totalFee / 10 ** 18) * 2);
+  }
+
   changePubKey = async () => {
-    if (this.network === 1) {
-      try {
-        const { data } = await axios.post(this.getZkSyncBaseUrl(1) + "/fee",
-          {
-            txType: { ChangePubKey: "ECDSA" },
-            address: "0x5364ff0cecb1d44efd9e4c7e4fe16bf5774530e3",
-            tokenLike: "USDC",
-          },
-          { headers: { "Content-Type": "application/json", }, }
-        );
-        const feeUSD = data.result.totalFee / 10 ** 6;
-        toast.info(
-          `You need to sign a one-time transaction to activate your zksync account. The fee for this tx will be $${feeUSD.toFixed(
+    try {
+      const feeUSD = await this.changePubKeyFee();
+      toast.info(
+        `You need to sign a one-time transaction to activate your zksync account. The fee for this tx will be $${feeUSD.toFixed(
+          2
+        )}`,
+        {
+          toastId: `You need to sign a one-time transaction to activate your zksync account. The fee for this tx will be $${feeUSD.toFixed(
             2
           )}`,
-          {
-            toastId: `You need to sign a one-time transaction to activate your zksync account. The fee for this tx will be $${feeUSD.toFixed(
-              2
-            )}`,
-          }
-        );
-      } catch (err) {
-        toast.info(
-          `You need to sign a one-time transaction to activate your zksync account. The fee for this tx will be ~$2.5`,
-          {
-            toastId: `You need to sign a one-time transaction to activate your zksync account. The fee for this tx will be ~$2.5`,
-          }
-        );
-      }
-    } else if (this.network === 1000) {
+        }
+      );
+    } catch (err) {
       toast.info(
-        "You need to sign a one-time transaction to activate your zksync account.",
+        `You need to sign a one-time transaction to activate your zksync account. The fee for this tx will be ~$2.5`,
         {
-          toastId:
-            "You need to sign a one-time transaction to activate your zksync account.",
+          toastId: `You need to sign a one-time transaction to activate your zksync account. The fee for this tx will be ~$2.5`,
         }
       );
     }
+    
     let feeToken = "ETH";
     const accountState = await this.syncWallet.getAccountState();
     const balances = accountState.committed.balances;
@@ -444,7 +443,7 @@ export default class APIZKProvider extends APIProvider {
           token,
           ZKSYNC_POLYGON_BRIDGE.zkSyncToPolygon,
           "zksync",
-          this.network === 1000 ? `https://mumbai.polygonscan.com/address/${userAddress}`:`https://polygonscan.com/address/${userAddress}`
+          this.network === 1000 ? `https://mumbai.polygonscan.com/address/${userAddress}#tokentxns`:`https://polygonscan.com/address/${userAddress}#tokentxns`
         )
       );
     } else if (ZKSYNC_ETHEREUM_FAST_BRIDGE.address === address) {
@@ -589,10 +588,26 @@ export default class APIZKProvider extends APIProvider {
 
     const accountState = await this.api.getAccountState();
     if (!accountState.id) {
-      if (!/^\/bridge(\/.*)?$/.test(window.location.pathname)) {
-        toast.error(
-          "Account not found. Please use the bridge to deposit funds before trying again."
-        );
+      const walletBalance = formatAmount(accountState.committed.balances['ETH'], { decimals: 18 });
+      const activationFee = await this.changePubKeyFee('ETH');
+
+      if (!/^\/bridge(\/.*)?$/.test(window.location.pathname)){
+        if(isNaN(walletBalance) || walletBalance < activationFee) {
+          toast.error(
+            "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
+            {
+              autoClose: 60000
+            }
+          );
+        }
+        else {
+          toast.error(
+            "Your zkSync account is not activated. Please activate your zkSync wallet.",
+            {
+              autoClose: false
+            }
+          );
+        }
       }
     } else {
       const signingKeySet = await this.syncWallet.isSigningKeySet();
