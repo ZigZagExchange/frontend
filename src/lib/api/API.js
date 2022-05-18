@@ -69,7 +69,7 @@ export default class API extends Emitter {
         return this.networks[this.getNetworkName(network)][1]
     }
 
-    setAPIProvider = (network) => {
+    setAPIProvider = (network, networkChanged = true) => {
         const networkName = this.getNetworkName(network)
         
         if (!networkName) {
@@ -134,7 +134,8 @@ export default class API extends Emitter {
                 console.log('Failed to switch providers', err)
             })
 
-        this.emit('providerChange', network)
+        if(networkChanged)
+          this.emit('providerChange', network)
     }
 
     getProfile = async (address) => {
@@ -364,7 +365,7 @@ export default class API extends Emitter {
     this.web3Modal = null;
     this.ethersProvider = null;
     this.isArgent = false
-    this.setAPIProvider(this.apiProvider.network);
+    this.setAPIProvider(this.apiProvider.network, false);
     this.emit("balanceUpdate", "wallet", {});
     this.emit("balanceUpdate", this.apiProvider.network, {});
     this.emit("balanceUpdate", "polygon", {});
