@@ -158,7 +158,7 @@ export default function ListPairPage() {
               <x.div>
                 <x.a
                   target={"_blank"}
-                  color={{ _: "foregroundHighEmphasis", hover: "blue-100" }}
+                  color={{ _: "foregroundHighEmphasis", hover: "foregroundLowEmphasis" }}
                   href={"https://zkscan.io/explorer/tokens"}>
                   List your token on zkSync
                   <HiExternalLink size="14px" style={{ marginLeft: "6px", marginBottom: "2px" }} />
