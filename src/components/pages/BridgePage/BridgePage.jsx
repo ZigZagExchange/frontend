@@ -13,6 +13,7 @@ import Text from "components/atoms/Text/Text";
 import { TabMenu, Tab } from "components/molecules/TabMenu";
 import TradeFooter from "components/organisms/TradeDashboard/TradeFooter/TradeFooter";
 import ConnectNotification from "./ConnectNotification/ConnectNotification";
+import NewBridgeModal from "./NewBridgeModal/NewBridgeModal";
 
 const BridgeContainer = styled.div`
   width: 100%;
@@ -39,7 +40,7 @@ const BridgeSection = styled.div`
   height: 100%;
   min-height: calc(100vh - 113px);
   padding: 2rem 0;
-  background-color: ${(p) => p.theme.colors.bridgeBackground};
+  background-color: ${(p) => p.theme.colors.backgroundMediumEmphasis};
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
@@ -95,6 +96,8 @@ export default function BridgePage() {
             <BridgeIncompatible />
           )}
         </BridgeContainer>
+
+        <NewBridgeModal />
       </BridgeSection>
       <TradeFooter />
     </BridgeTemplate>

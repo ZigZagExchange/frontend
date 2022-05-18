@@ -25,6 +25,7 @@ const TextInput = ({
       rightOfLabel={rightOfLabel}
       type={"text"}
       w={block ? "100%" : "inherit"}
+      h="100%"
       {...BaseInputStyle}
     />
   );

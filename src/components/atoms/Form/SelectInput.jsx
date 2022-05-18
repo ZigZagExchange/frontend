@@ -16,7 +16,7 @@ const SelectInput = ({
   padding = 8
 }) => {
   return (
-    <div className="select-wrap">
+    <div className="select-wrap" style={{ height: "100%" }}>
       <Input
         name={name}
         validate={validate}

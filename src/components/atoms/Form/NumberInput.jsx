@@ -13,7 +13,7 @@ const NumberInput = ({
   hideValidation,
   rightOfLabel,
   borderRadius = 4,
-  fontSize = 18
+  fontSize = 18,
 }) => {
   return (
     <Input

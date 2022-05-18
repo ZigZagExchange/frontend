@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { x } from "@xstyled/styled-components";
-import { Toggle, Tooltip } from "components";
+import { Toggle, QuestionHelper } from "components";
 import NumberInput from "../../atoms/Form/NumberInput";
 import { model } from "../../atoms/Form/helpers";
 import styled from "styled-components";
@@ -143,75 +143,81 @@ const ListPairForm = ({
           mb={16}
           alignItems="flex-end"
         >
-          <NumberInput
-            block
-            {...model(baseAssetId, setBaseAssetId)}
-            label={
-              <x.span fontSize={{ xs: 'xs', md: '10px' }} col>
-                Base Asset{" "}
-                <x.a
-                  color={{ _: "blue-gray-500", hover: "teal-200" }}
-                  target={"_blank"}
-                  href={
-                    zigZagChainId === 1
-                      ? "https://zkscan.io/explorer/tokens"
-                      : "https://rinkeby.zkscan.io/explorer/tokens"
-                  }
-                >
-                  Internal ID
-                </x.a>
-              </x.span>
-            }
-            name={"baseAssetId"}
-            fontSize={14}
-            borderRadius={8}
-            validate={[
-              required,
-              min(0),
-              forceValidation(isBaseAssetIdInvalid, "invalid asset on zksync"),
-            ]}
-            rightOfLabel={
-              <TooltipHelper>
-                zkSync token ID of the first asset appearing in the pair
-                (BASE/QUOTE)
-              </TooltipHelper>
-            }
-          />
-          <NumberInput
-            block
-            {...model(quoteAssetId, setQuoteAssetId)}
-            label={
-              <x.span fontSize={{ xs: 'xs', md: '10px' }}>
-                Quote Asset{" "}
-                <x.a
-                  color={{ _: "blue-gray-500", hover: "teal-200" }}
-                  target={"_blank"}
-                  href={
-                    zigZagChainId === 1
-                      ? "https://zkscan.io/explorer/tokens"
-                      : "https://rinkeby.zkscan.io/explorer/tokens"
-                  }
-                >
-                  Internal ID
-                </x.a>
-              </x.span>
-            }
-            name={"quoteAssetId"}
-            fontSize={14}
-            borderRadius={8}
-            validate={[
-              required,
-              min(0),
-              forceValidation(isQuoteAssetIdInvalid, "invalid asset on zksync"),
-            ]}
-            rightOfLabel={
-              <TooltipHelper>
-                zkSync token ID of the second asset appearing in the pair
-                (BASE/QUOTE)
-              </TooltipHelper>
-            }
-          />
-          <x.div display={"flex"} flexDirection={"column"}>
+          <x.div display={"flex"} flexDirection={"column"}
+            h={"100%"}>
+            <NumberInput
+              block
+              {...model(baseAssetId, setBaseAssetId)}
+              label={
+                <x.span fontSize={{ xs: 'xs', md: '10px' }} col>
+                  Base Asset{" "}
+                  <x.a
+                    color={{ _: "blue-gray-500", hover: "teal-200" }}
+                    target={"_blank"}
+                    href={
+                      zigZagChainId === 1
+                        ? "https://zkscan.io/explorer/tokens"
+                        : "https://rinkeby.zkscan.io/explorer/tokens"
+                    }
+                  >
+                    Internal ID
+                  </x.a>
+                </x.span>
+              }
+              name={"baseAssetId"}
+              fontSize={14}
+              borderRadius={8}
+              validate={[
+                required,
+                min(0),
+                forceValidation(isBaseAssetIdInvalid, "invalid asset on zksync"),
+              ]}
+              rightOfLabel={
+                <QuestionHelper text="zkSync token ID of the first asset appearing in the pair
+                (BASE/QUOTE)">
+                </QuestionHelper>
+              }
+            />
+          </x.div>
+
+          <x.div display={"flex"} flexDirection={"column"}
+            h={"100%"}>
+            <NumberInput
+              block
+              {...model(quoteAssetId, setQuoteAssetId)}
+              label={
+                <x.span fontSize={{ xs: 'xs', md: '10px' }}>
+                  Quote Asset{" "}
+                  <x.a
+                    color={{ _: "blue-gray-500", hover: "teal-200" }}
+                    target={"_blank"}
+                    href={
+                      zigZagChainId === 1
+                        ? "https://zkscan.io/explorer/tokens"
+                        : "https://rinkeby.zkscan.io/explorer/tokens"
+                    }
+                  >
+                    Internal ID
+                  </x.a>
+                </x.span>
+              }
+              name={"quoteAssetId"}
+              fontSize={14}
+              borderRadius={8}
+              validate={[
+                required,
+                min(0),
+                forceValidation(isQuoteAssetIdInvalid, "invalid asset on zksync"),
+              ]}
+              rightOfLabel={
+                <QuestionHelper text="zkSync token ID of the second asset appearing in the pair
+                (BASE/QUOTE)">
+                </QuestionHelper>
+              }
+            />
+          </x.div>
+          <x.div display={"flex"} flexDirection={"column"}
+            h={"100%"}>
             <NumberInput
               block
               name={"baseFee"}
@@ -223,14 +229,14 @@ const ListPairForm = ({
                 <x.span fontSize={{ xs: 'xs', md: '10px' }}>Base Swap Fee</x.span>}
               validate={[required, min(0)]}
               rightOfLabel={
-                <TooltipHelper>
-                  Swap fee collected by market makers
-                </TooltipHelper>
+                <QuestionHelper text="Swap fee collected by market makers">
+                </QuestionHelper>
               }
             />
             {renderFeeHint(basePrice, baseFee, baseSymbol, setBaseFee)}
           </x.div>
-          <x.div display={"flex"} flexDirection={"column"}>
+          <x.div display={"flex"} flexDirection={"column"} h={"100%"}
+            h={"100%"}>
             <NumberInput
               block
               fontSize={14}
@@ -241,9 +247,8 @@ const ListPairForm = ({
                 <x.span fontSize={{ xs: 'xs', md: '10px' }}>Quote Swap Fee</x.span>}
               validate={[required, min(0)]}
               rightOfLabel={
-                <TooltipHelper>
-                  Swap fee collected by market makers
-                </TooltipHelper>
+                <QuestionHelper text="Swap fee collected by market makers">
+                </QuestionHelper>
               }
             />
             {renderFeeHint(quotePrice, quoteFee, quoteSymbol, setQuoteFee)}
@@ -256,18 +261,21 @@ const ListPairForm = ({
             label={<x.span fontSize={{ xs: 'xs', md: '10px' }}>Price Precision Decimals</x.span>}
             validate={[required, max(10), min(0)]}
             rightOfLabel={
-              <TooltipHelper>
-                <x.div>
-                  Number of decimal places in the price of the asset pair.
-                </x.div>
+              <QuestionHelper text={
+                <>
+                  <x.div>
+                    Number of decimal places in the price of the asset pair.
+                  </x.div>
 
-                <x.div display={"grid"} gridTemplateColumns={2} mt={2} gap={0}>
-                  <x.div>ex: ETH/USDC has '2'</x.div>
-                  <x.div>($3250.61)</x.div>
-                  <x.div>ex: ETH/WBTC has '6'</x.div>
-                  <x.div>(0.075225)</x.div>
-                </x.div>
-              </TooltipHelper>
+                  <x.div display={"grid"} gridTemplateColumns={2} mt={2} gap={0}>
+                    <x.div>ex: ETH/USDC has '2'</x.div>
+                    <x.div>($3250.61)</x.div>
+                    <x.div>ex: ETH/WBTC has '6'</x.div>
+                    <x.div>(0.075225)</x.div>
+                  </x.div>
+                </>
+              }>
+              </QuestionHelper>
             }
           />
           <SelectInput
@@ -283,9 +291,8 @@ const ListPairForm = ({
             ]}
             validate={required}
             rightOfLabel={
-              <TooltipHelper>
-                zkSync network on which the pair will be listed
-              </TooltipHelper>
+              <QuestionHelper text="zkSync network on which the pair will be listed">
+              </QuestionHelper>
             }
           />
         </x.div>
@@ -321,14 +328,16 @@ const ListPairForm = ({
                   name={TRADING_VIEW_CHART_KEY}
                   label={<x.span fontSize={{ xs: 'xs', md: '10px' }}>Default Chart Ticker</x.span>}
                   rightOfLabel={
-                    <TooltipHelper>
-                      <x.div>
-                        Default TradingView chart to be seen on the trade page
-                      </x.div>
-                      <x.div mt={2}>
-                        (ex: show COINBASE:BTCUSD for WBTC-USD)
-                      </x.div>
-                    </TooltipHelper>
+                    <QuestionHelper text={
+                      <div>
+                        <x.div>
+                          Default TradingView chart to be seen on the trade page
+                        </x.div>
+                        <x.div mt={2}>
+                          (ex: show COINBASE:BTCUSD for WBTC-USD)
+                        </x.div>
+                      </div>}>
+                    </QuestionHelper>
                   }
                 />
               </x.div>
@@ -337,7 +346,7 @@ const ListPairForm = ({
         </x.div>
         {children}
       </Form>
-    </ListPairContainer>
+    </ListPairContainer >
   );
 };
 
@@ -370,19 +379,19 @@ const PairPreview = ({
   );
 };
 
-const TooltipHelper = ({ children }) => {
-  return (
-    <Tooltip placement={"right"} label={children}>
-      <x.div
-        color={"blue-gray-600"}
-        ml={-13}
-        alignItems={"center"}
-      >
-        <BsExclamationCircle size={10} color={"primaryHighEmphasis"} />
-      </x.div>
-    </Tooltip>
-  );
-};
+// const QuestionHelper = ({ children }) => {
+//   return (
+//     <Tooltip placement={"right"} label={children}>
+//       <x.div
+//         color={"blue-gray-600"}
+//         ml={-13}
+//         alignItems={"center"}
+//       >
+//         <BsExclamationCircle size={10} color={"primaryHighEmphasis"} />
+//       </x.div>
+//     </Tooltip>
+//   );
+// };
 
 const getAmountForTargetNotional = (price) => {
   const targetUSDFeeAmount = 1

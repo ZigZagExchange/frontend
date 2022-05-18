@@ -29,7 +29,7 @@ const L2Header = ({ networks, onSelect, selectedNetwork }) => {
           </div>
           <h4 className="bridge_coin_name">
             {selectedNetwork.network}
-            <span><br />{ network === 1 ? 'Mainnet' : 'Testnet'}</span>
+            <span><br />{network === 1 ? 'Mainnet' : 'Testnet'}</span>
           </h4>
           <BiChevronDown size={25} className="ml-2" />
         </div>

@@ -14,7 +14,7 @@ export default function Tooltip({ text, ...rest }) {
 }
 
 export function MouseoverTooltip({ children, ...rest }) {
-  const [show, setShow] = useState(false)
+  const [show, setShow] = useState(true)
   const open = useCallback(() => setShow(true), [setShow])
   const close = useCallback(() => setShow(false), [setShow])
   return (
