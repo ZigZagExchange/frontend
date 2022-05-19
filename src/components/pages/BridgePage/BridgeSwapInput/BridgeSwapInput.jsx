@@ -46,7 +46,7 @@ export const BridgeInputBox = styled.div`
     user-select: none;
 
     &:hover {
-      color: ${({ theme }) => theme.colors.primaryLowEmphasis};
+      color: ${({ theme }) => theme.colors.secondaryHighEmphasis};
     }
   }
 
