@@ -48,6 +48,11 @@ const NewBridgeModal = styled.div`
         display: inline-block;
         text-align: right;
         cursor: pointer;
+        color: ${(p) => p.theme.colors.primaryHighEmphasis};
+
+        &:hover {
+            color: ${(p) => p.theme.colors.primaryLowEmphasis} !important;
+        }
     }
 `
 
