@@ -39,14 +39,14 @@ export const BridgeInputBox = styled.div`
 
   .maxLink {
     padding: 2px 6px;
-    color: #69f;
+    color: ${({ theme }) => theme.colors.primaryHighEmphasis};
     text-decoration: none;
-    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid ${({ theme }) => theme.colors.foreground400};
     border-radius: 8px;
     user-select: none;
 
     &:hover {
-      background: rgba(0, 0, 0, 0.7);
+      color: ${({ theme }) => theme.colors.primaryLowEmphasis};
     }
   }
 
