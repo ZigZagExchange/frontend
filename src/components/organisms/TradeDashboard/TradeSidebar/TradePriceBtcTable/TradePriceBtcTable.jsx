@@ -305,7 +305,10 @@ class TradePriceBtcTable extends React.Component {
       <table>
         <thead>
           <tr>
-            <th onClick={() => this.resetSorting()}>Pair</th>
+            <th 
+              style={{ width: '35%' }}
+              onClick={() => this.resetSorting()}
+            >Pair</th>
             <th onClick={() => this.togglePriceSorting()}>
               {priceSorted ? (
                 priceDirection ? (
@@ -319,7 +322,7 @@ class TradePriceBtcTable extends React.Component {
               Price
             </th>
             <th
-              style={{ minWidth: 108 }}
+              style={{ width: '30%' }}
               onClick={() => this.toggleChangeSorting()}
             >
               {changeSorted ? (
