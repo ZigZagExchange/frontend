@@ -471,9 +471,9 @@ export class SpotForm extends React.Component {
             <input
               type="text"
               value={
-                this.priceIsDisabled()
+                (this.priceIsDisabled()
                   ? this.props.marketSummary && this.props.marketSummary?.price
-                  : this.state.userHasEditedPrice ? this.state.price : this.currentPrice()
+                  : this.state.userHasEditedPrice ? this.state.price : this.currentPrice()) || ""
               }
               onChange={this.updatePrice.bind(this)}
               disabled={this.priceIsDisabled()}
@@ -486,7 +486,7 @@ export class SpotForm extends React.Component {
             <span className="spf_desc_text">Amount</span>
             <input
               type="text"
-              value={this.state.baseAmount}
+              value={this.state.baseAmount || 0.00}
               placeholder="0.00"
               onChange={this.updateAmount.bind(this)}
             />

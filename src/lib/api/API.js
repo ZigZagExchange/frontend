@@ -71,6 +71,7 @@ export default class API extends Emitter {
 
     setAPIProvider = (network, networkChanged = true) => {
         const networkName = this.getNetworkName(network)
+        console.log(network, networkName);
         
         if (!networkName) {
             this.signOut()
@@ -214,7 +215,7 @@ export default class API extends Emitter {
       const noInfoPairs = lastprices
         .map((l) => l[0])
         .filter((pair) => !this.apiProvider.marketInfo[pair]);
-      this.apiProvider.cacheMarketInfoFromNetwork(noInfoPairs);
+      this.cacheMarketInfoFromNetwork(noInfoPairs);
     }
   }
 
@@ -497,6 +498,10 @@ export default class API extends Emitter {
 
   isZksyncChain = () => {
     return !!this.apiProvider.zksyncCompatible;
+  };
+
+  isEVMChain = () => {
+    return !!this.apiProvider.evmCompatible;
   };
 
   cancelOrder = async (orderId) => {
@@ -820,4 +825,19 @@ export default class API extends Emitter {
       return {};
     }
   }
+
+  // marketinfo calls can get expesnive so it's good to cache them
+  cacheMarketInfoFromNetwork = async (pairs) => {
+    if (pairs.length === 0) return;
+    if (!this.apiProvider.network) return;
+    const pairText = pairs.join(",");
+    const url = (this.apiProvider.network === 1)
+      ? `https://zigzag-markets.herokuapp.com/markets?id=${pairText}&chainid=${this.apiProvider.network}`
+      : `https://secret-thicket-93345.herokuapp.com/api/v1/marketinfos?chain_id=${this.apiProvider.network}&market=${pairText}`
+    const marketInfoArray = await fetch(url).then((r) => r.json());
+    if (!(marketInfoArray instanceof Array)) return;
+    marketInfoArray.forEach((info) => (this.marketInfo[info.alias] = info));
+    return;
+  };
+
 }

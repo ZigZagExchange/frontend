@@ -776,20 +776,6 @@ export default class APIZKProvider extends APIProvider {
     }
   };
 
-  cacheMarketInfoFromNetwork = async (pairs) => {
-    if (pairs.length === 0) return;
-    if (!this.network) return;
-    const pairText = pairs.join(",");
-    const url = (this.network === 1)
-      ? `https://zigzag-markets.herokuapp.com/markets?id=${pairText}&chainid=${this.network}`
-      : `https://secret-thicket-93345.herokuapp.com/api/v1/marketinfos?chain_id=${this.network}&market=${pairText}`
-    const marketInfoArray = await fetch(url).then((r) => r.json());
-    // if (!(marketInfoArray instanceof Array)) return;
-    _.forEach(marketInfoArray, info=>(this.marketInfo[info.alias] = info))
-    // marketInfoArray.forEach((info) => (this.marketInfo[info.alias] = info));
-    return;
-  };
-
   getPairs = () => {
     return Object.keys(this.lastPrices);
   };

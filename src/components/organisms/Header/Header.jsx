@@ -184,6 +184,7 @@ export const Header = (props) => {
                 >
                   <option value="1">zkSync - Mainnet</option>
                   <option value="1000">zkSync - Rinkeby</option>
+                  <option value="42161">Arbitrum</option>
                 </select>
                 <BiChevronDown className="eu_caret" />
               </div>
@@ -223,10 +224,8 @@ export const Header = (props) => {
         {/* desktop header */}
         <div className="main_header head_wrapper_desktop dex_h">
           <div className="head_left">
-            <Link to="/">
-              <a href="/" rel="noreferrer">
+            <Link to="/" rel="noreferrer">
                 <img src={logo} alt="logo" height="30" />
-              </a>
             </Link>
             <ul>
               <li>
@@ -324,6 +323,7 @@ export const Header = (props) => {
               >
                 <option value="1">zkSync - Mainnet</option>
                 <option value="1000">zkSync - Rinkeby</option>
+                <option value="42161">Arbitrum</option>
               </select>
               <BiChevronDown className="eu_caret" />
             </label>
