@@ -52,8 +52,8 @@ export const baseColors = {
 export const lightColors = {
   ...baseColors,
   backgroundHighEmphasis: '#ddf1f7',
-  backgroundMediumEmphasis: '#FFFFFFB8',
-  backgroundLowEmphasis: '#FFFFFF7A',
+  backgroundMediumEmphasis: '#f6fbfd',
+  backgroundLowEmphasis: '#ecf8fa',
   backgroundDisabled: '#FFFFFF52',
   background500: '#FFFFFF52',
   background400: '#FFFFFF21',
@@ -69,9 +69,7 @@ export const lightColors = {
   foreground300: '#292D3F14',
   foreground200: '#292D3F0D',
   foreground100: '#292D3F08',
-  bridgeBackground: '#DDF1F7',
-  successHighEmphasis: '#5e1635',
-  dangerHighEmphasis: '#431026',
+  bridgeBackground: '#ddf1f7',
 }
 
 export const darkColors = {
@@ -94,7 +92,5 @@ export const darkColors = {
   foreground300: '#FFFFFF14',
   foreground200: '#FFFFFF0D',
   foreground100: '#FFFFFF08',
-  bridgeBackground: '#1C2231',
-  dangerHighEmphasis: '#E83681',
-  successHighEmphasis: '#74DE9F',
+  bridgeBackground: '#62688F33',
 }
