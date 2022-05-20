@@ -5,7 +5,7 @@ import { CheckMarkCircleIcon } from 'components/atoms/Svg';
 import Text from 'components/atoms/Text/Text';
 
 const NotificationContainer = styled.div`
-    display: flex;
+    display: none;
     margin-bottom: 2rem;
     padding: 22px;
     border-radius: 8px;
@@ -27,7 +27,7 @@ const NotificationContainer = styled.div`
 
 const ConnectNotification = () => {
     return (
-        <NotificationContainer>
+        <NotificationContainer className="connect-notification">
             <Box className='notification-icon'>
                 <CheckMarkCircleIcon />
             </Box>
