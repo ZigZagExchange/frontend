@@ -37,6 +37,7 @@ export const baseColors = {
   warning300: '#FCC95814',
   warning200: '#FCC9580D',
   warning100: '#FCC95808',
+  dangerHighEmphasis: '#E83681',
   dangerMediumEmphasis: '#E83681B8',
   dangerLowEmphasis: '#E836817A',
   dangerDisabled: '#E8368152',
@@ -51,6 +52,7 @@ export const baseColors = {
 
 export const lightColors = {
   ...baseColors,
+  successHighEmphasis: '#2ed170',
   backgroundHighEmphasis: '#ddf1f7',
   backgroundMediumEmphasis: '#f6fbfd',
   backgroundLowEmphasis: '#ecf8fa',
@@ -74,6 +76,7 @@ export const lightColors = {
 
 export const darkColors = {
   ...baseColors,
+  successHighEmphasis: '#74DE9F',
   backgroundHighEmphasis: '#07071C',
   backgroundMediumEmphasis: '#191A33',
   backgroundLowEmphasis: '#2B2E4A',
