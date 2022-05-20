@@ -138,6 +138,20 @@ export default class API extends Emitter {
           this.emit('providerChange', network)
     }
 
+    getExplorer = (address, layer) => {
+      let explorer = "https://etherscan.io/address/";
+      let subdomain = this.apiProvider.network === 1 ? "" : "rinkeby.";
+  
+      switch(layer){
+        case 1:
+          explorer = `https://${subdomain}etherscan.io/address/${address}`;
+          return explorer;
+        default:
+          explorer = `https://${subdomain}zkscan.io/explorer/accounts/${address}`
+          return explorer;
+      }
+    }
+    
     getProfile = async (address) => {
         if (!this._profiles[address]) {
             const profile = this._profiles[address] = {

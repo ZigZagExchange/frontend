@@ -37,7 +37,7 @@ const defaultTransfer = {
   type: "deposit",
 };
 
-const Bridge = () => {
+const Bridge = (props) => {
   const user = useSelector(userSelector);
   const balanceData = useSelector(balancesSelector);
   const [loading, setLoading] = useState(false);
@@ -209,7 +209,6 @@ const Bridge = () => {
     // update changePubKeyFee fee if needed
     if (
       user.address &&
-      !user.id &&
       api.apiProvider?.zksyncCompatible
     ) {
       const usdFee = await api.apiProvider.changePubKeyFee();
@@ -412,10 +411,12 @@ const Bridge = () => {
 
   const renderGuidContent = () => {
     return <div>
-      <p style={{fontSize: '14px', lineHeight:'24px'}}>1. Switch to Polygon network</p>
-      <p style={{fontSize: '14px', lineHeight:'24px'}}>2. Sign the transaction and wait for confirmation</p>
-      <p style={{fontSize: '14px', lineHeight:'24px'}}>3. Wait until "Switch Network" pops up</p>
-      <p style={{fontSize: '14px', lineHeight:'24px'}}>4. Switch back to Ethereum mainnet. Activating a new zkSync wallet costs ~$5. Enjoy trading on ZigZag!</p>
+      <p style={{fontSize: '14px', lineHeight:'24px'}}>1. Connect to Ethereum network</p>
+      <p style={{fontSize: '14px', lineHeight:'24px'}}>2. Click "transfer" on Polygon -> zkSync</p>
+      <p style={{fontSize: '14px', lineHeight:'24px'}}>3. Click "Switch network" to Polygon and wait</p>
+      <p style={{fontSize: '14px', lineHeight:'24px'}}>4. Click "Confirm" on transfer pop up and wait</p>
+      <p style={{fontSize: '14px', lineHeight:'24px'}}>5. Click "Switch network" to Ethereum</p>
+      <p style={{fontSize: '14px', lineHeight:'24px'}}>&nbsp;&nbsp;&nbsp;&nbsp;{`Activating a new zkSync wallet costs ~${usdFee}. Enjoy trading on ZigZag!`}</p>
     </div>
   }
 
@@ -424,7 +425,8 @@ const Bridge = () => {
     let deferredXfer;
     setLoading(true);
     if (fromNetwork.from.key === "polygon" && toNetwork.key === "zksync") {
-      setPolygonLoading(true)
+      setPolygonLoading(true);
+      props.setLoading(true)
       deferredXfer = api.transferPolygonWeth(`${swapDetails.amount}`, user.address)
       toast.info(
         renderGuidContent(),
@@ -476,6 +478,7 @@ const Bridge = () => {
       })
       .finally(() => {
         setPolygonLoading(false)
+        props.setLoading(false)
         setLoading(false);
         setSwapDetails({amount: ''});
       });
@@ -758,11 +761,11 @@ const Bridge = () => {
             <a href="#disconnect">Disconnect</a>
           </span>
         </div>
-      ) : (
-        <div className="bridge_connected_as">
+      ) : (!polygonLoding &&
+        (<div className="bridge_connected_as">
           <span className="bridge_bubble_disconnected" />
           Disconnected
-        </div>
+        </div>)
       )}
       
     </>

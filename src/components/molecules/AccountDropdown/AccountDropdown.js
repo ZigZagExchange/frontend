@@ -1,6 +1,6 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import React, { useState, useEffect } from "react";
-import { IoMdLogOut } from "react-icons/io";
+import { IoMdGrid, IoMdLogOut, IoMdOpen } from "react-icons/io";
 import { AiOutlineCaretDown } from "react-icons/ai";
 import styled, { css } from "@xstyled/styled-components";
 import { useCoinEstimator } from "components";
@@ -9,9 +9,16 @@ import { userSelector } from "lib/store/features/auth/authSlice";
 import {
   networkSelector,
   balancesSelector,
+  layoutSelector,
 } from "lib/store/features/api/apiSlice";
 import { formatUSD } from "lib/utils";
 import api from "lib/api";
+import { setLayout } from "lib/helpers/storage/layouts";
+import { Modal, Tooltip } from "components";
+import FirstLayoutImage from "assets/images/layout/layout1.svg";
+import SecondLayoutImage from "assets/images/layout/layout2.svg";
+import ThirdLayoutImage from "assets/images/layout/layout3.svg";
+import FourthLayoutImage from "assets/images/layout/layout4.svg";
 
 const DropdownDisplay = styled.div`
   position: absolute;
@@ -182,15 +189,59 @@ const DropdownFooter = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   border-top: 1px solid rgba(0, 0, 0, 0.1);
   border-bottom-right-radius: 8px;
   border-bottom-left-radius: 8px;
   overflow: hidden;
-  width: 100%;
   flex-shrink: 0;
-  @media screen and (max-width: 991px) {
-    border-radius: 0;
+  width: 100%;
+`;
+const LayoutButton = styled.div`
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  padding: 15px;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1.1;
+  background: rgba(0, 0, 0, 0.04);
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
+  svg {
+    font-size: 15px;
+    position: relative;
+    top: -1px;
+  }
+  &:hover {
+    background: #4d76af;
+    color: #fff;
+  }
+  &:active {
+    background: #36527a;
+    color: #fff;
+  }
+`;
+const DropdownExplorer = styled.div`
+  display: flex;
+  flex-direction: row;
+  white-space: nowrap;
+  padding: 15px;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1.1;
+  background: rgba(0, 0, 0, 0.04);
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  &:hover {
+    background: #4d76af;
+  }
+  
+  &:hover > a {
+    color: #fff;
   }
 `;
 
@@ -223,18 +274,63 @@ const LoaderContainer = styled.div`
   height: 100px;
 `;
 
+const LayoutItem = styled.div`
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  font-size: 15px;
+  filter: invert(52%) sepia(5%) saturate(958%) hue-rotate(167deg) brightness(97%) contrast(82%);
+  padding: 10px;
+  & img {
+    height: 150px;
+    width: auto;
+    user-drag: none;
+    -webkit-user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+  }
+`;
+
+const LayoutList = styled.div`
+  display: grid;
+  grid-template-columns: 50% 50%;
+  ${LayoutItem}:nth-child(${(props) => props.layout + 1}) {
+    filter: invert(84%) sepia(18%) saturate(211%) hue-rotate(186deg) brightness(107%) contrast(106%);
+  }
+`;
+
 export const AccountDropdown = () => {
+  const dispatch = useDispatch();
+
   const user = useSelector(userSelector);
   const network = useSelector(networkSelector);
   const balanceData = useSelector(balancesSelector);
   const [show, setShow] = useState(false);
+
+  //UI layouts
+  const layout = useSelector(layoutSelector);
+  const [showLayout, setShowLayout] = useState(false);
+  const [selectedLayout, setSelectedLayout ] = useState(layout);
+  
+  const changeLayout = (l) => {
+    //local state
+    dispatch({type: 'api/setLayout', payload: l});
+    setLayout(l);
+
+    setSelectedLayout(l);
+  }
+  
   const [selectedLayer, setSelectedLayer] = useState(2);
   const coinEstimator = useCoinEstimator();
   const { profile } = user;
 
   const wallet =
     selectedLayer === 1 ? balanceData.wallet : balanceData[network];
-
+  const explorer = user.address ? api.getExplorer(user.address, selectedLayer) : null;
+  
   useEffect(() => {
     const hideDisplay = () => setShow(false);
     document.addEventListener("click", hideDisplay, false);
@@ -354,6 +450,48 @@ export const AccountDropdown = () => {
           )}
         </DropdownContent>
         <DropdownFooter>
+
+          <LayoutButton onClick={() => { setShowLayout(!showLayout); setShow(!show); }} tabIndex="0">
+            <IoMdGrid style={{ position: "relative", marginTop: 1, marginRight: 3 }} /> Layouts
+          </LayoutButton>
+
+          <Modal
+          title="Select a Layout"
+          show={showLayout}
+          onClose={() => setShowLayout(!showLayout)}
+          >
+            <LayoutList layout={selectedLayout}>
+              <LayoutItem onClick={() => changeLayout(0)}>
+                <Tooltip placement={"bottom"} label={"Default Layout"}>
+                  <img src={FirstLayoutImage} alt="Default"/>
+                </Tooltip>
+              </LayoutItem>
+              <LayoutItem onClick={() => changeLayout(1)}>
+                <Tooltip placement={"bottom"} label={"Chart Focused Layout"}>
+                  <img src={ThirdLayoutImage} alt="Chart Focused"/>
+                </Tooltip>
+              </LayoutItem>
+              <LayoutItem onClick={() => changeLayout(2)}>
+                <Tooltip placement={"bottom"} label={"Chart Focused RTL Layout"}>
+                  <img src={FourthLayoutImage} alt="Chart Focused RTL"/>
+                </Tooltip>
+              </LayoutItem>
+              <LayoutItem onClick={() => changeLayout(3)}>
+                <Tooltip placement={"bottom"} label={"Default RTL Layout"}>
+                  <img src={SecondLayoutImage} alt="Default RTL"/>
+                </Tooltip>
+              </LayoutItem>
+            </LayoutList>
+          </Modal>
+          
+          <DropdownExplorer>
+            <a target="_blank"
+              rel="noreferrer"
+              href={explorer}>
+                <IoMdOpen style={{ position: "relative", top: -2 }} /> {selectedLayer === 1 ? 'Etherscan' : `zkScan`} 
+            </a>
+          </DropdownExplorer> 
+          
           <SignOutButton onClick={() => api.signOut()}>
             <IoMdLogOut style={{ position: "relative", top: -1 }} /> Disconnect
           </SignOutButton>
