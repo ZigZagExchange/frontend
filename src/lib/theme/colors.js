@@ -20,7 +20,6 @@ export const baseColors = {
   secondary300: '#0CCFCF14',
   secondary200: '#0CCFCF0D',
   secondary100: '#0CCFCF08',
-  successHighEmphasis: '#74DE9F',
   successMediumEmphasis: '#74DE9FB8',
   successLowEmphasis: '#74DE9F7A',
   successDisabled: '#74DE9F52',
@@ -38,7 +37,6 @@ export const baseColors = {
   warning300: '#FCC95814',
   warning200: '#FCC9580D',
   warning100: '#FCC95808',
-  dangerHighEmphasis: '#E83681',
   dangerMediumEmphasis: '#E83681B8',
   dangerLowEmphasis: '#E836817A',
   dangerDisabled: '#E8368152',
@@ -72,6 +70,8 @@ export const lightColors = {
   foreground200: '#292D3F0D',
   foreground100: '#292D3F08',
   bridgeBackground: '#DDF1F7',
+  successHighEmphasis: '#5e1635',
+  dangerHighEmphasis: '#431026',
 }
 
 export const darkColors = {
@@ -95,4 +95,6 @@ export const darkColors = {
   foreground200: '#FFFFFF0D',
   foreground100: '#FFFFFF08',
   bridgeBackground: '#1C2231',
+  dangerHighEmphasis: '#E83681',
+  successHighEmphasis: '#74DE9F',
 }
