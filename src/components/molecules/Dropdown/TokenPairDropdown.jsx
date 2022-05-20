@@ -173,6 +173,7 @@ const PairWrapper = styled.div`
   gap: 9.44px;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
   svg {
       justify-self: center;
   }
