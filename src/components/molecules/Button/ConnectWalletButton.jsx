@@ -25,10 +25,6 @@ const ConnectWalletButton = (props) => {
     if (!state.id && (!/^\/bridge(\/.*)?/.test(location.pathname)) && (isNaN(walletBalance) || walletBalance < activationFee)) {
       history.push("/bridge");
     }
-
-    if (document.querySelector('.connect-notification')) {
-      document.querySelector('.connect-notification').style.display = 'flex';
-    }
   };
 
   return (
