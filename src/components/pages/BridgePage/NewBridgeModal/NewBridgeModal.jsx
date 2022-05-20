@@ -8,8 +8,8 @@ import PlayBtn from "assets/images/play-btn.svg";
 const NewBridgeModal = styled.div`
     display: flex;
     position: fixed;
-    right: 2rem;
-    bottom: 6rem;
+    right: 1vw;
+    bottom: 8vh;
     flex-direction: column;
     width: 300px;
     padding: 20px;
