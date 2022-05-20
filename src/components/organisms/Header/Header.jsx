@@ -42,6 +42,10 @@ export const Header = (props) => {
     }
   }, [show])
 
+  useEffect(()=>{
+    setConnecting(props.isLoading)
+  }, [props.isLoading])
+
 
   const connect = async () => {
     try {

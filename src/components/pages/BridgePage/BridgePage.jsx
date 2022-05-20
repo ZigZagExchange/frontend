@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams, Link } from "react-router-dom";
 import { networkSelector } from "lib/store/features/api/apiSlice";
@@ -17,9 +17,10 @@ export default function BridgePage() {
     [network]
   );
   const tab = useParams().tab || "bridge";
+  const [isLoading, setIsLoading] = useState(false);
 
   return (
-    <DefaultTemplate>
+    <DefaultTemplate isLoading={isLoading}>
       <div className="bridge_section">
         <div className="bridge_container">
           <div className="bridge_head_tabs">
@@ -40,7 +41,7 @@ export default function BridgePage() {
         <div className="bridge_container" style={{ flex: "1 1 auto" }}>
           {isBridgeCompatible ? (
             tab === "bridge" ? (
-              <Bridge />
+              <Bridge setLoading={(isLoading)=>{setIsLoading(isLoading)} }/>
             ) : (
               <BridgeReceipts />
             )

@@ -37,7 +37,7 @@ const defaultTransfer = {
   type: "deposit",
 };
 
-const Bridge = () => {
+const Bridge = (props) => {
   const user = useSelector(userSelector);
   const balanceData = useSelector(balancesSelector);
   const [loading, setLoading] = useState(false);
@@ -424,7 +424,8 @@ const Bridge = () => {
     let deferredXfer;
     setLoading(true);
     if (fromNetwork.from.key === "polygon" && toNetwork.key === "zksync") {
-      setPolygonLoading(true)
+      setPolygonLoading(true);
+      props.setLoading(true)
       deferredXfer = api.transferPolygonWeth(`${swapDetails.amount}`, user.address)
       toast.info(
         renderGuidContent(),
@@ -476,6 +477,7 @@ const Bridge = () => {
       })
       .finally(() => {
         setPolygonLoading(false)
+        props.setLoading(false)
         setLoading(false);
         setSwapDetails({amount: ''});
       });
@@ -758,11 +760,11 @@ const Bridge = () => {
             <a href="#disconnect">Disconnect</a>
           </span>
         </div>
-      ) : (
-        <div className="bridge_connected_as">
+      ) : (!polygonLoding &&
+        (<div className="bridge_connected_as">
           <span className="bridge_bubble_disconnected" />
           Disconnected
-        </div>
+        </div>)
       )}
       
     </>
