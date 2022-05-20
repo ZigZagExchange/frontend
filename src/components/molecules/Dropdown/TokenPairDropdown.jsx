@@ -170,10 +170,7 @@ const PairWrapper = styled.div`
   grid-auto-flow: column;
   align-items: center;
   justify-content: start;
-  gap: 9.44px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  gap: 3px;
   svg {
       justify-self: center;
   }
@@ -450,7 +447,7 @@ const TokenPairDropdown = ({ width, transparent, context, currentMarket, marketI
         setChangeDirection(false)
     }
 
-    const renderPairs = ({ pairs = [1, 2, 3] }) => {
+    const renderPairs = (pairs) => {
         const shown_pairs = pairs
             .map((pair) => [pair, rowData.find((row) => row.td1 === pair)])
             .sort(([_, d], [__, d2]) => {
@@ -490,13 +487,13 @@ const TokenPairDropdown = ({ width, transparent, context, currentMarket, marketI
                             </PairWrapper>
                         </td>
                         <td>
-                            <Text font="tableContent" color={d.td3 < 0 ? 'dangerHighEmphasis' : 'successHighEmphasis'} textAlign="right">{d.td2}</Text>
+                            <Text font="tableContent" color={d.td3 < 0 ? 'dangerHighEmphasis' : 'successHighEmphasis'} align="right">{d.td2}</Text>
                         </td>
                         <td>
-                            <Text font="tableContent" color={d.td3 < 0 ? 'dangerHighEmphasis' : 'successHighEmphasis'} textAlign="right">{d.usdVolume.toFixed(2)}</Text>
+                            <Text font="tableContent" color={d.td3 < 0 ? 'dangerHighEmphasis' : 'successHighEmphasis'} align="right">{d.usdVolume.toFixed(2)}</Text>
                         </td>
                         <td>
-                            <Text font="tableContent" color={d.td3 < 0 ? 'dangerHighEmphasis' : 'successHighEmphasis'} textAlign="right">{d.td3}%</Text>
+                            <Text font="tableContent" color={d.td3 < 0 ? 'dangerHighEmphasis' : 'successHighEmphasis'} align="right">{d.td3}%</Text>
                         </td>
                     </tr>
                 );
@@ -524,7 +521,7 @@ const TokenPairDropdown = ({ width, transparent, context, currentMarket, marketI
                         </th>
                         <th onClick={() => togglePriceSorting()}>
                             <HeaderWrapper>
-                                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis" textAlign="right">Last Price</Text>
+                                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis" align="right">Last Price</Text>
                                 {priceSorted ? (
                                     <SortIconWrapper>
                                         {priceDirection ? <SortUpIcon /> : <SortUpFilledIcon />}
@@ -540,7 +537,7 @@ const TokenPairDropdown = ({ width, transparent, context, currentMarket, marketI
                         </th>
                         <th onClick={() => toggleVolumeSorting()}>
                             <HeaderWrapper>
-                                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis" textAlign="right">Volume(24)</Text>
+                                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis" align="right">Volume(24)</Text>
                                 {volumeSorted ? (
                                     <SortIconWrapper>
                                         {volumeDirection ? <SortUpIcon /> : <SortUpFilledIcon />}
@@ -556,7 +553,7 @@ const TokenPairDropdown = ({ width, transparent, context, currentMarket, marketI
                         </th>
                         <th onClick={() => toggleChangeSorting()}>
                             <HeaderWrapper>
-                                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis" textAlign="right">Change</Text>
+                                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis" align="right">Change</Text>
                                 {changeSorted ? (
                                     <SortIconWrapper>
                                         {changeDirection ? <SortUpIcon /> : <SortUpFilledIcon />}
