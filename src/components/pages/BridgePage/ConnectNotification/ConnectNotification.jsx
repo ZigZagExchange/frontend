@@ -1,3 +1,5 @@
+import { useSelector } from 'react-redux';
+import { userSelector } from "lib/store/features/auth/authSlice";
 import styled from 'styled-components';
 
 import { Box } from '@material-ui/core';
@@ -5,7 +7,6 @@ import { CheckMarkCircleIcon } from 'components/atoms/Svg';
 import Text from 'components/atoms/Text/Text';
 
 const NotificationContainer = styled.div`
-    display: none;
     margin-bottom: 2rem;
     padding: 22px;
     border-radius: 8px;
@@ -26,8 +27,10 @@ const NotificationContainer = styled.div`
 `
 
 const ConnectNotification = () => {
+    const user = useSelector(userSelector);
+
     return (
-        <NotificationContainer className="connect-notification">
+        <NotificationContainer className={`connect-notification ${user.id && user.address ? 'd-flex' : 'd-none'}`}>
             <Box className='notification-icon'>
                 <CheckMarkCircleIcon />
             </Box>

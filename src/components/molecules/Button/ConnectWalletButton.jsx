@@ -26,9 +26,7 @@ const ConnectWalletButton = (props) => {
       history.push("/bridge");
     }
 
-    if (document.querySelector('.connect-notification')) {
-      document.querySelector('.connect-notification').style.display = 'flex';
-    }
+    if (document.querySelector('.connect-notification')) document.querySelector('.connect-notification').style.display = 'flex';
   };
 
   return (

@@ -9,9 +9,9 @@ import { TabMenu, Tab } from "../TabMenu";
 import api from "lib/api";
 import { getStables } from "lib/helpers/categories";
 import {
-  addFavourite,
-  removeFavourite,
-  fetchFavourites,
+    addFavourite,
+    removeFavourite,
+    fetchFavourites,
 } from "lib/helpers/storage/favourites";
 
 const ButtonWrapper = styled.div`
@@ -170,7 +170,7 @@ const PairWrapper = styled.div`
   grid-auto-flow: column;
   align-items: center;
   justify-content: start;
-  gap: 9.44px;
+  gap: 3px;
   svg {
       justify-self: center;
   }
@@ -191,7 +191,7 @@ const DropdownContent = styled.div`
   overflow-y: auto;
 `;
 
-const TokenPairDropdown = ({width, transparent, context, currentMarket, marketInfo, updateMarketChain, rowData}) => {
+const TokenPairDropdown = ({ width, transparent, context, currentMarket, marketInfo, updateMarketChain, rowData }) => {
     // const [foundPairs, setFoundPairs] = useState([])
     const [pairs, setPairs] = useState([])
     const [categorySelected, setCategorySelected] = useState(0)
@@ -278,64 +278,64 @@ const TokenPairDropdown = ({width, transparent, context, currentMarket, marketIn
         setSearchValue('')
 
         switch (category_index) {
-        case 0:
-            setPairsByCategory(rowData.map((row) => row.td1))
-            setPairs(rowData.map((row) => row.td1))
-            break;
-        case 1:
-            const eth = rowData
-                .filter((item) => {
-                    if (
-                    item.td1.toLowerCase().includes("ETH".toLowerCase())
-                    ) {
-                    return true;
-                    }
-                    return false;
-                })
-                .map((p) => p.td1);
-            setPairsByCategory(eth)
-            setPairs(eth)
-            break;
-        case 2:
-            const wbtc = rowData
-                .filter((item) => {
-                    if (
-                    item.td1.toLowerCase().includes("WBTC".toLowerCase())
-                    ) {
-                    return true;
-                    }
-                    return false;
-                })
-                .map((p) => p.td1);
-            setPairsByCategory(wbtc)
-            setPairs(wbtc)
-            break;
-        case 3:
-            //look for pairs against stables.
-            foundPairs = getStables(rowData);
-            setPairsByCategory(foundPairs)
-            setPairs(foundPairs)
-            break;
-        case 4:
-            //set favourites from localstorage
-            const favourites = fetchFavourites();
-            foundPairs = [];
+            case 0:
+                setPairsByCategory(rowData.map((row) => row.td1))
+                setPairs(rowData.map((row) => row.td1))
+                break;
+            case 1:
+                const eth = rowData
+                    .filter((item) => {
+                        if (
+                            item.td1.toLowerCase().includes("ETH".toLowerCase())
+                        ) {
+                            return true;
+                        }
+                        return false;
+                    })
+                    .map((p) => p.td1);
+                setPairsByCategory(eth)
+                setPairs(eth)
+                break;
+            case 2:
+                const wbtc = rowData
+                    .filter((item) => {
+                        if (
+                            item.td1.toLowerCase().includes("WBTC".toLowerCase())
+                        ) {
+                            return true;
+                        }
+                        return false;
+                    })
+                    .map((p) => p.td1);
+                setPairsByCategory(wbtc)
+                setPairs(wbtc)
+                break;
+            case 3:
+                //look for pairs against stables.
+                foundPairs = getStables(rowData);
+                setPairsByCategory(foundPairs)
+                setPairs(foundPairs)
+                break;
+            case 4:
+                //set favourites from localstorage
+                const favourites = fetchFavourites();
+                foundPairs = [];
 
-            favourites.forEach((value) => {
-                rowData.forEach((row) => {
-                    const pair_name = row.td1;
+                favourites.forEach((value) => {
+                    rowData.forEach((row) => {
+                        const pair_name = row.td1;
 
-                    //if found query, push it to found pairs
-                    if (pair_name.includes(value.toUpperCase())) {
-                        foundPairs.push(pair_name);
-                    }
+                        //if found query, push it to found pairs
+                        if (pair_name.includes(value.toUpperCase())) {
+                            foundPairs.push(pair_name);
+                        }
+                    });
                 });
-            });
-            setPairsByCategory(foundPairs)
-            setPairs(foundPairs)
-            break;
-        default:
-            return pairs;
+                setPairsByCategory(foundPairs)
+                setPairs(foundPairs)
+                break;
+            default:
+                return pairs;
         }
     }
 
@@ -449,162 +449,162 @@ const TokenPairDropdown = ({width, transparent, context, currentMarket, marketIn
 
     const renderPairs = (pairs) => {
         const shown_pairs = pairs
-        .map((pair) => [pair, rowData.find((row) => row.td1 === pair)])
-        .sort(([_, d], [__, d2]) => {
-            if (changeSorted) {
-                return changeDirection ? d.td3 - d2.td3 : d2.td3 - d.td3;
-            } else if (volumeSorted) {
-                return volumeDirection ? d.usdVolume - d2.usdVolume : d2.usdVolume - d.usdVolume
-            } else if (priceSorted) {
-                return priceDirection ? d.td2 - d2.td2 : d2.td2 - d.td2;
-            } else if (pairSorted) {
-                return pairDirection ? (d.td1 < d2.td1 ? -1 : 1) : (d.td1 < d2.td1 ? 1 : -1);
-            } else {
-                return d && d2? d.usdVolumn - d2.usdVolumn : 0;
-            }
-        })
-        .map(([pair, d], i) => {
-            if (!d) return "";
-            const selected = currentMarket === pair; //if current market selected
-            const isFavourited = favourites.includes(pair); //if contains, isFavourited
+            .map((pair) => [pair, rowData.find((row) => row.td1 === pair)])
+            .sort(([_, d], [__, d2]) => {
+                if (changeSorted) {
+                    return changeDirection ? d.td3 - d2.td3 : d2.td3 - d.td3;
+                } else if (volumeSorted) {
+                    return volumeDirection ? d.usdVolume - d2.usdVolume : d2.usdVolume - d.usdVolume
+                } else if (priceSorted) {
+                    return priceDirection ? d.td2 - d2.td2 : d2.td2 - d.td2;
+                } else if (pairSorted) {
+                    return pairDirection ? (d.td1 < d2.td1 ? -1 : 1) : (d.td1 < d2.td1 ? 1 : -1);
+                } else {
+                    return d && d2 ? d.usdVolumn - d2.usdVolumn : 0;
+                }
+            })
+            .map(([pair, d], i) => {
+                if (!d) return "";
+                const selected = currentMarket === pair; //if current market selected
+                const isFavourited = favourites.includes(pair); //if contains, isFavourited
 
-            return (
-            <tr
-                key={i}
-                onClick={(e) => {
-                    if (selected) return;
-                    updateMarketChain(pair);
-                }}
-                className={selected ? "selected" : ""}
-            >
-                <td>
-                    <PairWrapper>
-                        <span onClick={(e) => {favouritePair(d);}}>
-                            {isFavourited ? <ActivatedStarIcon /> : <StarIcon />}
-                        </span>
-                        <Text font="primarySmall" color="foregroundHighEmphasis">{pair.replace("-", "/")}</Text>
-                        <span>{d.span}</span>
-                    </PairWrapper>
-                </td>
-                <td>
-                    <Text font="tableContent" color={d.td3 < 0 ? 'dangerHighEmphasis' : 'successHighEmphasis'} textAlign="right">{d.td2}</Text>
-                </td>
-                <td>
-                    <Text font="tableContent" color={d.td3 < 0 ? 'dangerHighEmphasis' : 'successHighEmphasis'} textAlign="right">{d.usdVolume.toFixed(2)}</Text>
-                </td>
-                <td>
-                    <Text font="tableContent" color={d.td3 < 0 ? 'dangerHighEmphasis' : 'successHighEmphasis'} textAlign="right">{d.td3}%</Text>
-                </td>
-            </tr>
-            );
-        });
+                return (
+                    <tr
+                        key={i}
+                        onClick={(e) => {
+                            if (selected) return;
+                            updateMarketChain(pair);
+                        }}
+                        className={selected ? "selected" : ""}
+                    >
+                        <td>
+                            <PairWrapper>
+                                <span onClick={(e) => { favouritePair(d); }}>
+                                    {isFavourited ? <ActivatedStarIcon /> : <StarIcon />}
+                                </span>
+                                <Text font="primaryExtraSmall" color="foregroundHighEmphasis">{pair.replace("-", "/")}</Text>
+                                <span>{d.span}</span>
+                            </PairWrapper>
+                        </td>
+                        <td>
+                            <Text font="tableContent" color={d.td3 < 0 ? 'dangerHighEmphasis' : 'successHighEmphasis'} align="right">{d.td2}</Text>
+                        </td>
+                        <td>
+                            <Text font="tableContent" color={d.td3 < 0 ? 'dangerHighEmphasis' : 'successHighEmphasis'} align="right">{d.usdVolume.toFixed(2)}</Text>
+                        </td>
+                        <td>
+                            <Text font="tableContent" color={d.td3 < 0 ? 'dangerHighEmphasis' : 'successHighEmphasis'} align="right">{d.td3}%</Text>
+                        </td>
+                    </tr>
+                );
+            });
 
         return (
-        <table>
-            <thead>
-                <tr>
-                    <th onClick={() => togglePairSorting()}>
-                        <HeaderWrapper>
-                            <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Pair</Text>
-                            {pairSorted ? (
-                                <SortIconWrapper>
-                                    {pairDirection ? <SortUpIcon /> : <SortUpFilledIcon /> }
-                                    {pairDirection ? <SortDownFilledIcon /> : <SortDownIcon /> }
-                                </SortIconWrapper>
-                            ) : (
-                                <SortIconWrapper>
-                                    <SortUpIcon />
-                                    <SortDownIcon />
-                                </SortIconWrapper>
-                            )}
-                        </HeaderWrapper>
-                    </th>
-                    <th onClick={() => togglePriceSorting()}>
-                        <HeaderWrapper>
-                            <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis" textAlign="right">Last Price</Text>
-                            {priceSorted ? (
-                                <SortIconWrapper>
-                                    {priceDirection ? <SortUpIcon /> : <SortUpFilledIcon /> }
-                                    {priceDirection ? <SortDownFilledIcon /> : <SortDownIcon /> }
-                                </SortIconWrapper>
-                            ) : (
-                                <SortIconWrapper>
-                                    <SortUpIcon />
-                                    <SortDownIcon />
-                                </SortIconWrapper>
-                            )}
-                        </HeaderWrapper>
-                    </th>
-                    <th onClick={() => toggleVolumeSorting()}>
-                        <HeaderWrapper>
-                            <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis" textAlign="right">Volume(24)</Text>
-                            {volumeSorted ? (
-                                <SortIconWrapper>
-                                    {volumeDirection ? <SortUpIcon /> : <SortUpFilledIcon /> }
-                                    {volumeDirection ? <SortDownFilledIcon /> : <SortDownIcon /> }
-                                </SortIconWrapper>
-                            ) : (
-                                <SortIconWrapper>
-                                    <SortUpIcon />
-                                    <SortDownIcon />
-                                </SortIconWrapper>
-                            )}
-                        </HeaderWrapper>
-                    </th>
-                    <th onClick={() => toggleChangeSorting()}>
-                        <HeaderWrapper>
-                            <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis" textAlign="right">Change</Text>
-                            {changeSorted ? (
-                                <SortIconWrapper>
-                                    {changeDirection ? <SortUpIcon /> : <SortUpFilledIcon /> }
-                                    {changeDirection ? <SortDownFilledIcon /> : <SortDownIcon /> }
-                                </SortIconWrapper>
-                            ) : (
-                                <SortIconWrapper>
-                                    <SortUpIcon />
-                                    <SortDownIcon />
-                                </SortIconWrapper>
-                            )}
-                        </HeaderWrapper>
-                    </th>
-                </tr>
-            </thead>
-            <tbody>{shown_pairs}</tbody>
-        </table>
+            <table>
+                <thead>
+                    <tr>
+                        <th onClick={() => togglePairSorting()}>
+                            <HeaderWrapper>
+                                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Pair</Text>
+                                {pairSorted ? (
+                                    <SortIconWrapper>
+                                        {pairDirection ? <SortUpIcon /> : <SortUpFilledIcon />}
+                                        {pairDirection ? <SortDownFilledIcon /> : <SortDownIcon />}
+                                    </SortIconWrapper>
+                                ) : (
+                                    <SortIconWrapper>
+                                        <SortUpIcon />
+                                        <SortDownIcon />
+                                    </SortIconWrapper>
+                                )}
+                            </HeaderWrapper>
+                        </th>
+                        <th onClick={() => togglePriceSorting()}>
+                            <HeaderWrapper>
+                                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis" align="right">Last Price</Text>
+                                {priceSorted ? (
+                                    <SortIconWrapper>
+                                        {priceDirection ? <SortUpIcon /> : <SortUpFilledIcon />}
+                                        {priceDirection ? <SortDownFilledIcon /> : <SortDownIcon />}
+                                    </SortIconWrapper>
+                                ) : (
+                                    <SortIconWrapper>
+                                        <SortUpIcon />
+                                        <SortDownIcon />
+                                    </SortIconWrapper>
+                                )}
+                            </HeaderWrapper>
+                        </th>
+                        <th onClick={() => toggleVolumeSorting()}>
+                            <HeaderWrapper>
+                                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis" align="right">Volume(24)</Text>
+                                {volumeSorted ? (
+                                    <SortIconWrapper>
+                                        {volumeDirection ? <SortUpIcon /> : <SortUpFilledIcon />}
+                                        {volumeDirection ? <SortDownFilledIcon /> : <SortDownIcon />}
+                                    </SortIconWrapper>
+                                ) : (
+                                    <SortIconWrapper>
+                                        <SortUpIcon />
+                                        <SortDownIcon />
+                                    </SortIconWrapper>
+                                )}
+                            </HeaderWrapper>
+                        </th>
+                        <th onClick={() => toggleChangeSorting()}>
+                            <HeaderWrapper>
+                                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis" align="right">Change</Text>
+                                {changeSorted ? (
+                                    <SortIconWrapper>
+                                        {changeDirection ? <SortUpIcon /> : <SortUpFilledIcon />}
+                                        {changeDirection ? <SortDownFilledIcon /> : <SortDownIcon />}
+                                    </SortIconWrapper>
+                                ) : (
+                                    <SortIconWrapper>
+                                        <SortUpIcon />
+                                        <SortDownIcon />
+                                    </SortIconWrapper>
+                                )}
+                            </HeaderWrapper>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>{shown_pairs}</tbody>
+            </table>
         );
     }
 
     return (
-        <DropdownWrapper ref={wrapperRef}> 
+        <DropdownWrapper ref={wrapperRef}>
             <ButtonWrapper>
                 <img src={api.getCurrencyLogo(marketInfo?.baseAsset.symbol)} alt={marketInfo?.baseAsset.symbol} />
                 <ExpandableButton width={width} transparent={transparent} expanded={isOpened} onClick={toggle}>{context}</ExpandableButton>
             </ButtonWrapper>
-            { isOpened &&
-              <DropdownDisplay isMobile={isMobile}>
-                <DropdownHeader>
-                    <InputField 
-                        type="text" 
-                        placeholder="Search for a token pair" 
-                        icon="search"
-                        value={searchValue}
-                        onChange={updateSearchValue}
-                    />
-                </DropdownHeader>
-                <Divider />
-                <DropdownContent>
-                    <StyledTabMenu left activeIndex={categorySelected} onItemClick={categorizePairs}>
-                        <Tab>All</Tab>
-                        <Tab>ETH</Tab>
-                        <Tab>WBTC</Tab>
-                        <Tab>Stables</Tab>
-                        <Tab>Favorites</Tab>
-                    </StyledTabMenu>
-                    <TableContent className="trade_price_btc_table">
-                        {renderPairs(pairs)}
-                    </TableContent>
-                </DropdownContent>
-              </DropdownDisplay> 
+            {isOpened &&
+                <DropdownDisplay isMobile={isMobile}>
+                    <DropdownHeader>
+                        <InputField
+                            type="text"
+                            placeholder="Search for a token pair"
+                            icon="search"
+                            value={searchValue}
+                            onChange={updateSearchValue}
+                        />
+                    </DropdownHeader>
+                    <Divider />
+                    <DropdownContent>
+                        <StyledTabMenu left activeIndex={categorySelected} onItemClick={categorizePairs}>
+                            <Tab>All</Tab>
+                            <Tab>ETH</Tab>
+                            <Tab>WBTC</Tab>
+                            <Tab>Stables</Tab>
+                            <Tab>Favorites</Tab>
+                        </StyledTabMenu>
+                        <TableContent className="trade_price_btc_table">
+                            {renderPairs(pairs)}
+                        </TableContent>
+                    </DropdownContent>
+                </DropdownDisplay>
             }
         </DropdownWrapper>
     )
