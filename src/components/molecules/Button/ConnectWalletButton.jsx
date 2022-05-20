@@ -12,8 +12,8 @@ const ConnectWalletButton = (props) => {
   const history = useHistory();
   const location = useLocation();
 
-  useEffect(() => {
-    if (props.isLoading) {
+  useEffect(()=>{
+    if(props.isLoading) {
       setIsLoading(props.isLoading)
     }
   }, [props.isLoading])
@@ -39,10 +39,10 @@ const ConnectWalletButton = (props) => {
             pushToBridgeMaybe(state);
           })
           .finally(() => setIsLoading(false));
-      }}
-      style={{ width: props.width, padding: isLoading ? '8px 5px' : '8px 15px' }}
+      }} 
+      style={{width: props.width, padding: isLoading ? '8px 5px' : '8px 15px'}}
     >
-      CONNECT WALLET
+    CONNECT WALLET
     </Button>
   );
 };

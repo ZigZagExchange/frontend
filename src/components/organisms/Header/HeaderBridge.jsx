@@ -246,7 +246,7 @@ const HeaderWrapper = styled.div`
   height: 56px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.foreground400};
   align-items: center;
-  background-color: ${({ theme }) => theme.colors.backgroundMediumEmphasis};
+  background-color: ${({ theme }) => theme.colors.backgroundHighEmphasis};
   position: fixed;
   padding: 0px 20px;
   z-index: 100;
