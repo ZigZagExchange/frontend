@@ -71,7 +71,7 @@ export const lightColors = {
   foreground300: '#292D3F14',
   foreground200: '#292D3F0D',
   foreground100: '#292D3F08',
-  bridgeBackground: '#DDF1F7',
+  bridgeBackground: '#ddf1f7',
 }
 
 export const darkColors = {
@@ -94,5 +94,5 @@ export const darkColors = {
   foreground300: '#FFFFFF14',
   foreground200: '#FFFFFF0D',
   foreground100: '#FFFFFF08',
-  bridgeBackground: '#1C2231',
+  bridgeBackground: '#62688F33',
 }
