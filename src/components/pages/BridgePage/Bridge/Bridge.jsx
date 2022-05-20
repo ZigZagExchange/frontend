@@ -209,7 +209,6 @@ const Bridge = () => {
     // update changePubKeyFee fee if needed
     if (
       user.address &&
-      !user.id &&
       api.apiProvider?.zksyncCompatible
     ) {
       const usdFee = await api.apiProvider.changePubKeyFee();
@@ -412,10 +411,12 @@ const Bridge = () => {
 
   const renderGuidContent = () => {
     return <div>
-      <p style={{fontSize: '14px', lineHeight:'24px'}}>1. Switch to Polygon network</p>
-      <p style={{fontSize: '14px', lineHeight:'24px'}}>2. Sign the transaction and wait for confirmation</p>
-      <p style={{fontSize: '14px', lineHeight:'24px'}}>3. Wait until "Switch Network" pops up</p>
-      <p style={{fontSize: '14px', lineHeight:'24px'}}>4. Switch back to Ethereum mainnet. Activating a new zkSync wallet costs ~$5. Enjoy trading on ZigZag!</p>
+      <p style={{fontSize: '14px', lineHeight:'24px'}}>1. Connect to Ethereum network</p>
+      <p style={{fontSize: '14px', lineHeight:'24px'}}>2. Click "transfer" on Polygon -> zkSync</p>
+      <p style={{fontSize: '14px', lineHeight:'24px'}}>3. Click "Switch network" to Polygon and wait</p>
+      <p style={{fontSize: '14px', lineHeight:'24px'}}>4. Click "Confirm" on transfer pop up and wait</p>
+      <p style={{fontSize: '14px', lineHeight:'24px'}}>5. Click "Switch network" to Ethereum</p>
+      <p style={{fontSize: '14px', lineHeight:'24px'}}>&nbsp;&nbsp;&nbsp;&nbsp;{`Activating a new zkSync wallet costs ~${usdFee}. Enjoy trading on ZigZag!`}</p>
     </div>
   }
 
