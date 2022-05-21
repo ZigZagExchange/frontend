@@ -232,30 +232,28 @@ export function TradeDashboard() {
         side: fill[3],
       });
     });
-
-  if (api.isZksyncChain()) {
-    liquidity.forEach((liq) => {
-      const side = liq[0];
-      const price = liq[1];
-      const quantity = liq[2];
-      if (side === "b") {
-        orderbookBids.push({
-          td1: price,
-          td2: quantity,
-          td3: price * quantity,
-          side: "b",
-        });
-      }
-      if (side === "s") {
-        orderbookAsks.push({
-          td1: price,
-          td2: quantity,
-          td3: price * quantity,
-          side: "s",
-        });
-      }
-    });
-  }
+  
+  liquidity.forEach((liq) => {
+    const side = liq[0];
+    const price = liq[1];
+    const quantity = liq[2];
+    if (side === "b") {
+      orderbookBids.push({
+        td1: price,
+        td2: quantity,
+        td3: price * quantity,
+        side: "b",
+      });
+    }
+    if (side === "s") {
+      orderbookAsks.push({
+        td1: price,
+        td2: quantity,
+        td3: price * quantity,
+        side: "s",
+      });
+    }
+  });
 
   orderbookAsks.sort((a, b) => b.td1 - a.td1);
   orderbookBids.sort((a, b) => b.td1 - a.td1);
