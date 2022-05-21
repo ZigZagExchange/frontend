@@ -12,7 +12,6 @@ import {
   networkSelector,
   userOrdersSelector,
   userFillsSelector,
-  allOrdersSelector,
   marketFillsSelector,
   lastPricesSelector,
   marketSummarySelector,
@@ -127,7 +126,6 @@ export function TradeDashboard() {
   const currentMarket = useSelector(currentMarketSelector);
   const userOrders = useSelector(userOrdersSelector);
   const userFills = useSelector(userFillsSelector);
-  const allOrders = useSelector(allOrdersSelector);
   const marketFills = useSelector(marketFillsSelector);
   const lastPrices = useSelector(lastPricesSelector);
   const marketSummary = useSelector(marketSummarySelector);
@@ -219,41 +217,6 @@ export function TradeDashboard() {
   const orderbookBids = [];
   const orderbookAsks = [];
 
-  for (let orderid in allOrders) {
-    const order = allOrders[orderid];
-    const side = order[3];
-    const price = order[4];
-    const remaining = isNaN(Number(order[11])) ? order[5] : order[11];
-    const remainingQuote = remaining * price;
-    const orderStatus = order[9];
-
-    const orderWithoutFee = api.getOrderDetailsWithoutFee(order);
-    let orderRow;
-    if (api.isZksyncChain())
-      orderRow = {
-        td1: orderWithoutFee.price,
-        td2: orderWithoutFee.baseQuantity,
-        td3: orderWithoutFee.quoteQuantity,
-        side,
-        order: order,
-      };
-    else {
-      orderRow = {
-        td1: price,
-        td2: remaining,
-        td3: remainingQuote,
-        side,
-        order: order,
-      };
-    }
-
-    if (side === "b" && ["o", "pm", "pf"].includes(orderStatus)) {
-      orderbookBids.push(orderRow);
-    } else if (side === "s" && ["o", "pm", "pf"].includes(orderStatus)) {
-      orderbookAsks.push(orderRow);
-    }
-  }
-
   // Only display recent trades
   // There's a bunch of user trades in this list that are too old to display
   const fillData = [];
@@ -269,30 +232,28 @@ export function TradeDashboard() {
         side: fill[3],
       });
     });
-
-  if (api.isZksyncChain()) {
-    liquidity.forEach((liq) => {
-      const side = liq[0];
-      const price = liq[1];
-      const quantity = liq[2];
-      if (side === "b") {
-        orderbookBids.push({
-          td1: price,
-          td2: quantity,
-          td3: price * quantity,
-          side: "b",
-        });
-      }
-      if (side === "s") {
-        orderbookAsks.push({
-          td1: price,
-          td2: quantity,
-          td3: price * quantity,
-          side: "s",
-        });
-      }
-    });
-  }
+  
+  liquidity.forEach((liq) => {
+    const side = liq[0];
+    const price = liq[1];
+    const quantity = liq[2];
+    if (side === "b") {
+      orderbookBids.push({
+        td1: price,
+        td2: quantity,
+        td3: price * quantity,
+        side: "b",
+      });
+    }
+    if (side === "s") {
+      orderbookAsks.push({
+        td1: price,
+        td2: quantity,
+        td3: price * quantity,
+        side: "s",
+      });
+    }
+  });
 
   orderbookAsks.sort((a, b) => b.td1 - a.td1);
   orderbookBids.sort((a, b) => b.td1 - a.td1);
@@ -372,6 +333,7 @@ export function TradeDashboard() {
           userFills={userFills}
           userOrders={userOrders}
           user={user}
+          marketInfo={marketInfo}
         />
         <TradeFooter />
       </TradeGrid>
