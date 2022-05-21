@@ -18,12 +18,11 @@ const QuestionWrapper = styled.div`
 export default function QuestionHelper({ text }) {
   const [show, setShow] = useState(false)
 
-  const open = useCallback(() => setShow(true), [setShow])
-  const close = useCallback(() => setShow(false), [setShow])
+  const open = () => setShow(!show)
 
   return (
     <Tooltip text={text} show={show}>
-        <QuestionWrapper onClick={open} onMouseEnter={open} onMouseLeave={close}>
+        <QuestionWrapper onClick={open}>
             <InfoIcon />
         </QuestionWrapper>
     </Tooltip>

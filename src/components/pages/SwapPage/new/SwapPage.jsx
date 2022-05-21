@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, {useState} from "react";
 import useTheme from "components/hooks/useTheme";
 
 import { Link } from "react-router-dom";
@@ -8,7 +8,6 @@ import NetworkSelection from "components/organisms/NetworkSelection";
 import SwapContianer from "./SwapContainer";
 
 import classNames from "classnames";
-import api from "lib/api";
 import "../SwapPage.style.css";
 import TransactionSettings from "./TransationSettings";
 import { Button } from "components/molecules/Button";
@@ -21,71 +20,8 @@ export default function SwapPage() {
   // const tab = useParams().tab || "swap";
 
   const { isDark } = useTheme();
-  const [pairs, setGetPairs] = useState([]);
-  const [fromTokenList, setFromTokenList] = useState([]);
-  const [fromToken, setFromToken] = useState();
-  const [toToken, setToToken] = useState();
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setFromTokenList(api.getCurrencies());
-      setGetPairs(api.getPairs());
-    }, 500);
-    if (fromTokenList.length > 0) {
-      clearInterval(timer);
-    }
-    return () => {
-      clearInterval(timer);
-    };
-  }, [fromTokenList]);
-
-  const fromTokenOptions = useMemo(() => {
-    if (fromTokenList.length > 0) {
-      const p = fromTokenList.map((item, index) => {
-        return { id: index, name: item };
-      });
-      setFromToken(p[0]);
-      return p;
-    } else {
-      return [];
-    }
-  }, [fromTokenList]);
-
-  const toTokenOptions = useMemo(() => {
-    const p = pairs.map((item) => {
-      const a = item.split("-")[0];
-      const b = item.split("-")[1];
-      if (a === fromToken.name) {
-        return b;
-      } else if (b === fromToken.name) {
-        return a;
-      } else {
-        return null;
-      }
-    });
-    var filtered = p
-      .filter(function (el) {
-        return el != null;
-      })
-      .map((item, index) => {
-        return { id: index, name: item };
-      });
-    setToToken(filtered[0]);
-    return filtered;
-  }, [fromToken, pairs]);
-
-  const onChangeFromToken = (option) => {
-    setFromToken(option);
-  };
-
-  const onChangeToToken = (option) => {
-    setToToken(option);
-  };
-
-  const onSwitchTokenBtn = () => {
-    const p = fromTokenOptions.find((item) => item.name === toToken.name);
-    setFromToken(p);
-  };
+  const [tType, setTtype] = useState('buy')
+  
 
   return (
     <DefaultTemplate>
@@ -108,16 +44,8 @@ export default function SwapPage() {
             <InfoIcon size={16} />
           </div>
           <NetworkSelection className="mt-2" />
-          <SwapContianer
-            fromTokenOptions={fromTokenOptions}
-            onSelectedFromToken={onChangeFromToken}
-            selectedFromToken={fromToken}
-            toTokenOptions={toTokenOptions}
-            onSelectedToToken={onChangeToToken}
-            selectedToToken={toToken}
-            onSwitchTokenBtn={onSwitchTokenBtn}
-          />
-          <TransactionSettings />
+          <SwapContianer setTransactionType={(type)=>setTtype(type)} transactionType={tType} />
+          <TransactionSettings transactionType={tType} />
           <Button
             isLoading={false}
             className="w-full py-3 mt-3 uppercase"

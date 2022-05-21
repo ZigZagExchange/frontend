@@ -1,20 +1,32 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { networkSelector } from "../../../lib/store/features/api/apiSlice";
 import Button from "./Button";
 import api from "../../../lib/api";
 import { useHistory, useLocation } from "react-router-dom";
+import { formatAmount } from "../../../lib/utils";
 
-const ConnectWalletButton = ({width = '100%'}) => {
+const ConnectWalletButton = (props) => {
   const network = useSelector(networkSelector);
   const [isLoading, setIsLoading] = useState(false);
   const history = useHistory();
   const location = useLocation();
 
-  const pushToBridgeMaybe = (state) => {
-    if (!state.id && !/^\/bridge(\/.*)?/.test(location.pathname)) {
+  useEffect(() => {
+    if (props.isLoading) {
+      setIsLoading(props.isLoading)
+    }
+  }, [props.isLoading])
+
+  const pushToBridgeMaybe = async (state) => {
+    const walletBalance = formatAmount(state.committed.balances['ETH'], { decimals: 18 });
+    const activationFee = await api.apiProvider.changePubKeyFee('ETH');
+
+    if (!state.id && (!/^\/bridge(\/.*)?/.test(location.pathname)) && (isNaN(walletBalance) || walletBalance < activationFee)) {
       history.push("/bridge");
     }
+
+    if (document.querySelector('.connect-notification')) document.querySelector('.connect-notification').style.display = 'flex';
   };
 
   return (
@@ -29,10 +41,10 @@ const ConnectWalletButton = ({width = '100%'}) => {
             pushToBridgeMaybe(state);
           })
           .finally(() => setIsLoading(false));
-      }} 
-      style={{width, padding: isLoading ? '8px 5px' : '8px 15px'}}
+      }}
+      style={{ width: props.width, padding: isLoading ? '8px 5px' : '8px 15px' }}
     >
-    CONNECT WALLET
+      CONNECT WALLET
     </Button>
   );
 };

@@ -22,7 +22,7 @@ const TokenDropDownModal = ({tickers=[], onSelectedOption, selectedOption}) => {
   // const [selected, setSelected] = useState(tickers[0]);
   const { isDark, theme } = useTheme();
 
-  console.log(isDark);
+  // console.log(isDark);
   // const tickers = api.getCurrencies();
 
   function closeModal() {
