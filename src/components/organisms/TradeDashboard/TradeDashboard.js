@@ -333,6 +333,7 @@ export function TradeDashboard() {
           userFills={userFills}
           userOrders={userOrders}
           user={user}
+          marketInfo={marketInfo}
         />
         <TradeFooter />
       </TradeGrid>
