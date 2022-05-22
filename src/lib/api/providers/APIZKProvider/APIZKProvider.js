@@ -176,6 +176,19 @@ export default class APIZKProvider extends APIProvider {
     quoteAmount,
     orderType
   ) => {
+    const accountState = await this.getAccountState();
+    if (!accountState.id) {
+      toast.error(
+        "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
+        {
+          autoClose: 60000
+        },
+        {
+          toastId: "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
+        }
+      );
+      return;
+    }
     const marketInfo = this.marketInfo[market];
 
     if (!APIZKProvider.VALID_SIDES.includes(side)) {
