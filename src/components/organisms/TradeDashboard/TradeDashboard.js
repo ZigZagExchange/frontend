@@ -8,6 +8,7 @@ import TradeFooter from "./TradeFooter/TradeFooter";
 import TradeChartArea from "./TradeChartArea/TradeChartArea";
 import TradeBooks from "./TradeBooks/TradeBooks";
 import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import {
   networkSelector,
   userOrdersSelector,
@@ -169,6 +170,16 @@ export function TradeDashboard() {
   }, [network, currentMarket]);
 
   useEffect(() => {
+    if(user.address && !user.id){
+      console.log('here')
+      history.push("/bridge");
+      toast.error(
+        "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
+        {
+          autoClose: 60000
+        }
+      );
+    }
     const sub = () => {
       dispatch(resetData());
       api.subscribeToMarket(currentMarket);
