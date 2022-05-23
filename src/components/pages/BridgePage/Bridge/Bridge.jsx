@@ -228,7 +228,7 @@ const Bridge = (props) => {
 
     let error = null;
     if (inputValue > 0) {
-      if (inputValue <= activationFee) {
+      if (!user.id && inputValue <= activationFee) {
         error = `Must be more than ${activationFee} ${swapCurrency}`
       } else if (L2Fee !== null && inputValue < L2Fee) {
         error = "Amount too small";
