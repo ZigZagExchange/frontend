@@ -182,13 +182,13 @@ export const Header = (props) => {
               </SocialWrapper>
               <VerticalDivider />
               <LanguageWrapper>
-                <StyledDropdown transparent item={langList} context={language} clickFunction={changeLanguage} />
+                <StyledDropdown adClass="lang-dropdown" transparent item={langList} context={language} clickFunction={changeLanguage} />
                 <ToggleTheme isDark={isDark} toggleTheme={toggleTheme} />
               </LanguageWrapper>
               <VerticalDivider />
               {user.id && user.address ? (
                 <>
-                  <Dropdown width={162} item={networkItems} context={networkName} clickFunction={changeNetwork} leftIcon={true} />
+                  <Dropdown adClass="network-dropdown" width={162} item={networkItems} context={networkName} clickFunction={changeNetwork} leftIcon={true} />
                   <AccountDropdown />
                 </>
               ) : (
@@ -202,7 +202,7 @@ export const Header = (props) => {
           <SideMenuWrapper>
             {
               user.id && user.address ?
-                <Dropdown isMobile={true} style={{ justifySelf: 'center' }} width={242} item={networkItems} context={networkName} clickFunction={changeNetwork} leftIcon={true} /> :
+                <Dropdown adClass="network-dropdown" isMobile={true} style={{ justifySelf: 'center' }} width={242} item={networkItems} context={networkName} clickFunction={changeNetwork} leftIcon={true} /> :
                 <></>
             }
             <TabMenu row activeIndex={index} onItemClick={handleClick}>
@@ -214,7 +214,7 @@ export const Header = (props) => {
             <HorizontalDivider />
             <ActionSideMenuWrapper>
               <span>Language: </span>
-              <StyledDropdown transparent item={langList} context={language} clickFunction={changeLanguage} />
+              <StyledDropdown adClass="lang-dropdown" transparent item={langList} context={language} clickFunction={changeLanguage} />
             </ActionSideMenuWrapper>
             <ActionSideMenuWrapper>
               <span>Theme: </span>
@@ -316,7 +316,8 @@ const SocialLink = styled.a`
 `
 
 const StyledDropdown = styled(Dropdown)`
-  width: fit-content;
+  padding: 16px 0px 16px 16px;
+  width: auto;
 `
 
 const VerticalDivider = styled.div`
