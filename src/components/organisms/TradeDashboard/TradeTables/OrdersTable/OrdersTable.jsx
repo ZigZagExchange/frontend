@@ -378,13 +378,13 @@ export class OrdersTable extends React.Component {
         classNameFills = "selected";
         break;
       case "balances":
-        if (this.props.user.committed) {
+        if (this.props.wallet) {
           const balancesContent = Object.keys(
-            this.props.user.committed.balances
+            this.props.wallet
           )
             .sort()
             .map((token) => {
-              const balance = this.props.user.committed.balances[token].valueReadable;
+              const balance = this.props.wallet[token].valueReadable;
               return (
                 <tr>
                   <td data-label="Token">{token}</td>

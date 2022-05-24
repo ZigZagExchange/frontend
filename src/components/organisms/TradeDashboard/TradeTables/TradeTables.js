@@ -14,6 +14,7 @@ export default function TradeTables(props) {
         userFills={props.userFills}
         userOrders={props.userOrders}
         user={props.user}
+        wallet={props.wallet}
       />
     </StyledTradeTables>
   );

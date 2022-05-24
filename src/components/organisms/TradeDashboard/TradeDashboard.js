@@ -22,6 +22,7 @@ import {
   setCurrentMarket,
   resetData,
   layoutSelector,
+  balancesSelector,
 } from "lib/store/features/api/apiSlice";
 import { userSelector } from "lib/store/features/auth/authSlice";
 import api from "lib/api";
@@ -133,6 +134,7 @@ export function TradeDashboard() {
   const liquidity = useSelector(liquiditySelector);
   const layout = useSelector(layoutSelector);
   const marketInfo = useSelector(marketInfoSelector);
+  const balanceData = useSelector(balancesSelector);
   const dispatch = useDispatch();
   const lastPriceTableData = [];
   const markets = [];
@@ -143,6 +145,8 @@ export function TradeDashboard() {
   const updateMarketChain = (market) => {
     dispatch(setCurrentMarket(market));
   };
+
+  const wallet = balanceData[network];
 
   useEffect(() => {
     const urlParams = new URLSearchParams(search);
@@ -156,6 +160,7 @@ export function TradeDashboard() {
       api.setAPIProvider(chainid);
       api.signOut();
     }
+    api.getWalletBalances();
   }, []);
 
   // Update URL when market or network update
@@ -345,6 +350,7 @@ export function TradeDashboard() {
           userOrders={userOrders}
           user={user}
           marketInfo={marketInfo}
+          wallet={wallet}
         />
         <TradeFooter />
       </TradeGrid>
