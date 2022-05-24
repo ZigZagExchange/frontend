@@ -17,10 +17,10 @@ const Wrapper = styled.div`
     border: 1px solid ${({ theme }) => theme.colors.foreground400};
     box-shadow: 0px 8px 16px 0px #0101011A;
     backdrop-filter: blur(8px);
-    padding: 16px 10px 16px 16px;
+    padding: 16px 7px;
     border-radius: 8px;
     display: grid;
-    gap: 16px;
+    gap: 10px;
     align-items: start;
     z-index: 100;
 `
@@ -28,10 +28,15 @@ const Wrapper = styled.div`
 const DropdownListContainer = styled.div`
     display: grid;
     // grid-auto-flow: column;
-    height: 31px;
+    // height: 31px;
     align-items: center;
     grid-template-columns: ${({ leftIcon }) => leftIcon ? '32px 1fr' : '1fr 16px'};
     cursor: pointer;
+
+    .selected-icon {
+        padding-left: 30px;
+        grid-template-columns: max-content;
+    }
 `
 
 const IconButton = styled(baseIcon)`
@@ -73,11 +78,11 @@ const Dropdown = ({ width, item, context, leftIcon, rightIcon, transparent, clic
                 <Wrapper width={width}>
                     {item.map((items) => {
                         const { text, value, url, icon, selectedIcon, iconSelected } = items
-                        const menuIcon = iconSelected ? selectedIcon : icon
+                        const menuIcon = iconSelected ? selectedIcon : icon;
                         return (
                             <DropdownListContainer key={items.text} leftIcon={leftIcon} onClick={() => handleClick(url, text, value)}>
                                 {leftIcon && isValidElement(menuIcon) && <IconButton variant="secondary" startIcon={cloneElement(menuIcon)}></IconButton>}
-                                <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{text}</Text>
+                                <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis" className={!iconSelected ? "selected-icon" : ""}>{text}</Text>
                                 {rightIcon && isValidElement(menuIcon) && <IconButton variant="secondary" endIcon={cloneElement(menuIcon)}></IconButton>}
                             </DropdownListContainer>
                         )

@@ -10,7 +10,7 @@ import logo from "assets/images/logo.png";
 import { TabMenu, Tab } from "components/molecules/TabMenu";
 import { Dropdown, AccountDropdown } from "components/molecules/Dropdown";
 import { ConnectWalletButton } from "components/molecules/Button";
-import { DiscordIcon, ExternalLinkIcon, TelegramIcon, TwitterIcon, DeleteIcon, MenuIcon } from "components/atoms/Svg";
+import { DiscordIcon, ExternalLinkIcon, TelegramIcon, TwitterIcon, DeleteIcon, MenuIcon, CheckMarkCircleIcon } from "components/atoms/Svg";
 import { toNumber } from "lodash";
 import ToggleTheme from "components/molecules/Toggle/ToggleTheme";
 import useTheme from "components/hooks/useTheme";
@@ -21,8 +21,8 @@ const langList = [
 ]
 
 const networkLists = [
-  { text: 'zkSync - Mainnet', value: 1, url: '#' },
-  { text: 'zkSync - Rinkeby', value: 1000, url: '#' }
+  { text: 'zkSync - Mainnet', value: 1, url: '#', selectedIcon: <CheckMarkCircleIcon /> },
+  { text: 'zkSync - Rinkeby', value: 1000, url: '#', selectedIcon: <CheckMarkCircleIcon /> }
 ]
 
 const accountLists = [
@@ -38,10 +38,11 @@ export const HeaderBridge = (props) => {
   const hasBridge = api.isImplemented("depositL2");
   const history = useHistory();
   const [index, setIndex] = useState(0);
-  const [language, setLanguage] = useState(langList[0].text)
-  const [account, setAccount] = useState(accountLists[0].text)
-  const [networkName, setNetworkName] = useState('')
-  const { isDark, toggleTheme } = useTheme()
+  const [language, setLanguage] = useState(langList[0].text);
+  const [account, setAccount] = useState(accountLists[0].text);
+  const [networkName, setNetworkName] = useState('');
+  const [networkItems, setNetWorkItems] = useState(networkLists);
+  const { isDark, toggleTheme } = useTheme();
 
   useEffect(() => {
     const netName = networkLists.filter((item, i) => {
@@ -54,6 +55,13 @@ export const HeaderBridge = (props) => {
   useEffect(() => {
     const tabIndex = localStorage.getItem("tab_index")
     if (tabIndex !== null) setIndex(toNumber(tabIndex))
+
+    let temp = networkItems.reduce((acc, item) => {
+      if (item.text === networkName) item["iconSelected"] = true;
+      else item["iconSelected"] = false;
+      acc.push(item);
+      return acc;
+    }, []);
   }, [])
 
   const changeLanguage = (text) => {
@@ -66,7 +74,16 @@ export const HeaderBridge = (props) => {
 
   const changeNetwork = (text, value) => {
     setNetworkName(text)
-    console.log("networkid: ", value)
+    let temp = networkItems.reduce((acc, item) => {
+      if (item.text === text) item["iconSelected"] = true;
+      else item["iconSelected"] = false;
+      acc.push(item);
+      return acc;
+    }, []);
+
+    setNetWorkItems(temp);
+    console.log("temp is", temp);
+
     api.setAPIProvider(value);
     api.refreshNetwork().catch((err) => {
       console.log(err);
@@ -176,7 +193,7 @@ export const HeaderBridge = (props) => {
               <VerticalDivider />
               {user.id && user.address ? (
                 <>
-                  <Dropdown width={162} item={networkLists} context={networkName} clickFunction={changeNetwork} />
+                  <Dropdown width={162} item={networkItems} context={networkName} clickFunction={changeNetwork} leftIcon={true} />
                   <AccountDropdown />
                 </>
               ) : (
@@ -190,7 +207,7 @@ export const HeaderBridge = (props) => {
           <SideMenuWrapper>
             {
               user.id && user.address ?
-                <Dropdown style={{ justifySelf: 'center' }} width={242} item={networkLists} context={networkName} clickFunction={changeNetwork} /> :
+                <Dropdown style={{ justifySelf: 'center' }} width={242} item={networkItems} context={networkName} clickFunction={changeNetwork} /> :
                 <></>
             }
             <TabMenu row activeIndex={index} onItemClick={handleClick}>
