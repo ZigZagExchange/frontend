@@ -11,13 +11,13 @@ const DropdownWrapper = styled.div`
 
 const Wrapper = styled.div`
     position: absolute;
-    min-width: ${({ width }) => `${width}px`};
+    // min-width: ${({ width }) => `${width}px`};
     width: 100%;
     background-color: ${({ theme }) => theme.colors.backgroundMediumEmphasis};
     border: 1px solid ${({ theme }) => theme.colors.foreground400};
     box-shadow: 0px 8px 16px 0px #0101011A;
     backdrop-filter: blur(8px);
-    padding: 20px;
+    padding: 16px 10px 16px 16px;
     border-radius: 8px;
     display: grid;
     gap: 16px;
@@ -47,7 +47,7 @@ const IconButton = styled(baseIcon)`
     }
 `
 
-const Dropdown = ({width, item, context, leftIcon, rightIcon, transparent, clickFunction}) => {
+const Dropdown = ({ width, item, context, leftIcon, rightIcon, transparent, clickFunction }) => {
     const [isOpened, setIsOpened] = useState(false)
     const wrapperRef = useRef(null)
 
@@ -58,31 +58,31 @@ const Dropdown = ({width, item, context, leftIcon, rightIcon, transparent, click
     }
 
     const handleClick = (url, text, value) => {
-        if(url !== '#'){
+        if (url !== '#') {
             window.location.href = url
-        }else{
+        } else {
             clickFunction(text, value)
             toggle()
         }
     }
 
     return (
-        <DropdownWrapper ref={wrapperRef}> 
+        <DropdownWrapper ref={wrapperRef}>
             <ExpandableButton width={width} transparent={transparent} expanded={isOpened} onClick={toggle}>{context}</ExpandableButton>
-            { isOpened &&
+            {isOpened &&
                 <Wrapper width={width}>
-                        {item.map((items) => {
-                            const {text, value, url, icon, selectedIcon, iconSelected} = items
-                            const menuIcon = iconSelected ? selectedIcon : icon
+                    {item.map((items) => {
+                        const { text, value, url, icon, selectedIcon, iconSelected } = items
+                        const menuIcon = iconSelected ? selectedIcon : icon
                         return (
-                        <DropdownListContainer key={items.text} leftIcon={leftIcon} onClick={()=> handleClick(url, text, value)}>
-                            {leftIcon && isValidElement(menuIcon) && <IconButton variant="secondary" startIcon={cloneElement(menuIcon)}></IconButton>}
-                            <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{text}</Text>
-			                {rightIcon && isValidElement(menuIcon) && <IconButton variant="secondary" endIcon={cloneElement(menuIcon)}></IconButton>}
-                        </DropdownListContainer>
+                            <DropdownListContainer key={items.text} leftIcon={leftIcon} onClick={() => handleClick(url, text, value)}>
+                                {leftIcon && isValidElement(menuIcon) && <IconButton variant="secondary" startIcon={cloneElement(menuIcon)}></IconButton>}
+                                <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{text}</Text>
+                                {rightIcon && isValidElement(menuIcon) && <IconButton variant="secondary" endIcon={cloneElement(menuIcon)}></IconButton>}
+                            </DropdownListContainer>
                         )
-                    })}     
-                </Wrapper> 
+                    })}
+                </Wrapper>
             }
         </DropdownWrapper>
     )
