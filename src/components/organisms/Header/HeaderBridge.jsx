@@ -51,17 +51,21 @@ export const HeaderBridge = (props) => {
     setNetworkName(netName[0].text)
   })
 
-
   useEffect(() => {
-    const tabIndex = localStorage.getItem("tab_index")
-    if (tabIndex !== null) setIndex(toNumber(tabIndex))
-
     let temp = networkItems.reduce((acc, item) => {
       if (item.text === networkName) item["iconSelected"] = true;
       else item["iconSelected"] = false;
       acc.push(item);
       return acc;
     }, []);
+
+    setNetWorkItems(temp);
+  }, [networkName])
+
+
+  useEffect(() => {
+    const tabIndex = localStorage.getItem("tab_index")
+    if (tabIndex !== null) setIndex(toNumber(tabIndex))
   }, [])
 
   const changeLanguage = (text) => {
@@ -73,16 +77,7 @@ export const HeaderBridge = (props) => {
   }
 
   const changeNetwork = (text, value) => {
-    setNetworkName(text)
-    let temp = networkItems.reduce((acc, item) => {
-      if (item.text === text) item["iconSelected"] = true;
-      else item["iconSelected"] = false;
-      acc.push(item);
-      return acc;
-    }, []);
-
-    setNetWorkItems(temp);
-    console.log("temp is", temp);
+    setNetworkName(text);
 
     api.setAPIProvider(value);
     api.refreshNetwork().catch((err) => {
@@ -207,7 +202,7 @@ export const HeaderBridge = (props) => {
           <SideMenuWrapper>
             {
               user.id && user.address ?
-                <Dropdown style={{ justifySelf: 'center' }} width={242} item={networkItems} context={networkName} clickFunction={changeNetwork} /> :
+                <Dropdown isMobile={true} style={{ justifySelf: 'center' }} width={242} item={networkItems} context={networkName} clickFunction={changeNetwork} leftIcon={true} /> :
                 <></>
             }
             <TabMenu row activeIndex={index} onItemClick={handleClick}>

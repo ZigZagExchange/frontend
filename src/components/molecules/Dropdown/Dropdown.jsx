@@ -23,6 +23,10 @@ const Wrapper = styled.div`
     gap: 10px;
     align-items: start;
     z-index: 100;
+
+    &.mobile-mode {
+        padding: 16px;
+    }
 `
 
 const DropdownListContainer = styled.div`
@@ -52,7 +56,7 @@ const IconButton = styled(baseIcon)`
     }
 `
 
-const Dropdown = ({ width, item, context, leftIcon, rightIcon, transparent, clickFunction }) => {
+const Dropdown = ({ width, item, context, leftIcon, rightIcon, transparent, clickFunction, isMobile = false }) => {
     const [isOpened, setIsOpened] = useState(false)
     const wrapperRef = useRef(null)
 
@@ -75,7 +79,7 @@ const Dropdown = ({ width, item, context, leftIcon, rightIcon, transparent, clic
         <DropdownWrapper ref={wrapperRef}>
             <ExpandableButton width={width} transparent={transparent} expanded={isOpened} onClick={toggle}>{context}</ExpandableButton>
             {isOpened &&
-                <Wrapper width={width}>
+                <Wrapper width={width} className={isMobile ? "mobile-mode" : ""} >
                     {item.map((items) => {
                         const { text, value, url, icon, selectedIcon, iconSelected } = items
                         const menuIcon = iconSelected ? selectedIcon : icon;
