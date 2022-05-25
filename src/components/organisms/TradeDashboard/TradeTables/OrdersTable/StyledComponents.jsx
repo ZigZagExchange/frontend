@@ -8,6 +8,7 @@ export const StyledTabMenu = styled(TabMenu)`
 `
 
 export const FooterWrapper = styled.div`
+    position: relative;
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -59,12 +60,11 @@ export const FooterContainer = styled.div`
     div > div > table {
         padding: 20px;
         max-width: 500px;
-        margin-bottom: 30px;
     }
 
     div > div> table tbody {
         display: block;
-        height: 65px;
+        // height: 65px;
         overflow: auto;
     }
 `
@@ -134,7 +134,7 @@ export const MobileWrapper = styled.div`
     }
 
     table tbody tr:last-child {
-        border-bottom: 1px solid ${({theme}) => theme.colors.foreground400};
+        border-bottom: 1px solid ${({ theme }) => theme.colors.foreground400};
     }
 
     img.loading-gif {
@@ -164,4 +164,11 @@ export const HeaderWrapper = styled.div`
 export const ActionWrapper = styled(Text)`
     text-decoration: underline;
     cursor: pointer;
+
+    &.view-account-button {
+        position: absolute;
+        left: 50%;
+        bottom: 1rem;
+        transform: translateX(-50%);
+    }
 `
