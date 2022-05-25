@@ -55,12 +55,19 @@ const IconButton = styled(baseIcon)`
     width: 24px;
     height: 24px;
     background: transparent;
-    border: 1px solid ${({ theme }) => theme.colors.foreground400};
     border-radius: 9999px;
     padding: 0px !important;
     svg {
         margin-right: 0px !important;
         margin-left: 0px !important;
+    }
+
+    &:not(.network-dropdown) {
+        border: 1px solid ${({ theme }) => theme.colors.foreground400};
+    }
+
+    &.network-dropdown path {
+        fill: ${(p) => p.theme.colors.foregroundHighEmphasis};
     }
 `
 
@@ -93,9 +100,9 @@ const Dropdown = ({ width, item, context, leftIcon, rightIcon, transparent, clic
                         const menuIcon = iconSelected ? selectedIcon : icon;
                         return (
                             <DropdownListContainer key={items.text} leftIcon={leftIcon} onClick={() => handleClick(url, text, value)}>
-                                {leftIcon && isValidElement(menuIcon) && <IconButton variant="secondary" startIcon={cloneElement(menuIcon)}></IconButton>}
+                                {leftIcon && isValidElement(menuIcon) && <IconButton className={adClass} variant="secondary" startIcon={cloneElement(menuIcon)}></IconButton>}
                                 <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis" className={!iconSelected ? "selected-icon" : ""}>{text}</Text>
-                                {rightIcon && isValidElement(menuIcon) && <IconButton variant="secondary" endIcon={cloneElement(menuIcon)}></IconButton>}
+                                {rightIcon && isValidElement(menuIcon) && <IconButton className={adClass} variant="secondary" endIcon={cloneElement(menuIcon)}></IconButton>}
                             </DropdownListContainer>
                         )
                     })}

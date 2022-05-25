@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { useHistory } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import CheckIcon from '@mui/icons-material/Check';
+
 import { userSelector } from "lib/store/features/auth/authSlice";
 import { networkSelector } from "lib/store/features/api/apiSlice";
 import api from "lib/api";
@@ -21,8 +23,8 @@ const langList = [
 ]
 
 const networkLists = [
-  { text: 'zkSync - Mainnet', value: 1, url: '#', selectedIcon: <CheckMarkCircleIcon /> },
-  { text: 'zkSync - Rinkeby', value: 1000, url: '#', selectedIcon: <CheckMarkCircleIcon /> }
+  { text: 'zkSync - Mainnet', value: 1, url: '#', selectedIcon: <CheckIcon /> },
+  { text: 'zkSync - Rinkeby', value: 1000, url: '#', selectedIcon: <CheckIcon /> }
 ]
 
 const accountLists = [
