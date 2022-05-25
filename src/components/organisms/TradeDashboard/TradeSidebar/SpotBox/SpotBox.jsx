@@ -24,7 +24,7 @@ const SpotBox = ({
   const toggleClick = (num) => setSelectedLayer(num)
   const handleTabClick = (newIndex) => {
     setIndex(newIndex);
-    if(newIndex === 0)
+    if (newIndex === 0)
       updateOrderType("limit")
     else
       updateOrderType("market")
@@ -64,7 +64,7 @@ const SpotBox = ({
       : SellForm
   }
   const isMobile = window.innerWidth < 992
-    
+
   return (
     <Wrapper isMobile={isMobile}>
       <ToggleWrapper>
@@ -76,7 +76,7 @@ const SpotBox = ({
         <Tab>Market</Tab>
       </StyledTabMenu>
       <SpotFormWrapper>
-        {renderSpotForm()}
+        {lastPrice ? renderSpotForm() : ""}
       </SpotFormWrapper>
     </Wrapper>
   );
