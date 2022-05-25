@@ -380,46 +380,48 @@ export class OrdersTable extends React.Component {
               }
 
               return (
-                <tr key={orderId}>
-                  <td data-label="Market">
-                    <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{market}</Text>
-                  </td>
-                  <td data-label="Price">
-                    <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{price.toPrecision(6) / 1}</Text>
-                  </td>
-                  <td data-label="Side">
-                    <Text font="primaryExtraSmallSemiBold" color={sideclassname}>{side}</Text>
-                  </td>
-                  <td data-label="Quantity">
-                    <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">
-                      {baseQuantity.toPrecision(6) / 1} {baseCurrency}
-                    </Text>
-                  </td>
-                  <td data-label="Remaining">
-                    <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">
-                      {remaining.toPrecision(6) / 1} {baseCurrency}
-                    </Text>
-                  </td>
-                  <td data-label="Time">
-                    <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{time}</Text>
-                  </td>
-                  <td data-label="Order Status">
-                    <Text font="primaryExtraSmallSemiBold" color={statusClass}>{statusText}</Text>
-                  </td>
-                  <td data-label="Action">
-                    {orderStatus === "o" ? (
-                      <ActionWrapper
-                        font="primaryExtraSmallSemiBold"
-                        color="primaryHighEmphasis"
-                        onClick={() => api.cancelOrder(orderId)}
-                      >
-                        Cancel
-                      </ActionWrapper>
-                    ) : (
-                      ""
-                    )}
-                  </td>
-                </tr>
+                <>
+                  <tr key={orderId}>
+                    <td data-label="Market">
+                      <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{market}</Text>
+                    </td>
+                    <td data-label="Price">
+                      <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{price.toPrecision(6) / 1}</Text>
+                    </td>
+                    <td data-label="Side">
+                      <Text font="primaryExtraSmallSemiBold" color={sideclassname}>{side}</Text>
+                    </td>
+                    <td data-label="Quantity">
+                      <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">
+                        {baseQuantity.toPrecision(6) / 1} {baseCurrency}
+                      </Text>
+                    </td>
+                    <td data-label="Remaining">
+                      <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">
+                        {remaining.toPrecision(6) / 1} {baseCurrency}
+                      </Text>
+                    </td>
+                    <td data-label="Time">
+                      <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{time}</Text>
+                    </td>
+                    <td data-label="Order Status">
+                      <Text font="primaryExtraSmallSemiBold" color={statusClass}>{statusText}</Text>
+                    </td>
+                    <td data-label="Action">
+                      {orderStatus === "o" ? (
+                        <ActionWrapper
+                          font="primaryExtraSmallSemiBold"
+                          color="primaryHighEmphasis"
+                          onClick={() => api.cancelOrder(orderId)}
+                        >
+                          Cancel
+                        </ActionWrapper>
+                      ) : (
+                        ""
+                      )}
+                    </td>
+                  </tr>
+                </>
               );
             })}
           </tbody>
