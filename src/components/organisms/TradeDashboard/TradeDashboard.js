@@ -31,6 +31,7 @@ import {
   marketQueryParam,
   networkQueryParam,
 } from "../../pages/ListPairPage/SuccessModal";
+import { areArraysEqual } from "@mui/base";
 
 const TradeContainer = styled.div`
   color: #aeaebf;
@@ -246,8 +247,7 @@ export function TradeDashboard() {
 
   orderbookAsks.sort((a, b) => b.td1 - a.td1);
   orderbookBids.sort((a, b) => b.td1 - a.td1);
-
-  const askBins = [];
+  let askBins = [];
   for (let i = 0; i < orderbookAsks.length; i++) {
     const lastAskIndex = askBins.length - 1;
     if (i === 0) {
@@ -263,21 +263,26 @@ export function TradeDashboard() {
     }
   }
 
-  const bidBins = [];
+  let temp = [];
   for (let i in orderbookBids) {
-    const lastBidIndex = bidBins.length - 1;
+    const lastBidIndex = temp.length - 1;
     if (i === "0") {
-      bidBins.push(orderbookBids[i]);
+      temp.push(orderbookBids[i]);
     } else if (
       orderbookBids[i].td1.toPrecision(6) ===
-      bidBins[lastBidIndex].td1.toPrecision(6)
+      temp[lastBidIndex].td1.toPrecision(6)
     ) {
-      bidBins[lastBidIndex].td2 += orderbookBids[i].td2;
-      bidBins[lastBidIndex].td3 += orderbookBids[i].td3;
+      temp[lastBidIndex].td2 += orderbookBids[i].td2;
+      temp[lastBidIndex].td3 += orderbookBids[i].td3;
     } else {
-      bidBins.push(orderbookBids[i]);
+      temp.push(orderbookBids[i]);
     }
   }
+  let arrayLength = askBins.length > temp.length ? temp.length : askBins.length;
+  const bidBins = temp.slice(0, arrayLength);
+  askBins = askBins.slice(0, arrayLength);
+
+  console.log("askbinds length", askBins.length, "bidbins length", bidBins.length, arrayLength);
 
   const activeOrderStatuses = ["o", "m", "b"];
   const activeUserOrders = Object.values(userOrders).filter((order) =>
