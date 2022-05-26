@@ -282,8 +282,6 @@ export function TradeDashboard() {
   const bidBins = temp.slice(0, arrayLength);
   askBins = askBins.slice(0, arrayLength);
 
-  console.log("askbinds length", askBins.length, "bidbins length", bidBins.length, arrayLength);
-
   const activeOrderStatuses = ["o", "m", "b"];
   const activeUserOrders = Object.values(userOrders).filter((order) =>
     activeOrderStatuses.includes(order[9])

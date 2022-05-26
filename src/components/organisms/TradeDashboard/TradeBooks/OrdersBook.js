@@ -21,9 +21,6 @@ const BooksWrapper = styled.div`
 `
 
 export default function OrdersBook(props) {
-  console.log("price table data is", props.priceTableData);
-  console.log("bid bins are", props.bidBins);
-
   return (
     <>
       <StyledTradeBooks>
