@@ -127,8 +127,11 @@ export const BridgeBox = styled.div`
 `;
 
 const CustomSwapButton = styled(SwapButton)`
+  position: absolute;
+  left: 50%;
   width: 34px;
   height: 34px;
+  transform: translateX(-50%);
 `
 
 const ActionWrapper = styled(Text)`
@@ -205,8 +208,8 @@ const Bridge = () => {
       transfer.type === "withdraw" &&
       api.apiProvider.eligibleFastWithdrawTokens.includes(swapDetails.currency));
   }
- 
-  useEffect(()=>{
+
+  useEffect(() => {
     setHasError(formErr && formErr.length > 0);
   }, [formErr])
 
@@ -219,12 +222,12 @@ const Bridge = () => {
     );
   }, [toNetwork, swapDetails])
 
-  useEffect(()=>{
-    if(fromNetwork.from.key === 'zksync'){    
+  useEffect(() => {
+    if (fromNetwork.from.key === 'zksync') {
       const type = transfer.type = "withdraw";
       setTransfer({ type });
     }
-    else{
+    else {
       api.getWalletBalances()
       const type = transfer.type = "deposit";
       setTransfer({ type });
@@ -236,12 +239,12 @@ const Bridge = () => {
     }
     else if (fromNetwork.from.key === 'ethereum') {
       api.getWalletBalances()
-      const currency = switchClicking? swapDetails.currency: 'ETH';
+      const currency = switchClicking ? swapDetails.currency : 'ETH';
       setSwapDetails({ amount: '', currency });
-      
+
     }
     else if (fromNetwork.from.key === 'zksync' && toNetwork.key === 'ethereum') {
-      const currency = switchClicking? swapDetails.currency: 'ETH';
+      const currency = switchClicking ? swapDetails.currency : 'ETH';
       setSwapDetails({ amount: '', currency });
     }
     else if (fromNetwork.from.key === 'zksync' && toNetwork.key === 'polygon') {
@@ -317,7 +320,7 @@ const Bridge = () => {
     }
   }, [swapDetails.currency, user.address]);
 
-  useEffect(()=>{
+  useEffect(() => {
     calculateFees();
   }, [swapDetails.amount, swapDetails.currency]);
 
@@ -335,7 +338,7 @@ const Bridge = () => {
       } else if (inputValue >= detailBalance) {
         error = "Insufficient balance";
       } else if (isFastWithdraw()) {
-        if (toNetwork.key !== 'polygon' && L1Fee !== null  && inputValue < L1Fee) {
+        if (toNetwork.key !== 'polygon' && L1Fee !== null && inputValue < L1Fee) {
           error = "Amount too small";
         }
 
@@ -390,20 +393,20 @@ const Bridge = () => {
   };
 
   const setFastWithdrawFees = async (details) => {
-    try{
+    try {
       let res = await api.withdrawL2FastGasFee(details.currency);
       setFee(details, res.amount, res.feeToken);
-    }catch(e){
+    } catch (e) {
       console.error(e);
       setL2FeeToken(null);
       setFee(details, null, null);
     }
 
-    if(toNetwork.key !== 'polygon'){
-      try{
+    if (toNetwork.key !== 'polygon') {
+      try {
         let res = await api.withdrawL2FastBridgeFee(details.currency);
         setL1Fee(res);
-      }catch(e) {
+      } catch (e) {
         console.error(e);
         setL1Fee(null);
       }
@@ -414,10 +417,10 @@ const Bridge = () => {
   };
 
   const setNormalWithdrawFees = async (details) => {
-    try{
+    try {
       let res = await api.withdrawL2GasFee(details.currency);
       setFee(details, res.amount, res.feeToken);
-    }catch(err) {
+    } catch (err) {
       console.log(err);
       setL2FeeToken(null);
       setFee(details, null, null);
@@ -444,13 +447,13 @@ const Bridge = () => {
     _setSwapDetails(details);
   }
 
-  const calculateFees = async() => {
+  const calculateFees = async () => {
     const input = parseFloat(swapDetails.amount) || 0
     if ((input > 0 && input < 0.0001) && (fromNetwork.from.key === 'polygon' || toNetwork.key === 'polygon')) {
       setFormErr("Insufficient amount");
       return;
     }
-    else if(swapDetails.amount.includes('0.000') && input === 0){
+    else if (swapDetails.amount.includes('0.000') && input === 0) {
       setFormErr("");
       return;
     }
@@ -459,10 +462,10 @@ const Bridge = () => {
 
     setGasFetching(true);
 
-    if(fromNetwork.from.key === 'polygon') {
+    if (fromNetwork.from.key === 'polygon') {
       const gasFee = await api.getPolygonFee();
-      if(gasFee){
-        setL1Fee(35000 * gasFee.fast.maxFee / 10**9);
+      if (gasFee) {
+        setL1Fee(35000 * gasFee.fast.maxFee / 10 ** 9);
         setFee(swapDetails, 0, null)
       }
     }
@@ -476,11 +479,11 @@ const Bridge = () => {
       }
     } else {
       const gasFee = await api.depositL2Fee(swapDetails.currency);
-      if(gasFee){
-        let maxFee = (gasFee.maxFeePerGas) / 10**9;
+      if (gasFee) {
+        let maxFee = (gasFee.maxFeePerGas) / 10 ** 9;
         //For deposit, ethereum gaslimit is 90000. not sure why it's not 21000. 
         // To get the close gasfee, I used 46000 for gas limit.
-        setL1Fee(46000 * maxFee / 10**9); 
+        setL1Fee(46000 * maxFee / 10 ** 9);
         setFee(swapDetails, null, null)
       }
     }
@@ -488,11 +491,11 @@ const Bridge = () => {
     setGasFetching(false);
   }
 
-  const switchTransferType = (e) => {    
-      const f = NETWORKS.find(i => i.from.key === toNetwork.key)
-      setFromNetwork(f)
-      setToNetwork(fromNetwork.from)
-      setSwitchClicking(true);
+  const switchTransferType = (e) => {
+    const f = NETWORKS.find(i => i.from.key === toNetwork.key)
+    setFromNetwork(f)
+    setToNetwork(fromNetwork.from)
+    setSwitchClicking(true);
   };
 
   const approveSpend = (e) => {
@@ -576,7 +579,7 @@ const Bridge = () => {
       .finally(() => {
         setPolygonLoading(false)
         setLoading(false);
-        setSwapDetails({amount: ''});
+        setSwapDetails({ amount: '' });
       });
   };
 
