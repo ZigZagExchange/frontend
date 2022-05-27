@@ -12,7 +12,7 @@ import logo from "assets/images/logo.png";
 import { TabMenu, Tab } from "components/molecules/TabMenu";
 import { Dropdown, AccountDropdown } from "components/molecules/Dropdown";
 import { ConnectWalletButton } from "components/molecules/Button";
-import { DiscordIcon, ExternalLinkIcon, TelegramIcon, TwitterIcon, DeleteIcon, MenuIcon, CheckMarkCircleIcon } from "components/atoms/Svg";
+import { DiscordIcon, ExternalLinkIcon, TelegramIcon, TwitterIcon, DeleteIcon, MenuIcon } from "components/atoms/Svg";
 import { toNumber } from "lodash";
 import ToggleTheme from "components/molecules/Toggle/ToggleTheme";
 import useTheme from "components/hooks/useTheme";

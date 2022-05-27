@@ -198,6 +198,7 @@ const BridgeCurrencySelector = ({ onChange, balances = {}, value, isOpenable }) 
           resetTickers();
         }}
         show={show}
+        adClass="currency-modal"
       >
         <SearchBox searchPair={(value) => setSearchValue(value)} searchValue={searchValue} className="bridge_searchbox" />
         <BridgeCurrencyOptions>
