@@ -212,10 +212,10 @@ const BridgeCurrencySelector = ({ onChange, balances = {}, value, isOpenable }) 
               return false;
             })
             .map((ticker, key) => {
-              if(ticker === value) return (<></>);
-              
+              if (ticker === value) return (<></>);
+
               const isFastWithdraw = (api.apiProvider.eligibleFastWithdrawTokens.includes(ticker));
-                
+
               return (
                 <li
                   key={key}
@@ -231,11 +231,11 @@ const BridgeCurrencySelector = ({ onChange, balances = {}, value, isOpenable }) 
                   </div>
                   <div className="currencyName">{ticker}</div>
                   <BridgeEligibleFastwithdraw>
-                    {isFastWithdraw ? 
+                    {isFastWithdraw ?
                       <Tooltip placement={"right"} label={"Available for Fast Withdrawal"}>
                         <MdOfflineBolt />
                       </Tooltip>
-                    : null}
+                      : null}
                   </BridgeEligibleFastwithdraw>
                   {balances[ticker] && (
                     <div className="currencyBalance">
