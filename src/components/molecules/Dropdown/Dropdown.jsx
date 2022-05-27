@@ -77,8 +77,6 @@ const Dropdown = ({ width, item, context, leftIcon, rightIcon, transparent, clic
 
     HideMenuOnOutsideClicked(wrapperRef, setIsOpened)
 
-    console.log("item is", item);
-
     const toggle = () => {
         setIsOpened(!isOpened)
     }

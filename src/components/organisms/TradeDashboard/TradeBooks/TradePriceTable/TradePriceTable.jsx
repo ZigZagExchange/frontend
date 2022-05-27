@@ -10,10 +10,17 @@ const Table = styled.table`
   display: flex;
   flex: auto;
   overflow: auto;
-  height: 194px;
   padding: 0px;
   flex-direction: column;
   justify-content: space-between;
+
+  &:first-type-of {
+    height: 205px;
+  }
+
+  &:last-type-of {
+    height: 181px;
+  }
 
   tbody {
     width: 100%;
@@ -90,8 +97,8 @@ const TradePriceTable = (props) => {
   const marketInfo = useSelector(marketInfoSelector);
   const ref = useRef(null)
 
-  useEffect(()=>{
-    if(!ref.current) return;
+  useEffect(() => {
+    if (!ref.current) return;
     if (props.scrollToBottom) {
       ref.current?.scrollTo(0, ref.current.scrollHeight)
     }
