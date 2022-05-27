@@ -195,7 +195,20 @@ export default class APIZKProvider extends APIProvider {
     baseAmount = baseAmount
       ? parseFloat(baseAmount).toFixed(marketInfo.baseAsset.decimals)
       : null;
-
+    console.log(
+      "market===>",
+      market,
+      "side===>",
+      side,
+      "price===>",
+      price,
+      "quoteAmount===>",
+      quoteAmount,
+      "baseAmount===>",
+      baseAmount,
+      "orderType===>",
+      orderType
+    );
     let tokenBuy,
       tokenSell,
       sellQuantity,
