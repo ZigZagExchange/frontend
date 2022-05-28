@@ -89,11 +89,13 @@ export const apiSlice = createSlice({
         if (fill[2] === state.currentMarket && fill[0] === state.network) {
           state.marketFills[fillid] = fill;
         }
-        if (
-          state.userId &&
-          (fill[8] === state.userId.toString() ||
-            fill[9] === state.userId.toString())
-        ) {
+        if (state.userId && fill[8] === state.userId.toString()) {
+          state.userFills[fillid] = fill;
+        }
+        // for maker fills we need to flip the side and set fee to 0
+        if (state.userId && fill[9] === state.userId.toString()) {
+          fill[3] = (fill[3] === "b") ? "s" : "b";
+          fill[10] = 0;
           state.userFills[fillid] = fill;
         }
       });
