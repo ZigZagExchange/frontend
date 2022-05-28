@@ -100,6 +100,7 @@ const Label = ({
       display={"flex"}
       justifyContent={rightOfLabel ? "space-between" : "inherit"}
       alignItems={"center"}
+      className="custom-form-label"
     >
       <x.div>
         {isRequired && (

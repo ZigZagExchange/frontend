@@ -26,7 +26,7 @@ const ListPage = styled.div`
   width: 100%;
   height: 100%;
   min-height: calc(100vh - 113px);
-  padding: 2rem 0;
+  padding: 4rem 0 2rem;
   background-color: ${(p) => p.theme.colors.bridgeBackground};
   background-repeat: no-repeat;
   background-size: cover;
@@ -37,15 +37,11 @@ const ListPage = styled.div`
     height: 29px;
     font-size: 12px;
   }
-
-  @media screen and (min-width: 768px) {
-    padding: 5rem 0;
-  }
 `;
 
 const ListContainer = styled.div`
   width: 100%;
-  max-width: 400px;
+  max-width: 470px;
   margin: 0 auto;
   position: relative;
   display: flex;
@@ -54,10 +50,6 @@ const ListContainer = styled.div`
 
   @media screen and (max-width: 480px) {
     padding: 0 10px;
-  }
-
-  @media screen and (min-width: 768px) {
-    transform: scale(1.2);    
   }
 `
 
@@ -162,8 +154,8 @@ export default function ListPairPage() {
               List New Pair
             </Text>
 
-            <x.div fontSize={{ xs: 'xs', md: '10px' }} lineHeight={1} color={"blue-gray-400"}>
-              <x.div>No Internal ID?</x.div>
+            <x.div fontSize={{ xs: 'xs', md: '14px' }} lineHeight={1} color={"blue-gray-400"}>
+              <x.div marginBottom="4px">No Internal ID?</x.div>
               <x.div>
                 <x.a
                   target={"_blank"}
