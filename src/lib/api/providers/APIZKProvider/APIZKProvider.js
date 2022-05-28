@@ -178,6 +178,9 @@ export default class APIZKProvider extends APIProvider {
       this.syncWallet.isSigningKeySet(),
       this.syncWallet.isCorrespondingSigningKeySet()
     ]);
+    console.log(`accountState.id ==> ${accountState.id}`)
+    console.log(`signingKeySet ==> ${signingKeySet}`)
+    console.log(`correspondigKeySet ==> ${correspondigKeySet}`)
     if (!accountState.id || !signingKeySet || !correspondigKeySet) {
       return false;
     }
