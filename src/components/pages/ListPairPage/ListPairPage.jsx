@@ -37,6 +37,10 @@ const ListPage = styled.div`
     height: 29px;
     font-size: 12px;
   }
+
+  @media screen and (min-width: 768px) {
+    padding: 5rem 0;
+  }
 `;
 
 const ListContainer = styled.div`
@@ -50,6 +54,10 @@ const ListContainer = styled.div`
 
   @media screen and (max-width: 480px) {
     padding: 0 10px;
+  }
+
+  @media screen and (min-width: 768px) {
+    transform: scale(1.2);    
   }
 `
 
