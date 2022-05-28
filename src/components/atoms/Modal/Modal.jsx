@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import { CSSTransition } from "react-transition-group";
 import styled from 'styled-components';
 import "./Modal.css";
+import Text from 'components/atoms/Text/Text'
 
 const ModalWrapper = styled.div`
   &.currency-modal {
@@ -18,7 +19,24 @@ const ModalWrapper = styled.div`
     .zig_modal_body {
       background: ${({ theme }) => theme.colors.backgroundHighEmphasis};
     }
+
+    .bridge_searchbox input {
+      background: ${({ theme }) => theme.colors.backgroundHighEmphasis};
+      color: ${({ theme }) => theme.colors.foregroundHighEmphasis};
+      border: 1px solid ${({ theme }) => theme.colors.foreground400};
+    }
+
+    .zig_modal_body ul li {
+      background: ${({ theme }) => theme.colors.backgroundHighEmphasis};
+      border: 1px solid ${({ theme }) => theme.colors.foreground400};
+      color: ${({ theme }) => theme.colors.foregroundHighEmphasis};
+    }
   }
+`
+const Divider = styled.div`
+  height: 1px;
+  background: ${({ theme }) => theme.colors.foreground400};
+  margin-top: 20px;
 `
 
 export const Modal = (props) => {
@@ -44,7 +62,9 @@ export const Modal = (props) => {
       <div className="zig_modal" onClick={props.onClose}>
         <ModalWrapper className={`zig_modal_content  ${props.adClass}`} onClick={(e) => e.stopPropagation()}>
           <div className="zig_modal_header">
-            <h4 className="zig_modal_title">{props.title}</h4>
+            <Text font='primaryHeading6' color="foregroundHighEmphasis">{props.title}</Text>
+
+            <Divider />
           </div>
           <div className="zig_modal_body zig_scrollstyle">{props.children}</div>
         </ModalWrapper>
