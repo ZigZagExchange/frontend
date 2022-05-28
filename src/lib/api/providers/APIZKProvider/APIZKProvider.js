@@ -178,9 +178,6 @@ export default class APIZKProvider extends APIProvider {
       this.syncWallet.isSigningKeySet(),
       this.syncWallet.isCorrespondingSigningKeySet()
     ]);
-    console.log(`accountState.id ==> ${accountState.id}`)
-    console.log(`signingKeySet ==> ${signingKeySet}`)
-    console.log(`correspondigKeySet ==> ${correspondigKeySet}`)
     if (!accountState.id || !signingKeySet || !correspondigKeySet) {
       return false;
     }
@@ -625,7 +622,7 @@ export default class APIZKProvider extends APIProvider {
       this.api.getAccountState(),
       this.checkAccountActivated()
     ]);
-    if (!accountActivated) {
+    if (!accountState.id) {
       const walletBalance = formatAmount(accountState.committed.balances['ETH'], { decimals: 18 });
       const activationFee = await this.changePubKeyFee('ETH');
 
@@ -646,7 +643,9 @@ export default class APIZKProvider extends APIProvider {
         );
       }
     } else {
-      await this.changePubKey();
+      if(!accountActivated) {
+        await this.changePubKey();
+      }
     }
 
     return accountState;
