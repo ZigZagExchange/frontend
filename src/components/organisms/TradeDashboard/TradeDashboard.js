@@ -41,7 +41,7 @@ const TradeContainer = styled.div`
 
 const TradeGrid = styled.article`
   display: grid;
-  grid-template-rows: 75px 498px 212px 57px;
+  grid-template-rows: 75px 498px 1fr 57px;
   grid-template-columns: 300px 253.5px 253.5px 1fr;
   grid-template-areas:
     "marketSelector marketSelector marketSelector marketSelector"
@@ -52,7 +52,7 @@ const TradeGrid = styled.article`
   gap: 0px;
 
   @media screen and (max-width: 991px) {
-    grid-template-rows: 74px 410px 427px 508px 362px 111px;
+    grid-template-rows: 74px 410px 427px 508px 362px 1fr;
     grid-template-columns: 1fr 1fr;
     grid-template-areas:
       "marketSelector marketSelector"

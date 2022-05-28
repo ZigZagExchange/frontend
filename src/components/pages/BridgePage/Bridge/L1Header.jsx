@@ -65,7 +65,7 @@ const L1Header = ({ networks, onSelect, selectedNetwork }) => {
   return (
     <div className="bridge_coin_details">
       <Dropdown overlay={dropdownMenu} overlayClassName="bridge_menu"
-        minOverlayWidthMatchTrigger={false} align={100, 100} alignPoint={false}>
+        minOverlayWidthMatchTrigger={false} align={[100, 100]} alignPoint={false}>
         <div className="d-flex align-items-center">
           <div className="bridge_coin_image">
             <img alt="Ethereum logo" src={selectedNetwork.from.icon} />
