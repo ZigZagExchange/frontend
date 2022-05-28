@@ -72,7 +72,7 @@ export const FooterContainer = styled.div`
 export const LaptopWrapper = styled.div`
     tbody {
         display: block;
-        height: 111px;
+        height: 100%; // 111px;
         overflow: overlay;
 
         ::-webkit-scrollbar {
