@@ -85,7 +85,7 @@ const SpotBox = ({
 export default SpotBox;
 
 const Wrapper = styled.div`
-  display: grid;
+  // display: grid;
   grid-auto-flow: row;
   background-color: ${({ theme }) => theme.colors.backgroundMediumEmphasis};
   height: ${({ isMobile }) => isMobile ? '427px' : '398px'};
