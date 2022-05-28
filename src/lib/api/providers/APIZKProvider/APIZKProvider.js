@@ -168,6 +168,22 @@ export default class APIZKProvider extends APIProvider {
     return signingKey;
   };
 
+  checkAccountActivated = async () => {
+    const [
+      accountState,
+      signingKeySet,
+      correspondigKeySet
+    ] = await Promise.all([
+      this.getAccountState(),
+      this.syncWallet.isSigningKeySet(),
+      this.syncWallet.isCorrespondingSigningKeySet()
+    ]);
+    if (!accountState.id || !signingKeySet || !correspondigKeySet) {
+      return false;
+    }
+    return true;
+  }
+
   submitOrder = async (
     market,
     side,
@@ -176,8 +192,8 @@ export default class APIZKProvider extends APIProvider {
     quoteAmount,
     orderType
   ) => {
-    const accountState = await this.getAccountState();
-    if (!accountState.id) {
+    const accountActivated = await this.checkAccountActivated();
+    if (!accountActivated) {
       toast.error(
         "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
         {
@@ -599,8 +615,14 @@ export default class APIZKProvider extends APIProvider {
       this.syncWallet
     );
 
-    const accountState = await this.api.getAccountState();
-    if (!accountState.id) {
+    const [
+      accountState,
+      accountActivated
+    ] = await Promise.all([
+      this.api.getAccountState(),
+      this.checkAccountActivated()
+    ]);
+    if (!accountActivated) {
       const walletBalance = formatAmount(accountState.committed.balances['ETH'], { decimals: 18 });
       const activationFee = await this.changePubKeyFee('ETH');
 
@@ -621,10 +643,7 @@ export default class APIZKProvider extends APIProvider {
         );
       }
     } else {
-      const signingKeySet = await this.syncWallet.isSigningKeySet();
-      if (!signingKeySet) {
-        await this.changePubKey();
-      }
+      await this.changePubKey();
     }
 
     return accountState;
