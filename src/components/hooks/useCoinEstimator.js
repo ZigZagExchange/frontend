@@ -13,7 +13,7 @@ export function useCoinEstimator() {
 
   return useMemo(() => {
     let priceArray = {};
-    const remaining = Object.keys(pairPrices);
+    const remaining = Object.keys(pairPrices).filter((token) => !stables.includes(token));
     Object.keys(pairPrices).forEach((pair) => {
       const [base, quote] = pair.split("-").map((s) => s.toUpperCase());
       // add prices form stable pairs
@@ -51,17 +51,6 @@ export function useCoinEstimator() {
           priceArray[base] = arr;
         } else {
           priceArray[base] = [pairPrice]
-        }
-      }
-      
-      if (base in prices) {
-        const pairPrice = 1 / (pairPrices[pair].price * prices[base]);
-        if (quote in priceArray) {
-          const arr = priceArray[quote];
-          arr.push(pairPrice);
-          priceArray[quote] = arr;
-        } else {
-          priceArray[quote] = [pairPrice]
         }
       }
     });
