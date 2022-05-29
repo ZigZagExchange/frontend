@@ -39,6 +39,7 @@ export function useCoinEstimator() {
       prices[token] = sum / priceArray[token].length;
     });
 
+    // add prices from other pairs
     priceArray = {};
     remaining.forEach((pair) => {
       const [base, quote] = pair.split("-").map((s) => s.toUpperCase());
