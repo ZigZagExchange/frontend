@@ -1,4 +1,4 @@
-export const stables = ["USDC", "USDT", "DAI", "FRAX", "UST"];
+export const stables = ["USDC", "USDT", "DAI", "FRAX"];
 
 export function getStables(rows) {
   var found_stables = [];
