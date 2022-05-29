@@ -21,49 +21,49 @@ const ToggleItem = styled.li`
     padding-bottom: ${({ size }) => size === 'sm' ? '4px' : '8px'};
     // padding-left: ${({ type }) => type === 'option' ? '16px' : '40.5px'};
     // padding-right: ${({ type }) => type === 'option' ? '16px' : '40.5px'};
-    box-shadow: ${({ theme, show }) =>  show ? theme.colors.gradientBtnBoxShadow : 'unset'};
+    box-shadow: ${({ theme, show }) => show ? theme.colors.gradientBtnBoxShadow : 'unset'};
     text-align: center;
     text-transform: uppercase;
     user-select: none;
     cursor: pointer;
-    background: ${({ show, theme, type, leftLabel, rightLabel }) => show && type === 'option' ? 
-    `linear-gradient(93.46deg, ${theme.colors.primaryHighEmphasis} 16.94%, ${theme.colors.secondaryHighEmphasis} 97.24%)` : 
-    show && leftLabel === 'BUY' ? theme.colors.successHighEmphasis :
-    show && rightLabel === 'SELL' ? theme.colors.dangerHighEmphasis :
-    'transparent'};
+    background: ${({ show, theme, type, leftLabel, rightLabel }) => show && type === 'option' ?
+        `linear-gradient(93.46deg, ${theme.colors.primaryHighEmphasis} 16.94%, ${theme.colors.secondaryHighEmphasis} 97.24%)` :
+        show && leftLabel === 'BUY' ? theme.colors.successHighEmphasis :
+            show && rightLabel === 'SELL' ? theme.colors.dangerHighEmphasis :
+                'transparent'};
 `;
 
-const ToggleButton = ({...props}) => {
-  const {type, leftLabel, size, width, rightLabel, selectedLayer=1, toggleClick = () => {}} = props
+const ToggleButton = ({ ...props }) => {
+    const { type, leftLabel, size, width, rightLabel, selectedLayer = 1, toggleClick = () => { } } = props
 
-  return (
-    <ToggleButtonWrapper {...props}>
-        <ToggleItem
-            onClick={() => toggleClick(1)}
-            show={selectedLayer === 1}
-            type={type}
-            size={size}
-            width={width}
-            leftLabel={leftLabel}
-        >
-            <Text font="primaryBoldDisplay" color={selectedLayer === 1 && leftLabel === 'BUY' ? 'backgroundMediumEmphasis' : 'foregroundHighEmphasis'} textAlign="center">
-            {leftLabel}
-            </Text>
-        </ToggleItem>
-        <ToggleItem
-            onClick={() => toggleClick(2)}
-            show={selectedLayer === 2}
-            type={type}
-            size={size}
-            width={width}
-            rightLabel={rightLabel}
-        >
-            <Text font="primaryBoldDisplay" color="foregroundHighEmphasis" textAlign="center">
-            {rightLabel}
-            </Text>
-        </ToggleItem>
-    </ToggleButtonWrapper>
-  );
+    return (
+        <ToggleButtonWrapper {...props}>
+            <ToggleItem
+                onClick={() => toggleClick(1)}
+                show={selectedLayer === 1}
+                type={type}
+                size={size}
+                width={width}
+                leftLabel={leftLabel}
+            >
+                <Text font="primaryBoldDisplay" color={selectedLayer === 1 && leftLabel === 'BUY' ? 'backgroundMediumEmphasis' : 'foregroundHighEmphasis'} textAlign="center">
+                    {leftLabel}
+                </Text>
+            </ToggleItem>
+            <ToggleItem
+                onClick={() => toggleClick(2)}
+                show={selectedLayer === 2}
+                type={type}
+                size={size}
+                width={width}
+                rightLabel={rightLabel}
+            >
+                <Text font="primaryBoldDisplay" color="foregroundHighEmphasis" textAlign="center">
+                    {rightLabel}
+                </Text>
+            </ToggleItem>
+        </ToggleButtonWrapper>
+    );
 };
 
 export default ToggleButton;

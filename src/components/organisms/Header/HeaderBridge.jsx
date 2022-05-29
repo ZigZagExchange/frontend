@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { useHistory } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import CheckIcon from '@mui/icons-material/Check';
+
 import { userSelector } from "lib/store/features/auth/authSlice";
 import { networkSelector } from "lib/store/features/api/apiSlice";
 import api from "lib/api";
@@ -21,8 +23,8 @@ const langList = [
 ]
 
 const networkLists = [
-  { text: 'zkSync - Mainnet', value: 1, url: '#' },
-  { text: 'zkSync - Rinkeby', value: 1000, url: '#' }
+  { text: 'zkSync - Mainnet', value: 1, url: '#', selectedIcon: <CheckIcon /> },
+  { text: 'zkSync - Rinkeby', value: 1000, url: '#', selectedIcon: <CheckIcon /> }
 ]
 
 const accountLists = [
@@ -38,10 +40,11 @@ export const HeaderBridge = (props) => {
   const hasBridge = api.isImplemented("depositL2");
   const history = useHistory();
   const [index, setIndex] = useState(0);
-  const [language, setLanguage] = useState(langList[0].text)
-  const [account, setAccount] = useState(accountLists[0].text)
-  const [networkName, setNetworkName] = useState('')
-  const { isDark, toggleTheme } = useTheme()
+  const [language, setLanguage] = useState(langList[0].text);
+  const [account, setAccount] = useState(accountLists[0].text);
+  const [networkName, setNetworkName] = useState('');
+  const [networkItems, setNetWorkItems] = useState(networkLists);
+  const { isDark, toggleTheme } = useTheme();
 
   useEffect(() => {
     const netName = networkLists.filter((item, i) => {
@@ -49,6 +52,17 @@ export const HeaderBridge = (props) => {
     })
     setNetworkName(netName[0].text)
   })
+
+  useEffect(() => {
+    let temp = networkItems.reduce((acc, item) => {
+      if (item.text === networkName) item["iconSelected"] = true;
+      else item["iconSelected"] = false;
+      acc.push(item);
+      return acc;
+    }, []);
+
+    setNetWorkItems(temp);
+  }, [networkName])
 
 
   useEffect(() => {
@@ -65,8 +79,8 @@ export const HeaderBridge = (props) => {
   }
 
   const changeNetwork = (text, value) => {
-    setNetworkName(text)
-    console.log("networkid: ", value)
+    setNetworkName(text);
+
     api.setAPIProvider(value);
     api.refreshNetwork().catch((err) => {
       console.log(err);
@@ -170,13 +184,13 @@ export const HeaderBridge = (props) => {
               </SocialWrapper>
               <VerticalDivider />
               <LanguageWrapper>
-                <StyledDropdown transparent item={langList} context={language} clickFunction={changeLanguage} />
+                <StyledDropdown adClass="lang-dropdown" transparent item={langList} context={language} clickFunction={changeLanguage} />
                 <ToggleTheme isDark={isDark} toggleTheme={toggleTheme} />
               </LanguageWrapper>
               <VerticalDivider />
               {user.id && user.address ? (
                 <>
-                  <Dropdown width={162} item={networkLists} context={networkName} clickFunction={changeNetwork} />
+                  <Dropdown adClass="network-dropdown" width={162} item={networkItems} context={networkName} clickFunction={changeNetwork} leftIcon={true} />
                   <AccountDropdown />
                 </>
               ) : (
@@ -190,7 +204,7 @@ export const HeaderBridge = (props) => {
           <SideMenuWrapper>
             {
               user.id && user.address ?
-                <Dropdown style={{ justifySelf: 'center' }} width={242} item={networkLists} context={networkName} clickFunction={changeNetwork} /> :
+                <Dropdown adClass="network-dropdown" isMobile={true} style={{ justifySelf: 'center' }} width={242} item={networkItems} context={networkName} clickFunction={changeNetwork} leftIcon={true} /> :
                 <></>
             }
             <TabMenu row activeIndex={index} onItemClick={handleClick}>
@@ -202,7 +216,7 @@ export const HeaderBridge = (props) => {
             <HorizontalDivider />
             <ActionSideMenuWrapper>
               <span>Language: </span>
-              <StyledDropdown transparent item={langList} context={language} clickFunction={changeLanguage} />
+              <StyledDropdown adClass="lang-dropdown" transparent item={langList} context={language} clickFunction={changeLanguage} />
             </ActionSideMenuWrapper>
             <ActionSideMenuWrapper>
               <span>Theme: </span>

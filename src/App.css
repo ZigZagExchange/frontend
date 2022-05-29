@@ -141,3 +141,7 @@ html {
 .select-input {
   appearance: none;
 }
+
+.Toastify__toast-container{
+  width: 400px;
+}

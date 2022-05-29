@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { useHistory } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import CheckIcon from '@mui/icons-material/Check';
+
 import { userSelector } from "lib/store/features/auth/authSlice";
 import { networkSelector } from "lib/store/features/api/apiSlice";
 import api from "lib/api";
@@ -14,21 +16,20 @@ import { DiscordIcon, ExternalLinkIcon, TelegramIcon, TwitterIcon, DeleteIcon, M
 import { toNumber } from "lodash";
 import ToggleTheme from "components/molecules/Toggle/ToggleTheme";
 import useTheme from "components/hooks/useTheme";
-import { formatAmount } from "../../../lib/utils";
 
 const langList = [
-  {text:'EN',url:'#'},
-  {text:'FR',url:'#'}
+  { text: 'EN', url: '#' },
+  { text: 'FR', url: '#' }
 ]
 
 const networkLists = [
-  {text:'zkSync - Mainnet', value: 1, url:'#'},
-  {text:'zkSync - Rinkeby', value: 1000, url:'#'}
+  { text: 'zkSync - Mainnet', value: 1, url: '#', selectedIcon: <CheckIcon /> },
+  { text: 'zkSync - Rinkeby', value: 1000, url: '#', selectedIcon: <CheckIcon /> }
 ]
 
 const accountLists = [
-  {text:'0x83AD...83H4',url:'#', icon: <DeleteIcon />},
-  {text:'0x12BV...b89G',url:'#', icon: <DeleteIcon />}
+  { text: '0x83AD...83H4', url: '#', icon: <DeleteIcon /> },
+  { text: '0x12BV...b89G', url: '#', icon: <DeleteIcon /> }
 ]
 
 export const Header = (props) => {
@@ -39,10 +40,11 @@ export const Header = (props) => {
   const hasBridge = api.isImplemented("depositL2");
   const history = useHistory();
   const [index, setIndex] = useState(0);
-  const [language, setLanguage] = useState(langList[0].text)
-  const [account, setAccount] = useState(accountLists[0].text)
-  const [networkName, setNetworkName] = useState('')
-  const { isDark, toggleTheme } = useTheme()
+  const [language, setLanguage] = useState(langList[0].text);
+  const [account, setAccount] = useState(accountLists[0].text);
+  const [networkName, setNetworkName] = useState('');
+  const [networkItems, setNetWorkItems] = useState(networkLists);
+  const { isDark, toggleTheme } = useTheme();
 
   useEffect(() => {
     const netName = networkLists.filter((item, i) => {
@@ -51,10 +53,21 @@ export const Header = (props) => {
     setNetworkName(netName[0].text)
   })
 
+  useEffect(() => {
+    let temp = networkItems.reduce((acc, item) => {
+      if (item.text === networkName) item["iconSelected"] = true;
+      else item["iconSelected"] = false;
+      acc.push(item);
+      return acc;
+    }, []);
+
+    setNetWorkItems(temp);
+  }, [networkName])
+
 
   useEffect(() => {
     const tabIndex = localStorage.getItem("tab_index")
-    if(tabIndex !== null) setIndex(toNumber(tabIndex))
+    if (tabIndex !== null) setIndex(toNumber(tabIndex))
   }, [])
 
   const changeLanguage = (text) => {
@@ -66,8 +79,8 @@ export const Header = (props) => {
   }
 
   const changeNetwork = (text, value) => {
-    setNetworkName(text)
-    console.log("networkid: ", value)
+    setNetworkName(text);
+
     api.setAPIProvider(value);
     api.refreshNetwork().catch((err) => {
       console.log(err);
@@ -110,43 +123,107 @@ export const Header = (props) => {
     <HeaderWrapper isMobile={isMobile}>
       {
         isMobile ?
-        <>
-          <LogoWrapper>
-            <Link to="/">
-              <a href="/" rel="noreferrer">
-                <img src={logo} alt="logo" height="32" />
-              </a>
-            </Link>
-          </LogoWrapper>
-          <ButtonWrapper>
-            {user.id && user.address ? ( 
-              <>
-                <AccountDropdown notext />
-              </>
-            ) : (
-              <ConnectWalletButton />
-            )}
-            <MenuButtonWrapper>
-              <MenuIcon onClick={() => setShow(!show)} />
-            </MenuButtonWrapper>
-          </ButtonWrapper>
-        </> :
-        <>
-          <NavWrapper>
-            <Link to="/">
-              <a href="/" rel="noreferrer">
-                <img src={logo} alt="logo" height="32" />
-              </a>
-            </Link>
-            <TabMenu activeIndex={index} onItemClick={handleClick} style={{paddingTop: '20px'}}>
+          <>
+            <LogoWrapper>
+              <Link to="/">
+                <a href="/" rel="noreferrer">
+                  <img src={logo} alt="logo" height="32" />
+                </a>
+              </Link>
+            </LogoWrapper>
+            <ButtonWrapper>
+              {user.id && user.address ? (
+                <>
+                  <AccountDropdown notext />
+                </>
+              ) : (
+                <ConnectWalletButton />
+              )}
+              <MenuButtonWrapper>
+                <MenuIcon onClick={() => setShow(!show)} />
+              </MenuButtonWrapper>
+            </ButtonWrapper>
+          </> :
+          <>
+            <NavWrapper>
+              <Link to="/">
+                <a href="/" rel="noreferrer">
+                  <img src={logo} alt="logo" height="32" />
+                </a>
+              </Link>
+              <TabMenu activeIndex={index} onItemClick={handleClick} style={{ paddingTop: '20px' }}>
+                <Tab>TRADE</Tab>
+                {hasBridge && (<Tab>BRIDGE</Tab>)}
+                <Tab>LIST PAIR</Tab>
+                {hasBridge && (<Tab>DOCS<ExternalLinkIcon size={12} /></Tab>)}
+              </TabMenu>
+            </NavWrapper>
+            <ActionsWrapper>
+              <SocialWrapper>
+                <SocialLink
+                  target="_blank"
+                  rel="noreferrer"
+                  href="https://discord.gg/zigzag"
+                >
+                  <DiscordIcon />
+                </SocialLink>
+                <SocialLink
+                  target="_blank"
+                  rel="noreferrer"
+                  href="https://twitter.com/ZigZagExchange"
+                >
+                  <TwitterIcon />
+                </SocialLink>
+                <SocialLink
+                  target="_blank"
+                  rel="noreferrer"
+                  href="https://t.me/zigzagexchange"
+                >
+                  <TelegramIcon />
+                </SocialLink>
+              </SocialWrapper>
+              <VerticalDivider />
+              <LanguageWrapper>
+                <StyledDropdown adClass="lang-dropdown" transparent item={langList} context={language} clickFunction={changeLanguage} />
+                <ToggleTheme isDark={isDark} toggleTheme={toggleTheme} />
+              </LanguageWrapper>
+              <VerticalDivider />
+              {user.id && user.address ? (
+                <>
+                  <Dropdown adClass="network-dropdown" width={162} item={networkItems} context={networkName} clickFunction={changeNetwork} leftIcon={true} />
+                  <AccountDropdown />
+                </>
+              ) : (
+                <ConnectWalletButton />
+              )}
+            </ActionsWrapper>
+          </>
+      }
+      {
+        show && isMobile ?
+          <SideMenuWrapper>
+            {
+              user.id && user.address ?
+                <Dropdown adClass="network-dropdown" isMobile={true} style={{ justifySelf: 'center' }} width={242} item={networkItems} context={networkName} clickFunction={changeNetwork} leftIcon={true} /> :
+                <></>
+            }
+            <TabMenu row activeIndex={index} onItemClick={handleClick}>
               <Tab>TRADE</Tab>
-              { hasBridge && (<Tab>BRIDGE</Tab>)}
+              {hasBridge && (<Tab>BRIDGE</Tab>)}
               <Tab>LIST PAIR</Tab>
-              { hasBridge && (<Tab>DOCS<ExternalLinkIcon size={12} /></Tab>)}
+              {hasBridge && (<Tab>DOCS<ExternalLinkIcon size={12} /></Tab>)}
             </TabMenu>
-          </NavWrapper>
-          <ActionsWrapper>
-            <SocialWrapper>
+            <HorizontalDivider />
+            <ActionSideMenuWrapper>
+              <span>Language: </span>
+              <StyledDropdown adClass="lang-dropdown" transparent item={langList} context={language} clickFunction={changeLanguage} />
+            </ActionSideMenuWrapper>
+            <ActionSideMenuWrapper>
+              <span>Theme: </span>
+              <ToggleTheme isDark={isDark} toggleTheme={toggleTheme} />
+            </ActionSideMenuWrapper>
+            <HorizontalDivider />
+            <SocialWrapper style={{ justifySelf: 'center' }}>
               <SocialLink
                 target="_blank"
                 rel="noreferrer"
@@ -169,72 +246,8 @@ export const Header = (props) => {
                 <TelegramIcon />
               </SocialLink>
             </SocialWrapper>
-            <VerticalDivider />
-            <LanguageWrapper>
-              <StyledDropdown transparent item={langList} context={language} clickFunction={changeLanguage}/>
-              <ToggleTheme isDark={isDark} toggleTheme={toggleTheme} />
-            </LanguageWrapper>
-            <VerticalDivider />
-            {user.id && user.address ? ( 
-              <>
-                <Dropdown width={162} item={networkLists} context={networkName} clickFunction={changeNetwork}/>
-                <AccountDropdown />
-              </>
-            ) : (
-              <ConnectWalletButton />
-            )}
-          </ActionsWrapper>
-        </>
-      }
-      {
-        show && isMobile ? 
-        <SideMenuWrapper>
-          {
-          user.id && user.address ? 
-          <Dropdown style={{justifySelf: 'center'}} width={242} item={networkLists} context={networkName} clickFunction={changeNetwork}/> : 
+          </SideMenuWrapper> :
           <></>
-          }
-          <TabMenu row activeIndex={index} onItemClick={handleClick}>
-            <Tab>TRADE</Tab>
-            { hasBridge && (<Tab>BRIDGE</Tab>)}
-            <Tab>LIST PAIR</Tab>
-            { hasBridge && (<Tab>DOCS<ExternalLinkIcon size={12} /></Tab>)}
-          </TabMenu>
-          <HorizontalDivider />
-          <ActionSideMenuWrapper>
-            <span>Language: </span>
-            <StyledDropdown transparent item={langList} context={language} clickFunction={changeLanguage}/>
-          </ActionSideMenuWrapper>
-          <ActionSideMenuWrapper>
-            <span>Theme: </span>
-            <ToggleTheme isDark={isDark} toggleTheme={toggleTheme} />
-          </ActionSideMenuWrapper>
-          <HorizontalDivider />
-          <SocialWrapper style={{justifySelf: 'center'}}>
-            <SocialLink
-              target="_blank"
-              rel="noreferrer"
-              href="https://discord.gg/zigzag"
-            >
-              <DiscordIcon />
-            </SocialLink>
-            <SocialLink
-              target="_blank"
-              rel="noreferrer"
-              href="https://twitter.com/ZigZagExchange"
-            >
-              <TwitterIcon />
-            </SocialLink>
-            <SocialLink
-              target="_blank"
-              rel="noreferrer"
-              href="https://t.me/zigzagexchange"
-            >
-              <TelegramIcon />
-            </SocialLink>
-          </SocialWrapper>
-        </SideMenuWrapper> :
-        <></>
       }
     </HeaderWrapper>
   );
@@ -245,14 +258,14 @@ const HeaderWrapper = styled.div`
   grid-auto-flow: column;
   width: 100%;
   height: 56px;
-  border-bottom: 1px solid ${({theme}) => theme.colors.foreground400};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.foreground400};
   align-items: center;
-  background-color: ${({theme}) => theme.colors.backgroundHighEmphasis};
+  background-color: ${({ theme }) => theme.colors.backgroundHighEmphasis};
   position: fixed;
   padding: 0px 20px;
   z-index: 100;
-  box-shadow: ${({isMobile}) => isMobile? '0px 8px 16px 0px #0101011A' : ''};
-  ${({isMobile}) => isMobile? 'backdrop-filter: blur(8px);' : ''}
+  box-shadow: ${({ isMobile }) => isMobile ? '0px 8px 16px 0px #0101011A' : ''};
+  ${({ isMobile }) => isMobile ? 'backdrop-filter: blur(8px);' : ''}
 `
 
 const LogoWrapper = styled.div`
@@ -300,18 +313,19 @@ const LanguageWrapper = styled.div`
 
 const SocialLink = styled.a`
   svg path {
-    fill: ${({theme}) => theme.colors.foregroundLowEmphasis};
+    fill: ${({ theme }) => theme.colors.foregroundLowEmphasis};
   }
 `
 
 const StyledDropdown = styled(Dropdown)`
-  width: fit-content;
+  padding: 16px 0px 16px 16px;
+  width: auto;
 `
 
 const VerticalDivider = styled.div`
   width: 1px;
   height: 32px;
-  background-color: ${({theme}) => theme.colors.foreground400};
+  background-color: ${({ theme }) => theme.colors.foreground400};
 `
 
 const SideMenuWrapper = styled.div`
@@ -320,20 +334,20 @@ const SideMenuWrapper = styled.div`
   top: 0;
   left: 0;
   height: 100vh;
-  background: ${({theme}) => theme.colors.backgroundLowEmphasis};
+  background: ${({ theme }) => theme.colors.backgroundLowEmphasis};
   z-index: 9999;
   display: grid;
   grid-auto-flow: row;
   justify-content: center;
   align-items: center;
-  border: 1px solid ${({theme}) => theme.colors.foreground400};
+  border: 1px solid ${({ theme }) => theme.colors.foreground400};
   backdrop-filter: blur(8px);
 `
 
 const HorizontalDivider = styled.div`
   width: 229px;
   height: 1px;
-  background: ${({theme}) => theme.colors.foreground400};
+  background: ${({ theme }) => theme.colors.foreground400};
 `
 
 const ActionSideMenuWrapper = styled.div`

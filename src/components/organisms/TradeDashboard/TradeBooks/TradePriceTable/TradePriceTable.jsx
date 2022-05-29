@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
 import useTheme from "components/hooks/useTheme";
@@ -10,10 +10,17 @@ const Table = styled.table`
   display: flex;
   flex: auto;
   overflow: auto;
-  height: 194px;
   padding: 0px;
   flex-direction: column;
   justify-content: space-between;
+
+  &:first-type-of {
+    height: 205px;
+  }
+
+  &:last-type-of {
+    height: 181px;
+  }
 
   tbody {
     width: 100%;
@@ -89,10 +96,14 @@ const TradePriceTable = (props) => {
   const { theme } = useTheme()
   const marketInfo = useSelector(marketInfoSelector);
   const ref = useRef(null)
+  const [isUpdateScroll, setUpdateScroll] = useState(false);
 
   useEffect(()=>{
     if(!ref.current) return;
+    if(props.priceTableData.length === 0) setUpdateScroll(false);
     if (props.scrollToBottom) {
+      if(isUpdateScroll) return;
+      setUpdateScroll(true);
       ref.current?.scrollTo(0, ref.current.scrollHeight)
     }
   }, [props.priceTableData.length])
