@@ -168,6 +168,19 @@ export default class APIZKProvider extends APIProvider {
     return signingKey;
   };
 
+  checkAccountActivated = async () => {
+    const [
+      accountState,
+      signingKeySet,
+      correspondigKeySet
+    ] = await Promise.all([
+      this.getAccountState(),
+      this.syncWallet.isSigningKeySet(),
+      this.syncWallet.isCorrespondingSigningKeySet()
+    ]);
+    return (accountState.id && signingKeySet && correspondigKeySet);
+  }
+
   submitOrder = async (
     market,
     side,
@@ -176,6 +189,19 @@ export default class APIZKProvider extends APIProvider {
     quoteAmount,
     orderType
   ) => {
+    const accountActivated = await this.checkAccountActivated();
+    if (!accountActivated) {
+      toast.error(
+        "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
+        {
+          autoClose: 60000
+        },
+        {
+          toastId: "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
+        }
+      );
+      return;
+    }
     const marketInfo = this.marketInfo[market];
 
     if (!APIZKProvider.VALID_SIDES.includes(side)) {
@@ -586,32 +612,35 @@ export default class APIZKProvider extends APIProvider {
       this.syncWallet
     );
 
-    const accountState = await this.api.getAccountState();
+    const [
+      accountState,
+      accountActivated
+    ] = await Promise.all([
+      this.api.getAccountState(),
+      this.checkAccountActivated()
+    ]);
     if (!accountState.id) {
       const walletBalance = formatAmount(accountState.committed.balances['ETH'], { decimals: 18 });
       const activationFee = await this.changePubKeyFee('ETH');
 
-      if (!/^\/bridge(\/.*)?$/.test(window.location.pathname)){
-        if(isNaN(walletBalance) || walletBalance < activationFee) {
-          toast.error(
-            "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
-            {
-              autoClose: 60000
-            }
-          );
-        }
-        else {
-          toast.error(
-            "Your zkSync account is not activated. Please activate your zkSync wallet.",
-            {
-              autoClose: false
-            }
-          );
-        }
+      if(isNaN(walletBalance) || walletBalance < activationFee) {
+        toast.error(
+          "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
+          {
+            autoClose: 60000
+          }
+        );
+      }
+      else {
+        toast.error(
+          "Your zkSync account is not activated. Please activate your zkSync wallet.",
+          {
+            autoClose: false
+          }
+        );
       }
     } else {
-      const signingKeySet = await this.syncWallet.isSigningKeySet();
-      if (!signingKeySet) {
+      if(!accountActivated) {
         await this.changePubKey();
       }
     }

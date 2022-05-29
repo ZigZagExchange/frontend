@@ -862,14 +862,11 @@ export class OrdersTable extends React.Component {
       case 2:
         if (this.props.user.committed) {
           const balancesContent = Object.keys(
-            this.props.user.committed.balances
+            this.props.wallet
           )
             .sort()
             .map((token) => {
-              const currencyInfo = api.getCurrencyInfo(token);
-              if (!currencyInfo) return "";
-              let balance = this.props.user.committed.balances[token];
-              balance = parseInt(balance) / Math.pow(10, currencyInfo.decimals);
+              const balance = this.props.wallet[token].valueReadable;
               return (
                 <tr>
                   <td data-label="Token"><Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{token}</Text></td>

@@ -139,7 +139,7 @@ const ActionWrapper = styled(Text)`
     cursor: pointer;
 `
 
-const Bridge = () => {
+const Bridge = (props) => {
   const user = useSelector(userSelector);
   const balanceData = useSelector(balancesSelector);
   const [loading, setLoading] = useState(false);
@@ -311,7 +311,6 @@ const Bridge = () => {
     // update changePubKeyFee fee if needed
     if (
       user.address &&
-      !user.id &&
       api.apiProvider?.zksyncCompatible
     ) {
       const usdFee = await api.apiProvider.changePubKeyFee();
@@ -331,7 +330,7 @@ const Bridge = () => {
 
     let error = null;
     if (inputValue > 0) {
-      if (inputValue <= activationFee) {
+      if (!user.id && inputValue <= activationFee) {
         error = `Must be more than ${activationFee} ${swapCurrency}`
       } else if (L2Fee !== null && inputValue < L2Fee) {
         error = "Amount too small";
@@ -526,7 +525,8 @@ const Bridge = () => {
     let deferredXfer;
     setLoading(true);
     if (fromNetwork.from.key === "polygon" && toNetwork.key === "zksync") {
-      setPolygonLoading(true)
+      setPolygonLoading(true);
+      props.setLoading(true)
       deferredXfer = api.transferPolygonWeth(`${swapDetails.amount}`, user.address)
       toast.info(
         renderGuidContent(),
@@ -578,6 +578,7 @@ const Bridge = () => {
       })
       .finally(() => {
         setPolygonLoading(false)
+        props.setLoading(false)
         setLoading(false);
         setSwapDetails({ amount: '' });
       });
