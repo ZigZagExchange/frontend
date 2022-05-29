@@ -126,15 +126,15 @@ export class OrdersTable extends React.Component {
                   break;
                 case "o":
                   statusText = "open";
-                  statusClass = "success500";
+                  statusClass = "successHighEmphasis";
                   break;
                 case "c":
                   statusText = "canceled";
-                  statusClass = "danger500";
+                  statusClass = "dangerHighEmphasis";
                   break;
                 case "e":
                   statusText = "expired";
-                  statusClass = "warning500";
+                  statusClass = "warningHighEmphasis";
                   break;
                 default:
                   break;
@@ -365,15 +365,15 @@ export class OrdersTable extends React.Component {
                   break;
                 case "o":
                   statusText = "open";
-                  statusClass = "success500";
+                  statusClass = "successHighEmphasis";
                   break;
                 case "c":
                   statusText = "canceled";
-                  statusClass = "danger500";
+                  statusClass = "dangerHighEmphasis";
                   break;
                 case "e":
                   statusText = "expired";
-                  statusClass = "warning500";
+                  statusClass = "warningHighEmphasis";
                   break;
                 default:
                   break;
@@ -536,15 +536,15 @@ export class OrdersTable extends React.Component {
                   break;
                 case "o":
                   statusText = "open";
-                  statusClass = "success500";
+                  statusClass = "successHighEmphasis";
                   break;
                 case "c":
                   statusText = "canceled";
-                  statusClass = "danger500";
+                  statusClass = "dangerHighEmphasis";
                   break;
                 case "e":
                   statusText = "expired";
-                  statusClass = "warning500";
+                  statusClass = "warningHighEmphasis";
                   break;
                 default:
                   break;
@@ -777,15 +777,15 @@ export class OrdersTable extends React.Component {
                   break;
                 case "o":
                   statusText = "open";
-                  statusClass = "success500";
+                  statusClass = "successHighEmphasis";
                   break;
                 case "c":
                   statusText = "canceled";
-                  statusClass = "danger500";
+                  statusClass = "dangerHighEmphasis";
                   break;
                 case "e":
                   statusText = "expired";
-                  statusClass = "warning500";
+                  statusClass = "warningHighEmphasis";
                   break;
                 default:
                   break;
