@@ -275,10 +275,7 @@ export const apiSlice = createSlice({
     },
     _orders(state, { payload }) {
       const orders = payload[0]
-        .filter(
-          (order) =>
-            order[2] === state.currentMarket && order[0] === state.network
-        )
+        .filter((order) => order[0] === state.network)
         .reduce((res, order) => {
           res[order[1]] = order;
           return res;
