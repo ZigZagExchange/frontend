@@ -53,6 +53,17 @@ export function useCoinEstimator() {
           priceArray[base] = [pairPrice]
         }
       }
+      
+      if (base in prices) {
+        const pairPrice = 1 / (pairPrices[pair].price * prices[base]);
+        if (quote in priceArray) {
+          const arr = priceArray[quote];
+          arr.push(pairPrice);
+          priceArray[quote] = arr;
+        } else {
+          priceArray[quote] = [pairPrice]
+        }
+      }
     });
 
     // get mid price of all pairs found with other pair
