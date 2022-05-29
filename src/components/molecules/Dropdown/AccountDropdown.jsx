@@ -206,14 +206,14 @@ const AccountDropdown = ({ notext }) => {
       <AccountButton notext={notext} expanded={isOpened} onClick={toggle}></AccountButton>
       {isOpened &&
         <DropdownDisplay isMobile={isMobile}>
-          <DropdownHeader>
+          {/* <DropdownHeader>
             <Dropdown width={242} item={accountData} rightIcon context="0x83AD...83H4" clickFunction={clickItem} />
             <IconButtonWrapper>
               <IconButton variant="secondary" startIcon={<PlusIcon />}></IconButton>
               <IconButton variant="secondary" startIcon={<CompareArrowIcon />}></IconButton>
             </IconButtonWrapper>
           </DropdownHeader>
-          <Divider />
+          <Divider /> */}
           <DropdownHeader>
             <div>
               <Text font="primaryTiny" color="foregroundMediumEmphasis">TOTAL BALANCE</Text>
