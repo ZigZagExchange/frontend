@@ -106,7 +106,7 @@ const Bridge = (props) => {
       transfer.type === "withdraw" &&
       api.apiProvider.eligibleFastWithdrawTokens.includes(swapDetails.currency));
   }
- 
+
   useEffect(()=>{
     setHasError(formErr && formErr.length > 0);
   }, [formErr])
@@ -171,7 +171,6 @@ const Bridge = (props) => {
       return;
     }
 
-
     const swapAmountBN = ethersUtils.parseUnits(
       isSwapAmountEmpty ? '0.0' : swapDetails.amount,
       _swapCurrencyInfo?.decimals
@@ -192,6 +191,7 @@ const Bridge = (props) => {
 
   useEffect(() => {
     calculateFees();
+
     if (withdrawSpeed === "normal") {
       setL1Fee(null);
     }
@@ -199,11 +199,12 @@ const Bridge = (props) => {
 
   useEffect(async () => {
     if (
-      !api.apiProvider.eligibleFastWithdrawTokens?.includes(swapDetails.currency)
+        fromNetwork.from.key === 'zksync' && toNetwork.key === 'ethereum'
+        && api.apiProvider.eligibleFastWithdrawTokens?.includes(swapDetails.currency)
     ) {
-      setWithdrawSpeed("normal");
-    } else {
       setWithdrawSpeed("fast");
+    } else {
+      setWithdrawSpeed("normal");
     }
 
     // update changePubKeyFee fee if needed
@@ -215,9 +216,9 @@ const Bridge = (props) => {
       setUsdFee(usdFee);
       setActivationFee((usdFee / currencyValue).toFixed(5));
     }
-  }, [swapDetails.currency, user.address]);
+  }, [fromNetwork, toNetwork, swapDetails.currency, user.address]);
 
-  useEffect(()=>{
+  useEffect(() => {
     calculateFees();
   }, [swapDetails.amount, swapDetails.currency]);
 
