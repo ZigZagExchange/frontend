@@ -9,12 +9,11 @@ import TradeChartArea from "./TradeChartArea/TradeChartArea";
 import OrdersBook from "./TradeBooks/OrdersBook";
 import TradesBook from "./TradeBooks/TradesBook";
 import "react-toastify/dist/ReactToastify.css";
-
+import { toast } from "react-toastify";
 import {
   networkSelector,
   userOrdersSelector,
   userFillsSelector,
-  allOrdersSelector,
   marketFillsSelector,
   lastPricesSelector,
   marketSummarySelector,
@@ -23,6 +22,8 @@ import {
   marketInfoSelector,
   setCurrentMarket,
   resetData,
+  layoutSelector,
+  balancesSelector,
 } from "lib/store/features/api/apiSlice";
 import { userSelector } from "lib/store/features/auth/authSlice";
 import api from "lib/api";
@@ -32,6 +33,7 @@ import {
   marketQueryParam,
   networkQueryParam,
 } from "../../pages/ListPairPage/SuccessModal";
+import { areArraysEqual } from "@mui/base";
 
 const TradeContainer = styled.div`
   color: #aeaebf;
@@ -41,7 +43,7 @@ const TradeContainer = styled.div`
 
 const TradeGrid = styled.article`
   display: grid;
-  grid-template-rows: 75px 498px 212px 57px;
+  grid-template-rows: 75px 498px 1fr 57px;
   grid-template-columns: 300px 253.5px 253.5px 1fr;
   grid-template-areas:
     "marketSelector marketSelector marketSelector marketSelector"
@@ -52,7 +54,7 @@ const TradeGrid = styled.article`
   gap: 0px;
 
   @media screen and (max-width: 991px) {
-    grid-template-rows: 74px 410px 427px 508px 362px 111px;
+    grid-template-rows: 74px 410px 427px 508px 362px 1fr;
     grid-template-columns: 1fr 1fr;
     grid-template-areas:
       "marketSelector marketSelector"
@@ -79,12 +81,13 @@ export function TradeDashboard() {
   const currentMarket = useSelector(currentMarketSelector);
   const userOrders = useSelector(userOrdersSelector);
   const userFills = useSelector(userFillsSelector);
-  const allOrders = useSelector(allOrdersSelector);
   const marketFills = useSelector(marketFillsSelector);
   const lastPrices = useSelector(lastPricesSelector);
   const marketSummary = useSelector(marketSummarySelector);
   const liquidity = useSelector(liquiditySelector);
+  const layout = useSelector(layoutSelector);
   const marketInfo = useSelector(marketInfoSelector);
+  const balanceData = useSelector(balancesSelector);
   const dispatch = useDispatch();
   const lastPriceTableData = [];
   const markets = [];
@@ -95,6 +98,8 @@ export function TradeDashboard() {
   const updateMarketChain = (market) => {
     dispatch(setCurrentMarket(market));
   };
+
+  const wallet = balanceData[network];
 
   useEffect(() => {
     const urlParams = new URLSearchParams(search);
@@ -108,6 +113,7 @@ export function TradeDashboard() {
       api.setAPIProvider(chainid);
       api.signOut();
     }
+    api.getWalletBalances();
   }, []);
 
   // Update URL when market or network update
@@ -122,6 +128,16 @@ export function TradeDashboard() {
   }, [network, currentMarket]);
 
   useEffect(() => {
+    if(user.address && !user.id){
+      console.log('here')
+      history.push("/bridge");
+      toast.error(
+        "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
+        {
+          autoClose: 60000
+        }
+      );
+    }
     const sub = () => {
       dispatch(resetData());
       api.subscribeToMarket(currentMarket);
@@ -170,41 +186,6 @@ export function TradeDashboard() {
   const orderbookBids = [];
   const orderbookAsks = [];
 
-  for (let orderid in allOrders) {
-    const order = allOrders[orderid];
-    const side = order[3];
-    const price = order[4];
-    const remaining = isNaN(Number(order[11])) ? order[5] : order[11];
-    const remainingQuote = remaining * price;
-    const orderStatus = order[9];
-
-    const orderWithoutFee = api.getOrderDetailsWithoutFee(order);
-    let orderRow;
-    if (api.isZksyncChain())
-      orderRow = {
-        td1: orderWithoutFee.price,
-        td2: orderWithoutFee.baseQuantity,
-        td3: orderWithoutFee.quoteQuantity,
-        side,
-        order: order,
-      };
-    else {
-      orderRow = {
-        td1: price,
-        td2: remaining,
-        td3: remainingQuote,
-        side,
-        order: order,
-      };
-    }
-
-    if (side === "b" && ["o", "pm", "pf"].includes(orderStatus)) {
-      orderbookBids.push(orderRow);
-    } else if (side === "s" && ["o", "pm", "pf"].includes(orderStatus)) {
-      orderbookAsks.push(orderRow);
-    }
-  }
-
   // Only display recent trades
   // There's a bunch of user trades in this list that are too old to display
   const fillData = [];
@@ -220,35 +201,32 @@ export function TradeDashboard() {
         side: fill[3],
       });
     });
-
-  if (api.isZksyncChain()) {
-    liquidity.forEach((liq) => {
-      const side = liq[0];
-      const price = liq[1];
-      const quantity = liq[2];
-      if (side === "b") {
-        orderbookBids.push({
-          td1: price,
-          td2: quantity,
-          td3: price * quantity,
-          side: "b",
-        });
-      }
-      if (side === "s") {
-        orderbookAsks.push({
-          td1: price,
-          td2: quantity,
-          td3: price * quantity,
-          side: "s",
-        });
-      }
-    });
-  }
+  
+  liquidity.forEach((liq) => {
+    const side = liq[0];
+    const price = liq[1];
+    const quantity = liq[2];
+    if (side === "b") {
+      orderbookBids.push({
+        td1: price,
+        td2: quantity,
+        td3: price * quantity,
+        side: "b",
+      });
+    }
+    if (side === "s") {
+      orderbookAsks.push({
+        td1: price,
+        td2: quantity,
+        td3: price * quantity,
+        side: "s",
+      });
+    }
+  });
 
   orderbookAsks.sort((a, b) => b.td1 - a.td1);
   orderbookBids.sort((a, b) => b.td1 - a.td1);
-
-  const askBins = [];
+  let askBins = [];
   for (let i = 0; i < orderbookAsks.length; i++) {
     const lastAskIndex = askBins.length - 1;
     if (i === 0) {
@@ -264,21 +242,24 @@ export function TradeDashboard() {
     }
   }
 
-  const bidBins = [];
+  let temp = [];
   for (let i in orderbookBids) {
-    const lastBidIndex = bidBins.length - 1;
+    const lastBidIndex = temp.length - 1;
     if (i === "0") {
-      bidBins.push(orderbookBids[i]);
+      temp.push(orderbookBids[i]);
     } else if (
       orderbookBids[i].td1.toPrecision(6) ===
-      bidBins[lastBidIndex].td1.toPrecision(6)
+      temp[lastBidIndex].td1.toPrecision(6)
     ) {
-      bidBins[lastBidIndex].td2 += orderbookBids[i].td2;
-      bidBins[lastBidIndex].td3 += orderbookBids[i].td3;
+      temp[lastBidIndex].td2 += orderbookBids[i].td2;
+      temp[lastBidIndex].td3 += orderbookBids[i].td3;
     } else {
-      bidBins.push(orderbookBids[i]);
+      temp.push(orderbookBids[i]);
     }
   }
+  let arrayLength = askBins.length > temp.length ? temp.length : askBins.length;
+  const bidBins = temp.slice(0, arrayLength);
+  askBins = askBins.slice(0, arrayLength);
 
   const activeOrderStatuses = ["o", "m", "b"];
   const activeUserOrders = Object.values(userOrders).filter((order) =>
@@ -287,7 +268,7 @@ export function TradeDashboard() {
 
   return (
     <TradeContainer>
-      <TradeGrid>
+      <TradeGrid layout={layout}>
         <TradeMarketSelector
           updateMarketChain={updateMarketChain}
           marketSummary={marketSummary}
@@ -324,6 +305,8 @@ export function TradeDashboard() {
           userFills={userFills}
           userOrders={userOrders}
           user={user}
+          marketInfo={marketInfo}
+          wallet={wallet}
         />
         <TradeFooter />
       </TradeGrid>

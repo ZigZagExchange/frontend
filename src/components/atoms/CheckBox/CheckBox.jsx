@@ -73,11 +73,11 @@ const CheckBox = ({ ...props }) => {
 
   return (
     <Wrapper {...props}>
-      { labelLeft && <ChildWrapper Size={Size} labelRight={labelRight}><Text font="primarySmall" color="foregroundHighEmphasis" mr="11px">{children}</Text></ChildWrapper>}
+      {labelLeft && <ChildWrapper Size={Size} labelRight={labelRight}><Text font="primarySmall" color="foregroundHighEmphasis" mr="11px">{children}</Text></ChildWrapper>}
       <Container State={_state} Size={Size} onClick={handleClick}>
         {getCheckIcon()}
       </Container>
-      { (labelRight || (!labelLeft && !labelRight)) && <ChildWrapper Size={Size} labelRight={labelRight}><Text font="primarySmall" color="foregroundHighEmphasis" ml="11px">{children}</Text></ChildWrapper>}
+      {(labelRight || (!labelLeft && !labelRight)) && <ChildWrapper Size={Size} labelRight={labelRight}><Text font="primarySmall" color="foregroundHighEmphasis" ml="11px">{children}</Text></ChildWrapper>}
     </Wrapper>
   )
 }

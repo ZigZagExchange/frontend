@@ -79,6 +79,7 @@ const TableContent = styled.div`
 
       ::-webkit-scrollbar {
           width: 5px;
+          height: 5px;
           position: relative;
           z-index: 20;
       }

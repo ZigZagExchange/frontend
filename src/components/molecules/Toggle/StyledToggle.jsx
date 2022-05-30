@@ -26,9 +26,9 @@ const scaleKeyValues = {
 }
 const getScale =
   (property) =>
-  ({ scale = scales.MD }) => {
-    return scaleKeyValues[scale][property]
-  }
+    ({ scale = scales.MD }) => {
+      return scaleKeyValues[scale][property]
+    }
 
 export const ToggleWrapper = styled.div`
   display: flex;
@@ -38,11 +38,11 @@ export const ToggleWrapper = styled.div`
 `
 
 export const Handle = styled.div`
-  background: ${({ theme, isChecked }) => !isChecked ? theme.colors.foregroundHighEmphasis : theme.colors.primaryHighEmphasis};
+  background: ${({ theme, isChecked }) => !isChecked ? theme.colors.foreground500 : theme.colors.primaryHighEmphasis};
   border-radius: 50%;
   cursor: pointer;
   height: ${getScale('handleWidth')};
-  left: ${({ isChecked }) => !isChecked ?  '0px' : getScale('checkedLeft')};
+  left: ${({ isChecked }) => !isChecked ? '0px' : getScale('checkedLeft')};
   top: ${getScale('handleTop')};
   position: absolute;
   transition: left 200ms ease-in;

@@ -25,6 +25,18 @@ const ListPairContainer = styled.div`
   padding: 1rem 18px;
   border: 1px solid ${(p) => p.theme.colors.foreground400};
   border-radius: 8px;
+
+  .custom-form-label {
+    margin-bottom: 5px;
+  }
+
+  form {
+    display: flex;
+    padding: 3vh 18px;
+    min-height: 50vh;
+    flex-direction: column;
+    justify-content: space-between;
+  }
 `
 
 const ListPairForm = ({
@@ -148,7 +160,7 @@ const ListPairForm = ({
               block
               {...model(baseAssetId, setBaseAssetId)}
               label={
-                <x.span fontSize={{ xs: 'xs', md: '10px' }} col>
+                <x.span fontSize={{ xs: 'xs', md: '14px' }} col>
                   Base Asset{" "}
                   <x.a
                     color={{ _: "blue-gray-500", hover: "teal-200" }}
@@ -184,7 +196,7 @@ const ListPairForm = ({
               block
               {...model(quoteAssetId, setQuoteAssetId)}
               label={
-                <x.span fontSize={{ xs: 'xs', md: '10px' }}>
+                <x.span fontSize={{ xs: 'xs', md: '14px' }}>
                   Quote Asset{" "}
                   <x.a
                     color={{ _: "blue-gray-500", hover: "teal-200" }}
@@ -222,8 +234,8 @@ const ListPairForm = ({
               borderRadius={8}
               {...model(baseFee, setBaseFee)}
               label={baseSymbol ?
-                <x.span fontSize={{ xs: 'xs', md: '10px' }}>`${baseSymbol} Swap Fee`</x.span> :
-                <x.span fontSize={{ xs: 'xs', md: '10px' }}>Base Swap Fee</x.span>}
+                <x.span fontSize={{ xs: 'xs', md: '14px' }}>`${baseSymbol} Swap Fee`</x.span> :
+                <x.span fontSize={{ xs: 'xs', md: '14px' }}>Base Swap Fee</x.span>}
               validate={[required, min(0)]}
               rightOfLabel={
                 <QuestionHelper text="Swap fee collected by market makers">
@@ -239,8 +251,8 @@ const ListPairForm = ({
               borderRadius={8}
               name={"quoteFee"}
               {...model(quoteFee, setQuoteFee)}
-              label={quoteSymbol ? <x.span fontSize={{ xs: 'xs', md: '10px' }}>`${quoteSymbol} Swap Fee`</x.span> :
-                <x.span fontSize={{ xs: 'xs', md: '10px' }}>Quote Swap Fee</x.span>}
+              label={quoteSymbol ? <x.span fontSize={{ xs: 'xs', md: '14px' }}>`${quoteSymbol} Swap Fee`</x.span> :
+                <x.span fontSize={{ xs: 'xs', md: '14px' }}>Quote Swap Fee</x.span>}
               validate={[required, min(0)]}
               rightOfLabel={
                 <QuestionHelper text="Swap fee collected by market makers">
@@ -254,7 +266,7 @@ const ListPairForm = ({
             fontSize={14}
             borderRadius={8}
             name={"pricePrecisionDecimals"}
-            label={<x.span fontSize={{ xs: 'xs', md: '10px' }}>Price Precision Decimals</x.span>}
+            label={<x.span fontSize={{ xs: 'xs', md: '14px' }}>Price Precision Decimals</x.span>}
             validate={[required, max(10), min(0)]}
             rightOfLabel={
               <QuestionHelper text={
@@ -275,12 +287,12 @@ const ListPairForm = ({
             }
           />
           <SelectInput
-            fontSize={10}
+            fontSize={14}
             padding={5}
             borderRadius={8}
             {...model(zigZagChainId, setZigZagChainId)}
             name={"zigzagChainId"}
-            label={<x.span fontSize={{ xs: 'xs', md: '10px' }}>Network</x.span>}
+            label={<x.span fontSize={{ xs: 'xs', md: '14px' }}>Network</x.span>}
             items={[
               { name: "zkSync - Mainnet", id: 1 },
               { name: "zkSync - Rinkeby", id: 1000 },
@@ -307,7 +319,7 @@ const ListPairForm = ({
             alignItems={"center"}
             mb={21}
           >
-            <Toggle scale="md" font="primaryTiny" leftLabel="Advanced Settings" onChange={() => setShowAdvancedSettings(!showAdvancedSettings)} />
+            <Toggle scale="md" font="primarySmall" leftLabel="Advanced Settings" onChange={() => setShowAdvancedSettings(!showAdvancedSettings)} />
           </x.div>
           {showAdvancedSettings && (
             <>
@@ -325,7 +337,7 @@ const ListPairForm = ({
                   padding={5}
                   borderRadius={8}
                   name={TRADING_VIEW_CHART_KEY}
-                  label={<x.span fontSize={{ xs: 'xs', md: '10px' }}>Default Chart Ticker</x.span>}
+                  label={<x.span fontSize={{ xs: 'xs', md: '14px' }}>Default Chart Ticker</x.span>}
                   rightOfLabel={
                     <QuestionHelper text={
                       <div>

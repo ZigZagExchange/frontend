@@ -10,7 +10,7 @@ const StyledTradeBooks = styled.section`
   flex-direction: row;
   justify-content: space-between;
   padding: 21px 10px 12px 20px;
-  border-top: 1px solid ${({theme}) => theme.colors.foreground400};
+  border-top: 1px solid ${({ theme }) => theme.colors.foreground400};
 `;
 
 const BooksWrapper = styled.div`
@@ -21,30 +21,29 @@ const BooksWrapper = styled.div`
 `
 
 export default function OrdersBook(props) {
-
   return (
     <>
       <StyledTradeBooks>
-          <BooksWrapper>
-            <Text font="primaryTitleDisplay" color="foregroundHighEmphasis">Order Book</Text>
-            <TradePriceTable
-              head
-              className="trade_table_asks"
-              useGradient="true"
-              priceTableData={props.priceTableData}
-              currentMarket={props.currentMarket}
-              scrollToBottom={true}
-            />
-            <TradePriceHeadSecond 
-              lastPrice={props.lastPrice}
-              marketInfo={props.marketInfo}
-           />
-            <TradePriceTable
-              useGradient="true"
-              currentMarket={props.currentMarket}
-              priceTableData={props.bidBins}
-            />
-          </BooksWrapper>
+        <BooksWrapper>
+          <Text font="primaryTitleDisplay" color="foregroundHighEmphasis">Order Book</Text>
+          <TradePriceTable
+            head
+            className="trade_table_asks"
+            useGradient="true"
+            priceTableData={props.priceTableData}
+            currentMarket={props.currentMarket}
+            scrollToBottom={true}
+          />
+          <TradePriceHeadSecond
+            lastPrice={props.lastPrice}
+            marketInfo={props.marketInfo}
+          />
+          <TradePriceTable
+            useGradient="true"
+            currentMarket={props.currentMarket}
+            priceTableData={props.bidBins}
+          />
+        </BooksWrapper>
       </StyledTradeBooks>
     </>
   );

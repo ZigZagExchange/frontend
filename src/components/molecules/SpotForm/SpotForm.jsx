@@ -17,7 +17,7 @@ export class SpotForm extends React.Component {
     super(props);
     this.state = {
       userHasEditedPrice: false,
-      price: "",
+      price: props.lastPrice,
       baseAmount: "",
       quoteAmount: "",
       orderButtonDisabled: false,
@@ -35,7 +35,7 @@ export class SpotForm extends React.Component {
   increasePrice(e) {
     e.preventDefault()
     const newState = { ...this.state };
-    newState.price = (Number(this.state.price)+1).toString();
+    newState.price = (Number(this.state.price) + 1).toString();
     newState.userHasEditedPrice = true;
     this.setState(newState);
   }
@@ -43,7 +43,7 @@ export class SpotForm extends React.Component {
   decreasePrice(e) {
     e.preventDefault()
     const newState = { ...this.state };
-    newState.price = Number(this.state.price)-1 < 0 ? '0' : (Number(this.state.price)-1).toString();
+    newState.price = Number(this.state.price) - 1 < 0 ? '0' : (Number(this.state.price) - 1).toString();
     newState.userHasEditedPrice = true;
     this.setState(newState);
   }
@@ -58,7 +58,7 @@ export class SpotForm extends React.Component {
   increaseAmount(e) {
     e.preventDefault()
     const newState = { ...this.state };
-    newState.baseAmount = (Number(this.state.baseAmount)+1).toString();
+    newState.baseAmount = (Number(this.state.baseAmount) + 1).toString();
     newState.quoteAmount = "";
     this.setState(newState);
   }
@@ -66,7 +66,7 @@ export class SpotForm extends React.Component {
   decreaseAmount(e) {
     e.preventDefault()
     const newState = { ...this.state };
-    newState.baseAmount = Number(this.state.baseAmount)-1 < 0 ? '0' : (Number(this.state.baseAmount)-1).toString();
+    newState.baseAmount = Number(this.state.baseAmount) - 1 < 0 ? '0' : (Number(this.state.baseAmount) - 1).toString();
     newState.quoteAmount = "";
     newState.maxSizeSelected = false;
     this.setState(newState);
@@ -308,7 +308,6 @@ export class SpotForm extends React.Component {
         this.props.orderType
       );
     } catch (e) {
-      console.log(e);
       toast.error(e.message);
     }
 
@@ -482,19 +481,19 @@ export class SpotForm extends React.Component {
     }
 
     const balance1Html = (
-        <Text font="primaryExtraSmallSemiBold" color="foregroundMediumEmphasis" textAlign="right">
-          {quoteBalance.toPrecision(8)}{" "}
-          {marketInfo && marketInfo.quoteAsset?.symbol}
-        </Text>
-      );
+      <Text font="primaryExtraSmallSemiBold" color="foregroundMediumEmphasis" textAlign="right">
+        {quoteBalance.toPrecision(8)}{" "}
+        {marketInfo && marketInfo.quoteAsset?.symbol}
+      </Text>
+    );
 
-    
+
     const balance2Html = (
-        <Text font="primaryExtraSmallSemiBold" color="foregroundMediumEmphasis" textAlign="right">
-          {baseBalance.toPrecision(8)}{" "}
-          {marketInfo && marketInfo.baseAsset?.symbol}
-        </Text>
-      );
+      <Text font="primaryExtraSmallSemiBold" color="foregroundMediumEmphasis" textAlign="right">
+        {baseBalance.toPrecision(8)}{" "}
+        {marketInfo && marketInfo.baseAsset?.symbol}
+      </Text>
+    );
 
     let buttonText, feeAmount, buttonType;
     if (this.props.side === "b") {
@@ -504,7 +503,7 @@ export class SpotForm extends React.Component {
         <FormHeader>
           <InfoWrapper>
             <Text font="primaryTiny" color="foregroundMediumEmphasis">Buy Fee</Text>
-            <QuestionHelper text={this.showLabel()}/>
+            <QuestionHelper text={this.showLabel()} />
           </InfoWrapper>
           <Text font="primaryExtraSmallSemiBold" color="foregroundMediumEmphasis">
             {marketInfo && marketInfo.quoteFee &&
@@ -520,7 +519,7 @@ export class SpotForm extends React.Component {
         <FormHeader>
           <InfoWrapper>
             <Text font="primaryTiny" color="foregroundMediumEmphasis">Sell Fee</Text>
-            <QuestionHelper text={this.showLabel()}/>
+            <QuestionHelper text={this.showLabel()} />
           </InfoWrapper>
           <Text font="primaryExtraSmallSemiBold" color="foregroundMediumEmphasis">
             {marketInfo && marketInfo.baseFee &&
@@ -536,8 +535,8 @@ export class SpotForm extends React.Component {
         <StyledForm>
           <InputBox>
             <IconButton variant="secondary" startIcon={<MinusIcon />} disabled={this.priceIsDisabled()} onClick={this.decreasePrice.bind(this)}></IconButton>
-            <InputField 
-              type="text" 
+            <InputField
+              type="text"
               pattern="\d+(?:[.,]\d+)?"
               placeholder={`Price (${marketInfo && marketInfo.quoteAsset?.symbol})`}
               value={
@@ -555,8 +554,8 @@ export class SpotForm extends React.Component {
           </InputBox>
           <InputBox>
             <IconButton variant="secondary" startIcon={<MinusIcon />} onClick={this.decreaseAmount.bind(this)}></IconButton>
-            <InputField 
-              type="text" 
+            <InputField
+              type="text"
               pattern="\d+(?:[.,]\d+)?"
               placeholder={`Amount (${marketInfo && marketInfo.baseAsset?.symbol})`}
               value={this.state.baseAmount}
@@ -581,13 +580,13 @@ export class SpotForm extends React.Component {
           </FormHeader>
           <InputBox>
             {/* <IconButton variant="secondary" startIcon={<MinusIcon />}></IconButton> */}
-            <InputField 
-              type="text" 
+            <InputField
+              type="text"
               placeholder={`Total (${marketInfo && marketInfo.quoteAsset?.symbol})`}
               value={
-                this.props.orderType === "limit" ? 
-                (this.currentPrice() * this.state.baseAmount).toPrecision(6) + ' ' + (marketInfo && marketInfo.quoteAsset?.symbol) :
-                (this.props.marketSummary.price * this.state.baseAmount).toPrecision(6) + ' ' + (marketInfo && marketInfo.quoteAsset?.symbol)
+                this.props.orderType === "limit" ?
+                  (this.currentPrice() * this.state.baseAmount).toPrecision(6) + ' ' + (marketInfo && marketInfo.quoteAsset?.symbol) :
+                  (this.props.marketSummary.price * this.state.baseAmount).toPrecision(6) + ' ' + (marketInfo && marketInfo.quoteAsset?.symbol)
               }
               disabled
             />
@@ -597,14 +596,14 @@ export class SpotForm extends React.Component {
           {feeAmount}
           {this.props.user.id ? (
             <div className="">
-              <Button 
-                variant={buttonType.toLowerCase()} 
-                width="100%" 
+              <Button
+                variant={buttonType.toLowerCase()}
+                width="100%"
                 scale="imd"
-                disabled={this.state.orderButtonDisabled} 
+                disabled={this.state.orderButtonDisabled}
                 onClick={this.buySellHandler.bind(this)}
               >
-              {buttonText}
+                {buttonText}
               </Button>
             </div>
           ) : (

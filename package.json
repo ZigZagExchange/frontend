@@ -7,9 +7,14 @@
     "@babel/core": "7.12.3",
     "@babel/plugin-proposal-nullish-coalescing-operator": "^7.16.0",
     "@download/blockies": "^1.0.3",
-    "@headlessui/react": "^1.6.1",
+    "@emotion/react": "^11.9.0",
+    "@emotion/styled": "^11.8.1",
+    "@headlessui/react": "^1.6.4",
     "@heroicons/react": "^1.0.6",
     "@material-ui/core": "^4.12.3",
+    "@material-ui/icons": "^4.11.3",
+    "@mui/icons-material": "^5.8.0",
+    "@mui/material": "^5.8.1",
     "@pmmmwh/react-refresh-webpack-plugin": "0.4.3",
     "@reach/portal": "^0.17.0",
     "@reduxjs/toolkit": "^1.6.2",
@@ -113,7 +118,7 @@
     "webpack-manifest-plugin": "2.2.0",
     "workbox-webpack-plugin": "5.1.4",
     "ws": "^8.2.2",
-    "zksync": "^0.12.0-alpha.6"
+    "zksync": "^0.12.1"
   },
   "scripts": {
     "analyze": "source-map-explorer 'build/static/js/*.js'",
