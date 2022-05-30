@@ -537,7 +537,7 @@ const Bridge = (props) => {
               <span>~${formatUSD(estimatedValue)}</span>
             </div>
             {(
-              swapDetails.currency !== "ETH" &&
+              swapDetails.currency !== "ETH" && fromNetwork.from.key !== "polygon" &&
               (swapCurrencyInfo?.decimals ? swapDetails.amount * 10 ** swapCurrencyInfo?.decimals : 0) > allowance
             ) ? (
               <div className="bridge_coin_stat">
