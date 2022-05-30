@@ -27,6 +27,7 @@ import {
   resetData,
 } from "lib/store/features/api/apiSlice";
 import { formatPrice } from "lib/utils";
+import { LoadingSpinner } from "components/atoms/LoadingSpinner";
 
 export default function SwapPage() {
   // const isSwapCompatible = useMemo(
@@ -52,6 +53,7 @@ export default function SwapPage() {
   const [sellToken, setSellToken] = useState();
   const [buyToken, setBuyToken] = useState();
   const [basePrice, setBasePrice] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   const [sellAmounts, setSellAmounts] = useState(0);
   const [buyAmounts, setBuyAmounts] = useState(0);
@@ -68,12 +70,14 @@ export default function SwapPage() {
   );
 
   useEffect(() => {
+    setLoading(true);
     const timer = setInterval(() => {
       setSellTokenList(api.getCurrencies());
       setGetPairs(api.getPairs());
     }, 500);
     if (sellTokenList.length > 0) {
       clearInterval(timer);
+      setLoading(false);
     }
     return () => {
       clearInterval(timer);
@@ -375,56 +379,70 @@ export default function SwapPage() {
     }
   };
 
+  const onClickMax = () => {
+    const balance = balances[sellToken?.name]?.valueReadable;
+    const fees = tType === "sell" ? marketInfo?.baseFee : marketInfo?.quoteFee;
+    console.log(balance, fees);
+    if (balance && fees) {
+      const s_amounts = balance - fees;
+      setSellAmounts(s_amounts);
+    }
+  };
+
   return (
     <DefaultTemplate>
-      <div className={classNames("flex justify-center", { dark: isDark })}>
-        <div>
-          <p className="mt-8 text-3xl font-semibold ">Quick DEX Swap</p>
-          <p className="mt-2 text-sm text-gray-500">
-            Swap into more than 200 tokens, using the best quotes from over 8
-            sources.
-          </p>
-          <Link
-            to="/"
-            className="flex items-center mt-1 dark:hover:text-foreground-700 dark:text-foreground-900 text-background-900 hover:text-background-800"
-          >
-            <p className="mr-2">Learn More</p>
-            <ExternalLinkIcon size={11} />
-          </Link>
-          <div className="flex items-center justify-between mt-4">
-            <p>Network</p>
-            <InfoIcon size={16} />
+      {loading &&  <div className={classNames("flex justify-center align-center mt-48", { dark: isDark })}><LoadingSpinner /></div>}
+      {!loading && (
+        <div className={classNames("flex justify-center", { dark: isDark })}>
+          <div>
+            <p className="mt-8 text-3xl font-semibold ">Quick DEX Swap</p>
+            <p className="mt-2 text-sm text-gray-500">
+              Swap into more than 200 tokens, using the best quotes from over 8
+              sources.
+            </p>
+            <Link
+              to="/"
+              className="flex items-center mt-1 dark:hover:text-foreground-700 dark:text-foreground-900 text-background-900 hover:text-background-800"
+            >
+              <p className="mr-2">Learn More</p>
+              <ExternalLinkIcon size={11} />
+            </Link>
+            <div className="flex items-center justify-between mt-4">
+              <p>Network</p>
+              <InfoIcon size={16} />
+            </div>
+            <NetworkSelection className="mt-2" />
+            <SwapContianer
+              setTransactionType={(type) => setTtype(type)}
+              transactionType={tType}
+              balances={balances}
+              fromToken={sellToken}
+              fromTokenOptions={fromTokenOptions}
+              onChangeFromToken={onChangeSellToken}
+              onChangeFromAmounts={onChangeSellAmounts}
+              fromAmounts={sellAmounts}
+              estimatedValue={estimatedValue}
+              onSwitchTokenBtn={onSwitchTokenBtn}
+              basePrice={basePrice}
+              toToken={buyToken}
+              toTokenOptions={buyTokenOptions}
+              onChangeToToken={onChangeBuyToken}
+              toAmounts={buyAmounts}
+              onClickMax={onClickMax}
+            />
+            <TransactionSettings transactionType={tType} />
+            <Button
+              isLoading={false}
+              className="w-full py-3 mt-3 uppercase"
+              scale="imd"
+              onClick={onClickExchange}
+              disabled={orderButtonDisabled || !user.address}
+            >
+              Exchange
+            </Button>
           </div>
-          <NetworkSelection className="mt-2" />
-          <SwapContianer
-            setTransactionType={(type) => setTtype(type)}
-            transactionType={tType}
-            balances={balances}
-            fromToken={sellToken}
-            fromTokenOptions={fromTokenOptions}
-            onChangeFromToken={onChangeSellToken}
-            onChangeFromAmounts={onChangeSellAmounts}
-            fromAmounts={sellAmounts}
-            estimatedValue={estimatedValue}
-            onSwitchTokenBtn={onSwitchTokenBtn}
-            basePrice={basePrice}
-            toToken={buyToken}
-            toTokenOptions={buyTokenOptions}
-            onChangeToToken={onChangeBuyToken}
-            toAmounts={buyAmounts}
-          />
-          <TransactionSettings transactionType={tType} />
-          <Button
-            isLoading={false}
-            className="w-full py-3 mt-3 uppercase"
-            scale="imd"
-            onClick={onClickExchange}
-            disabled={orderButtonDisabled}
-          >
-            Exchange
-          </Button>
         </div>
-      </div>
+      )}
     </DefaultTemplate>
   );
 }

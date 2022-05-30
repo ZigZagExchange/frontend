@@ -27,14 +27,14 @@ const TransactionSettings = ({ transactionType }) => {
             <div>
               {marketInfo &&
                 marketInfo.quoteFee &&
-                Number(marketInfo.quoteFee).toPrecision(4)}{" "}
+                Number(marketInfo.quoteFee).toPrecision(5)}{" "}
               {marketInfo && marketInfo.quoteAsset.symbol}
             </div>
           )}
           {transactionType === "sell" && (
             <div>
                {marketInfo && marketInfo.baseFee &&
-              Number(marketInfo.baseFee).toPrecision(4)}{" "}
+              Number(marketInfo.baseFee).toPrecision(5)}{" "}
             {marketInfo && marketInfo.baseAsset.symbol}
             </div>
           )}

@@ -21,6 +21,7 @@ const SwapContianer = ({
   toTokenOptions,
   onChangeToToken,
   toAmounts,
+  onClickMax,
 }) => {
   return (
     <div className="p-4 mt-4 border-t border-b border-l border-r rounded-lg dark:border-foreground-400 border-primary-500">
@@ -42,7 +43,10 @@ const SwapContianer = ({
             selectedOption={fromToken}
           />
         )}
-        <button className="bg-[#07071C] px-2 py-1 rounded-md text-sm font-semibold text-primary-900 ml-2.5 hover:bg-slate-800 font-work">
+        <button
+          className="bg-[#07071C] px-2 py-1 rounded-md text-sm font-semibold text-primary-900 ml-2.5 hover:bg-slate-800 font-work"
+          onClick={onClickMax}
+        >
           Max
         </button>
         <input
