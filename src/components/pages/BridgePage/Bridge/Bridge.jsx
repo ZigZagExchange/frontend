@@ -221,10 +221,45 @@ const Bridge = (props) => {
     calculateFees();
   }, [swapDetails.amount, swapDetails.currency]);
 
+  const getMax = (swapCurrency, feeCurrency) => {
+    let max = 0;
+    try {
+      const roundedDecimalDigits = Math.min(swapCurrencyInfo.decimals, 8);
+      let actualBalance = balances[swapCurrency].value / (10 ** swapCurrencyInfo.decimals);
+      if (actualBalance !== 0) {
+        let receiveAmount = 0;
+        if (feeCurrency === 'ETH' && swapCurrency === 'ETH') {
+          receiveAmount = actualBalance - L2Fee - L1Fee;
+          max = actualBalance - L2Fee;
+        }
+        else if (feeCurrency === swapCurrency) {
+          receiveAmount = actualBalance - L2Fee;
+          max = actualBalance - L2Fee;
+        }
+        else if (swapCurrency === 'ETH' && feeCurrency === null) {
+          receiveAmount = actualBalance - L1Fee;
+          max = actualBalance - L1Fee;
+        }
+        else {
+          max = actualBalance;
+        }
+        // one number to protect against overflow
+        if(receiveAmount < 0) max = 0;
+        else {
+          max = Math.round(max * 10**roundedDecimalDigits - 1) / 10**roundedDecimalDigits;
+        }
+      }
+    } catch (e) {
+      max = parseFloat((balances[swapCurrency] && balances[swapCurrency].valueReadable) || 0)
+    }
+    return max;
+  }
+
   const validateInput = (inputValue, swapCurrency) => {
     if (balances.length === 0) return false;
     const getCurrencyBalance = (cur) => (balances[cur] && swapCurrencyInfo?.decimals ? balances[cur].value / (10 ** (swapCurrencyInfo.decimals)) : 0);
     const detailBalance = getCurrencyBalance(swapCurrency);
+    const max = getMax(swapCurrency, L2FeeToken);
 
     let error = null;
     if (inputValue > 0) {
@@ -234,34 +269,20 @@ const Bridge = (props) => {
         error = "Amount too small";
       } else if (inputValue >= detailBalance) {
         error = "Insufficient balance";
-      } else if (isFastWithdraw()) {
-        if (toNetwork.key !== 'polygon' && L1Fee !== null  && inputValue < L1Fee) {
-          error = "Amount too small";
-        }
+      } else if (inputValue > max) {
+        error = "Insufficient balance for fees"
 
+      } else if (isFastWithdraw()) {
         if (swapDetails.currency in fastWithdrawCurrencyMaxes) {
           const maxAmount = fastWithdrawCurrencyMaxes[swapCurrency];
           if (inputValue > maxAmount) {
             error = `Max ${swapCurrency} liquidity for fast withdraw: ${maxAmount.toPrecision(
               4
             )}`;
-          } else if (toNetwork.key !== 'polygon' && L1Fee !== null && L2Fee !== null && inputValue < (L2Fee + L1Fee)) {
-            error = "Amount too small";
           }
         }
-      } else if (L2FeeToken !== null && L2FeeToken === swapCurrency) {
-        if (L2Fee !== null && (inputValue + L2Fee) > detailBalance) {
-          error = "Insufficient balance for fees";
-        }
-      } else if(L2FeeToken !== null){
-        const feeCurrencyBalance = getCurrencyBalance(L2FeeToken);
-        if (L1Fee != null && feeCurrencyBalance < L1Fee) {
-          error = "Insufficient balance for fees";
-        }
       }
-      /*else if (L1Fee !== null  && inputValue < L1Fee) {
-        error = "Amount too small";
-      }*/
+
       else if (inputValue < 0.0001 && (fromNetwork.from.key === 'polygon' || toNetwork.key === 'polygon')) {
         error = "Insufficient amount";
       }
@@ -537,7 +558,7 @@ const Bridge = (props) => {
               <span>~${formatUSD(estimatedValue)}</span>
             </div>
             {(
-              swapDetails.currency !== "ETH" &&
+              swapDetails.currency !== "ETH" && fromNetwork.from.key !== "polygon" &&
               (swapCurrencyInfo?.decimals ? swapDetails.amount * 10 ** swapCurrencyInfo?.decimals : 0) > allowance
             ) ? (
               <div className="bridge_coin_stat">
