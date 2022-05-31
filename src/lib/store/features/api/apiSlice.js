@@ -161,6 +161,8 @@ export const apiSlice = createSlice({
         const market = update[0];
         const price = update[1];
         const change = update[2];
+
+        if (!price || Number.isNaN(price)) return;
         state.lastPrices[market] = {
           price: update[1],
           change: update[2],
