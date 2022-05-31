@@ -213,7 +213,11 @@ const Bridge = (props) => {
     ) {
       const usdFee = await api.apiProvider.changePubKeyFee();
       setUsdFee(usdFee);
-      setActivationFee((usdFee / currencyValue).toFixed(5));
+      if (currencyValue) {
+        setActivationFee((usdFee / currencyValue).toFixed(5));
+      } else {
+        setActivationFee(0);
+      }
     }
   }, [swapDetails.currency, user.address]);
 
