@@ -15,15 +15,18 @@ export function useCoinEstimator() {
     let priceArray = {};
     const remaining = Object.keys(pairPrices).filter((token) => !stables.includes(token));
     Object.keys(pairPrices).forEach((pair) => {
+      const pairPrice = pairPrices[pair].price;
+      if (Number.isNaN(pairPrice) || !Number.isFinite(pairPrice)) return;
+
       const [base, quote] = pair.split("-").map((s) => s.toUpperCase());
       // add prices form stable pairs
       if (stables.includes(quote)) {
         if (base in priceArray) {
           const arr = priceArray[base];
-          arr.push(pairPrices[pair].price);
+          arr.push(pairPrice);
           priceArray[base] = arr;
         } else {
-          priceArray[base] = [pairPrices[pair].price]
+          priceArray[base] = [pairPrice]
         }
 
         const index = remaining.indexOf(base);
@@ -42,9 +45,11 @@ export function useCoinEstimator() {
     // add prices from other pairs
     priceArray = {};
     remaining.forEach((pair) => {
+      const pairPrice = pairPrices[pair].price;
+      if (Number.isNaN(pairPrice) || !Number.isFinite(pairPrice)) return;
+      
       const [base, quote] = pair.split("-").map((s) => s.toUpperCase());
       if (quote in prices) {
-        const pairPrice = pairPrices[pair].price * prices[quote];
         if (base in priceArray) {
           const arr = priceArray[base];
           arr.push(pairPrice);
