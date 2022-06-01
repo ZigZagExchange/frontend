@@ -45,11 +45,11 @@ export function useCoinEstimator() {
     // add prices from other pairs
     priceArray = {};
     remaining.forEach((pair) => {
-      const pairPrice = pairPrices[pair].price;
+      let pairPrice = pairPrices[pair].price;
       if (Number.isNaN(pairPrice) || !Number.isFinite(pairPrice)) return;
-      
       const [base, quote] = pair.split("-").map((s) => s.toUpperCase());
       if (quote in prices) {
+        pairPrice *= prices[quote];
         if (base in priceArray) {
           const arr = priceArray[base];
           arr.push(pairPrice);
