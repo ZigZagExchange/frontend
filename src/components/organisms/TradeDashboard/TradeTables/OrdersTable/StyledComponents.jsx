@@ -67,6 +67,13 @@ export const FooterContainer = styled.div`
         // height: 65px;
         overflow: auto;
     }
+    
+    td div {
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 `
 
 export const LaptopWrapper = styled.div`
