@@ -680,6 +680,17 @@ const InputBox = styled.div`
 const RangeWrapper = styled.div`
   width: 98%;
   padding-left: 10px;
+
+  .custom_range {
+    &.MuiSlider-markActive::before {
+      content: none;
+    }
+
+    &::before {
+      width: 7px !important;
+      height: 7px !important;
+    }  
+  }
 `
 
 const IconButton = styled(BaseIcon)`
