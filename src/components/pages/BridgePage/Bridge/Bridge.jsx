@@ -653,22 +653,22 @@ const Bridge = (props) => {
                       />
                     </div>
                   )}
-
-                  {transfer.type === "withdraw" && (
+                  {isFastWithdraw() && L1FeeAmount && toNetwork.key === "ethereum" && (
+                    <div>
+                      Ethereum L1 gas + bridge fee: ~{formatPrice(L1FeeAmount)}{" "}
+                      {swapDetails.currency}
+                    </div>
+                  )}
+                  {transfer.type === "withdraw" && !formErr && (swapDetails.amount > 0) && (
                     <x.div>
-                      {isFastWithdraw() && L1FeeAmount && toNetwork.key === "ethereum" && (
-                        <div>
-                          Ethereum L1 gas + bridge fee: ~{formatPrice(L1FeeAmount)}{" "}
-                          {swapDetails.currency}
-                        </div>
-                      )}
+                      
                       <x.div color={"blue-gray-300"}>
                         You'll receive: 
-                          {toNetwork.key === "polygon" && ` ~${formatPrice(swapDetails.amount)}`}
-                          {toNetwork.key === "ethereum" && !L1FeeAmount && ` ${formatPrice(swapDetails.amount)}`}
-                          {toNetwork.key === "ethereum" && !L1FeeAmount && ` ~${formatPrice(swapDetails.amount - L1FeeAmount)}`}
-
-                          {toNetwork.key === "polygon" && ` WETH on Polygon`}
+                          {toNetwork.key === "polygon" && ` ~${formatPrice(swapDetails.amount)} WETH on Polygon`}
+                          {toNetwork.key === "ethereum" && (L1FeeAmount 
+                            ? ` ~${formatPrice(swapDetails.amount - L1FeeAmount)}`
+                            : ` ${formatPrice(swapDetails.amount)}`)
+                          }
                           {toNetwork.key === "ethereum" && ` ${swapDetails.currency} on Ethereum L1`}
                       </x.div>
                     </x.div>
@@ -697,7 +697,7 @@ const Bridge = (props) => {
                       />
                     </div>
                   )}
-                  {transfer.type === "deposit" && (
+                  {transfer.type === "deposit" && !formErr && (swapDetails.amount > 0) && (
                     <x.div>
                       <x.div color={"blue-gray-300"}>
                       You'll receive: 
