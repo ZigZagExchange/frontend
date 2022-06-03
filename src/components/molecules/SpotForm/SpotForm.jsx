@@ -697,14 +697,29 @@ const RangeWrapper = styled.div`
   padding-left: 10px;
 
   .custom_range {
-    &.MuiSlider-markActive::before {
-      content: none;
+    &:not(.MuiSlider-markActive)::before {
+      border: 2px solid ${({ theme }) => theme.colors.foregroundLowEmphasis} !important;
+      background-color: ${({ theme }) => theme.colors.backgroundMediumEmphasis} !important;
+    }
+
+    &.MuiSlider-markActive {
+      display: none;
     }
 
     &::before {
-      width: 7px !important;
-      height: 7px !important;
-    }  
+      width: 5px !important;
+      height: 5px !important;
+    }
+  }
+
+  .MuiSlider-rail {
+    background-color: ${({ theme }) => theme.colors.foregroundLowEmphasis} !important;
+  }
+
+  .MuiSlider-thumb {
+    margin: 0 !important;
+    padding: 7px !important;
+    transform: translate(-50%, -50%);
   }
 `
 
