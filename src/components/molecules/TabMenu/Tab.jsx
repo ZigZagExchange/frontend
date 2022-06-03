@@ -10,7 +10,7 @@ const StyledText = styled(Text)`
   transition: color .25s;
 
   &:hover {
-    color: ${({ isActive, theme }) => !isActive ? `${theme.colors.foregroundHighEmphasis} !important` : ""
+    color: ${({ isActive, theme }) => !isActive ? `${theme.colors.primaryHighEmphasis} !important` : ""
   }
 `
 
