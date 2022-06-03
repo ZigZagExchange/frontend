@@ -369,8 +369,8 @@ const Bridge = (props) => {
       const gasFee = await api.getEthereumFee(swapDetails.currency);
       if(gasFee){
         let maxFee = (gasFee.maxFeePerGas) / 10**9;
-        //For deposit, ethereum gaslimit is 90000
-        setL1Fee(90000 * maxFee / 10**9); 
+        // For deposit, ethereum gaslimit is 90k, median is 63k
+        setL1Fee(70000 * maxFee / 10**9); 
         setL2Fee(swapDetails, null, null)
       }
     }
