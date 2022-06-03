@@ -354,8 +354,8 @@ const Bridge = (props) => {
     if(fromNetwork.from.key === 'polygon' && toNetwork.key === 'zksync') {
       const gasFee = await api.getPolygonFee();
       if(gasFee){
-        setL1Fee(35000 * gasFee.fast.maxFee / 10**9);
-        setFee(swapDetails, 0, null)
+        setL1Fee(null);
+        setL2Fee(swapDetails, 35000 * gasFee.fast.maxFee / 10**9, 'MATIC')
       }
     }
     // zkSync -> polygon
@@ -378,7 +378,6 @@ const Bridge = (props) => {
     else if (transfer.type === "withdraw") {
       if (api.apiProvider.syncWallet) {
         if (isFastWithdraw()) {
-          console.log('HERE')
           const [L1res, L2res] = await Promise.all([
             api.withdrawL2FastBridgeFee(swapDetails.currency),
             api.transferL2GasFee(swapDetails.currency)
@@ -655,35 +654,40 @@ const Bridge = (props) => {
                     </div>
                   )}
 
-                  {transfer.type === "withdraw" && toNetwork.key === "ethereum" && (
+                  {transfer.type === "withdraw" && (
                     <x.div>
-                      {isFastWithdraw() && L1FeeAmount && (
+                      {isFastWithdraw() && L1FeeAmount && toNetwork.key === "ethereum" && (
                         <div>
                           Ethereum L1 gas + bridge fee: ~{formatPrice(L1FeeAmount)}{" "}
                           {swapDetails.currency}
                         </div>
                       )}
                       <x.div color={"blue-gray-300"}>
-                        You'll receive:
-                        {isFastWithdraw()?' ~':' '}
-                        {isFastWithdraw() && L1FeeAmount
-                          ? formatPrice(swapDetails.amount - L1FeeAmount)
-                          : formatPrice(swapDetails.amount)}
-                        {" " + swapDetails.currency} on Ethereum L1
+                        You'll receive: 
+                          {toNetwork.key === "polygon" && ` ~${formatPrice(swapDetails.amount)}`}
+                          {toNetwork.key === "ethereum" && !L1FeeAmount && ` ${formatPrice(swapDetails.amount)}`}
+                          {toNetwork.key === "ethereum" && !L1FeeAmount && ` ~${formatPrice(swapDetails.amount - L1FeeAmount)}`}
+
+                          {toNetwork.key === "polygon" && ` WETH on Polygon`}
+                          {toNetwork.key === "ethereum" && ` ${swapDetails.currency} on Ethereum L1`}
                       </x.div>
                     </x.div>
-                  )}
+                  )}                  
                 </x.div>
               )}
               {transfer.type === "deposit" && (
                 <x.div>
                   {L1FeeAmount && (
                     <>
-                     {fromNetwork.from.key === "polygon" && `Polygon gas fee: ~${formatPrice(L1FeeAmount)} MATIC`}
                      {fromNetwork.from.key === "ethereum" && `Maximum gas fee: ~${formatPrice(L1FeeAmount)} ETH`}
                     </>
                   )}
-                  {!L1FeeAmount && !hasError && (
+                  {L2FeeAmount && (
+                    <>
+                      {fromNetwork.from.key === "polygon" && `Polygon gas fee: ~${formatPrice(L2FeeAmount)} ${L2FeeToken}`}
+                    </>
+                  )}                  
+                  {!L1FeeAmount && !hasError && fromNetwork.from.key === "ethereum" && (
                     <div style={{ display: "inline-flex", margin: "0 5px" }}>
                       <Loader
                         type="TailSpin"
@@ -698,7 +702,6 @@ const Bridge = (props) => {
                       <x.div color={"blue-gray-300"}>
                       You'll receive: 
                         {fromNetwork.from.key === "polygon" && ` ~${formatPrice(swapDetails.amount)}`}
-                        {toNetwork.key === "polygon" && ` ~${formatPrice(swapDetails.amount)}`}
                         {fromNetwork.from.key === "ethereum" && toNetwork.key === "zksync" && ` ${formatPrice(swapDetails.amount)}`}
 
                         {fromNetwork.from.key === "polygon" && ` ETH on zkSync L2`}
