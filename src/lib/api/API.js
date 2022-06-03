@@ -856,4 +856,17 @@ export default class API extends Emitter {
       return {};
     }
   }
+
+  requestOrderUpdate = (orderId) => {
+    this.send("orderreceiptreq", [this.apiProvider.network, orderId])
+  };
+
+  updatePendingOrders = (userOrders) => {
+    Object.keys(userOrders).forEach(orderId => {
+      const orderStatus = userOrders[orderId][9];
+      if (['b', 'm', 'pm'].includes(orderStatus)) {
+        this.requestOrderUpdate(orderId);
+      }
+    })
+  }
 }
