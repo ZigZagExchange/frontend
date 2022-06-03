@@ -210,65 +210,66 @@ export class OrdersTable extends React.Component {
               <th scope="col">
                 <HeaderWrapper>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Market</Text>
-                  <SortIconWrapper>
+                  {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper>
+                  </SortIconWrapper> */}
                 </HeaderWrapper>
               </th>
               <th scope="col">
                 <HeaderWrapper>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Price</Text>
-                  <SortIconWrapper>
+                  {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper>
+                  </SortIconWrapper> */}
                 </HeaderWrapper>
               </th>
               <th scope="col">
                 <HeaderWrapper>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Side</Text>
                   <SortIconWrapper>
-                    <SortUpIcon /><SortDownIcon />
+                    <SortUpIcon />
+                    {/* <SortDownIcon /> */}
                   </SortIconWrapper>
                 </HeaderWrapper>
               </th>
               <th scope="col">
                 <HeaderWrapper>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Amount</Text>
-                  <SortIconWrapper>
+                  {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper>
+                  </SortIconWrapper> */}
                 </HeaderWrapper>
               </th>
               <th scope="col">
                 <HeaderWrapper>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Remaining</Text>
-                  <SortIconWrapper>
+                  {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper>
+                  </SortIconWrapper> */}
                 </HeaderWrapper>
               </th>
               <th scope="col">
                 <HeaderWrapper>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Time</Text>
-                  <SortIconWrapper>
+                  {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper>
+                  </SortIconWrapper> */}
                 </HeaderWrapper>
               </th>
               <th scope="col">
                 <HeaderWrapper>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Order Status</Text>
-                  <SortIconWrapper>
+                  {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper>
+                  </SortIconWrapper> */}
                 </HeaderWrapper>
               </th>
               <th scope="col">
                 <HeaderWrapper>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Action</Text>
-                  <SortIconWrapper>
+                  {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper>
+                  </SortIconWrapper> */}
                 </HeaderWrapper>
               </th>
             </tr>
