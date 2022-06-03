@@ -12,8 +12,6 @@ import { TokenPairDropdown } from "components/molecules/Dropdown";
 import useModal from "components/hooks/useModal";
 
 const TradeRatesCard = ({ updateMarketChain, marketSummary, rowData, currentMarket, marketInfo }) => {
-  console.log("marketSummary", marketSummary);
-
   const handleOnModalClose = () => {
     onSettingsModalClose()
   }
@@ -61,7 +59,7 @@ const TradeRatesCard = ({ updateMarketChain, marketSummary, rowData, currentMark
               <>
                 <RatesCard>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h Change</Text>
-                  <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{marketSummary["priceChange"] ?? '--'}</Text>
+                  <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{parseFloat(marketSummary["priceChange"]).toFixed(5) ?? '--'}</Text>
                 </RatesCard>
                 <RatesCard>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h High</Text>
