@@ -43,9 +43,9 @@ const Bridge = (props) => {
   const [loading, setLoading] = useState(false);
   const [isApproving, setApproving] = useState(false);
   const [formErr, setFormErr] = useState("");
-  const [L2Fee, setL2Fee] = useState(null);
+  const [L2FeeAmount, setL2FeeAmount] = useState(null);
   const [L2FeeToken, setL2FeeToken] = useState(null);
-  const [L1Fee, setL1Fee] = useState(null);
+  const [L1FeeAmount, setL1Fee] = useState(null);
   const network = useSelector(networkSelector);
   const [transfer, setTransfer] = useState(defaultTransfer);
   const [swapCurrencyInfo, setSwapCurrencyInfo] = useState({ decimals: 0 });
@@ -234,16 +234,16 @@ const Bridge = (props) => {
       if (actualBalance !== 0) {
         let receiveAmount = 0;
         if (feeCurrency === 'ETH' && swapCurrency === 'ETH') {
-          receiveAmount = actualBalance - L2Fee - L1Fee;
-          max = actualBalance - L2Fee;
+          receiveAmount = actualBalance - L2FeeAmount - L1FeeAmount;
+          max = actualBalance - L2FeeAmount;
         }
         else if (feeCurrency === swapCurrency) {
-          receiveAmount = actualBalance - L2Fee;
-          max = actualBalance - L2Fee;
+          receiveAmount = actualBalance - L2FeeAmount;
+          max = actualBalance - L2FeeAmount;
         }
         else if (swapCurrency === 'ETH' && feeCurrency === null) {
-          receiveAmount = actualBalance - L1Fee;
-          max = actualBalance - L1Fee;
+          receiveAmount = actualBalance - L1FeeAmount;
+          max = actualBalance - L1FeeAmount;
         }
         else {
           max = actualBalance;
@@ -270,7 +270,7 @@ const Bridge = (props) => {
     if (inputValue > 0) {
       if (!user.id && inputValue <= activationFee) {
         error = `Must be more than ${activationFee} ${swapCurrency}`
-      } else if (L2Fee !== null && inputValue < L2Fee) {
+      } else if (L2FeeAmount !== null && inputValue < L2FeeAmount) {
         error = "Amount too small";
       } else if (inputValue >= detailBalance) {
         error = "Insufficient balance";
@@ -315,43 +315,8 @@ const Bridge = (props) => {
     return true;
   };
 
-  const setFastWithdrawFees = async (details) => {
-    try{
-      let res = await api.withdrawL2FastGasFee(details.currency);
-      setFee(details, res.amount, res.feeToken);
-    }catch(e){
-      console.error(e);
-      setL2FeeToken(null);
-      setFee(details, null, null);
-    }
-
-    if(toNetwork.key !== 'polygon'){
-      try{
-        let res = await api.withdrawL2FastBridgeFee(details.currency);
-        setL1Fee(res);
-      }catch(e) {
-        console.error(e);
-        setL1Fee(null);
-      }
-    }
-    else {
-      setL1Fee(null);
-    }
-  };
-
-  const setNormalWithdrawFees = async (details) => {
-    try{
-      let res = await api.withdrawL2GasFee(details.currency);
-      setFee(details, res.amount, res.feeToken);
-    }catch(err) {
-      console.log(err);
-      setL2FeeToken(null);
-      setFee(details, null, null);
-    }
-  };
-
-  const setFee = (details, bridgeFee, feeToken) => {
-    setL2Fee(bridgeFee)
+  const setL2Fee = (details, bridgeFee, feeToken) => {
+    setL2FeeAmount(bridgeFee)
     setL2FeeToken(feeToken)
     const input = parseFloat(details.amount) || 0
     const isInputValid = validateInput(input, details.currency)
@@ -385,30 +350,53 @@ const Bridge = (props) => {
 
     setGasFetching(true);
 
-    if(fromNetwork.from.key === 'polygon') {
+    // polygon -> zkSync
+    if(fromNetwork.from.key === 'polygon' && toNetwork.key === 'zksync') {
       const gasFee = await api.getPolygonFee();
       if(gasFee){
-        setL1Fee(35000 * gasFee.fast.maxFee / 10**9);
-        setFee(swapDetails, 0, null)
+        setL1Fee(null);
+        setL2Fee(swapDetails, 35000 * gasFee.fast.maxFee / 10**9, 'MATIC')
       }
     }
+    // zkSync -> polygon
+    else if(fromNetwork.from.key === 'zksync' && toNetwork.key === 'polygon') {
+      let res = await api.transferL2GasFee(swapDetails.currency);
+      setL1Fee(null);
+      setL2Fee(swapDetails, res.amount, res.feeToken);
+    }
+    // Ethereum -> zkSync aka deposit
+    else if (transfer.type === "deposit") {
+      const gasFee = await api.getEthereumFee(swapDetails.currency);
+      if(gasFee){
+        let maxFee = (gasFee.maxFeePerGas) / 10**9;
+        // For deposit, ethereum gaslimit is 90k, median is 63k
+        setL1Fee(70000 * maxFee / 10**9); 
+        setL2Fee(swapDetails, null, null)
+      }
+    }
+    // zkSync -> Ethereum aka withdraw
     else if (transfer.type === "withdraw") {
       if (api.apiProvider.syncWallet) {
         if (isFastWithdraw()) {
-          await setFastWithdrawFees(swapDetails);
+          const [L1res, L2res] = await Promise.all([
+            api.withdrawL2FastBridgeFee(swapDetails.currency),
+            api.transferL2GasFee(swapDetails.currency)
+          ]);
+          setL1Fee(L1res);
+          setL2Fee(swapDetails, L2res.amount, L2res.feeToken);
         } else {
-          await setNormalWithdrawFees(swapDetails);
+          let res = await api.withdrawL2GasFee(swapDetails.currency);
+          setL1Fee(null);
+          setL2Fee(swapDetails, res.amount, res.feeToken);
         }
       }
+    // bad case, cant calculate fee 
     } else {
-      const gasFee = await api.depositL2Fee(swapDetails.currency);
-      if(gasFee){
-        let maxFee = (gasFee.maxFeePerGas) / 10**9;
-        //For deposit, ethereum gaslimit is 90000. not sure why it's not 21000. 
-        // To get the close gasfee, I used 46000 for gas limit.
-        setL1Fee(46000 * maxFee / 10**9); 
-        setFee(swapDetails, null, null)
-      }
+      console.log(`Bad op ==> from: ${
+        fromNetwork.from.key
+      }, to: ${toNetwork.key}, type: ${transfer.type}`);
+      setL2FeeToken(null);
+      setL2Fee(swapDetails, null, null);
     }
 
     setGasFetching(false);
@@ -548,8 +536,8 @@ const Bridge = (props) => {
             <L1Header networks={NETWORKS} onSelect={onSelectFromNetwork} selectedNetwork={fromNetwork} />
           </div>
           <BridgeSwapInput
-            L1Fee={L1Fee}
-            L2Fee={L2Fee}
+            L1Fee={L1FeeAmount}
+            L2Fee={L2FeeAmount}
             balances={balances}
             value={swapDetails}
             onChange={setSwapDetails}
@@ -650,12 +638,12 @@ const Bridge = (props) => {
             <div className="bridge_transfer_fee">
               {transfer.type === "withdraw" && (
                 <x.div>
-                  {L2Fee && (
+                  {L2FeeAmount && (
                     <>
-                      {fromNetwork.from.key === "zksync" && `zkSync L2 gas fee: ~${L2Fee} ${L2FeeToken}`}
+                      {fromNetwork.from.key === "zksync" && `zkSync L2 gas fee: ~${L2FeeAmount} ${L2FeeToken}`}
                     </>
                   )}
-                  {!L2Fee && (
+                  {!L2FeeAmount && (
                     <div style={{ display: "inline-flex", margin: "0 5px" }}>
                       <Loader
                         type="TailSpin"
@@ -665,36 +653,41 @@ const Bridge = (props) => {
                       />
                     </div>
                   )}
-
-                  {transfer.type === "withdraw" && toNetwork.key === "ethereum" && (
+                  {isFastWithdraw() && L1FeeAmount && toNetwork.key === "ethereum" && (
+                    <div>
+                      Ethereum L1 gas + bridge fee: ~{formatPrice(L1FeeAmount)}{" "}
+                      {swapDetails.currency}
+                    </div>
+                  )}
+                  {transfer.type === "withdraw" && !formErr && (swapDetails.amount > 0) && (
                     <x.div>
-                      {isFastWithdraw() && L1Fee && (
-                        <div>
-                          Ethereum L1 gas + bridge fee: ~{formatPrice(L1Fee)}{" "}
-                          {swapDetails.currency}
-                        </div>
-                      )}
+                      
                       <x.div color={"blue-gray-300"}>
-                        You'll receive:
-                        {isFastWithdraw()?' ~':' '}
-                        {isFastWithdraw() && L1Fee
-                          ? formatPrice(swapDetails.amount - L1Fee)
-                          : formatPrice(swapDetails.amount)}
-                        {" " + swapDetails.currency} on Ethereum L1
+                        You'll receive: 
+                          {toNetwork.key === "polygon" && ` ~${formatPrice(swapDetails.amount)} WETH on Polygon`}
+                          {toNetwork.key === "ethereum" && (L1FeeAmount 
+                            ? ` ~${formatPrice(swapDetails.amount - L1FeeAmount)}`
+                            : ` ${formatPrice(swapDetails.amount)}`)
+                          }
+                          {toNetwork.key === "ethereum" && ` ${swapDetails.currency} on Ethereum L1`}
                       </x.div>
                     </x.div>
-                  )}
+                  )}                  
                 </x.div>
               )}
               {transfer.type === "deposit" && (
                 <x.div>
-                  {L1Fee && (
+                  {L1FeeAmount && (
                     <>
-                     {fromNetwork.from.key === "polygon" && `Polygon gas fee: ~${formatPrice(L1Fee)} MATIC`}
-                     {fromNetwork.from.key === "ethereum" && `Gas fee: ~${formatPrice(L1Fee)} ETH`}
+                     {fromNetwork.from.key === "ethereum" && `Maximum gas fee: ~${formatPrice(L1FeeAmount)} ETH`}
                     </>
                   )}
-                  {!L1Fee && !hasError && (
+                  {L2FeeAmount && (
+                    <>
+                      {fromNetwork.from.key === "polygon" && `Polygon gas fee: ~${formatPrice(L2FeeAmount)} ${L2FeeToken}`}
+                    </>
+                  )}                  
+                  {!L1FeeAmount && !hasError && fromNetwork.from.key === "ethereum" && (
                     <div style={{ display: "inline-flex", margin: "0 5px" }}>
                       <Loader
                         type="TailSpin"
@@ -704,12 +697,11 @@ const Bridge = (props) => {
                       />
                     </div>
                   )}
-                  {transfer.type === "deposit" && (
+                  {transfer.type === "deposit" && !formErr && (swapDetails.amount > 0) && (
                     <x.div>
                       <x.div color={"blue-gray-300"}>
                       You'll receive: 
                         {fromNetwork.from.key === "polygon" && ` ~${formatPrice(swapDetails.amount)}`}
-                        {toNetwork.key === "polygon" && ` ~${formatPrice(swapDetails.amount)}`}
                         {fromNetwork.from.key === "ethereum" && toNetwork.key === "zksync" && ` ${formatPrice(swapDetails.amount)}`}
 
                         {fromNetwork.from.key === "polygon" && ` ETH on zkSync L2`}
@@ -761,7 +753,7 @@ const Bridge = (props) => {
                     className={cx("bg_btn", {
                       zig_disabled:
                         formErr.length > 0 ||
-                        (L2Fee === null && L1Fee === null) ||
+                        (L2FeeAmount === null && L1FeeAmount === null) ||
                         !hasAllowance ||
                         Number(swapDetails.amount) === 0,
                     })}
