@@ -224,7 +224,7 @@ const Bridge = (props) => {
 
   useEffect(() => {
     calculateFees();
-  }, [swapDetails.amount, swapDetails.currency]);
+  }, [swapDetails.currency]);
 
   const getMax = (swapCurrency, feeCurrency) => {
     let max = 0;
@@ -691,7 +691,7 @@ const Bridge = (props) => {
                   {L1Fee && (
                     <>
                      {fromNetwork.from.key === "polygon" && `Polygon gas fee: ~${formatPrice(L1Fee)} MATIC`}
-                     {fromNetwork.from.key === "ethereum" && `Gas fee: ~${formatPrice(L1Fee)} ETH`}
+                     {fromNetwork.from.key === "ethereum" && `Maximum gas fee: ~${formatPrice(L1Fee)} ETH`}
                     </>
                   )}
                   {!L1Fee && !hasError && (
