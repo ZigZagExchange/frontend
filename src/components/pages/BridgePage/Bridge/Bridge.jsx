@@ -224,7 +224,7 @@ const Bridge = (props) => {
 
   useEffect(() => {
     calculateFees();
-  }, [swapDetails.currency]);
+  }, [swapDetails.amount, swapDetails.currency]);
 
   const getMax = (swapCurrency, feeCurrency) => {
     let max = 0;
