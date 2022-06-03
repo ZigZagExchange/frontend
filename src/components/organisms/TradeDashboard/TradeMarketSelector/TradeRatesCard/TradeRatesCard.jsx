@@ -11,7 +11,8 @@ import SettingsModal from "./SettingsModal";
 import { TokenPairDropdown } from "components/molecules/Dropdown";
 import useModal from "components/hooks/useModal";
 
-const TradeRatesCard = ({updateMarketChain, marketSummary, rowData, currentMarket, marketInfo}) => {
+const TradeRatesCard = ({ updateMarketChain, marketSummary, rowData, currentMarket, marketInfo }) => {
+  console.log("marketSummary", marketSummary);
 
   const handleOnModalClose = () => {
     onSettingsModalClose()
@@ -31,14 +32,14 @@ const TradeRatesCard = ({updateMarketChain, marketSummary, rowData, currentMarke
     <Wrapper>
       <LeftWrapper>
         <MarketSelector>
-          <TokenPairDropdown 
-          width ={isMobile ? 83 : 223} 
-          transparent 
-          context={currentMarket}
-          rowData={rowData}
-          updateMarketChain={updateMarketChain}
-          currentMarket={currentMarket}
-          marketInfo={marketInfo}
+          <TokenPairDropdown
+            width={isMobile ? 83 : 223}
+            transparent
+            context={currentMarket}
+            rowData={rowData}
+            updateMarketChain={updateMarketChain}
+            currentMarket={currentMarket}
+            marketInfo={marketInfo}
           />
         </MarketSelector>
         <RatesCardsWrapper>
@@ -57,33 +58,37 @@ const TradeRatesCard = ({updateMarketChain, marketSummary, rowData, currentMarke
           </RatesCard> */}
           {
             isMobile ? <></> :
-            <>
-              <RatesCard>
-                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h High</Text>
-                <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{marketSummary["24hi"] ?? '--'}</Text>
-              </RatesCard>
-              <RatesCard>
-                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h Low</Text>
-                <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{marketSummary["24lo"] ?? '--'}</Text>
-              </RatesCard>
-              <RatesCard>
-                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h Volume({marketInfo && marketInfo.baseAsset.symbol})</Text>
-                <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{marketSummary.baseVolume ?? '--'}</Text>
-              </RatesCard>
-              <RatesCard>
-                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h Volume({marketInfo && marketInfo.quoteAsset.symbol})</Text>
-                <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{marketSummary.quoteVolume ?? '--'}</Text>
-              </RatesCard>
-            </>
+              <>
+                <RatesCard>
+                  <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h Change</Text>
+                  <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{marketSummary["priceChange"] ?? '--'}</Text>
+                </RatesCard>
+                <RatesCard>
+                  <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h High</Text>
+                  <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{marketSummary["24hi"] ?? '--'}</Text>
+                </RatesCard>
+                <RatesCard>
+                  <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h Low</Text>
+                  <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{marketSummary["24lo"] ?? '--'}</Text>
+                </RatesCard>
+                <RatesCard>
+                  <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h Volume({marketInfo && marketInfo.baseAsset.symbol})</Text>
+                  <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{marketSummary.baseVolume ?? '--'}</Text>
+                </RatesCard>
+                <RatesCard>
+                  <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h Volume({marketInfo && marketInfo.quoteAsset.symbol})</Text>
+                  <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{marketSummary.quoteVolume ?? '--'}</Text>
+                </RatesCard>
+              </>
           }
         </RatesCardsWrapper>
       </LeftWrapper>
       {
         isMobile ?
-        <SettingsIcon style={{marginRight: '20px'}} onClick={handleSettings}/> :
-        <Button endIcon={<SettingsIcon/>} variant="outlined" scale="imd" mr="20px" onClick={handleSettings}>
+          <SettingsIcon style={{ marginRight: '20px' }} onClick={handleSettings} /> :
+          <Button endIcon={<SettingsIcon />} variant="outlined" scale="imd" mr="20px" onClick={handleSettings}>
             Settings
-        </Button>
+          </Button>
       }
     </Wrapper>
   )
