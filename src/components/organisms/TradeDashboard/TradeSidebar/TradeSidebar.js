@@ -11,7 +11,7 @@ const StyledTradeSidebar = styled.aside`
   grid-area: sidebar;
   position: relative;
   height: fit-content;
-  border: 1px solid ${({theme}) => theme.colors.foreground300};
+  border: 1px solid ${({ theme }) => theme.colors.foreground300};
 `;
 
 const InfoWrapper = styled.div`
@@ -33,19 +33,19 @@ export default function TradeSidebar(props) {
   return (
     <StyledTradeSidebar>
       {
-        isMobile ? <></> : 
-        <InfoWrapper>
-          <Text font="primarySmall" color="foregroundHighEmphasis">
-            {props.user.id ? 'Have a question? Need live support?' : 'You have not connected your wallet.'}
-          </Text>
-          {props.user.id ? (
-            <Button width="150px" startIcon={<DiscordIcon />} variant="outlined" scale="imd" mr="8px" onClick={joinDiscord}>
-              <Text font="primaryBoldDisplay" color="foregroundHighEmphasis" textAlign="center">JOIN DISCORD</Text>
-            </Button>
-          ) : (
-            <ConnectWalletButton width="fit-content" />
-          )}
-        </InfoWrapper>
+        isMobile ? <></> :
+          <InfoWrapper>
+            <Text font="primarySmall" color="foregroundHighEmphasis">
+              {props.user.id ? 'Have a question? Need live support?' : 'You have not connected your wallet.'}
+            </Text>
+            {props.user.id ? (
+              <Button width="150px" startIcon={<DiscordIcon />} variant="outlined" scale="imd" mr="8px" onClick={joinDiscord}>
+                <Text font="primaryBoldDisplay" color="foregroundHighEmphasis" textAlign="center">JOIN DISCORD</Text>
+              </Button>
+            ) : (
+              <ConnectWalletButton width="fit-content" />
+            )}
+          </InfoWrapper>
       }
       <SpotBox
         lastPrice={props.lastPrice}
