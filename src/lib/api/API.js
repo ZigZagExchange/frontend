@@ -527,6 +527,13 @@ export default class API extends Emitter {
     return res.data;
   }
 
+  getEthereumFee = async () => {
+    if (this.ethersProvider) {
+      const feeData = await this.ethersProvider.getFeeData();
+      return feeData;
+    }
+  };
+
   withdrawL2 = async (amount, token) => {
     return this.apiProvider.withdrawL2(amount, token);
   };
@@ -540,15 +547,30 @@ export default class API extends Emitter {
   };
 
   withdrawL2GasFee = async (token) => {
-    return await this.apiProvider.withdrawL2GasFee(token);
+    try {
+      return await this.apiProvider.withdrawL2GasFee(token);
+    } catch (err) {
+      console.log(err);
+      return { amount: 0, feeToken: 'ETH' };
+    }
   };
 
-  withdrawL2FastGasFee = async (token) => {
-    return await this.apiProvider.withdrawL2FastGasFee(token);
+  transferL2GasFee = async (token) => {
+    try {
+      return await this.apiProvider.transferL2GasFee(token);
+    } catch (err) {
+      console.log(err);
+      return { amount: 0, feeToken: 'ETH' };
+    }
   };
 
   withdrawL2FastBridgeFee = async (token) => {
-    return await this.apiProvider.withdrawL2FastBridgeFee(token);
+    try {
+      return await this.apiProvider.withdrawL2FastBridgeFee(token);
+     } catch (err) {
+      console.log(err);
+      return 0;
+    }
   };
 
   cancelAllOrders = async () => {
