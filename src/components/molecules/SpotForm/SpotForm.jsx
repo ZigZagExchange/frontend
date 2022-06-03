@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import styled from "styled-components"
 import { toast } from "react-toastify";
 import api from "lib/api";
@@ -19,6 +19,7 @@ export class SpotForm extends React.Component {
       userHasEditedPrice: false,
       price: props.lastPrice,
       baseAmount: "",
+      totalAmount: "",
       quoteAmount: "",
       orderButtonDisabled: false,
       maxSizeSelected: false,
@@ -52,6 +53,21 @@ export class SpotForm extends React.Component {
     const newState = { ...this.state };
     newState.baseAmount = (rx_live.test(e.target.value)) ? e.target.value : this.state.baseAmount;
     newState.quoteAmount = "";
+    newState.baseAmount === "" ? newState.totalAmount = "" :
+      newState.totalAmount = this.props.orderType === "limit" ?
+        (this.currentPrice() * newState.baseAmount).toPrecision(6) :
+        (this.props.marketSummary.price * newState.baseAmount).toPrecision(6);
+    this.setState(newState);
+  }
+
+  updateTotalAmount(e) {
+    const newState = { ...this.state };
+    newState.totalAmount = (rx_live.test(e.target.value)) ? e.target.value : this.state.totalAmount;
+    newState.quoteAmount = "";
+    newState.totalAmount === "" ? newState.baseAmount = "" :
+      newState.baseAmount = this.props.orderType === "limit" ?
+        (newState.totalAmount / this.currentPrice()).toPrecision(6) :
+        (newState.totalAmount / this.props.marketSummary.price).toPrecision(6);
     this.setState(newState);
   }
 
@@ -460,6 +476,8 @@ export class SpotForm extends React.Component {
   }
 
   render() {
+    // const ethInput = useRef(null);
+    // const usdInput = useRef(null);
     const marketInfo = this.props.marketInfo;
 
     let price = this.currentPrice();
@@ -582,13 +600,10 @@ export class SpotForm extends React.Component {
             {/* <IconButton variant="secondary" startIcon={<MinusIcon />}></IconButton> */}
             <InputField
               type="text"
+              pattern="\d+(?:[.,]\d+)?"
               placeholder={`Total (${marketInfo && marketInfo.quoteAsset?.symbol})`}
-              value={
-                this.props.orderType === "limit" ?
-                  (this.currentPrice() * this.state.baseAmount).toPrecision(6) + ' ' + (marketInfo && marketInfo.quoteAsset?.symbol) :
-                  (this.props.marketSummary.price * this.state.baseAmount).toPrecision(6) + ' ' + (marketInfo && marketInfo.quoteAsset?.symbol)
-              }
-              disabled
+              value={this.state.totalAmount}
+              onChange={this.updateTotalAmount.bind(this)}
             />
             {/* <IconButton variant="secondary" startIcon={<PlusIcon />}></IconButton> */}
             {/* <span>{marketInfo && marketInfo.baseAsset.symbol}</span> */}
