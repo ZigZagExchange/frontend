@@ -315,41 +315,6 @@ const Bridge = (props) => {
     return true;
   };
 
-  const setFastWithdrawFees = async (details) => {
-    try{
-      let res = await api.withdrawL2FastGasFee(details.currency);
-      setFee(details, res.amount, res.feeToken);
-    }catch(e){
-      console.error(e);
-      setL2FeeToken(null);
-      setFee(details, null, null);
-    }
-
-    if(toNetwork.key !== 'polygon'){
-      try{
-        let res = await api.withdrawL2FastBridgeFee(details.currency);
-        setL1Fee(res);
-      }catch(e) {
-        console.error(e);
-        setL1Fee(null);
-      }
-    }
-    else {
-      setL1Fee(null);
-    }
-  };
-
-  const setNormalWithdrawFees = async (details) => {
-    try{
-      let res = await api.withdrawL2GasFee(details.currency);
-      setFee(details, res.amount, res.feeToken);
-    }catch(err) {
-      console.log(err);
-      setL2FeeToken(null);
-      setFee(details, null, null);
-    }
-  };
-
   const setFee = (details, bridgeFee, feeToken) => {
     setL2Fee(bridgeFee)
     setL2FeeToken(feeToken)
@@ -385,30 +350,53 @@ const Bridge = (props) => {
 
     setGasFetching(true);
 
-    if(fromNetwork.from.key === 'polygon') {
+    // polygon -> zkSync
+    if(fromNetwork.from.key === 'polygon' && toNetwork.key === 'zksync') {
       const gasFee = await api.getPolygonFee();
       if(gasFee){
         setL1Fee(35000 * gasFee.fast.maxFee / 10**9);
         setFee(swapDetails, 0, null)
       }
     }
+    // zkSync -> polygon
+    else if(fromNetwork.from.key === 'zksync' && toNetwork.key === 'polygon') {
+      let res = await api.transferL2GasFee(swapDetails.currency);
+      setFee(swapDetails, res.amount, res.feeToken);
+      setL1Fee(null);
+    }
+    // Ethereum -> zkSync aka deposit
+    else if (transfer.type === "deposit") {
+      const gasFee = await api.getEthereumFee(swapDetails.currency);
+      console.log(gasFee);
+      if(gasFee){
+        let maxFee = (gasFee.maxFeePerGas) / 10**9;
+        //For deposit, ethereum gaslimit is 90000
+        setL1Fee(90000 * maxFee / 10**9); 
+        setFee(swapDetails, null, null)
+      }
+    }
+    // zkSync -> Ethereum aka withdraw
     else if (transfer.type === "withdraw") {
       if (api.apiProvider.syncWallet) {
         if (isFastWithdraw()) {
-          await setFastWithdrawFees(swapDetails);
+          const [L1res, L2res] = await Promise.all([
+            api.transferL2GasFee(swapDetails.currency),
+            api.withdrawL2FastBridgeFee(swapDetails.currency)
+          ])
+          setL1Fee(L1res);
+          setFee(swapDetails, L2res.amount, L2res.feeToken);
         } else {
-          await setNormalWithdrawFees(swapDetails);
+          let res = await api.withdrawL2GasFee(swapDetails.currency);
+          setFee(swapDetails, res.amount, res.feeToken);
         }
       }
+    // bad case, cant calculate fee 
     } else {
-      const gasFee = await api.depositL2Fee(swapDetails.currency);
-      if(gasFee){
-        let maxFee = (gasFee.maxFeePerGas) / 10**9;
-        //For deposit, ethereum gaslimit is 90000. not sure why it's not 21000. 
-        // To get the close gasfee, I used 46000 for gas limit.
-        setL1Fee(46000 * maxFee / 10**9); 
-        setFee(swapDetails, null, null)
-      }
+      console.log(`Bad op ==> from: ${
+        fromNetwork.from.key
+      }, to: ${toNetwork.key}, type: ${transfer.type}`);
+      setL2FeeToken(null);
+      setFee(swapDetails, null, null);
     }
 
     setGasFetching(false);

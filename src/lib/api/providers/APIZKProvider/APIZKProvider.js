@@ -356,13 +356,6 @@ export default class APIZKProvider extends APIProvider {
     }
   };
 
-  depositL2Fee = async (token = "ETH") => {
-    if (this.api.ethersProvider) {
-      const feeData = await this.api.ethersProvider.getFeeData();
-      return feeData;
-    }
-  };
-
   createWithdraw = async (
     amountDecimals,
     token,
@@ -508,7 +501,7 @@ export default class APIZKProvider extends APIProvider {
     return this._tokenWithdrawFees[token];
   };
 
-  withdrawL2FastGasFee = async (token) => {
+  transferL2GasFee = async (token) => {
     const feeToken = await this.getWithdrawFeeToken(token);
     const feeCurrencyInfo = this.getCurrencyInfo(feeToken);
     const address = this.syncWallet.address();

@@ -13,7 +13,6 @@ export default class APIProvider {
   depositL2               = notImplemented('depositL2')
   withdrawL2Normal        = notImplemented('withdrawL2Normal')
   withdrawL2Fast          = notImplemented('withdrawL2Fast')
-  depositL2Fee            = notImplemented('depositL2Fee')
   withdrawL2GasFee        = notImplemented('withdrawL2GasFee')
   withdrawL2FastBridgeFee = notImplemented('withdrawL2FastBridgeFee')
   getBalances             = notImplemented('getBalances')
