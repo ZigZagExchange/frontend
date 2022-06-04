@@ -22,7 +22,7 @@ const TransactionSettings = ({ transactionType }) => {
         <p className="flex items-center gap-2 text-base font-light font-work">
           Estimated gas fee:
         </p>
-        <p className="flex items-center gap-2 text-base font-work">
+        <div className="flex items-center gap-2 text-base font-work">
           {transactionType === "buy" && (
             <div>
               {marketInfo &&
@@ -33,12 +33,13 @@ const TransactionSettings = ({ transactionType }) => {
           )}
           {transactionType === "sell" && (
             <div>
-               {marketInfo && marketInfo.baseFee &&
-              Number(marketInfo.baseFee).toPrecision(5)}{" "}
-            {marketInfo && marketInfo.baseAsset.symbol}
+              {marketInfo &&
+                marketInfo.baseFee &&
+                Number(marketInfo.baseFee).toPrecision(5)}{" "}
+              {marketInfo && marketInfo.baseAsset.symbol}
             </div>
           )}
-        </p>
+        </div>
       </div>
     </div>
   );

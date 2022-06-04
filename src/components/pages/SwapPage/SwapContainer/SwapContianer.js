@@ -86,6 +86,7 @@ const SwapContianer = ({
           className="ml-3 text-2xl font-semibold text-right bg-transparent focus:outline-none"
           placeholder="0.00"
           value={toAmounts.toPrecision(6)}
+          readOnly
         />
       </div>
     </div>

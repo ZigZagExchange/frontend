@@ -2,25 +2,17 @@ import React, { Fragment, useState } from "react";
 import { Dialog, Combobox, Transition } from "@headlessui/react";
 import classNames from "classnames";
 import useTheme from "components/hooks/useTheme";
-import {
-  ChevronDownIcon,
-  CheckIcon,
-} from "@heroicons/react/solid";
+import { ChevronDownIcon, CheckIcon } from "@heroicons/react/solid";
 import api from "lib/api";
 
-// const tickers = [
-//   { id: 1, name: "ETH" },
-//   { id: 2, name: "TOKE" },
-//   { id: 3, name: "UST" },
-//   { id: 4, name: "rETH" },
-//   { id: 5, name: "USDT" },
-//   { id: 6, name: "MATIC" },
-// ];
-
-const TokenDropDownModal = ({tickers=[], onSelectedOption, selectedOption}) => {
+const TokenDropDownModal = ({
+  tickers = [],
+  onSelectedOption,
+  selectedOption,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   // const [selected, setSelected] = useState(tickers[0]);
-  const { isDark, theme } = useTheme();
+  const { isDark } = useTheme();
 
   // console.log(isDark);
   // const tickers = api.getCurrencies();
@@ -32,7 +24,6 @@ const TokenDropDownModal = ({tickers=[], onSelectedOption, selectedOption}) => {
   function openModal() {
     setIsOpen(true);
   }
-  
 
   const [query, setQuery] = useState("");
 
@@ -40,7 +31,7 @@ const TokenDropDownModal = ({tickers=[], onSelectedOption, selectedOption}) => {
     // setSelected(e);
     onSelectedOption(e);
     setIsOpen(false);
-  }
+  };
 
   const filteredToken =
     query === ""
@@ -54,7 +45,7 @@ const TokenDropDownModal = ({tickers=[], onSelectedOption, selectedOption}) => {
 
   return (
     <>
-      <div >
+      <div>
         <button
           type="button"
           onClick={openModal}
@@ -64,7 +55,7 @@ const TokenDropDownModal = ({tickers=[], onSelectedOption, selectedOption}) => {
             <img
               src={api.getCurrencyLogo(selectedOption.name)}
               alt={selectedOption}
-              style={{width: 25, height: 25}}
+              style={{ width: 25, height: 25 }}
             />
           }
           <p className="ml-3 text-lg ">{selectedOption.name}</p>
@@ -73,7 +64,11 @@ const TokenDropDownModal = ({tickers=[], onSelectedOption, selectedOption}) => {
       </div>
 
       <Transition appear show={isOpen} as={Fragment}>
-        <Dialog as="div" className={classNames('relative z-10', {dark: isDark})} onClose={closeModal}>
+        <Dialog
+          as="div"
+          className={classNames("relative z-10", { dark: isDark })}
+          onClose={closeModal}
+        >
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
@@ -97,13 +92,16 @@ const TokenDropDownModal = ({tickers=[], onSelectedOption, selectedOption}) => {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className={classNames('w-full max-w-md transform overflow-hidden rounded-md dark:bg-[#2B2E4A] bg-sky-100 text-left align-middle shadow-xl transition-all')}>
+                <Dialog.Panel
+                  className={classNames(
+                    "w-full max-w-md transform overflow-hidden rounded-md dark:bg-[#2B2E4A] bg-sky-100 text-left align-middle shadow-xl transition-all"
+                  )}
+                >
                   <Dialog.Title
                     as="h3"
                     className="pt-4 pl-5 text-lg font-semibold leading-6 divide-y font-work"
                   >
                     Select a token to Bridge
-                    
                   </Dialog.Title>
                   <div className="h-px mx-3 my-3 dark:bg-foreground-400 bg-primary-500"></div>
                   <Combobox value={selectedOption} onChange={onSelectedToken}>
@@ -153,7 +151,7 @@ const TokenDropDownModal = ({tickers=[], onSelectedOption, selectedOption}) => {
                                       <img
                                         src={api.getCurrencyLogo(item.name)}
                                         alt={item}
-                                        style={{width: 25, height: 25}}
+                                        style={{ width: 25, height: 25 }}
                                       />
                                       <p className="pl-3">{item.name}</p>
                                     </span>

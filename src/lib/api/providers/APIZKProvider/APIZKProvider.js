@@ -176,17 +176,15 @@ export default class APIZKProvider extends APIProvider {
   };
 
   checkAccountActivated = async () => {
-    const [
-      accountState,
-      signingKeySet,
-      correspondigKeySet
-    ] = await Promise.all([
-      this.getAccountState(),
-      this.syncWallet.isSigningKeySet(),
-      this.syncWallet.isCorrespondingSigningKeySet()
-    ]);
-    return (accountState.id && signingKeySet && correspondigKeySet);
-  }
+    const [accountState, signingKeySet, correspondigKeySet] = await Promise.all(
+      [
+        this.getAccountState(),
+        this.syncWallet.isSigningKeySet(),
+        this.syncWallet.isCorrespondingSigningKeySet(),
+      ]
+    );
+    return accountState.id && signingKeySet && correspondigKeySet;
+  };
 
   submitOrder = async (
     market,
@@ -201,10 +199,11 @@ export default class APIZKProvider extends APIProvider {
       toast.error(
         "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
         {
-          autoClose: 60000
+          autoClose: 60000,
         },
         {
-          toastId: "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
+          toastId:
+            "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
         }
       );
       return;
@@ -221,20 +220,7 @@ export default class APIZKProvider extends APIProvider {
     baseAmount = baseAmount
       ? parseFloat(baseAmount).toFixed(marketInfo.baseAsset.decimals)
       : null;
-    console.log(
-      "market===>",
-      market,
-      "side===>",
-      side,
-      "price===>",
-      price,
-      "quoteAmount===>",
-      quoteAmount,
-      "baseAmount===>",
-      baseAmount,
-      "orderType===>",
-      orderType
-    );
+
     let tokenBuy,
       tokenSell,
       sellQuantity,
@@ -382,13 +368,6 @@ export default class APIZKProvider extends APIProvider {
       return transfer;
     } catch (err) {
       console.log(err);
-    }
-  };
-
-  depositL2Fee = async (token = "ETH") => {
-    if (this.api.ethersProvider) {
-      const feeData = await this.api.ethersProvider.getFeeData();
-      return feeData;
     }
   };
 
@@ -546,7 +525,7 @@ export default class APIZKProvider extends APIProvider {
     return this._tokenWithdrawFees[token];
   };
 
-  withdrawL2FastGasFee = async (token) => {
+  transferL2GasFee = async (token) => {
     const feeToken = await this.getWithdrawFeeToken(token);
     const feeCurrencyInfo = this.getCurrencyInfo(feeToken);
     const address = this.syncWallet.address();
@@ -653,12 +632,9 @@ export default class APIZKProvider extends APIProvider {
       this.syncWallet
     );
 
-    const [
-      accountState,
-      accountActivated
-    ] = await Promise.all([
+    const [accountState, accountActivated] = await Promise.all([
       this.api.getAccountState(),
-      this.checkAccountActivated()
+      this.checkAccountActivated(),
     ]);
     if (!accountState.id) {
       const walletBalance = formatAmount(
@@ -667,24 +643,23 @@ export default class APIZKProvider extends APIProvider {
       );
       const activationFee = await this.changePubKeyFee("ETH");
 
-      if(isNaN(walletBalance) || walletBalance < activationFee) {
+      if (isNaN(walletBalance) || walletBalance < activationFee) {
         toast.error(
           "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
           {
-            autoClose: 60000
+            autoClose: 60000,
           }
         );
-      }
-      else {
+      } else {
         toast.error(
           "Your zkSync account is not activated. Please activate your zkSync wallet.",
           {
-            autoClose: false
+            autoClose: false,
           }
         );
       }
     } else {
-      if(!accountActivated) {
+      if (!accountActivated) {
         await this.changePubKey();
       }
     }

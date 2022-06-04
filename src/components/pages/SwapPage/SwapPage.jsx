@@ -10,7 +10,6 @@ import NetworkSelection from "components/organisms/NetworkSelection";
 import SwapContianer from "./SwapContainer";
 
 import classNames from "classnames";
-import "../SwapPage.style.css";
 import TransactionSettings from "./TransationSettings";
 import { Button } from "components/molecules/Button";
 
@@ -151,7 +150,6 @@ export default function SwapPage() {
 
   const getLadderPrice = () => {
     if (!marketInfo) return 0;
-
     const side = tType === "buy" ? "b" : "s";
     let baseAmount = sellAmounts;
     if (!baseAmount) baseAmount = 0;
@@ -273,6 +271,20 @@ export default function SwapPage() {
     }
 
     let price = currentPrice();
+    if (!price) {
+      toast.error("No price available", {
+        toastId: "No price available",
+      });
+      return;
+    }
+
+    if (price < 0) {
+      toast.error(`Price (${price}) can't be below 0`, {
+        toastId: `Price (${price}) can't be below 0`,
+      });
+      return;
+    }
+
     if (tType === "buy") {
       const bidPrice = getFirstBid();
       const delta = ((price - bidPrice) / bidPrice) * 100;
@@ -391,11 +403,19 @@ export default function SwapPage() {
 
   return (
     <DefaultTemplate>
-      {loading &&  <div className={classNames("flex justify-center align-center mt-48", { dark: isDark })}><LoadingSpinner /></div>}
+      {loading && (
+        <div
+          className={classNames("flex justify-center align-center mt-48", {
+            dark: isDark,
+          })}
+        >
+          <LoadingSpinner />
+        </div>
+      )}
       {!loading && (
         <div className={classNames("flex justify-center", { dark: isDark })}>
           <div>
-            <p className="mt-8 text-3xl font-semibold ">Quick DEX Swap</p>
+            <p className="mt-20 text-3xl font-semibold ">Quick DEX Swap</p>
             <p className="mt-2 text-sm text-gray-500">
               Swap into more than 200 tokens, using the best quotes from over 8
               sources.

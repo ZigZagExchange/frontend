@@ -23,62 +23,62 @@ const chainMap = {
   "0x4": 1000,
 };
 export default class API extends Emitter {
-  networks = {}
-  ws = null
-  apiProvider = null
-  ethersProvider = null
-  currencies = null
-  isArgent = false
-  marketInfo = {}
-  lastprices = {}
-  _signInProgress = null
-  _profiles = {}
+  networks = {};
+  ws = null;
+  apiProvider = null;
+  ethersProvider = null;
+  currencies = null;
+  isArgent = false;
+  marketInfo = {};
+  lastprices = {};
+  _signInProgress = null;
+  _profiles = {};
 
   constructor({ infuraId, networks, currencies, validMarkets }) {
-    super()
+    super();
 
     if (networks) {
-      Object.keys(networks).forEach(k => {
+      Object.keys(networks).forEach((k) => {
         this.networks[k] = [
           networks[k][0],
           new networks[k][1](this, networks[k][0]),
           networks[k][2],
-        ]
-      })
+        ];
+      });
     }
 
-    this.infuraId = infuraId
-    this.currencies = currencies
-    this.validMarkets = validMarkets
+    this.infuraId = infuraId;
+    this.currencies = currencies;
+    this.validMarkets = validMarkets;
 
     if (window.ethereum) {
-      window.ethereum.on('accountsChanged', this.signOut)
-      window.ethereum.on('chainChanged', chainId => {
+      window.ethereum.on("accountsChanged", this.signOut);
+      window.ethereum.on("chainChanged", (chainId) => {
         this.signOut().then(() => {
-          this.setAPIProvider(chainMap[chainId])
-        })
-      })
+          this.setAPIProvider(chainMap[chainId]);
+        });
+      });
 
-      this.setAPIProvider(chainMap[window.ethereum.chainId] || 1)
+      this.setAPIProvider(chainMap[window.ethereum.chainId] || 1);
     } else {
-      this.setAPIProvider(this.networks.mainnet[0])
+      this.setAPIProvider(this.networks.mainnet[0]);
     }
   }
 
   getAPIProvider = (network) => {
-    return this.networks[this.getNetworkName(network)][1]
-  }
+    return this.networks[this.getNetworkName(network)][1];
+  };
 
   setAPIProvider = (network, networkChanged = true) => {
-    const networkName = this.getNetworkName(network)
+    const networkName = this.getNetworkName(network);
 
     if (!networkName) {
-      this.signOut()
-      return
+      this.signOut();
+      return;
     }
 
-    const apiProvider = this.getAPIProvider(network)
-    this.apiProvider = apiProvider
+    const apiProvider = this.getAPIProvider(network);
+    this.apiProvider = apiProvider;
 
     // Change WebSocket if necessary
     if (this.ws) {
@@ -92,10 +92,11 @@ export default class API extends Emitter {
 
     if (this.isZksyncChain()) {
       this.web3 = new Web3(
-        window.ethereum || new Web3.providers.HttpProvider(
-          `https://${networkName}.infura.io/v3/${this.infuraId}`
-        )
-      )
+        window.ethereum ||
+          new Web3.providers.HttpProvider(
+            `https://${networkName}.infura.io/v3/${this.infuraId}`
+          )
+      );
 
       this.web3Modal = new Web3Modal({
         network: networkName,
@@ -106,13 +107,13 @@ export default class API extends Emitter {
             package: WalletConnectProvider,
             options: {
               infuraId: this.infuraId,
-            }
+            },
           },
           "custom-argent": {
             display: {
               logo: "https://images.prismic.io/argentwebsite/313db37e-055d-42ee-9476-a92bda64e61d_logo.svg?auto=format%2Ccompress&fit=max&q=50",
               name: "Argent zkSync",
-              description: "Connect to your Argent zkSync wallet"
+              description: "Connect to your Argent zkSync wallet",
             },
             package: WalletConnectProvider,
             options: {
@@ -123,63 +124,61 @@ export default class API extends Emitter {
               await provider.enable();
               this.isArgent = true;
               return provider;
-            }
-          }
-        }
-      })
+            },
+          },
+        },
+      });
     }
 
-    this.getAccountState()
-      .catch(err => {
-        console.log('Failed to switch providers', err)
-      })
+    this.getAccountState().catch((err) => {
+      console.log("Failed to switch providers", err);
+    });
 
-    if (networkChanged)
-      this.emit('providerChange', network)
-  }
+    if (networkChanged) this.emit("providerChange", network);
+  };
 
   getExplorer = (address, layer) => {
     let explorer = "https://etherscan.io/address/";
     let subdomain = this.apiProvider.network === 1 ? "" : "rinkeby.";
 
-    switch(layer){
+    switch (layer) {
       case 1:
         explorer = `https://${subdomain}etherscan.io/address/${address}`;
         return explorer;
       default:
-        explorer = `https://${subdomain}zkscan.io/explorer/accounts/${address}`
+        explorer = `https://${subdomain}zkscan.io/explorer/accounts/${address}`;
         return explorer;
     }
-  }
+  };
 
   getProfile = async (address) => {
     if (!this._profiles[address]) {
-      const profile = this._profiles[address] = {
+      const profile = (this._profiles[address] = {
         description: null,
         website: null,
         image: null,
         address,
-      }
+      });
 
       if (!address) {
-        return profile
+        return profile;
       }
 
-      profile.name = `${address.substr(0, 6)}…${address.substr(-6)}`
+      profile.name = `${address.substr(0, 6)}…${address.substr(-6)}`;
       Object.assign(
         profile,
         ...(await Promise.all([
           this._fetchENSName(address),
           this.apiProvider.getProfile(address),
         ]))
-      )
+      );
 
       if (!profile.image) {
-        profile.image = createIcon({ seed: address }).toDataURL()
+        profile.image = createIcon({ seed: address }).toDataURL();
       }
     }
 
-    return this._profiles[address]
+    return this._profiles[address];
   };
 
   _fetchENSName = async (address) => {
@@ -234,16 +233,16 @@ export default class API extends Emitter {
 
   _socketError = (e) => {
     console.warn("Zigzag websocket connection failed");
-  }
+  };
 
   start = () => {
-    if (this.ws) this.stop()
-    this.ws = new WebSocket(this.apiProvider.websocketUrl)
-    this.ws.addEventListener('open', this._socketOpen)
-    this.ws.addEventListener('close', this._socketClose)
-    this.ws.addEventListener('message', this._socketMsg)
-    this.ws.addEventListener('error', this._socketError)
-    this.emit('start')
+    if (this.ws) this.stop();
+    this.ws = new WebSocket(this.apiProvider.websocketUrl);
+    this.ws.addEventListener("open", this._socketOpen);
+    this.ws.addEventListener("close", this._socketClose);
+    this.ws.addEventListener("message", this._socketMsg);
+    this.ws.addEventListener("error", this._socketError);
+    this.emit("start");
 
     // login after reconnect
     const accountState = this.getAccountState();
@@ -253,29 +252,29 @@ export default class API extends Emitter {
         accountState.id && accountState.id.toString(),
       ]);
     }
-  }
+  };
 
   stop = () => {
-    if (!this.ws) return
-    this.ws.close()
-    this.emit('stop')
-  }
+    if (!this.ws) return;
+    this.ws.close();
+    this.emit("stop");
+  };
 
   getAccountState = async () => {
-    const accountState = { ...(await this.apiProvider.getAccountState()) }
-    accountState.profile = await this.getProfile(accountState.address)
-    this.emit('accountState', accountState)
-    return accountState
-  }
+    const accountState = { ...(await this.apiProvider.getAccountState()) };
+    accountState.profile = await this.getProfile(accountState.address);
+    this.emit("accountState", accountState);
+    return accountState;
+  };
 
   send = (op, args) => {
     if (!this.ws) return;
-    return this.ws.send(JSON.stringify({ op, args }))
-  }
+    return this.ws.send(JSON.stringify({ op, args }));
+  };
 
   refreshNetwork = async () => {
-    if (!window.ethereum) return
-    let ethereumChainId
+    if (!window.ethereum) return;
+    let ethereumChainId;
 
     // await this.signOut();
 
@@ -287,12 +286,12 @@ export default class API extends Emitter {
         ethereumChainId = "0x4";
         break;
       default:
-        return
+        return;
     }
 
     await window.ethereum.request({
-      method: 'eth_requestAccounts',
-      params: [{ eth_accounts: {} }]
+      method: "eth_requestAccounts",
+      params: [{ eth_accounts: {} }],
     });
 
     await window.ethereum.request({
@@ -301,10 +300,9 @@ export default class API extends Emitter {
     });
   };
 
-
   sleep = (ms) => {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  };
 
   signIn = async (network, ...args) => {
     if (!this._signInProgress) {
@@ -370,10 +368,8 @@ export default class API extends Emitter {
       await this.web3Modal.clearCachedProvider();
     }
 
-    if (isMobile)
-      window.localStorage.clear();
-    else
-      window.localStorage.removeItem('walletconnect');
+    if (isMobile) window.localStorage.clear();
+    else window.localStorage.removeItem("walletconnect");
 
     this.web3 = null;
     this.web3Modal = null;
@@ -466,7 +462,10 @@ export default class API extends Emitter {
       // contract.connect(signer);
       const [account] = await this.web3.eth.getAccounts();
       const result = await contract.methods
-        .transfer(ZKSYNC_POLYGON_BRIDGE.address, "" + Math.round(amount * (10 ** 18)))
+        .transfer(
+          ZKSYNC_POLYGON_BRIDGE.address,
+          "" + Math.round(amount * 10 ** 18)
+        )
         .send({
           from: account,
           maxPriorityFeePerGas: null,
@@ -491,10 +490,9 @@ export default class API extends Emitter {
       receipt.txUrl = `https://${subdomain}polygonscan.com/tx/${txHash}`;
       this.emit("bridgeReceipt", receipt);
 
-      await this.signIn(this.apiProvider.network)
+      await this.signIn(this.apiProvider.network);
     } catch (e) {
-      if (networkSwitched)
-        await this.signIn(this.apiProvider.network);
+      if (networkSwitched) await this.signIn(this.apiProvider.network);
       throw e;
     }
   };
@@ -530,6 +528,13 @@ export default class API extends Emitter {
     return res.data;
   };
 
+  getEthereumFee = async () => {
+    if (this.ethersProvider) {
+      const feeData = await this.ethersProvider.getFeeData();
+      return feeData;
+    }
+  };
+
   withdrawL2 = async (amount, token) => {
     return this.apiProvider.withdrawL2(amount, token);
   };
@@ -548,15 +553,30 @@ export default class API extends Emitter {
   };
 
   withdrawL2GasFee = async (token) => {
-    return await this.apiProvider.withdrawL2GasFee(token);
+    try {
+      return await this.apiProvider.withdrawL2GasFee(token);
+    } catch (err) {
+      console.log(err);
+      return { amount: 0, feeToken: "ETH" };
+    }
   };
 
-  withdrawL2FastGasFee = async (token) => {
-    return await this.apiProvider.withdrawL2FastGasFee(token);
+  transferL2GasFee = async (token) => {
+    try {
+      return await this.apiProvider.transferL2GasFee(token);
+    } catch (err) {
+      console.log(err);
+      return { amount: 0, feeToken: "ETH" };
+    }
   };
 
   withdrawL2FastBridgeFee = async (token) => {
-    return await this.apiProvider.withdrawL2FastBridgeFee(token);
+    try {
+      return await this.apiProvider.withdrawL2FastBridgeFee(token);
+    } catch (err) {
+      console.log(err);
+      return 0;
+    }
   };
 
   cancelAllOrders = async () => {
@@ -646,7 +666,9 @@ export default class API extends Emitter {
 
     const tickers = this.getCurrencies();
     // allways fetch ETH for Etherum wallet
-    if (!tickers.includes("ETH")) { tickers.push("ETH"); }
+    if (!tickers.includes("ETH")) {
+      tickers.push("ETH");
+    }
 
     await Promise.all(tickers.map((ticker) => getBalance(ticker)));
 
