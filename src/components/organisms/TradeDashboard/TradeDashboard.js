@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import styled from "@xstyled/styled-components";
 import TradeSidebar from "./TradeSidebar/TradeSidebar";
@@ -88,6 +88,7 @@ export function TradeDashboard() {
   const layout = useSelector(layoutSelector);
   const marketInfo = useSelector(marketInfoSelector);
   const balanceData = useSelector(balancesSelector);
+  const [fixedPoint, setFixedPoint] = useState(2);
   const dispatch = useDispatch();
   const lastPriceTableData = [];
   const markets = [];
@@ -157,6 +158,10 @@ export function TradeDashboard() {
       }
     };
   }, [network, currentMarket, api.ws]);
+
+  const changeFixedPoint = (point) => {
+    setFixedPoint(point);
+  }
 
   Object.keys(lastPrices).forEach((market) => {
     markets.push(market);
@@ -296,9 +301,11 @@ export function TradeDashboard() {
           lastPrice={marketSummary.price}
           marketInfo={marketInfo}
           bidBins={bidBins}
+          changeFixedPoint={changeFixedPoint}
         />
         <TradesBook
           currentMarket={currentMarket}
+          fixedPoint={fixedPoint}
         />
         {/* TradeChartArea */}
         <TradeChartArea marketInfo={marketInfo} />

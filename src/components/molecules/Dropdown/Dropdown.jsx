@@ -104,7 +104,7 @@ const Dropdown = ({ width, item, context, leftIcon, rightIcon, transparent, clic
     }
 
     return (
-        <DropdownWrapper ref={wrapperRef} className={`${adClass === "side-dropdown" ? "position-static side-dropdown" : ""}`}>
+        <DropdownWrapper ref={wrapperRef} className={`${adClass.includes("wide-size") ? "position-static" : ""}`}>
             <ExpandableButton width={width} transparent={transparent} expanded={isOpened} onClick={toggle}>{context}</ExpandableButton>
             {isOpened &&
                 <Wrapper width={width} className={`${adClass} ${isMobile ? "mobile-mode" : ""}`} >

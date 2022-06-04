@@ -250,7 +250,7 @@ export class OrdersTable extends React.Component {
               <th scope="col">
                 <HeaderWrapper className="position-relative">
                   {/* <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis" onClick>Side</Text> */}
-                  <Dropdown adClass="side-dropdown" transparent={true} width={162} item={this.state.sideItems} context="Side" leftIcon={false} clickFunction={this.changeSide} />
+                  <Dropdown adClass="side-dropdown wide-size" transparent={true} width={162} item={this.state.sideItems} context="Side" leftIcon={false} clickFunction={this.changeSide} />
                 </HeaderWrapper>
               </th>
               <th scope="col">
@@ -661,7 +661,7 @@ export class OrdersTable extends React.Component {
               <th>
                 <HeaderWrapper className="position-relative">
                   {/* <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Side</Text> */}
-                  <Dropdown adClass="side-dropdown" transparent={true} width={162} item={this.state.sideItems} context="Side" leftIcon={false} clickFunction={this.changeSide} />
+                  <Dropdown adClass="side-dropdown wide-size" transparent={true} width={162} item={this.state.sideItems} context="Side" leftIcon={false} clickFunction={this.changeSide} />
                 </HeaderWrapper>
               </th>
               <th>

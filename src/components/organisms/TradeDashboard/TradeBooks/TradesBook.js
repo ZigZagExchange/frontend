@@ -53,6 +53,7 @@ export default function TradesBook(props) {
             value="up_value"
             priceTableData={openOrdersLatestTradesData}
             currentMarket={props.currentMarket}
+            fixedPoint={props.fixedPoint}
           />
         </TradesWrapper>
       </StyledTradeBooks>
