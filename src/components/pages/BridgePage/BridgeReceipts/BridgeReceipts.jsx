@@ -32,7 +32,7 @@ const RecepitSection = styled.div`
     font-weight: 400;
 
     &.bridge_link {
-      color: ${(p) => p.theme.colors.primaryHighEmphasis}
+      color: ${(p) => p.theme.colors.primaryHighEmphasis};
     }
   }
 `;
@@ -59,10 +59,11 @@ const ReceiptBox = styled.div`
     cursor: pointer;
 
     &:not(:last-child) {
-      border-bottom: 1px solid ${(p) => p.theme.colors.foreground400}
+      border-bottom: 1px solid ${(p) => p.theme.colors.foreground400};
     }
 
-    .layer-left, .layer-right {
+    .layer-left,
+    .layer-right {
       display: flex;
       justify-content: space-between;
     }
@@ -85,7 +86,7 @@ const ReceiptBox = styled.div`
         display: flex;
         flex-direction: row;
         gap: 8px;
-        
+
         .currencyIcon > img {
           width: 16px;
           height: 16px;
@@ -106,32 +107,32 @@ const ReceiptBox = styled.div`
       }
     }
   }
-`
+`;
 
 const BridgeReceipts = () => {
   const receipts = useSelector(bridgeReceiptsSelector);
   const dispatch = useDispatch();
-  const [groupArray, setGroupArray] = useState([])
+  const [groupArray, setGroupArray] = useState([]);
 
   useEffect(() => {
-    let tempArray = []
-    let tempObj = {date: '', items: []}
+    let tempArray = [];
+    let tempObj = { date: "", items: [] };
     receipts.forEach((item, key) => {
-      const mdate = format(item.date, 'MMM d, Y')
-      if ( tempObj.date === '' ) {
-        tempObj = {date: mdate, items: []}
+      const mdate = format(item.date, "MMM d, Y");
+      if (tempObj.date === "") {
+        tempObj = { date: mdate, items: [] };
       }
-      if ( tempObj.date !== mdate ) {
-        tempArray.push(tempObj)
-        tempObj = {date: mdate, items: []}
+      if (tempObj.date !== mdate) {
+        tempArray.push(tempObj);
+        tempObj = { date: mdate, items: [] };
       }
-      tempObj.items.push(item)
-      if (key === receipts.length-1) {
-        tempArray.push(tempObj)
+      tempObj.items.push(item);
+      if (key === receipts.length - 1) {
+        tempArray.push(tempObj);
       }
-    })
-    setGroupArray(tempArray)
-  }, [])
+    });
+    setGroupArray(tempArray);
+  }, []);
 
   return (
     <RecepitSection>
@@ -145,45 +146,54 @@ const BridgeReceipts = () => {
         </h5>
       </RecepitHeader>
 
-      {receipts.length === 0 && (
-        <h3>No bridge receipts yet.</h3>
-      )}
+      {receipts.length === 0 && <h3>No bridge receipts yet.</h3>}
       {groupArray.map((item) => {
         return (
           <>
-          <ReceiptBox>
-            <h3 className="receipt-header">{item.date}</h3>
-            <div className="layer-wrapper">
-            {
-              item.items.map((rr) => {
-                const mtime = format(rr.date, 'H:mm')
-                const currency = api.getCurrencyInfo(rr.token);
-                const image = api.getCurrencyLogo(rr.token);
-                return (
-                  <div className="layer" onClick={() => window.open(rr.txUrl)}>
-                    <div className="layer-left">
-                      <h3>{rr.type === 'eth_to_zksync' ? 'Deposit' : 'Withdraw'}</h3>
-                      <div className="amountWrapper">
-                        <div className="currencyIcon">
-                          <img src={image && image} alt={currency && currency.symbol} />
+            <ReceiptBox>
+              <h3 className="receipt-header">{item.date}</h3>
+              <div className="layer-wrapper">
+                {item.items.map((rr) => {
+                  const mtime = format(rr.date, "H:mm");
+                  const currency = api.getCurrencyInfo(rr.token);
+                  const image = api.getCurrencyLogo(rr.token);
+                  return (
+                    <div
+                      className="layer"
+                      onClick={() => window.open(rr.txUrl)}
+                    >
+                      <div className="layer-left">
+                        <h3>
+                          {rr.type === "eth_to_zksync" ? "Deposit" : "Withdraw"}
+                        </h3>
+                        <div className="amountWrapper">
+                          <div className="currencyIcon">
+                            <img
+                              src={image && image}
+                              alt={currency && currency.symbol}
+                            />
+                          </div>
+                          <h3>
+                            {rr.amount} {rr.token}
+                          </h3>
                         </div>
-                        <h3>{rr.amount} {rr.token}</h3>
+                      </div>
+
+                      <div className="layer-right">
+                        <h5>{`${rr.txId.substr(0, 6)}...${rr.txId.substr(
+                          -6
+                        )}`}</h5>
+
+                        <h4>{mtime}</h4>
                       </div>
                     </div>
-    
-                    <div className="layer-right">
-                      <h5>{`${rr.txId.substr(0, 6)}...${rr.txId.substr(-6)}`}</h5>
-    
-                      <h4>{mtime}</h4>
-                    </div>
-                  </div>
-                )
-              })
-            }
-            </div>
-          </ReceiptBox>
+                  );
+                })}
+              </div>
+            </ReceiptBox>
           </>
-      )})}
+        );
+      })}
     </RecepitSection>
   );
 };

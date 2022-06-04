@@ -1,6 +1,6 @@
-import zksyncLogo from "../../../../assets/images/logo.svg";
-import ethLogo from "../../../../assets/images/currency/ETH.svg";
-import polygonLogo from "../../../../assets/images/polygon.png";
+import zksyncLogo from "assets/images/zksynclogo.svg";
+import ethLogo from "assets/images/ethlogo.svg";
+import polygonLogo from "assets/images/polygon.png";
 
 export const POLYGON_MUMBAI_WETH_ADDRESS =
   "0xA6FA4fB5f76172d178d61B04b0ecd319C5d1C0aa";
@@ -31,29 +31,29 @@ export const ZKSYNC_ETHEREUM_FAST_BRIDGE = {
 export const NETWORKS = [
   {
     from: {
-      network: "Ethereum",
-      key: "ethereum",
+      name: "Ethereum",
+      id: "ethereum",
       icon: ethLogo,
     },
-    to: [{ network: "zkSync", key: "zksync", icon: zksyncLogo }],
+    to: [{ name: "zkSync", id: "zksync", icon: zksyncLogo }],
   },
   {
     from: {
-      network: "zkSync",
-      key: "zksync",
+      name: "zkSync",
+      id: "zksync",
       icon: zksyncLogo,
     },
     to: [
-      { network: "Ethereum", key: "ethereum", icon: ethLogo },
-      { network: "Polygon", key: "polygon", icon: polygonLogo },
+      { name: "Ethereum", id: "ethereum", icon: ethLogo },
+      { name: "Polygon", id: "polygon", icon: polygonLogo },
     ],
   },
   {
     from: {
-      network: "Polygon",
-      key: "polygon",
+      name: "Polygon",
+      id: "polygon",
       icon: polygonLogo,
     },
-    to: [{ network: "zkSync", key: "zksync", icon: zksyncLogo }],
+    to: [{ name: "zkSync", id: "zksync", icon: zksyncLogo }],
   },
 ];

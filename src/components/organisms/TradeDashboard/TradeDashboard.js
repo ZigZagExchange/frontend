@@ -297,9 +297,7 @@ export function TradeDashboard() {
           marketInfo={marketInfo}
           bidBins={bidBins}
         />
-        <TradesBook
-          currentMarket={currentMarket}
-        />
+        <TradesBook currentMarket={currentMarket} />
         {/* TradeChartArea */}
         <TradeChartArea marketInfo={marketInfo} />
         {/* OrdersTable */}
