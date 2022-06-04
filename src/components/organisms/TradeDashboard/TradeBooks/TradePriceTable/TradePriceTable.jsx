@@ -77,14 +77,14 @@ const Table = styled.table`
   }
   
   ::-webkit-scrollbar-track {
-    border-radius: 0px;
-    background: hsla(0, 0%, 100%, 0.15);
+    border-radius: 4px;
+    background: #07071C;
     height: 23px;
   }
   
   ::-webkit-scrollbar-thumb {
-    border-radius: 0px;
-    background: hsla(0, 0%, 100%, 0.4);
+    border-radius: 4px;
+    background: #FFFFFF21;
   }
   
   ::-webkit-scrollbar-thumb:window-inactive {
@@ -98,11 +98,11 @@ const TradePriceTable = (props) => {
   const ref = useRef(null)
   const [isUpdateScroll, setUpdateScroll] = useState(false);
 
-  useEffect(()=>{
-    if(!ref.current) return;
-    if(props.priceTableData.length === 0) setUpdateScroll(false);
+  useEffect(() => {
+    if (!ref.current) return;
+    if (props.priceTableData.length === 0) setUpdateScroll(false);
     if (props.scrollToBottom) {
-      if(isUpdateScroll) return;
+      if (isUpdateScroll) return;
       setUpdateScroll(true);
       ref.current?.scrollTo(0, ref.current.scrollHeight)
     }
