@@ -35,6 +35,11 @@ const Wrapper = styled.div`
         }
     }
 
+    &.side-dropdown {
+        padding: 8px 0;
+        gap: 0;
+    }
+
     &.lang-dropdown {
         padding: 16px 0px 16px 16px;
         margin-left: -8px;
@@ -49,6 +54,14 @@ const DropdownListContainer = styled.div`
     align-items: center;
     grid-template-columns: ${({ leftIcon }) => leftIcon ? '32px 1fr' : '1fr 16px'};
     cursor: pointer;
+
+    &.side-dropdown {
+        padding: 8px 1rem;
+
+        &:hover, &.active {
+            background-color: ${({ theme }) => theme.colors.foregroundLowEmphasis}
+        }
+    }
 `
 
 const IconButton = styled(baseIcon)`
@@ -91,7 +104,7 @@ const Dropdown = ({ width, item, context, leftIcon, rightIcon, transparent, clic
     }
 
     return (
-        <DropdownWrapper ref={wrapperRef}>
+        <DropdownWrapper ref={wrapperRef} className={`${adClass === "side-dropdown" ? "position-static side-dropdown" : ""}`}>
             <ExpandableButton width={width} transparent={transparent} expanded={isOpened} onClick={toggle}>{context}</ExpandableButton>
             {isOpened &&
                 <Wrapper width={width} className={`${adClass} ${isMobile ? "mobile-mode" : ""}`} >
@@ -99,7 +112,7 @@ const Dropdown = ({ width, item, context, leftIcon, rightIcon, transparent, clic
                         const { text, value, url, icon, selectedIcon, iconSelected } = items
                         const menuIcon = iconSelected ? selectedIcon : icon;
                         return (
-                            <DropdownListContainer key={items.text} leftIcon={leftIcon} onClick={() => handleClick(url, text, value)}>
+                            <DropdownListContainer className={`${adClass} ${iconSelected ? "active" : ""}`} key={items.text} leftIcon={leftIcon} onClick={() => handleClick(url, text, value)}>
                                 {leftIcon && isValidElement(menuIcon) && <IconButton className={adClass} variant="secondary" startIcon={cloneElement(menuIcon)}></IconButton>}
                                 <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis" className={!iconSelected ? "selected-icon" : ""}>{text}</Text>
                                 {rightIcon && isValidElement(menuIcon) && <IconButton className={adClass} variant="secondary" endIcon={cloneElement(menuIcon)}></IconButton>}
@@ -108,7 +121,7 @@ const Dropdown = ({ width, item, context, leftIcon, rightIcon, transparent, clic
                     })}
                 </Wrapper>
             }
-        </DropdownWrapper>
+        </DropdownWrapper >
     )
 }
 

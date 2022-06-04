@@ -1,4 +1,5 @@
 import React from "react";
+
 import "./OrdersTable.css";
 import loadingGif from "assets/icons/loading.svg";
 import api from "lib/api";
@@ -16,11 +17,18 @@ import {
   HeaderWrapper,
   ActionWrapper
 } from "./StyledComponents"
+import { Dropdown } from "components/molecules/Dropdown";
 
 export class OrdersTable extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { tab: 0, isMobile: window.innerWidth < 1064 };
+    this.state = {
+      tab: 0, isMobile: window.innerWidth < 1064, selectedSide: "All",
+      sideItems: [{ text: "All", url: "#", iconSelected: true },
+      { text: "Buy", url: "#" },
+      { text: "Sell", url: "#" }]
+    };
+    this.changeSide = this.changeSide.bind(this);
   }
 
   setTab(newIndex) {
@@ -28,11 +36,27 @@ export class OrdersTable extends React.Component {
   }
 
   getFills() {
-    return Object.values(this.props.userFills).sort((a, b) => b[1] - a[1]);
+    return Object.values(this.props.userFills).filter(i => this.state.selectedSide === 'All' || i[3] === this.state.selctedSide.toLowerCase()[0]).sort((a, b) => b[1] - a[1]);
   }
 
   getUserOrders() {
-    return Object.values(this.props.userOrders).filter(i => i[9] !== 'f').sort((a, b) => b[1] - a[1]);
+    return Object.values(this.props.userOrders).filter(i => i[9] !== 'f' && (this.state.selectedSide === 'All' || i[3] === this.state.selctedSide.toLowerCase()[0])).sort((a, b) => b[1] - a[1]);
+  }
+
+  changeSide(newSide) {
+    let newItems = this.state.sideItems.reduce((acc, item) => {
+      if (item.text === newSide) {
+        acc.push({
+          ...item, iconSelected: true
+        })
+      } else {
+        acc.push({
+          ...item, iconSelected: false
+        })
+      }
+      return acc;
+    }, [])
+    this.setState({ selectedSide: newSide, sideItems: newItems });
   }
 
   renderOrderTable(orders) {
@@ -224,12 +248,9 @@ export class OrdersTable extends React.Component {
                 </HeaderWrapper>
               </th>
               <th scope="col">
-                <HeaderWrapper>
-                  <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Side</Text>
-                  <SortIconWrapper>
-                    <SortUpIcon />
-                    {/* <SortDownIcon /> */}
-                  </SortIconWrapper>
+                <HeaderWrapper className="position-relative">
+                  {/* <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis" onClick>Side</Text> */}
+                  <Dropdown adClass="side-dropdown" transparent={true} width={162} item={this.state.sideItems} context="Side" leftIcon={false} clickFunction={this.changeSide} />
                 </HeaderWrapper>
               </th>
               <th scope="col">
@@ -259,9 +280,9 @@ export class OrdersTable extends React.Component {
               <th scope="col">
                 <HeaderWrapper>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Order Status</Text>
-                  {/* <SortIconWrapper>
+                  <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper> */}
+                  </SortIconWrapper>
                 </HeaderWrapper>
               </th>
               <th scope="col">
@@ -426,7 +447,7 @@ export class OrdersTable extends React.Component {
               );
             })}
           </tbody>
-        </table>
+        </table >
     );
   }
 
@@ -624,49 +645,47 @@ export class OrdersTable extends React.Component {
               <th>
                 <HeaderWrapper>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Market</Text>
-                  <SortIconWrapper>
+                  {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper>
+                  </SortIconWrapper> */}
                 </HeaderWrapper>
               </th>
               <th>
                 <HeaderWrapper>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Price</Text>
-                  <SortIconWrapper>
+                  {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper>
+                  </SortIconWrapper> */}
                 </HeaderWrapper>
               </th>
               <th>
-                <HeaderWrapper>
-                  <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Side</Text>
-                  <SortIconWrapper>
-                    <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper>
+                <HeaderWrapper className="position-relative">
+                  {/* <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Side</Text> */}
+                  <Dropdown adClass="side-dropdown" transparent={true} width={162} item={this.state.sideItems} context="Side" leftIcon={false} clickFunction={this.changeSide} />
                 </HeaderWrapper>
               </th>
               <th>
                 <HeaderWrapper>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Amount</Text>
-                  <SortIconWrapper>
+                  {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper>
+                  </SortIconWrapper> */}
                 </HeaderWrapper>
               </th>
               <th>
                 <HeaderWrapper>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Fee</Text>
-                  <SortIconWrapper>
+                  {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper>
+                  </SortIconWrapper> */}
                 </HeaderWrapper>
               </th>
               <th>
                 <HeaderWrapper>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Time</Text>
-                  <SortIconWrapper>
+                  {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper>
+                  </SortIconWrapper> */}
                 </HeaderWrapper>
               </th>
               <th>
@@ -680,9 +699,9 @@ export class OrdersTable extends React.Component {
               <th>
                 <HeaderWrapper>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Action</Text>
-                  <SortIconWrapper>
+                  {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper>
+                  </SortIconWrapper> */}
                 </HeaderWrapper>
               </th>
             </tr>
