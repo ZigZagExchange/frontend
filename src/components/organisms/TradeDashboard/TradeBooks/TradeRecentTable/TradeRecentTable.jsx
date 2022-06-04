@@ -28,7 +28,7 @@ const Table = styled.table`
     top: 0;
     display: table;
     width: 100%;
-    background-color: ${({theme}) => theme.colors.backgroundHighEmphasis};
+    background-color: ${({ theme }) => theme.colors.backgroundHighEmphasis};
   }
 
   th {
@@ -70,13 +70,13 @@ const Table = styled.table`
   
   ::-webkit-scrollbar-track {
     border-radius: 0px;
-    background: ${({theme}) => theme.colors.backgroundHighEmphasis};
+    background: ${({ theme }) => theme.colors.backgroundHighEmphasis};
     height: 23px;
   }
   
   ::-webkit-scrollbar-thumb {
     border-radius: 0px;
-    background: ${({theme}) => theme.colors.foreground400};
+    background: ${({ theme }) => theme.colors.foreground400};
   }
   
   ::-webkit-scrollbar-thumb:window-inactive {
@@ -127,7 +127,7 @@ const TradeRecentTable = (props) => {
               rowStyle = {};
             }
             let time = "--:--:--"
-            if(d.td1) time = new Date(d.td1).toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1");
+            if (d.td1) time = new Date(d.td1).toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1");
             const price =
               typeof d.td2 === "number" ? d.td2.toPrecision(6) : d.td2;
             const amount =
@@ -140,7 +140,7 @@ const TradeRecentTable = (props) => {
                 <td>
                   <Text font="tableContent" color="foregroundHighEmphasis" textAlign="right">{numStringToSymbol(amount, 2)}</Text>
                 </td>
-                <td> 
+                <td>
                   <Text font="tableContent" color="foregroundHighEmphasis" textAlign="right">{time}</Text>
                 </td>
               </tr>

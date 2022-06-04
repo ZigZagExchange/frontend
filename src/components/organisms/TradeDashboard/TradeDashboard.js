@@ -128,7 +128,7 @@ export function TradeDashboard() {
   }, [network, currentMarket]);
 
   useEffect(() => {
-    if(user.address && !user.id){
+    if (user.address && !user.id) {
       console.log('here')
       history.push("/bridge");
       toast.error(
@@ -201,7 +201,7 @@ export function TradeDashboard() {
         side: fill[3],
       });
     });
-  
+
   liquidity.forEach((liq) => {
     const side = liq[0];
     const price = liq[1];
