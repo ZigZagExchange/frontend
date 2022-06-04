@@ -91,6 +91,11 @@ const Table = styled.table`
     background: #fff;
   }
 `
+const Divider = styled.div`
+  height: 1px;
+  background: ${({ theme }) => theme.colors.foreground400};
+  margin-top: 20px;
+`
 
 const TradePriceTable = (props) => {
   const { theme } = useTheme()
@@ -147,7 +152,7 @@ const TradePriceTable = (props) => {
               rowStyle = {};
             }
             const price =
-              typeof d.td1 === "number" ? d.td1.toPrecision(6) : d.td1;
+              typeof d.td1 === "number" ? d.td1.toPrecision(props.fixedPoint) : d.td1;
             const amount =
               typeof d.td2 === "number" ? d.td2.toPrecision(6) : d.td2;
             const total =
