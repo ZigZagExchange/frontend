@@ -33,6 +33,7 @@ export default class API extends Emitter {
     lastprices = {}
     _signInProgress = null
     _profiles = {}
+    _pendingOrders = []
 
     constructor({ infuraId, networks, currencies, validMarkets }) {
         super()
@@ -855,5 +856,22 @@ export default class API extends Emitter {
       console.error("Ethers provider null or undefined");
       return {};
     }
+  }
+
+  updatePendingOrders = (userOrders) => {
+    Object.keys(userOrders).forEach(orderId => {
+      const orderStatus = userOrders[orderId][9];
+      if (['b', 'm', 'pm'].includes(orderStatus)) {
+        // _pendingOrders is used to only request on the 2nd time
+        const index = this._pendingOrders.indexOf(orderId);
+        if (index > -1) {
+          this._pendingOrders.splice(index, 1);
+          // request status update
+          this.send("orderreceiptreq", [this.apiProvider.network, orderId])
+        } else {
+          this._pendingOrders.push(orderId);
+        }
+      }
+    })
   }
 }

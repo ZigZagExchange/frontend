@@ -297,6 +297,10 @@ export const apiSlice = createSlice({
         }
       }
     },
+    _orderreceipt(state, { payload }) {
+      const orderId = payload[1];
+      state.userOrders[orderId] = payload;      
+    },
     setBalances(state, { payload }) {
       const scope = makeScope(state);
       state.balances[scope] = state.balances[scope] || {};
