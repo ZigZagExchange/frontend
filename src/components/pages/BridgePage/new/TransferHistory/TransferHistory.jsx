@@ -78,7 +78,11 @@ const TransferHistory = () => {
                     </div>
                     <div className="flex gap-5">
                       <a
-                        href={`https://rinkeby.etherscan.io/tx/${item.txId}`}
+                        href={
+                          item.type !== "eth_to_zksync"
+                            ? `https://rinkeby.zkscan.io/explorer/transactions/`
+                            : `https://rinkeby.etherscan.io/tx/${item.txId}`
+                        }
                         target="_blank"
                         rel="noreferrer"
                         className="text-xs text-gray-400 font-work hover:underline underline-offset-2"
