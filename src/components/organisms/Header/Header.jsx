@@ -188,7 +188,7 @@ export const Header = (props) => {
                 </Tab>
               )}
               {hasBridge && <Tab>DSL</Tab>}
-              {hasBridge && <Tab>Swap</Tab>}
+              {hasBridge && <Tab>SWAP</Tab>}
               {/* {hasBridge && <Tab>Old BRIDGE</Tab>} */}
             </TabMenu>
           </NavWrapper>
@@ -273,7 +273,7 @@ export const Header = (props) => {
               </Tab>
             )}
             {hasBridge && <Tab>DSL</Tab>}
-            {hasBridge && <Tab>Swap</Tab>}
+            {hasBridge && <Tab>SWAP</Tab>}
           </TabMenu>
           <HorizontalDivider />
           <ActionSideMenuWrapper>
