@@ -145,6 +145,23 @@ export const apiSlice = createSlice({
         }
       });
     },
+    _fillreceipt(state, { payload }) {
+      payload[0].forEach((fill) => {
+        const fillid = fill[1];
+        if (fill[2] === state.currentMarket && fill[0] === state.network) {
+          state.marketFills[fillid] = fill;
+        }
+        if (state.userId && fill[8] === state.userId.toString()) {
+          state.userFills[fillid] = fill;
+        }
+        // for maker fills we need to flip the side and set fee to 0
+        if (state.userId && fill[9] === state.userId.toString()) {
+          fill[3] = (fill[3] === "b") ? "s" : "b";
+          fill[10] = 0;
+          state.userFills[fillid] = fill;
+        }
+      });
+    },
     _marketsummary(state, { payload }) {
       state.marketSummary = {
         market: payload[0],

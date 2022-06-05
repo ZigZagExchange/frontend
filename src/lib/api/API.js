@@ -34,6 +34,7 @@ export default class API extends Emitter {
     _signInProgress = null
     _profiles = {}
     _pendingOrders = []
+    _pendingFills = []
 
     constructor({ infuraId, networks, currencies, validMarkets }) {
         super()
@@ -873,5 +874,24 @@ export default class API extends Emitter {
         }
       }
     })
+  }
+
+  updatePendingFills = (userFills) => {
+    const fillRequestIds = [];
+    Object.keys(userFills).forEach(fillId => {
+      const fillStatus = userFills[fillId][6];
+      if (['b', 'm', 'pm'].includes(fillStatus)) {
+        // _pendingFills is used to only request on the 2nd time
+        const index = this._pendingFills.indexOf(fillId);
+        if (index > -1) {
+          this._pendingFills.splice(index, 1);
+          fillRequestIds.push(fillId);
+        } else {
+          this._pendingFills.push(fillId);
+        }
+      }
+    })    
+    // request status update
+    this.send("fillreceiptreq", [this.apiProvider.network, fillRequestIds])
   }
 }
