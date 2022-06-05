@@ -863,7 +863,7 @@ export default class API extends Emitter {
       const orderStatus = userOrders[orderId][9];
       if (['b', 'm', 'pm'].includes(orderStatus)) {
         // _pendingOrders is used to only request on the 2nd time
-        let index = this._pendingOrders.indexOf(orderId);
+        const index = this._pendingOrders.indexOf(orderId);
         if (index > -1) {
           this._pendingOrders.splice(index, 1);
           // request status update
