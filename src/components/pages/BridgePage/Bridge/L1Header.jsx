@@ -2,8 +2,8 @@ import { useSelector } from "react-redux";
 import { Dropdown, Menu, MenuItem } from "components";
 import { BiChevronDown } from "react-icons/bi";
 import React from "react";
-import styled from 'styled-components';
-import CheckIcon from '@mui/icons-material/Check';
+import styled from "styled-components";
+import CheckIcon from "@mui/icons-material/Check";
 import { networkSelector } from "lib/store/features/api/apiSlice";
 
 const MenuWrapper = styled.div`
@@ -13,7 +13,7 @@ const MenuWrapper = styled.div`
   margin-top: 10px;
   padding: 16px;
   font-size: 14px;
-  box-shadow: 0px 8px 16px 0px #0101011A;
+  box-shadow: 0px 8px 16px 0px #0101011a;
   backdrop-filter: blur(8px);
   border-radius: 8px;
   gap: 10px;
@@ -38,21 +38,26 @@ const MenuWrapper = styled.div`
       margin-left: 30px;
     }
   }
-`
+`;
 
 const L1Header = ({ networks, onSelect, selectedNetwork }) => {
   const network = useSelector(networkSelector);
   const dropdownMenu = () => {
     return (
       <MenuWrapper>
-        <Menu className="bridge_menu" onSelect={onSelect} selectedKeys={[selectedNetwork.from.key]}>
+        <Menu
+          className="bridge_menu"
+          onSelect={onSelect}
+          selectedKeys={[selectedNetwork.from.key]}
+        >
           {networks.map((item) => {
             return (
               <MenuItem key={item.from.key}>
-                {
-                  item.from.key === selectedNetwork.from.key ?
-                    <CheckIcon /> : ""
-                }
+                {item.from.key === selectedNetwork.from.key ? (
+                  <CheckIcon />
+                ) : (
+                  ""
+                )}
                 <div>{item.from.network}</div>
               </MenuItem>
             );
@@ -64,15 +69,23 @@ const L1Header = ({ networks, onSelect, selectedNetwork }) => {
 
   return (
     <div className="bridge_coin_details">
-      <Dropdown overlay={dropdownMenu} overlayClassName="bridge_menu"
-        minOverlayWidthMatchTrigger={false} align={[100, 100]} alignPoint={false}>
+      <Dropdown
+        overlay={dropdownMenu}
+        overlayClassName="bridge_menu"
+        minOverlayWidthMatchTrigger={false}
+        align={[100, 100]}
+        alignPoint={false}
+      >
         <div className="d-flex align-items-center">
           <div className="bridge_coin_image">
             <img alt="Ethereum logo" src={selectedNetwork.from.icon} />
           </div>
           <h4 className="bridge_coin_name">
             {selectedNetwork.from.network}
-            <span><br />{network === 1 ? 'Mainnet' : 'Testnet'}</span>
+            <span>
+              <br />
+              {network === 1 ? "Mainnet" : "Testnet"}
+            </span>
           </h4>
           <BiChevronDown size={25} className="ml-2" />
         </div>

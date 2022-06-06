@@ -14,19 +14,26 @@ const ConnectWalletButton = (props) => {
 
   useEffect(() => {
     if (props.isLoading) {
-      setIsLoading(props.isLoading)
+      setIsLoading(props.isLoading);
     }
-  }, [props.isLoading])
+  }, [props.isLoading]);
 
   const pushToBridgeMaybe = async (state) => {
-    const walletBalance = formatAmount(state.committed.balances['ETH'], { decimals: 18 });
-    const activationFee = await api.apiProvider.changePubKeyFee('ETH');
+    const walletBalance = formatAmount(state.committed.balances["ETH"], {
+      decimals: 18,
+    });
+    const activationFee = await api.apiProvider.changePubKeyFee("ETH");
 
-    if (!state.id && (!/^\/bridge(\/.*)?/.test(location.pathname)) && (isNaN(walletBalance) || walletBalance < activationFee)) {
+    if (
+      !state.id &&
+      !/^\/bridge(\/.*)?/.test(location.pathname) &&
+      (isNaN(walletBalance) || walletBalance < activationFee)
+    ) {
       history.push("/bridge");
     }
 
-    if (document.querySelector('.connect-notification')) document.querySelector('.connect-notification').style.display = 'flex';
+    if (document.querySelector(".connect-notification"))
+      document.querySelector(".connect-notification").style.display = "flex";
   };
 
   return (
@@ -42,7 +49,11 @@ const ConnectWalletButton = (props) => {
           })
           .finally(() => setIsLoading(false));
       }}
-      style={{ width: props.width, padding: isLoading ? '8px 5px' : '8px 15px' }}
+      style={{
+        width: props.width,
+        padding: isLoading ? "8px 5px" : "8px 15px",
+      }}
+      className={props?.className}
     >
       CONNECT WALLET
     </Button>

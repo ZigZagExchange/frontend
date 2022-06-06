@@ -55,67 +55,95 @@ export const BridgeInputBox = styled.div`
   }
 `;
 
-const BridgeSwapInput = ({ value = {}, onChange, balances = {}, L1Fee, L2Fee, feeCurrency, isOpenable, gasFetching }) => {
-  const setCurrency = useCallback(currency => {
-    onChange({ currency, amount: '' })
-  }, [onChange])
-  const setAmount = useCallback(e => {
-    if (e.target.value.length > 10) return;
-    onChange({ amount: e.target.value.replace(/[^0-9.]/g, '') })
-  }, [onChange])
+const BridgeSwapInput = ({
+  value = {},
+  onChange,
+  balances = {},
+  L1Fee,
+  L2Fee,
+  feeCurrency,
+  isOpenable,
+  gasFetching,
+}) => {
+  const setCurrency = useCallback(
+    (currency) => {
+      onChange({ currency, amount: "" });
+    },
+    [onChange]
+  );
+
+  const setAmount = useCallback(
+    (e) => {
+      if (e.target.value.length > 10) return;
+      onChange({ amount: e.target.value.replace(/[^0-9.]/g, "") });
+    },
+    [onChange]
+  );
 
   const setMax = () => {
-    if(gasFetching) return;
+    if (gasFetching) return;
     let max = 0;
     try {
       let currencyInfo = {};
-      if (value.currency === 'WETH') {
-        currencyInfo = api.getCurrencyInfo('ETH');
-      }
-      else {
+      if (value.currency === "WETH") {
+        currencyInfo = api.getCurrencyInfo("ETH");
+      } else {
         currencyInfo = api.getCurrencyInfo(value.currency);
       }
       const roundedDecimalDigits = Math.min(currencyInfo.decimals, 8);
-      let actualBalance = balances[value.currency].value / (10 ** currencyInfo.decimals);
+      let actualBalance =
+        balances[value.currency].value / 10 ** currencyInfo.decimals;
       if (actualBalance !== 0) {
         let receiveAmount = 0;
-        if (feeCurrency === 'ETH' && value.currency === 'ETH') {
+        if (feeCurrency === "ETH" && value.currency === "ETH") {
           receiveAmount = actualBalance - L2Fee - L1Fee;
           max = actualBalance - L2Fee;
-        }
-        else if (feeCurrency === value.currency) {
+        } else if (feeCurrency === value.currency) {
           receiveAmount = actualBalance - L2Fee;
           max = actualBalance - L2Fee;
-        }
-        else if (value.currency === 'ETH' && feeCurrency === null) {
+        } else if (value.currency === "ETH" && feeCurrency === null) {
           receiveAmount = actualBalance - L1Fee;
           max = actualBalance - L1Fee;
-        }
-        else {
+        } else {
           max = actualBalance;
         }
         // one number to protect against overflow
-        if(receiveAmount < 0) max = 0;
+        if (receiveAmount < 0) max = 0;
         else {
-          max = Math.round(max * 10**roundedDecimalDigits - 1) / 10**roundedDecimalDigits;
+          max =
+            Math.round(max * 10 ** roundedDecimalDigits - 1) /
+            10 ** roundedDecimalDigits;
         }
       }
     } catch (e) {
-      max = parseFloat((balances[value.currency] && balances[value.currency].valueReadable) || 0)
+      max = parseFloat(
+        (balances[value.currency] && balances[value.currency].valueReadable) ||
+          0
+      );
     }
 
-    onChange({ amount: String(max) })
-  }
+    onChange({ amount: String(max) });
+  };
 
   return (
     <BridgeInputBox>
       <div className="currencySelector">
-        <BridgeCurrencySelector balances={balances} onChange={setCurrency} value={value.currency} isOpenable={isOpenable} />
+        <BridgeCurrencySelector
+          balances={balances}
+          onChange={setCurrency}
+          value={value.currency}
+          isOpenable={isOpenable}
+        />
       </div>
       <a className="maxLink" href="#max" onClick={setMax}>
         Max
       </a>
-      <input onChange={setAmount} value={value.amount} placeholder="0.00" type="text" />
+      <input
+        onChange={setAmount}
+        value={value.amount}
+        placeholder="0.00"
+        type="text"
+      />
     </BridgeInputBox>
   );
 };
