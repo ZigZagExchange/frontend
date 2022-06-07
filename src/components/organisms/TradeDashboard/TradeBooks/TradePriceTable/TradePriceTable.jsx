@@ -152,7 +152,7 @@ const TradePriceTable = (props) => {
               rowStyle = {};
             }
             const price =
-              typeof d.td1 === "number" ? d.td1.toPrecision(props.fixedPoint) : d.td1;
+              typeof d.td1 === "number" ? d.td1.toFixed(props.fixedPoint) : d.td1;
             const amount =
               typeof d.td2 === "number" ? d.td2.toPrecision(6) : d.td2;
             const total =
