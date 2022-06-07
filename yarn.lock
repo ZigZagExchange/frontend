@@ -1700,7 +1700,7 @@
     "@ethersproject/bytes" "^5.6.1"
     js-sha3 "0.8.0"
 
-"@ethersproject/logger@5.6.0", "@ethersproject/logger@^5.0.5", "@ethersproject/logger@^5.6.0":
+"@ethersproject/logger@5.6.0", "@ethersproject/logger@^5.0.5", "@ethersproject/logger@^5.4.0", "@ethersproject/logger@^5.6.0":
   version "5.6.0"
   resolved "https://registry.yarnpkg.com/@ethersproject/logger/-/logger-5.6.0.tgz#d7db1bfcc22fd2e4ab574cba0bb6ad779a9a3e7a"
   integrity sha512-BiBWllUROH9w+P21RzoxJKzqoqpkyM1pRnEKG69bulE9TSQD8SAIvTQqIMZmmCO8pUNkgLP1wndX1gKghSpBmg==
@@ -3831,13 +3831,6 @@ axios@^0.21.2:
   dependencies:
     follow-redirects "^1.14.0"
 
-axios@^0.23.0:
-  version "0.23.0"
-  resolved "https://registry.yarnpkg.com/axios/-/axios-0.23.0.tgz#b0fa5d0948a8d1d75e3d5635238b6c4625b05149"
-  integrity sha512-NmvAE4i0YAv5cKq8zlDoPd1VLKAqX5oLuZKs8xkJa4qi6RGn0uhCYFjWtHHC9EM/MwOwYWOs53W+V0aqEXq1sg==
-  dependencies:
-    follow-redirects "^1.14.4"
-
 axios@^0.24.0:
   version "0.24.0"
   resolved "https://registry.yarnpkg.com/axios/-/axios-0.24.0.tgz#804e6fa1e4b9c5288501dd9dff56a7a0940d20d6"
@@ -5217,6 +5210,13 @@ cross-fetch@^2.1.0:
   dependencies:
     node-fetch "^2.6.7"
     whatwg-fetch "^2.0.4"
+
+cross-fetch@^3.1.5:
+  version "3.1.5"
+  resolved "https://registry.yarnpkg.com/cross-fetch/-/cross-fetch-3.1.5.tgz#e1389f44d9e7ba767907f7af8454787952ab534f"
+  integrity sha512-lvb1SBsI0Z7GDwmuid+mU3kWVBwTVUbe7S0H52yaaAdQOXq2YktTCZdlAcNKFzE6QtRz0snpw9bNiPeOIkkQvw==
+  dependencies:
+    node-fetch "2.6.7"
 
 cross-spawn@7.0.3, cross-spawn@^7.0.0, cross-spawn@^7.0.2:
   version "7.0.3"
@@ -7074,6 +7074,11 @@ fb-watchman@^2.0.0:
   dependencies:
     bser "2.1.1"
 
+fetch-intercept@^2.4.0:
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/fetch-intercept/-/fetch-intercept-2.4.0.tgz#be8b0f17abaadeea6de52ecdb6e9ed081f03480a"
+  integrity sha512-BPZ2LM9Dh1ua2ovQf03N6rhWg1qxdVD5qK/G4llvcemt6M+jjxCuIDxJ+6IiG+uz//3UQmgfKEv0gOGvYIxZ7g==
+
 figgy-pudding@^3.5.1:
   version "3.5.2"
   resolved "https://registry.npmjs.org/figgy-pudding/-/figgy-pudding-3.5.2.tgz"
@@ -7431,10 +7436,10 @@ get-package-type@^0.1.0:
   resolved "https://registry.npmjs.org/get-package-type/-/get-package-type-0.1.0.tgz"
   integrity sha512-pjzuKtY64GYfWizNAJ0fr9VqttZkNiK2iS430LtIHzjBEr6bX8Am2zm4sW4Ro5wjWW5cAlRL1qAMTcXbjNAO2Q==
 
-get-starknet@^1.3.2:
-  version "1.3.2"
-  resolved "https://registry.yarnpkg.com/get-starknet/-/get-starknet-1.3.2.tgz#ca815b909ed4b46fbac92464c9e19369e3a5cbeb"
-  integrity sha512-sqDH5E4zqzfvuZwXUGhdclYByLWV4HZs82mbIZiXXOErh29kzh0yF4yspbLnswjd164m9dAzA197qz6WvuXYGA==
+get-starknet@^1.4.1:
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/get-starknet/-/get-starknet-1.4.1.tgz#ea6f19bb2038878ab192822c9e59e1dca86c7b4d"
+  integrity sha512-HyYH4wngdOekeNFbtD4Qw+USQOfs1k9mWAHhhxiQyk2AKpdmLiIDz+A7lbA/X7OEi7U4Ypl0+Z4h7djq/ues9A==
   dependencies:
     bowser "^2.11.0"
 
@@ -10327,7 +10332,7 @@ node-addon-api@^2.0.0:
   resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-2.0.2.tgz#432cfa82962ce494b132e9d72a15b29f71ff5d32"
   integrity sha512-Ntyt4AIXyaLIuMHF6IOoTakB3K+RWxwtsHNRxllEoA6vPwP9o4866g6YWDLUdnucilZhmkxiHwHr11gAENw+QA==
 
-node-fetch@^2.6.0, node-fetch@^2.6.1, node-fetch@^2.6.7:
+node-fetch@2.6.7, node-fetch@^2.6.0, node-fetch@^2.6.1, node-fetch@^2.6.7:
   version "2.6.7"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.7.tgz#24de9fba827e3b4ae44dc8b20256a379160052ad"
   integrity sha512-ZjMPFEfVx5j+y2yF35Kzx5sF7kDzxuDj6ziH4FFbOp87zKDZNx8yExJIb05OGF4Nlt9IHFIMBkRl41VdvcNdbQ==
@@ -13548,20 +13553,21 @@ stackframe@^1.1.1:
   resolved "https://registry.npmjs.org/stackframe/-/stackframe-1.2.0.tgz"
   integrity sha512-GrdeshiRmS1YLMYgzF16olf2jJ/IzxXY9lhKOskuVziubpTYcYqyOwYeJKzQkwy7uN0fYSsbsC4RQaXf9LCrYA==
 
-starknet@^2.0.2:
-  version "2.9.0"
-  resolved "https://registry.yarnpkg.com/starknet/-/starknet-2.9.0.tgz#a263e603a45441785991f2c18fcecd8722d6368b"
-  integrity sha512-i/wYJMR1DtkjagCNkPOwUsZLyyCYZtT533nJLdhL5CYw2K7ChuLQphhC8tSDKvrzMm0/PkthDVSI+xjYOPVdTw==
+starknet@^3.10.2:
+  version "3.12.3"
+  resolved "https://registry.yarnpkg.com/starknet/-/starknet-3.12.3.tgz#16c22f6c4597aa91fd2c887019d3fc56f6f73474"
+  integrity sha512-FmWC+AgeqgPkOnp0FXcg9q/T00vg02JGgqTyWvWJgB/9L9vYdkFfIbnkLwKbAdzzGrYr4iL9EE94ZXoosOYnAg==
   dependencies:
-    axios "^0.23.0"
+    "@ethersproject/bytes" "^5.6.1"
     bn.js "^5.2.0"
+    cross-fetch "^3.1.5"
     elliptic "^6.5.4"
     ethereum-cryptography "^0.2.0"
+    fetch-intercept "^2.4.0"
     hash.js "^1.1.7"
     json-bigint "^1.0.0"
     minimalistic-assert "^1.0.1"
     pako "^2.0.4"
-    superstruct "^0.15.3"
     url-join "^4.0.1"
 
 static-extend@^0.1.1:
@@ -13822,11 +13828,6 @@ stylehacks@^4.0.0:
     browserslist "^4.0.0"
     postcss "^7.0.0"
     postcss-selector-parser "^3.0.0"
-
-superstruct@^0.15.3:
-  version "0.15.5"
-  resolved "https://registry.yarnpkg.com/superstruct/-/superstruct-0.15.5.tgz#0f0a8d3ce31313f0d84c6096cd4fa1bfdedc9dab"
-  integrity sha512-4AOeU+P5UuE/4nOUkmcQdW5y7i9ndt1cQd/3iUe+LTz3RxESf/W/5lg4B74HbDMMv8PHnPnGCQFH45kBcrQYoQ==
 
 supports-color@^5.3.0, supports-color@^5.5.0:
   version "5.5.0"
