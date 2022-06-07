@@ -7,6 +7,10 @@ import { HideMenuOnOutsideClicked } from 'lib/utils'
 
 const DropdownWrapper = styled.div`
     position: relative;
+
+    &.size-wide {
+        position: static;
+    }
 `
 
 export const Wrapper = styled.div`
@@ -104,7 +108,7 @@ const Dropdown = ({ width, item, context, leftIcon, rightIcon, transparent, clic
     }
 
     return (
-        <DropdownWrapper ref={wrapperRef} className={`${adClass.includes("wide-size") ? "position-static" : ""}`}>
+        <DropdownWrapper ref={wrapperRef} className={adClass}>
             <ExpandableButton width={width} transparent={transparent} expanded={isOpened} onClick={toggle}>{context}</ExpandableButton>
             {isOpened &&
                 <Wrapper width={width} className={`${adClass} ${isMobile ? "mobile-mode" : ""}`} >
