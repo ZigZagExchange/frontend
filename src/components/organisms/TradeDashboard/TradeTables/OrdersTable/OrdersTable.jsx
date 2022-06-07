@@ -36,11 +36,11 @@ export class OrdersTable extends React.Component {
   }
 
   getFills() {
-    return Object.values(this.props.userFills).filter(i => this.state.selectedSide === 'All' || i[3] === this.state.selctedSide.toLowerCase()[0]).sort((a, b) => b[1] - a[1]);
+    return Object.values(this.props.userFills).filter(i => this.state.selectedSide === 'All' || i[3] === this.state.selectedSide.toLowerCase()[0]).sort((a, b) => b[1] - a[1]);
   }
 
   getUserOrders() {
-    return Object.values(this.props.userOrders).filter(i => i[9] !== 'f' && (this.state.selectedSide === 'All' || i[3] === this.state.selctedSide.toLowerCase()[0])).sort((a, b) => b[1] - a[1]);
+    return Object.values(this.props.userOrders).filter(i => i[9] !== 'f' && (this.state.selectedSide === 'All' || i[3] === this.state.selectedSide.toLowerCase()[0])).sort((a, b) => b[1] - a[1]);
   }
 
   changeSide(newSide) {
