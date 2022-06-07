@@ -65,6 +65,7 @@ const CurrencyImg = styled.img`
 
 const CurrencyList = styled.ul`
   display: flex;
+  max-height: 17rem;
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
@@ -101,6 +102,28 @@ const CurrencyListItem = styled.li`
 const DropdownContent = styled.div`
   flex: 1 1 auto;
   overflow-y: auto;
+
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+    position: relative;
+    z-index: 20;
+  }
+
+  ::-webkit-scrollbar-track {
+      border-radius: 5px;
+      background: transparent;
+      height: 23px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+      border-radius: 5px;
+      background: hsla(0, 0%, 100%, 0.4);
+  }
+
+  ::-webkit-scrollbar-thumb:window-inactive {
+      background: #fff;
+  }
 `;
 
 const DropdownFooter = styled.div`

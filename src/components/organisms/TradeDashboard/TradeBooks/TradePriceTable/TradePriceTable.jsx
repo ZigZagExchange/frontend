@@ -83,7 +83,7 @@ const Table = styled.table`
   }
   
   ::-webkit-scrollbar-thumb {
-    border-radius: 4px;
+    border-radius: 4px;         
     background: #FFFFFF21;
   }
   
