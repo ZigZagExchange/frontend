@@ -441,6 +441,11 @@ export class SpotForm extends React.Component {
       } else {
         newstate.baseAmount = displayAmount;
       }
+
+      newstate.baseAmount === "" ? newstate.totalAmount = "" :
+        newstate.totalAmount = this.props.orderType === "limit" ?
+          (this.currentPrice() * newstate.baseAmount).toPrecision(6) :
+          (this.props.marketSummary.price * newstate.baseAmount).toPrecision(6);
     } else if (this.props.side === "b") {
       const quoteBalance = this.getQuoteBalance();
       const quoteDecimals = marketInfo.quoteAsset.decimals;
