@@ -14,7 +14,7 @@ import { formatUSD, HideMenuOnOutsideClicked } from "lib/utils";
 import api from "lib/api";
 import { IconButton as baseIcon } from "../IconButton";
 import Text from "components/atoms/Text/Text";
-import { PlusIcon, CompareArrowIcon, DeleteIcon } from "components/atoms/Svg";
+import { PlusIcon, CompareArrowIcon, DeleteIcon, ExternalLinkIcon } from "components/atoms/Svg";
 import ToggleButton from "../Toggle/ToggleButton";
 
 const DropdownWrapper = styled.div`
@@ -160,6 +160,10 @@ const AccountDropdown = ({ notext }) => {
     toggle()
   }
 
+  const popoutzkScan = () => {
+    window.open(`https://rinkeby.zkscan.io/explorer/accounts/${wallet["ETH"]["allowance"]["_hex"]}`, "_blank");
+  }
+
   const filterSmallBalances = (currency) => {
     const balance = wallet[currency].valueReadable;
     if (balance) {
@@ -267,6 +271,12 @@ const AccountDropdown = ({ notext }) => {
           </DropdownContent>
           <Divider />
           <DropdownFooter>
+            <Button variant="outlined" scale="imd" onClick={popoutzkScan} className="mr-[1rem]">
+              <Text font="primaryBoldDisplay" color="foregroundHighEmphasis" textAlign="center">
+                <ExternalLinkIcon size={10} />
+                zkScan
+              </Text>
+            </Button>
             <Button variant="outlined" scale="imd" onClick={disconnect}>
               <Text font="primaryBoldDisplay" color="foregroundHighEmphasis" textAlign="center">DISCONNECT</Text>
             </Button>
