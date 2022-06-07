@@ -11,6 +11,7 @@ import {
   balancesSelector,
 } from "lib/store/features/api/apiSlice";
 import { formatUSD, HideMenuOnOutsideClicked } from "lib/utils";
+import { userSelector } from "lib/store/features/auth/authSlice";
 import api from "lib/api";
 import { IconButton as baseIcon } from "../IconButton";
 import Text from "components/atoms/Text/Text";
@@ -139,6 +140,7 @@ const IconButton = styled(baseIcon)`
 const AccountDropdown = ({ notext }) => {
   const [isOpened, setIsOpened] = useState(false)
   const network = useSelector(networkSelector);
+  const user = useSelector(userSelector);
   const balanceData = useSelector(balancesSelector);
   const [totalBalance, setTotalBalance] = useState(0);
   const [selectedLayer, setSelectedLayer] = useState(2);
@@ -161,7 +163,9 @@ const AccountDropdown = ({ notext }) => {
   }
 
   const popoutzkScan = () => {
-    window.open(`https://rinkeby.zkscan.io/explorer/accounts/${wallet["ETH"]["allowance"]["_hex"]}`, "_blank");
+    if (user.id && user.address) {
+      window.open(`https://rinkeby.zkscan.io/explorer/accounts/${user.address}`, "_blank");
+    }
   }
 
   const filterSmallBalances = (currency) => {
