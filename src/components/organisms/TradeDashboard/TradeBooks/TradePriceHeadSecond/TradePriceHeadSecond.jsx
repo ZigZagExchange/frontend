@@ -33,7 +33,7 @@ const TradePriceHeadSecond = (props) => {
   return (
     <Wrapper>
       <div>
-        {/* <Text font="primaryTitleDisplay" color="successHighEmphasis">{parseFloat(props.lastPrice.toFixed(props.fixedPoint))}</Text> */}
+        <Text font="primaryTitleDisplay" color="successHighEmphasis">{parseFloat(props.lastPrice).toFixed(props.fixedPoint)}</Text>
         <ArrowUpIcon />
       </div>
       {/* <span>$ {
