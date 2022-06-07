@@ -30,6 +30,9 @@ export class SpotForm extends React.Component {
     const newState = { ...this.state };
     newState.price = (rx_live.test(e.target.value)) ? e.target.value : this.state.price;
     newState.userHasEditedPrice = true;
+    newState.totalAmount = this.props.orderType === "limit" ?
+      (this.currentPrice() * newState.baseAmount).toPrecision(6) :
+      (this.props.marketSummary.price * newState.baseAmount).toPrecision(6);
     this.setState(newState);
   }
 
@@ -38,6 +41,9 @@ export class SpotForm extends React.Component {
     const newState = { ...this.state };
     newState.price = (Number(this.state.price) + 1).toString();
     newState.userHasEditedPrice = true;
+    newState.totalAmount = this.props.orderType === "limit" ?
+      (this.currentPrice() * newState.baseAmount).toPrecision(6) :
+      (this.props.marketSummary.price * newState.baseAmount).toPrecision(6);
     this.setState(newState);
   }
 
@@ -46,6 +52,9 @@ export class SpotForm extends React.Component {
     const newState = { ...this.state };
     newState.price = Number(this.state.price) - 1 < 0 ? '0' : (Number(this.state.price) - 1).toString();
     newState.userHasEditedPrice = true;
+    newState.totalAmount = this.props.orderType === "limit" ?
+      (this.currentPrice() * newState.baseAmount).toPrecision(6) :
+      (this.props.marketSummary.price * newState.baseAmount).toPrecision(6);
     this.setState(newState);
   }
 
@@ -76,6 +85,10 @@ export class SpotForm extends React.Component {
     const newState = { ...this.state };
     newState.baseAmount = (Number(this.state.baseAmount) + 1).toString();
     newState.quoteAmount = "";
+    newState.baseAmount === "" ? newState.totalAmount = "" :
+      newState.totalAmount = this.props.orderType === "limit" ?
+        (this.currentPrice() * newState.baseAmount).toPrecision(6) :
+        (this.props.marketSummary.price * newState.baseAmount).toPrecision(6);
     this.setState(newState);
   }
 
@@ -85,6 +98,10 @@ export class SpotForm extends React.Component {
     newState.baseAmount = Number(this.state.baseAmount) - 1 < 0 ? '0' : (Number(this.state.baseAmount) - 1).toString();
     newState.quoteAmount = "";
     newState.maxSizeSelected = false;
+    newState.baseAmount === "" ? newState.totalAmount = "" :
+      newState.totalAmount = this.props.orderType === "limit" ?
+        (this.currentPrice() * newState.baseAmount).toPrecision(6) :
+        (this.props.marketSummary.price * newState.baseAmount).toPrecision(6);
     this.setState(newState);
   }
 
@@ -445,10 +462,14 @@ export class SpotForm extends React.Component {
         newstate.baseAmount = (baseDisplayAmount > 9999)
           ? baseDisplayAmount.toFixed(0)
           : baseDisplayAmount.toPrecision(5)
+        newstate.totalAmount = (baseDisplayAmount > 9999)
+          ? baseDisplayAmount.toFixed(0) * this.currentPrice()
+          : baseDisplayAmount.toPrecision(5) * this.currentPrice()
       }
     }
 
     if (isNaN(newstate.baseAmount)) newstate.baseAmount = 0;
+    if (isNaN(newstate.totalAmount)) newstate.totalAmount = 0;
     if (isNaN(newstate.quoteAmount)) newstate.quoteAmount = 0;
     this.setState(newstate);
   }
