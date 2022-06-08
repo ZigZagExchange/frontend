@@ -59,7 +59,9 @@ const TradeRatesCard = ({ updateMarketChain, marketSummary, rowData, currentMark
               <>
                 <RatesCard>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h Change</Text>
-                  <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{parseFloat(marketSummary["priceChange"]).toFixed(5) ?? '--'}</Text>
+                  <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis" className={parseFloat(marketSummary["priceChange"]) >= 0 ? "text-green" : "text-red"}>
+                    {parseFloat(marketSummary["priceChange"]).toFixed(2) ?? '--'}
+                  </Text>
                 </RatesCard>
                 <RatesCard>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h High</Text>

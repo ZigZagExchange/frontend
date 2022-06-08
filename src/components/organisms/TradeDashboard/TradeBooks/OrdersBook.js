@@ -50,6 +50,7 @@ const OrderFooterRight = styled.div`
 `
 
 const OrderButtonWrapper = styled.div`
+  margin-left: 5px;
   cursor: pointer;
 
   rect {

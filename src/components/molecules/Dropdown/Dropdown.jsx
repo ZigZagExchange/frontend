@@ -63,7 +63,7 @@ const DropdownListContainer = styled.div`
         padding: 8px 1rem;
 
         &:hover, &.active {
-            background-color: ${({ theme }) => theme.colors.foregroundLowEmphasis}
+            background-color: ${({ theme }) => theme.colors.backgroundLowEmphasis}
         }
     }
 `

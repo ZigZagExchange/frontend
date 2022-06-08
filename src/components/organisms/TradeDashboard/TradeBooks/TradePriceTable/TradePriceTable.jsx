@@ -81,17 +81,13 @@ const Table = styled.table`
   
   ::-webkit-scrollbar-track {
     border-radius: 4px;
-    background: #07071C;
+    background: transparent;
     height: 23px;
   }
   
   ::-webkit-scrollbar-thumb {
     border-radius: 4px;         
-    background: #FFFFFF21;
-  }
-  
-  ::-webkit-scrollbar-thumb:window-inactive {
-    background: #fff;
+    background: ${({ theme }) => theme.colors.foreground400};
   }
 `
 const Divider = styled.div`
