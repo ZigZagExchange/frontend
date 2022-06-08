@@ -895,7 +895,7 @@ export class OrdersTable extends React.Component {
               );
             });
           footerContent = (
-            <div style={{ textAlign: 'center' }}>
+            <div style={{ textAlign: 'center', marginTop: '8px' }}>
               {
                 this.state.isMobile ?
                   <table><tbody>{balancesContent}</tbody></table> :
