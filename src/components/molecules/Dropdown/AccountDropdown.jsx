@@ -186,8 +186,13 @@ const AccountDropdown = ({ notext }) => {
   }
 
   const popoutzkScan = () => {
+    // https://etherscan.io/token/0x38d646b2c2d88c8576330b127a5187a47fb3cf46
     if (user.id && user.address) {
-      window.open(`https://rinkeby.zkscan.io/explorer/accounts/${user.address}`, "_blank");
+      if (selectedLayer === 1) {
+        window.open(`https://etherscan.io/token/${user.address}`, "_blank");
+      } else {
+        window.open(`https://rinkeby.zkscan.io/explorer/accounts/${user.address}`, "_blank");
+      }
     }
   }
 
