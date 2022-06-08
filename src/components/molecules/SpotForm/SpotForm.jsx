@@ -734,8 +734,8 @@ const RangeWrapper = styled.div`
     }
 
     &::before {
-      width: 5px !important;
-      height: 5px !important;
+      width: 10px !important;
+      height: 10px !important;
     }
   }
 
@@ -745,8 +745,8 @@ const RangeWrapper = styled.div`
 
   .MuiSlider-thumb {
     margin: 0 !important;
-    padding: 7px !important;
-    transform: translate(-50%, -50%);
+    padding: 10px !important;
+    transform: translate(-50%, -40%);
   }
 `
 

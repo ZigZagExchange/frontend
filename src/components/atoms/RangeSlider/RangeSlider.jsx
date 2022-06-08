@@ -3,7 +3,7 @@ import { useTheme } from "styled-components"
 // css
 import "./RangeSlider.css";
 // library
-import { Slider, makeStyles } from "@material-ui/core";
+import { Slider, makeStyles, withStyles } from "@material-ui/core";
 
 const marks = [
   {
@@ -22,6 +22,16 @@ const marks = [
     value: 100,
   },
 ];
+
+const CustomSlider = withStyles({
+  rail: {
+    height: 6
+  },
+  thumb: {
+    padding: 10
+  }
+})(Slider)
+
 export const RangeSlider = (props) => {
   const theme = useTheme()
   const useStyles = makeStyles(() => ({
@@ -34,9 +44,11 @@ export const RangeSlider = (props) => {
       outline: 0,
       marginLeft: "-10px",
       position: "absolute",
+      padding: "10px",
       boxSizing: "border-box",
       border: "1px solid #47485C",
       transition: "box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
+      transform: "translate(-50%,-50%)",
       "&::after": {
         position: "absolute",
         left: "50%",
@@ -49,7 +61,7 @@ export const RangeSlider = (props) => {
       },
     },
     root: {
-      height: "4px",
+      height: "6px",
       backgroundColor: theme.colors.foreground400,
       width: "100%",
       cursor: "pointer",
@@ -59,6 +71,9 @@ export const RangeSlider = (props) => {
       boxSizing: "content-box",
       touchAction: "none",
     },
+    rail: {
+      height: "6px"
+    },
     active: {
       boxShadow: "none !important",
     },
@@ -67,7 +82,7 @@ export const RangeSlider = (props) => {
   const classes = useStyles()
   return (
     <>
-      <Slider
+      <CustomSlider
         defaultValue={0}
         aria-labelledby="discrete-slider-always"
         step={1}
