@@ -504,6 +504,7 @@ export class SpotForm extends React.Component {
   render() {
     // const ethInput = useRef(null);
     // const usdInput = useRef(null);
+    const isMobile = window.innerWidth < 430
     const marketInfo = this.props.marketInfo;
 
     let price = this.currentPrice();
@@ -576,7 +577,7 @@ export class SpotForm extends React.Component {
 
     return (
       <>
-        <StyledForm>
+        <StyledForm isMobile={isMobile}>
           <InputBox>
             <IconButton variant="secondary" startIcon={<MinusIcon />} disabled={this.priceIsDisabled()} onClick={this.decreasePrice.bind(this)}></IconButton>
             <InputField
@@ -660,8 +661,8 @@ const StyledForm = styled.form`
   display: grid;
   grid-auto-flow: row;
   align-items: center;
-  gap: 5px;
-  padding: 0px 20px 20px 20px;
+  gap: ${({ isMobile }) => isMobile ? '11px' : '5px'};
+  padding: ${({ isMobile }) => isMobile ? '0px 5px 8px 5px' : '0px 20px 20px 20px'};
 `
 
 const FormHeader = styled.div`
