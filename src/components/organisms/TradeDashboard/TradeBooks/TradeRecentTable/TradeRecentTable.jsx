@@ -102,6 +102,8 @@ const TradeRecentTable = (props) => {
   if (props.onClickRow) onClickRow = props.onClickRow;
   else onClickRow = () => null;
 
+  console.log("props side is", props.side);
+
   return (
     <>
       <Table>
@@ -134,15 +136,21 @@ const TradeRecentTable = (props) => {
               typeof d.td3 === "number" ? d.td3.toPrecision(6) : d.td3;
             return (
               <tr key={i} style={rowStyle} onClick={() => onClickRow(d)}>
-                <td>
-                  <Text font="tableContent" color={d.side === "b" ? "successHighEmphasis" : "dangerHighEmphasis"}>{numStringToSymbol(price, 2)}</Text>
-                </td>
-                <td>
-                  <Text font="tableContent" color="foregroundHighEmphasis" textAlign="right">{numStringToSymbol(amount, 2)}</Text>
-                </td>
-                <td>
-                  <Text font="tableContent" color="foregroundHighEmphasis" textAlign="right">{time}</Text>
-                </td>
+                {
+                  (props.side === "sell" && d.side === "s") || (props.side === "buy" && d.side === "b") || props.side === 'all' ?
+                    <>
+                      <td>
+                        <Text font="tableContent" color={d.side === "b" ? "successHighEmphasis" : "dangerHighEmphasis"}>{numStringToSymbol(price, 2)}</Text>
+                      </td>
+                      <td>
+                        <Text font="tableContent" color="foregroundHighEmphasis" textAlign="right">{numStringToSymbol(amount, 2)}</Text>
+                      </td>
+                      <td>
+                        <Text font="tableContent" color="foregroundHighEmphasis" textAlign="right">{time}</Text>
+                      </td>
+                    </>
+                    : ""
+                }
               </tr>
             );
           })}

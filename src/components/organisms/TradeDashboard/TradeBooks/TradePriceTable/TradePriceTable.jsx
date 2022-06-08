@@ -12,7 +12,10 @@ const Table = styled.table`
   overflow: auto;
   padding: 0px;
   flex-direction: column;
-  justify-content: space-between;
+
+  &:not(.no-space) {
+    justify-content: space-between;
+  }
 
   &:first-type-of {
     height: 205px;
@@ -102,6 +105,7 @@ const TradePriceTable = (props) => {
   const marketInfo = useSelector(marketInfoSelector);
   const ref = useRef(null)
   const [isUpdateScroll, setUpdateScroll] = useState(false);
+  console.log("ad class is", props.adClass);
 
   useEffect(() => {
     if (!ref.current) return;
@@ -124,7 +128,7 @@ const TradePriceTable = (props) => {
   else onClickRow = () => null;
 
   return (
-    <Table ref={ref}>
+    <Table ref={ref} className={props.adClass}>
       {props.head && (
         <thead>
           <tr>

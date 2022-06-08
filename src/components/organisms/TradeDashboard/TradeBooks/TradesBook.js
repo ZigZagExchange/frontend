@@ -49,11 +49,11 @@ export default function TradesBook(props) {
           <Text font="primaryTitleDisplay" color="foregroundHighEmphasis">Market Trades</Text>
           <TradeRecentTable
             head
-            className=""
             value="up_value"
             priceTableData={openOrdersLatestTradesData}
             currentMarket={props.currentMarket}
             fixedPoint={props.fixedPoint}
+            side={props.side}
           />
         </TradesWrapper>
       </StyledTradeBooks>

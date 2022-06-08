@@ -46,11 +46,15 @@ const OrderFooterRight = styled.div`
 
   img {
     margin-left: 5px;
+    cursor: pointer;
   }
 `
 
 export default function OrdersBook(props) {
   const [fixedPoint, setFixedPoint] = useState(2);
+  const [side, setSide] = useState('all');
+
+  console.log("order book is", props);
   const fixedPoints = [
     { text: "2", url: "#", value: 2 },
     { text: "3", url: "#", value: 3 },
@@ -64,41 +68,95 @@ export default function OrdersBook(props) {
     }
   }
 
+  const changeSide = (type) => {
+    console.log("type side is", type);
+    setSide(type);
+    if (props.changeSide) {
+      props.changeSide(type);
+    }
+  }
+
   return (
     <>
       <StyledTradeBooks>
         <BooksWrapper>
           <Text font="primaryTitleDisplay" color="foregroundHighEmphasis">Order Book</Text>
-          <TradePriceTable
-            head
-            className="trade_table_asks"
-            useGradient="true"
-            priceTableData={props.priceTableData}
-            currentMarket={props.currentMarket}
-            scrollToBottom={true}
-            fixedPoint={fixedPoint}
-          />
-          <Divider />
-          <TradePriceHeadSecond
-            lastPrice={props.lastPrice}
-            marketInfo={props.marketInfo}
-            fixedPoint={fixedPoint}
-          />
-          <Divider />
-          <TradePriceTable
-            useGradient="true"
-            currentMarket={props.currentMarket}
-            priceTableData={props.bidBins}
-            fixedPoint={fixedPoint}
-          />
+          {
+            side === 'sell' ?
+              <>
+                <TradePriceHeadSecond
+                  lastPrice={props.lastPrice}
+                  marketInfo={props.marketInfo}
+                  fixedPoint={fixedPoint}
+                />
+                <Divider />
+                <TradePriceTable
+                  head
+                  className="trade_table_asks sell-side"
+                  useGradient="true"
+                  adClass="no-space"
+                  priceTableData={props.priceTableData}
+                  currentMarket={props.currentMarket}
+                  scrollToBottom={true}
+                  fixedPoint={fixedPoint}
+                />
+              </>
+              : ""
+          }
+          {
+            side === 'buy' ?
+              <>
+                <TradePriceHeadSecond
+                  lastPrice={props.lastPrice}
+                  marketInfo={props.marketInfo}
+                  fixedPoint={fixedPoint}
+                />
+                <Divider />
+                <TradePriceTable
+                  head
+                  useGradient="true"
+                  adClass="no-space"
+                  currentMarket={props.currentMarket}
+                  priceTableData={props.bidBins}
+                  fixedPoint={fixedPoint}
+                />
+              </> : ""
+          }
+          {
+            side === 'all' ?
+              <>
+                <TradePriceTable
+                  head
+                  className="trade_table_asks sell-side"
+                  useGradient="true"
+                  priceTableData={props.priceTableData}
+                  currentMarket={props.currentMarket}
+                  scrollToBottom={true}
+                  fixedPoint={fixedPoint}
+                />
+                <Divider />
+                <TradePriceHeadSecond
+                  lastPrice={props.lastPrice}
+                  marketInfo={props.marketInfo}
+                  fixedPoint={fixedPoint}
+                />
+                <Divider />
+                <TradePriceTable
+                  useGradient="true"
+                  currentMarket={props.currentMarket}
+                  priceTableData={props.bidBins}
+                  fixedPoint={fixedPoint}
+                />
+              </> : ""
+          }
           <Divider />
           <OrderFooterWrapper>
             <Dropdown adClass="side-dropdown" transparent={true} width={162} item={fixedPoints} context={`${fixedPoint} decimal`} leftIcon={false} clickFunction={changeFixedPoint} />
 
             <OrderFooterRight>
-              <img src={Order1} width="12" height="12" />
-              <img src={Order2} width="12" height="12" />
-              <img src={Order3} width="12" height="12" />
+              <img src={Order1} width="12" height="12" onClick={() => { changeSide('all') }} />
+              <img src={Order2} width="12" height="12" onClick={() => { changeSide('sell') }} />
+              <img src={Order3} width="12" height="12" onClick={() => { changeSide('buy') }} />
             </OrderFooterRight>
           </OrderFooterWrapper>
         </BooksWrapper>

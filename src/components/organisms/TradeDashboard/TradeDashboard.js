@@ -89,6 +89,7 @@ export function TradeDashboard() {
   const marketInfo = useSelector(marketInfoSelector);
   const balanceData = useSelector(balancesSelector);
   const [fixedPoint, setFixedPoint] = useState(2);
+  const [side, setSide] = useState('all');
   const dispatch = useDispatch();
   const lastPriceTableData = [];
   const markets = [];
@@ -161,6 +162,10 @@ export function TradeDashboard() {
 
   const changeFixedPoint = (point) => {
     setFixedPoint(point);
+  }
+
+  const changeSide = (side) => {
+    setSide(side);
   }
 
   Object.keys(lastPrices).forEach((market) => {
@@ -302,10 +307,12 @@ export function TradeDashboard() {
           marketInfo={marketInfo}
           bidBins={bidBins}
           changeFixedPoint={changeFixedPoint}
+          changeSide={changeSide}
         />
         <TradesBook
           currentMarket={currentMarket}
           fixedPoint={fixedPoint}
+          side={side}
         />
         {/* TradeChartArea */}
         <TradeChartArea marketInfo={marketInfo} />
