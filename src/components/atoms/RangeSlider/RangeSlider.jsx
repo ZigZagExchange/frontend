@@ -49,7 +49,7 @@ export const RangeSlider = (props) => {
       },
     },
     root: {
-      height: "2px",
+      height: "4px",
       backgroundColor: theme.colors.foreground400,
       width: "100%",
       cursor: "pointer",
