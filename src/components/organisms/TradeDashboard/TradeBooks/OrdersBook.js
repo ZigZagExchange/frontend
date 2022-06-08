@@ -5,9 +5,7 @@ import TradePriceHeadSecond from "./TradePriceHeadSecond/TradePriceHeadSecond";
 import Text from "components/atoms/Text/Text";
 import { Dropdown } from "components/molecules/Dropdown";
 
-import Order1 from "assets/images/order/1.svg";
-import Order2 from "assets/images/order/2.svg";
-import Order3 from "assets/images/order/3.svg";
+import { SideAllButton, SideSellButton, SideBuyButton } from "./OrdersFooter/SideButtons";
 
 const StyledTradeBooks = styled.section`
   display: flex;
@@ -46,7 +44,16 @@ const OrderFooterRight = styled.div`
 
   img {
     margin-left: 5px;
+    // border: 1px solid ${({ theme }) => theme.colors.foregroundMediumEmphasis};
     cursor: pointer;
+  }
+`
+
+const OrderButtonWrapper = styled.div`
+  cursor: pointer;
+
+  rect {
+      fill: ${({ theme }) => theme.colors.foregroundHighEmphasis}
   }
 `
 
@@ -154,9 +161,15 @@ export default function OrdersBook(props) {
             <Dropdown adClass="side-dropdown" transparent={true} width={162} item={fixedPoints} context={`${fixedPoint} decimal`} leftIcon={false} clickFunction={changeFixedPoint} />
 
             <OrderFooterRight>
-              <img src={Order1} width="12" height="12" onClick={() => { changeSide('all') }} />
-              <img src={Order2} width="12" height="12" onClick={() => { changeSide('sell') }} />
-              <img src={Order3} width="12" height="12" onClick={() => { changeSide('buy') }} />
+              <OrderButtonWrapper onClick={() => { changeSide('all') }}>
+                <SideAllButton />
+              </OrderButtonWrapper>
+              <OrderButtonWrapper onClick={() => { changeSide('sell') }}>
+                <SideSellButton />
+              </OrderButtonWrapper>
+              <OrderButtonWrapper onClick={() => { changeSide('buy') }}>
+                <SideBuyButton />
+              </OrderButtonWrapper>
             </OrderFooterRight>
           </OrderFooterWrapper>
         </BooksWrapper>
