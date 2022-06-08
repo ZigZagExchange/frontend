@@ -381,6 +381,12 @@ const LanguageWrapper = styled.div`
 `;
 
 const SocialLink = styled.a`
+  &:hover {
+    svg path {
+      fill: ${({ isActive, theme }) => !isActive ? `${theme.colors.primaryHighEmphasis} !important` : ""
+  }
+  }
+
   svg path {
     fill: ${({ theme }) => theme.colors.foregroundLowEmphasis};
   }

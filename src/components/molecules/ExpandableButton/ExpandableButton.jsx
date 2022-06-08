@@ -24,7 +24,7 @@ const ExpandableButton = ({ ...props }) => {
 
 	return (
 		<IconButton width={width} variant="secondary" transparent={transparent} onClick={onClick} endIcon={expanded ? <CaretUpIcon /> : <CaretDownIcon />}>
-			<CustomText font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{children}</CustomText>
+			<CustomText font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis" className="button-title">{children}</CustomText>
 		</IconButton>
 	)
 }
