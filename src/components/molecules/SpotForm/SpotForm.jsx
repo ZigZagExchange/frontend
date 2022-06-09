@@ -729,10 +729,6 @@ const RangeWrapper = styled.div`
       background-color: ${({ theme }) => theme.colors.backgroundMediumEmphasis} !important;
     }
 
-    &.MuiSlider-markActive {
-      display: none;
-    }
-
     &::before {
       width: 10px !important;
       height: 10px !important;
