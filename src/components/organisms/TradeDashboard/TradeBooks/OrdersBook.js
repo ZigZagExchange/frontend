@@ -62,7 +62,6 @@ export default function OrdersBook(props) {
   const [fixedPoint, setFixedPoint] = useState(2);
   const [side, setSide] = useState('all');
 
-  console.log("order book is", props);
   const fixedPoints = [
     { text: "2", url: "#", value: 2 },
     { text: "3", url: "#", value: 3 },
@@ -77,7 +76,6 @@ export default function OrdersBook(props) {
   }
 
   const changeSide = (type) => {
-    console.log("type side is", type);
     setSide(type);
     if (props.changeSide) {
       props.changeSide(type);

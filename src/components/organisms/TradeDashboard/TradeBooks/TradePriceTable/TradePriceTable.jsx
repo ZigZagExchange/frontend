@@ -101,7 +101,7 @@ const TradePriceTable = (props) => {
   const marketInfo = useSelector(marketInfoSelector);
   const ref = useRef(null)
   const [isUpdateScroll, setUpdateScroll] = useState(false);
-  console.log("ad class is", props.adClass);
+
 
   useEffect(() => {
     if (!ref.current) return;

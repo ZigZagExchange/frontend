@@ -331,8 +331,7 @@ export default function SwapPage() {
         baseBalance === undefined
       ) {
         toast.error(
-          `Minimum order size is ${marketInfo.baseFee.toPrecision(5)} ${
-            marketInfo.baseAsset.symbol
+          `Minimum order size is ${marketInfo.baseFee.toPrecision(5)} ${marketInfo.baseAsset.symbol
           }`
         );
         return;
@@ -350,8 +349,7 @@ export default function SwapPage() {
         baseBalance === undefined
       ) {
         toast.error(
-          `Minimum order size is ${marketInfo.quoteFee.toPrecision(5)} ${
-            marketInfo.quoteAsset.symbol
+          `Minimum order size is ${marketInfo.quoteFee.toPrecision(5)} ${marketInfo.quoteAsset.symbol
           }`
         );
         return;
@@ -394,7 +392,6 @@ export default function SwapPage() {
   const onClickMax = () => {
     const balance = balances[sellToken?.name]?.valueReadable;
     const fees = tType === "sell" ? marketInfo?.baseFee : marketInfo?.quoteFee;
-    console.log(balance, fees);
     if (balance && fees) {
       const s_amounts = balance - fees;
       setSellAmounts(s_amounts);

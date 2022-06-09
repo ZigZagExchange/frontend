@@ -258,7 +258,6 @@ const TokenPairDropdown = ({ width, transparent, context, currentMarket, marketI
             pairsByCategory.length === 0 &&
             rowData.length !== 0
         ) {
-            console.log(rowData)
             setPairs(rowData.map((r) => r.td1));
             setPairsByCategory(rowData.map((r) => r.td1));
         }

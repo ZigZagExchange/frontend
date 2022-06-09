@@ -315,6 +315,12 @@ const SocialLink = styled.a`
   svg path {
     fill: ${({ theme }) => theme.colors.foregroundLowEmphasis};
   }
+  
+  &:hover {
+    svg path {
+      fill: ${({ theme }) => `${theme.colors.primaryHighEmphasis} !important`};
+    }
+  }
 `
 
 const StyledDropdown = styled(Dropdown)`

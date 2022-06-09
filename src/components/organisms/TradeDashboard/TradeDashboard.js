@@ -131,7 +131,6 @@ export function TradeDashboard() {
 
   useEffect(() => {
     if (user.address && !user.id) {
-      console.log('here')
       history.push("/bridge");
       toast.error(
         "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
