@@ -691,9 +691,9 @@ export class OrdersTable extends React.Component {
               <th>
                 <HeaderWrapper>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Order Status</Text>
-                  <SortIconWrapper>
+                  {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper>
+                  </SortIconWrapper> */}
                 </HeaderWrapper>
               </th>
               <th>
