@@ -272,7 +272,7 @@ export const Header = (props) => {
           <ButtonWrapper>
             {user.id && user.address ? (
               <>
-                <AccountDropdown notext />
+                <AccountDropdown notext networkName={networkName} />
               </>
             ) : (
               <ConnectWalletButton />
@@ -356,7 +356,7 @@ export const Header = (props) => {
                   clickFunction={changeNetwork}
                   leftIcon={true}
                 />
-                <AccountDropdown />
+                <AccountDropdown networkName={networkName} />
               </>
             ) : (
               <ConnectWalletButton />
