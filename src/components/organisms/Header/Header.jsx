@@ -60,6 +60,20 @@ const HeaderWrapper = styled.div`
   box-shadow: ${({ isMobile }) =>
     isMobile ? "0px 8px 16px 0px #0101011A" : ""};
   ${({ isMobile }) => (isMobile ? "backdrop-filter: blur(8px);" : "")}
+
+  button {
+    &:hover {
+      // background-color: ${({ theme }) => `${theme.colors.foregroundHighEmphasis} !important`};
+
+      div {
+        color: ${({ theme }) => `${theme.colors.primaryHighEmphasis} !important`};
+  
+        svg path {
+          fill: ${({ theme }) => `${theme.colors.primaryHighEmphasis} !important`};
+        }
+      }
+    }
+  }
 `;
 
 const LogoWrapper = styled.div``;
