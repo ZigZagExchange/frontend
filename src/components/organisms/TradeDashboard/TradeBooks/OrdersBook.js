@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "@xstyled/styled-components";
 import TradePriceTable from "./TradePriceTable/TradePriceTable";
 import TradePriceHeadSecond from "./TradePriceHeadSecond/TradePriceHeadSecond";
@@ -58,15 +58,24 @@ const OrderButtonWrapper = styled.div`
   }
 `
 
+const fixedPoints = [
+  { text: "2", url: "#", value: 2 },
+  { text: "3", url: "#", value: 3 },
+  { text: "4", url: "#", value: 4 }
+]
+
 export default function OrdersBook(props) {
   const [fixedPoint, setFixedPoint] = useState(2);
   const [side, setSide] = useState('all');
+  const [fixedPointItems, setFixedPointItems] = useState(fixedPoints);
 
-  const fixedPoints = [
-    { text: "2", url: "#", value: 2 },
-    { text: "3", url: "#", value: 3 },
-    { text: "4", url: "#", value: 4 }
-  ]
+  useEffect(() => {
+    let newFixedPoints = [...fixedPointItems];
+    newFixedPoints.forEach(item => {
+      item.iconSelected = item.value === fixedPoint;
+    })
+    setFixedPointItems(newFixedPoints);
+  }, [fixedPoint])
 
   const changeFixedPoint = (text, value) => {
     setFixedPoint(parseInt(value));
@@ -157,7 +166,7 @@ export default function OrdersBook(props) {
           }
           <Divider />
           <OrderFooterWrapper>
-            <Dropdown adClass="side-dropdown" transparent={true} width={162} item={fixedPoints} context={`${fixedPoint} decimal`} leftIcon={false} clickFunction={changeFixedPoint} />
+            <Dropdown adClass="side-dropdown" transparent={true} width={162} item={fixedPointItems} context={`${fixedPoint} decimal`} leftIcon={false} clickFunction={changeFixedPoint} />
 
             <OrderFooterRight>
               <OrderButtonWrapper onClick={() => { changeSide('all') }}>

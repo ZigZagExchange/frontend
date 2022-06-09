@@ -15,12 +15,12 @@ const DropdownWrapper = styled.div`
     &:hover {
         .button-title {
             color: ${({ theme }) => `${theme.colors.primaryHighEmphasis} !important`};
-            transition: color .25s;
+            // transition: color .25s;
         }
         
         svg path {
             fill: ${({ theme }) => `${theme.colors.primaryHighEmphasis} !important`};
-            transition: color .25s;
+            // transition: color .25s;
         }
     }
 
@@ -40,12 +40,6 @@ export const Wrapper = styled.div`
     // gap: 10px;
     align-items: start;
     z-index: 100;
-
-    &.network-dropdown {
-        &.mobile-mode {
-            padding: 16px;
-        }
-    }
 
     &.side-dropdown {
         padding: 8px 0;
@@ -67,7 +61,7 @@ const DropdownListContainer = styled.div`
     grid-template-columns: ${({ leftIcon }) => leftIcon ? '32px 1fr' : '1fr 16px'};
     cursor: pointer;
 
-    &:hover {
+    &:hover, &.active {
         background-color: ${({ theme }) => theme.colors.backgroundLowEmphasis}
     }
 
@@ -83,12 +77,6 @@ const DropdownListContainer = styled.div`
         display: block;
         width: 100%;
         padding: 8px 20px;
-    }
-
-    &.side-dropdown, &.lang-dropdown, &.network-dropdown {
-        &.active {
-            background-color: ${({ theme }) => theme.colors.backgroundLowEmphasis}
-        }
     }
 `
 
