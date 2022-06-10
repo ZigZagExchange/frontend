@@ -724,7 +724,7 @@ const RangeWrapper = styled.div`
   padding-left: 10px;
 
   .custom_range {
-    &:not(.MuiSlider-markActive)::before {
+    &::before {
       border: 2px solid ${({ theme }) => theme.colors.foregroundLowEmphasis} !important;
       background-color: ${({ theme }) => theme.colors.backgroundMediumEmphasis} !important;
     }
@@ -736,13 +736,23 @@ const RangeWrapper = styled.div`
   }
 
   .MuiSlider-rail {
+    top: 50%;
+    height: 6px;
+    transform: translateY(-50%);
     background-color: ${({ theme }) => theme.colors.foregroundLowEmphasis} !important;
   }
 
+  .MuiSlider-track {
+    top: 50%;
+    height: 6px;
+    transform: translateY(-50%);
+  }
+
   .MuiSlider-thumb {
+    top: 50%;
     margin: 0 !important;
     padding: 10px !important;
-    transform: translate(-50%, -40%);
+    transform: translate(-50%, -50%);
   }
 `
 
