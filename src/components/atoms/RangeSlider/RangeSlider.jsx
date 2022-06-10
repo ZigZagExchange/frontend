@@ -29,8 +29,8 @@ const useStyles = makeStyles(() => ({
     },
   },
   root: {
-    height: "6px",
-    backgroundColor: "#6c768c",
+    height: "40px",
+    backgroundColor: "transparent",
     width: "100%",
     cursor: "pointer",
     display: "inline-block",

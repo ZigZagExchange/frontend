@@ -155,6 +155,7 @@ export const SortIconWrapper = styled.div`
     grid-auto-flow: row;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
     svg path {
     color: none;
     }
