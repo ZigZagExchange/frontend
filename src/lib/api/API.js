@@ -449,10 +449,10 @@ export default class API extends Emitter {
       const polygonProvider = new ethers.providers.Web3Provider(
         window.web3.currentProvider
       );
-      const currentNetwork = await polygonProvider.getNetwork();
+      // const currentNetwork = await polygonProvider.getNetwork(); // This is not correct on the brave browser.
 
-      if ("0x"+currentNetwork.chainId.toString(16) !== polygonChainId)
-        throw new Error("Must approve network change");
+      // if ("0x"+currentNetwork.chainId.toString(16) !== polygonChainId)
+      //   throw new Error("Must approve network change");
       // const signer = polygonProvider.getSigner();
 
       networkSwitched = true;
