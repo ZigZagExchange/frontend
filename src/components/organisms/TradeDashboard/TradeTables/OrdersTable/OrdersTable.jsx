@@ -28,7 +28,8 @@ export class OrdersTable extends React.Component {
         { text: "All", url: "#", iconSelected: true },
         { text: "Buy", url: "#" },
         { text: "Sell", url: "#" }],
-      walletList: []
+      walletList: [],
+      direction: "desc"
     };
     this.changeSide = this.changeSide.bind(this);
     this.changeSortType = this.changeSortType.bind(this);
@@ -75,8 +76,15 @@ export class OrdersTable extends React.Component {
 
   changeSortType(type) {
     let walletArray = [...this.state.walletList];
-    console.log("wallet array", this.state.walletList);
-    walletArray.sort((a, b) => { return a[type] - b[type] });
+
+    if (this.state.direction === "desc") {
+      walletArray.sort((a, b) => { return a[type] > b[type] ? 1 : -1 });
+      this.setState({ direction: "asce" });
+    }
+    else {
+      walletArray.sort((a, b) => { return a[type] < b[type] ? 1 : -1 });
+      this.setState({ direction: "desc" });
+    }
 
     this.setState({ walletList: walletArray });
   }
@@ -908,7 +916,7 @@ export class OrdersTable extends React.Component {
               return (
                 <tr>
                   <td data-label="Token"><Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{token.token}</Text></td>
-                  <td data-label="Balance"><Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{token.value}</Text></td>
+                  <td data-label="Balance"><Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{token.valueReadable}</Text></td>
                 </tr>
               );
             });
@@ -931,7 +939,7 @@ export class OrdersTable extends React.Component {
                         <th scope="col">
                           <HeaderWrapper>
                             <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Balance</Text>
-                            <SortIconWrapper onClick={() => { this.changeSortType("value") }}>
+                            <SortIconWrapper onClick={() => { this.changeSortType("valueReadable") }}>
                               <SortUpIcon /><SortDownIcon />
                             </SortIconWrapper>
                           </HeaderWrapper>
