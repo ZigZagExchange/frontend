@@ -58,6 +58,8 @@ const BridgeSwapInput = ({ value = {}, onChange, balances = {}, L1Fee, L2Fee, fe
   }, [onChange])
   const setAmount = useCallback(e => {
     if(e.target.value.length > 10) return;
+    const regExp = /^(\d+\.?\d*|\.\d+)$/
+    if(!regExp.test(e.target.value)) return;
     onChange({ amount: e.target.value.replace(/[^0-9.]/g,'') })
   }, [onChange])
 
