@@ -13,11 +13,9 @@ const SwitchNetwork = ({
   onClickSwitchNetwork,
 }) => {
   return (
-    <div className="flex gap-2 p-2 mt-4 border borderrounded-lg sm:p-4 sm:gap-4 dark:border-foreground-400 border-primary-500">
+    <div className="flex gap-2 p-2 mt-4 border rounded-lg sm:p-4 sm:gap-4 dark:border-foreground-400 border-primary-500">
       <div className="w-full">
-        <p className="mb-1 text-sm font-semibold tracking-wide font-work">
-          Transfer from
-        </p>
+        <p className="mb-1 text-base tracking-wide font-work">Transfer from</p>
         <NetworkDropdown
           options={fromNetworkOptions}
           setSelectedItem={onChangeFromNetwork}
@@ -33,9 +31,7 @@ const SwitchNetwork = ({
         </button>
       </div>
       <div className="w-full">
-        <p className="mb-1 text-sm font-semibold tracking-wide font-work">
-          Transfer to
-        </p>
+        <p className="mb-1 text-base tracking-wide font-work">Transfer to</p>
         <NetworkDropdown
           options={toNetworkOptions}
           setSelectedItem={onChangeToNetwork}

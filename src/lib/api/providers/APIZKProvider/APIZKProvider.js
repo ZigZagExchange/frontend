@@ -644,19 +644,19 @@ export default class APIZKProvider extends APIProvider {
       const activationFee = await this.changePubKeyFee("ETH");
 
       if (isNaN(walletBalance) || walletBalance < activationFee) {
-        toast.error(
-          "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
-          {
-            autoClose: 60000,
-          }
-        );
+        // toast.error(
+        //   "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
+        //   {
+        //     autoClose: 60000,
+        //   }
+        // );
       } else {
-        toast.error(
-          "Your zkSync account is not activated. Please activate your zkSync wallet.",
-          {
-            autoClose: false,
-          }
-        );
+        // toast.error(
+        //   "Your zkSync account is not activated. Please activate your zkSync wallet.",
+        //   {
+        //     autoClose: false,
+        //   }
+        // );
       }
     } else {
       if (!accountActivated) {

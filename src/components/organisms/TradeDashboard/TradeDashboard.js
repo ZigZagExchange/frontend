@@ -128,13 +128,13 @@ export function TradeDashboard() {
   }, [network, currentMarket]);
 
   useEffect(() => {
-    if(user.address && !user.id){
-      console.log('here')
+    if (user.address && !user.id) {
+      console.log("here");
       history.push("/bridge");
       toast.error(
         "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
         {
-          autoClose: 60000
+          autoClose: 60000,
         }
       );
     }
@@ -201,7 +201,7 @@ export function TradeDashboard() {
         side: fill[3],
       });
     });
-  
+
   liquidity.forEach((liq) => {
     const side = liq[0];
     const price = liq[1];

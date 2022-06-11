@@ -415,7 +415,9 @@ export default function SwapPage() {
       {!loading && (
         <div className={classNames("flex justify-center", { dark: isDark })}>
           <div>
-            <p className="mt-20 text-3xl font-semibold ">Quick DEX Swap</p>
+            <p className="mt-10 text-3xl font-semibold font-work ">
+              Quick DEX Swap
+            </p>
             <p className="mt-2 text-sm text-gray-500">
               Swap into more than 200 tokens, using the best quotes from over 8
               sources.
@@ -428,7 +430,7 @@ export default function SwapPage() {
               <ExternalLinkIcon size={11} />
             </Link>
             <div className="flex items-center justify-between mt-4">
-              <p>Network</p>
+              <p className="text-sm font-work">Network</p>
               <InfoIcon size={16} />
             </div>
             <NetworkSelection className="mt-2" />

@@ -1,6 +1,8 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { constants as ethersConstants, utils as ethersUtils } from "ethers";
+import classNames from "classnames";
 import { useCoinEstimator } from "components";
+import { LoadingSpinner } from "components/atoms/LoadingSpinner";
 import { toast } from "react-toastify";
 import isEmpty from "lodash/isEmpty";
 import { useSelector } from "react-redux";
@@ -32,6 +34,7 @@ const BridgeContainer = () => {
   const [sellTokenList, setSellTokenList] = useState([]);
   const [sellToken, setSellToken] = useState();
   const [loading, setLoading] = useState(false);
+  const [tokenLoading, setTokenLoading] = useState(false);
   const [fromAmounts, setFromAmounts] = useState(0);
 
   const user = useSelector(userSelector);
@@ -95,6 +98,21 @@ const BridgeContainer = () => {
     }
     return balances;
   };
+
+  useEffect(() => {
+    setTokenLoading(true);
+    const timer = setInterval(() => {
+      setSellTokenList(api.getCurrencies());
+    }, 500);
+    if (sellTokenList.length > 0) {
+      clearInterval(timer);
+      setTokenLoading(false);
+    }
+    return () => {
+      clearInterval(timer);
+      setTokenLoading(false);
+    };
+  }, [sellTokenList]);
 
   useEffect(async () => {
     if (!user.address) return;
@@ -521,20 +539,6 @@ const BridgeContainer = () => {
       });
   };
 
-  useEffect(() => {
-    setLoading(true);
-    const timer = setInterval(() => {
-      setSellTokenList(api.getCurrencies());
-    }, 500);
-    if (sellTokenList.length > 0) {
-      clearInterval(timer);
-      setLoading(false);
-    }
-    return () => {
-      clearInterval(timer);
-    };
-  }, [sellTokenList]);
-
   const onChangeSellToken = (option) => {
     setSellToken(option);
     const sDetails = {};
@@ -546,15 +550,49 @@ const BridgeContainer = () => {
 
   const fromTokenOptions = useMemo(() => {
     if (sellTokenList.length > 0) {
-      const p = sellTokenList.map((item, index) => {
-        return { id: index, name: item };
+      let t = sellTokenList;
+      if (balances.length !== 0) {
+        const tickersOfBalance = t.filter((x) => {
+          return balances[x] && parseFloat(balances[x].valueReadable) > 0;
+        });
+
+        const tickersRest = t.filter((x) => {
+          return balances[x] && parseFloat(balances[x].valueReadable) === 0;
+        });
+
+        tickersOfBalance.sort((a, b) => {
+          return (
+            parseFloat(coinEstimator(b) * balances[b].valueReadable) -
+            parseFloat(coinEstimator(a) * balances[a].valueReadable)
+          );
+        });
+
+        t = [...tickersOfBalance, ...tickersRest];
+      }
+
+      const p = t.map((item, index) => {
+        const price = balances[item]?.valueReadable
+          ? `$ ${formatUSD(
+              coinEstimator(item) * balances[item]?.valueReadable
+            )}`
+          : "";
+        const isFastWithdraw =
+          transfer.type === "withdraw" &&
+          api.apiProvider.eligibleFastWithdrawTokens.includes(item);
+        return {
+          id: index,
+          name: item,
+          balance: balances[item]?.valueReadable,
+          price: `${price}`,
+          isFastWithdraw: isFastWithdraw,
+        };
       });
-      setSellToken(p.find((item) => item.name === "ETH"));
+      // setSellToken(p.find((item) => item.name === "ETH"));
       return p;
     } else {
       return [];
     }
-  }, [sellTokenList]);
+  }, [sellTokenList, balances]);
 
   const onSelectFromNetwork = (option) => {
     setFromNetwork(option);
@@ -607,116 +645,125 @@ const BridgeContainer = () => {
   };
 
   return (
-    <div>
-      <SwitchNetwork
-        fromNetworkOptions={NETWORKS.map((item) => item.from)}
-        onChangeFromNetwork={onSelectFromNetwork}
-        fromNetwork={fromNetwork}
-        toNetworkOptions={toNetworkOption}
-        onChangeToNetwork={onSelectToNetwork}
-        toNetwork={toNetwork}
-        onClickSwitchNetwork={switchTransferType}
-      />
-      <SelectAsset
-        fromNetwork={fromNetwork}
-        fromToken={sellToken}
-        fromTokenOptions={fromTokenOptions}
-        onChangeFromToken={onChangeSellToken}
-        onChangeFromAmounts={onChangeFromAmounts}
-        fromAmounts={fromAmounts}
-        estimatedValue={estimatedValue}
-        L1Fee={L1FeeAmount}
-        L2Fee={L2FeeAmount}
-        balances={balances}
-        swapDetails={swapDetails}
-        onChange={setSwapDetails}
-        feeCurrency={L2FeeToken}
-        isOpenable={
-          !(
-            fromNetwork.id === "polygon" ||
-            (fromNetwork.id === "zksync" && toNetwork.id === "polygon")
-          )
-        }
-        gasFetching={gasFetching}
-        swapCurrencyInfo={swapCurrencyInfo}
-        allowance={allowance}
-      />
-      <TransactionSettings
-        user={user}
-        transfer={transfer}
-        isSwapAmountEmpty={isSwapAmountEmpty}
-        fromNetwork={fromNetwork}
-        toNetwork={toNetwork}
-        L1Fee={L1FeeAmount}
-        L2Fee={L2FeeAmount}
-        swapDetails={swapDetails}
-        isFastWithdraw={isFastWithdraw}
-        balances={balances}
-        usdFee={usdFee}
-        withdrawSpeed={withdrawSpeed}
-        onChangeSpeed={setWithdrawSpeed}
-        activationFee={activationFee}
-        L2FeeToken={L2FeeToken}
-        hasError={hasError}
-        fastWithdrawDisabled={
-          !api.apiProvider.eligibleFastWithdrawTokens?.includes(
-            swapDetails.currency
-          )
-        }
-      />
-      {!user.address && (
-        <ConnectWalletButton
-          isLoading={polygonLoding}
-          className="w-full py-3 mt-3 uppercase"
-        />
+    <>
+      {tokenLoading && (
+        <div className={classNames("flex justify-center align-center mt-48")}>
+          <LoadingSpinner />
+        </div>
       )}
-      {user.address && (
-        <>
-          {balances[swapDetails.currency] &&
-            !hasAllowance &&
-            !hasError &&
-            fromNetwork.id !== "polygon" && (
-              <Button
-                isLoading={isApproving}
-                scale="md"
-                disabled={
-                  formErr.length > 0 ||
-                  Number(swapDetails.amount) === 0 ||
-                  swapDetails.currency === "ETH"
-                }
-                onClick={approveSpend}
-                className="w-full py-3 mt-3 uppercase"
-              >
-                APPROVE
-              </Button>
-            )}
-          {hasError && (
-            <Button
-              variant="sell"
-              scale="md"
+      {!tokenLoading && (
+        <div>
+          <SwitchNetwork
+            fromNetworkOptions={NETWORKS.map((item) => item.from)}
+            onChangeFromNetwork={onSelectFromNetwork}
+            fromNetwork={fromNetwork}
+            toNetworkOptions={toNetworkOption}
+            onChangeToNetwork={onSelectToNetwork}
+            toNetwork={toNetwork}
+            onClickSwitchNetwork={switchTransferType}
+          />
+          <SelectAsset
+            fromNetwork={fromNetwork}
+            fromToken={sellToken}
+            fromTokenOptions={fromTokenOptions}
+            onChangeFromToken={onChangeSellToken}
+            onChangeFromAmounts={onChangeFromAmounts}
+            fromAmounts={fromAmounts}
+            estimatedValue={estimatedValue}
+            L1Fee={L1FeeAmount}
+            L2Fee={L2FeeAmount}
+            balances={balances}
+            swapDetails={swapDetails}
+            onChange={setSwapDetails}
+            feeCurrency={L2FeeToken}
+            isOpenable={
+              !(
+                fromNetwork.id === "polygon" ||
+                (fromNetwork.id === "zksync" && toNetwork.id === "polygon")
+              )
+            }
+            gasFetching={gasFetching}
+            swapCurrencyInfo={swapCurrencyInfo}
+            allowance={allowance}
+          />
+          <TransactionSettings
+            user={user}
+            transfer={transfer}
+            isSwapAmountEmpty={isSwapAmountEmpty}
+            fromNetwork={fromNetwork}
+            toNetwork={toNetwork}
+            L1Fee={L1FeeAmount}
+            L2Fee={L2FeeAmount}
+            swapDetails={swapDetails}
+            isFastWithdraw={isFastWithdraw}
+            balances={balances}
+            usdFee={usdFee}
+            withdrawSpeed={withdrawSpeed}
+            onChangeSpeed={setWithdrawSpeed}
+            activationFee={activationFee}
+            L2FeeToken={L2FeeToken}
+            hasError={hasError}
+            fastWithdrawDisabled={
+              !api.apiProvider.eligibleFastWithdrawTokens?.includes(
+                swapDetails.currency
+              )
+            }
+          />
+          {!user.address && (
+            <ConnectWalletButton
+              isLoading={polygonLoding}
               className="w-full py-3 mt-3 uppercase"
-            >
-              {formErr}
-            </Button>
+            />
           )}
-          {hasAllowance && !hasError && (
-            <Button
-              className="w-full py-3 mt-3 uppercase"
-              isLoading={loading}
-              disabled={
-                formErr.length > 0 ||
-                (L2FeeAmount === null && L1FeeAmount === null) ||
-                !hasAllowance ||
-                Number(swapDetails.amount) === 0
-              }
-              onClick={doTransfer}
-            >
-              TRANSFER
-            </Button>
+          {user.address && (
+            <>
+              {balances[swapDetails.currency] &&
+                !hasAllowance &&
+                !hasError &&
+                fromNetwork.id !== "polygon" && (
+                  <Button
+                    isLoading={isApproving}
+                    scale="md"
+                    disabled={
+                      formErr.length > 0 ||
+                      Number(swapDetails.amount) === 0 ||
+                      swapDetails.currency === "ETH"
+                    }
+                    onClick={approveSpend}
+                    className="w-full py-3 mt-3 uppercase"
+                  >
+                    APPROVE
+                  </Button>
+                )}
+              {hasError && (
+                <Button
+                  variant="sell"
+                  scale="md"
+                  className="w-full py-3 mt-3 uppercase"
+                >
+                  {formErr}
+                </Button>
+              )}
+              {hasAllowance && !hasError && (
+                <Button
+                  className="w-full py-3 mt-3 uppercase"
+                  isLoading={loading}
+                  disabled={
+                    formErr.length > 0 ||
+                    (L2FeeAmount === null && L1FeeAmount === null) ||
+                    !hasAllowance ||
+                    Number(swapDetails.amount) === 0
+                  }
+                  onClick={doTransfer}
+                >
+                  TRANSFER
+                </Button>
+              )}
+            </>
           )}
-        </>
+        </div>
       )}
-    </div>
+    </>
   );
 };
 

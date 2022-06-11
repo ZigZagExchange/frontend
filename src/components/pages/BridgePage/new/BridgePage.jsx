@@ -11,7 +11,7 @@ import { Tab } from "@headlessui/react";
 
 const tabList = ["Bridge", "Transfer History"];
 
-export default function SwapPage() {
+export default function BridgePage() {
   // const isSwapCompatible = useMemo(
   //   () => network && api.isImplemented("depositL2"),
   //   [network]

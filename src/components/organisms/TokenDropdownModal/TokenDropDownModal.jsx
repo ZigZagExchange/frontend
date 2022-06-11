@@ -124,7 +124,7 @@ const TokenDropDownModal = ({
                       >
                         <Combobox.Options
                           open
-                          className=" mt-1 max-h-60 w-full overflow-auto rounded-md dark:bg-[#2B2E4A] bg-sky-100 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none "
+                          className=" mt-1 max-h-72 w-full overflow-auto rounded-md dark:bg-[#2B2E4A] bg-sky-100 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none "
                         >
                           {filteredToken.length === 0 && query !== "" ? (
                             <div className="relative px-4 py-2 cursor-default select-none font-work">
@@ -143,18 +143,35 @@ const TokenDropDownModal = ({
                               >
                                 {({ selected, active }) => (
                                   <>
-                                    <span
-                                      className={`flex items-center truncate   ${
-                                        selected ? "font-medium" : "font-normal"
-                                      }`}
-                                    >
-                                      <img
-                                        src={api.getCurrencyLogo(item.name)}
-                                        alt={item}
-                                        style={{ width: 25, height: 25 }}
-                                      />
-                                      <p className="pl-3">{item.name}</p>
-                                    </span>
+                                    <div className="flex items-center justify-between">
+                                      <div
+                                        className={`flex items-center truncate   ${
+                                          selected
+                                            ? "font-medium"
+                                            : "font-normal"
+                                        }`}
+                                      >
+                                        <img
+                                          src={api.getCurrencyLogo(item.name)}
+                                          alt={item}
+                                          style={{ width: 25, height: 25 }}
+                                        />
+                                        <p className="pl-3">{item.name}</p>
+                                      </div>
+                                      {item?.isFastWithdraw && (
+                                        <div className="bg-[#07071C] px-2 py-1 rounded-md text-sm font-semibold text-primary-900 ml-2.5 hover:bg-slate-800 font-work">
+                                          Fast
+                                        </div>
+                                      )}
+                                      <div className="text-right">
+                                        <p className="text-base text-primary-900">
+                                          {item?.balance}
+                                        </p>
+                                        <p className="text-xs font-work">
+                                          {item?.price}
+                                        </p>
+                                      </div>
+                                    </div>
                                     {selected ? (
                                       <span
                                         className={`absolute  inset-y-0 left-0 flex items-center pl-3 ${
