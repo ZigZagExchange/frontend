@@ -28,6 +28,12 @@ const SocialLink = styled.a`
     transition: fill .25s;
     fill: ${({ theme }) => theme.colors.foregroundLowEmphasis};
   }
+  
+  &:hover {
+    svg path {
+      fill: ${({ theme }) => theme.colors.primaryHighEmphasis};
+    }
+  }
 `
 
 const StyledLinkBox = styled.div`

@@ -24,11 +24,26 @@ export class OrdersTable extends React.Component {
     super(props);
     this.state = {
       tab: 0, isMobile: window.innerWidth < 1064, selectedSide: "All",
-      sideItems: [{ text: "All", url: "#", iconSelected: true },
-      { text: "Buy", url: "#" },
-      { text: "Sell", url: "#" }]
+      sideItems: [
+        { text: "All", url: "#", iconSelected: true },
+        { text: "Buy", url: "#" },
+        { text: "Sell", url: "#" }],
+      walletList: [],
+      direction: "desc"
     };
     this.changeSide = this.changeSide.bind(this);
+    this.changeSortType = this.changeSortType.bind(this);
+  }
+
+  componentDidMount() {
+    let wallet = { ...this.props.wallet };
+    let walletArray = [];
+
+    Object.keys(wallet).map(function (key) {
+      walletArray.push({ ...wallet[key], token: key });
+    });
+
+    this.setState({ walletList: walletArray });
   }
 
   setTab(newIndex) {
@@ -57,6 +72,21 @@ export class OrdersTable extends React.Component {
       return acc;
     }, [])
     this.setState({ selectedSide: newSide, sideItems: newItems });
+  }
+
+  changeSortType(type) {
+    let walletArray = [...this.state.walletList];
+
+    if (this.state.direction === "desc") {
+      walletArray.sort((a, b) => { return a[type] > b[type] ? 1 : -1 });
+      this.setState({ direction: "asce" });
+    }
+    else {
+      walletArray.sort((a, b) => { return a[type] < b[type] ? 1 : -1 });
+      this.setState({ direction: "desc" });
+    }
+
+    this.setState({ walletList: walletArray });
   }
 
   renderOrderTable(orders) {
@@ -691,9 +721,9 @@ export class OrdersTable extends React.Component {
               <th>
                 <HeaderWrapper>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Order Status</Text>
-                  <SortIconWrapper>
+                  {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper>
+                  </SortIconWrapper> */}
                 </HeaderWrapper>
               </th>
               <th>
@@ -881,16 +911,12 @@ export class OrdersTable extends React.Component {
         break;
       case 2:
         if (this.props.user.committed) {
-          const balancesContent = Object.keys(
-            this.props.wallet
-          )
-            .sort()
+          const balancesContent = this.state.walletList
             .map((token) => {
-              const balance = this.props.wallet[token].valueReadable;
               return (
                 <tr>
-                  <td data-label="Token"><Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{token}</Text></td>
-                  <td data-label="Balance"><Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{balance}</Text></td>
+                  <td data-label="Token"><Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{token.token}</Text></td>
+                  <td data-label="Balance"><Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{token.valueReadable}</Text></td>
                 </tr>
               );
             });
@@ -905,7 +931,7 @@ export class OrdersTable extends React.Component {
                         <th scope="col">
                           <HeaderWrapper>
                             <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Token</Text>
-                            <SortIconWrapper>
+                            <SortIconWrapper onClick={() => { this.changeSortType("token") }}>
                               <SortUpIcon /><SortDownIcon />
                             </SortIconWrapper>
                           </HeaderWrapper>
@@ -913,7 +939,7 @@ export class OrdersTable extends React.Component {
                         <th scope="col">
                           <HeaderWrapper>
                             <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Balance</Text>
-                            <SortIconWrapper>
+                            <SortIconWrapper onClick={() => { this.changeSortType("valueReadable") }}>
                               <SortUpIcon /><SortDownIcon />
                             </SortIconWrapper>
                           </HeaderWrapper>

@@ -15,12 +15,12 @@ const DropdownWrapper = styled.div`
     &:hover {
         .button-title {
             color: ${({ theme }) => `${theme.colors.primaryHighEmphasis} !important`};
-            transition: color .25s;
+            // transition: color .25s;
         }
         
         svg path {
             fill: ${({ theme }) => `${theme.colors.primaryHighEmphasis} !important`};
-            transition: color .25s;
+            // transition: color .25s;
         }
     }
 
@@ -40,17 +40,6 @@ export const Wrapper = styled.div`
     // gap: 10px;
     align-items: start;
     z-index: 100;
-
-    &.network-dropdown {
-        &.mobile-mode {
-            padding: 16px;
-        }
-    
-        .selected-icon {
-            padding-left: 30px;
-            grid-template-columns: max-content;
-        }
-    }
 
     &.side-dropdown {
         padding: 8px 0;
@@ -72,7 +61,7 @@ const DropdownListContainer = styled.div`
     grid-template-columns: ${({ leftIcon }) => leftIcon ? '32px 1fr' : '1fr 16px'};
     cursor: pointer;
 
-    &:hover {
+    &:hover, &.active {
         background-color: ${({ theme }) => theme.colors.backgroundLowEmphasis}
     }
 
@@ -85,17 +74,9 @@ const DropdownListContainer = styled.div`
     }
 
     &.network-dropdown {
-        padding: 2px 0;
-
-        &:not(.active) {
-            padding: 7px 0;
-        }
-    }
-
-    &.side-dropdown, &.lang-dropdown {
-        &.active {
-            background-color: ${({ theme }) => theme.colors.backgroundLowEmphasis}
-        }
+        display: block;
+        width: 100%;
+        padding: 8px 20px;
     }
 `
 
@@ -148,9 +129,9 @@ const Dropdown = ({ width, item, context, leftIcon, rightIcon, transparent, clic
                         const menuIcon = iconSelected ? selectedIcon : icon;
                         return (
                             <DropdownListContainer className={`${adClass} ${iconSelected ? "active" : ""}`} key={items.text} leftIcon={leftIcon} onClick={() => handleClick(url, text, value)}>
-                                {leftIcon && isValidElement(menuIcon) && <IconButton className={adClass} variant="secondary" startIcon={cloneElement(menuIcon)}></IconButton>}
+                                {/* {leftIcon && isValidElement(menuIcon) && <IconButton className={adClass} variant="secondary" startIcon={cloneElement(menuIcon)}></IconButton>} */}
                                 <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis" className={!iconSelected ? "selected-icon" : ""}>{text}</Text>
-                                {rightIcon && isValidElement(menuIcon) && <IconButton className={adClass} variant="secondary" endIcon={cloneElement(menuIcon)}></IconButton>}
+                                {/* {rightIcon && isValidElement(menuIcon) && <IconButton className={adClass} variant="secondary" endIcon={cloneElement(menuIcon)}></IconButton>} */}
                             </DropdownListContainer>
                         )
                     })}

@@ -44,6 +44,138 @@ const accountLists = [
   { text: "0x12BV...b89G", url: "#", icon: <DeleteIcon /> },
 ];
 
+
+
+const HeaderWrapper = styled.div`
+  display: grid;
+  grid-auto-flow: column;
+  width: 100%;
+  height: 56px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.foreground400};
+  align-items: center;
+  background-color: ${({ theme }) => theme.colors.backgroundHighEmphasis};
+  position: fixed;
+  padding: 0px 20px;
+  z-index: 100;
+  box-shadow: ${({ isMobile }) =>
+    isMobile ? "0px 8px 16px 0px #0101011A" : ""};
+  ${({ isMobile }) => (isMobile ? "backdrop-filter: blur(8px);" : "")}
+
+  button {
+    &:hover {
+      // background-color: ${({ theme }) => `${theme.colors.foregroundHighEmphasis} !important`};
+
+      div {
+        color: ${({ theme }) => `${theme.colors.primaryHighEmphasis} !important`};
+  
+        svg path {
+          fill: ${({ theme }) => `${theme.colors.primaryHighEmphasis} !important`};
+        }
+      }
+    }
+  }
+`;
+
+const LogoWrapper = styled.div``;
+
+const ButtonWrapper = styled.div`
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  justify-content: end;
+  gap: 19px;
+`;
+
+const MenuButtonWrapper = styled.div`
+  cursor: pointer;
+`;
+
+const NavWrapper = styled.div`
+  display: grid;
+  grid-template-columns: 32px 421px;
+  align-items: center;
+`;
+
+const ActionsWrapper = styled.div`
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  justify-items: center;
+`;
+
+const SocialWrapper = styled.div`
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  justify-items: center;
+  width: 120px;
+`;
+
+const LanguageWrapper = styled.div`
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  gap: 27px;
+`;
+
+const SocialLink = styled.a`
+  &:hover {
+    svg path {
+      fill: ${({ theme }) => `${theme.colors.primaryHighEmphasis} !important`};
+    }
+  }
+
+  svg path {
+    fill: ${({ theme }) => theme.colors.foregroundLowEmphasis};
+  }
+`;
+
+const StyledDropdown = styled(Dropdown)`
+  padding: 16px 0px 16px 16px;
+  width: auto;
+`;
+
+const VerticalDivider = styled.div`
+  width: 1px;
+  height: 32px;
+  background-color: ${({ theme }) => theme.colors.foreground400};
+`;
+
+const SideMenuWrapper = styled.div`
+  position: fixed;
+  width: 320px;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  background: ${({ theme }) => theme.colors.backgroundLowEmphasis};
+  z-index: 9999;
+  display: grid;
+  grid-auto-flow: row;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid ${({ theme }) => theme.colors.foreground400};
+  backdrop-filter: blur(8px);
+`;
+
+const HorizontalDivider = styled.div`
+  width: 229px;
+  height: 1px;
+  background: ${({ theme }) => theme.colors.foreground400};
+`;
+
+const ActionSideMenuWrapper = styled.div`
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  justify-content: space-between;
+  span {
+    font-family: WorkSans-SemiBold;
+    font-size: 12px;
+    line-height: 14px;
+    text-transform: uppercase;
+  }
+`;
+
 export const Header = (props) => {
   // state to open or close the sidebar in mobile
   const [show, setShow] = useState(false);
@@ -154,7 +286,7 @@ export const Header = (props) => {
           <ButtonWrapper>
             {user.id && user.address ? (
               <>
-                <AccountDropdown notext />
+                <AccountDropdown notext networkName={networkName} />
               </>
             ) : (
               <ConnectWalletButton />
@@ -238,7 +370,7 @@ export const Header = (props) => {
                   clickFunction={changeNetwork}
                   leftIcon={true}
                 />
-                <AccountDropdown />
+                <AccountDropdown networkName={networkName} />
               </>
             ) : (
               <ConnectWalletButton />
@@ -321,119 +453,3 @@ export const Header = (props) => {
     </HeaderWrapper>
   );
 };
-
-const HeaderWrapper = styled.div`
-  display: grid;
-  grid-auto-flow: column;
-  width: 100%;
-  height: 56px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.foreground400};
-  align-items: center;
-  background-color: ${({ theme }) => theme.colors.backgroundHighEmphasis};
-  position: fixed;
-  padding: 0px 20px;
-  z-index: 100;
-  box-shadow: ${({ isMobile }) =>
-    isMobile ? "0px 8px 16px 0px #0101011A" : ""};
-  ${({ isMobile }) => (isMobile ? "backdrop-filter: blur(8px);" : "")}
-`;
-
-const LogoWrapper = styled.div``;
-
-const ButtonWrapper = styled.div`
-  display: grid;
-  grid-auto-flow: column;
-  align-items: center;
-  justify-content: end;
-  gap: 19px;
-`;
-
-const MenuButtonWrapper = styled.div`
-  cursor: pointer;
-`;
-
-const NavWrapper = styled.div`
-  display: grid;
-  grid-template-columns: 32px 421px;
-  align-items: center;
-`;
-
-const ActionsWrapper = styled.div`
-  display: grid;
-  grid-auto-flow: column;
-  align-items: center;
-  justify-items: center;
-`;
-
-const SocialWrapper = styled.div`
-  display: grid;
-  grid-auto-flow: column;
-  align-items: center;
-  justify-items: center;
-  width: 120px;
-`;
-
-const LanguageWrapper = styled.div`
-  display: grid;
-  grid-auto-flow: column;
-  align-items: center;
-  gap: 27px;
-`;
-
-const SocialLink = styled.a`
-  &:hover {
-    svg path {
-      fill: ${({ isActive, theme }) => !isActive ? `${theme.colors.primaryHighEmphasis} !important` : ""
-  }
-  }
-
-  svg path {
-    fill: ${({ theme }) => theme.colors.foregroundLowEmphasis};
-  }
-`;
-
-const StyledDropdown = styled(Dropdown)`
-  padding: 16px 0px 16px 16px;
-  width: auto;
-`;
-
-const VerticalDivider = styled.div`
-  width: 1px;
-  height: 32px;
-  background-color: ${({ theme }) => theme.colors.foreground400};
-`;
-
-const SideMenuWrapper = styled.div`
-  position: fixed;
-  width: 320px;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  background: ${({ theme }) => theme.colors.backgroundLowEmphasis};
-  z-index: 9999;
-  display: grid;
-  grid-auto-flow: row;
-  justify-content: center;
-  align-items: center;
-  border: 1px solid ${({ theme }) => theme.colors.foreground400};
-  backdrop-filter: blur(8px);
-`;
-
-const HorizontalDivider = styled.div`
-  width: 229px;
-  height: 1px;
-  background: ${({ theme }) => theme.colors.foreground400};
-`;
-
-const ActionSideMenuWrapper = styled.div`
-  display: grid;
-  grid-auto-flow: column;
-  align-items: center;
-  justify-content: space-between;
-  span {
-    font-family: WorkSans-SemiBold;
-    font-size: 12px;
-    line-height: 14px;
-    text-transform: uppercase;
-  }
-`;

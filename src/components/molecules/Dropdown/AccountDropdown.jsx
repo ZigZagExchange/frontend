@@ -160,7 +160,7 @@ const IconButton = styled(baseIcon)`
   }
 `
 
-const AccountDropdown = ({ notext }) => {
+const AccountDropdown = ({ notext, networkName }) => {
   const [isOpened, setIsOpened] = useState(false)
   const network = useSelector(networkSelector);
   const user = useSelector(userSelector);
@@ -186,12 +186,19 @@ const AccountDropdown = ({ notext }) => {
   }
 
   const popoutzkScan = () => {
-    // https://etherscan.io/token/0x38d646b2c2d88c8576330b127a5187a47fb3cf46
     if (user.id && user.address) {
       if (selectedLayer === 1) {
-        window.open(`https://etherscan.io/token/${user.address}`, "_blank");
+        if (networkName.includes('Rinkeby')) {
+          window.open(`https://rinkeby.etherscan.io/address/${user.address}`, "_blank");
+        } else {
+          window.open(`https://etherscan.io/address/${user.address}`, "_blank");
+        }
       } else {
-        window.open(`https://rinkeby.zkscan.io/explorer/accounts/${user.address}`, "_blank");
+        if (networkName.includes('Rinkeby')) {
+          window.open(`https://rinkeby.zkscan.io/explorer/accounts/${user.address}`, "_blank");
+        } else {
+          window.open(`https://zkscan.io/explorer/accounts/${user.address}`, "_blank");
+        }
       }
     }
   }

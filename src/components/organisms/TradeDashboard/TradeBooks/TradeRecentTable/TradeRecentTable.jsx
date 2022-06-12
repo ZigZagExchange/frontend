@@ -102,8 +102,6 @@ const TradeRecentTable = (props) => {
   if (props.onClickRow) onClickRow = props.onClickRow;
   else onClickRow = () => null;
 
-  console.log("props side is", props.side);
-
   return (
     <>
       <Table>

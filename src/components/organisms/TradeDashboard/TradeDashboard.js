@@ -43,7 +43,7 @@ const TradeContainer = styled.div`
 
 const TradeGrid = styled.article`
   display: grid;
-  grid-template-rows: 75px 498px 1fr 57px;
+  grid-template-rows: 75px 528px 1fr 57px;
   grid-template-columns: 300px 253.5px 253.5px 1fr;
   grid-template-areas:
     "marketSelector marketSelector marketSelector marketSelector"
@@ -131,7 +131,6 @@ export function TradeDashboard() {
 
   useEffect(() => {
     if (user.address && !user.id) {
-      console.log('here')
       history.push("/bridge");
       toast.error(
         "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",

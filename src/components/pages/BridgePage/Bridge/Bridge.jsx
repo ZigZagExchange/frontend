@@ -226,7 +226,7 @@ const Bridge = (props) => {
   useEffect(() => {
     setHasAllowance(
       balances[swapDetails.currency] &&
-        balances[swapDetails.currency].allowance.gte(MAX_ALLOWANCE.div(3))
+      balances[swapDetails.currency].allowance.gte(MAX_ALLOWANCE.div(3))
     );
   }, [toNetwork, swapDetails]);
 
@@ -402,7 +402,7 @@ const Bridge = (props) => {
     if (balances.length === 0) return false;
     const feeTokenBalance = parseFloat(
       balances[feeCurrency] &&
-        balances[feeCurrency].value / 10 ** feeCurrencyInfo.decimals
+      balances[feeCurrency].value / 10 ** feeCurrencyInfo.decimals
     );
 
     if (inputValue > 0 && bridgeFee > feeTokenBalance) {
@@ -458,12 +458,10 @@ const Bridge = (props) => {
   };
 
   const setSwapDetails = async (values) => {
-    console.log(values);
     const details = {
       ...swapDetails,
       ...values,
     };
-    console.log(details);
     _setSwapDetails(details);
   };
 
