@@ -131,7 +131,6 @@ export const LaptopWrapper = styled.div`
 `
 
 export const MobileWrapper = styled.div`
-
     table {
         width: 100%;
     }

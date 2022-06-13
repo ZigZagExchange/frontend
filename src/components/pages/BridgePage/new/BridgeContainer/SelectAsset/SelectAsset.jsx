@@ -61,7 +61,7 @@ const SelectAsset = ({
       max = parseFloat(
         (balances[swapDetails.currency] &&
           balances[swapDetails.currency].valueReadable) ||
-          0
+        0
       );
     }
 
@@ -74,10 +74,10 @@ const SelectAsset = ({
           Select an Asset
         </p>
         {swapDetails.currency !== "ETH" &&
-        fromNetwork.id !== "polygon" &&
-        (swapCurrencyInfo?.decimals
-          ? swapDetails.amount * 10 ** swapCurrencyInfo?.decimals
-          : 0) > allowance ? (
+          fromNetwork.id !== "polygon" &&
+          (swapCurrencyInfo?.decimals
+            ? swapDetails.amount * 10 ** swapCurrencyInfo?.decimals
+            : 0) > allowance ? (
           <p className="text-xs font-work">
             Available allowance:{" "}
             {ethersUtils.formatUnits(allowance, swapCurrencyInfo?.decimals)}
@@ -132,4 +132,4 @@ const SelectAsset = ({
   );
 };
 
-export default SelectAsset;
+export default React.memo(SelectAsset);

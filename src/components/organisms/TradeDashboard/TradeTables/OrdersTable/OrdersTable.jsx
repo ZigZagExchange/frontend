@@ -310,9 +310,9 @@ export class OrdersTable extends React.Component {
               <th scope="col">
                 <HeaderWrapper>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Order Status</Text>
-                  <SortIconWrapper>
+                  {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper>
+                  </SortIconWrapper> */}
                 </HeaderWrapper>
               </th>
               <th scope="col">
@@ -939,7 +939,7 @@ export class OrdersTable extends React.Component {
                         <th scope="col">
                           <HeaderWrapper>
                             <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Balance</Text>
-                            <SortIconWrapper onClick={() => { this.changeSortType("valueReadable") }}>
+                            <SortIconWrapper onClick={() => { this.changeSortType("value") }}>
                               <SortUpIcon /><SortDownIcon />
                             </SortIconWrapper>
                           </HeaderWrapper>

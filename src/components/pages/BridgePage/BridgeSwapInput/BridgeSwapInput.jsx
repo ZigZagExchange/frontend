@@ -118,7 +118,7 @@ const BridgeSwapInput = ({
     } catch (e) {
       max = parseFloat(
         (balances[value.currency] && balances[value.currency].valueReadable) ||
-          0
+        0
       );
     }
 

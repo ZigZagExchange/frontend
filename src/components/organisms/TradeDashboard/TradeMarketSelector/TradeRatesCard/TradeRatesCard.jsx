@@ -61,9 +61,9 @@ const TradeRatesCard = ({ updateMarketChain, marketSummary, rowData, currentMark
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h Change</Text>
                   {
                     parseFloat(marketSummary["priceChange"]) > 0 ?
-                      <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis" className="text-green" >{parseFloat(marketSummary["priceChange"]).toFixed(2)}</Text> :
+                      <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis" className="text-green" >{`${parseFloat(marketSummary["priceChange"]).toFixed(2)}   ${parseFloat(marketSummary["priceChange"] * 100 / marketSummary.price).toFixed(2)}%`}</Text> :
                       parseFloat(marketSummary["priceChange"]) < 0 ?
-                        <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis" className="text-red" >{parseFloat(marketSummary["priceChange"]).toFixed(2)}</Text> :
+                        <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis" className="text-red" >{`${parseFloat(marketSummary["priceChange"]).toFixed(2)}   ${parseFloat(marketSummary["priceChange"] * 100 / marketSummary.price).toFixed(2)}%`}</Text> :
                         <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{marketSummary["priceChange"]}</Text>
                   }
                 </RatesCard>
