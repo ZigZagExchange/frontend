@@ -17,6 +17,7 @@ import {
 
 import axios from "axios";
 import { isMobile } from "react-device-detect";
+import get from "lodash/get";
 
 const chainMap = {
   "0x1": 1,
@@ -140,39 +141,70 @@ export default class API extends Emitter {
     }
 
     getProfile = async (address) => {
-        if (!this._profiles[address]) {
-            const profile = this._profiles[address] = {
-                description: null,
-                website: null,
-                image: null,
-                address,
-            }
-
-            if (!address) {
-                return profile
-            }
-
-            profile.name = `${address.substr(0, 6)}…${address.substr(-6)}`
-            Object.assign(
-                profile,
-                ...(await Promise.all([
-                    this._fetchENSName(address),
-                    this.apiProvider.getProfile(address),
-                ]))
-            )
-
-            if (!profile.image) {
-                profile.image = createIcon({ seed: address }).toDataURL()
-            }
+      const getProfileFromIPFS  = async (address) => {
+      try {
+        const { data } = await axios.get(
+          `https://ipfs.3box.io/profile?address=${address}`
+        );
+        const profile = {
+          coverPhoto: get(data, "coverPhoto.0.contentUrl./"),
+          image: get(data, "image.0.contentUrl./"),
+          description: data.description,
+          emoji: data.emoji,
+          website: data.website,
+          location: data.location,
+          twitter_proof: data.twitter_proof,
+        };
+  
+        if (data.name) {
+          profile.name = data.name;
         }
+        if (profile.image) {
+          profile.image = `https://gateway.ipfs.io/ipfs/${profile.image}`;
+        }
+  
+        return profile;
+      } catch (err) {
+        if (!err.response) {
+          throw err;
+        }
+      }
+      return {};
+    };
 
-        return this._profiles[address]
-  };
+    const fetchENSName = async (address) => {
+      let name = await getENSName(address);
+      if (name) return { name };
+      return {};
+    };
 
-  _fetchENSName = async (address) => {
-    let name = await getENSName(address);
-    if (name) return { name };
-    return {};
+    if (!this._profiles[address]) {
+      const profile = this._profiles[address] = {
+        description: null,
+        website: null,
+        image: null,
+        address,
+      }
+
+      if (!address) {
+        return profile
+      }
+
+      profile.name = `${address.substr(0, 6)}…${address.substr(-6)}`
+      Object.assign(
+        profile,
+      ...(await Promise.all([
+          fetchENSName(address),
+          getProfileFromIPFS(address),
+        ]))
+      )
+
+      if (!profile.image) {
+        profile.image = createIcon({ seed: address }).toDataURL()
+      }
+    }
+
+    return this._profiles[address]
   };
 
   _socketOpen = () => {

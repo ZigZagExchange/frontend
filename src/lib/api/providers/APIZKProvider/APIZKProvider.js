@@ -1,4 +1,3 @@
-import get from "lodash/get";
 import * as zksync from "zksync";
 import { ethers } from "ethers";
 import { toast } from "react-toastify";
@@ -31,37 +30,7 @@ export default class APIZKProvider extends APIProvider {
   _tokenInfo = {};
   eligibleFastWithdrawTokens = ["ETH", "FRAX", "UST"];
   fastWithdrawContractAddress = ZKSYNC_ETHEREUM_FAST_BRIDGE.address;
-  getProfile = async (address) => {
-    try {
-      const { data } = await axios.get(
-        `https://ipfs.3box.io/profile?address=${address}`
-      );
-      const profile = {
-        coverPhoto: get(data, "coverPhoto.0.contentUrl./"),
-        image: get(data, "image.0.contentUrl./"),
-        description: data.description,
-        emoji: data.emoji,
-        website: data.website,
-        location: data.location,
-        twitter_proof: data.twitter_proof,
-      };
-
-      if (data.name) {
-        profile.name = data.name;
-      }
-      if (profile.image) {
-        profile.image = `https://gateway.ipfs.io/ipfs/${profile.image}`;
-      }
-
-      return profile;
-    } catch (err) {
-      if (!err.response) {
-        throw err;
-      }
-    }
-    return {};
-  };
-
+  
   handleBridgeReceipt = (_receipt, amount, token, type, target, walletAddress) => {
     let receipt = {
       date: +new Date(),
