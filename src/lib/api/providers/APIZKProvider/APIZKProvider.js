@@ -12,7 +12,6 @@ import {
   ZKSYNC_ETHEREUM_FAST_BRIDGE,
   ETH_ZKSYNC_BRIDGE
 } from "components/pages/BridgePage/Bridge/constants";
-import _ from "lodash"
 import { formatAmount } from "lib/utils";
 
 export default class APIZKProvider extends APIProvider {
