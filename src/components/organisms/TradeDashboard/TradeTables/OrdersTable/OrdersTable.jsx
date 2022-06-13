@@ -39,7 +39,7 @@ export class OrdersTable extends React.Component {
     let wallet = { ...this.props.wallet };
     let walletArray = [];
 
-    Object.keys(wallet).map(function (key) {
+    Object.keys(wallet).forEach((key) => {
       walletArray.push({ ...wallet[key], token: key });
     });
 

@@ -33,7 +33,6 @@ import {
   marketQueryParam,
   networkQueryParam,
 } from "../../pages/ListPairPage/SuccessModal";
-import { areArraysEqual } from "@mui/base";
 
 const TradeContainer = styled.div`
   color: #aeaebf;
