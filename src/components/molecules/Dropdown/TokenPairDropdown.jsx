@@ -537,7 +537,7 @@ const TokenPairDropdown = ({ width, transparent, context, currentMarket, marketI
                         </th>
                         <th onClick={() => toggleVolumeSorting()}>
                             <HeaderWrapper>
-                                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis" align="right">Volume(24)</Text>
+                                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis" align="right">Volume(24h)</Text>
                                 {volumeSorted ? (
                                     <SortIconWrapper>
                                         {volumeDirection ? <SortUpIcon /> : <SortUpFilledIcon />}
