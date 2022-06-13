@@ -25,6 +25,8 @@ const TradeRatesCard = ({ updateMarketChain, marketSummary, rowData, currentMark
   }
 
   const isMobile = window.innerWidth < 800
+  const percentChange = ((marketSummary.priceChange / marketSummary.price) * 100).toFixed(2);
+
 
   return (
     <Wrapper>
@@ -59,13 +61,9 @@ const TradeRatesCard = ({ updateMarketChain, marketSummary, rowData, currentMark
               <>
                 <RatesCard>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h Change</Text>
-                  {
-                    parseFloat(marketSummary["priceChange"]) > 0 ?
-                      <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis" className="text-green" >{parseFloat(marketSummary["priceChange"]).toFixed(2)}</Text> :
-                      parseFloat(marketSummary["priceChange"]) < 0 ?
-                        <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis" className="text-red" >{parseFloat(marketSummary["priceChange"]).toFixed(2)}</Text> :
-                        <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{marketSummary["priceChange"]}</Text>
-                  }
+                  <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis" className={parseFloat(marketSummary["priceChange"]) >= 0 ? "text-green" : "text-red"}>
+                    {marketSummary.priceChange && formatPrice(marketSummary.priceChange / 1)}{" "}{percentChange !== 'NaN' && `${percentChange}%`}
+                  </Text>
                 </RatesCard>
                 <RatesCard>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h High</Text>
