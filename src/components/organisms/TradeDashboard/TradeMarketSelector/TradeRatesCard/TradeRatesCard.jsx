@@ -61,7 +61,7 @@ const TradeRatesCard = ({ updateMarketChain, marketSummary, rowData, currentMark
               <>
                 <RatesCard>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h Change</Text>
-                  <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis" className={parseFloat(marketSummary["priceChange"]) >= 0 ? "text-green" : "text-red"}>
+                  <Text font="primaryMediumSmallSemiBold" color={parseFloat(marketSummary["priceChange"]) >= 0 ? "successHighEmphasis" : "dangerHighEmphasis"}>
                     {marketSummary.priceChange && formatPrice(marketSummary.priceChange / 1)}{" "}{percentChange !== 'NaN' && `${percentChange}%`}
                   </Text>
                 </RatesCard>
