@@ -734,6 +734,11 @@ export class OrdersTable extends React.Component {
                   </SortIconWrapper> */}
                 </HeaderWrapper>
               </th>
+              <th>
+                <HeaderWrapper>
+                  <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Trade ID</Text>
+                </HeaderWrapper>
+              </th>
             </tr>
           </thead>
           <tbody>
