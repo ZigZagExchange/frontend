@@ -145,3 +145,28 @@ html {
 .Toastify__toast-container{
   width: 400px;
 }
+
+.Toastify__toast-theme--colored.Toastify__toast--success {
+  background: rgba(116, 222, 159, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  box-shadow: 0px 8px 16px rgba(1, 1, 1, 0.5);
+  backdrop-filter: blur(16px);
+  border-radius: 8px;
+}
+
+.Toastify__toast-theme--colored.Toastify__toast--error {
+  background: rgba(232, 54, 129, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  box-shadow: 0px 8px 16px rgba(1, 1, 1, 0.5);
+  backdrop-filter: blur(16px);
+  border-radius: 8px;
+}
+
+.Toastify__toast-theme--colored.Toastify__toast--warning {
+  background: rgba(252, 201, 88, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  box-shadow: 0px 8px 16px rgba(1, 1, 1, 0.5);
+  backdrop-filter: blur(16px);
+  border-radius: 8px;
+}
+
