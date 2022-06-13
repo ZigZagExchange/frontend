@@ -728,15 +728,15 @@ export class OrdersTable extends React.Component {
               </th>
               <th>
                 <HeaderWrapper>
-                  <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Action</Text>
-                  {/* <SortIconWrapper>
-                    <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper> */}
+                  <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Trade ID</Text>
                 </HeaderWrapper>
               </th>
               <th>
                 <HeaderWrapper>
-                  <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Trade ID</Text>
+                  <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Action</Text>
+                  {/* <SortIconWrapper>
+                    <SortUpIcon /><SortDownIcon />
+                  </SortIconWrapper> */}
                 </HeaderWrapper>
               </th>
             </tr>
