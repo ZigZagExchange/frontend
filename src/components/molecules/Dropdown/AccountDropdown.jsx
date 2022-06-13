@@ -313,7 +313,7 @@ const AccountDropdown = ({ notext, networkName }) => {
             <Button variant="outlined" scale="imd" onClick={popoutzkScan} className="mr-[1rem]">
               <Text font="primaryBoldDisplay" color="foregroundHighEmphasis" textAlign="center">
                 <ExternalLinkIcon size={10} />
-                zkScan
+                {selectedLayer === 1 ? 'Etherscan' : `zkScan`}
               </Text>
             </Button>
             <Button variant="outlined" scale="imd" onClick={disconnect}>
