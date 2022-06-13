@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import styled from "@xstyled/styled-components";
 import TradePriceTable from "./TradePriceTable/TradePriceTable";
 import TradePriceHeadSecond from "./TradePriceHeadSecond/TradePriceHeadSecond";
 import Text from "components/atoms/Text/Text";
 import { Dropdown } from "components/molecules/Dropdown";
-
+import { liquiditySelector, marketSummarySelector, marketInfoSelector } from "lib/store/features/api/apiSlice";
 import { SideAllButton, SideSellButton, SideBuyButton } from "./OrdersFooter/SideButtons";
 
 const StyledTradeBooks = styled.section`
@@ -65,6 +66,9 @@ const fixedPoints = [
 ]
 
 export default function OrdersBook(props) {
+  const marketInfo = useSelector(marketInfoSelector);
+  const marketSummary = useSelector(marketSummarySelector);
+  const liquidity = useSelector(liquiditySelector);
   const [fixedPoint, setFixedPoint] = useState(2);
   const [side, setSide] = useState('all');
   const [fixedPointItems, setFixedPointItems] = useState(fixedPoints);
@@ -91,6 +95,68 @@ export default function OrdersBook(props) {
     }
   }
 
+  const orderbookBids = [];
+  const orderbookAsks = [];
+
+  liquidity.forEach((liq) => {
+    const side = liq[0];
+    const price = liq[1];
+    const quantity = liq[2];
+    if (side === "b") {
+      orderbookBids.push({
+        td1: price,
+        td2: quantity,
+        td3: price * quantity,
+        side: "b",
+      });
+    }
+    if (side === "s") {
+      orderbookAsks.push({
+        td1: price,
+        td2: quantity,
+        td3: price * quantity,
+        side: "s",
+      });
+    }
+  });
+
+  orderbookAsks.sort((a, b) => b.td1 - a.td1);
+  orderbookBids.sort((a, b) => b.td1 - a.td1);
+  let askBins = [];
+  for (let i = 0; i < orderbookAsks.length; i++) {
+    const lastAskIndex = askBins.length - 1;
+    if (i === 0) {
+      askBins.push(orderbookAsks[i]);
+    } else if (
+      orderbookAsks[i].td1.toPrecision(6) ===
+      askBins[lastAskIndex].td1.toPrecision(6)
+    ) {
+      askBins[lastAskIndex].td2 += orderbookAsks[i].td2;
+      askBins[lastAskIndex].td3 += orderbookAsks[i].td3;
+    } else {
+      askBins.push(orderbookAsks[i]);
+    }
+  }
+
+  let temp = [];
+  for (let i in orderbookBids) {
+    const lastBidIndex = temp.length - 1;
+    if (i === "0") {
+      temp.push(orderbookBids[i]);
+    } else if (
+      orderbookBids[i].td1.toPrecision(6) ===
+      temp[lastBidIndex].td1.toPrecision(6)
+    ) {
+      temp[lastBidIndex].td2 += orderbookBids[i].td2;
+      temp[lastBidIndex].td3 += orderbookBids[i].td3;
+    } else {
+      temp.push(orderbookBids[i]);
+    }
+  }
+  let arrayLength = askBins.length > temp.length ? temp.length : askBins.length;
+  const bidBins = temp.slice(0, arrayLength);
+  askBins = askBins.slice(0, arrayLength);
+
   return (
     <>
       <StyledTradeBooks>
@@ -100,8 +166,8 @@ export default function OrdersBook(props) {
             side === 'sell' ?
               <>
                 <TradePriceHeadSecond
-                  lastPrice={props.lastPrice}
-                  marketInfo={props.marketInfo}
+                  lastPrice={marketSummary.price}
+                  marketInfo={marketInfo}
                   fixedPoint={fixedPoint}
                 />
                 <Divider />
@@ -110,7 +176,7 @@ export default function OrdersBook(props) {
                   className="trade_table_asks sell-side"
                   useGradient="true"
                   adClass="no-space"
-                  priceTableData={props.priceTableData}
+                  priceTableData={askBins}
                   currentMarket={props.currentMarket}
                   scrollToBottom={true}
                   fixedPoint={fixedPoint}
@@ -122,8 +188,8 @@ export default function OrdersBook(props) {
             side === 'buy' ?
               <>
                 <TradePriceHeadSecond
-                  lastPrice={props.lastPrice}
-                  marketInfo={props.marketInfo}
+                  lastPrice={marketSummary.price}
+                  marketInfo={marketInfo}
                   fixedPoint={fixedPoint}
                 />
                 <Divider />
@@ -132,7 +198,7 @@ export default function OrdersBook(props) {
                   useGradient="true"
                   adClass="no-space"
                   currentMarket={props.currentMarket}
-                  priceTableData={props.bidBins}
+                  priceTableData={bidBins}
                   fixedPoint={fixedPoint}
                 />
               </> : ""
@@ -144,22 +210,22 @@ export default function OrdersBook(props) {
                   head
                   className="trade_table_asks sell-side"
                   useGradient="true"
-                  priceTableData={props.priceTableData}
+                  priceTableData={askBins}
                   currentMarket={props.currentMarket}
                   scrollToBottom={true}
                   fixedPoint={fixedPoint}
                 />
                 <Divider />
                 <TradePriceHeadSecond
-                  lastPrice={props.lastPrice}
-                  marketInfo={props.marketInfo}
+                  lastPrice={marketSummary.price}
+                  marketInfo={marketInfo}
                   fixedPoint={fixedPoint}
                 />
                 <Divider />
                 <TradePriceTable
                   useGradient="true"
                   currentMarket={props.currentMarket}
-                  priceTableData={props.bidBins}
+                  priceTableData={bidBins}
                   fixedPoint={fixedPoint}
                 />
               </> : ""

@@ -1,8 +1,10 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import styled from "@xstyled/styled-components";
 import SpotBox from "./SpotBox/SpotBox";
 import Text from "components/atoms/Text/Text";
 import { DiscordIcon } from "components/atoms/Svg";
+import { liquiditySelector, marketSummarySelector, marketInfoSelector } from "lib/store/features/api/apiSlice";
 import { Button, ConnectWalletButton } from "components/molecules/Button"
 
 const StyledTradeSidebar = styled.aside`
@@ -26,6 +28,9 @@ const InfoWrapper = styled.div`
 `
 
 export default function TradeSidebar(props) {
+  const marketInfo = useSelector(marketInfoSelector);
+  const marketSummary = useSelector(marketSummarySelector);
+  const liquidity = useSelector(liquiditySelector);
   const isMobile = window.innerWidth < 992
   const joinDiscord = () => {
     window.open('https://discord.gg/zigzag', '_blank')
@@ -48,13 +53,13 @@ export default function TradeSidebar(props) {
           </InfoWrapper>
       }
       <SpotBox
-        lastPrice={props.lastPrice}
+        lastPrice={marketSummary.price}
         user={props.user}
         activeOrderCount={props.activeOrderCount}
-        liquidity={props.liquidity}
+        liquidity={liquidity}
         currentMarket={props.currentMarket}
-        marketSummary={props.marketSummary}
-        marketInfo={props.marketInfo}
+        marketSummary={marketSummary}
+        marketInfo={marketInfo}
       />
     </StyledTradeSidebar>
   );

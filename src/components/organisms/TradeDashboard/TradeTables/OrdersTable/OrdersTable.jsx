@@ -1,7 +1,8 @@
-import React from "react";
-
+import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import "./OrdersTable.css";
 import loadingGif from "assets/icons/loading.svg";
+import { balancesSelector, networkSelector } from "lib/store/features/api/apiSlice";
 import api from "lib/api";
 import { formatDate, formatDateTime } from 'lib/utils'
 import { Tab } from "components/molecules/TabMenu";
@@ -19,47 +20,46 @@ import {
 } from "./StyledComponents"
 import { Dropdown } from "components/molecules/Dropdown";
 
-export class OrdersTable extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      tab: 0, isMobile: window.innerWidth < 1064, selectedSide: "All",
-      sideItems: [
-        { text: "All", url: "#", iconSelected: true },
-        { text: "Buy", url: "#" },
-        { text: "Sell", url: "#" }],
-      walletList: [],
-      direction: "desc"
-    };
-    this.changeSide = this.changeSide.bind(this);
-    this.changeSortType = this.changeSortType.bind(this);
-  }
+export default function  OrdersTable(props) {
+  const network = useSelector(networkSelector);
+  const balanceData = useSelector(balancesSelector);
+  const [tab, setTabIndex] = useState(0)
+  const [selectedSide, setSelectedSide] = useState("All")
+  const [direction, setDirection] = useState("desc")
+  const [walletList, setWalletList] = useState([])
+  const [sideItems, setSideItems] = useState([
+    { text: "All", url: "#", iconSelected: true },
+    { text: "Buy", url: "#" },
+    { text: "Sell", url: "#" }])
+  const isMobile = window.innerWidth < 1064
 
-  componentDidMount() {
-    let wallet = { ...this.props.wallet };
+  const wallet = balanceData[network];
+
+  useEffect(() => {
     let walletArray = [];
 
-    Object.keys(wallet).forEach((key) => {
-      walletArray.push({ ...wallet[key], token: key });
-    });
+    if (wallet) {
+      Object.keys(wallet).forEach((key) => {
+        walletArray.push({ ...wallet[key], token: key });
+      });
+    }
+    setWalletList(walletArray)
+  }, [wallet])
 
-    this.setState({ walletList: walletArray });
+  const setTab = (newIndex) => {
+    setTabIndex(newIndex);
   }
 
-  setTab(newIndex) {
-    this.setState({ tab: newIndex });
+  const getFills = () => {
+    return Object.values(props.userFills).filter(i => selectedSide === 'All' || i[3] === selectedSide.toLowerCase()[0]).sort((a, b) => b[1] - a[1]);
   }
 
-  getFills() {
-    return Object.values(this.props.userFills).filter(i => this.state.selectedSide === 'All' || i[3] === this.state.selectedSide.toLowerCase()[0]).sort((a, b) => b[1] - a[1]);
+  const getUserOrders = () => {
+    return Object.values(props.userOrders).filter(i => i[9] !== 'f' && (selectedSide === 'All' || i[3] === selectedSide.toLowerCase()[0])).sort((a, b) => b[1] - a[1]);
   }
 
-  getUserOrders() {
-    return Object.values(this.props.userOrders).filter(i => i[9] !== 'f' && (this.state.selectedSide === 'All' || i[3] === this.state.selectedSide.toLowerCase()[0])).sort((a, b) => b[1] - a[1]);
-  }
-
-  changeSide(newSide) {
-    let newItems = this.state.sideItems.reduce((acc, item) => {
+  const changeSide = (newSide) => {
+    const newItems = sideItems.reduce((acc, item) => {
       if (item.text === newSide) {
         acc.push({
           ...item, iconSelected: true
@@ -71,27 +71,27 @@ export class OrdersTable extends React.Component {
       }
       return acc;
     }, [])
-    this.setState({ selectedSide: newSide, sideItems: newItems });
+    setSelectedSide(newSide)
+    setSideItems(newItems)
   }
 
-  changeSortType(type) {
-    let walletArray = [...this.state.walletList];
+  const changeSortType = (type) => {
+    let walletArray = [...walletList];
 
-    if (this.state.direction === "desc") {
+    if (direction === "desc") {
       walletArray.sort((a, b) => { return a[type] > b[type] ? 1 : -1 });
-      this.setState({ direction: "asce" });
+      setDirection("asce")
     }
     else {
       walletArray.sort((a, b) => { return a[type] < b[type] ? 1 : -1 });
-      this.setState({ direction: "desc" });
+      setDirection("desc")
     }
-
-    this.setState({ walletList: walletArray });
+    setWalletList(walletArray)
   }
 
-  renderOrderTable(orders) {
+  const renderOrderTable = (orders) => {
     return (
-      this.state.isMobile ?
+      isMobile ?
         <table>
           <tbody>
             {orders.map((order, i) => {
@@ -280,7 +280,7 @@ export class OrdersTable extends React.Component {
               <th scope="col">
                 <HeaderWrapper style={{ position: 'relative' }}>
                   {/* <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis" onClick>Side</Text> */}
-                  <Dropdown adClass="side-dropdown size-wide" transparent={true} width={162} item={this.state.sideItems} context="Side" leftIcon={false} clickFunction={this.changeSide} />
+                  <Dropdown adClass="side-dropdown size-wide" transparent={true} width={162} item={sideItems} context="Side" leftIcon={false} clickFunction={changeSide} />
                 </HeaderWrapper>
               </th>
               <th scope="col">
@@ -481,7 +481,7 @@ export class OrdersTable extends React.Component {
     );
   }
 
-  renderFillTable(fills) {
+  const renderFillTable = (fills) => {
     let baseExplorerUrl;
     switch (api.apiProvider.network) {
       case 1001:
@@ -495,7 +495,7 @@ export class OrdersTable extends React.Component {
         baseExplorerUrl = "https://zkscan.io/explorer/transactions/";
     }
     return (
-      this.state.isMobile ?
+      isMobile ?
         <table>
           <tbody>
             {fills.map((fill, i) => {
@@ -691,7 +691,7 @@ export class OrdersTable extends React.Component {
               <th>
                 <HeaderWrapper style={{ position: 'relative' }}>
                   {/* <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Side</Text> */}
-                  <Dropdown adClass="side-dropdown size-wide" transparent={true} width={162} item={this.state.sideItems} context="Side" leftIcon={false} clickFunction={this.changeSide} />
+                  <Dropdown adClass="side-dropdown size-wide" transparent={true} width={162} item={sideItems} context="Side" leftIcon={false} clickFunction={changeSide} />
                 </HeaderWrapper>
               </th>
               <th>
@@ -893,117 +893,116 @@ export class OrdersTable extends React.Component {
     );
   }
 
-  render() {
-    let explorerLink;
-    switch (api.apiProvider.network) {
-      case 1000:
-        explorerLink =
-          "https://rinkeby.zkscan.io/explorer/accounts/" +
-          this.props.user.address;
-        break;
-      case 1:
-      default:
-        explorerLink =
-          "https://zkscan.io/explorer/accounts/" + this.props.user.address;
-    }
-    let footerContent
-    switch (this.state.tab) {
-      case 0:
-        footerContent = this.renderOrderTable(this.getUserOrders());
-        break;
-      case 1:
-        footerContent = this.renderFillTable(this.getFills());
-        break;
-      case 2:
-        if (this.props.user.committed) {
-          const balancesContent = this.state.walletList
-            .map((token) => {
-              return (
-                <tr>
-                  <td data-label="Token"><Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{token.token}</Text></td>
-                  <td data-label="Balance"><Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{token.valueReadable}</Text></td>
-                </tr>
-              );
-            });
-          footerContent = (
-            <div style={{ textAlign: 'center', marginTop: '8px' }}>
-              {
-                this.state.isMobile ?
-                  <table><tbody>{balancesContent}</tbody></table> :
-                  <table>
-                    <thead>
-                      <tr>
-                        <th scope="col">
-                          <HeaderWrapper>
-                            <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Token</Text>
-                            <SortIconWrapper onClick={() => { this.changeSortType("token") }}>
-                              <SortUpIcon /><SortDownIcon />
-                            </SortIconWrapper>
-                          </HeaderWrapper>
-                        </th>
-                        <th scope="col">
-                          <HeaderWrapper>
-                            <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Balance</Text>
-                            <SortIconWrapper onClick={() => { this.changeSortType("value") }}>
-                              <SortUpIcon /><SortDownIcon />
-                            </SortIconWrapper>
-                          </HeaderWrapper>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>{balancesContent}</tbody>
-                  </table>
-              }
-              <ActionWrapper
-                font="primaryExtraSmallSemiBold"
-                color="primaryHighEmphasis"
-                textAlign="center"
-                className="view-account-button"
-                onClick={() => window.open(explorerLink, '_blank')}
-              >
-                View Account on Explorer
-              </ActionWrapper>
-            </div>
-          );
-        } else {
-          footerContent = (
-            <div style={{ textAlign: 'center' }}>
-              <ActionWrapper
-                font="primaryExtraSmallSemiBold"
-                color="primaryHighEmphasis"
-                textAlign="center"
-                className="view-account-button"
-                onClick={() => window.open(explorerLink, '_blank')}
-              >
-                View Account on Explorer
-              </ActionWrapper>
-            </div>
-          );
-        }
-        break;
-      default:
-        break;
-    }
-
-    return (
-      <>
-        <FooterWrapper>
-          <FooterContainer>
-            <div>
-              <StyledTabMenu left activeIndex={this.state.tab} onItemClick={(newIndex) => this.setTab(newIndex)} >
-                <Tab>Open Orders ({this.getUserOrders().length})</Tab>
-                <Tab>Order History ({this.getFills().length})</Tab>
-                <Tab>Balances</Tab>
-              </StyledTabMenu>
-            </div>
-            {
-              this.state.isMobile ?
-                <MobileWrapper>{footerContent}</MobileWrapper> :
-                <LaptopWrapper>{footerContent}</LaptopWrapper>
-            }
-          </FooterContainer>
-        </FooterWrapper>
-      </>
-    );
+  let explorerLink;
+  switch (api.apiProvider.network) {
+    case 1000:
+      explorerLink =
+        "https://rinkeby.zkscan.io/explorer/accounts/" +
+        props.user.address;
+      break;
+    case 1:
+    default:
+      explorerLink =
+        "https://zkscan.io/explorer/accounts/" + props.user.address;
   }
+
+  let footerContent
+  switch (tab) {
+    case 0:
+      footerContent = renderOrderTable(getUserOrders());
+      break;
+    case 1:
+      footerContent = renderFillTable(getFills());
+      break;
+    case 2:
+      if (props.user.committed) {
+        const balancesContent = walletList
+          .map((token) => {
+            return (
+              <tr>
+                <td data-label="Token"><Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{token.token}</Text></td>
+                <td data-label="Balance"><Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{token.valueReadable}</Text></td>
+              </tr>
+            );
+          });
+        footerContent = (
+          <div style={{ textAlign: 'center', marginTop: '8px' }}>
+            {
+              isMobile ?
+                <table><tbody>{balancesContent}</tbody></table> :
+                <table>
+                  <thead>
+                    <tr>
+                      <th scope="col">
+                        <HeaderWrapper>
+                          <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Token</Text>
+                          <SortIconWrapper onClick={() => { changeSortType("token") }}>
+                            <SortUpIcon /><SortDownIcon />
+                          </SortIconWrapper>
+                        </HeaderWrapper>
+                      </th>
+                      <th scope="col">
+                        <HeaderWrapper>
+                          <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Balance</Text>
+                          <SortIconWrapper onClick={() => { changeSortType("value") }}>
+                            <SortUpIcon /><SortDownIcon />
+                          </SortIconWrapper>
+                        </HeaderWrapper>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>{balancesContent}</tbody>
+                </table>
+            }
+            <ActionWrapper
+              font="primaryExtraSmallSemiBold"
+              color="primaryHighEmphasis"
+              textAlign="center"
+              className="view-account-button"
+              onClick={() => window.open(explorerLink, '_blank')}
+            >
+              View Account on Explorer
+            </ActionWrapper>
+          </div>
+        );
+      } else {
+        footerContent = (
+          <div style={{ textAlign: 'center' }}>
+            <ActionWrapper
+              font="primaryExtraSmallSemiBold"
+              color="primaryHighEmphasis"
+              textAlign="center"
+              className="view-account-button"
+              onClick={() => window.open(explorerLink, '_blank')}
+            >
+              View Account on Explorer
+            </ActionWrapper>
+          </div>
+        );
+      }
+      break;
+    default:
+      break;
+  }
+
+  return (
+    <>
+      <FooterWrapper>
+        <FooterContainer>
+          <div>
+            <StyledTabMenu left activeIndex={tab} onItemClick={(newIndex) => setTab(newIndex)} >
+              <Tab>Open Orders ({getUserOrders().length})</Tab>
+              <Tab>Order History ({getFills().length})</Tab>
+              <Tab>Balances</Tab>
+            </StyledTabMenu>
+          </div>
+          {
+            isMobile ?
+              <MobileWrapper>{footerContent}</MobileWrapper> :
+              <LaptopWrapper>{footerContent}</LaptopWrapper>
+          }
+        </FooterContainer>
+      </FooterWrapper>
+    </>
+  );
 }
