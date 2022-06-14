@@ -79,6 +79,7 @@ export default function OrdersTable(props) {
 
   const changeSortType = (type) => {
     let walletArray = [...walletList];
+    console.log("wallet array is", walletArray);
 
     if (direction === "desc") {
       walletArray.sort((a, b) => { return a[type] > b[type] ? 1 : -1 });
@@ -946,7 +947,7 @@ export default function OrdersTable(props) {
                       <th scope="col">
                         <HeaderWrapper>
                           <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Balance</Text>
-                          <SortIconWrapper onClick={() => { changeSortType("valuereadable") }}>
+                          <SortIconWrapper onClick={() => { changeSortType("valueReadable") }}>
                             <SortUpIcon /><SortDownIcon />
                           </SortIconWrapper>
                         </HeaderWrapper>
