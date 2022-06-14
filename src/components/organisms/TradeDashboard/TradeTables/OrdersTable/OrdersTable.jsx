@@ -20,7 +20,7 @@ import {
 } from "./StyledComponents"
 import { Dropdown } from "components/molecules/Dropdown";
 
-export default function  OrdersTable(props) {
+export default function OrdersTable(props) {
   const network = useSelector(networkSelector);
   const balanceData = useSelector(balancesSelector);
   const [tab, setTabIndex] = useState(0)
@@ -36,14 +36,16 @@ export default function  OrdersTable(props) {
   const wallet = balanceData[network];
 
   useEffect(() => {
-    let walletArray = [];
+    if (walletList.length === 0) {
+      let walletArray = [];
 
-    if (wallet) {
-      Object.keys(wallet).forEach((key) => {
-        walletArray.push({ ...wallet[key], token: key });
-      });
+      if (wallet) {
+        Object.keys(wallet).forEach((key) => {
+          walletArray.push({ ...wallet[key], token: key });
+        });
+      }
+      setWalletList(walletArray)
     }
-    setWalletList(walletArray)
   }, [wallet])
 
   const setTab = (newIndex) => {
