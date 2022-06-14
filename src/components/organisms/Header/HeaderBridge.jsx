@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useHistory } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import CheckIcon from '@mui/icons-material/Check';
+import CheckIcon from "@mui/icons-material/Check";
 
 import { userSelector } from "lib/store/features/auth/authSlice";
 import { networkSelector } from "lib/store/features/api/apiSlice";
@@ -12,10 +12,39 @@ import logo from "assets/images/logo.png";
 import { TabMenu, Tab } from "components/molecules/TabMenu";
 import { Dropdown, AccountDropdown } from "components/molecules/Dropdown";
 import { ConnectWalletButton } from "components/molecules/Button";
-import { DiscordIcon, ExternalLinkIcon, TelegramIcon, TwitterIcon, DeleteIcon, MenuIcon } from "components/atoms/Svg";
+import {
+  DiscordIcon,
+  ExternalLinkIcon,
+  TelegramIcon,
+  TwitterIcon,
+  DeleteIcon,
+  MenuIcon,
+} from "components/atoms/Svg";
 import { toNumber } from "lodash";
 import ToggleTheme from "components/molecules/Toggle/ToggleTheme";
 import useTheme from "components/hooks/useTheme";
+
+const langList = [
+  { text: "EN", url: "#" },
+  { text: "FR", url: "#" },
+];
+
+const networkLists = [
+  { text: "zkSync - Mainnet", value: 1, url: "#", selectedIcon: <CheckIcon /> },
+  {
+    text: "zkSync - Rinkeby",
+    value: 1000,
+    url: "#",
+    selectedIcon: <CheckIcon />,
+  },
+];
+
+const accountLists = [
+  { text: "0x83AD...83H4", url: "#", icon: <DeleteIcon /> },
+  { text: "0x12BV...b89G", url: "#", icon: <DeleteIcon /> },
+];
+
+
 
 const HeaderWrapper = styled.div`
   display: grid;
@@ -37,17 +66,16 @@ const HeaderWrapper = styled.div`
 
       div {
         color: ${({ theme }) => `${theme.colors.primaryHighEmphasis} !important`};
-  
+
         svg path {
           fill: ${({ theme }) => `${theme.colors.primaryHighEmphasis} !important`};
         }
       }
     }
   }
-`
+`;
 
-const LogoWrapper = styled.div`
-`
+const LogoWrapper = styled.div``;
 
 const ButtonWrapper = styled.div`
   display: grid;
@@ -55,24 +83,24 @@ const ButtonWrapper = styled.div`
   align-items: center;
   justify-content: end;
   gap: 19px;
-`
+`;
 
 const MenuButtonWrapper = styled.div`
   cursor: pointer;
-`
+`;
 
 const NavWrapper = styled.div`
   display: grid;
   grid-template-columns: 32px 421px;
   align-items: center;
-`
+`;
 
 const ActionsWrapper = styled.div`
   display: grid;
   grid-auto-flow: column;
   align-items: center;
   justify-items: center;
-`
+`;
 
 const SocialWrapper = styled.div`
   display: grid;
@@ -80,36 +108,37 @@ const SocialWrapper = styled.div`
   align-items: center;
   justify-items: center;
   width: 120px;
-`
+`;
 
 const LanguageWrapper = styled.div`
   display: grid;
   grid-auto-flow: column;
   align-items: center;
   gap: 27px;
-`
+`;
 
 const SocialLink = styled.a`
-  svg path {
-    fill: ${({ theme }) => theme.colors.foregroundLowEmphasis};
-  }
-  
   &:hover {
     svg path {
       fill: ${({ theme }) => `${theme.colors.primaryHighEmphasis} !important`};
     }
   }
-`
+
+  svg path {
+    fill: ${({ theme }) => theme.colors.foregroundLowEmphasis};
+  }
+`;
 
 const StyledDropdown = styled(Dropdown)`
-  width: fit-content;
-`
+  padding: 16px 0px 16px 16px;
+  width: auto;
+`;
 
 const VerticalDivider = styled.div`
   width: 1px;
   height: 32px;
   background-color: ${({ theme }) => theme.colors.foreground400};
-`
+`;
 
 const SideMenuWrapper = styled.div`
   position: fixed;
@@ -125,13 +154,13 @@ const SideMenuWrapper = styled.div`
   align-items: center;
   border: 1px solid ${({ theme }) => theme.colors.foreground400};
   backdrop-filter: blur(8px);
-`
+`;
 
 const HorizontalDivider = styled.div`
   width: 229px;
   height: 1px;
   background: ${({ theme }) => theme.colors.foreground400};
-`
+`;
 
 const ActionSideMenuWrapper = styled.div`
   display: grid;
@@ -144,22 +173,7 @@ const ActionSideMenuWrapper = styled.div`
     line-height: 14px;
     text-transform: uppercase;
   }
-`
-
-const langList = [
-  { text: 'EN', url: '#' },
-  { text: 'FR', url: '#' }
-]
-
-const networkLists = [
-  { text: 'zkSync - Mainnet', value: 1, url: '#', selectedIcon: <CheckIcon /> },
-  { text: 'zkSync - Rinkeby', value: 1000, url: '#', selectedIcon: <CheckIcon /> }
-]
-
-const accountLists = [
-  { text: '0x83AD...83H4', url: '#', icon: <DeleteIcon /> },
-  { text: '0x12BV...b89G', url: '#', icon: <DeleteIcon /> }
-]
+`;
 
 export const HeaderBridge = (props) => {
   // state to open or close the sidebar in mobile
@@ -171,16 +185,16 @@ export const HeaderBridge = (props) => {
   const [index, setIndex] = useState(0);
   const [language, setLanguage] = useState(langList[0].text);
   const [account, setAccount] = useState(accountLists[0].text);
-  const [networkName, setNetworkName] = useState('');
+  const [networkName, setNetworkName] = useState("");
   const [networkItems, setNetWorkItems] = useState(networkLists);
   const { isDark, toggleTheme } = useTheme();
 
   useEffect(() => {
     const netName = networkLists.filter((item, i) => {
-      return item.value === network
-    })
-    setNetworkName(netName[0].text)
-  })
+      return item.value === network;
+    });
+    setNetworkName(netName[0].text);
+  });
 
   useEffect(() => {
     let temp = networkItems.reduce((acc, item) => {
@@ -191,21 +205,20 @@ export const HeaderBridge = (props) => {
     }, []);
 
     setNetWorkItems(temp);
-  }, [networkName])
-
+  }, [networkName]);
 
   useEffect(() => {
-    const tabIndex = localStorage.getItem("tab_index")
-    if (tabIndex !== null) setIndex(toNumber(tabIndex))
-  }, [])
+    const tabIndex = localStorage.getItem("tab_index");
+    if (tabIndex !== null) setIndex(toNumber(tabIndex));
+  }, []);
 
   const changeLanguage = (text) => {
-    setLanguage(text)
-  }
+    setLanguage(text);
+  };
 
   const changeAccount = (text) => {
-    alert(text)
-  }
+    alert(text);
+  };
 
   const changeNetwork = (text, value) => {
     setNetworkName(text);
@@ -214,145 +227,104 @@ export const HeaderBridge = (props) => {
     api.refreshNetwork().catch((err) => {
       console.log(err);
     });
-  }
+  };
 
   const handleClick = (newIndex) => {
     switch (newIndex) {
       case 0:
         setIndex(newIndex);
-        localStorage.setItem('tab_index', newIndex)
-        history.push('/')
+        localStorage.setItem("tab_index", newIndex);
+        history.push("/");
         break;
       case 1:
         setIndex(newIndex);
-        localStorage.setItem('tab_index', newIndex)
-        history.push('bridge')
+        localStorage.setItem("tab_index", newIndex);
+        history.push("bridge");
         break;
       case 2:
         setIndex(newIndex);
-        localStorage.setItem('tab_index', newIndex)
-        history.push('/list-pair')
+        localStorage.setItem("tab_index", newIndex);
+        history.push("/list-pair");
         break;
       case 3:
-        window.open('https://docs.zigzag.exchange/', '_blank')
+        window.open("https://docs.zigzag.exchange/", "_blank");
         break;
       case 4:
         setIndex(newIndex);
-        localStorage.setItem('tab_index', newIndex)
-        history.push('/dsl')
+        localStorage.setItem("tab_index", newIndex);
+        history.push("/dsl");
+        break;
+      case 5:
+        setIndex(newIndex);
+        localStorage.setItem("tab_index", newIndex);
+        history.push("/swap");
+        break;
+      case 6:
+        setIndex(newIndex);
+        localStorage.setItem("tab_index", newIndex);
+        history.push("oldbridge");
         break;
       default:
         break;
     }
-  }
+  };
 
-  const isMobile = window.innerWidth < 1034
+  const isMobile = window.innerWidth < 1034;
 
   return (
     <HeaderWrapper isMobile={isMobile}>
-      {
-        isMobile ?
-          <>
-            <LogoWrapper>
-              <Link to="/">
-                <a href="/" rel="noreferrer">
-                  <img src={logo} alt="logo" height="32" />
-                </a>
-              </Link>
-            </LogoWrapper>
-            <ButtonWrapper>
-              {user.id && user.address ? (
-                <>
-                  <AccountDropdown notext />
-                </>
-              ) : (
-                <ConnectWalletButton />
-              )}
-              <MenuButtonWrapper>
-                <MenuIcon onClick={() => setShow(!show)} />
-              </MenuButtonWrapper>
-            </ButtonWrapper>
-          </> :
-          <>
-            <NavWrapper>
-              <Link to="/">
-                <a href="/" rel="noreferrer">
-                  <img src={logo} alt="logo" height="32" />
-                </a>
-              </Link>
-              <TabMenu activeIndex={index} onItemClick={handleClick} style={{ paddingTop: '20px' }}>
-                <Tab>TRADE</Tab>
-                {hasBridge && (<Tab>BRIDGE</Tab>)}
-                <Tab>LIST PAIR</Tab>
-                {hasBridge && (<Tab>DOCS<ExternalLinkIcon size={12} /></Tab>)}
-              </TabMenu>
-            </NavWrapper>
-            <ActionsWrapper>
-              <SocialWrapper>
-                <SocialLink
-                  target="_blank"
-                  rel="noreferrer"
-                  href="https://discord.gg/zigzag"
-                >
-                  <DiscordIcon />
-                </SocialLink>
-                <SocialLink
-                  target="_blank"
-                  rel="noreferrer"
-                  href="https://twitter.com/ZigZagExchange"
-                >
-                  <TwitterIcon />
-                </SocialLink>
-                <SocialLink
-                  target="_blank"
-                  rel="noreferrer"
-                  href="https://t.me/zigzagexchange"
-                >
-                  <TelegramIcon />
-                </SocialLink>
-              </SocialWrapper>
-              <VerticalDivider />
-              <LanguageWrapper>
-                <StyledDropdown adClass="lang-dropdown" transparent item={langList} context={language} clickFunction={changeLanguage} />
-                <ToggleTheme isDark={isDark} toggleTheme={toggleTheme} />
-              </LanguageWrapper>
-              <VerticalDivider />
-              {user.id && user.address ? (
-                <>
-                  <Dropdown adClass="network-dropdown" width={162} item={networkItems} context={networkName} clickFunction={changeNetwork} leftIcon={true} />
-                  <AccountDropdown />
-                </>
-              ) : (
-                <ConnectWalletButton />
-              )}
-            </ActionsWrapper>
-          </>
-      }
-      {
-        show && isMobile ?
-          <SideMenuWrapper>
-            {
-              user.id && user.address ?
-                <Dropdown adClass="network-dropdown" isMobile={true} style={{ justifySelf: 'center' }} width={242} item={networkItems} context={networkName} clickFunction={changeNetwork} leftIcon={true} /> :
-                <></>
-            }
-            <TabMenu row activeIndex={index} onItemClick={handleClick}>
+      {isMobile ? (
+        <>
+          <LogoWrapper>
+            <Link to="/">
+              <a href="/" rel="noreferrer">
+                <img src={logo} alt="logo" height="32" />
+              </a>
+            </Link>
+          </LogoWrapper>
+          <ButtonWrapper>
+            {user.id && user.address ? (
+              <>
+                <AccountDropdown notext networkName={networkName} />
+              </>
+            ) : (
+              <ConnectWalletButton />
+            )}
+            <MenuButtonWrapper>
+              <MenuIcon onClick={() => setShow(!show)} />
+            </MenuButtonWrapper>
+          </ButtonWrapper>
+        </>
+      ) : (
+        <>
+          <NavWrapper>
+            <Link to="/">
+              <a href="/" rel="noreferrer">
+                <img src={logo} alt="logo" height="32" />
+              </a>
+            </Link>
+            <TabMenu
+              activeIndex={index}
+              onItemClick={handleClick}
+              style={{ paddingTop: "20px" }}
+            >
               <Tab>TRADE</Tab>
-              {hasBridge && (<Tab>BRIDGE</Tab>)}
+
+              {hasBridge && <Tab>BRIDGE</Tab>}
               <Tab>LIST PAIR</Tab>
-              {hasBridge && (<Tab>DOCS<ExternalLinkIcon size={12} /></Tab>)}
+              {hasBridge && (
+                <Tab>
+                  DOCS
+                  <ExternalLinkIcon size={12} />
+                </Tab>
+              )}
+              {hasBridge && <Tab>DSL</Tab>}
+              {hasBridge && <Tab>SWAP</Tab>}
+              {/* {hasBridge && <Tab>Old BRIDGE</Tab>} */}
             </TabMenu>
-            <HorizontalDivider />
-            <ActionSideMenuWrapper>
-              <span>Language: </span>
-              <StyledDropdown adClass="lang-dropdown" transparent item={langList} context={language} clickFunction={changeLanguage} />
-            </ActionSideMenuWrapper>
-            <ActionSideMenuWrapper>
-              <span>Theme: </span>
-              <ToggleTheme isDark={isDark} toggleTheme={toggleTheme} />
-            </ActionSideMenuWrapper>
-            <HorizontalDivider />
-            <SocialWrapper style={{ justifySelf: 'center' }}>
+          </NavWrapper>
+          <ActionsWrapper>
+            <SocialWrapper>
               <SocialLink
                 target="_blank"
                 rel="noreferrer"
@@ -375,9 +347,108 @@ export const HeaderBridge = (props) => {
                 <TelegramIcon />
               </SocialLink>
             </SocialWrapper>
-          </SideMenuWrapper> :
-          <></>
-      }
+            <VerticalDivider />
+            <LanguageWrapper>
+              <StyledDropdown
+                adClass="lang-dropdown"
+                transparent
+                item={langList}
+                context={language}
+                clickFunction={changeLanguage}
+              />
+              <ToggleTheme isDark={isDark} toggleTheme={toggleTheme} />
+            </LanguageWrapper>
+            <VerticalDivider />
+            {user.id && user.address ? (
+              <>
+                <Dropdown
+                  adClass="network-dropdown"
+                  width={162}
+                  item={networkItems}
+                  context={networkName}
+                  clickFunction={changeNetwork}
+                  leftIcon={true}
+                />
+                <AccountDropdown networkName={networkName} />
+              </>
+            ) : (
+              <ConnectWalletButton />
+            )}
+          </ActionsWrapper>
+        </>
+      )}
+      {show && isMobile ? (
+        <SideMenuWrapper>
+          {user.id && user.address ? (
+            <Dropdown
+              adClass="network-dropdown"
+              isMobile={true}
+              style={{ justifySelf: "center" }}
+              width={242}
+              item={networkItems}
+              context={networkName}
+              clickFunction={changeNetwork}
+              leftIcon={true}
+            />
+          ) : (
+            <></>
+          )}
+          <TabMenu row activeIndex={index} onItemClick={handleClick}>
+            <Tab>TRADE</Tab>
+            {hasBridge && <Tab>BRIDGE</Tab>}
+            <Tab>LIST PAIR</Tab>
+            {hasBridge && (
+              <Tab>
+                DOCS
+                <ExternalLinkIcon size={12} />
+              </Tab>
+            )}
+            {hasBridge && <Tab>DSL</Tab>}
+            {hasBridge && <Tab>SWAP</Tab>}
+          </TabMenu>
+          <HorizontalDivider />
+          <ActionSideMenuWrapper>
+            <span>Language: </span>
+            <StyledDropdown
+              adClass="lang-dropdown"
+              transparent
+              item={langList}
+              context={language}
+              clickFunction={changeLanguage}
+            />
+          </ActionSideMenuWrapper>
+          <ActionSideMenuWrapper>
+            <span>Theme: </span>
+            <ToggleTheme isDark={isDark} toggleTheme={toggleTheme} />
+          </ActionSideMenuWrapper>
+          <HorizontalDivider />
+          <SocialWrapper style={{ justifySelf: "center" }}>
+            <SocialLink
+              target="_blank"
+              rel="noreferrer"
+              href="https://discord.gg/zigzag"
+            >
+              <DiscordIcon />
+            </SocialLink>
+            <SocialLink
+              target="_blank"
+              rel="noreferrer"
+              href="https://twitter.com/ZigZagExchange"
+            >
+              <TwitterIcon />
+            </SocialLink>
+            <SocialLink
+              target="_blank"
+              rel="noreferrer"
+              href="https://t.me/zigzagexchange"
+            >
+              <TelegramIcon />
+            </SocialLink>
+          </SocialWrapper>
+        </SideMenuWrapper>
+      ) : (
+        <></>
+      )}
     </HeaderWrapper>
   );
 };

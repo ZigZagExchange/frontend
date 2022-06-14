@@ -48,6 +48,10 @@ const ListContainer = styled.div`
   flex-direction: column;
   justify-content: flex-start;
 
+  svg {
+    display: inline;
+  }
+
   @media screen and (max-width: 480px) {
     padding: 0 10px;
   }
