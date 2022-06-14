@@ -17,10 +17,10 @@ const NetworkDropdown = ({ options, setSelectedItem, selectedItem }) => {
             className="rounded-full w-9 h-9"
           />
           <div>
-            <p className="text-base font-bold tracking-wider font-work">
+            <p className="text-base font-bold tracking-wider ">
               {selectedItem.name}
             </p>
-            <p className="text-xs tracking-wider font-work">
+            <p className="text-xs tracking-wider ">
               {network === 1 ? "Mainnet" : "Testnet"}
             </p>
           </div>

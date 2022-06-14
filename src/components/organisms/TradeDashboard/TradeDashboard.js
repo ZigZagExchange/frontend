@@ -76,7 +76,7 @@ export function TradeDashboard() {
   const userFills = useSelector(userFillsSelector);
   const layout = useSelector(layoutSelector);
   const [fixedPoint, setFixedPoint] = useState(2);
-  const [side, setSide] = useState('all');
+  const [side, setSide] = useState("all");
   const dispatch = useDispatch();
 
   const { search } = useLocation();
@@ -118,7 +118,7 @@ export function TradeDashboard() {
       toast.error(
         "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
         {
-          autoClose: 60000
+          autoClose: 60000,
         }
       );
     }
@@ -144,11 +144,11 @@ export function TradeDashboard() {
 
   const changeFixedPoint = (point) => {
     setFixedPoint(point);
-  }
+  };
 
   const changeSide = (side) => {
     setSide(side);
-  }
+  };
 
   const activeOrderStatuses = ["o", "m", "b"];
   const activeUserOrders = Object.values(userOrders).filter((order) =>

@@ -54,7 +54,7 @@ export default function SwapPage() {
   const [basePrice, setBasePrice] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  const [sellAmounts, setSellAmounts] = useState(0);
+  const [sellAmounts, setSellAmounts] = useState();
   const [buyAmounts, setBuyAmounts] = useState(0);
 
   const [balances, setBalances] = useState([]);
@@ -189,7 +189,10 @@ export default function SwapPage() {
       const p = sellTokenList.map((item, index) => {
         return { id: index, name: item };
       });
-      setSellToken(p[0]);
+      const f = p.find((item) => item.name === currentMarket.split("-")[0]);
+      const t = p.find((item) => item.name === currentMarket.split("-")[1]);
+      setSellToken(f);
+      setBuyToken(t);
       return p;
     } else {
       return [];
@@ -218,7 +221,7 @@ export default function SwapPage() {
     if (buyToken) {
       const d = filtered.find((item) => item.name === buyToken.name);
       if (d === undefined) {
-        setBuyToken(filtered[0]);
+        // setBuyToken(filtered[0]);
       } else {
         setBuyToken(d);
       }
@@ -412,7 +415,9 @@ export default function SwapPage() {
       {!loading && (
         <div className={classNames("flex justify-center", { dark: isDark })}>
           <div>
-            <p className="mt-20 text-3xl font-semibold ">Quick DEX Swap</p>
+            <p className="mt-10 text-3xl font-semibold font-work ">
+              Quick DEX Swap
+            </p>
             <p className="mt-2 text-sm text-gray-500">
               Swap into more than 200 tokens, using the best quotes from over 8
               sources.
@@ -424,11 +429,11 @@ export default function SwapPage() {
               <p className="mr-2">Learn More</p>
               <ExternalLinkIcon size={11} />
             </Link>
-            <div className="flex items-center justify-between mt-4">
-              <p>Network</p>
+            {/* <div className="flex items-center justify-between mt-4">
+              <p className="text-sm font-work">Network</p>
               <InfoIcon size={16} />
             </div>
-            <NetworkSelection className="mt-2" />
+            <NetworkSelection className="mt-2" /> */}
             <SwapContianer
               setTransactionType={(type) => setTtype(type)}
               transactionType={tType}
@@ -444,7 +449,11 @@ export default function SwapPage() {
               toToken={buyToken}
               toTokenOptions={buyTokenOptions}
               onChangeToToken={onChangeBuyToken}
-              toAmounts={buyAmounts}
+              toAmounts={
+                isNaN(buyAmounts) || Number.isSafeInteger(buyAmounts)
+                  ? 0
+                  : buyAmounts
+              }
               onClickMax={onClickMax}
             />
             <TransactionSettings transactionType={tType} />

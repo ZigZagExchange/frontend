@@ -26,8 +26,8 @@ const SwapContianer = ({
   return (
     <div className="p-4 mt-4 border-t border-b border-l border-r rounded-lg dark:border-foreground-400 border-primary-500">
       <div className="flex items-center justify-between">
-        <p className="text-lg font-semibold font-work">From</p>
-        <p className="text-sm font-normal font-work">
+        <p className="text-lg font-work">From</p>
+        <p className="text-sm font-normal ">
           Available Balance:{" "}
           {balances[fromToken?.name]
             ? balances[fromToken?.name].valueReadable.toPrecision(8)
@@ -41,10 +41,11 @@ const SwapContianer = ({
             tickers={fromTokenOptions}
             onSelectedOption={onChangeFromToken}
             selectedOption={fromToken}
+            label={"Select a token to Swap"}
           />
         )}
         <button
-          className="bg-[#07071C] px-2 py-1 rounded-md text-sm font-semibold text-primary-900 ml-2.5 hover:bg-slate-800 font-work"
+          className="bg-[#07071C] px-2 py-1 rounded-md text-sm font-semibold text-primary-900 ml-2.5 hover:bg-slate-800 "
           onClick={onClickMax}
         >
           Max
@@ -56,7 +57,7 @@ const SwapContianer = ({
           value={fromAmounts}
         />
       </div>
-      <p className="mt-1 text-sm font-normal text-right text-slate-400 font-work">
+      <p className="mt-1 text-sm font-normal text-right text-slate-400 ">
         Estimated value: ~ ${formatUSD(estimatedValue)}
       </p>
       <div className="relative h-px mx-2 my-5 dark:bg-foreground-400 bg-primary-500">
@@ -68,8 +69,8 @@ const SwapContianer = ({
         </button>
       </div>
       <div className="flex items-center justify-between">
-        <p className="text-lg font-semibold">To</p>
-        <p className="flex items-center text-sm font-normal font-work">
+        <p className="text-lg font-work">To</p>
+        <p className="flex items-center text-sm font-normal ">
           1 {fromToken?.name} = {formatPrice(basePrice)} {toToken?.name}
           <SwitchHorizontalIcon className="w-4" />
         </p>
@@ -80,12 +81,13 @@ const SwapContianer = ({
             tickers={toTokenOptions}
             onSelectedOption={onChangeToToken}
             selectedOption={toToken}
+            label={"Select a token to Swap"}
           />
         )}
         <input
           className="ml-3 text-2xl font-semibold text-right bg-transparent focus:outline-none"
           placeholder="0.00"
-          value={toAmounts.toPrecision(6)}
+          value={toAmounts?.toPrecision(6)}
           readOnly
         />
       </div>

@@ -9,6 +9,7 @@ const TokenDropDownModal = ({
   tickers = [],
   onSelectedOption,
   selectedOption,
+  label = "Select a token to Bridge",
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   // const [selected, setSelected] = useState(tickers[0]);
@@ -37,11 +38,11 @@ const TokenDropDownModal = ({
     query === ""
       ? tickers
       : tickers.filter((token) =>
-        token.name
-          .toLowerCase()
-          .replace(/\s+/g, "")
-          .includes(query.toLowerCase().replace(/\s+/g, ""))
-      );
+          token.name
+            .toLowerCase()
+            .replace(/\s+/g, "")
+            .includes(query.toLowerCase().replace(/\s+/g, ""))
+        );
 
   return (
     <>
@@ -101,7 +102,7 @@ const TokenDropDownModal = ({
                     as="h3"
                     className="pt-4 pl-5 text-lg font-semibold leading-6 divide-y font-work"
                   >
-                    Select a token to Bridge
+                    {label}
                   </Dialog.Title>
                   <div className="h-px mx-3 my-3 dark:bg-foreground-400 bg-primary-500"></div>
                   <Combobox value={selectedOption} onChange={onSelectedToken}>
@@ -124,7 +125,7 @@ const TokenDropDownModal = ({
                       >
                         <Combobox.Options
                           open
-                          className=" mt-1 max-h-[30rem] w-full overflow-auto rounded-md dark:bg-[#2B2E4A] bg-sky-100 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none "
+                          className=" mt-1 max-h-72 w-full overflow-auto rounded-md dark:bg-[#2B2E4A] bg-sky-100 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none "
                         >
                           {filteredToken.length === 0 && query !== "" ? (
                             <div className="relative px-4 py-2 cursor-default select-none font-work">
@@ -135,30 +136,50 @@ const TokenDropDownModal = ({
                               <Combobox.Option
                                 key={item.id}
                                 className={({ active }) =>
-                                  `relative cursor-default select-none py-2 font-work pl-10 pr-4 mx-3 bg-foreground-100 rounded-md mb-2 border-t border-l border-r border-b dark:border-foreground-400 border-primary-500 ${active ? "bg-teal-600" : ""
+                                  `relative cursor-default select-none py-2 font-work pl-10 pr-4 mx-3 bg-foreground-100 rounded-md mb-2 border-t border-l border-r border-b dark:border-foreground-400 border-primary-500 ${
+                                    active ? "bg-teal-600" : ""
                                   }`
                                 }
                                 value={item}
                               >
                                 {({ selected, active }) => (
                                   <>
-                                    <span
-                                      className={`flex items-center truncate   ${selected ? "font-medium" : "font-normal"
+                                    <div className="flex items-center justify-between">
+                                      <div
+                                        className={`flex items-center truncate   ${
+                                          selected
+                                            ? "font-medium"
+                                            : "font-normal"
                                         }`}
-                                    >
-                                      <img
-                                        src={api.getCurrencyLogo(item.name)}
-                                        alt={item}
-                                        style={{ width: 25, height: 25 }}
-                                      />
-                                      <p className="pl-3">{item.name}</p>
-                                    </span>
+                                      >
+                                        <img
+                                          src={api.getCurrencyLogo(item.name)}
+                                          alt={item}
+                                          style={{ width: 25, height: 25 }}
+                                        />
+                                        <p className="pl-3">{item.name}</p>
+                                      </div>
+                                      {item?.isFastWithdraw && (
+                                        <div className="bg-[#07071C] px-2 py-1 rounded-md text-sm font-semibold text-primary-900 ml-2.5 hover:bg-slate-800 font-work">
+                                          Fast
+                                        </div>
+                                      )}
+                                      <div className="text-right">
+                                        <p className="text-base text-primary-900">
+                                          {item?.balance}
+                                        </p>
+                                        <p className="text-xs font-work">
+                                          {item?.price}
+                                        </p>
+                                      </div>
+                                    </div>
                                     {selected ? (
                                       <span
-                                        className={`absolute  inset-y-0 left-0 flex items-center pl-3 ${active
-                                          ? "text-white"
-                                          : "text-teal-600"
-                                          }`}
+                                        className={`absolute  inset-y-0 left-0 flex items-center pl-3 ${
+                                          active
+                                            ? "text-white"
+                                            : "text-teal-600"
+                                        }`}
                                       >
                                         <CheckIcon
                                           className="w-5 h-5"

@@ -1,6 +1,6 @@
-import zksyncLogo from "../../../../assets/images/logo.svg";
-import ethLogo from "../../../../assets/images/currency/ETH.svg";
-import polygonLogo from "../../../../assets/images/polygon.png";
+import zksyncLogo from "assets/images/logo.svg";
+import ethLogo from "assets/images/currency/ETH.svg";
+import polygonLogo from "assets/images/polygon.png";
 
 export const POLYGON_MUMBAI_WETH_ADDRESS =
   "0xA6FA4fB5f76172d178d61B04b0ecd319C5d1C0aa";
