@@ -12,7 +12,10 @@ const Table = styled.table`
   overflow: auto;
   padding: 0px;
   flex-direction: column;
-  justify-content: space-between;
+
+  &:not(.no-space) {
+    justify-content: space-between;
+  }
 
   &:first-type-of {
     height: 205px;
@@ -77,19 +80,20 @@ const Table = styled.table`
   }
   
   ::-webkit-scrollbar-track {
-    border-radius: 0px;
-    background: hsla(0, 0%, 100%, 0.15);
+    border-radius: 4px;
+    background: transparent;
     height: 23px;
   }
   
   ::-webkit-scrollbar-thumb {
-    border-radius: 0px;
-    background: hsla(0, 0%, 100%, 0.4);
+    border-radius: 4px;         
+    background: ${({ theme }) => theme.colors.foreground400};
   }
-  
-  ::-webkit-scrollbar-thumb:window-inactive {
-    background: #fff;
-  }
+`
+const Divider = styled.div`
+  height: 1px;
+  background: ${({ theme }) => theme.colors.foreground400};
+  margin-top: 20px;
 `
 
 const TradePriceTable = (props) => {
@@ -98,11 +102,12 @@ const TradePriceTable = (props) => {
   const ref = useRef(null)
   const [isUpdateScroll, setUpdateScroll] = useState(false);
 
-  useEffect(()=>{
-    if(!ref.current) return;
-    if(props.priceTableData.length === 0) setUpdateScroll(false);
+
+  useEffect(() => {
+    if (!ref.current) return;
+    if (props.priceTableData.length === 0) setUpdateScroll(false);
     if (props.scrollToBottom) {
-      if(isUpdateScroll) return;
+      if (isUpdateScroll) return;
       setUpdateScroll(true);
       ref.current?.scrollTo(0, ref.current.scrollHeight)
     }
@@ -119,7 +124,7 @@ const TradePriceTable = (props) => {
   else onClickRow = () => null;
 
   return (
-    <Table ref={ref}>
+    <Table ref={ref} className={props.adClass}>
       {props.head && (
         <thead>
           <tr>
@@ -147,7 +152,7 @@ const TradePriceTable = (props) => {
               rowStyle = {};
             }
             const price =
-              typeof d.td1 === "number" ? d.td1.toPrecision(6) : d.td1;
+              typeof d.td1 === "number" ? d.td1.toFixed(props.fixedPoint) : d.td1;
             const amount =
               typeof d.td2 === "number" ? d.td2.toPrecision(6) : d.td2;
             const total =

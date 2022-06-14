@@ -7,6 +7,23 @@ import { HideMenuOnOutsideClicked } from 'lib/utils'
 
 const DropdownWrapper = styled.div`
     position: relative;
+
+    &.size-wide {
+        position: static;
+    }
+
+    &:hover {
+        .button-title {
+            color: ${({ theme }) => `${theme.colors.primaryHighEmphasis} !important`};
+            // transition: color .25s;
+        }
+        
+        svg path {
+            fill: ${({ theme }) => `${theme.colors.primaryHighEmphasis} !important`};
+            // transition: color .25s;
+        }
+    }
+
 `
 
 export const Wrapper = styled.div`
@@ -17,27 +34,21 @@ export const Wrapper = styled.div`
     border: 1px solid ${({ theme }) => theme.colors.foreground400};
     box-shadow: 0px 8px 16px 0px #0101011A;
     backdrop-filter: blur(8px);
-    padding: 16px 7px;
+    padding: 8px 0;
     border-radius: 8px;
     display: grid;
-    gap: 10px;
+    // gap: 10px;
     align-items: start;
     z-index: 100;
 
-    &.network-dropdown {
-        &.mobile-mode {
-            padding: 16px;
-        }
-    
-        .selected-icon {
-            padding-left: 30px;
-            grid-template-columns: max-content;
-        }
+    &.side-dropdown {
+        padding: 8px 0;
+        gap: 0;
     }
 
     &.lang-dropdown {
-        padding: 16px 0px 16px 16px;
         margin-left: -8px;
+        gap: 0;
         width: auto;
     }
 `
@@ -49,6 +60,24 @@ const DropdownListContainer = styled.div`
     align-items: center;
     grid-template-columns: ${({ leftIcon }) => leftIcon ? '32px 1fr' : '1fr 16px'};
     cursor: pointer;
+
+    &:hover, &.active {
+        background-color: ${({ theme }) => theme.colors.backgroundLowEmphasis}
+    }
+
+    &.side-dropdown {
+        padding: 8px 1rem;
+    }
+
+    &.lang-dropdown {
+        padding: 8px 0px 8px 14px;
+    }
+
+    &.network-dropdown {
+        display: block;
+        width: 100%;
+        padding: 8px 20px;
+    }
 `
 
 const IconButton = styled(baseIcon)`
@@ -91,7 +120,7 @@ const Dropdown = ({ width, item, context, leftIcon, rightIcon, transparent, clic
     }
 
     return (
-        <DropdownWrapper ref={wrapperRef}>
+        <DropdownWrapper ref={wrapperRef} className={adClass}>
             <ExpandableButton width={width} transparent={transparent} expanded={isOpened} onClick={toggle}>{context}</ExpandableButton>
             {isOpened &&
                 <Wrapper width={width} className={`${adClass} ${isMobile ? "mobile-mode" : ""}`} >
@@ -99,16 +128,16 @@ const Dropdown = ({ width, item, context, leftIcon, rightIcon, transparent, clic
                         const { text, value, url, icon, selectedIcon, iconSelected } = items
                         const menuIcon = iconSelected ? selectedIcon : icon;
                         return (
-                            <DropdownListContainer key={items.text} leftIcon={leftIcon} onClick={() => handleClick(url, text, value)}>
-                                {leftIcon && isValidElement(menuIcon) && <IconButton className={adClass} variant="secondary" startIcon={cloneElement(menuIcon)}></IconButton>}
+                            <DropdownListContainer className={`${adClass} ${iconSelected ? "active" : ""}`} key={items.text} leftIcon={leftIcon} onClick={() => handleClick(url, text, value)}>
+                                {/* {leftIcon && isValidElement(menuIcon) && <IconButton className={adClass} variant="secondary" startIcon={cloneElement(menuIcon)}></IconButton>} */}
                                 <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis" className={!iconSelected ? "selected-icon" : ""}>{text}</Text>
-                                {rightIcon && isValidElement(menuIcon) && <IconButton className={adClass} variant="secondary" endIcon={cloneElement(menuIcon)}></IconButton>}
+                                {/* {rightIcon && isValidElement(menuIcon) && <IconButton className={adClass} variant="secondary" endIcon={cloneElement(menuIcon)}></IconButton>} */}
                             </DropdownListContainer>
                         )
                     })}
                 </Wrapper>
             }
-        </DropdownWrapper>
+        </DropdownWrapper >
     )
 }
 

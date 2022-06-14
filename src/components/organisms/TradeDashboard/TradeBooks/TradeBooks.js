@@ -51,37 +51,37 @@ export default function TradeBooks(props) {
   return (
     <>
       <StyledTradeBooks>
-          <BooksWrapper>
-            <Text font="primaryTitleDisplay" color="foregroundHighEmphasis">Order Book</Text>
-            <TradePriceTable
-              head
-              className="trade_table_asks"
-              useGradient="true"
-              priceTableData={props.priceTableData}
-              currentMarket={props.currentMarket}
-              scrollToBottom={true}
-            />
-            <TradePriceHeadSecond 
-              lastPrice={props.lastPrice}
-              marketInfo={props.marketInfo}
-           />
-            <TradePriceTable
-              useGradient="true"
-              currentMarket={props.currentMarket}
-              priceTableData={props.bidBins}
-            />
-          </BooksWrapper>
-          <TradesWrapper>
-            {/* TradePriceTable*/}
-            <Text font="primaryTitleDisplay" color="foregroundHighEmphasis">Market Trades</Text>
-            <TradeRecentTable
-              head
-              className=""
-              value="up_value"
-              priceTableData={openOrdersLatestTradesData}
-              currentMarket={props.currentMarket}
-            />
-          </TradesWrapper>
+        <BooksWrapper>
+          <Text font="primaryTitleDisplay" color="foregroundHighEmphasis">Order Book</Text>
+          <TradePriceTable
+            head
+            className="trade_table_asks"
+            useGradient="true"
+            priceTableData={props.priceTableData}
+            currentMarket={props.currentMarket}
+            scrollToBottom={true}
+          />
+          <TradePriceHeadSecond
+            lastPrice={props.lastPrice}
+            marketInfo={props.marketInfo}
+          />
+          <TradePriceTable
+            useGradient="true"
+            currentMarket={props.currentMarket}
+            priceTableData={props.bidBins}
+          />
+        </BooksWrapper>
+        <TradesWrapper>
+          {/* TradePriceTable*/}
+          <Text font="primaryTitleDisplay" color="foregroundHighEmphasis">Market Trades</Text>
+          <TradeRecentTable
+            head
+            className=""
+            value="up_value"
+            priceTableData={openOrdersLatestTradesData}
+            currentMarket={props.currentMarket}
+          />
+        </TradesWrapper>
       </StyledTradeBooks>
     </>
   );

@@ -13,6 +13,10 @@ const IconButton = styled(baseIcon)`
 	justify-content: space-between;
 `
 
+const CustomText = styled(Text)`
+	white-space: nowrap;
+`
+
 
 const ExpandableButton = ({ ...props }) => {
 
@@ -20,7 +24,7 @@ const ExpandableButton = ({ ...props }) => {
 
 	return (
 		<IconButton width={width} variant="secondary" transparent={transparent} onClick={onClick} endIcon={expanded ? <CaretUpIcon /> : <CaretDownIcon />}>
-			<Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{children}</Text>
+			<CustomText font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis" className="button-title">{children}</CustomText>
 		</IconButton>
 	)
 }

@@ -55,6 +55,7 @@ export const FooterWrapper = styled.div`
 export const FooterContainer = styled.div`
     align-content: center;
     width: 100%;
+    max-height: calc(100vh - 720px);
     margin: 0 auto;
 
     div > div > table {
@@ -66,6 +67,13 @@ export const FooterContainer = styled.div`
         display: block;
         // height: 65px;
         overflow: auto;
+    }
+    
+    td div {
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 `
 
@@ -110,7 +118,7 @@ export const LaptopWrapper = styled.div`
     }
 
     table thead th {
-        padding: 20px 20px 0px 20px;
+        padding: 10px 20px 0px 20px;
     }
 
     table tbody td {
@@ -124,7 +132,6 @@ export const LaptopWrapper = styled.div`
 `
 
 export const MobileWrapper = styled.div`
-
     table {
         width: 100%;
     }
@@ -144,13 +151,13 @@ export const MobileWrapper = styled.div`
 `
 
 export const SortIconWrapper = styled.div`
-    display: grid;
-    grid-auto-flow: row;
-    align-items: center;
-    justify-content: center;
-    svg path {
+  display: grid;
+  grid-auto-flow: row;
+  align-items: center;
+  justify-content: center;
+  svg path {
     color: none;
-    }
+  }
 `
 
 export const HeaderWrapper = styled.div`

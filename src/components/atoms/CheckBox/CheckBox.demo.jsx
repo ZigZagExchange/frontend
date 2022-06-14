@@ -15,23 +15,23 @@ const Col = styled.div`
 `
 
 const CheckBoxDemo = () => {
-    const handleChange = (val) => {
-        console.log("ValueChanged: ".concat(val))
-    }
+  const handleChange = (val) => {
+    console.log("ValueChanged: ".concat(val))
+  }
   return (
     <Col>
-        <Row>
-			<CheckBox Size="Medium" onChange={handleChange}></CheckBox>
-			<CheckBox Size="Medium" onChange={handleChange} isChecked></CheckBox>
-        </Row>
-        <Row>
-			<CheckBox Size="Medium" onChange={handleChange} labelLeft>Label Left</CheckBox>
-			<CheckBox Size="Medium" onChange={handleChange} labelLeft isChecked>Label Left</CheckBox>
-        </Row>
-        <Row>
-			<CheckBox Size="Medium" onChange={handleChange} labelRight>Label Right</CheckBox>
-			<CheckBox Size="Medium" onChange={handleChange} labelRight isChecked>Label Right</CheckBox>
-        </Row>
+      <Row>
+        <CheckBox Size="Medium" onChange={handleChange}></CheckBox>
+        <CheckBox Size="Medium" onChange={handleChange} isChecked></CheckBox>
+      </Row>
+      <Row>
+        <CheckBox Size="Medium" onChange={handleChange} labelLeft>Label Left</CheckBox>
+        <CheckBox Size="Medium" onChange={handleChange} labelLeft isChecked>Label Left</CheckBox>
+      </Row>
+      <Row>
+        <CheckBox Size="Medium" onChange={handleChange} labelRight>Label Right</CheckBox>
+        <CheckBox Size="Medium" onChange={handleChange} labelRight isChecked>Label Right</CheckBox>
+      </Row>
     </Col>
   );
 };

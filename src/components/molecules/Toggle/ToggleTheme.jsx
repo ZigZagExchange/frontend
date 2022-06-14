@@ -6,11 +6,21 @@ const ToggleThemeWrapper = styled.div`
   display: flex;
   cursor: pointer;
   width: 19px;
+
+  svg path {
+    transition: fill .25s;
+  }
+  
+  &:hover {
+    svg path {
+      fill: ${({ theme }) => theme.colors.primaryHighEmphasis};
+    }
+  }
 `
 
 const ToggleTheme = ({ isDark, toggleTheme }) => (
   <ToggleThemeWrapper onClick={() => toggleTheme(!isDark)}>
-      { isDark ? <LightIcon /> : <DarkIcon /> }
+    {isDark ? <LightIcon /> : <DarkIcon />}
   </ToggleThemeWrapper>
 );
 

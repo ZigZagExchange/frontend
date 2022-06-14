@@ -6,7 +6,6 @@ export default function CategorizeBox(props) {
   const [selected, setCategory] = useState(props.initialValue || "");
 
   function changeCategory(category_name) {
-    //console.log("category selected: ", category_name)
     props.categorizePairs(category_name);
     setCategory(category_name);
   }

@@ -19,7 +19,6 @@ const ToggleDemo = () => {
   const { isDark, toggleTheme } = useTheme()
 
   useEffect(() => {
-    console.log(checked)
   }, [checked])
 
   const toggle = () => setChecked(!checked)
