@@ -41,6 +41,7 @@ const SwapContianer = ({
             tickers={fromTokenOptions}
             onSelectedOption={onChangeFromToken}
             selectedOption={fromToken}
+            label={"Select a token to Swap"}
           />
         )}
         <button
@@ -80,12 +81,13 @@ const SwapContianer = ({
             tickers={toTokenOptions}
             onSelectedOption={onChangeToToken}
             selectedOption={toToken}
+            label={"Select a token to Swap"}
           />
         )}
         <input
           className="ml-3 text-2xl font-semibold text-right bg-transparent focus:outline-none"
           placeholder="0.00"
-          value={toAmounts.toPrecision(6)}
+          value={toAmounts?.toPrecision(6)}
           readOnly
         />
       </div>

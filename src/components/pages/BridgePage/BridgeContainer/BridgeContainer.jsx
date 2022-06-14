@@ -686,29 +686,31 @@ const BridgeContainer = () => {
             swapCurrencyInfo={swapCurrencyInfo}
             allowance={allowance}
           />
-          <TransactionSettings
-            user={user}
-            transfer={transfer}
-            isSwapAmountEmpty={isSwapAmountEmpty}
-            fromNetwork={fromNetwork}
-            toNetwork={toNetwork}
-            L1Fee={L1FeeAmount}
-            L2Fee={L2FeeAmount}
-            swapDetails={swapDetails}
-            isFastWithdraw={isFastWithdraw}
-            balances={balances}
-            usdFee={usdFee}
-            withdrawSpeed={withdrawSpeed}
-            onChangeSpeed={setWithdrawSpeed}
-            activationFee={activationFee}
-            L2FeeToken={L2FeeToken}
-            hasError={hasError}
-            fastWithdrawDisabled={
-              !api.apiProvider.eligibleFastWithdrawTokens?.includes(
-                swapDetails.currency
-              )
-            }
-          />
+          {user.address && (
+            <TransactionSettings
+              user={user}
+              transfer={transfer}
+              isSwapAmountEmpty={isSwapAmountEmpty}
+              fromNetwork={fromNetwork}
+              toNetwork={toNetwork}
+              L1Fee={L1FeeAmount}
+              L2Fee={L2FeeAmount}
+              swapDetails={swapDetails}
+              isFastWithdraw={isFastWithdraw}
+              balances={balances}
+              usdFee={usdFee}
+              withdrawSpeed={withdrawSpeed}
+              onChangeSpeed={setWithdrawSpeed}
+              activationFee={activationFee}
+              L2FeeToken={L2FeeToken}
+              hasError={hasError}
+              fastWithdrawDisabled={
+                !api.apiProvider.eligibleFastWithdrawTokens?.includes(
+                  swapDetails.currency
+                )
+              }
+            />
+          )}
           {!user.address && (
             <ConnectWalletButton
               isLoading={polygonLoding}

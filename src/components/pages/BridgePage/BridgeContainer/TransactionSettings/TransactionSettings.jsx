@@ -27,8 +27,8 @@ const TransactionSettings = ({
     <div className="p-2 mt-3 border rounded-lg sm:p-4 dark:border-foreground-400 border-primary-500">
       <p className="text-base font-work">Transaction Settings</p>
       <div className="flex justify-between mt-3">
-        <p className="text-sm font-work ">Address</p>
-        <div className="flex space-x-2">
+        {user.address && <p className="text-sm font-work ">Address</p>}
+        {/* <div className="flex space-x-2">
           <p className="text-sm font-work ">
             {user.address ? "Connected Address" : "Disconnected"}
           </p>
@@ -39,7 +39,7 @@ const TransactionSettings = ({
               <div className="w-3 h-3 bg-red-500 rounded-sm"></div>
             )}
           </div>
-        </div>
+        </div> */}
       </div>
       {user.address && (
         <div className="py-2 mt-2 font-sans text-sm tracking-wider text-center border rounded-lg dark:border-foreground-400 border-primary-500 text-slate-400 ">

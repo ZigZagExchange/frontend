@@ -13,7 +13,7 @@ import {
   ZKSYNC_POLYGON_BRIDGE,
   POLYGON_MUMBAI_WETH_ADDRESS,
   POLYGON_MAINNET_WETH_ADDRESS,
-} from "components/pages/BridgePage/Bridge/constants";
+} from "components/pages/BridgePage/constants";
 
 import axios from "axios";
 import { isMobile } from "react-device-detect";

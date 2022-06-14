@@ -9,6 +9,7 @@ const TokenDropDownModal = ({
   tickers = [],
   onSelectedOption,
   selectedOption,
+  label = "Select a token to Bridge",
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   // const [selected, setSelected] = useState(tickers[0]);
@@ -101,7 +102,7 @@ const TokenDropDownModal = ({
                     as="h3"
                     className="pt-4 pl-5 text-lg font-semibold leading-6 divide-y font-work"
                   >
-                    Select a token to Bridge
+                    {label}
                   </Dialog.Title>
                   <div className="h-px mx-3 my-3 dark:bg-foreground-400 bg-primary-500"></div>
                   <Combobox value={selectedOption} onChange={onSelectedToken}>
