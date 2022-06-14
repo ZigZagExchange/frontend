@@ -55,6 +55,7 @@ export const FooterWrapper = styled.div`
 export const FooterContainer = styled.div`
     align-content: center;
     width: 100%;
+    max-height: calc(100vh - 720px);
     margin: 0 auto;
 
     div > div > table {
