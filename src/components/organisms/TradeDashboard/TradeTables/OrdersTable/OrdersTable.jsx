@@ -946,7 +946,7 @@ export default function OrdersTable(props) {
                       <th scope="col">
                         <HeaderWrapper>
                           <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Balance</Text>
-                          <SortIconWrapper onClick={() => { changeSortType("value") }}>
+                          <SortIconWrapper onClick={() => { changeSortType("valuereadable") }}>
                             <SortUpIcon /><SortDownIcon />
                           </SortIconWrapper>
                         </HeaderWrapper>
