@@ -36,14 +36,21 @@ export default function OrdersTable(props) {
   const wallet = balanceData[network];
 
   useEffect(() => {
-    if (walletList.length === 0) {
-      let walletArray = [];
+    let walletArray = [];
 
-      if (wallet) {
-        Object.keys(wallet).forEach((key) => {
-          walletArray.push({ ...wallet[key], token: key });
-        });
-      }
+    if (wallet) {
+      Object.keys(wallet).forEach((key) => {
+        walletArray.push({ ...wallet[key], token: key });
+      });
+    }
+
+    let isSame = true;
+
+    walletArray.map((item, index) => {
+      if (JSON.stringify(item) !== JSON.stringify(walletList[index])) isSame = false;
+    })
+
+    if (!isSame) {
       setWalletList(walletArray)
     }
   }, [wallet])
