@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import "./OrdersTable.css";
+import { useCoinEstimator } from "components";
 import loadingGif from "assets/icons/loading.svg";
 import { balancesSelector, networkSelector } from "lib/store/features/api/apiSlice";
 import api from "lib/api";
 import { formatDate, formatDateTime } from 'lib/utils'
 import { Tab } from "components/molecules/TabMenu";
 import Text from "components/atoms/Text/Text"
-import { SortUpIcon, SortDownIcon } from 'components/atoms/Svg'
+import { SortUpIcon, SortDownIcon, SortUpFilledIcon, SortDownFilledIcon } from 'components/atoms/Svg'
 import {
   StyledTabMenu,
   FooterWrapper,
@@ -23,10 +24,14 @@ import { Dropdown } from "components/molecules/Dropdown";
 export default function OrdersTable(props) {
   const network = useSelector(networkSelector);
   const balanceData = useSelector(balancesSelector);
+  const coinEstimator = useCoinEstimator();
   const [tab, setTabIndex] = useState(0)
   const [selectedSide, setSelectedSide] = useState("All")
-  const [direction, setDirection] = useState("desc")
+  const [tokenDirection, setTokenDirection] = useState(false)
+  const [balanceDirection, setBalanceDirection] = useState(false)
   const [walletList, setWalletList] = useState([])
+  const [tokenSorted, setTokenSorted] = useState(false)
+  const [balanceSorted, setBalanceSorted] = useState(false)
   const [sideItems, setSideItems] = useState([
     { text: "All", url: "#", iconSelected: true },
     { text: "Buy", url: "#" },
@@ -39,7 +44,10 @@ export default function OrdersTable(props) {
     let walletArray = [];
 
     if (wallet) {
-      Object.keys(wallet).forEach((key) => {
+      Object.keys(wallet)
+        .filter(filterSmallBalances)
+        .sort(sortByNotional)
+        .forEach((key) => {
         walletArray.push({ ...wallet[key], token: key });
       });
     }
@@ -89,18 +97,66 @@ export default function OrdersTable(props) {
     setSideItems(newItems)
   }
 
-  const changeSortType = (type) => {
-    let walletArray = [...walletList];
-    console.log("wallet array is", walletArray);
+  const sortByNotional = (cur1, cur2) => {
+    const notionalCur1 = coinEstimator(cur1) * wallet[cur1].valueReadable;
+    const notionalCur2 = coinEstimator(cur2) * wallet[cur2].valueReadable;
+    if (notionalCur1 > notionalCur2) {
+      return -1;
+    } else if (notionalCur1 < notionalCur2) {
+      return 1;
+    } else return 0;
+  };
 
-    if (direction === "desc") {
-      walletArray.sort((a, b) => { return a[type] > b[type] ? 1 : -1 });
-      setDirection("asce")
+  const filterSmallBalances = (currency) => {
+    const balance = wallet[currency].valueReadable;
+    if (balance) {
+      return Number(balance) > 0;
+    } else {
+      return 0;
     }
-    else {
-      walletArray.sort((a, b) => { return a[type] < b[type] ? 1 : -1 });
-      setDirection("desc")
-    }
+  };
+
+  const sortByToken = () => {
+    let walletArray = [...walletList];
+    const toggled = !tokenDirection
+    walletArray.sort((a, b) => { 
+      if (toggled) {
+        return a['token'] > b['token'] ? 1 : -1 
+      }
+      return a['token'] > b['token'] ? -1 : 1 
+    });
+
+    setTokenSorted(true)
+    setBalanceSorted(false)
+    setTokenDirection(toggled)
+    setBalanceDirection(false)
+    setWalletList(walletArray)
+  }
+
+  const sortByBalance = () => {
+    let walletArray = [...walletList];
+    const toggled = !balanceDirection
+    walletArray.sort((a, b) => { 
+      const notionalCur1 = coinEstimator(a['token']) * a['valueReadable'];
+      const notionalCur2 = coinEstimator(b['token']) * b['valueReadable'];
+      if (toggled) {
+        if (notionalCur1 > notionalCur2) {
+          return -1;
+        } else if (notionalCur1 < notionalCur2) {
+          return 1;
+        } else return 0;
+      }
+      if (notionalCur1 > notionalCur2) {
+        return 1;
+      } else if (notionalCur1 < notionalCur2) {
+        return -1;
+      } else return 0;
+    });
+
+    setTokenSorted(false)
+    setBalanceSorted(true)
+    setTokenDirection(false)
+    setBalanceDirection(toggled)
     setWalletList(walletArray)
   }
 
@@ -948,20 +1004,36 @@ export default function OrdersTable(props) {
                 <table>
                   <thead>
                     <tr>
-                      <th scope="col">
+                      <th scope="col" style={{cursor: 'pointer'}} onClick={() => { sortByToken() }}>
                         <HeaderWrapper>
                           <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Token</Text>
-                          <SortIconWrapper onClick={() => { changeSortType("token") }}>
-                            <SortUpIcon /><SortDownIcon />
-                          </SortIconWrapper>
+                          {tokenSorted ? (
+                              <SortIconWrapper>
+                                  {tokenDirection ? <SortUpIcon /> : <SortUpFilledIcon />}
+                                  {tokenDirection ? <SortDownFilledIcon /> : <SortDownIcon />}
+                              </SortIconWrapper>
+                          ) : (
+                              <SortIconWrapper>
+                                  <SortUpIcon />
+                                  <SortDownIcon />
+                              </SortIconWrapper>
+                          )}
                         </HeaderWrapper>
                       </th>
-                      <th scope="col">
+                      <th scope="col" style={{cursor: 'pointer'}} onClick={() => { sortByBalance() }}>
                         <HeaderWrapper>
                           <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Balance</Text>
-                          <SortIconWrapper onClick={() => { changeSortType("valueReadable") }}>
-                            <SortUpIcon /><SortDownIcon />
-                          </SortIconWrapper>
+                          {balanceSorted ? (
+                              <SortIconWrapper>
+                                  {balanceDirection ? <SortUpIcon /> : <SortUpFilledIcon />}
+                                  {balanceDirection ? <SortDownFilledIcon /> : <SortDownIcon />}
+                              </SortIconWrapper>
+                          ) : (
+                              <SortIconWrapper>
+                                  <SortUpIcon />
+                                  <SortDownIcon />
+                              </SortIconWrapper>
+                          )}
                         </HeaderWrapper>
                       </th>
                     </tr>

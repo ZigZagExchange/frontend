@@ -151,14 +151,13 @@ export const MobileWrapper = styled.div`
 `
 
 export const SortIconWrapper = styled.div`
-    display: grid;
-    grid-auto-flow: row;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    svg path {
+  display: grid;
+  grid-auto-flow: row;
+  align-items: center;
+  justify-content: center;
+  svg path {
     color: none;
-    }
+  }
 `
 
 export const HeaderWrapper = styled.div`
