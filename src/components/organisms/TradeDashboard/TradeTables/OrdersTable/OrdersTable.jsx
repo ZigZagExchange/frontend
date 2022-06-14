@@ -46,11 +46,16 @@ export default function OrdersTable(props) {
 
     let isSame = true;
 
-    walletArray.map((item, index) => {
-      if (JSON.stringify(item) !== JSON.stringify(walletList[index])) isSame = false;
+    walletArray.map(item => {
+      let index = walletList.findIndex(item1 => item.token === item1.token);
+      if (index === -1) isSame = false;
+      else {
+        if (JSON.stringify(item) !== JSON.stringify(walletList[index])) isSame = false;
+      }
     })
 
     if (!isSame) {
+      console.log("wallet array is", walletArray, "wallet list is", walletList);
       setWalletList(walletArray)
     }
   }, [wallet])
