@@ -53,12 +53,13 @@ const HeaderWrapper = styled.div`
   height: 56px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.foreground400};
   align-items: center;
-  background-color: ${({ theme }) => theme.colors.bridgeBackground};
+  background-color: ${({ theme }) => theme.colors.backgroundHighEmphasis};
   position: fixed;
   padding: 0px 20px;
   z-index: 100;
-  box-shadow: ${({ isMobile }) => isMobile ? '0px 8px 16px 0px #0101011A' : ''};
-  ${({ isMobile }) => isMobile ? 'backdrop-filter: blur(8px);' : ''}
+  box-shadow: ${({ isMobile }) =>
+    isMobile ? "0px 8px 16px 0px #0101011A" : ""};
+  ${({ isMobile }) => (isMobile ? "backdrop-filter: blur(8px);" : "")}
 
   button {
     &:hover {
@@ -66,7 +67,7 @@ const HeaderWrapper = styled.div`
 
       div {
         color: ${({ theme }) => `${theme.colors.primaryHighEmphasis} !important`};
-
+  
         svg path {
           fill: ${({ theme }) => `${theme.colors.primaryHighEmphasis} !important`};
         }

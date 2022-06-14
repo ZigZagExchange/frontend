@@ -27,7 +27,7 @@ const ListPage = styled.div`
   height: 100%;
   min-height: calc(100vh - 113px);
   padding: 4rem 0 2rem;
-  background-color: ${(p) => p.theme.colors.bridgeBackground};
+  // background-color: ${(p) => p.theme.colors.bridgeBackground};
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
