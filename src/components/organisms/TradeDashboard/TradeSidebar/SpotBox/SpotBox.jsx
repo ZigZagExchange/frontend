@@ -88,7 +88,7 @@ const Wrapper = styled.div`
   // display: grid;
   grid-auto-flow: row;
   background-color: ${({ theme }) => theme.colors.backgroundMediumEmphasis};
-  height: ${({ isMobile }) => isMobile ? '427px' : '398px'};
+  height: ${({ isMobile }) => isMobile ? '457px' : '428px'};
 `
 
 const ToggleWrapper = styled.div`

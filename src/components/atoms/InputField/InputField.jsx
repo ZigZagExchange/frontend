@@ -3,7 +3,7 @@ import styled from "styled-components";
 import Text from "../Text/Text"
 
 import {
-	SearchIcon,
+  SearchIcon,
 } from "../Svg";
 
 const InputFieldWrapper = styled.div`
@@ -64,32 +64,32 @@ const Input = styled.input`
   }
 `;
 
-const InputField = ({...props}) => {
+const InputField = ({ ...props }) => {
 
-	const { icon, label, inline, fontSize } = props;
+  const { icon, label, inline, fontSize } = props;
 
-	const getIcon = () => {
-		switch (icon) {
-			case "search":
-				return <SearchIcon size={12} />
-			default:
-				return <></>
-		}
-	}
+  const getIcon = () => {
+    switch (icon) {
+      case "search":
+        return <SearchIcon size={12} />
+      default:
+        return <></>
+    }
+  }
 
-	return (
-		<InputFieldWrapper inline={inline}>
-            {
-            label && <LabelWrapper>
-                <Text font="primaryBody2" color="foregroundHighEmphasis" fontSize={fontSize} mb={inline ? '0px' : '8px'} style={{margin: inline ? 'auto' : ''}}>{label}</Text>
-            </LabelWrapper>
-            }
-            <InputWrapper>
-                <IconWrapper>{getIcon()}</IconWrapper>
-                <Input {...props}/>
-            </InputWrapper>
-		</InputFieldWrapper>
-	)
+  return (
+    <InputFieldWrapper inline={inline}>
+      {
+        label && <LabelWrapper>
+          <Text font="primaryBody2" color="foregroundHighEmphasis" fontSize={fontSize} mb={inline ? '0px' : '8px'} style={{ margin: inline ? 'auto' : '' }}>{label}</Text>
+        </LabelWrapper>
+      }
+      <InputWrapper>
+        <IconWrapper>{getIcon()}</IconWrapper>
+        <Input {...props} />
+      </InputWrapper>
+    </InputFieldWrapper>
+  )
 }
 
 export default InputField;

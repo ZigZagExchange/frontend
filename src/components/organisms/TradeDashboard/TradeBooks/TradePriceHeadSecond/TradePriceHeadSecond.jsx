@@ -8,7 +8,7 @@ const Wrapper = styled.div`
   width: 100%;
   margin: 0 auto;
   display: flex;
-  padding: 8px 0px;
+  // padding: 8px 0px;
   align-items: start;
 
   div {
@@ -16,7 +16,7 @@ const Wrapper = styled.div`
     align-items: center;
 
     svg path {
-      fill: ${({theme}) => theme.colors.successHighEmphasis};
+      fill: ${({ theme }) => theme.colors.successHighEmphasis};
     }
   }
 
@@ -33,7 +33,7 @@ const TradePriceHeadSecond = (props) => {
   return (
     <Wrapper>
       <div>
-        <Text font="primaryTitleDisplay" color="successHighEmphasis">{formatPrice(props.lastPrice)}</Text>
+        <Text font="primaryTitleDisplay" color="successHighEmphasis">{parseFloat(props.lastPrice).toFixed(props.fixedPoint)}</Text>
         <ArrowUpIcon />
       </div>
       {/* <span>$ {

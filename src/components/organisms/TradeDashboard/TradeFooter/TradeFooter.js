@@ -4,13 +4,13 @@ import { DiscordIcon, TelegramIcon, TwitterIcon } from "components/atoms/Svg";
 import Text from "components/atoms/Text/Text";
 
 const StyledTradeFooter = styled.footer`
-  display: ${({isMobile}) => isMobile ? 'grid' : 'flex'};
+  display: ${({ isMobile }) => isMobile ? 'grid' : 'flex'};
   align-items: center;
   padding: 0 20px;
-  justify-content: ${({isMobile}) => isMobile ? 'center' : 'space-between'};
+  justify-content: ${({ isMobile }) => isMobile ? 'center' : 'space-between'};
   grid-area: footer;
-  background: ${({theme}) => theme.colors.backgroundDisabled};
-  border-top: 1px solid ${({theme}) => theme.colors.foreground400};
+  background: ${({ theme }) => theme.colors.backgroundDisabled};
+  border-top: 1px solid ${({ theme }) => theme.colors.foreground400};
   font-size: 12px;
   height: 57px;
 `;
@@ -25,7 +25,14 @@ const SocialWrapper = styled.div`
 
 const SocialLink = styled.a`
   svg path {
-    fill: ${({theme}) => theme.colors.foregroundLowEmphasis};
+    transition: fill .25s;
+    fill: ${({ theme }) => theme.colors.foregroundLowEmphasis};
+  }
+  
+  &:hover {
+    svg path {
+      fill: ${({ theme }) => theme.colors.primaryHighEmphasis};
+    }
   }
 `
 

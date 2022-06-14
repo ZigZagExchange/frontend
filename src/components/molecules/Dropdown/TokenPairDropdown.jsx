@@ -258,7 +258,6 @@ const TokenPairDropdown = ({ width, transparent, context, currentMarket, marketI
             pairsByCategory.length === 0 &&
             rowData.length !== 0
         ) {
-            console.log(rowData)
             setPairs(rowData.map((r) => r.td1));
             setPairsByCategory(rowData.map((r) => r.td1));
         }
@@ -538,7 +537,7 @@ const TokenPairDropdown = ({ width, transparent, context, currentMarket, marketI
                         </th>
                         <th onClick={() => toggleVolumeSorting()}>
                             <HeaderWrapper>
-                                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis" align="right">Volume(24)</Text>
+                                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis" align="right">Volume(24h)</Text>
                                 {volumeSorted ? (
                                     <SortIconWrapper>
                                         {volumeDirection ? <SortUpIcon /> : <SortUpFilledIcon />}

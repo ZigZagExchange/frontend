@@ -11,10 +11,11 @@ import {
   balancesSelector,
 } from "lib/store/features/api/apiSlice";
 import { formatUSD, HideMenuOnOutsideClicked } from "lib/utils";
+import { userSelector } from "lib/store/features/auth/authSlice";
 import api from "lib/api";
 import { IconButton as baseIcon } from "../IconButton";
 import Text from "components/atoms/Text/Text";
-import { PlusIcon, CompareArrowIcon, DeleteIcon } from "components/atoms/Svg";
+import { PlusIcon, CompareArrowIcon, DeleteIcon, ExternalLinkIcon } from "components/atoms/Svg";
 import ToggleButton from "../Toggle/ToggleButton";
 
 const DropdownWrapper = styled.div`
@@ -64,6 +65,7 @@ const CurrencyImg = styled.img`
 
 const CurrencyList = styled.ul`
   display: flex;
+  max-height: 17rem;
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
@@ -100,6 +102,28 @@ const CurrencyListItem = styled.li`
 const DropdownContent = styled.div`
   flex: 1 1 auto;
   overflow-y: auto;
+
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+    position: relative;
+    z-index: 20;
+  }
+
+  ::-webkit-scrollbar-track {
+      border-radius: 5px;
+      background: transparent;
+      height: 23px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+      border-radius: 5px;
+      background: hsla(0, 0%, 100%, 0.4);
+  }
+
+  ::-webkit-scrollbar-thumb:window-inactive {
+      background: #fff;
+  }
 `;
 
 const DropdownFooter = styled.div`
@@ -136,9 +160,10 @@ const IconButton = styled(baseIcon)`
   }
 `
 
-const AccountDropdown = ({ notext }) => {
+const AccountDropdown = ({ notext, networkName }) => {
   const [isOpened, setIsOpened] = useState(false)
   const network = useSelector(networkSelector);
+  const user = useSelector(userSelector);
   const balanceData = useSelector(balancesSelector);
   const [totalBalance, setTotalBalance] = useState(0);
   const [selectedLayer, setSelectedLayer] = useState(2);
@@ -158,6 +183,24 @@ const AccountDropdown = ({ notext }) => {
   const disconnect = () => {
     api.signOut()
     toggle()
+  }
+
+  const popoutzkScan = () => {
+    if (user.id && user.address) {
+      if (selectedLayer === 1) {
+        if (networkName.includes('Rinkeby')) {
+          window.open(`https://rinkeby.etherscan.io/address/${user.address}`, "_blank");
+        } else {
+          window.open(`https://etherscan.io/address/${user.address}`, "_blank");
+        }
+      } else {
+        if (networkName.includes('Rinkeby')) {
+          window.open(`https://rinkeby.zkscan.io/explorer/accounts/${user.address}`, "_blank");
+        } else {
+          window.open(`https://zkscan.io/explorer/accounts/${user.address}`, "_blank");
+        }
+      }
+    }
   }
 
   const filterSmallBalances = (currency) => {
@@ -267,6 +310,12 @@ const AccountDropdown = ({ notext }) => {
           </DropdownContent>
           <Divider />
           <DropdownFooter>
+            <Button variant="outlined" scale="imd" onClick={popoutzkScan} className="mr-[1rem]">
+              <Text font="primaryBoldDisplay" color="foregroundHighEmphasis" textAlign="center">
+                <ExternalLinkIcon size={10} />
+                {selectedLayer === 1 ? 'Etherscan' : `zkScan`}
+              </Text>
+            </Button>
             <Button variant="outlined" scale="imd" onClick={disconnect}>
               <Text font="primaryBoldDisplay" color="foregroundHighEmphasis" textAlign="center">DISCONNECT</Text>
             </Button>

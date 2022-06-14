@@ -1,11 +1,14 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import "./OrdersTable.css";
+import { useCoinEstimator } from "components";
 import loadingGif from "assets/icons/loading.svg";
+import { balancesSelector, networkSelector } from "lib/store/features/api/apiSlice";
 import api from "lib/api";
 import { formatDate, formatDateTime } from 'lib/utils'
 import { Tab } from "components/molecules/TabMenu";
 import Text from "components/atoms/Text/Text"
-import { SortUpIcon, SortDownIcon } from 'components/atoms/Svg'
+import { SortUpIcon, SortDownIcon, SortUpFilledIcon, SortDownFilledIcon } from 'components/atoms/Svg'
 import {
   StyledTabMenu,
   FooterWrapper,
@@ -16,28 +19,150 @@ import {
   HeaderWrapper,
   ActionWrapper
 } from "./StyledComponents"
+import { Dropdown } from "components/molecules/Dropdown";
 
-export class OrdersTable extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { tab: 0, isMobile: window.innerWidth < 1064 };
+export default function OrdersTable(props) {
+  const network = useSelector(networkSelector);
+  const balanceData = useSelector(balancesSelector);
+  const coinEstimator = useCoinEstimator();
+  const [tab, setTabIndex] = useState(0)
+  const [selectedSide, setSelectedSide] = useState("All")
+  const [tokenDirection, setTokenDirection] = useState(false)
+  const [balanceDirection, setBalanceDirection] = useState(false)
+  const [walletList, setWalletList] = useState([])
+  const [tokenSorted, setTokenSorted] = useState(false)
+  const [balanceSorted, setBalanceSorted] = useState(false)
+  const [sideItems, setSideItems] = useState([
+    { text: "All", url: "#", iconSelected: true },
+    { text: "Buy", url: "#" },
+    { text: "Sell", url: "#" }])
+  const isMobile = window.innerWidth < 1064
+
+  const wallet = balanceData[network];
+
+  useEffect(() => {
+    let walletArray = [];
+
+    if (wallet) {
+      Object.keys(wallet)
+        .filter(filterSmallBalances)
+        .sort(sortByNotional)
+        .forEach((key) => {
+        walletArray.push({ ...wallet[key], token: key });
+      });
+    }
+
+    let isSame = true;
+
+    walletArray.map(item => {
+      let index = walletList.findIndex(item1 => item.token === item1.token);
+      if (index === -1) isSame = false;
+      else {
+        if (JSON.stringify(item) !== JSON.stringify(walletList[index])) isSame = false;
+      }
+    })
+
+    if (!isSame) {
+      console.log("wallet array is", walletArray, "wallet list is", walletList);
+      setWalletList(walletArray)
+    }
+  }, [wallet])
+
+  const setTab = (newIndex) => {
+    setTabIndex(newIndex);
   }
 
-  setTab(newIndex) {
-    this.setState({ tab: newIndex });
+  const getFills = () => {
+    return Object.values(props.userFills).filter(i => selectedSide === 'All' || i[3] === selectedSide.toLowerCase()[0]).sort((a, b) => b[1] - a[1]);
   }
 
-  getFills() {
-    return Object.values(this.props.userFills).sort((a, b) => b[1] - a[1]);
+  const getUserOrders = () => {
+    return Object.values(props.userOrders).filter(i => i[9] !== 'f' && (selectedSide === 'All' || i[3] === selectedSide.toLowerCase()[0])).sort((a, b) => b[1] - a[1]);
   }
 
-  getUserOrders() {
-    return Object.values(this.props.userOrders).filter(i => i[9] !== 'f').sort((a, b) => b[1] - a[1]);
+  const changeSide = (newSide) => {
+    const newItems = sideItems.reduce((acc, item) => {
+      if (item.text === newSide) {
+        acc.push({
+          ...item, iconSelected: true
+        })
+      } else {
+        acc.push({
+          ...item, iconSelected: false
+        })
+      }
+      return acc;
+    }, [])
+    setSelectedSide(newSide)
+    setSideItems(newItems)
   }
 
-  renderOrderTable(orders) {
+  const sortByNotional = (cur1, cur2) => {
+    const notionalCur1 = coinEstimator(cur1) * wallet[cur1].valueReadable;
+    const notionalCur2 = coinEstimator(cur2) * wallet[cur2].valueReadable;
+    if (notionalCur1 > notionalCur2) {
+      return -1;
+    } else if (notionalCur1 < notionalCur2) {
+      return 1;
+    } else return 0;
+  };
+
+  const filterSmallBalances = (currency) => {
+    const balance = wallet[currency].valueReadable;
+    if (balance) {
+      return Number(balance) > 0;
+    } else {
+      return 0;
+    }
+  };
+
+  const sortByToken = () => {
+    let walletArray = [...walletList];
+    const toggled = !tokenDirection
+    walletArray.sort((a, b) => { 
+      if (toggled) {
+        return a['token'] > b['token'] ? 1 : -1 
+      }
+      return a['token'] > b['token'] ? -1 : 1 
+    });
+
+    setTokenSorted(true)
+    setBalanceSorted(false)
+    setTokenDirection(toggled)
+    setBalanceDirection(false)
+    setWalletList(walletArray)
+  }
+
+  const sortByBalance = () => {
+    let walletArray = [...walletList];
+    const toggled = !balanceDirection
+    walletArray.sort((a, b) => { 
+      const notionalCur1 = coinEstimator(a['token']) * a['valueReadable'];
+      const notionalCur2 = coinEstimator(b['token']) * b['valueReadable'];
+      if (toggled) {
+        if (notionalCur1 > notionalCur2) {
+          return -1;
+        } else if (notionalCur1 < notionalCur2) {
+          return 1;
+        } else return 0;
+      }
+      if (notionalCur1 > notionalCur2) {
+        return 1;
+      } else if (notionalCur1 < notionalCur2) {
+        return -1;
+      } else return 0;
+    });
+
+    setTokenSorted(false)
+    setBalanceSorted(true)
+    setTokenDirection(false)
+    setBalanceDirection(toggled)
+    setWalletList(walletArray)
+  }
+
+  const renderOrderTable = (orders) => {
     return (
-      this.state.isMobile ?
+      isMobile ?
         <table>
           <tbody>
             {orders.map((order, i) => {
@@ -210,65 +335,63 @@ export class OrdersTable extends React.Component {
               <th scope="col">
                 <HeaderWrapper>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Market</Text>
-                  <SortIconWrapper>
+                  {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper>
+                  </SortIconWrapper> */}
                 </HeaderWrapper>
               </th>
               <th scope="col">
                 <HeaderWrapper>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Price</Text>
-                  <SortIconWrapper>
+                  {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper>
+                  </SortIconWrapper> */}
                 </HeaderWrapper>
               </th>
               <th scope="col">
-                <HeaderWrapper>
-                  <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Side</Text>
-                  <SortIconWrapper>
-                    <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper>
+                <HeaderWrapper style={{ position: 'relative' }}>
+                  {/* <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis" onClick>Side</Text> */}
+                  <Dropdown adClass="side-dropdown size-wide" transparent={true} width={162} item={sideItems} context="Side" leftIcon={false} clickFunction={changeSide} />
                 </HeaderWrapper>
               </th>
               <th scope="col">
                 <HeaderWrapper>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Amount</Text>
-                  <SortIconWrapper>
+                  {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper>
+                  </SortIconWrapper> */}
                 </HeaderWrapper>
               </th>
               <th scope="col">
                 <HeaderWrapper>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Remaining</Text>
-                  <SortIconWrapper>
+                  {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper>
+                  </SortIconWrapper> */}
                 </HeaderWrapper>
               </th>
               <th scope="col">
                 <HeaderWrapper>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Time</Text>
-                  <SortIconWrapper>
+                  {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper>
+                  </SortIconWrapper> */}
                 </HeaderWrapper>
               </th>
               <th scope="col">
                 <HeaderWrapper>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Order Status</Text>
-                  <SortIconWrapper>
+                  {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper>
+                  </SortIconWrapper> */}
                 </HeaderWrapper>
               </th>
               <th scope="col">
                 <HeaderWrapper>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Action</Text>
-                  <SortIconWrapper>
+                  {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper>
+                  </SortIconWrapper> */}
                 </HeaderWrapper>
               </th>
             </tr>
@@ -425,11 +548,11 @@ export class OrdersTable extends React.Component {
               );
             })}
           </tbody>
-        </table>
+        </table >
     );
   }
 
-  renderFillTable(fills) {
+  const renderFillTable = (fills) => {
     let baseExplorerUrl;
     switch (api.apiProvider.network) {
       case 1001:
@@ -443,7 +566,7 @@ export class OrdersTable extends React.Component {
         baseExplorerUrl = "https://zkscan.io/explorer/transactions/";
     }
     return (
-      this.state.isMobile ?
+      isMobile ?
         <table>
           <tbody>
             {fills.map((fill, i) => {
@@ -623,65 +746,68 @@ export class OrdersTable extends React.Component {
               <th>
                 <HeaderWrapper>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Market</Text>
-                  <SortIconWrapper>
+                  {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper>
+                  </SortIconWrapper> */}
                 </HeaderWrapper>
               </th>
               <th>
                 <HeaderWrapper>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Price</Text>
-                  <SortIconWrapper>
+                  {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper>
+                  </SortIconWrapper> */}
                 </HeaderWrapper>
               </th>
               <th>
-                <HeaderWrapper>
-                  <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Side</Text>
-                  <SortIconWrapper>
-                    <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper>
+                <HeaderWrapper style={{ position: 'relative' }}>
+                  {/* <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Side</Text> */}
+                  <Dropdown adClass="side-dropdown size-wide" transparent={true} width={162} item={sideItems} context="Side" leftIcon={false} clickFunction={changeSide} />
                 </HeaderWrapper>
               </th>
               <th>
                 <HeaderWrapper>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Amount</Text>
-                  <SortIconWrapper>
+                  {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper>
+                  </SortIconWrapper> */}
                 </HeaderWrapper>
               </th>
               <th>
                 <HeaderWrapper>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Fee</Text>
-                  <SortIconWrapper>
+                  {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper>
+                  </SortIconWrapper> */}
                 </HeaderWrapper>
               </th>
               <th>
                 <HeaderWrapper>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Time</Text>
-                  <SortIconWrapper>
+                  {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper>
+                  </SortIconWrapper> */}
                 </HeaderWrapper>
               </th>
               <th>
                 <HeaderWrapper>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Order Status</Text>
-                  <SortIconWrapper>
+                  {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper>
+                  </SortIconWrapper> */}
+                </HeaderWrapper>
+              </th>
+              <th>
+                <HeaderWrapper>
+                  <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Trade ID</Text>
                 </HeaderWrapper>
               </th>
               <th>
                 <HeaderWrapper>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Action</Text>
-                  <SortIconWrapper>
+                  {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper>
+                  </SortIconWrapper> */}
                 </HeaderWrapper>
               </th>
             </tr>
@@ -838,121 +964,132 @@ export class OrdersTable extends React.Component {
     );
   }
 
-  render() {
-    let explorerLink;
-    switch (api.apiProvider.network) {
-      case 1000:
-        explorerLink =
-          "https://rinkeby.zkscan.io/explorer/accounts/" +
-          this.props.user.address;
-        break;
-      case 1:
-      default:
-        explorerLink =
-          "https://zkscan.io/explorer/accounts/" + this.props.user.address;
-    }
-    let footerContent
-    switch (this.state.tab) {
-      case 0:
-        footerContent = this.renderOrderTable(this.getUserOrders());
-        break;
-      case 1:
-        footerContent = this.renderFillTable(this.getFills());
-        break;
-      case 2:
-        if (this.props.user.committed) {
-          const balancesContent = Object.keys(
-            this.props.wallet
-          )
-            .sort()
-            .map((token) => {
-              const balance = this.props.wallet[token].valueReadable;
-              return (
-                <tr>
-                  <td data-label="Token"><Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{token}</Text></td>
-                  <td data-label="Balance"><Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{balance}</Text></td>
-                </tr>
-              );
-            });
-          footerContent = (
-            <div style={{ textAlign: 'center' }}>
-              {
-                this.state.isMobile ?
-                  <table><tbody>{balancesContent}</tbody></table> :
-                  <table>
-                    <thead>
-                      <tr>
-                        <th scope="col">
-                          <HeaderWrapper>
-                            <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Token</Text>
-                            <SortIconWrapper>
-                              <SortUpIcon /><SortDownIcon />
-                            </SortIconWrapper>
-                          </HeaderWrapper>
-                        </th>
-                        <th scope="col">
-                          <HeaderWrapper>
-                            <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Balance</Text>
-                            <SortIconWrapper>
-                              <SortUpIcon /><SortDownIcon />
-                            </SortIconWrapper>
-                          </HeaderWrapper>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>{balancesContent}</tbody>
-                  </table>
-              }
-              <ActionWrapper
-                font="primaryExtraSmallSemiBold"
-                color="primaryHighEmphasis"
-                textAlign="center"
-                className="view-account-button"
-                onClick={() => window.open(explorerLink, '_blank')}
-              >
-                View Account on Explorer
-              </ActionWrapper>
-            </div>
-          );
-        } else {
-          footerContent = (
-            <div style={{ textAlign: 'center' }}>
-              <ActionWrapper
-                font="primaryExtraSmallSemiBold"
-                color="primaryHighEmphasis"
-                textAlign="center"
-                className="view-account-button"
-                onClick={() => window.open(explorerLink, '_blank')}
-              >
-                View Account on Explorer
-              </ActionWrapper>
-            </div>
-          );
-        }
-        break;
-      default:
-        break;
-    }
-
-    return (
-      <>
-        <FooterWrapper>
-          <FooterContainer>
-            <div>
-              <StyledTabMenu left activeIndex={this.state.tab} onItemClick={(newIndex) => this.setTab(newIndex)} >
-                <Tab>Open Orders ({this.getUserOrders().length})</Tab>
-                <Tab>Order History ({this.getFills().length})</Tab>
-                <Tab>Balances</Tab>
-              </StyledTabMenu>
-            </div>
-            {
-              this.state.isMobile ?
-                <MobileWrapper>{footerContent}</MobileWrapper> :
-                <LaptopWrapper>{footerContent}</LaptopWrapper>
-            }
-          </FooterContainer>
-        </FooterWrapper>
-      </>
-    );
+  let explorerLink;
+  switch (api.apiProvider.network) {
+    case 1000:
+      explorerLink =
+        "https://rinkeby.zkscan.io/explorer/accounts/" +
+        props.user.address;
+      break;
+    case 1:
+    default:
+      explorerLink =
+        "https://zkscan.io/explorer/accounts/" + props.user.address;
   }
+
+  let footerContent
+  switch (tab) {
+    case 0:
+      footerContent = renderOrderTable(getUserOrders());
+      break;
+    case 1:
+      footerContent = renderFillTable(getFills());
+      break;
+    case 2:
+      if (props.user.committed) {
+        const balancesContent = walletList
+          .map((token) => {
+            return (
+              <tr>
+                <td data-label="Token"><Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{token.token}</Text></td>
+                <td data-label="Balance"><Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{token.valueReadable}</Text></td>
+              </tr>
+            );
+          });
+        footerContent = (
+          <div style={{ textAlign: 'center', marginTop: '8px' }}>
+            {
+              isMobile ?
+                <table><tbody>{balancesContent}</tbody></table> :
+                <table>
+                  <thead>
+                    <tr>
+                      <th scope="col" style={{cursor: 'pointer'}} onClick={() => { sortByToken() }}>
+                        <HeaderWrapper>
+                          <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Token</Text>
+                          {tokenSorted ? (
+                              <SortIconWrapper>
+                                  {tokenDirection ? <SortUpIcon /> : <SortUpFilledIcon />}
+                                  {tokenDirection ? <SortDownFilledIcon /> : <SortDownIcon />}
+                              </SortIconWrapper>
+                          ) : (
+                              <SortIconWrapper>
+                                  <SortUpIcon />
+                                  <SortDownIcon />
+                              </SortIconWrapper>
+                          )}
+                        </HeaderWrapper>
+                      </th>
+                      <th scope="col" style={{cursor: 'pointer'}} onClick={() => { sortByBalance() }}>
+                        <HeaderWrapper>
+                          <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Balance</Text>
+                          {balanceSorted ? (
+                              <SortIconWrapper>
+                                  {balanceDirection ? <SortUpIcon /> : <SortUpFilledIcon />}
+                                  {balanceDirection ? <SortDownFilledIcon /> : <SortDownIcon />}
+                              </SortIconWrapper>
+                          ) : (
+                              <SortIconWrapper>
+                                  <SortUpIcon />
+                                  <SortDownIcon />
+                              </SortIconWrapper>
+                          )}
+                        </HeaderWrapper>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>{balancesContent}</tbody>
+                </table>
+            }
+            <ActionWrapper
+              font="primaryExtraSmallSemiBold"
+              color="primaryHighEmphasis"
+              textAlign="center"
+              className="view-account-button"
+              onClick={() => window.open(explorerLink, '_blank')}
+            >
+              View Account on Explorer
+            </ActionWrapper>
+          </div>
+        );
+      } else {
+        footerContent = (
+          <div style={{ textAlign: 'center' }}>
+            <ActionWrapper
+              font="primaryExtraSmallSemiBold"
+              color="primaryHighEmphasis"
+              textAlign="center"
+              className="view-account-button"
+              onClick={() => window.open(explorerLink, '_blank')}
+            >
+              View Account on Explorer
+            </ActionWrapper>
+          </div>
+        );
+      }
+      break;
+    default:
+      break;
+  }
+
+  return (
+    <>
+      <FooterWrapper>
+        <FooterContainer>
+          <div>
+            <StyledTabMenu left activeIndex={tab} onItemClick={(newIndex) => setTab(newIndex)} >
+              <Tab>Open Orders ({getUserOrders().length})</Tab>
+              <Tab>Order History ({getFills().length})</Tab>
+              <Tab>Balances</Tab>
+            </StyledTabMenu>
+          </div>
+          {
+            isMobile ?
+              <MobileWrapper>{footerContent}</MobileWrapper> :
+              <LaptopWrapper>{footerContent}</LaptopWrapper>
+          }
+        </FooterContainer>
+      </FooterWrapper>
+    </>
+  );
 }

@@ -27,7 +27,7 @@ const ListPage = styled.div`
   height: 100%;
   min-height: calc(100vh - 113px);
   padding: 4rem 0 2rem;
-  background-color: ${(p) => p.theme.colors.bridgeBackground};
+  // background-color: ${(p) => p.theme.colors.bridgeBackground};
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
@@ -47,6 +47,10 @@ const ListContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+
+  svg {
+    display: inline;
+  }
 
   @media screen and (max-width: 480px) {
     padding: 0 10px;

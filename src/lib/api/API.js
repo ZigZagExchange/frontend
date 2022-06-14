@@ -93,9 +93,9 @@ export default class API extends Emitter {
     if (this.isZksyncChain()) {
       this.web3 = new Web3(
         window.ethereum ||
-          new Web3.providers.HttpProvider(
-            `https://${networkName}.infura.io/v3/${this.infuraId}`
-          )
+        new Web3.providers.HttpProvider(
+          `https://${networkName}.infura.io/v3/${this.infuraId}`
+        )
       );
 
       this.web3Modal = new Web3Modal({

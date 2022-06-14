@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import styled from "styled-components"
 import { toast } from "react-toastify";
 import api from "lib/api";
@@ -19,6 +19,7 @@ export class SpotForm extends React.Component {
       userHasEditedPrice: false,
       price: props.lastPrice,
       baseAmount: "",
+      totalAmount: "",
       quoteAmount: "",
       orderButtonDisabled: false,
       maxSizeSelected: false,
@@ -29,6 +30,9 @@ export class SpotForm extends React.Component {
     const newState = { ...this.state };
     newState.price = (rx_live.test(e.target.value)) ? e.target.value : this.state.price;
     newState.userHasEditedPrice = true;
+    newState.totalAmount = this.props.orderType === "limit" ?
+      (this.currentPrice() * newState.baseAmount).toPrecision(6) :
+      (this.props.marketSummary.price * newState.baseAmount).toPrecision(6);
     this.setState(newState);
   }
 
@@ -37,6 +41,9 @@ export class SpotForm extends React.Component {
     const newState = { ...this.state };
     newState.price = (Number(this.state.price) + 1).toString();
     newState.userHasEditedPrice = true;
+    newState.totalAmount = this.props.orderType === "limit" ?
+      (this.currentPrice() * newState.baseAmount).toPrecision(6) :
+      (this.props.marketSummary.price * newState.baseAmount).toPrecision(6);
     this.setState(newState);
   }
 
@@ -45,6 +52,9 @@ export class SpotForm extends React.Component {
     const newState = { ...this.state };
     newState.price = Number(this.state.price) - 1 < 0 ? '0' : (Number(this.state.price) - 1).toString();
     newState.userHasEditedPrice = true;
+    newState.totalAmount = this.props.orderType === "limit" ?
+      (this.currentPrice() * newState.baseAmount).toPrecision(6) :
+      (this.props.marketSummary.price * newState.baseAmount).toPrecision(6);
     this.setState(newState);
   }
 
@@ -52,6 +62,21 @@ export class SpotForm extends React.Component {
     const newState = { ...this.state };
     newState.baseAmount = (rx_live.test(e.target.value)) ? e.target.value : this.state.baseAmount;
     newState.quoteAmount = "";
+    newState.baseAmount === "" ? newState.totalAmount = "" :
+      newState.totalAmount = this.props.orderType === "limit" ?
+        (this.currentPrice() * newState.baseAmount).toPrecision(6) :
+        (this.props.marketSummary.price * newState.baseAmount).toPrecision(6);
+    this.setState(newState);
+  }
+
+  updateTotalAmount(e) {
+    const newState = { ...this.state };
+    newState.totalAmount = (rx_live.test(e.target.value)) ? e.target.value : this.state.totalAmount;
+    newState.quoteAmount = "";
+    newState.totalAmount === "" ? newState.baseAmount = "" :
+      newState.baseAmount = this.props.orderType === "limit" ?
+        (newState.totalAmount / this.currentPrice()).toPrecision(6) :
+        (newState.totalAmount / this.props.marketSummary.price).toPrecision(6);
     this.setState(newState);
   }
 
@@ -60,6 +85,10 @@ export class SpotForm extends React.Component {
     const newState = { ...this.state };
     newState.baseAmount = (Number(this.state.baseAmount) + 1).toString();
     newState.quoteAmount = "";
+    newState.baseAmount === "" ? newState.totalAmount = "" :
+      newState.totalAmount = this.props.orderType === "limit" ?
+        (this.currentPrice() * newState.baseAmount).toPrecision(6) :
+        (this.props.marketSummary.price * newState.baseAmount).toPrecision(6);
     this.setState(newState);
   }
 
@@ -69,6 +98,10 @@ export class SpotForm extends React.Component {
     newState.baseAmount = Number(this.state.baseAmount) - 1 < 0 ? '0' : (Number(this.state.baseAmount) - 1).toString();
     newState.quoteAmount = "";
     newState.maxSizeSelected = false;
+    newState.baseAmount === "" ? newState.totalAmount = "" :
+      newState.totalAmount = this.props.orderType === "limit" ?
+        (this.currentPrice() * newState.baseAmount).toPrecision(6) :
+        (this.props.marketSummary.price * newState.baseAmount).toPrecision(6);
     this.setState(newState);
   }
 
@@ -408,6 +441,11 @@ export class SpotForm extends React.Component {
       } else {
         newstate.baseAmount = displayAmount;
       }
+
+      newstate.baseAmount === "" ? newstate.totalAmount = "" :
+        newstate.totalAmount = this.props.orderType === "limit" ?
+          (this.currentPrice() * newstate.baseAmount).toPrecision(6) :
+          (this.props.marketSummary.price * newstate.baseAmount).toPrecision(6);
     } else if (this.props.side === "b") {
       const quoteBalance = this.getQuoteBalance();
       const quoteDecimals = marketInfo.quoteAsset.decimals;
@@ -429,10 +467,14 @@ export class SpotForm extends React.Component {
         newstate.baseAmount = (baseDisplayAmount > 9999)
           ? baseDisplayAmount.toFixed(0)
           : baseDisplayAmount.toPrecision(5)
+        newstate.totalAmount = (baseDisplayAmount > 9999)
+          ? baseDisplayAmount.toFixed(0) * this.currentPrice()
+          : baseDisplayAmount.toPrecision(5) * this.currentPrice()
       }
     }
 
     if (isNaN(newstate.baseAmount)) newstate.baseAmount = 0;
+    if (isNaN(newstate.totalAmount)) newstate.totalAmount = 0;
     if (isNaN(newstate.quoteAmount)) newstate.quoteAmount = 0;
     this.setState(newstate);
   }
@@ -460,6 +502,9 @@ export class SpotForm extends React.Component {
   }
 
   render() {
+    // const ethInput = useRef(null);
+    // const usdInput = useRef(null);
+    const isMobile = window.innerWidth < 430
     const marketInfo = this.props.marketInfo;
 
     let price = this.currentPrice();
@@ -532,7 +577,7 @@ export class SpotForm extends React.Component {
 
     return (
       <>
-        <StyledForm>
+        <StyledForm isMobile={isMobile}>
           <InputBox>
             <IconButton variant="secondary" startIcon={<MinusIcon />} disabled={this.priceIsDisabled()} onClick={this.decreasePrice.bind(this)}></IconButton>
             <InputField
@@ -582,13 +627,10 @@ export class SpotForm extends React.Component {
             {/* <IconButton variant="secondary" startIcon={<MinusIcon />}></IconButton> */}
             <InputField
               type="text"
+              pattern="\d+(?:[.,]\d+)?"
               placeholder={`Total (${marketInfo && marketInfo.quoteAsset?.symbol})`}
-              value={
-                this.props.orderType === "limit" ?
-                  (this.currentPrice() * this.state.baseAmount).toPrecision(6) + ' ' + (marketInfo && marketInfo.quoteAsset?.symbol) :
-                  (this.props.marketSummary.price * this.state.baseAmount).toPrecision(6) + ' ' + (marketInfo && marketInfo.quoteAsset?.symbol)
-              }
-              disabled
+              value={this.state.totalAmount}
+              onChange={this.updateTotalAmount.bind(this)}
             />
             {/* <IconButton variant="secondary" startIcon={<PlusIcon />}></IconButton> */}
             {/* <span>{marketInfo && marketInfo.baseAsset.symbol}</span> */}
@@ -619,8 +661,8 @@ const StyledForm = styled.form`
   display: grid;
   grid-auto-flow: row;
   align-items: center;
-  gap: 5px;
-  padding: 0px 20px 20px 20px;
+  gap: ${({ isMobile }) => isMobile ? '11px' : '5px'};
+  padding: ${({ isMobile }) => isMobile ? '0px 5px 8px 5px' : '0px 20px 20px 20px'};
 `
 
 const FormHeader = styled.div`
@@ -680,6 +722,38 @@ const InputBox = styled.div`
 const RangeWrapper = styled.div`
   width: 98%;
   padding-left: 10px;
+
+  .custom_range {
+    &::before {
+      border: 2px solid ${({ theme }) => theme.colors.foregroundLowEmphasis} !important;
+      background-color: ${({ theme }) => theme.colors.backgroundMediumEmphasis} !important;
+    }
+
+    &::before {
+      width: 10px !important;
+      height: 10px !important;
+    }
+  }
+
+  .MuiSlider-rail {
+    top: 50%;
+    height: 6px;
+    transform: translateY(-50%);
+    background-color: ${({ theme }) => theme.colors.foregroundLowEmphasis} !important;
+  }
+
+  .MuiSlider-track {
+    top: 50%;
+    height: 6px;
+    transform: translateY(-50%);
+  }
+
+  .MuiSlider-thumb {
+    top: 50%;
+    margin: 0 !important;
+    padding: 10px !important;
+    transform: translate(-50%, -50%);
+  }
 `
 
 const IconButton = styled(BaseIcon)`

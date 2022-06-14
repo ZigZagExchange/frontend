@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "@xstyled/styled-components";
-import { OrdersTable } from "./OrdersTable/OrdersTable";
+import OrdersTable from "./OrdersTable/OrdersTable";
 
 const StyledTradeTables = styled.section`
   display: flex;
