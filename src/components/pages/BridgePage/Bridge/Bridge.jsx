@@ -9,6 +9,7 @@ import { SwapButton, Button, useCoinEstimator } from "components";
 import {
   networkSelector,
   balancesSelector,
+  userOrdersSelector
 } from "lib/store/features/api/apiSlice";
 import Loader from "react-loader-spinner";
 import { userSelector } from "lib/store/features/auth/authSlice";
@@ -287,9 +288,13 @@ const Bridge = (props) => {
           }
         }
       }
-
       else if (inputValue < 0.0001 && (fromNetwork.from.key === 'polygon' || toNetwork.key === 'polygon')) {
         error = "Insufficient amount";
+      }
+
+      const openOrders = useSelector(userOrdersSelector).filter((o) => ['o', 'b', 'm'].includes(o[9]));
+      if(openOrders.length > 0) {
+        error = 'zkSync 1.0 only allows one open order at a time. Please cancel your order first or wait for it to be filled, before bridging';
       }
     }
 
