@@ -397,24 +397,24 @@ const Bridge = (props) => {
             )}`;
           } else if (
             toNetwork.key !== "polygon" &&
-            L1Fee !== null &&
-            L2Fee !== null &&
-            inputValue < L2Fee + L1Fee
+            L1FeeAmount !== null &&
+            L2FeeAmount !== null &&
+            inputValue < L2FeeAmount + L1FeeAmount
           ) {
             error = "Amount too small";
           }
         }
       } else if (L2FeeToken !== null && L2FeeToken === swapCurrency) {
-        if (L2Fee !== null && inputValue + L2Fee > detailBalance) {
+        if (L2FeeAmount !== null && inputValue + L2FeeAmount > detailBalance) {
           error = "Insufficient balance for fees";
         }
       } else if (L2FeeToken !== null) {
         const feeCurrencyBalance = getCurrencyBalance(L2FeeToken);
-        if (L1Fee != null && feeCurrencyBalance < L1Fee) {
+        if (L1FeeAmount != null && feeCurrencyBalance < L1FeeAmount) {
           error = "Insufficient balance for fees";
         }
       } else if (
-        /*else if (L1Fee !== null  && inputValue < L1Fee) {
+        /*else if (L1FeeAmount !== null  && inputValue < L1Fee) {
         error = "Amount too small";
       }*/
         inputValue < 0.0001 &&
@@ -865,7 +865,7 @@ const Bridge = (props) => {
                       </Box>
                     </Box>
                   )}
-                {L2Fee && (
+                {L2FeeAmount && (
                   <Box className="layer">
                     <Box component="h4">
                       {fromNetwork.from.key === "zksync" &&
@@ -873,11 +873,11 @@ const Bridge = (props) => {
                     </Box>
                     <Box component="h4">
                       {fromNetwork.from.key === "zksync" &&
-                        `~${L2Fee} ${L2FeeToken}`}
+                        `~${L2FeeAmount} ${L2FeeToken}`}
                     </Box>
                   </Box>
                 )}
-                {!L2Fee && (
+                {!L2FeeAmount && (
                   <Box className="spinner">
                     <LoadingSpinner size={16} />
                   </Box>
@@ -885,11 +885,11 @@ const Bridge = (props) => {
 
                 {transfer.type === "withdraw" && toNetwork.key === "ethereum" && (
                   <>
-                    {isFastWithdraw && L1Fee && (
+                    {isFastWithdraw && L1FeeAmount && (
                       <Box className="layer">
                         <Box component="h4">Ethereum L1 gas + bridge fee: </Box>
                         <Box component="h4">
-                          ~{formatPrice(L1Fee)} {swapDetails.currency}
+                          ~{formatPrice(L1FeeAmount)} {swapDetails.currency}
                         </Box>
                       </Box>
                     )}
@@ -899,8 +899,8 @@ const Bridge = (props) => {
                       </Box>
                       <Box component="h4" color={"blue-gray-300"}>
                         {isFastWithdraw ? " ~" : " "}
-                        {isFastWithdraw && L1Fee
-                          ? formatPrice(swapDetails.amount - L1Fee)
+                        {isFastWithdraw && L1FeeAmount
+                          ? formatPrice(swapDetails.amount - L1FeeAmount)
                           : formatPrice(swapDetails.amount)}
                         {" " + swapDetails.currency} on Ethereum L1
                       </Box>
@@ -911,7 +911,7 @@ const Bridge = (props) => {
             )}
             {transfer.type === "deposit" && (
               <>
-                {L1Fee && (
+                {L1FeeAmount && (
                   <Box className="layer">
                     <Box component="h4">
                       {fromNetwork.from.key === "polygon" &&
@@ -920,13 +920,13 @@ const Bridge = (props) => {
                     </Box>
                     <Box component="h4">
                       {fromNetwork.from.key === "polygon" &&
-                        `~${formatPrice(L1Fee)} MATIC`}
+                        `~${formatPrice(L1FeeAmount)} MATIC`}
                       {fromNetwork.from.key === "ethereum" &&
-                        `~${formatPrice(L1Fee)} ETH`}
+                        `~${formatPrice(L1FeeAmount)} ETH`}
                     </Box>
                   </Box>
                 )}
-                {!L1Fee && !hasError && (
+                {!L1FeeAmount && !hasError && (
                   <Box className="spinner">
                     <LoadingSpinner size={16} />
                   </Box>
@@ -988,7 +988,7 @@ const Bridge = (props) => {
               isLoading={loading}
               disabled={
                 formErr.length > 0 ||
-                (L2Fee === null && L1Fee === null) ||
+                (L2FeeAmount === null && L1FeeAmount === null) ||
                 !hasAllowance ||
                 Number(swapDetails.amount) === 0
               }
