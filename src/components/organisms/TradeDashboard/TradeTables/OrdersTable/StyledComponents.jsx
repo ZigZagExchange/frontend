@@ -12,7 +12,7 @@ export const FooterWrapper = styled.div`
     width: 100%;
     display: flex;
     flex-direction: column;
-    overflow: auto;
+    overflow: hidden;
 
     ::-webkit-scrollbar {
         width: 5px;
@@ -55,11 +55,12 @@ export const FooterWrapper = styled.div`
 export const FooterContainer = styled.div`
     align-content: center;
     width: 100%;
+    height: 100%;
     max-height: calc(100vh - 720px);
     margin: 0 auto;
 
     div > div > table {
-        padding: 20px;
+        // padding: 20px;
         max-width: 500px;
     }
 
@@ -78,10 +79,17 @@ export const FooterContainer = styled.div`
 `
 
 export const LaptopWrapper = styled.div`
+    height: 100%;
+
+    > div {
+        height: 100%;
+    }
+
     tbody {
         display: block;
         height: 100%; // 111px;
-        overflow: overlay;
+        max-height: calc(100% - 42px);
+        overflow: auto;
 
         ::-webkit-scrollbar {
             width: 5px;
@@ -114,7 +122,9 @@ export const LaptopWrapper = styled.div`
     // }
 
     table {
+        display: block;
         width: 100%;
+        height: calc(100% - 53px);
     }
 
     table thead th {
@@ -132,6 +142,15 @@ export const LaptopWrapper = styled.div`
 `
 
 export const MobileWrapper = styled.div`
+    display: block;
+    height: 100%;
+    overflow: auto;
+
+    > tr {
+        display: block;
+        width: 100%;
+    }
+
     table {
         width: 100%;
     }
