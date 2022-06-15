@@ -11,7 +11,7 @@ import { NavLink } from "react-router-dom";
 import { Button, Dropdown, AccountDropdown, Menu, MenuItem } from "components";
 import ConnectWalletButton from "../../atoms/ConnectWalletButton/ConnectWalletButton";
 import { userSelector } from "lib/store/features/auth/authSlice";
-import { networkSelector } from "lib/store/features/api/apiSlice";
+import { networkSelector, isConnectingSelector } from "lib/store/features/api/apiSlice";
 import api from "lib/api";
 import logo from "assets/images/logo.png";
 import menu from "assets/icons/menu.png";
@@ -23,7 +23,8 @@ export const Header = (props) => {
   // state to open or close the sidebar in mobile
   const mobileRef = useRef();
   const [show, setShow] = useState(false);
-  const [connecting, setConnecting] = useState(false);
+  const connecting = useSelector(isConnectingSelector);
+  // const [connecting, setConnecting] = useState(false);
   const user = useSelector(userSelector);
   const network = useSelector(networkSelector);
   const hasBridge = api.isImplemented("depositL2");
@@ -43,13 +44,15 @@ export const Header = (props) => {
   }, [show])
 
   useEffect(()=>{
-    setConnecting(props.isLoading)
+    api.emit("connecting", props.isLoading)
+    // setConnecting(props.isLoading)
   }, [props.isLoading])
 
 
   const connect = async () => {
     try {
-      setConnecting(true);
+      api.emit("connecting", true)
+      // setConnecting(true);
       const state = await api.signIn(network);
       const walletBalance = formatAmount(state.committed.balances['ETH'], { decimals: 18 });
       const activationFee = await api.apiProvider.changePubKeyFee('ETH');
@@ -57,10 +60,12 @@ export const Header = (props) => {
       if (!state.id && (!/^\/bridge(\/.*)?/.test(location.pathname)) && (isNaN(walletBalance) || walletBalance < activationFee)) {
         history.push("/bridge");
       }
-      setConnecting(false);
+      // setConnecting(false);
+      api.emit("connecting", false)
     } catch (e) {
       console.error(e);
-      setConnecting(false);
+      // setConnecting(false);
+      api.emit("connecting", false)
     }
   };
 
