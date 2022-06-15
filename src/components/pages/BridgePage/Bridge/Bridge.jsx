@@ -294,7 +294,7 @@ const Bridge = (props) => {
       }
 
       const openOrders = userOrders.filter((o) => ['o', 'b', 'm'].includes(o[9]));
-      if(openOrders.length > 0) {
+      if([1, 1000].includes(network) && openOrders.length > 0) {
         error = 'zkSync 1.0 only allows one open order at a time. Please cancel your order first or wait for it to be filled, before bridging';
       }
     }
