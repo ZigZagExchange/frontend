@@ -6,7 +6,7 @@ import styled from "styled-components";
 import CheckIcon from "@mui/icons-material/Check";
 
 import { userSelector } from "lib/store/features/auth/authSlice";
-import { networkSelector } from "lib/store/features/api/apiSlice";
+import { networkSelector, isConnectingSelector } from "lib/store/features/api/apiSlice";
 import api from "lib/api";
 import logo from "assets/images/logo.png";
 import { TabMenu, Tab } from "components/molecules/TabMenu";
@@ -23,6 +23,7 @@ import {
 import { toNumber } from "lodash";
 import ToggleTheme from "components/molecules/Toggle/ToggleTheme";
 import useTheme from "components/hooks/useTheme";
+import { formatAmount } from "../../../lib/utils";
 
 const langList = [
   { text: "EN", url: "#" },
@@ -179,6 +180,8 @@ const ActionSideMenuWrapper = styled.div`
 export const Header = (props) => {
   // state to open or close the sidebar in mobile
   const [show, setShow] = useState(false);
+  const connecting = useSelector(isConnectingSelector);
+  // const [connecting, setConnecting] = useState(false);
   const user = useSelector(userSelector);
   const network = useSelector(networkSelector);
   const hasBridge = api.isImplemented("depositL2");
@@ -207,6 +210,11 @@ export const Header = (props) => {
 
     setNetWorkItems(temp);
   }, [networkName]);
+
+  useEffect(()=>{
+    api.emit("connecting", props.isLoading)
+    // setConnecting(props.isLoading)
+  }, [props.isLoading])
 
   useEffect(() => {
     const tabIndex = localStorage.getItem("tab_index");
