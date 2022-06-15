@@ -66,6 +66,7 @@ const Bridge = (props) => {
   const [usdFee, setUsdFee] = useState(0);
   const [switchClicking, setSwitchClicking] = useState(false);
   const [gasFetching, setGasFetching] = useState(false);
+  const userOrders = useSelector(userOrdersSelector);
 
   const coinEstimator = useCoinEstimator();
   const currencyValue = coinEstimator(swapDetails.currency);
@@ -292,7 +293,7 @@ const Bridge = (props) => {
         error = "Insufficient amount";
       }
 
-      const openOrders = useSelector(userOrdersSelector).filter((o) => ['o', 'b', 'm'].includes(o[9]));
+      const openOrders = userOrders.filter((o) => ['o', 'b', 'm'].includes(o[9]));
       if(openOrders.length > 0) {
         error = 'zkSync 1.0 only allows one open order at a time. Please cancel your order first or wait for it to be filled, before bridging';
       }
