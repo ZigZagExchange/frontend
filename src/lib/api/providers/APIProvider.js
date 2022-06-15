@@ -17,7 +17,6 @@ export default class APIProvider {
   withdrawL2GasFee        = notImplemented('withdrawL2GasFee')
   withdrawL2FastBridgeFee = notImplemented('withdrawL2FastBridgeFee')
   getBalances             = notImplemented('getBalances')
-  getProfile              = notImplemented('getProfile')
 
   constructor(api, network) {
       this.api = api
