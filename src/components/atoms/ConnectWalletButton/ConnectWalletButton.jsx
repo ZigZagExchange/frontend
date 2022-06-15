@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
-import { networkSelector } from "../../../lib/store/features/api/apiSlice";
+import { networkSelector, isConnectingSelector } from "../../../lib/store/features/api/apiSlice";
 import { Button } from "../Button";
 import darkPlugHead from "../../../assets/icons/dark-plug-head.png";
 import api from "../../../lib/api";
@@ -9,13 +9,15 @@ import { formatAmount } from "../../../lib/utils";
 
 const ConnectWalletButton = (props) => {
   const network = useSelector(networkSelector);
-  const [isLoading, setIsLoading] = useState(false);
+  const isLoading = useSelector(isConnectingSelector);
+  // const [isLoading, setIsLoading] = useState(false);
   const history = useHistory();
   const location = useLocation();
 
   useEffect(()=>{
     if(props.isLoading) {
-      setIsLoading(props.isLoading)
+      api.emit("connecting", props.isLoading);
+      // setIsLoading(props.isLoading)
     }
   }, [props.isLoading])
 
@@ -35,13 +37,14 @@ const ConnectWalletButton = (props) => {
       text="CONNECT WALLET"
       img={darkPlugHead}
       onClick={() => {
-        setIsLoading(true);
+        api.emit("connecting", true);
+        // setIsLoading(true);
         api
           .signIn(network)
           .then((state) => {
             pushToBridgeMaybe(state);
           })
-          .finally(() => setIsLoading(false));
+          .finally(() => api.emit("connecting", false));
       }}
     />
   );

@@ -48,8 +48,8 @@ export default function OrdersTable(props) {
         .filter(filterSmallBalances)
         .sort(sortByNotional)
         .forEach((key) => {
-        walletArray.push({ ...wallet[key], token: key });
-      });
+          walletArray.push({ ...wallet[key], token: key });
+        });
     }
 
     let isSame = true;
@@ -63,7 +63,6 @@ export default function OrdersTable(props) {
     })
 
     if (!isSame) {
-      console.log("wallet array is", walletArray, "wallet list is", walletList);
       setWalletList(walletArray)
     }
   }, [wallet])
@@ -119,11 +118,11 @@ export default function OrdersTable(props) {
   const sortByToken = () => {
     let walletArray = [...walletList];
     const toggled = !tokenDirection
-    walletArray.sort((a, b) => { 
+    walletArray.sort((a, b) => {
       if (toggled) {
-        return a['token'] > b['token'] ? 1 : -1 
+        return a['token'] > b['token'] ? 1 : -1
       }
-      return a['token'] > b['token'] ? -1 : 1 
+      return a['token'] > b['token'] ? -1 : 1
     });
 
     setTokenSorted(true)
@@ -136,7 +135,7 @@ export default function OrdersTable(props) {
   const sortByBalance = () => {
     let walletArray = [...walletList];
     const toggled = !balanceDirection
-    walletArray.sort((a, b) => { 
+    walletArray.sort((a, b) => {
       const notionalCur1 = coinEstimator(a['token']) * a['valueReadable'];
       const notionalCur2 = coinEstimator(b['token']) * b['valueReadable'];
       if (toggled) {
@@ -1004,35 +1003,35 @@ export default function OrdersTable(props) {
                 <table>
                   <thead>
                     <tr>
-                      <th scope="col" style={{cursor: 'pointer'}} onClick={() => { sortByToken() }}>
+                      <th scope="col" style={{ cursor: 'pointer' }} onClick={() => { sortByToken() }}>
                         <HeaderWrapper>
                           <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Token</Text>
                           {tokenSorted ? (
-                              <SortIconWrapper>
-                                  {tokenDirection ? <SortUpIcon /> : <SortUpFilledIcon />}
-                                  {tokenDirection ? <SortDownFilledIcon /> : <SortDownIcon />}
-                              </SortIconWrapper>
+                            <SortIconWrapper>
+                              {tokenDirection ? <SortUpIcon /> : <SortUpFilledIcon />}
+                              {tokenDirection ? <SortDownFilledIcon /> : <SortDownIcon />}
+                            </SortIconWrapper>
                           ) : (
-                              <SortIconWrapper>
-                                  <SortUpIcon />
-                                  <SortDownIcon />
-                              </SortIconWrapper>
+                            <SortIconWrapper>
+                              <SortUpIcon />
+                              <SortDownIcon />
+                            </SortIconWrapper>
                           )}
                         </HeaderWrapper>
                       </th>
-                      <th scope="col" style={{cursor: 'pointer'}} onClick={() => { sortByBalance() }}>
+                      <th scope="col" style={{ cursor: 'pointer' }} onClick={() => { sortByBalance() }}>
                         <HeaderWrapper>
                           <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Balance</Text>
                           {balanceSorted ? (
-                              <SortIconWrapper>
-                                  {balanceDirection ? <SortUpIcon /> : <SortUpFilledIcon />}
-                                  {balanceDirection ? <SortDownFilledIcon /> : <SortDownIcon />}
-                              </SortIconWrapper>
+                            <SortIconWrapper>
+                              {balanceDirection ? <SortUpIcon /> : <SortUpFilledIcon />}
+                              {balanceDirection ? <SortDownFilledIcon /> : <SortDownIcon />}
+                            </SortIconWrapper>
                           ) : (
-                              <SortIconWrapper>
-                                  <SortUpIcon />
-                                  <SortDownIcon />
-                              </SortIconWrapper>
+                            <SortIconWrapper>
+                              <SortUpIcon />
+                              <SortDownIcon />
+                            </SortIconWrapper>
                           )}
                         </HeaderWrapper>
                       </th>

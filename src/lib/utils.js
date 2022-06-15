@@ -20,7 +20,10 @@ export function formatAmount(amount, currency) {
 }
 
 export function formatPrice(input) {
-  const inputNumber = Number(input)
+  const inputNumber = Number(input)  
+  if (Number.isNaN(inputNumber)) return '--';
+  if (!Number.isFinite(inputNumber)) return '--';
+  
   let outputNumber;
   if (inputNumber > 99999) {
     outputNumber = inputNumber.toFixed(0);

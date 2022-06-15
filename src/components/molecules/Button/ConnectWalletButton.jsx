@@ -18,37 +18,31 @@ const ConnectWalletButton = (props) => {
     }
   }, [props.isLoading]);
 
-  const pushToBridgeMaybe = async (state) => {
-    const walletBalance = formatAmount(state.committed.balances["ETH"], {
-      decimals: 18,
-    });
-    const activationFee = await api.apiProvider.changePubKeyFee("ETH");
+  const connect = async () => {
+    try {
+      api.emit("connecting", true)
+      // setConnecting(true);
+      const state = await api.signIn(network);
+      const walletBalance = formatAmount(state.committed.balances['ETH'], { decimals: 18 });
+      const activationFee = await api.apiProvider.changePubKeyFee('ETH');
 
-    if (
-      !state.id &&
-      !/^\/bridge(\/.*)?/.test(location.pathname) &&
-      (isNaN(walletBalance) || walletBalance < activationFee)
-    ) {
-      history.push("/bridge");
+      if (!state.id && (!/^\/bridge(\/.*)?/.test(location.pathname)) && (isNaN(walletBalance) || walletBalance < activationFee)) {
+        history.push("/bridge");
+      }
+      // setConnecting(false);
+      api.emit("connecting", false)
+    } catch (e) {
+      console.error(e);
+      // setConnecting(false);
+      api.emit("connecting", false)
     }
-
-    if (document.querySelector(".connect-notification"))
-      document.querySelector(".connect-notification").style.display = "flex";
   };
 
   return (
     <Button
       isLoading={isLoading}
       scale="md"
-      onClick={() => {
-        setIsLoading(true);
-        api
-          .signIn(network)
-          .then((state) => {
-            pushToBridgeMaybe(state);
-          })
-          .finally(() => setIsLoading(false));
-      }}
+      onClick={connect}
       style={{
         width: props.width,
         padding: isLoading ? "8px 5px" : "8px 15px",
