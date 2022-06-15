@@ -17,6 +17,7 @@ import apiReducer, {
   clearLastPrices,
   setArweaveAllocation,
   setCurrentMarket,
+  setConnecting
 } from "lib/store/features/api/apiSlice";
 import autoMergeLevel2 from "redux-persist/lib/stateReconciler/autoMergeLevel2";
 import api from "lib/api";
@@ -99,5 +100,9 @@ api.on("providerChange", (network) => {
 api.on("message", (operation, args) => {
   store.dispatch(handleMessage({ operation, args }));
 });
+
+api.on("connecting", (flag) => {
+  store.dispatch(setConnecting(flag))
+})
 
 export default store;

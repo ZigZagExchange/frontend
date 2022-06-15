@@ -24,6 +24,7 @@ export const apiSlice = createSlice({
     userFills: {},
     orders: {},
     arweaveAllocation: 0,
+    isConnecting: false,
   },
   reducers: {
     _error(state, { payload }) {
@@ -494,6 +495,9 @@ export const apiSlice = createSlice({
     setLayout(state, { payload }){
       state.layout = payload;
     },
+    setConnecting(state,{payload}) {
+      state.isConnecting = payload
+    }
   },
 });
 
@@ -508,6 +512,7 @@ export const {
   clearUserOrders,
   clearLastPrices,
   setArweaveAllocation,
+  setConnecting,
 } = apiSlice.actions;
 
 export const layoutSelector = (state) => state.api.layout;
@@ -523,6 +528,7 @@ export const currentMarketSelector = (state) => state.api.currentMarket;
 export const bridgeReceiptsSelector = (state) => state.api.bridgeReceipts;
 export const marketInfoSelector = (state) => state.api.marketinfo;
 export const arweaveAllocationSelector = (state) => state.api.arweaveAllocation;
+export const isConnectingSelector = (state) => state.api.isConnecting;
 export const balancesSelector = (state) =>
   state.api.balances[makeScope(state.api)] || {};
 
