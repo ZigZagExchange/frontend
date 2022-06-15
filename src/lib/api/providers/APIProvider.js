@@ -1,3 +1,5 @@
+import axios from 'axios'
+
 const notImplemented = function (method) {
   const x = () => { throw new Error(`APIProvider method not implemented: ${method}`) }
   x.notImplemented = true
