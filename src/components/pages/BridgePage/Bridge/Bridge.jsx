@@ -293,10 +293,24 @@ const Bridge = (props) => {
         error = "Insufficient amount";
       }
 
-      const openOrders = userOrders.filter((o) => ['o', 'b', 'm'].includes(o[9]));
-      if([1, 1000].includes(network) && openOrders.length > 0) {
-        error = 'zkSync 1.0 only allows one open order at a time. Please cancel your order first or wait for it to be filled, before bridging';
-      }
+      const userOrderArray = Object.values(userOrders);
+      if(userOrderArray.length > 0) {
+        const openOrders = userOrderArray.filter((o) => ['o', 'b', 'm'].includes(o[9]));
+        if(
+          [1, 1000].includes(network) &&
+          fromNetwork.from.key === 'zksync' && 
+           openOrders.length > 0
+        ) {
+          error = 'Open limit order prevents you from bridging';
+        }
+        toast.warn(
+          'zkSync 1.0 allows one open order at a time. Please cancel your limit order or wait for it to be filled before bridging. Otherwise your limit order will fail.',
+          {
+            toastId: 'zkSync 1.0 allows one open order at a time. Please cancel your limit order or wait for it to be filled before bridging. Otherwise your limit order will fail.',
+            autoClose: 20000,
+          }
+        );
+      }      
     }
 
     if (error) {
