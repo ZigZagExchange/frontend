@@ -1,11 +1,10 @@
 import React, { useState } from 'react'
-import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 import Text from 'components/atoms/Text/Text'
 import { GenericModal } from 'components/molecules/GenericModal'
 import { Toggle } from 'components/molecules/Toggle'
 import { RestartIcon, EditIcon } from 'components/atoms/Svg'
-import { settingsSelector } from 'lib/store/features/api/apiSlice'
+
 
 const SettingModalWrapper = styled(GenericModal)`
   position: relative;
@@ -57,7 +56,6 @@ const ToggleWrapper = styled.div`
 `
 
 const SettingsModal = ({ onDismiss }) => {
-  const { settings } = useSelector(settingsSelector);
   const [checked, setChecked] = useState(false)
   const toggle = () => setChecked(!checked)
 
@@ -83,7 +81,7 @@ const SettingsModal = ({ onDismiss }) => {
           </ActionWrapper>
         </ActionsWrapper>
         <ToggleWrapper>
-          <Toggle isChecked scale="md" onChange={toggle} settingKey="showNightPriceChange" />
+          <Toggle isChecked scale="md" onChange={toggle} />
           <Text font='primarySmall' color="foregroundHighEmphasis">Show price change since midnight UTC instead of 24h change</Text>
         </ToggleWrapper>
         <ToggleWrapper>
