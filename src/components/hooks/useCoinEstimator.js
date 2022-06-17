@@ -20,9 +20,6 @@ export function useCoinEstimator() {
 
       const [base, quote] = pair.split("-").map((s) => s.toUpperCase());
 
-      // retrun if that base token has a price already (stable)
-      if (Object.keys(prices).includes(base)) return;
-
       // add prices form stable pairs
       if (stables.includes(quote) && !stables.includes(base)) {
         if (base in priceArray) {
