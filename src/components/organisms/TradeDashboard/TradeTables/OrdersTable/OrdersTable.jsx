@@ -72,7 +72,7 @@ export default function OrdersTable(props) {
   }
 
   const getFills = () => {
-    return Object.values(props.userFills).filter(i => selectedSide === 'All' || i[3] === selectedSide.toLowerCase()[0]).sort((a, b) => b[1] - a[1]);
+    return Object.values(props.userFills).filter(i => i[6] === 'f' && selectedSide === 'All' || i[3] === selectedSide.toLowerCase()[0]).sort((a, b) => b[1] - a[1]);
   }
 
   const getUserOrders = () => {
