@@ -27,7 +27,7 @@ const AccountButton = ({ ...props }) => {
 	const { expanded, notext, onClick } = props
 
 	return (
-		user.id && user.address ? <IconButton variant="secondary" onClick={onClick} startIcon={<AvatarImg notext={notext} src={profile.image} alt={profile.name} />} endIcon={expanded ? <CaretUpIcon /> : <CaretDownIcon />}>
+		user.address ? <IconButton variant="secondary" onClick={onClick} startIcon={<AvatarImg notext={notext} src={profile.image} alt={profile.name} />} endIcon={expanded ? <CaretUpIcon /> : <CaretDownIcon />}>
 			{ notext ? null : <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{profile.name}</Text>}
 		</IconButton> : null
 	)
