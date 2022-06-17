@@ -9,6 +9,7 @@ import Loader from "react-loader-spinner";
 import {
   networkSelector,
   balancesSelector,
+  settingsSelector,
 } from "lib/store/features/api/apiSlice";
 import { formatUSD, HideMenuOnOutsideClicked } from "lib/utils";
 import { userSelector } from "lib/store/features/auth/authSlice";
@@ -164,6 +165,7 @@ const AccountDropdown = ({ notext, networkName }) => {
   const [isOpened, setIsOpened] = useState(false)
   const network = useSelector(networkSelector);
   const user = useSelector(userSelector);
+  const settings = useSelector(settingsSelector);
   const balanceData = useSelector(balancesSelector);
   const [totalBalance, setTotalBalance] = useState(0);
   const [selectedLayer, setSelectedLayer] = useState(2);
@@ -261,7 +263,10 @@ const AccountDropdown = ({ notext, networkName }) => {
             <div>
               <Text font="primaryTiny" color="foregroundMediumEmphasis">TOTAL BALANCE</Text>
               <Text font="primaryHeading6" color="foregroundHighEmphasis">
-                ${formatUSD(totalBalance)}
+                {
+                  settings.hideBalance ?
+                    "****.****" : "$ " + formatUSD(totalBalance)
+                }
               </Text>
             </div>
             <ToggleButton
@@ -294,12 +299,19 @@ const AccountDropdown = ({ notext, networkName }) => {
                           alt={ticker}
                         />
                         <div>
-                          <Text font="primarySmallSemiBold" color="foregroundHighEmphasis">{wallet[ticker].valueReadable} {ticker}</Text>
+                          <Text font="primarySmallSemiBold" color="foregroundHighEmphasis">
+                            {
+                              settings.hideBalance ?
+                                "****.****" :
+                                wallet[ticker].valueReadable + " " + ticker
+                            }
+                          </Text>
                           <Text font="primaryTiny" color="foregroundMediumEmphasis">
-                            $
-                            {formatUSD(
-                              coinEstimator(ticker) * wallet[ticker].valueReadable
-                            )}
+                            {
+                              settings.hideBalance ?
+                                "****.****" :
+                                "$" + formatUSD(coinEstimator(ticker) * wallet[ticker].valueReadable)
+                            }
                           </Text>
                         </div>
                       </CurrencyListItem>
