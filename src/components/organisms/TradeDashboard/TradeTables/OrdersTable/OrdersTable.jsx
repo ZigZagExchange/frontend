@@ -942,6 +942,9 @@ export default function OrdersTable(props) {
                   <td data-label="Order Status">
                     <Text font="primaryExtraSmallSemiBold" color={statusClass}>{statusText}</Text>
                   </td>
+                  <td data-label="TradeID">
+                    <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">&nbsp;</Text>
+                  </td>
                   <td data-label="Action">
                     {txhash ? (
                       <ActionWrapper
