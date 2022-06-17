@@ -33,7 +33,7 @@ const persistConfig = {
 
 const apiPersistConfig = {
   key: "api",
-  whitelist: ["userId", "currentMarket", "bridgeReceipts", "network", "settings"],
+  whitelist: ["userId", "currentMarket", "bridgeReceipts", "network"],
   storage,
 };
 
