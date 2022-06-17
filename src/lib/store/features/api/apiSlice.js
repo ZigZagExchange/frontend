@@ -516,7 +516,7 @@ export const apiSlice = createSlice({
       state.isConnecting = payload
     },
     setUISettings(state, { payload }) {
-      state.settings[payload.key] = payload.value
+      state[payload.key] = payload.value
     }
   },
 });
