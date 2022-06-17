@@ -6,6 +6,7 @@ import { SwapButton, useCoinEstimator, QuestionHelper } from "components";
 import {
   networkSelector,
   balancesSelector,
+  userOrdersSelector
 } from "lib/store/features/api/apiSlice";
 import { userSelector } from "lib/store/features/auth/authSlice";
 import { Box } from "@material-ui/core";
@@ -165,6 +166,7 @@ const Bridge = (props) => {
   const [usdFee, setUsdFee] = useState(0);
   const [switchClicking, setSwitchClicking] = useState(false);
   const [gasFetching, setGasFetching] = useState(false);
+  const userOrders = useSelector(userOrdersSelector);
 
   const coinEstimator = useCoinEstimator();
   const currencyValue = coinEstimator(swapDetails.currency);
@@ -404,24 +406,29 @@ const Bridge = (props) => {
             error = "Amount too small";
           }
         }
-      } else if (L2FeeToken !== null && L2FeeToken === swapCurrency) {
-        if (L2FeeAmount !== null && inputValue + L2FeeAmount > detailBalance) {
-          error = "Insufficient balance for fees";
-        }
-      } else if (L2FeeToken !== null) {
-        const feeCurrencyBalance = getCurrencyBalance(L2FeeToken);
-        if (L1FeeAmount != null && feeCurrencyBalance < L1FeeAmount) {
-          error = "Insufficient balance for fees";
-        }
-      } else if (
-        /*else if (L1FeeAmount !== null  && inputValue < L1Fee) {
-        error = "Amount too small";
-      }*/
-        inputValue < 0.0001 &&
-        (fromNetwork.from.key === "polygon" || toNetwork.key === "polygon")
-      ) {
+      }
+      else if (inputValue < 0.0001 && (fromNetwork.from.key === 'polygon' || toNetwork.key === 'polygon')) {
         error = "Insufficient amount";
       }
+
+      const userOrderArray = Object.values(userOrders);
+      if(userOrderArray.length > 0) {
+        const openOrders = userOrderArray.filter((o) => ['o', 'b', 'm'].includes(o[9]));
+        if(
+          [1, 1000].includes(network) &&
+          fromNetwork.from.key === 'zksync' && 
+           openOrders.length > 0
+        ) {
+          error = 'Open limit order prevents you from bridging';
+        }
+        toast.warn(
+          'zkSync 1.0 allows one open order at a time. Please cancel your limit order or wait for it to be filled before bridging. Otherwise your limit order will fail.',
+          {
+            toastId: 'zkSync 1.0 allows one open order at a time. Please cancel your limit order or wait for it to be filled before bridging. Otherwise your limit order will fail.',
+            autoClose: 20000,
+          }
+        );
+      }      
     }
 
     if (error) {
