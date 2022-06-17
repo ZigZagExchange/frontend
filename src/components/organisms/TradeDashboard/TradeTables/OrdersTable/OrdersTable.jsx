@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import "./OrdersTable.css";
 import { useCoinEstimator } from "components";
 import loadingGif from "assets/icons/loading.svg";
-import { balancesSelector, networkSelector } from "lib/store/features/api/apiSlice";
+import { balancesSelector, networkSelector, settingsSelector } from "lib/store/features/api/apiSlice";
 import api from "lib/api";
 import { formatDate, formatDateTime } from 'lib/utils'
 import { Tab } from "components/molecules/TabMenu";
@@ -24,6 +24,7 @@ import { Dropdown } from "components/molecules/Dropdown";
 export default function OrdersTable(props) {
   const network = useSelector(networkSelector);
   const balanceData = useSelector(balancesSelector);
+  const settings = useSelector(settingsSelector);
   const coinEstimator = useCoinEstimator();
   const [tab, setTabIndex] = useState(0)
   const [selectedSide, setSelectedSide] = useState("All")
@@ -994,7 +995,7 @@ export default function OrdersTable(props) {
             return (
               <tr>
                 <td data-label="Token"><Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{token.token}</Text></td>
-                <td data-label="Balance"><Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{token.valueReadable}</Text></td>
+                <td data-label="Balance"><Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{settings.hideBalance ? "****.****" : token.valueReadable}</Text></td>
               </tr>
             );
           });
