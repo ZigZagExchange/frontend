@@ -14,7 +14,7 @@ export function useCoinEstimator() {
   return useMemo(() => {
     let priceArray = {};
     const remaining = Object.keys(pairPrices).filter((token) => !stables.includes(token));
-    Object.keys(remaining).forEach((pair) => {
+    remaining.forEach((pair) => {
       const pairPrice = pairPrices[pair].price;
       if (Number.isNaN(pairPrice) || !Number.isFinite(pairPrice)) return;
 
