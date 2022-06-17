@@ -25,17 +25,6 @@ export const apiSlice = createSlice({
     orders: {},
     arweaveAllocation: 0,
     isConnecting: false,
-    settings: {
-      showNightPriceChange: true,
-      cancelOrders: false,
-      showFillNotification: false,
-      showSizeInUSD: false,
-      stackOrderbook: true,
-      highSlippageWarning: true,
-      orderBookFlash: false,
-      hideAddress: false,
-      hideBalance: false
-    }
   },
   reducers: {
     _error(state, { payload }) {
@@ -274,13 +263,17 @@ export const apiSlice = createSlice({
               filledOrder[10] = txHash;
               const noFeeOrder = api.getOrderDetailsWithoutFee(filledOrder);
               toast.error(
-                `Your ${sideText} order for ${noFeeOrder.baseQuantity.toPrecision(4) / 1
-                } ${baseCurrency} @ ${noFeeOrder.price.toPrecision(4) / 1
+                `Your ${sideText} order for ${
+                  noFeeOrder.baseQuantity.toPrecision(4) / 1
+                } ${baseCurrency} @ ${
+                  noFeeOrder.price.toPrecision(4) / 1
                 } was rejected: ${error}`,
                 {
-                  toastId: `Your ${sideText} order for ${noFeeOrder.baseQuantity.toPrecision(4) / 1
-                    } ${baseCurrency} @ ${noFeeOrder.price.toPrecision(4) / 1
-                    } was rejected: ${error}`,
+                  toastId: `Your ${sideText} order for ${
+                    noFeeOrder.baseQuantity.toPrecision(4) / 1
+                  } ${baseCurrency} @ ${
+                    noFeeOrder.price.toPrecision(4) / 1
+                  } was rejected: ${error}`,
                 }
               );
               toast.info(
@@ -328,7 +321,7 @@ export const apiSlice = createSlice({
     },
     _orderreceipt(state, { payload }) {
       const orderId = payload[1];
-      state.userOrders[orderId] = payload;
+      state.userOrders[orderId] = payload;      
     },
     setBalances(state, { payload }) {
       const scope = makeScope(state);
@@ -461,22 +454,22 @@ export const apiSlice = createSlice({
             {(type === "eth_to_zksync" ||
               type === "zkSync_to_polygon" ||
               type === "polygon_to_zkSync") && (
-                <div className="mt-3">
-                  Confirm that your funds have arrived {targetMsg}
-                  <p>
-                    <a
-                      href={walletAddress}
-                      rel="noreferrer"
-                      target="_blank"
-                      className="text-base font-bold underline font-work underline-offset-2"
-                    >
-                      {type === "zkSync_to_polygon"
-                        ? "Polygon wallet"
-                        : " zkSync wallet"}{" "}
-                    </a>
-                  </p>
-                </div>
-              )}
+              <div className="mt-3">
+                Confirm that your funds have arrived {targetMsg}
+                <p>
+                  <a
+                    href={walletAddress}
+                    rel="noreferrer"
+                    target="_blank"
+                    className="text-base font-bold underline font-work underline-offset-2"
+                  >
+                    {type === "zkSync_to_polygon"
+                      ? "Polygon wallet"
+                      : " zkSync wallet"}{" "}
+                  </a>
+                </p>
+              </div>
+            )}
             {extraInfoLink &&
               renderBridgeLink(extraInfoLink.text, extraInfoLink.link)}
             {ethWallet && renderBridgeLink(ethWallet.text, ethWallet.link)}
@@ -512,11 +505,8 @@ export const apiSlice = createSlice({
     setLayout(state, { payload }) {
       state.layout = payload;
     },
-    setConnecting(state, { payload }) {
+    setConnecting(state,{payload}) {
       state.isConnecting = payload
-    },
-    setUISettings(state, { payload }) {
-      state[payload.key] = payload.value
     }
   },
 });
@@ -533,7 +523,6 @@ export const {
   clearLastPrices,
   setArweaveAllocation,
   setConnecting,
-  setUISettings
 } = apiSlice.actions;
 
 export const layoutSelector = (state) => state.api.layout;
@@ -550,7 +539,6 @@ export const bridgeReceiptsSelector = (state) => state.api.bridgeReceipts;
 export const marketInfoSelector = (state) => state.api.marketinfo;
 export const arweaveAllocationSelector = (state) => state.api.arweaveAllocation;
 export const isConnectingSelector = (state) => state.api.isConnecting;
-export const settingsSelector = (state) => state.api.settings;
 export const balancesSelector = (state) =>
   state.api.balances[makeScope(state.api)] || {};
 
