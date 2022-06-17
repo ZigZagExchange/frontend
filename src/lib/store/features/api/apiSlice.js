@@ -6,6 +6,18 @@ import { getLayout } from "lib/helpers/storage/layouts";
 
 const makeScope = (state) => `${state.network}-${state.userId}`;
 
+const initialUISettings = {
+  showNightPriceChange: true,
+  cancelOrders: false,
+  showFillNotification: false,
+  showSizeInUSD: false,
+  stackOrderbook: true,
+  highSlippageWarning: true,
+  orderBookFlash: false,
+  hideAddress: false,
+  hideBalance: false
+}
+
 export const apiSlice = createSlice({
   name: "api",
   initialState: {
@@ -25,17 +37,7 @@ export const apiSlice = createSlice({
     orders: {},
     arweaveAllocation: 0,
     isConnecting: false,
-    settings: {
-      showNightPriceChange: true,
-      cancelOrders: false,
-      showFillNotification: false,
-      showSizeInUSD: false,
-      stackOrderbook: true,
-      highSlippageWarning: true,
-      orderBookFlash: false,
-      hideAddress: false,
-      hideBalance: false
-    }
+    settings: initialUISettings
   },
   reducers: {
     _error(state, { payload }) {
@@ -517,6 +519,9 @@ export const apiSlice = createSlice({
     },
     setUISettings(state, { payload }) {
       state.settings[payload.key] = payload.value
+    },
+    resetUISettings(state) {
+      state.settings = initialUISettings;
     }
   },
 });
@@ -533,7 +538,8 @@ export const {
   clearLastPrices,
   setArweaveAllocation,
   setConnecting,
-  setUISettings
+  setUISettings,
+  resetUISettings
 } = apiSlice.actions;
 
 export const layoutSelector = (state) => state.api.layout;

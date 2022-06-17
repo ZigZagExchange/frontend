@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import StyledToggle, { Input, Handle, ToggleWrapper } from "./StyledToggle";
 import { scales } from "./types";
@@ -9,6 +9,10 @@ const Toggle = ({ isChecked = false, scale = scales.MD, font = "primarySmall", l
   const [checked, setChecked] = useState(isChecked);
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    setChecked(isChecked);
+  }, [isChecked])
+
   const toggle = (e) => {
     props.onChange(e);
 
@@ -18,6 +22,7 @@ const Toggle = ({ isChecked = false, scale = scales.MD, font = "primarySmall", l
 
     setChecked(!checked);
   }
+
   return (
     <ToggleWrapper>
       {leftLabel && <Text font={font} color={leftLabel && rightLabel && !checked ? 'foregroundDisabled' : 'foregroundHighEmphasis'}>{leftLabel}</Text>}

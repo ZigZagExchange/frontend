@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import styled from 'styled-components'
 import Text from 'components/atoms/Text/Text'
 import { GenericModal } from 'components/molecules/GenericModal'
 import { Toggle } from 'components/molecules/Toggle'
 import { RestartIcon, EditIcon } from 'components/atoms/Svg'
-import { settingsSelector } from 'lib/store/features/api/apiSlice'
+import { settingsSelector, resetUISettings } from 'lib/store/features/api/apiSlice'
 
 const SettingModalWrapper = styled(GenericModal)`
   position: relative;
@@ -60,13 +60,17 @@ const SettingsModal = ({ onDismiss }) => {
   const settings = useSelector(settingsSelector);
   const [checked, setChecked] = useState(false)
   const toggle = () => setChecked(!checked)
-  console.log("settings is", settings);
+  const dispatch = useDispatch()
+
+  const resetSettings = () => {
+    dispatch(resetUISettings());
+  }
 
   return (
     <SettingModalWrapper isOpened onClose={onDismiss}>
       <ModalHeader>
         <Text font='primaryHeading6' color="foregroundHighEmphasis">Settings</Text>
-        <ResetAllSettingsWrapper>
+        <ResetAllSettingsWrapper onClick={resetSettings}>
           <RestartIcon />
           <Text font='primaryMediumBody' color="primaryHighEmphasis" style={{ textDecoration: 'underline', cursor: 'pointer' }}>Reset All Settings</Text>
         </ResetAllSettingsWrapper>
