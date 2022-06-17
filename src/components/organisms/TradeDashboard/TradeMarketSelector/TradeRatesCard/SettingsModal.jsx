@@ -57,9 +57,10 @@ const ToggleWrapper = styled.div`
 `
 
 const SettingsModal = ({ onDismiss }) => {
-  const { settings } = useSelector(settingsSelector);
+  const settings = useSelector(settingsSelector);
   const [checked, setChecked] = useState(false)
   const toggle = () => setChecked(!checked)
+  console.log("settings is", settings);
 
   return (
     <SettingModalWrapper isOpened onClose={onDismiss}>
