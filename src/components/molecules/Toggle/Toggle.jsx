@@ -1,14 +1,28 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import StyledToggle, { Input, Handle, ToggleWrapper } from "./StyledToggle";
 import { scales } from "./types";
 import Text from '../../atoms/Text/Text'
+import { setUISettings } from "lib/store/features/api/apiSlice";
 
-const Toggle = ({ isChecked = false, scale = scales.MD, font = "primarySmall", leftLabel, rightLabel, ...props }) => {
-  const [checked, setChecked] = useState(isChecked)
+const Toggle = ({ isChecked = false, scale = scales.MD, font = "primarySmall", leftLabel, rightLabel, settingKey, ...props }) => {
+  const [checked, setChecked] = useState(isChecked);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    setChecked(isChecked);
+  }, [isChecked])
+
   const toggle = (e) => {
     props.onChange(e);
-    setChecked(!checked)
+
+    if (settingKey !== undefined) {
+      dispatch(setUISettings({ key: settingKey, value: !checked }));
+    }
+
+    setChecked(!checked);
   }
+
   return (
     <ToggleWrapper>
       {leftLabel && <Text font={font} color={leftLabel && rightLabel && !checked ? 'foregroundDisabled' : 'foregroundHighEmphasis'}>{leftLabel}</Text>}
