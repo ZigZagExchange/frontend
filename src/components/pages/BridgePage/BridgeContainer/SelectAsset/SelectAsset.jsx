@@ -77,7 +77,7 @@ const SelectAsset = ({
           fromNetwork.id !== "polygon" &&
           (swapCurrencyInfo?.decimals
             ? swapDetails.amount * 10 ** swapCurrencyInfo?.decimals
-            : 0) > allowance ? (
+            : "") > allowance ? (
           <p className="text-xs font-work">
             Available allowance:{" "}
             {ethersUtils.formatUnits(allowance, swapCurrencyInfo?.decimals)}
@@ -122,7 +122,7 @@ const SelectAsset = ({
           className="ml-3 text-2xl font-semibold text-right bg-transparent w-36 sm:w-auto focus:outline-none"
           placeholder="0.00"
           onChange={(e) => onChangeFromAmounts(e.target.value)}
-          value={fromAmounts}
+          value={fromAmounts===0 ? "" : fromAmounts}
         />
       </div>
       <p className="mt-1 text-sm font-normal text-right text-slate-400 font-work">

@@ -35,7 +35,7 @@ const DropdownDisplay = styled.div`
   transition: all 0.2s ease-in-out;
   box-shadow: 0px 8px 16px 0px #0101011A;
   width: ${({ isMobile }) => isMobile ? '350px' : '419px'};
-  height: 331px;
+  height: 531px;
   background: ${({ theme }) => theme.colors.backgroundLowEmphasis};
   border: 1px solid ${({ theme }) => theme.colors.foreground400};
   top: 45px;
@@ -66,7 +66,7 @@ const StyledTabMenu = styled(TabMenu)`
 `
 
 const TableContent = styled.div`
-  height: 186px;
+  height: 386px;
   
   table tbody tr {
     cursor: pointer;
@@ -74,7 +74,7 @@ const TableContent = styled.div`
 
   tbody {
       display: block;
-      height: 142px;
+      height: 342px;
       overflow: overlay;
 
       ::-webkit-scrollbar {
