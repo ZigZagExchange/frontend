@@ -84,39 +84,39 @@ const SettingsModal = ({ onDismiss }) => {
           </ActionWrapper>
         </ActionsWrapper>
         <ToggleWrapper>
-          <Toggle isChecked scale="md" onChange={toggle} settingKey="showNightPriceChange" />
+          <Toggle isChecked={settings.showNightPriceChange} scale="md" onChange={toggle} settingKey="showNightPriceChange" />
           <Text font='primarySmall' color="foregroundHighEmphasis">Show price change since midnight UTC instead of 24h change</Text>
         </ToggleWrapper>
         <ToggleWrapper>
-          <Toggle scale="md" onChange={toggle} />
+          <Toggle isChecked={settings.cancelOrders} scale="md" onChange={toggle} settingKey="cancelOrders" />
           <Text font='primarySmall' color="foregroundHighEmphasis">Cancel all orders button enabled</Text>
         </ToggleWrapper>
         <ToggleWrapper>
-          <Toggle scale="md" onChange={toggle} />
+          <Toggle isChecked={settings.showFillNotification} scale="md" onChange={toggle} settingKey="showFillNotification" />
           <Text font='primarySmall' color="foregroundHighEmphasis">Show notifications for fills</Text>
         </ToggleWrapper>
         <ToggleWrapper>
-          <Toggle scale="md" onChange={toggle} />
+          <Toggle isChecked={settings.showSizeInUSD} scale="md" onChange={toggle} settingKey="showSizeInUSD" />
           <Text font='primarySmall' color="foregroundHighEmphasis">Show order and trade sizes in USD</Text>
         </ToggleWrapper>
         <ToggleWrapper>
-          <Toggle isChecked scale="md" onChange={toggle} />
+          <Toggle isChecked={settings.stackOrderbook} scale="md" onChange={toggle} settingKey="stackOrderbook" />
           <Text font='primarySmall' color="foregroundHighEmphasis">Stack orderbooks</Text>
         </ToggleWrapper>
         <ToggleWrapper>
-          <Toggle scale="md" onChange={toggle} />
+          <Toggle isChecked={settings.highSlippageWarning} scale="md" onChange={toggle} settingKey="highSlippageWarning" />
           <Text font='primarySmall' color="foregroundHighEmphasis">Disable high slippage warning</Text>
         </ToggleWrapper>
         <ToggleWrapper>
-          <Toggle isChecked scale="md" onChange={toggle} />
+          <Toggle isChecked={settings.orderBookFlash} scale="md" onChange={toggle} settingKey="orderBookFlash" />
           <Text font='primarySmall' color="foregroundHighEmphasis">Disable orderbook and trade flashes</Text>
         </ToggleWrapper>
         <ToggleWrapper>
-          <Toggle scale="md" onChange={toggle} />
+          <Toggle isChecked={settings.hideAddress} scale="md" onChange={toggle} settingKey="hideAddress" />
           <Text font='primarySmall' color="foregroundHighEmphasis">Hide addresses</Text>
         </ToggleWrapper>
         <ToggleWrapper>
-          <Toggle scale="md" onChange={toggle} />
+          <Toggle isChecked={settings.hideBalance} scale="md" onChange={toggle} settingKey="hideBalance" />
           <Text font='primarySmall' color="foregroundHighEmphasis">Hide balances</Text>
         </ToggleWrapper>
       </ModalBody>
