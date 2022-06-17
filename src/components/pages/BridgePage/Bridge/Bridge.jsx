@@ -406,22 +406,8 @@ const Bridge = (props) => {
             error = "Amount too small";
           }
         }
-      } else if (L2FeeToken !== null && L2FeeToken === swapCurrency) {
-        if (L2FeeAmount !== null && inputValue + L2FeeAmount > detailBalance) {
-          error = "Insufficient balance for fees";
-        }
-      } else if (L2FeeToken !== null) {
-        const feeCurrencyBalance = getCurrencyBalance(L2FeeToken);
-        if (L1FeeAmount != null && feeCurrencyBalance < L1FeeAmount) {
-          error = "Insufficient balance for fees";
-        }
-      } else if (
-        /*else if (L1FeeAmount !== null  && inputValue < L1Fee) {
-        error = "Amount too small";
-      }*/
-        inputValue < 0.0001 &&
-        (fromNetwork.from.key === "polygon" || toNetwork.key === "polygon")
-      ) {
+      }
+      else if (inputValue < 0.0001 && (fromNetwork.from.key === 'polygon' || toNetwork.key === 'polygon')) {
         error = "Insufficient amount";
       }
 
