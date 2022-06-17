@@ -163,6 +163,7 @@ export class SpotForm extends React.Component {
   }
 
   async buySellHandler(e) {
+    e.preventDefault();
     let baseAmount, quoteAmount;
     if (typeof this.state.baseAmount === "string") {
       baseAmount = parseFloat(this.state.baseAmount.replace(",", "."));
