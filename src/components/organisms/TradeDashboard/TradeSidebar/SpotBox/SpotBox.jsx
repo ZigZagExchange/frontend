@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import styled from "styled-components";
 import "./SpotBox.css";
 // assets
@@ -7,6 +8,7 @@ import { ToggleButton } from "components/molecules/Toggle";
 import { IconButton as baseIcon } from "components/molecules/IconButton";
 import { CalculatorIcon } from "components/atoms/Svg";
 import { TabMenu, Tab } from "components/molecules/TabMenu";
+import { settingsSelector } from "lib/store/features/api/apiSlice";
 
 const SpotBox = ({
   marketInfo,
@@ -22,6 +24,7 @@ const SpotBox = ({
   const [orderType, updateOrderType] = useState("market");
 
   const toggleClick = (num) => setSelectedLayer(num)
+  const settings = useSelector(settingsSelector);
   const handleTabClick = (newIndex) => {
     setIndex(newIndex);
     if (newIndex === 0)
@@ -41,6 +44,7 @@ const SpotBox = ({
       liquidity={liquidity}
       marketInfo={marketInfo}
       marketSummary={marketSummary}
+      settings={settings}
     />
   )
 
@@ -55,6 +59,7 @@ const SpotBox = ({
       liquidity={liquidity}
       marketInfo={marketInfo}
       marketSummary={marketSummary}
+      settings={settings}
     />
   )
 
