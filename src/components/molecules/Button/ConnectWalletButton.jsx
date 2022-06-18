@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { networkSelector } from "../../../lib/store/features/api/apiSlice";
+import { networkSelector, isConnectingSelector } from "../../../lib/store/features/api/apiSlice";
 import Button from "./Button";
 import api from "../../../lib/api";
 import { useHistory, useLocation } from "react-router-dom";
@@ -8,13 +8,13 @@ import { formatAmount } from "../../../lib/utils";
 
 const ConnectWalletButton = (props) => {
   const network = useSelector(networkSelector);
-  const [isLoading, setIsLoading] = useState(false);
+  const isLoading = useSelector(isConnectingSelector);
   const history = useHistory();
   const location = useLocation();
 
   useEffect(() => {
     if (props.isLoading) {
-      setIsLoading(props.isLoading);
+      api.emit("connecting", props.isLoading);
     }
   }, [props.isLoading]);
 

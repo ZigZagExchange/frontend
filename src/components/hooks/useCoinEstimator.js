@@ -19,8 +19,9 @@ export function useCoinEstimator() {
       if (Number.isNaN(pairPrice) || !Number.isFinite(pairPrice)) return;
 
       const [base, quote] = pair.split("-").map((s) => s.toUpperCase());
+
       // add prices form stable pairs
-      if (stables.includes(quote)) {
+      if (stables.includes(quote) && !stables.includes(base)) {
         if (base in priceArray) {
           const arr = priceArray[base];
           arr.push(pairPrice);
@@ -48,7 +49,8 @@ export function useCoinEstimator() {
       let pairPrice = pairPrices[pair].price;
       if (Number.isNaN(pairPrice) || !Number.isFinite(pairPrice)) return;
       const [base, quote] = pair.split("-").map((s) => s.toUpperCase());
-      if (quote in prices) {
+      
+      if (quote in prices && !stables.includes(base)) {
         pairPrice *= prices[quote];
         if (base in priceArray) {
           const arr = priceArray[base];

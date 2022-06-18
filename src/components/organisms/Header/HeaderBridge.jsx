@@ -284,9 +284,9 @@ export const HeaderBridge = (props) => {
             </Link>
           </LogoWrapper>
           <ButtonWrapper>
-            {user.id && user.address ? (
+            {user.address ? (
               <>
-                <AccountDropdown notext networkName={networkName} />
+                {/* <AccountDropdown notext networkName={networkName} /> */}
               </>
             ) : (
               <ConnectWalletButton />
@@ -360,7 +360,7 @@ export const HeaderBridge = (props) => {
               <ToggleTheme isDark={isDark} toggleTheme={toggleTheme} />
             </LanguageWrapper>
             <VerticalDivider />
-            {user.id && user.address ? (
+            {user.address ? (
               <>
                 <Dropdown
                   adClass="network-dropdown"
@@ -370,7 +370,7 @@ export const HeaderBridge = (props) => {
                   clickFunction={changeNetwork}
                   leftIcon={true}
                 />
-                <AccountDropdown networkName={networkName} />
+                {/* <AccountDropdown networkName={networkName} /> */}
               </>
             ) : (
               <ConnectWalletButton />

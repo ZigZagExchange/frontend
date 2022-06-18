@@ -292,7 +292,7 @@ export const Header = (props) => {
             </Link>
           </LogoWrapper>
           <ButtonWrapper>
-            {user.id && user.address ? (
+            {user.address ? (
               <>
                 <AccountDropdown notext networkName={networkName} />
               </>
@@ -368,7 +368,7 @@ export const Header = (props) => {
               <ToggleTheme isDark={isDark} toggleTheme={toggleTheme} />
             </LanguageWrapper>
             <VerticalDivider />
-            {user.id && user.address ? (
+            {user.address ? (
               <>
                 <Dropdown
                   adClass="network-dropdown"

@@ -2,10 +2,10 @@ import React from "react";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
 import { userSelector } from "lib/store/features/auth/authSlice";
+import { settingsSelector } from "lib/store/features/api/apiSlice";
 import { IconButton as baseIcon } from "../IconButton";
 import { CaretUpIcon, CaretDownIcon } from '../../atoms/Svg'
 import Text from '../../atoms/Text/Text'
-import { settingsSelector } from "lib/store/features/api/apiSlice";
 
 const IconButton = styled(baseIcon)`
     background-color: transparent;
