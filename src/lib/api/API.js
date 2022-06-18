@@ -34,6 +34,8 @@ export default class API extends Emitter {
     lastprices = {}
     _signInProgress = null
     _profiles = {}
+    _pendingOrders = []
+    _pendingFills = []
 
     constructor({ infuraId, networks, currencies, validMarkets }) {
         super()
@@ -140,6 +142,20 @@ export default class API extends Emitter {
           this.emit('providerChange', network)
     }
 
+    getExplorer = (address, layer) => {
+      let explorer = "https://etherscan.io/address/";
+      let subdomain = this.apiProvider.network === 1 ? "" : "rinkeby.";
+  
+      switch(layer){
+        case 1:
+          explorer = `https://${subdomain}etherscan.io/address/${address}`;
+          return explorer;
+        default:
+          explorer = `https://${subdomain}zkscan.io/explorer/accounts/${address}`
+          return explorer;
+      }
+    }
+    
     getProfile = async (address) => {
       const getProfileFromIPFS  = async (address) => {
       try {
@@ -466,10 +482,10 @@ export default class API extends Emitter {
       const polygonProvider = new ethers.providers.Web3Provider(
         window.web3.currentProvider
       );
-      const currentNetwork = await polygonProvider.getNetwork();
+      // const currentNetwork = await polygonProvider.getNetwork(); // This is not correct on the brave browser.
 
-      if ("0x"+currentNetwork.chainId.toString(16) !== polygonChainId)
-        throw new Error("Must approve network change");
+      // if ("0x"+currentNetwork.chainId.toString(16) !== polygonChainId)
+      //   throw new Error("Must approve network change");
       // const signer = polygonProvider.getSigner();
 
       networkSwitched = true;
@@ -550,6 +566,13 @@ export default class API extends Emitter {
     return res.data;
   }
 
+  getEthereumFee = async () => {
+    if (this.ethersProvider) {
+      const feeData = await this.ethersProvider.getFeeData();
+      return feeData;
+    }
+  };
+
   withdrawL2 = async (amount, token) => {
     return this.apiProvider.withdrawL2(amount, token);
   };
@@ -563,15 +586,30 @@ export default class API extends Emitter {
   };
 
   withdrawL2GasFee = async (token) => {
-    return await this.apiProvider.withdrawL2GasFee(token);
+    try {
+      return await this.apiProvider.withdrawL2GasFee(token);
+    } catch (err) {
+      console.log(err);
+      return { amount: 0, feeToken: 'ETH' };
+    }
   };
 
-  withdrawL2FastGasFee = async (token) => {
-    return await this.apiProvider.withdrawL2FastGasFee(token);
+  transferL2GasFee = async (token) => {
+    try {
+      return await this.apiProvider.transferL2GasFee(token);
+    } catch (err) {
+      console.log(err);
+      return { amount: 0, feeToken: 'ETH' };
+    }
   };
 
   withdrawL2FastBridgeFee = async (token) => {
-    return await this.apiProvider.withdrawL2FastBridgeFee(token);
+    try {
+      return await this.apiProvider.withdrawL2FastBridgeFee(token);
+     } catch (err) {
+      console.log(err);
+      return 0;
+    }
   };
 
   cancelAllOrders = async () => {
@@ -857,19 +895,40 @@ export default class API extends Emitter {
       return {};
     }
   }
+  
+  updatePendingOrders = (userOrders) => {
+    Object.keys(userOrders).forEach(orderId => {
+      const orderStatus = userOrders[orderId][9];
+      if (['b', 'm', 'pm'].includes(orderStatus)) {
+        // _pendingOrders is used to only request on the 2nd time
+        const index = this._pendingOrders.indexOf(orderId);
+        if (index > -1) {
+          this._pendingOrders.splice(index, 1);
+          // request status update
+          this.send("orderreceiptreq", [this.apiProvider.network, orderId])
+        } else {
+          this._pendingOrders.push(orderId);
+        }
+      }
+    })
+  }
 
-  // marketinfo calls can get expesnive so it's good to cache them
-  cacheMarketInfoFromNetwork = async (pairs) => {
-    if (pairs.length === 0) return;
-    if (!this.apiProvider.network) return;
-    const pairText = pairs.join(",");
-    const url = (this.apiProvider.network === 1)
-      ? `https://zigzag-markets.herokuapp.com/markets?id=${pairText}&chainid=${this.apiProvider.network}`
-      : `https://secret-thicket-93345.herokuapp.com/api/v1/marketinfos?chain_id=${this.apiProvider.network}&market=${pairText}`
-    const marketInfoArray = await fetch(url).then((r) => r.json());
-    if (!(marketInfoArray instanceof Array)) return;
-    marketInfoArray.forEach((info) => (this.marketInfo[info.alias] = info));
-    return;
-  };
-
+  updatePendingFills = (userFills) => {
+    const fillRequestIds = [];
+    Object.keys(userFills).forEach(fillId => {
+      const fillStatus = userFills[fillId][6];
+      if (['b', 'm', 'pm'].includes(fillStatus)) {
+        // _pendingFills is used to only request on the 2nd time
+        const index = this._pendingFills.indexOf(fillId);
+        if (index > -1) {
+          this._pendingFills.splice(index, 1);
+          fillRequestIds.push(fillId);
+        } else {
+          this._pendingFills.push(fillId);
+        }
+      }
+    })    
+    // request status update
+    this.send("fillreceiptreq", [this.apiProvider.network, fillRequestIds])
+  }
 }

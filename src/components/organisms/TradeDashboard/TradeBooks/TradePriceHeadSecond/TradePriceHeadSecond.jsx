@@ -12,11 +12,9 @@ const TradePriceHeadSecond = (props) => {
           <img src={upArrow} alt="..." />
         </div>
         <span>$ {
-          formatPrice(
-            (props.marketInfo?.baseAsset?.usdPrice)
-              ? props.marketInfo.baseAsset.usdPrice
-              : "--"
-          )
+          (props.marketInfo?.baseAsset?.usdPrice)
+            ? formatPrice(props.marketInfo.baseAsset.usdPrice)
+            : "--"
         }</span>
       </div>
     </>
