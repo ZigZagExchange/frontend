@@ -145,16 +145,19 @@ export const apiSlice = createSlice({
             const sideText = fillDetails[3] === "b" ? "buy" : "sell";
             const price = Number(fillDetails[4]);
             const baseQuantity = Number(fillDetails[5]);
-            toast.success(
-              `Your ${sideText} order for ${Number(
-                baseQuantity.toPrecision(4)
-              )} ${baseCurrency} was filled @ ${Number(formatPrice(price))}!`,
-              {
-                toastId: `Your ${sideText} order for ${Number(
+
+            if (state.settings.showFillNotification) {
+              toast.success(
+                `Your ${sideText} order for ${Number(
                   baseQuantity.toPrecision(4)
                 )} ${baseCurrency} was filled @ ${Number(formatPrice(price))}!`,
-              }
-            );
+                {
+                  toastId: `Your ${sideText} order for ${Number(
+                    baseQuantity.toPrecision(4)
+                  )} ${baseCurrency} was filled @ ${Number(formatPrice(price))}!`,
+                }
+              );
+            }
           }
         }
       });
