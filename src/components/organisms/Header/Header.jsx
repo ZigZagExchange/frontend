@@ -6,7 +6,10 @@ import styled from "styled-components";
 import CheckIcon from "@mui/icons-material/Check";
 
 import { userSelector } from "lib/store/features/auth/authSlice";
-import { networkSelector, isConnectingSelector } from "lib/store/features/api/apiSlice";
+import {
+  networkSelector,
+  isConnectingSelector,
+} from "lib/store/features/api/apiSlice";
 import api from "lib/api";
 import logo from "assets/images/logo.png";
 import { TabMenu, Tab } from "components/molecules/TabMenu";
@@ -45,8 +48,6 @@ const accountLists = [
   { text: "0x12BV...b89G", url: "#", icon: <DeleteIcon /> },
 ];
 
-
-
 const HeaderWrapper = styled.div`
   display: grid;
   grid-auto-flow: column;
@@ -64,13 +65,16 @@ const HeaderWrapper = styled.div`
 
   button {
     &:hover {
-      // background-color: ${({ theme }) => `${theme.colors.foregroundHighEmphasis} !important`};
+      // background-color: ${({ theme }) =>
+        `${theme.colors.foregroundHighEmphasis} !important`};
 
       div {
-        color: ${({ theme }) => `${theme.colors.primaryHighEmphasis} !important`};
-  
+        color: ${({ theme }) =>
+          `${theme.colors.primaryHighEmphasis} !important`};
+
         svg path {
-          fill: ${({ theme }) => `${theme.colors.primaryHighEmphasis} !important`};
+          fill: ${({ theme }) =>
+            `${theme.colors.primaryHighEmphasis} !important`};
         }
       }
     }
@@ -211,10 +215,10 @@ export const Header = (props) => {
     setNetWorkItems(temp);
   }, [networkName]);
 
-  useEffect(()=>{
-    api.emit("connecting", props.isLoading)
+  useEffect(() => {
+    api.emit("connecting", props.isLoading);
     // setConnecting(props.isLoading)
-  }, [props.isLoading])
+  }, [props.isLoading]);
 
   useEffect(() => {
     const tabIndex = localStorage.getItem("tab_index");
@@ -248,30 +252,26 @@ export const Header = (props) => {
       case 1:
         setIndex(newIndex);
         localStorage.setItem("tab_index", newIndex);
+        history.push("/swap");
+        break;
+
+      case 2:
+        setIndex(newIndex);
+        localStorage.setItem("tab_index", newIndex);
         history.push("bridge");
         break;
-      case 2:
+      case 3:
         setIndex(newIndex);
         localStorage.setItem("tab_index", newIndex);
         history.push("/list-pair");
         break;
-      case 3:
-        window.open("https://docs.zigzag.exchange/", "_blank");
-        break;
       case 4:
-        setIndex(newIndex);
-        localStorage.setItem("tab_index", newIndex);
-        history.push("/dsl");
+        window.open("https://docs.zigzag.exchange/", "_blank");
         break;
       case 5:
         setIndex(newIndex);
         localStorage.setItem("tab_index", newIndex);
-        history.push("/swap");
-        break;
-      case 6:
-        setIndex(newIndex);
-        localStorage.setItem("tab_index", newIndex);
-        history.push("oldbridge");
+        history.push("/dsl");
         break;
       default:
         break;
@@ -318,7 +318,7 @@ export const Header = (props) => {
               style={{ paddingTop: "20px" }}
             >
               <Tab>TRADE</Tab>
-
+              {hasBridge && <Tab>CONVERT</Tab>}
               {hasBridge && <Tab>BRIDGE</Tab>}
               <Tab>LIST PAIR</Tab>
               {hasBridge && (
@@ -328,7 +328,7 @@ export const Header = (props) => {
                 </Tab>
               )}
               {hasBridge && <Tab>DSL</Tab>}
-              {hasBridge && <Tab>SWAP</Tab>}
+
               {/* {hasBridge && <Tab>Old BRIDGE</Tab>} */}
             </TabMenu>
           </NavWrapper>
@@ -404,6 +404,7 @@ export const Header = (props) => {
           )}
           <TabMenu row activeIndex={index} onItemClick={handleClick}>
             <Tab>TRADE</Tab>
+            {hasBridge && <Tab>CONVERT</Tab>}
             {hasBridge && <Tab>BRIDGE</Tab>}
             <Tab>LIST PAIR</Tab>
             {hasBridge && (
@@ -413,7 +414,6 @@ export const Header = (props) => {
               </Tab>
             )}
             {hasBridge && <Tab>DSL</Tab>}
-            {hasBridge && <Tab>SWAP</Tab>}
           </TabMenu>
           <HorizontalDivider />
           <ActionSideMenuWrapper>

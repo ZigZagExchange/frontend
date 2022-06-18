@@ -35,7 +35,7 @@ const BridgeContainer = () => {
   const [sellToken, setSellToken] = useState();
   const [loading, setLoading] = useState(false);
   const [tokenLoading, setTokenLoading] = useState(false);
-  const [fromAmounts, setFromAmounts] = useState(0);
+  const [fromAmounts, setFromAmounts] = useState();
 
   const user = useSelector(userSelector);
   const balanceData = useSelector(balancesSelector);
@@ -156,22 +156,22 @@ const BridgeContainer = () => {
       api.getPolygonWethBalance();
       setSwapDetails({ amount: "", currency: "WETH" });
       setSellToken({ id: 0, name: "WETH" });
-      setFromAmounts(0);
+      setFromAmounts();
     } else if (fromNetwork.id === "ethereum") {
       api.getWalletBalances();
       const currency = switchClicking ? swapDetails.currency : "ETH";
       setSwapDetails({ amount: "", currency });
       setSellToken({ id: 0, name: currency });
-      setFromAmounts(0);
+      setFromAmounts();
     } else if (fromNetwork.id === "zksync" && toNetwork.id === "ethereum") {
       const currency = switchClicking ? swapDetails.currency : "ETH";
       setSwapDetails({ amount: "", currency });
       setSellToken({ id: 0, name: currency });
-      setFromAmounts(0);
+      setFromAmounts();
     } else if (fromNetwork.id === "zksync" && toNetwork.id === "polygon") {
       setSwapDetails({ amount: "", currency: "ETH" });
       setSellToken({ id: 0, name: "ETH" });
-      setFromAmounts(0);
+      setFromAmounts();
     }
     setSwitchClicking(false);
   }, [toNetwork, fromNetwork]);

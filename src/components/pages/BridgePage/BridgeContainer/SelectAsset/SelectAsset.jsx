@@ -61,7 +61,7 @@ const SelectAsset = ({
       max = parseFloat(
         (balances[swapDetails.currency] &&
           balances[swapDetails.currency].valueReadable) ||
-        0
+          0
       );
     }
 
@@ -74,10 +74,10 @@ const SelectAsset = ({
           Select an Asset
         </p>
         {swapDetails.currency !== "ETH" &&
-          fromNetwork.id !== "polygon" &&
-          (swapCurrencyInfo?.decimals
-            ? swapDetails.amount * 10 ** swapCurrencyInfo?.decimals
-            : 0) > allowance ? (
+        fromNetwork.id !== "polygon" &&
+        (swapCurrencyInfo?.decimals
+          ? swapDetails.amount * 10 ** swapCurrencyInfo?.decimals
+          : 0) > allowance ? (
           <p className="text-xs font-work">
             Available allowance:{" "}
             {ethersUtils.formatUnits(allowance, swapCurrencyInfo?.decimals)}
@@ -92,7 +92,7 @@ const SelectAsset = ({
           {` ${swapDetails.currency}`}
         </p>
       </div>
-      <div className="flex items-center justify-between px-3 py-2 mt-2 rounded-lg dark:bg-foreground-200 bg-primary-300">
+      <div className="flex items-center justify-between px-3 py-2 mt-2 rounded-lg dark:bg-foreground-200 bg-primary-300 hover:ring-1 hover:ring-offset-0 hover:dark:ring-foreground-500 hover:ring-primary-600">
         {isOpenable && fromTokenOptions.length > 0 && (
           <TokenDropDownModal
             tickers={fromTokenOptions}

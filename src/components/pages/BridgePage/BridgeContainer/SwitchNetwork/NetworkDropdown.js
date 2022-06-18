@@ -9,7 +9,7 @@ const NetworkDropdown = ({ options, setSelectedItem, selectedItem }) => {
 
   return (
     <ListBoxSelect value={selectedItem} onChange={setSelectedItem}>
-      <ListBoxSelect.Button className="relative w-full py-2 pl-3 pr-10 text-sm text-left rounded-lg dark:bg-foreground-200 bg-primary-300">
+      <ListBoxSelect.Button className="relative w-full py-2 pl-3 pr-10 text-sm text-left rounded-lg hover:bg-primary-400 dark:bg-foreground-200 bg-primary-300 hover:dark:bg-foreground-100">
         <div className="flex items-start gap-2">
           <img
             src={selectedItem.icon}
