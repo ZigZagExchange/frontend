@@ -45,7 +45,7 @@ const TradeRatesCard = ({ updateMarketChain, marketSummary, rowData, currentMark
         <RatesCardsWrapper>
           <RatesCard>
             <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Price</Text>
-            <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{marketSummary.price}</Text>
+            <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{marketSummary.price ? marketSummary.price : '--'}</Text>
           </RatesCard>
           {/* <RatesCard>
             <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h Change</Text>
@@ -61,8 +61,8 @@ const TradeRatesCard = ({ updateMarketChain, marketSummary, rowData, currentMark
               <>
                 <RatesCard>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h Change</Text>
-                  <Text font="primaryMediumSmallSemiBold" color={parseFloat(marketSummary["priceChange"]) >= 0 ? "successHighEmphasis" : "dangerHighEmphasis"}>
-                    {marketSummary.priceChange && formatPrice(marketSummary.priceChange / 1)}{" "}{percentChange !== 'NaN' && `${percentChange}%`}
+                  <Text font="primaryMediumSmallSemiBold" color={percentChange === 'NaN' ? "black" : (parseFloat(marketSummary["priceChange"]) >= 0 ? "successHighEmphasis" : "dangerHighEmphasis")}>
+                    {marketSummary.priceChange && formatPrice(marketSummary.priceChange / 1)}{" "}{percentChange !== 'NaN' ? `${percentChange}%` : '--'}
                   </Text>
                 </RatesCard>
                 <RatesCard>

@@ -186,7 +186,7 @@ const AccountDropdown = ({ notext, networkName }) => {
   }
 
   const popoutzkScan = () => {
-    if (user.id && user.address) {
+    if (user.address) {
       if (selectedLayer === 1) {
         if (networkName.includes('Rinkeby')) {
           window.open(`https://rinkeby.etherscan.io/address/${user.address}`, "_blank");
