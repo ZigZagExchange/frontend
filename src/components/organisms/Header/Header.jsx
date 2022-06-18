@@ -211,7 +211,7 @@ export const Header = (props) => {
     setNetWorkItems(temp);
   }, [networkName]);
 
-  useEffect(()=>{
+  useEffect(() => {
     api.emit("connecting", props.isLoading)
     // setConnecting(props.isLoading)
   }, [props.isLoading])

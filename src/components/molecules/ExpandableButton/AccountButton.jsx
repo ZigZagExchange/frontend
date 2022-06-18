@@ -5,6 +5,7 @@ import { userSelector } from "lib/store/features/auth/authSlice";
 import { IconButton as baseIcon } from "../IconButton";
 import { CaretUpIcon, CaretDownIcon } from '../../atoms/Svg'
 import Text from '../../atoms/Text/Text'
+import { settingsSelector } from "lib/store/features/api/apiSlice";
 
 const IconButton = styled(baseIcon)`
     background-color: transparent;
@@ -22,15 +23,16 @@ const AvatarImg = styled.img`
 
 const AccountButton = ({ ...props }) => {
     const user = useSelector(userSelector);
+    const settings = useSelector(settingsSelector);
     const { profile } = user;
 
-	const { expanded, notext, onClick } = props
+    const { expanded, notext, onClick } = props
 
-	return (
-		user.id && user.address ? <IconButton variant="secondary" onClick={onClick} startIcon={<AvatarImg notext={notext} src={profile.image} alt={profile.name} />} endIcon={expanded ? <CaretUpIcon /> : <CaretDownIcon />}>
-			{ notext ? null : <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{profile.name}</Text>}
-		</IconButton> : null
-	)
+    return (
+        user.id && user.address ? <IconButton variant="secondary" onClick={onClick} startIcon={<AvatarImg notext={notext} src={profile.image} alt={profile.name} />} endIcon={expanded ? <CaretUpIcon /> : <CaretDownIcon />}>
+            {notext ? null : <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{settings.hideAddress ? "*****...*****" : profile.name}</Text>}
+        </IconButton> : null
+    )
 }
 
 export default AccountButton;
