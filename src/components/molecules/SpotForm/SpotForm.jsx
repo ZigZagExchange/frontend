@@ -146,9 +146,12 @@ export class SpotForm extends React.Component {
     const marketInfo = this.props.marketInfo;
     baseBalance = parseFloat(baseBalance);
     quoteBalance = parseFloat(quoteBalance);
+    let baseAmountMsg, quoteAmountMsg;
     if (this.props.side === "s") {
       baseAmount = baseAmount ? baseAmount : (quoteAmount / price);
       quoteAmount = 0;
+      baseAmountMsg = baseAmount;
+      quoteAmountMsg = baseAmount * price;
 
       if (isNaN(baseBalance)) {
         toast.error(`No ${marketInfo.baseAsset.symbol} balance`, {
@@ -199,6 +202,8 @@ export class SpotForm extends React.Component {
     } else if (this.props.side === "b") {
       quoteAmount = quoteAmount ? quoteAmount : (baseAmount * price);
       baseAmount = 0;
+      quoteAmountMsg = quoteAmount;
+      baseAmountMsg = quoteAmount / price;
 
       if (isNaN(quoteBalance)) {
         toast.error(`No ${marketInfo.quoteAsset.symbol} balance`, {
@@ -251,14 +256,12 @@ export class SpotForm extends React.Component {
     let newstate = { ...this.state };
     newstate.orderButtonDisabled = true;
     this.setState(newstate);
-    let orderPendingToast;
-    if (api.isZksyncChain()) {
-      orderPendingToast = toast.info(
-        "Order pending. Sign or Cancel to continue...", {
-        toastId: "Order pending. Sign or Cancel to continue...",
+    let orderPendingToast = toast.info(
+      `Your ${this.props.side === 's' ? 'sell' : 'buy'} Order for ${baseAmountMsg} ${marketInfo.baseAsset.symbol} @ ${quoteAmountMsg} ${marketInfo.quoteAsset.symbol} is pending. Sign or Cancel to continue...`, {
+      toastId: "Order pending",
       }
-      );
-    }
+    );
+
 
     try {
       await api.submitOrder(
@@ -274,9 +277,7 @@ export class SpotForm extends React.Component {
       toast.error(e.message);
     }
 
-    if (api.isZksyncChain()) {
-      toast.dismiss(orderPendingToast);
-    }
+    toast.dismiss(orderPendingToast);
     newstate = { ...this.state };
     newstate.orderButtonDisabled = false;
     this.setState(newstate);
