@@ -121,6 +121,7 @@ export class SpotForm extends React.Component {
       return;
     }
 
+    price = Number(price);
     if (price < 0) {
       toast.error(`Price (${price}) can't be below 0`, {
         toastId: `Price (${price}) can't be below 0`,
