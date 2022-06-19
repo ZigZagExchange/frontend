@@ -21,7 +21,7 @@ export class SpotForm extends React.Component {
       baseAmount: "",
       totalAmount: "",
       quoteAmount: "",
-      orderButtonDisabled: false,
+      orderButtonDisabled: true,
       maxSizeSelected: false,
     };
   }
@@ -60,12 +60,18 @@ export class SpotForm extends React.Component {
 
   updateAmount(e) {
     const newState = { ...this.state };
+    if(Number.isNaN(e.target.value) || Number(e.target.value) === 0) {
+      newState.orderButtonDisabled = true;
+    } else {
+      newState.orderButtonDisabled = false;
+    }
     newState.baseAmount = (rx_live.test(e.target.value)) ? e.target.value : this.state.baseAmount;
     newState.quoteAmount = "";
     newState.baseAmount === "" ? newState.totalAmount = "" :
       newState.totalAmount = this.props.orderType === "limit" ?
         (this.currentPrice() * newState.baseAmount).toPrecision(6) :
         (this.props.marketSummary.price * newState.baseAmount).toPrecision(6);
+        
     this.setState(newState);
   }
 
