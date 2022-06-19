@@ -342,12 +342,15 @@ export class SpotForm extends React.Component {
     let newstate = { ...this.state };
     newstate.orderButtonDisabled = true;
     this.setState(newstate);
-    const orderPendingToast = toast.info(
-      renderGuidContent(), {
-      toastId: "Order pending",
-      autoClose: false,
-      }
-    );
+    let orderPendingToast;
+    if (this.props.settings.showFillNotification) {
+      orderPendingToast = toast.info(
+        renderGuidContent(), {
+        toastId: "Order pending",
+        autoClose: false,
+        }
+      );
+    }
 
 
     try {
