@@ -150,8 +150,8 @@ export class SpotForm extends React.Component {
     if (this.props.side === "s") {
       baseAmount = baseAmount ? baseAmount : (quoteAmount / price);
       quoteAmount = 0;
-      baseAmountMsg = baseAmount;
-      quoteAmountMsg = baseAmount * price;
+      baseAmountMsg = formatPrice(baseAmount);
+      quoteAmountMsg = formatPrice(baseAmount * price);
 
       if (isNaN(baseBalance)) {
         toast.error(`No ${marketInfo.baseAsset.symbol} balance`, {
@@ -202,8 +202,8 @@ export class SpotForm extends React.Component {
     } else if (this.props.side === "b") {
       quoteAmount = quoteAmount ? quoteAmount : (baseAmount * price);
       baseAmount = 0;
-      quoteAmountMsg = quoteAmount;
-      baseAmountMsg = quoteAmount / price;
+      quoteAmountMsg = formatPrice(quoteAmount);
+      baseAmountMsg = formatPrice(quoteAmount / price);
 
       if (isNaN(quoteBalance)) {
         toast.error(`No ${marketInfo.quoteAsset.symbol} balance`, {
