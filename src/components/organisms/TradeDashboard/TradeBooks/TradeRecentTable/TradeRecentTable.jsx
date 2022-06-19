@@ -33,11 +33,11 @@ const Table = styled.table`
 
   th {
     text-transform: uppercase;
-    padding: 6px 0px;
+    padding: 2px 0px;
   }
 
   th:nth-child(1), td:nth-child(1) {
-    width: 30%;
+    width: 25%;
     text-align: start;
     padding-left: 0px;
   }
@@ -48,7 +48,7 @@ const Table = styled.table`
   }
   
   th:nth-child(3), td:nth-child(3) {
-    width: 30%;
+    width: 40%;
     text-align: right;
     white-space: nowrap;
     padding-right: 0px;

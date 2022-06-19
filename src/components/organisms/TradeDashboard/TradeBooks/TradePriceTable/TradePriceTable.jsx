@@ -44,11 +44,11 @@ const Table = styled.table`
   
   th {
     text-transform: uppercase;
-    padding: 6px 0px;
+    padding: 2px 0px;
   }
 
   th:nth-child(1), td:nth-child(1) {
-    width: 25%;
+    width: 20%;
     text-align: start;
     padding-left: 0px;
   }
@@ -59,7 +59,7 @@ const Table = styled.table`
   }
 
   th:nth-child(3), td:nth-child(3) {
-    width: 35%;
+    width: 40%;
     text-align: right;
     white-space: nowrap;
     padding-right: 0px;
@@ -130,7 +130,7 @@ const TradePriceTable = (props) => {
           <tr>
             <th><Text font="tableHeader" color="foregroundLowEmphasis">Price</Text></th>
             <th><Text font="tableHeader" color="foregroundLowEmphasis" textAlign="right">Amount</Text></th>
-            <th><Text font="tableHeader" color="foregroundLowEmphasis" textAlign="right">Total ({marketInfo && marketInfo.quoteAsset.symbol})</Text></th>
+            <th><Text font="tableHeader" color="foregroundLowEmphasis" textAlign="right">Total({marketInfo && marketInfo.quoteAsset.symbol})</Text></th>
           </tr>
         </thead>
       )}

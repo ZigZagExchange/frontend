@@ -72,8 +72,8 @@ const primaryExtraSmallSemiBold = {
 
 const tableHeader = {
   fontFamily: 'WorkSans-SemiBold',
-  fontSize: '12px',
-  lineHeight: '14px',
+  fontSize: '11px',
+  lineHeight: '13px',
 }
 
 const primaryMediumBody = {
