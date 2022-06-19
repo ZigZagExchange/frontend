@@ -146,12 +146,11 @@ export class SpotForm extends React.Component {
     const marketInfo = this.props.marketInfo;
     baseBalance = parseFloat(baseBalance);
     quoteBalance = parseFloat(quoteBalance);
-    let baseAmountMsg, quoteAmountMsg;
+    let baseAmountMsg;
     if (this.props.side === "s") {
       baseAmount = baseAmount ? baseAmount : (quoteAmount / price);
       quoteAmount = 0;
       baseAmountMsg = formatPrice(baseAmount);
-      quoteAmountMsg = formatPrice(baseAmount * price);
 
       if (isNaN(baseBalance)) {
         toast.error(`No ${marketInfo.baseAsset.symbol} balance`, {
@@ -202,7 +201,6 @@ export class SpotForm extends React.Component {
     } else if (this.props.side === "b") {
       quoteAmount = quoteAmount ? quoteAmount : (baseAmount * price);
       baseAmount = 0;
-      quoteAmountMsg = formatPrice(quoteAmount);
       baseAmountMsg = formatPrice(quoteAmount / price);
 
       if (isNaN(quoteBalance)) {
@@ -257,7 +255,7 @@ export class SpotForm extends React.Component {
     newstate.orderButtonDisabled = true;
     this.setState(newstate);
     let orderPendingToast = toast.info(
-      `Your ${this.props.side === 's' ? 'sell' : 'buy'} Order for ${baseAmountMsg} ${marketInfo.baseAsset.symbol} @ ${quoteAmountMsg} ${marketInfo.quoteAsset.symbol} is pending. Sign or Cancel to continue...`, {
+      `Your ${this.props.side === 's' ? 'sell' : 'buy'} Order for ${baseAmountMsg} ${marketInfo.baseAsset.symbol} @ ${price} ${marketInfo.quoteAsset.symbol} is pending. Sign or Cancel to continue...`, {
       toastId: "Order pending",
       }
     );
