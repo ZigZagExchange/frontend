@@ -224,9 +224,11 @@ export class SpotForm extends React.Component {
     const marketInfo = this.props.marketInfo;
     baseBalance = parseFloat(baseBalance);
     quoteBalance = parseFloat(quoteBalance);
+    let baseAmountMsg;
     if (this.props.side === "s") {
       baseAmount = baseAmount ? baseAmount : (quoteAmount / price);
       quoteAmount = 0;
+      baseAmountMsg = formatPrice(baseAmount);
 
       if (isNaN(baseBalance)) {
         toast.error(`No ${marketInfo.baseAsset.symbol} balance`, {
@@ -277,6 +279,7 @@ export class SpotForm extends React.Component {
     } else if (this.props.side === "b") {
       quoteAmount = quoteAmount ? quoteAmount : (baseAmount * price);
       baseAmount = 0;
+      baseAmountMsg = formatPrice(quoteAmount / price);
 
       if (isNaN(quoteBalance)) {
         toast.error(`No ${marketInfo.quoteAsset.symbol} balance`, {
@@ -326,17 +329,29 @@ export class SpotForm extends React.Component {
       }
     }
 
+    const renderGuidContent = () => {
+      return <div>
+        <p style={{fontSize: '14px', lineHeight:'24px'}}>{this.props.side === 's' ? 'Sell' : 'Buy'} Order pending</p>
+        <p style={{fontSize: '14px', lineHeight:'24px'}}>{baseAmountMsg} {marketInfo.baseAsset.symbol} @ {
+            ['USDC', 'USDT', 'DAI', 'FRAX'].includes(marketInfo.quoteAsset.symbol) ? price.toFixed(2) : formatPrice(price)
+          } {marketInfo.quoteAsset.symbol}</p>
+        <p style={{fontSize: '14px', lineHeight:'24px'}}>Sign or Cancel to continue...</p>
+      </div>
+    }
+
     let newstate = { ...this.state };
     newstate.orderButtonDisabled = true;
     this.setState(newstate);
     let orderPendingToast;
-    if (api.isZksyncChain() && this.props.settings.showFillNotification) {
+    if (this.props.settings.showFillNotification) {
       orderPendingToast = toast.info(
-        "Order pending. Sign or Cancel to continue...", {
-        toastId: "Order pending. Sign or Cancel to continue...",
-      }
+        renderGuidContent(), {
+        toastId: "Order pending",
+        autoClose: false,
+        }
       );
     }
+
 
     try {
       await api.submitOrder(
@@ -358,9 +373,7 @@ export class SpotForm extends React.Component {
       toast.error(e.message);
     }
 
-    if (api.isZksyncChain()) {
-      toast.dismiss(orderPendingToast);
-    }
+    toast.dismiss(orderPendingToast);
     newstate = { ...this.state };
     newstate.orderButtonDisabled = false;
     this.setState(newstate);
