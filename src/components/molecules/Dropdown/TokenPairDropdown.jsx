@@ -39,7 +39,7 @@ const DropdownDisplay = styled.div`
   background: ${({ theme }) => theme.colors.backgroundLowEmphasis};
   border: 1px solid ${({ theme }) => theme.colors.foreground400};
   top: 45px;
-  left: 0px;
+  left: -20px;
   opacity: 1;
   display: flex;
   flex-direction: column;
