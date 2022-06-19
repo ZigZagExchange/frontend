@@ -253,9 +253,10 @@ export class SpotForm extends React.Component {
 
     const renderGuidContent = () => {
       return <div>
-        <p style={{fontSize: '14px', lineHeight:'24px'}}>${this.props.side === 's' ? 'sell' : 'buy'} Order pending</p>
-        <p style={{fontSize: '14px', lineHeight:'24px'}}>${baseAmountMsg} ${marketInfo.baseAsset.symbol} @ ${
-          ['USDC', 'USDT', 'DAI', 'FRAX'].includes(marketInfo.quoteAsset.symbol) ? price.toFixed(2) : formatPrice(price)}</p>
+        <p style={{fontSize: '14px', lineHeight:'24px'}}>{this.props.side === 's' ? 'Sell' : 'Buy'} Order pending</p>
+        <p style={{fontSize: '14px', lineHeight:'24px'}}>{baseAmountMsg} {marketInfo.baseAsset.symbol} @ ${
+            ['USDC', 'USDT', 'DAI', 'FRAX'].includes(marketInfo.quoteAsset.symbol) ? price.toFixed(2) : formatPrice(price)
+          } {marketInfo.quoteAsset.symbol}</p>
         <p style={{fontSize: '14px', lineHeight:'24px'}}>Sign or Cancel to continue...</p>
       </div>
     }
@@ -266,6 +267,7 @@ export class SpotForm extends React.Component {
     let orderPendingToast = toast.info(
       renderGuidContent(), {
       toastId: "Order pending",
+      autoClose: false,
       }
     );
 
