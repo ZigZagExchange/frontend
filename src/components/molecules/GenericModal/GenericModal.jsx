@@ -51,8 +51,8 @@ const GenericModal = ({
 }) => {
     return isOpened ? (
         <>
-                <ModalOverlay>
-                    <Modal width={width} height={height} {...props}>
+                <ModalOverlay onClick={onClose}>
+                    <Modal width={width} height={height} {...props} onClick={(e) => e.stopPropagation()}>
                         {onClose && (
                             <CloseWrapper>
                                 <CloseButton onClick={onClose}>
