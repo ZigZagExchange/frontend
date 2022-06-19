@@ -343,9 +343,9 @@ export class SpotForm extends React.Component {
       );
 
       if (this.props.settings.showFillNotification) {
-        toast.success(
-          "Transaction Successful", {
-          toastId: "Transaction Successful",
+        toast.info(
+          "Order placed", {
+          toastId: "Order placed.",
         });
       }
     } catch (e) {
