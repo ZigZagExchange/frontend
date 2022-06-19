@@ -375,21 +375,19 @@ export const Header = (props) => {
               <ToggleTheme isDark={isDark} toggleTheme={toggleTheme} />
             </LanguageWrapper>
             <VerticalDivider />
-            {user.address ? (
-              <>
-                <Dropdown
-                  adClass="network-dropdown"
-                  width={162}
-                  item={networkItems}
-                  context={networkName}
-                  clickFunction={changeNetwork}
-                  leftIcon={true}
-                />
-                <AccountDropdown networkName={networkName} />
-              </>
-            ) : (
+
+            <Dropdown
+              adClass="network-dropdown"
+              width={162}
+              item={networkItems}
+              context={networkName}
+              clickFunction={changeNetwork}
+              leftIcon={true}
+            />
+            {user.address ? 
+              <AccountDropdown networkName={networkName} /> :
               <ConnectWalletButton />
-            )}
+            }
           </ActionsWrapper>
         </>
       )}
