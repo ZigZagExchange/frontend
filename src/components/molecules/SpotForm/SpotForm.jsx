@@ -255,7 +255,9 @@ export class SpotForm extends React.Component {
     newstate.orderButtonDisabled = true;
     this.setState(newstate);
     let orderPendingToast = toast.info(
-      `Your ${this.props.side === 's' ? 'sell' : 'buy'} Order for ${baseAmountMsg} ${marketInfo.baseAsset.symbol} @ ${price} ${marketInfo.quoteAsset.symbol} is pending. Sign or Cancel to continue...`, {
+      `Your ${this.props.side === 's' ? 'sell' : 'buy'} Order for ${baseAmountMsg} ${marketInfo.baseAsset.symbol} @ ${
+        ['USDC', 'USDT', 'DAI', 'FRAX'].includes(marketInfo.quoteAsset.symbol) ? price.toFixed(2) : formatPrice(price)} ${
+          marketInfo.quoteAsset.symbol} is pending. Sign or Cancel to continue...`, {
       toastId: "Order pending",
       }
     );
