@@ -95,11 +95,12 @@ const Label = ({
     <x.label
       for={name}
       mb={1}
-      fontSize={{xs: 'xs', md: '14px'}}
+      fontSize={{ xs: 'xs', md: '14px' }}
       color={"blue-gray-500"}
       display={"flex"}
       justifyContent={rightOfLabel ? "space-between" : "inherit"}
       alignItems={"center"}
+      className="custom-form-label"
     >
       <x.div>
         {isRequired && (
@@ -108,7 +109,7 @@ const Label = ({
             display={"inline-block"}
             mr={0.5}
           >
-            *
+            {/* * */}
           </x.span>
         )}
         {children}

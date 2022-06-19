@@ -1,42 +1,142 @@
 import React, { useEffect, useState, useMemo } from "react";
-import {
-  constants as ethersConstants,
-  utils as ethersUtils
-} from 'ethers';
+import { constants as ethersConstants, utils as ethersUtils } from "ethers";
 import { useSelector } from "react-redux";
 import isEmpty from "lodash/isEmpty";
-import { SwapButton, Button, useCoinEstimator } from "components";
+import { SwapButton, useCoinEstimator, QuestionHelper } from "components";
 import {
   networkSelector,
   balancesSelector,
   userOrdersSelector
 } from "lib/store/features/api/apiSlice";
-import Loader from "react-loader-spinner";
 import { userSelector } from "lib/store/features/auth/authSlice";
+import { Box } from "@material-ui/core";
+import { toast } from "react-toastify";
+import styled from "styled-components";
+
 import api from "lib/api";
 import { MAX_ALLOWANCE } from "lib/api/constants";
 import { formatUSD, formatPrice } from "lib/utils";
-import cx from "classnames";
-import { BiError } from "react-icons/bi";
-import { MdSwapCalls } from "react-icons/md";
-import BridgeSwapInput from "../BridgeSwapInput/BridgeSwapInput";
-import ConnectWalletButton from "../../../atoms/ConnectWalletButton/ConnectWalletButton";
-import Pane from "../../../atoms/Pane/Pane";
-import { x } from "@xstyled/styled-components";
-import RadioButtons from "../../../atoms/RadioButtons/RadioButtons";
-import L2Header from "./L2Header";
-import L1Header from "./L1Header";
-import FastWithdrawTooltip from "./FastWithdrawTooltip";
 import {
   NETWORKS,
   ZKSYNC_ETHEREUM_FAST_BRIDGE,
-  ZKSYNC_POLYGON_BRIDGE
-} from "./constants"
-import { toast } from "react-toastify";
+  ZKSYNC_POLYGON_BRIDGE,
+} from "./constants";
+import RadioButtons from "components/atoms/RadioButtons/RadioButtons";
+import { Button, ConnectWalletButton } from "components/molecules/Button";
+import BridgeSwapInput from "../BridgeSwapInput/BridgeSwapInput";
+import L2Header from "./L2Header";
+import L1Header from "./L1Header";
+import { BridgeInputBox } from "../BridgeSwapInput/BridgeSwapInput";
+import { LoadingSpinner } from "components/atoms/LoadingSpinner";
+import { ExternalLinkIcon } from "components/atoms/Svg";
+import Text from "components/atoms/Text/Text";
 
 const defaultTransfer = {
   type: "deposit",
 };
+
+export const BridgeBox = styled.div`
+  padding: 2rem;
+  border: 1px solid ${({ theme }) => theme.colors.foreground400};
+  border-radius: 1rem;
+
+  .layer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 13px;
+
+    &:not(:last-child) {
+      margin-bottom: 15px;
+    }
+
+    &.layer-end {
+      justify-content: flex-end;
+      align-items: center;
+
+      p {
+        color: ${(p) => p.theme.colors.foregroundHighEmphasis};
+        opacity: 0.72;
+      }
+    }
+  }
+
+  .spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .bridge_coin_details {
+    .svg {
+      color: ${(p) => p.theme.colors.foregroundHighEmphasis};
+    }
+  }
+
+  .bridge_coin_image {
+    width: 26px;
+    height: 26px;
+    text-align: center;
+    overflow: hidden;
+    border-radius: 50%;
+  }
+
+  .bridge_coin_name {
+    font-size: 16px;
+    font-weight: 600;
+    color: ${(p) => p.theme.colors.foregroundHighEmphasis};
+
+    span {
+      font-size: 12px;
+    }
+  }
+
+  .font-thin {
+    font-weight: 400;
+  }
+
+  .maxLink {
+    font-size: 10px;
+  }
+
+  .bridge_bubble_connected,
+  .bridge_bubble_disconnected {
+    border: 1px solid ${(p) => p.theme.colors.foregroundHighEmphasis};
+  }
+
+  h3 {
+    color: ${(p) => p.theme.colors.foregroundHighEmphasis};
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  h4 {
+    color: ${(p) => p.theme.colors.foregroundHighEmphasis};
+    font-size: 12px;
+  }
+
+  p {
+    font-size: 10px;
+    font-weight: 400;
+    color: ${(p) => p.theme.colors.foregroundHighEmphasis};
+  }
+
+  span {
+    color: ${(p) => p.theme.colors.foregroundHighEmphasis};
+  }
+`;
+
+const CustomSwapButton = styled(SwapButton)`
+  position: absolute;
+  left: 50%;
+  width: 34px;
+  height: 34px;
+  transform: translateX(-50%);
+`;
+
+const ActionWrapper = styled(Text)`
+  text-decoration: underline;
+  cursor: pointer;
+`;
 
 const Bridge = (props) => {
   const user = useSelector(userSelector);
@@ -52,11 +152,11 @@ const Bridge = (props) => {
   const [swapCurrencyInfo, setSwapCurrencyInfo] = useState({ decimals: 0 });
   const [allowance, setAllowance] = useState(ethersConstants.Zero);
   const [hasAllowance, setHasAllowance] = useState(false);
-  const [fromNetwork, setFromNetwork] = useState(NETWORKS[0])
-  const [toNetwork, setToNetwork] = useState(fromNetwork.to[0])
+  const [fromNetwork, setFromNetwork] = useState(NETWORKS[0]);
+  const [toNetwork, setToNetwork] = useState(fromNetwork.to[0]);
   const [balances, setBalances] = useState([]);
   const [altBalances, setAltBalances] = useState([]);
-  const [polygonLoding, setPolygonLoading] = useState(false)
+  const [polygonLoding, setPolygonLoading] = useState(false);
   const [swapDetails, _setSwapDetails] = useState(() => ({
     amount: "",
     currency: "ETH",
@@ -77,9 +177,18 @@ const Bridge = (props) => {
     {}
   );
 
-  const walletBalances = useMemo(()=> (balanceData.wallet) ? balanceData.wallet : {}, [balanceData.wallet])
-  const zkBalances = useMemo(()=> (balanceData[network]) ? balanceData[network] : {} , [balanceData, network])
-  const polygonBalances = useMemo(()=> (balanceData.polygon) ? balanceData.polygon : {}, [balanceData.polygon])
+  const walletBalances = useMemo(
+    () => (balanceData.wallet ? balanceData.wallet : {}),
+    [balanceData.wallet]
+  );
+  const zkBalances = useMemo(
+    () => (balanceData[network] ? balanceData[network] : {}),
+    [balanceData, network]
+  );
+  const polygonBalances = useMemo(
+    () => (balanceData.polygon ? balanceData.polygon : {}),
+    [balanceData.polygon]
+  );
 
   const _getBalances = (_network) => {
     let balances = [];
@@ -93,77 +202,78 @@ const Bridge = (props) => {
       setFormErr("Bad Network");
     }
     return balances;
+  };
 
-  }
-
-  useEffect(async()=> {
-    if(!user.address) return;
+  useEffect(async () => {
+    if (!user.address) return;
     setBalances(_getBalances(fromNetwork.from.key));
     setAltBalances(_getBalances(toNetwork.key));
-  }, [toNetwork, user.address, walletBalances, zkBalances, polygonBalances])
+  }, [toNetwork, user.address, walletBalances, zkBalances, polygonBalances]);
 
   const [withdrawSpeed, setWithdrawSpeed] = useState("fast");
   const isFastWithdraw = () => {
-    return (withdrawSpeed === "fast" &&
+    return (
+      withdrawSpeed === "fast" &&
       transfer.type === "withdraw" &&
-      api.apiProvider.eligibleFastWithdrawTokens.includes(swapDetails.currency));
-  }
+      api.apiProvider.eligibleFastWithdrawTokens.includes(swapDetails.currency)
+    );
+  };
 
-  useEffect(()=>{
+  useEffect(() => {
     setHasError(formErr && formErr.length > 0);
-  }, [formErr])
+  }, [formErr]);
 
   const isSwapAmountEmpty = swapDetails.amount === "";
 
-  useEffect(()=>{
+  useEffect(() => {
     setHasAllowance(
       balances[swapDetails.currency] &&
       balances[swapDetails.currency].allowance.gte(MAX_ALLOWANCE.div(3))
     );
-  }, [toNetwork, swapDetails])
-
-  useEffect(()=>{
-    if(fromNetwork.from.key === 'zksync'){    
-      const type = transfer.type = "withdraw";
-      setTransfer({ type });
-    }
-    else{
-      api.getWalletBalances()
-      const type = transfer.type = "deposit";
-      setTransfer({ type });
-    }
-
-    if (fromNetwork.from.key === 'polygon') {
-      api.getPolygonWethBalance()
-      setSwapDetails({ amount: '', currency: 'WETH' })
-    }
-    else if (fromNetwork.from.key === 'ethereum') {
-      api.getWalletBalances()
-      const currency = switchClicking? swapDetails.currency: 'ETH';
-      setSwapDetails({ amount: '', currency });
-      
-    }
-    else if (fromNetwork.from.key === 'zksync' && toNetwork.key === 'ethereum') {
-      const currency = switchClicking? swapDetails.currency: 'ETH';
-      setSwapDetails({ amount: '', currency });
-    }
-    else if (fromNetwork.from.key === 'zksync' && toNetwork.key === 'polygon') {
-      setSwapDetails({ amount: '', currency: 'ETH' });
-    }
-    setSwitchClicking(false);
-  }, [toNetwork])
+  }, [toNetwork, swapDetails]);
 
   useEffect(() => {
-    let _swapCurrencyInfo = {}
-    if (swapDetails.currency === 'WETH'){
-      _swapCurrencyInfo = api.getCurrencyInfo('ETH');
+    if (fromNetwork.from.key === "zksync") {
+      const type = (transfer.type = "withdraw");
+      setTransfer({ type });
+    } else {
+      api.getWalletBalances();
+      const type = (transfer.type = "deposit");
+      setTransfer({ type });
     }
-    else {
+
+    if (fromNetwork.from.key === "polygon") {
+      api.getPolygonWethBalance();
+      setSwapDetails({ amount: "", currency: "WETH" });
+    } else if (fromNetwork.from.key === "ethereum") {
+      api.getWalletBalances();
+      const currency = switchClicking ? swapDetails.currency : "ETH";
+      setSwapDetails({ amount: "", currency });
+    } else if (
+      fromNetwork.from.key === "zksync" &&
+      toNetwork.key === "ethereum"
+    ) {
+      const currency = switchClicking ? swapDetails.currency : "ETH";
+      setSwapDetails({ amount: "", currency });
+    } else if (
+      fromNetwork.from.key === "zksync" &&
+      toNetwork.key === "polygon"
+    ) {
+      setSwapDetails({ amount: "", currency: "ETH" });
+    }
+    setSwitchClicking(false);
+  }, [toNetwork]);
+
+  useEffect(() => {
+    let _swapCurrencyInfo = {};
+    if (swapDetails.currency === "WETH") {
+      _swapCurrencyInfo = api.getCurrencyInfo("ETH");
+    } else {
       _swapCurrencyInfo = api.getCurrencyInfo(swapDetails.currency);
     }
 
-    setSwapCurrencyInfo(_swapCurrencyInfo)
-    
+    setSwapCurrencyInfo(_swapCurrencyInfo);
+
     if (swapDetails.currency === "ETH") {
       setAllowance(MAX_ALLOWANCE);
       setHasAllowance(true);
@@ -174,10 +284,11 @@ const Bridge = (props) => {
     }
 
     const swapAmountBN = ethersUtils.parseUnits(
-      isSwapAmountEmpty ? '0.0' : swapDetails.amount,
+      isSwapAmountEmpty ? "0.0" : swapDetails.amount,
       _swapCurrencyInfo?.decimals
     );
-    const allowanceBN = balances[swapDetails.currency]?.allowance ?? ethersConstants.Zero;
+    const allowanceBN =
+      balances[swapDetails.currency]?.allowance ?? ethersConstants.Zero;
     setAllowance(allowanceBN);
     setHasAllowance(allowanceBN.gte(swapAmountBN));
   }, [balances, swapDetails, isSwapAmountEmpty]);
@@ -210,10 +321,7 @@ const Bridge = (props) => {
     }
 
     // update changePubKeyFee fee if needed
-    if (
-      user.address &&
-      api.apiProvider?.zksyncCompatible
-    ) {
+    if (user.address && api.apiProvider?.zksyncCompatible) {
       const usdFee = await api.apiProvider.changePubKeyFee();
       setUsdFee(usdFee);
       if (currencyValue) {
@@ -264,7 +372,10 @@ const Bridge = (props) => {
 
   const validateInput = (inputValue, swapCurrency) => {
     if (balances.length === 0) return false;
-    const getCurrencyBalance = (cur) => (balances[cur] && swapCurrencyInfo?.decimals ? balances[cur].value / (10 ** (swapCurrencyInfo.decimals)) : 0);
+    const getCurrencyBalance = (cur) =>
+      balances[cur] && swapCurrencyInfo?.decimals
+        ? balances[cur].value / 10 ** swapCurrencyInfo.decimals
+        : 0;
     const detailBalance = getCurrencyBalance(swapCurrency);
     const max = getMax(swapCurrency, L2FeeToken);
 
@@ -286,6 +397,13 @@ const Bridge = (props) => {
             error = `Max ${swapCurrency} liquidity for fast withdraw: ${maxAmount.toPrecision(
               4
             )}`;
+          } else if (
+            toNetwork.key !== "polygon" &&
+            L1FeeAmount !== null &&
+            L2FeeAmount !== null &&
+            inputValue < L2FeeAmount + L1FeeAmount
+          ) {
+            error = "Amount too small";
           }
         }
       }
@@ -323,13 +441,13 @@ const Bridge = (props) => {
   const validateFees = (inputValue, bridgeFee, feeCurrency) => {
     const feeCurrencyInfo = api.getCurrencyInfo(feeCurrency);
     if (balances.length === 0) return false;
-    const feeTokenBalance = parseFloat(balances[feeCurrency] && balances[feeCurrency].value / (10 ** feeCurrencyInfo.decimals))
+    const feeTokenBalance = parseFloat(
+      balances[feeCurrency] &&
+      balances[feeCurrency].value / 10 ** feeCurrencyInfo.decimals
+    );
 
-    if (
-      inputValue > 0 &&
-      bridgeFee > feeTokenBalance
-    ) {
-      setFormErr("Not enough balance to pay for fees")
+    if (inputValue > 0 && bridgeFee > feeTokenBalance) {
+      setFormErr("Not enough balance to pay for fees");
       return false;
     }
     return true;
@@ -343,7 +461,7 @@ const Bridge = (props) => {
     const isFeesValid = validateFees(input, bridgeFee, feeToken)
     if (isFeesValid && isInputValid) {
       setFormErr("");
-    } 
+    }
   };
 
   const setSwapDetails = async (values) => {
@@ -351,17 +469,19 @@ const Bridge = (props) => {
       ...swapDetails,
       ...values,
     };
-
     _setSwapDetails(details);
-  }
+  };
 
-  const calculateFees = async() => {
-    const input = parseFloat(swapDetails.amount) || 0
-    if ((input > 0 && input < 0.0001) && (fromNetwork.from.key === 'polygon' || toNetwork.key === 'polygon')) {
+  const calculateFees = async () => {
+    const input = parseFloat(swapDetails.amount) || 0;
+    if (
+      input > 0 &&
+      input < 0.0001 &&
+      (fromNetwork.from.key === "polygon" || toNetwork.key === "polygon")
+    ) {
       setFormErr("Insufficient amount");
       return;
-    }
-    else if(swapDetails.amount.includes('0.000') && input === 0){
+    } else if (swapDetails.amount.includes("0.000") && input === 0) {
       setFormErr("");
       return;
     }
@@ -420,13 +540,13 @@ const Bridge = (props) => {
     }
 
     setGasFetching(false);
-  }
+  };
 
-  const switchTransferType = (e) => {    
-      const f = NETWORKS.find(i => i.from.key === toNetwork.key)
-      setFromNetwork(f)
-      setToNetwork(fromNetwork.from)
-      setSwitchClicking(true);
+  const switchTransferType = (e) => {
+    const f = NETWORKS.find((i) => i.from.key === toNetwork.key);
+    setFromNetwork(f);
+    setToNetwork(fromNetwork.from);
+    setSwitchClicking(true);
   };
 
   const approveSpend = (e) => {
@@ -444,15 +564,24 @@ const Bridge = (props) => {
   };
 
   const renderGuidContent = () => {
-    return <div>
-      <p style={{fontSize: '14px', lineHeight:'24px'}}>1. Connect to Ethereum network</p>
-      <p style={{fontSize: '14px', lineHeight:'24px'}}>2. Click "transfer" on Polygon -> zkSync</p>
-      <p style={{fontSize: '14px', lineHeight:'24px'}}>3. Click "Switch network" to Polygon and wait</p>
-      <p style={{fontSize: '14px', lineHeight:'24px'}}>4. Click "Confirm" on transfer pop up and wait</p>
-      <p style={{fontSize: '14px', lineHeight:'24px'}}>5. Click "Switch network" to Ethereum</p>
-      <p style={{fontSize: '14px', lineHeight:'24px'}}>&nbsp;&nbsp;&nbsp;&nbsp;{`Activating a new zkSync wallet costs ~${usdFee}. Enjoy trading on ZigZag!`}</p>
-    </div>
-  }
+    return (
+      <div>
+        <p style={{ fontSize: "14px", lineHeight: "24px" }}>
+          1. Switch to Polygon network
+        </p>
+        <p style={{ fontSize: "14px", lineHeight: "24px" }}>
+          2. Sign the transaction and wait for confirmation
+        </p>
+        <p style={{ fontSize: "14px", lineHeight: "24px" }}>
+          3. Wait until "Switch Network" pops up
+        </p>
+        <p style={{ fontSize: "14px", lineHeight: "24px" }}>
+          4. Switch back to Ethereum mainnet. Activating a new zkSync wallet
+          costs ~$5. Enjoy trading on ZigZag!
+        </p>
+      </div>
+    );
+  };
 
   const doTransfer = (e) => {
     e.preventDefault();
@@ -460,29 +589,38 @@ const Bridge = (props) => {
     setLoading(true);
     if (fromNetwork.from.key === "polygon" && toNetwork.key === "zksync") {
       setPolygonLoading(true);
-      props.setLoading(true)
-      deferredXfer = api.transferPolygonWeth(`${swapDetails.amount}`, user.address)
-      toast.info(
-        renderGuidContent(),
-        {
-          closeOnClick: false,
-          autoClose: 15000,
-        },
+      props.setLoading(true);
+      deferredXfer = api.transferPolygonWeth(
+        `${swapDetails.amount}`,
+        user.address
       );
-    } else if (fromNetwork.from.key === "zksync" && toNetwork.key === "polygon") {
+      toast.info(renderGuidContent(), {
+        closeOnClick: false,
+        autoClose: 15000,
+      });
+    } else if (
+      fromNetwork.from.key === "zksync" &&
+      toNetwork.key === "polygon"
+    ) {
       deferredXfer = api.transferToBridge(
         `${swapDetails.amount}`,
         swapDetails.currency,
         ZKSYNC_POLYGON_BRIDGE.address,
         user.address
       );
-    } else if (fromNetwork.from.key === "ethereum" && toNetwork.key === "zksync") {
+    } else if (
+      fromNetwork.from.key === "ethereum" &&
+      toNetwork.key === "zksync"
+    ) {
       deferredXfer = api.depositL2(
         `${swapDetails.amount}`,
         swapDetails.currency,
         user.address
       );
-    } else if (fromNetwork.from.key === "zksync" && toNetwork.key === "ethereum") {
+    } else if (
+      fromNetwork.from.key === "zksync" &&
+      toNetwork.key === "ethereum"
+    ) {
       if (isFastWithdraw()) {
         deferredXfer = api.transferToBridge(
           `${swapDetails.amount}`,
@@ -497,10 +635,9 @@ const Bridge = (props) => {
         );
       }
     } else {
-      setFormErr("Wrong from/to combination")
+      setFormErr("Wrong from/to combination");
       return false;
     }
-
 
     deferredXfer
       .then(() => {
@@ -511,50 +648,122 @@ const Bridge = (props) => {
         setTimeout(() => api.getAccountState(), 1000);
       })
       .finally(() => {
-        setPolygonLoading(false)
-        props.setLoading(false)
+        setPolygonLoading(false);
+        props.setLoading(false);
         setLoading(false);
-        setSwapDetails({amount: ''});
+        setSwapDetails({ amount: "" });
       });
   };
 
   const onSelectFromNetwork = ({ key }) => {
-    const f = NETWORKS.find((i) => i.from.key === key)
-    setFromNetwork(f)
-    setToNetwork(f.to[0])
+    const f = NETWORKS.find((i) => i.from.key === key);
+    setFromNetwork(f);
+    setToNetwork(f.to[0]);
   };
 
   const onSelectToNetwork = ({ key }) => {
-    const t = fromNetwork.to.find((i) => i.key === key)
-    setToNetwork(t)
-  }
+    const t = fromNetwork.to.find((i) => i.key === key);
+    setToNetwork(t);
+  };
 
   const getToBalance = () => {
     let balance, unit;
-    if(fromNetwork.from.key === "polygon") {
-      balance = altBalances["ETH"] ? altBalances["ETH"].valueReadable : '0.00'
+    if (fromNetwork.from.key === "polygon") {
+      balance = altBalances["ETH"] ? altBalances["ETH"].valueReadable : "0.00";
       unit = "ETH";
-    } 
-    else if(toNetwork.key === "polygon") {
-      balance = altBalances["WETH"] ? altBalances["WETH"].valueReadable : '0.00'
+    } else if (toNetwork.key === "polygon") {
+      balance = altBalances["WETH"]
+        ? altBalances["WETH"].valueReadable
+        : "0.00";
       unit = "WETH";
-    } 
-    else {
-      balance = altBalances[swapDetails.currency] ? altBalances[swapDetails.currency].valueReadable : '0.00'
+    } else {
+      balance = altBalances[swapDetails.currency]
+        ? altBalances[swapDetails.currency].valueReadable
+        : "0.00";
       unit = swapDetails.currency;
     }
-    
+
     return balance + " " + unit;
-  }
+  };
+
+  const renderLabel = () => {
+    return (
+      <>
+        <Text font="primaryExtraSmall" color="foregroundHighEmphasis" mb={2}>
+          Fast: receive ETH, UST and FRAX within seconds through ZigZag's Fast
+          Withdrawal bridge.
+        </Text>
+        <Text font="primaryExtraSmall" color="foregroundHighEmphasis" mb={2}>
+          Normal: use zkSync's bridge and receive funds after a few hours.
+        </Text>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            gap: 4,
+            alignItems: "center",
+          }}
+        >
+          <ActionWrapper
+            font="primaryExtraSmallSemiBold"
+            color="primaryHighEmphasis"
+            onClick={() =>
+              window.open(
+                "https://docs.zigzag.exchange/zksync/fast-withdraw-bridge",
+                "_blank"
+              )
+            }
+          >
+            Learn more
+          </ActionWrapper>
+          <ExternalLinkIcon size={10} />
+        </div>
+      </>
+    );
+  };
 
   return (
     <>
-      <div className="bridge_box">
-        <Pane size={"md"} variant={"light"}>
-          <div className="bridge_coin_title">
-            <h5>FROM</h5>
-            <L1Header networks={NETWORKS} onSelect={onSelectFromNetwork} selectedNetwork={fromNetwork} />
-          </div>
+      <BridgeBox className="mb-3">
+        <Box className="layer">
+          <Box component="h3">Transfer from</Box>
+
+          <Box component="h3">Transfer to</Box>
+        </Box>
+
+        <Box className="layer">
+          <L1Header
+            networks={NETWORKS}
+            onSelect={onSelectFromNetwork}
+            selectedNetwork={fromNetwork}
+          />
+
+          <Box>
+            <CustomSwapButton onClick={switchTransferType} />
+          </Box>
+
+          <L2Header
+            networks={fromNetwork.to}
+            selectedNetwork={toNetwork}
+            onSelect={onSelectToNetwork}
+          />
+        </Box>
+      </BridgeBox>
+
+      <BridgeBox className="mb-3">
+        <Box className="layer">
+          <Box component="h3">Select an Asset</Box>
+
+          <Box component="p">
+            Available balance:&nbsp;
+            {balances[swapDetails.currency]
+              ? balances[swapDetails.currency].valueReadable
+              : "0.00"}
+            {` ${swapDetails.currency}`}
+          </Box>
+        </Box>
+
+        <Box className="layer">
           <BridgeSwapInput
             L1Fee={L1FeeAmount}
             L2Fee={L2FeeAmount}
@@ -562,250 +771,241 @@ const Bridge = (props) => {
             value={swapDetails}
             onChange={setSwapDetails}
             feeCurrency={L2FeeToken}
-            isOpenable={!(fromNetwork.from.key === "polygon" || (fromNetwork.from.key === "zksync" && toNetwork.key === "polygon"))}
+            isOpenable={
+              !(
+                fromNetwork.from.key === "polygon" ||
+                (fromNetwork.from.key === "zksync" &&
+                  toNetwork.key === "polygon")
+              )
+            }
             gasFetching={gasFetching}
           />
-          <div className="bridge_coin_stats">
-            <div className="bridge_coin_stat">
-              <h5>Estimated value</h5>
-              <span>~${formatUSD(estimatedValue)}</span>
-            </div>
-            {(
-              swapDetails.currency !== "ETH" && fromNetwork.from.key !== "polygon" &&
-              (swapCurrencyInfo?.decimals ? swapDetails.amount * 10 ** swapCurrencyInfo?.decimals : 0) > allowance
-            ) ? (
-              <div className="bridge_coin_stat">
-                <h5>Available allowance</h5>
-                <span>
-                  {ethersUtils.formatUnits(allowance, swapCurrencyInfo?.decimals)}
-                  {` ${swapDetails.currency}`}
-                </span>
-              </div>
-            ) : null}
-            <div className="bridge_coin_stat">
-              <h5>Available balance</h5>
-              <span>
-                {balances[swapDetails.currency] ?
-                  balances[swapDetails.currency].valueReadable : '0.00'}
-                {` ${swapDetails.currency}`}
-              </span>
-            </div>
-          </div>
-        </Pane>
+        </Box>
 
-        <Pane size={"md"} borderRadius={"0 0 3xl 3xl"}>
-          <div className="bridge_box_swap_wrapper">
-            <SwapButton onClick={switchTransferType} />
-            <h5>Switch</h5>
-          </div>
+        <Box className="layer layer-end">
+          <Box component="p">
+            Estimated value:&nbsp; ~${formatUSD(estimatedValue)}
+          </Box>
+        </Box>
+      </BridgeBox>
 
-          <div className="bridge_coin_stats">
-            <div className="bridge_coin_stat">
-              <div className="bridge_coin_details">
-                <div className="bridge_coin_title">
-                  <h5>TO</h5>
-                  <L2Header networks={fromNetwork.to} selectedNetwork={toNetwork} onSelect={onSelectToNetwork} />
-                </div>
+      <BridgeBox className="mb-3">
+        <Box className="layer">
+          <Box component="h3">Transaction Settings</Box>
+        </Box>
+
+        <Box className="mb-2 layer">
+          <Box component="h3" className="font-thin">
+            Address
+          </Box>
+
+          <Box component="h3" className="font-thin">
+            {user.address ? (
+              <div className="bridge_connected_as">
+                Connected Address
+                <span className="bridge_bubble_connected" />
               </div>
-            </div>
-            <div className="bridge_coin_stat">
-              <h5>Available balance</h5>
-              <span>
-                {getToBalance()}
-              </span>
-            </div>
-          </div>
-          <x.div
-            flexDirection={"column"}
-            display={"flex"}
-            alignItems={"flex-end"}
-          >
-            {fromNetwork.from.key === 'zksync' && toNetwork.key === 'ethereum' && (
-              <>
-                <RadioButtons
-                  horizontal
-                  value={withdrawSpeed}
-                  onChange={setWithdrawSpeed}
-                  name={"withdrawSpeed"}
-                  items={[
-                    {
-                      id: "fast",
-                      name: "Fast",
-                      disabled:
-                        !api.apiProvider.eligibleFastWithdrawTokens?.includes(
-                          swapDetails.currency
-                        ),
-                    },
-                    { id: "normal", name: "Normal" },
-                  ]}
-                />
-                <x.div display={"flex"} mt={2}>
-                  <x.div fontSize={12} color={"blue-gray-500"}>
-                    Withdraw speed
-                  </x.div>
-                  <FastWithdrawTooltip />
-                </x.div>
-              </>
+            ) : (
+              <div className="bridge_connected_as">
+                Disconnected
+                <span className="bridge_bubble_disconnected" />
+              </div>
             )}
-          </x.div>
-          {transfer.type === "deposit" && user.address && !user.id && (
-            <div className="bridge_transfer_fee">
-              One-Time Activation Fee: {activationFee} {swapDetails.currency}{" "}
-              (~${usdFee})
-            </div>
-          )}
-          {user.address && user.id && !isSwapAmountEmpty && (
-            <div className="bridge_transfer_fee">
-              {transfer.type === "withdraw" && (
-                <x.div>
-                  {L2FeeAmount && (
-                    <>
-                      {fromNetwork.from.key === "zksync" && `zkSync L2 gas fee: ~${L2FeeAmount} ${L2FeeToken}`}
-                    </>
-                  )}
-                  {!L2FeeAmount && (
-                    <div style={{ display: "inline-flex", margin: "0 5px" }}>
-                      <Loader
-                        type="TailSpin"
-                        color="#444"
-                        height={16}
-                        width={16}
-                      />
-                    </div>
-                  )}
-                  {isFastWithdraw() && L1FeeAmount && toNetwork.key === "ethereum" && (
-                    <div>
-                      Ethereum L1 gas + bridge fee: ~{formatPrice(L1FeeAmount)}{" "}
-                      {swapDetails.currency}
-                    </div>
-                  )}
-                  {transfer.type === "withdraw" && !formErr && (swapDetails.amount > 0) && (
-                    <x.div>
-                      
-                      <x.div color={"blue-gray-300"}>
-                        You'll receive: 
-                          {toNetwork.key === "polygon" && ` ~${formatPrice(swapDetails.amount)} WETH on Polygon`}
-                          {toNetwork.key === "ethereum" && (L1FeeAmount 
-                            ? ` ~${formatPrice(swapDetails.amount - L1FeeAmount)}`
-                            : ` ${formatPrice(swapDetails.amount)}`)
-                          }
-                          {toNetwork.key === "ethereum" && ` ${swapDetails.currency} on Ethereum L1`}
-                      </x.div>
-                    </x.div>
-                  )}                  
-                </x.div>
-              )}
-              {transfer.type === "deposit" && (
-                <x.div>
-                  {L1FeeAmount && (
-                    <>
-                     {fromNetwork.from.key === "ethereum" && `Maximum gas fee: ~${formatPrice(L1FeeAmount)} ETH`}
-                    </>
-                  )}
-                  {L2FeeAmount && (
-                    <>
-                      {fromNetwork.from.key === "polygon" && `Polygon gas fee: ~${formatPrice(L2FeeAmount)} ${L2FeeToken}`}
-                    </>
-                  )}                  
-                  {!L1FeeAmount && !hasError && fromNetwork.from.key === "ethereum" && (
-                    <div style={{ display: "inline-flex", margin: "0 5px" }}>
-                      <Loader
-                        type="TailSpin"
-                        color="#444"
-                        height={16}
-                        width={16}
-                      />
-                    </div>
-                  )}
-                  {transfer.type === "deposit" && !formErr && (swapDetails.amount > 0) && (
-                    <x.div>
-                      <x.div color={"blue-gray-300"}>
-                      You'll receive: 
-                        {fromNetwork.from.key === "polygon" && ` ~${formatPrice(swapDetails.amount)}`}
-                        {fromNetwork.from.key === "ethereum" && toNetwork.key === "zksync" && ` ${formatPrice(swapDetails.amount)}`}
+          </Box>
+        </Box>
 
-                        {fromNetwork.from.key === "polygon" && ` ETH on zkSync L2`}
-                        {toNetwork.key === "polygon" && ` WETH on Polygon`}
-                        {fromNetwork.from.key === "ethereum" && toNetwork.key === "zksync" && ` ${swapDetails.currency} on zkSync L2`}
-                      </x.div>
-                    </x.div>
-                  )}
-                </x.div>
-              )}
-            </div>
-          )}
+        {user.address ? (
+          <Box>
+            <BridgeInputBox>
+              <input
+                placeholder={user.address}
+                disabled={true}
+                className="w-100 address-input"
+              ></input>
+            </BridgeInputBox>
+          </Box>
+        ) : (
+          ""
+        )}
 
-          {!user.address && !polygonLoding && (
-            <div className="bridge_transfer_fee">
-              🔗 &nbsp;Please connect your wallet
-            </div>
-          )}
-
-          <div className="bridge_button">
-            {!user.address && <ConnectWalletButton isLoading={polygonLoding} />}
-            {user.address && (
+        {transfer.type === "deposit" && user.address && !user.id && (
+          <Box className="layer">
+            <Box component="h4">One-Time Activation Fee: (~${usdFee})</Box>
+            <Box component="h4">
+              {activationFee} {swapDetails.currency} (~${usdFee})
+            </Box>
+          </Box>
+        )}
+        {user.address && user.id && !isSwapAmountEmpty && (
+          <>
+            {transfer.type === "withdraw" && (
               <>
-                {balances[swapDetails.currency] && !hasAllowance && !hasError 
-                && fromNetwork.from.key !== "polygon" &&(
-                  <Button
-                    loading={isApproving}
-                    className={cx("bg_btn", {
-                      zig_disabled:
-                        formErr.length > 0 || 
-                        Number(swapDetails.amount) === 0 || 
-                        swapDetails.currency === "ETH",
-                    })}
-                    text="APPROVE"
-                    style={{ marginBottom: 10 }}
-                    onClick={approveSpend}
-                  />
+                {fromNetwork.from.key === "zksync" &&
+                  toNetwork.key === "ethereum" && (
+                    <Box className="layer">
+                      <Box>
+                        <RadioButtons
+                          horizontal
+                          value={withdrawSpeed}
+                          onChange={setWithdrawSpeed}
+                          name={"withdrawSpeed"}
+                          items={[
+                            {
+                              id: "fast",
+                              name: "Fast",
+                              disabled:
+                                !api.apiProvider.eligibleFastWithdrawTokens?.includes(
+                                  swapDetails.currency
+                                ),
+                            },
+                            { id: "normal", name: "Normal" },
+                          ]}
+                        />
+                      </Box>
+                      <Box>
+                        <div style={{ display: "flex", marginTop: 2 }}>
+                          <div fontSize={12} color={"blue-gray-500"}>
+                            Withdraw speed
+                          </div>
+                          <QuestionHelper text={renderLabel()} />
+                        </div>
+                      </Box>
+                    </Box>
+                  )}
+                {L2FeeAmount && (
+                  <Box className="layer">
+                    <Box component="h4">
+                      {fromNetwork.from.key === "zksync" &&
+                        `zkSync L2 gas fee: `}
+                    </Box>
+                    <Box component="h4">
+                      {fromNetwork.from.key === "zksync" &&
+                        `~${L2FeeAmount} ${L2FeeToken}`}
+                    </Box>
+                  </Box>
                 )}
-                {hasError && (
-                  <Button
-                    className="bg_btn zig_btn_disabled bg_err"
-                    text={formErr}
-                    icon={<BiError />}
-                  />
+                {!L2FeeAmount && (
+                  <Box className="spinner">
+                    <LoadingSpinner size={16} />
+                  </Box>
                 )}
-                {!hasError && (
-                  <Button
-                    loading={loading}
-                    className={cx("bg_btn", {
-                      zig_disabled:
-                        formErr.length > 0 ||
-                        (L2FeeAmount === null && L1FeeAmount === null) ||
-                        !hasAllowance ||
-                        Number(swapDetails.amount) === 0,
-                    })}
-                    text="TRANSFER"
-                    icon={<MdSwapCalls />}
-                    onClick={doTransfer}
-                  />                  
+
+                {transfer.type === "withdraw" && toNetwork.key === "ethereum" && (
+                  <>
+                    {isFastWithdraw && L1FeeAmount && (
+                      <Box className="layer">
+                        <Box component="h4">Ethereum L1 gas + bridge fee: </Box>
+                        <Box component="h4">
+                          ~{formatPrice(L1FeeAmount)} {swapDetails.currency}
+                        </Box>
+                      </Box>
+                    )}
+                    <Box className="layer">
+                      <Box component="h4" color={"blue-gray-300"}>
+                        You'll receive:
+                      </Box>
+                      <Box component="h4" color={"blue-gray-300"}>
+                        {isFastWithdraw ? " ~" : " "}
+                        {isFastWithdraw && L1FeeAmount
+                          ? formatPrice(swapDetails.amount - L1FeeAmount)
+                          : formatPrice(swapDetails.amount)}
+                        {" " + swapDetails.currency} on Ethereum L1
+                      </Box>
+                    </Box>
+                  </>
                 )}
               </>
             )}
-          </div>
-        </Pane>
-      </div>
-      {user.address ? (
-        <div className="bridge_connected_as">
-          <span className="bridge_bubble_connected" /> Connected as{" "}
-          {`${user.address.substr(0, 6)}...${user.address.substr(-5)}`}
-          <span
-            onClick={() => api.signOut().catch((err) => console.log(err))}
-            className="bridge_disconnect"
-          >
-            {" • "}
-            <a href="#disconnect">Disconnect</a>
-          </span>
-        </div>
-      ) : (!polygonLoding &&
-        (<div className="bridge_connected_as">
-          <span className="bridge_bubble_disconnected" />
-          Disconnected
-        </div>)
+            {transfer.type === "deposit" && (
+              <>
+                {L1FeeAmount && (
+                  <Box className="layer">
+                    <Box component="h4">
+                      {fromNetwork.from.key === "polygon" &&
+                        `Polygon gas fee: `}
+                      {fromNetwork.from.key === "ethereum" && `Gas fee: `}
+                    </Box>
+                    <Box component="h4">
+                      {fromNetwork.from.key === "polygon" &&
+                        `~${formatPrice(L1FeeAmount)} MATIC`}
+                      {fromNetwork.from.key === "ethereum" &&
+                        `~${formatPrice(L1FeeAmount)} ETH`}
+                    </Box>
+                  </Box>
+                )}
+                {!L1FeeAmount && !hasError && (
+                  <Box className="spinner">
+                    <LoadingSpinner size={16} />
+                  </Box>
+                )}
+                {transfer.type === "deposit" && (
+                  <Box className="layer">
+                    <Box component="h4">You'll receive: </Box>
+                    <Box component="h4">
+                      {fromNetwork.from.key === "polygon" &&
+                        ` ~${formatPrice(swapDetails.amount)}`}
+                      {toNetwork.key === "polygon" &&
+                        ` ~${formatPrice(swapDetails.amount)}`}
+                      {fromNetwork.from.key === "ethereum" &&
+                        toNetwork.key === "zksync" &&
+                        ` ${formatPrice(swapDetails.amount)}`}
+
+                      {fromNetwork.from.key === "polygon" &&
+                        ` ETH on zkSync L2`}
+                      {toNetwork.key === "polygon" && ` WETH on Polygon`}
+                      {fromNetwork.from.key === "ethereum" &&
+                        toNetwork.key === "zksync" &&
+                        ` ${swapDetails.currency} on zkSync L2`}
+                    </Box>
+                  </Box>
+                )}
+              </>
+            )}
+          </>
+        )}
+      </BridgeBox>
+
+      {!user.address && <ConnectWalletButton isLoading={polygonLoding} />}
+      {user.address && (
+        <>
+          {balances[swapDetails.currency] &&
+            !hasAllowance &&
+            !hasError &&
+            fromNetwork.from.key !== "polygon" && (
+              <Button
+                isLoading={isApproving}
+                scale="md"
+                disabled={
+                  formErr.length > 0 ||
+                  Number(swapDetails.amount) === 0 ||
+                  swapDetails.currency === "ETH"
+                }
+                onClick={approveSpend}
+              >
+                APPROVE
+              </Button>
+            )}
+          {hasError && (
+            <Button variant="sell" scale="md">
+              {formErr}
+            </Button>
+          )}
+          {hasAllowance && !hasError && (
+            <Button
+              isLoading={loading}
+              disabled={
+                formErr.length > 0 ||
+                (L2FeeAmount === null && L1FeeAmount === null) ||
+                !hasAllowance ||
+                Number(swapDetails.amount) === 0
+              }
+              onClick={doTransfer}
+            >
+              TRANSFER
+            </Button>
+          )}
+        </>
       )}
-      
     </>
   );
 };

@@ -6,7 +6,7 @@ import { Slider, makeStyles } from "@material-ui/core";
 
 const useStyles = makeStyles(() => ({
   thumb: {
-    backgroundColor: "#e1e1e1",
+    backgroundColor: "#6c768c",
     borderRadius: "50%",
     width: "20px",
     height: "20px",
@@ -22,15 +22,15 @@ const useStyles = makeStyles(() => ({
       left: "50%",
       top: "50%",
       transform: "translate(-50%,-50%)",
-      backgroundColor: "#171c28",
+      backgroundColor: "#2AABEE",
       content: "",
-      width: "10px",
-      height: "10px",
+      width: "13px",
+      height: "13px",
     },
   },
   root: {
-    height: "6px",
-    backgroundColor: "#6c768c",
+    height: "40px",
+    backgroundColor: "transparent",
     width: "100%",
     cursor: "pointer",
     display: "inline-block",
