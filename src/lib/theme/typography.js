@@ -72,8 +72,8 @@ const primaryExtraSmallSemiBold = {
 
 const tableHeader = {
   fontFamily: 'WorkSans-SemiBold',
-  fontSize: '10px',
-  lineHeight: '12px',
+  fontSize: '12px',
+  lineHeight: '14px',
 }
 
 const primaryMediumBody = {
@@ -157,8 +157,8 @@ const monospaceTiny = {
 
 const tableContent = {
   fontFamily: 'IBMPlexMono-Medium',
-  fontSize: '10px',
-  lineHeight: '13px',
+  fontSize: '12px',
+  lineHeight: '15px',
 }
 
 const typography = {
