@@ -324,7 +324,7 @@ export class SpotForm extends React.Component {
     newstate.orderButtonDisabled = true;
     this.setState(newstate);
     let orderPendingToast;
-    if (api.isZksyncChain()) {
+    if (api.isZksyncChain() && this.props.settings.showFillNotification) {
       orderPendingToast = toast.info(
         "Order pending. Sign or Cancel to continue...", {
         toastId: "Order pending. Sign or Cancel to continue...",
@@ -343,9 +343,9 @@ export class SpotForm extends React.Component {
       );
 
       if (this.props.settings.showFillNotification) {
-        toast.success(
-          "Transaction Successful", {
-          toastId: "Transaction Successful",
+        toast.info(
+          "Order placed", {
+          toastId: "Order placed.",
         });
       }
     } catch (e) {
