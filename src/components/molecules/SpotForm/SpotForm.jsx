@@ -513,9 +513,7 @@ export class SpotForm extends React.Component {
             <input
               type="text"
               value={
-                this.priceIsDisabled()
-                  ? this.props.marketSummary && this.props.marketSummary?.price
-                  : this.state.userHasEditedPrice ? this.state.price : this.currentPrice()
+                this.state.userHasEditedPrice ? this.state.price : this.currentPrice()
               }
               onChange={this.updatePrice.bind(this)}
               disabled={this.priceIsDisabled()}
@@ -545,19 +543,10 @@ export class SpotForm extends React.Component {
               <div className="spf_head">
                 <span>Total</span>
                 <strong>
-                  {this.props.orderType === "limit" ? (
-                    <>
-                      {(this.currentPrice() * this.state.baseAmount).toPrecision(6)}{" "}
-                      {marketInfo && marketInfo.quoteAsset.symbol}
-                    </>
-                  ) : (
-                    <>
-                      {(
-                        this.props.marketSummary.price * this.state.baseAmount
-                      ).toPrecision(6)}{" "}
-                      {marketInfo && marketInfo.quoteAsset.symbol}
-                    </>
-                  )}
+                  <>
+                    {(this.currentPrice() * this.state.baseAmount).toPrecision(6)}{" "}
+                    {marketInfo && marketInfo.quoteAsset.symbol}
+                  </>
                 </strong>
               </div>
               <div className="spf_btn">
