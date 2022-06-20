@@ -354,7 +354,7 @@ export class SpotForm extends React.Component {
     if (this.props.orderType === "limit" && this.state.price) {
       return this.state.price;
     } else {
-      if (this.api.APIProvider.isZksyncChain()) {
+      if (api.isZksyncChain()) {
         return this.getLadderPriceZkSync_v1();
       } else {
         console.log('this.getLadderPrice() not implemented for not zkSync_v1')
@@ -513,9 +513,7 @@ export class SpotForm extends React.Component {
             <input
               type="text"
               value={
-                this.priceIsDisabled()
-                  ? this.props.marketSummary && this.props.marketSummary?.price
-                  : this.state.userHasEditedPrice ? this.state.price : this.currentPrice()
+                this.state.userHasEditedPrice ? this.state.price : this.currentPrice()
               }
               onChange={this.updatePrice.bind(this)}
               disabled={this.priceIsDisabled()}
@@ -545,19 +543,10 @@ export class SpotForm extends React.Component {
               <div className="spf_head">
                 <span>Total</span>
                 <strong>
-                  {this.props.orderType === "limit" ? (
-                    <>
-                      {(this.currentPrice() * this.state.baseAmount).toPrecision(6)}{" "}
-                      {marketInfo && marketInfo.quoteAsset.symbol}
-                    </>
-                  ) : (
-                    <>
-                      {(
-                        this.props.marketSummary.price * this.state.baseAmount
-                      ).toPrecision(6)}{" "}
-                      {marketInfo && marketInfo.quoteAsset.symbol}
-                    </>
-                  )}
+                  <>
+                    {(this.currentPrice() * this.state.baseAmount).toPrecision(6)}{" "}
+                    {marketInfo && marketInfo.quoteAsset.symbol}
+                  </>
                 </strong>
               </div>
               <div className="spf_btn">
