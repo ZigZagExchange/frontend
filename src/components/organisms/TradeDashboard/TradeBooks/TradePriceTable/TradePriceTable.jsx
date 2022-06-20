@@ -44,7 +44,7 @@ const Table = styled.table`
   
   th {
     text-transform: uppercase;
-    padding: 1px 0px;
+    padding: 6px 0px;
   }
 
   th:nth-child(1), td:nth-child(1) {
