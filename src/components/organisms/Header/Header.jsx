@@ -4,7 +4,7 @@ import { useHistory } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import CheckIcon from "@mui/icons-material/Check";
-
+import { useLocation } from "react-router-dom";
 import { userSelector } from "lib/store/features/auth/authSlice";
 import {
   networkSelector,
@@ -27,6 +27,7 @@ import { toNumber } from "lodash";
 import ToggleTheme from "components/molecules/Toggle/ToggleTheme";
 import useTheme from "components/hooks/useTheme";
 import { formatAmount } from "../../../lib/utils";
+import { SwapVerticalCircleSharp } from "@material-ui/icons";
 
 const langList = [
   { text: "EN", url: "#" },
@@ -196,7 +197,7 @@ export const Header = (props) => {
   const [networkName, setNetworkName] = useState("");
   const [networkItems, setNetWorkItems] = useState(networkLists);
   const { isDark, toggleTheme } = useTheme();
-
+  const location = useLocation();
   useEffect(() => {
     const netName = networkLists.filter((item, i) => {
       return item.value === network;
@@ -221,8 +222,27 @@ export const Header = (props) => {
   }, [props.isLoading]);
 
   useEffect(() => {
-    const tabIndex = localStorage.getItem("tab_index");
-    if (tabIndex !== null) setIndex(toNumber(tabIndex));
+    switch (location.pathname) {
+      case "/":
+        setIndex(0);
+        break;
+      case "/convert":
+        setIndex(1);
+        break;
+      case "/bridge":
+        setIndex(2);
+        break;
+      case "/list-pair":
+        setIndex(3);
+        break;
+      case "/dsl":
+        setIndex(5);
+        break;
+
+      default:
+        setIndex(0);
+        break;
+    }
   }, []);
 
   const changeLanguage = (text) => {
@@ -245,14 +265,12 @@ export const Header = (props) => {
   const handleClick = (newIndex) => {
     switch (newIndex) {
       case 0:
-        setIndex(newIndex);
-        localStorage.setItem("tab_index", newIndex);
         history.push("/");
         break;
       case 1:
         setIndex(newIndex);
         localStorage.setItem("tab_index", newIndex);
-        history.push("/swap");
+        history.push("/convert");
         break;
 
       case 2:
@@ -368,18 +386,17 @@ export const Header = (props) => {
               <ToggleTheme isDark={isDark} toggleTheme={toggleTheme} />
             </LanguageWrapper>
             <VerticalDivider />
+
+            <Dropdown
+              adClass="network-dropdown"
+              width={162}
+              item={networkItems}
+              context={networkName}
+              clickFunction={changeNetwork}
+              leftIcon={true}
+            />
             {user.address ? (
-              <>
-                <Dropdown
-                  adClass="network-dropdown"
-                  width={162}
-                  item={networkItems}
-                  context={networkName}
-                  clickFunction={changeNetwork}
-                  leftIcon={true}
-                />
-                <AccountDropdown networkName={networkName} />
-              </>
+              <AccountDropdown networkName={networkName} />
             ) : (
               <ConnectWalletButton />
             )}

@@ -3,7 +3,8 @@ import { BigNumber } from "ethers";
 import isString from "lodash/isString";
 import get from "lodash/get";
 
-export const getThemeValue = (path, fallback) => (theme) => get(theme, path, fallback);
+export const getThemeValue = (path, fallback) => (theme) =>
+  get(theme, path, fallback);
 
 export function formatUSD(floatNum) {
   const num = parseFloat(floatNum || 0)
@@ -20,10 +21,10 @@ export function formatAmount(amount, currency) {
 }
 
 export function formatPrice(input) {
-  const inputNumber = Number(input)  
-  if (Number.isNaN(inputNumber)) return '--';
-  if (!Number.isFinite(inputNumber)) return '--';
-  
+  const inputNumber = Number(input);
+  if (Number.isNaN(inputNumber)) return "--";
+  if (!Number.isFinite(inputNumber)) return "--";
+
   let outputNumber;
   if (inputNumber > 99999) {
     outputNumber = inputNumber.toFixed(0);
@@ -41,7 +42,7 @@ export function formatPrice(input) {
     outputNumber = inputNumber.toPrecision(6);
   }
   // remove trailing zero's
-  return Number(outputNumber).toString();    
+  return Number(outputNumber).toString();
 }
 
 export function toBaseUnit(value, decimals) {
@@ -58,7 +59,7 @@ export function toBaseUnit(value, decimals) {
   if (value === ".") {
     throw new Error(
       `Invalid value ${value} cannot be converted to` +
-      ` base unit with ${decimals} decimals.`
+        ` base unit with ${decimals} decimals.`
     );
   }
 
@@ -137,34 +138,38 @@ export function formatDate(date) {
 
 export function formatDateTime(date) {
   const timestr = [
-      padTo2Digits(date.getHours()),
-      padTo2Digits(date.getMinutes()),
-      padTo2Digits(date.getSeconds()),
-    ].join(":");
+    padTo2Digits(date.getHours()),
+    padTo2Digits(date.getMinutes()),
+    padTo2Digits(date.getSeconds()),
+  ].join(":");
   const datestr = [
-      padTo2Digits(date.getMonth() + 1),
-      padTo2Digits(date.getDate()),
-      date.getFullYear(),
-    ].join("-");
-  return datestr + ' ' + timestr;
+    padTo2Digits(date.getMonth() + 1),
+    padTo2Digits(date.getDate()),
+    date.getFullYear(),
+  ].join("-");
+  return datestr + " " + timestr;
 }
 
 export function HideMenuOnOutsideClicked(ref, hideMenu) {
   useEffect(() => {
-      /**
-       * Alert if clicked on outside of element
-       */
-      function handleClickOutside(event) {
-          if (ref.current && !ref.current.contains(event.target)) {
-              hideMenu(false)
-          }
+    /**
+     * Alert if clicked on outside of element
+     */
+    function handleClickOutside(event) {
+      if (ref.current && !ref.current.contains(event.target)) {
+        hideMenu(false);
       }
+    }
 
-      // Bind the event listener
-      document.addEventListener("mousedown", handleClickOutside)
-      return () => {
-          // Unbind the event listener on clean up
-          document.removeEventListener("mousedown", handleClickOutside)
-      };
-  }, [ref, hideMenu])
+    // Bind the event listener
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      // Unbind the event listener on clean up
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [ref, hideMenu]);
+}
+
+export function shortenAddress(address, chars) {
+  return `${address.slice(0, chars)}•••${address.slice(-chars)}`;
 }

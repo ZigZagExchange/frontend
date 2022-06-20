@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import useTheme from "components/hooks/useTheme";
 import { useSelector } from "react-redux";
 import { userSelector } from "lib/store/features/auth/authSlice";
+import { settingsSelector } from "lib/store/features/api/apiSlice";
 import { DefaultTemplate } from "components";
 import BridgeContainer from "./BridgeContainer";
 import TransferHistory from "./TransferHistory";
@@ -27,6 +28,7 @@ export default function BridgePage() {
   const [loading, setLoading] = useState(false);
   const [popup, setpopup] = useState("walletconnected");
   const user = useSelector(userSelector);
+  const settings = useSelector(settingsSelector);
 
   return (
     <DefaultTemplate>
@@ -92,7 +94,7 @@ export default function BridgePage() {
               </Tab.Group>
             </div>
           </div>
-          <GuidePopup />
+          {!settings.hideGuidePopup && <GuidePopup />}
         </div>
       )}
     </DefaultTemplate>

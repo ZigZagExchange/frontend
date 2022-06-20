@@ -24,7 +24,7 @@ const SwapContianer = ({
   onClickMax,
 }) => {
   return (
-    <div className="p-4 mt-4 border-t border-b border-l border-r rounded-lg dark:border-foreground-400 border-primary-500">
+    <div className="p-4 mt-5 border-t border-b border-l border-r rounded-lg dark:border-foreground-400 border-primary-500">
       <div className="flex items-center justify-between">
         <p className="text-lg font-work">From</p>
         <p className="text-sm font-normal ">

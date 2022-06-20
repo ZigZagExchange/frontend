@@ -1,11 +1,15 @@
 import { useRef, useState } from "react";
+import { useDispatch } from "react-redux";
 import React from "react";
+import { setUISettings } from "lib/store/features/api/apiSlice";
 import { DiscordIcon } from "components/atoms/Svg";
 import { CloseIcon } from "components/atoms/Svg";
 import PlayBtn from "assets/images/play-btn.svg";
+
 const GuidePopup = () => {
   const { videoRef } = useRef(null);
   const [open, setOpen] = useState(true);
+  const dispatch = useDispatch();
 
   const playVideo = () => {
     videoRef && videoRef.current.play();
@@ -14,6 +18,11 @@ const GuidePopup = () => {
   const onClose = () => {
     setOpen(false);
   };
+
+  const onDismissPermanently = () => {
+    dispatch(setUISettings({ key: "hideGuidePopup", value: true }));
+  };
+
   return (
     open && (
       <div className="max-w-lg p-6 mx-1 border rounded-lg shadow-lg md:mx-0 xl:max-w-sm xl:fixed bottom-5 right-5 dark:bg-background-700 dark:border-foreground-400 border-primary-400 bg-foreground-600">
@@ -63,15 +72,19 @@ const GuidePopup = () => {
           <p className="flex items-center max-w-xs gap-2 text-base">
             <DiscordIcon /> Join our{" "}
             <a
-              href="/faq"
+              href="https://discord.com/invite/zigzag"
               target="_blank"
               className="text-primary-900 hover:underline"
+              rel="noreferrer"
             >
-              discord
+              Discord
             </a>{" "}
             for live support.
           </p>
-          <button className="float-right mt-6 text-primary-900 hover:underline">
+          <button
+            className="float-right mt-6 text-primary-900 hover:underline"
+            onClick={onDismissPermanently}
+          >
             Dismiss and don’t show again.
           </button>
         </div>
