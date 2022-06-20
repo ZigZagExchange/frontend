@@ -354,7 +354,7 @@ export class SpotForm extends React.Component {
     if (this.props.orderType === "limit" && this.state.price) {
       return this.state.price;
     } else {
-      if (api.APIProvider.isZksyncChain()) {
+      if (api.isZksyncChain()) {
         return this.getLadderPriceZkSync_v1();
       } else {
         console.log('this.getLadderPrice() not implemented for not zkSync_v1')
