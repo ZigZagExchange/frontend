@@ -498,7 +498,7 @@ export const apiSlice = createSlice({
       state.bridgeReceipts.unshift(payload);
     },
     resetData(state) {
-      state.marketinfo = null;
+      // state.marketinfo = null;
       state.marketFills = {};
       state.marketSummary = {};
       state.orders = {};
