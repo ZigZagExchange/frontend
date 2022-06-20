@@ -1,20 +1,113 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-// css
-import "./TradePriceTable.css";
+import styled from "styled-components";
+import useTheme from "components/hooks/useTheme";
 import { marketInfoSelector } from "lib/store/features/api/apiSlice";
 import { numStringToSymbol } from "lib/utils";
+import Text from "components/atoms/Text/Text";
+
+const Table = styled.table`
+  display: flex;
+  flex: auto;
+  overflow: auto;
+  padding: 0px;
+  flex-direction: column;
+
+  &:not(.no-space) {
+    justify-content: space-between;
+  }
+
+  &:first-type-of {
+    height: 205px;
+  }
+
+  &:last-type-of {
+    height: 181px;
+  }
+
+  tbody {
+    width: 100%;
+    display: table;
+    background-position: top right;
+    background-size: 70% 100%;
+    background-repeat: no-repeat;
+    margin-top: 0;
+  }
+  
+  thead {
+    position: sticky;
+    top: 0;
+    display: table;
+    width: 100%;
+    background: ${(p) => p.theme.colors.backgroundHighEmphasis};
+  }
+  
+  th {
+    text-transform: uppercase;
+    padding: 6px 0px;
+  }
+
+  th:nth-child(1), td:nth-child(1) {
+    width: 20%;
+    text-align: start;
+    padding-left: 0px;
+  }
+
+  th:nth-child(2), td:nth-child(2) {
+    width: 40%;
+    text-align: center;
+  }
+
+  th:nth-child(3), td:nth-child(3) {
+    width: 40%;
+    text-align: right;
+    white-space: nowrap;
+    padding-right: 0px;
+  }
+  
+  @media screen and (min-width: 1800px) {
+    width: 100%;
+  }
+  
+  @media screen and (max-width: 991px) {
+    width: 100%;
+  }
+  
+  ::-webkit-scrollbar {
+    width: 5px;
+    position: relative;
+    z-index: 20;
+  }
+  
+  ::-webkit-scrollbar-track {
+    border-radius: 4px;
+    background: transparent;
+    height: 23px;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    border-radius: 4px;         
+    background: ${({ theme }) => theme.colors.foreground400};
+  }
+`
+const Divider = styled.div`
+  height: 1px;
+  background: ${({ theme }) => theme.colors.foreground400};
+  margin-top: 20px;
+`
 
 const TradePriceTable = (props) => {
+  const { theme } = useTheme()
   const marketInfo = useSelector(marketInfoSelector);
   const ref = useRef(null)
   const [isUpdateScroll, setUpdateScroll] = useState(false);
 
-  useEffect(()=>{
-    if(!ref.current) return;
-    if(props.priceTableData.length === 0) setUpdateScroll(false);
+
+  useEffect(() => {
+    if (!ref.current) return;
+    if (props.priceTableData.length === 0) setUpdateScroll(false);
     if (props.scrollToBottom) {
-      if(isUpdateScroll) return;
+      if (isUpdateScroll) return;
       setUpdateScroll(true);
       ref.current?.scrollTo(0, ref.current.scrollHeight)
     }
@@ -31,20 +124,20 @@ const TradePriceTable = (props) => {
   else onClickRow = () => null;
 
   return (
-    <table className={`trade_price_table zig_scrollstyle ${props.className}`} ref={ref}>
+    <Table ref={ref} className={props.adClass}>
       {props.head && (
         <thead>
           <tr>
-            <th>Price</th>
-            <th>Amount</th>
-            <th>Total ({marketInfo && marketInfo.quoteAsset.symbol})</th>
+            <th><Text font="tableHeader" color="foregroundLowEmphasis">Price</Text></th>
+            <th><Text font="tableHeader" color="foregroundLowEmphasis" textAlign="right">Amount</Text></th>
+            <th><Text font="tableHeader" color="foregroundLowEmphasis" textAlign="right">Total({marketInfo && marketInfo.quoteAsset.symbol})</Text></th>
           </tr>
         </thead>
       )}
       <tbody >
         {
           props.priceTableData.map((d, i) => {
-            const color = d.side === "b" ? "#27302F" : "#2C232D";
+            const color = d.side === "b" ? theme.colors.success400 : theme.colors.danger400;
             if (props.className !== "trade_table_asks") {
               total_step += d.td2;
             }
@@ -53,13 +146,13 @@ const TradePriceTable = (props) => {
             let rowStyle;
             if (props.useGradient) {
               rowStyle = {
-                backgroundImage: `linear-gradient(to left, ${color}, ${color} ${breakpoint}%, #171c28 0%)`,
+                background: `linear-gradient(to right, ${color}, ${color} ${breakpoint}%, ${theme.colors.backgroundHighEmphasis} 0%)`,
               };
             } else {
               rowStyle = {};
             }
             const price =
-              typeof d.td1 === "number" ? d.td1.toPrecision(6) : d.td1;
+              typeof d.td1 === "number" ? d.td1.toFixed(props.fixedPoint) : d.td1;
             const amount =
               typeof d.td2 === "number" ? d.td2.toPrecision(6) : d.td2;
             const total =
@@ -71,16 +164,20 @@ const TradePriceTable = (props) => {
             }
             return (
               <tr key={i} style={rowStyle} onClick={() => onClickRow(d)}>
-                <td className={d.side === "b" ? "up_value" : "down_value"}>
-                  {price}
+                <td>
+                  <Text font="tableContent" color={d.side === "b" ? "successHighEmphasis" : "dangerHighEmphasis"}>{price}</Text>
                 </td>
-                <td>{numStringToSymbol(amount, 2)}</td>
-                <td>{numStringToSymbol(total, 2)}</td>
+                <td>
+                  <Text font="tableContent" color="foregroundHighEmphasis" textAlign="right">{numStringToSymbol(amount, 2)}</Text>
+                </td>
+                <td>
+                  <Text font="tableContent" color="foregroundHighEmphasis" textAlign="right">{numStringToSymbol(total, 2)}</Text>
+                </td>
               </tr>
             );
           })}
       </tbody>
-    </table>
+    </Table>
   );
 };
 

@@ -1,38 +1,76 @@
 import React from "react";
-import { x } from "@xstyled/styled-components";
+import styled from "styled-components";
 import { DefaultTemplate } from "../../templates/DefaultTemplate";
 import Pane from "../../atoms/Pane/Pane";
-import FormDemo from "../../atoms/Form/Form.demo";
-import TooltipDemo from "../../atoms/Tooltip/Tooltip.demo";
-import RadioButtonsDemo from "../../atoms/RadioButtons/RadioButtons.demo";
+import TextDemo from "../../atoms/Text/Text.demo";
+import SvgDemo from "../../atoms/Svg/Svg.demo";
+import ButtonDemo from "../../molecules/Button/Button.demo";
+import InputFieldDemo from "../../atoms/InputField/InputField.demo";
+import CheckBoxDemo from "../../atoms/CheckBox/CheckBox.demo";
+import ToggleDemo from "../../molecules/Toggle/Toggle.demo";
+import DropdownDemo from "../../molecules/Dropdown/Dropdown.demo";
+import TabMenuDemo from "../../molecules/TabMenu/TabMenu.demo";
 import { Button } from "../../atoms/Form/Submit";
 import { toast } from "react-toastify";
+
+const DSLWrapper = styled.div`
+  height: 100%;
+  padding: 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: ${(p) => p.theme.colors.backgroundHighEmphasis};
+  color: white;
+`
+
+const DSLSpan = styled.span`
+  font-size: 24px;
+  margin-bottom: 3px;
+  margin-top: 5px;
+`
+
+const DSLItemsWrapper = styled.div`
+  display: grid;
+  grid-auto-flow: row;
+  gap: 6px;
+`
+
+const DSLItemTitle = styled.div`
+  font-size: 18px;
+`
 
 const DSLPage = () => {
   return (
     <DefaultTemplate>
-      <div style={{ minHeight: "calc(100vh - 48px)" }}>
-        <x.div
-          h={"100%"}
-          padding={2}
-          display={"flex"}
-          flexDirection={"column"}
-          alignItems={"center"}
-          backgroundColor={"blue-400"}
-          color={"white"}
-        >
-          <x.span fontSize={24} mb={3} mt={5}>
+      <div style={{ minHeight: "calc(100vh - 56px)" }}>
+        <DSLWrapper>
+          <DSLSpan>
             DSL
-          </x.span>
-          <x.div spaceY={6}>
-            <DSLItem title={"Form"}>
-              <FormDemo />
+          </DSLSpan>
+          <DSLItemsWrapper>
+            <DSLItem title={"Text Demo"}>
+              <TextDemo />
             </DSLItem>
-            <DSLItem title={"Tooltip"}>
-              <TooltipDemo />
+            <DSLItem title={"Button Demo"}>
+              <ButtonDemo />
             </DSLItem>
-            <DSLItem title={"Radio Buttons"}>
-              <RadioButtonsDemo />
+            <DSLItem title={"Svg Icons Demo"}>
+              <SvgDemo />
+            </DSLItem>
+            <DSLItem title={"Input Demo"}>
+              <InputFieldDemo />
+            </DSLItem>
+            <DSLItem title={"CheckBox Demo"}>
+              <CheckBoxDemo />
+            </DSLItem>
+            <DSLItem title={"Toggle Demo"}>
+              <ToggleDemo />
+            </DSLItem>
+            <DSLItem title={"Dropdown Demo"}>
+              <DropdownDemo />
+            </DSLItem>
+            <DSLItem title={"TabMenu Demo"}>
+              <TabMenuDemo />
             </DSLItem>
             <DSLItem title={"Toast"}>
               <Button
@@ -42,8 +80,8 @@ const DSLPage = () => {
                 Success
               </Button>
             </DSLItem>
-          </x.div>
-        </x.div>
+          </DSLItemsWrapper>
+        </DSLWrapper>
       </div>
     </DefaultTemplate>
   );
@@ -51,8 +89,8 @@ const DSLPage = () => {
 
 const DSLItem = ({ title, children }) => {
   return (
-    <Pane size={"sm"} variant={"light"} w={"lg"}>
-      <x.div fontSize={18}>{title}</x.div>
+    <Pane size={"sm"} variant={"dark"} w={"lg"}>
+      <DSLItemTitle>{title}</DSLItemTitle>
       {children && children}
     </Pane>
   );
