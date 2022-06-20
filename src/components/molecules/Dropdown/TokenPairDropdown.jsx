@@ -19,6 +19,7 @@ const ButtonWrapper = styled.div`
   grid-auto-flow: column;
   align-items: center;
   gap: 8px;
+  width: 130px;
   img {
     height: 1.3rem;
   }
