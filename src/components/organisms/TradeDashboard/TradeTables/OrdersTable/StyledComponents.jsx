@@ -88,7 +88,7 @@ export const LaptopWrapper = styled.div`
     tbody {
         display: block;
         height: 100%; // 111px;
-        min-height: 105px;
+        min-height: 217px;
         max-height: calc(100% - 42px);
         overflow: auto;
 
