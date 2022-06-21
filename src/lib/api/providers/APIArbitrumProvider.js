@@ -93,9 +93,11 @@ export default class APIArbitrumProvider extends APIProvider {
     console.log('signing in to arbitrum');
     this.ethWallet = this.api.ethersProvider.getSigner();
 
-    const address = await this.ethWallet.getAddress();
-    this.accountState.id = address
-    this.accountState.address = address
+    const address = await this.api.ethWallet.getAddress();
+    this.accountState.id = address;
+    this.accountState.address = address;
+
+    return this.accountState;
   }
 
   cacheMarketInfoFromNetwork = async (pairs) => {
