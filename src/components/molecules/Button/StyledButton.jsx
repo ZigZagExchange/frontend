@@ -26,7 +26,8 @@ const StyledButton = styled.button`
 })}
 
   ${layout}
-  ${space}
+
+  transition: color .25s;
 
   div {
     transition: color .25s;
@@ -45,6 +46,10 @@ const StyledButton = styled.button`
     div {
       color: ${({ show, theme }) => !show ? `${theme.colors.primaryHighEmphasis} !important` : ""
   }}
+
+  &:hover {
+    color: ${({ show, theme }) => !show ? `${theme.colors.primaryHighEmphasis} !important` : ""
+  }
 `;
 
 export default StyledButton;
