@@ -132,6 +132,7 @@ export const apiSlice = createSlice({
             const sideText = fillDetails[3] === "b" ? "buy" : "sell";
             const price = Number(fillDetails[4]);
             const baseQuantity = Number(fillDetails[5]);
+            const quoteQuantity = Number(fillDetails[6]);
             toast.success(
               `Your ${sideText} order for ${Number(baseQuantity.toPrecision(4))
               } ${baseCurrency} was filled @ ${Number(formatPrice(price))
@@ -142,6 +143,14 @@ export const apiSlice = createSlice({
                   }!`,
               }
             );
+            if(api.apiProvider.evmCompatible) {
+              api.apiProvider.settleOrderFill(
+                fillDetails[2], // market
+                fillDetails[3], // side
+                baseQuantity,
+                quoteQuantity
+              )
+            }
           }
         }
       });
