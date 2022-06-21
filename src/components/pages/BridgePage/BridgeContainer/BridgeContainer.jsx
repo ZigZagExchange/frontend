@@ -313,11 +313,10 @@ const BridgeContainer = () => {
             )}`;
           }
         }
-      } else if (
-        inputValue < 0.0001 &&
-        (fromNetwork.id === "polygon" || toNetwork.id === "polygon")
-      ) {
-        error = "Insufficient amount";
+      } 
+      // 0.0005 -> poly bridge min size
+      else if ((inputValue - L2FeeAmount) < 0.0005 && (toNetwork.key === 'polygon' || fromNetwork.from.key === 'polygon')) {
+        error = "Amount too small";
       }
     }
 
@@ -385,15 +384,15 @@ const BridgeContainer = () => {
     if (fromNetwork.id === "polygon" && toNetwork.id === "zksync") {
       const gasFee = await api.getPolygonFee();
       if (gasFee) {
-        setL1Fee(null);
-        setL2Fee(swapDetails, (35000 * gasFee.fast.maxFee) / 10 ** 9, "MATIC");
+        setL1Fee(35000 * gasFee.fast.maxFee / 10**9);
+        setL2Fee(swapDetails, 0.0005, 'ETH') // ZigZag fee
       }
     }
     // zkSync -> polygon
     else if (fromNetwork.id === "zksync" && toNetwork.id === "polygon") {
       let res = await api.transferL2GasFee(swapDetails.currency);
       setL1Fee(null);
-      setL2Fee(swapDetails, res.amount, res.feeToken);
+      setL2Fee(swapDetails, (res.amount * 10), res.feeToken); // 10x => ZigZag fee
     }
     // Ethereum -> zkSync aka deposit
     else if (transfer.type === "deposit") {
