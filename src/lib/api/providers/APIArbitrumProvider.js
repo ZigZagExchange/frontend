@@ -6,7 +6,9 @@ import balanceBundleABI from "lib/contracts/BalanceBundle.json";
 export default class APIArbitrumProvider extends APIProvider {
   balanceBundleAddress = '0x1b7ad12c73b9fea574cd2320650676c0a0bde8a0';
 
-  accountState = {};
+  accountState = {
+    writable: true
+  };
   ethWallet = {};
   evmCompatible = true;
   zksyncCompatible = false;
