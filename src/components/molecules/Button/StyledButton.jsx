@@ -27,7 +27,7 @@ const StyledButton = styled.button`
 
   ${layout}
 
-  transition: color .25s;
+    transition: color .25s;
 
   div {
     transition: color .25s;
@@ -48,7 +48,7 @@ const StyledButton = styled.button`
   }}
 
   &:hover {
-    color: ${({ show, theme }) => !show ? `${theme.colors.primaryHighEmphasis} !important` : ""
+    color: ${({ variant, theme }) => variant === 'outlined' ? `${theme.colors.primaryHighEmphasis} !important` : ""
   }
 `;
 
