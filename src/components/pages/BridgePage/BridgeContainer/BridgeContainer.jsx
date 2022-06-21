@@ -758,7 +758,7 @@ const BridgeContainer = () => {
                   }
                   onClick={doTransfer}
                 >
-                  TRANSFER
+                  CONVERT
                 </Button>
               )}
             </>
