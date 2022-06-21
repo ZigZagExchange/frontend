@@ -321,6 +321,8 @@ export default class API extends Emitter {
             case 1000:
                 ethereumChainId = "0x4";
             break;
+            case 42161: 
+            ethereumChainId = "0xf00";
             default:
                 return
         }
