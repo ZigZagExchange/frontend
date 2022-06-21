@@ -13,11 +13,7 @@ export default class APIArbitrumProvider extends APIProvider {
   balances = {};
 
   getAccountState = async () => {
-    return this._accountState;
-  };
-
-  getProfile = async () => {
-    return {};
+    return this.accountState;
   };
 
   getBalances = async () => {
