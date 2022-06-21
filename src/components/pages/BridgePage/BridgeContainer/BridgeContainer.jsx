@@ -758,7 +758,7 @@ const BridgeContainer = () => {
                   }
                   onClick={doTransfer}
                 >
-                  CONVERT
+                  Exchange
                 </Button>
               )}
             </>

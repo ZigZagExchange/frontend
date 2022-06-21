@@ -466,7 +466,7 @@ export default function SwapPage() {
               onClick={onClickExchange}
               disabled={orderButtonDisabled || !user.address}
             >
-              Exchange
+              Convert
             </Button>
           </div>
         </div>
