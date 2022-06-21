@@ -1087,9 +1087,9 @@ export default function OrdersTable(props) {
               <Tab>Balances</Tab>
             </StyledTabMenu>
 
-            <Button variant="outlined" width="50px" scale="sm">
+            {/* <Button variant="outlined" width="50px" scale="sm">
                 SELL
-            </Button>
+            </Button> */}
           </div>
           {
             isMobile ?
