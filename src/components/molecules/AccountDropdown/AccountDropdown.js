@@ -330,6 +330,7 @@ export const AccountDropdown = () => {
   const wallet =
     selectedLayer === 1 ? balanceData.wallet : balanceData[network];
   const explorer = user.address ? api.getExplorer(user.address, selectedLayer) : null;
+  const networkName = api.getNetworkName(selectedLayer);
   
   useEffect(() => {
     const hideDisplay = () => setShow(false);
@@ -488,7 +489,7 @@ export const AccountDropdown = () => {
             <a target="_blank"
               rel="noreferrer"
               href={explorer}>
-                <IoMdOpen style={{ position: "relative", top: -2 }} /> {selectedLayer === 1 ? 'Etherscan' : `zkScan`} 
+                <IoMdOpen style={{ position: "relative", top: -2 }} /> {networkName} 
             </a>
           </DropdownExplorer> 
           

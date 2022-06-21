@@ -6,9 +6,7 @@ import balanceBundleABI from "lib/contracts/BalanceBundle.json";
 export default class APIArbitrumProvider extends APIProvider {
   balanceBundleAddress = '0x1b7ad12c73b9fea574cd2320650676c0a0bde8a0';
 
-  accountState = {
-    writable: true
-  };
+  accountState = {};
   ethWallet = {};
   evmCompatible = true;
   zksyncCompatible = false;
@@ -93,8 +91,10 @@ export default class APIArbitrumProvider extends APIProvider {
     this.ethWallet = this.api.ethersProvider.getSigner();
 
     const address = await this.ethWallet.getAddress();
-    this.accountState.id = address;
-    this.accountState.address = address;
+    this.accountState = {
+      id: address,
+      address,
+    };
 
     return this.accountState;
   }  

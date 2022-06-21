@@ -143,16 +143,17 @@ export default class API extends Emitter {
     }
 
     getExplorer = (address, layer) => {
-      let explorer = "https://etherscan.io/address/";
-      let subdomain = this.apiProvider.network === 1 ? "" : "rinkeby.";
-  
-      switch(layer){
-        case 1:
-          explorer = `https://${subdomain}etherscan.io/address/${address}`;
-          return explorer;
-        default:
-          explorer = `https://${subdomain}zkscan.io/explorer/accounts/${address}`
-          return explorer;
+      if (layer === 1) {
+        const subdomain = this.apiProvider.network === 1 ? "" : "rinkeby.";
+        return `https://${subdomain}etherscan.io/address/${address}`;
+      }
+
+      const network = this.apiProvider.network
+      const subdomain = this.apiProvider.network === 1 ? "" : "rinkeby.";
+      switch(network) {
+        case 1000: return `https://${subdomain}zkscan.io/explorer/accounts/${address}`;
+        case 42161: return `https://${subdomain}arbiscan.io/address/${address}`;
+        default: return `https://${subdomain}etherscan.io/address/${address}`;
       }
     }
     
