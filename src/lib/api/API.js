@@ -22,7 +22,9 @@ import get from "lodash/get";
 const chainMap = {
   "0x1": 1,
   "0x4": 1000,
+  "0xf00": 42161,
 };
+
 export default class API extends Emitter {
     networks = {}
     ws = null
@@ -320,7 +322,7 @@ export default class API extends Emitter {
                 ethereumChainId = "0x4";
             break;
             case 42161: 
-            ethereumChainId = "0xf00";
+              ethereumChainId = "0xf00";
             default:
                 return
         }
