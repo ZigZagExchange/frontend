@@ -257,7 +257,7 @@ export default class API extends Emitter {
     }
     if (msg.op === "lastprice") {
       const lastprices = msg.args[0];
-      lastprices.forEach((l) => (this.apiProvider.lastPrices[l[0]] = l));
+      lastprices.forEach((l) => (this.lastPrices[l[0]] = l));
       const noInfoPairs = lastprices
         .map((l) => l[0])
         .filter((pair) => !this.apiProvider.marketInfo[pair]);
@@ -379,6 +379,8 @@ export default class API extends Emitter {
             ]);
           }
 
+          accountState.profile = await this.getProfile(accountState.address)
+
           this.emit("signIn", accountState);
 
           // fetch blances
@@ -407,6 +409,13 @@ export default class API extends Emitter {
       window.localStorage.clear();
     else
       window.localStorage.removeItem('walletconnect');
+
+      
+    this.marketInfo = {}
+    this.lastprices = {}
+    this._profiles = {}
+    this._pendingOrders = []
+    this._pendingFills = []
 
     this.web3 = null;
     this.web3Modal = null;
