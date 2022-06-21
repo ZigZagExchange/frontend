@@ -1086,10 +1086,6 @@ export default function OrdersTable(props) {
               <Tab>Order History ({getFills().length})</Tab>
               <Tab>Balances</Tab>
             </StyledTabMenu>
-
-            <Button variant="outlined" width="50px" scale="sm">
-                SELL
-            </Button>
           </div>
           {
             isMobile ?
