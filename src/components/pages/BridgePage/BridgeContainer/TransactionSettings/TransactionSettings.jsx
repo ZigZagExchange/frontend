@@ -183,7 +183,7 @@ const TransactionSettings = ({
                   </p>
                   <p className="font-sans text-sm ">
                     {fromNetwork.id === "polygon" &&
-                      `~${formatPrice(L1FeeAmount)} MATIC`}
+                      `~${formatPrice(L1Fee)} MATIC`}
                   </p>
                 </div>
               )}
@@ -194,7 +194,7 @@ const TransactionSettings = ({
                   </p>
                   <p className="font-sans text-sm ">
                     {fromNetwork.id === "polygon" &&
-                      `${formatPrice(L2FeeAmount)} ${L2FeeToken}`}
+                      `${formatPrice(L2Fee)} ${L2FeeToken}`}
                   </p>
                 </div>
               )}
