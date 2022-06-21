@@ -13,7 +13,7 @@ const initialUISettings = {
   showSizeInUSD: false,
   stackOrderbook: true,
   highSlippageWarning: true,
-  orderBookFlash: false,
+  disabledisableOrderBookFlash: false,
   hideAddress: false,
   hideBalance: false
 }

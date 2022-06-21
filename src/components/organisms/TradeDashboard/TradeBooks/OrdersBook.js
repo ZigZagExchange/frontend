@@ -181,7 +181,7 @@ export default function OrdersBook(props) {
                 <TradePriceTable
                   head
                   className="trade_table_asks sell-side"
-                  useGradient={settings.orderBookFlash}
+                  useGradient={!settings.disableOrderBookFlash}
                   adClass="no-space"
                   priceTableData={askBins}
                   currentMarket={props.currentMarket}
@@ -202,7 +202,7 @@ export default function OrdersBook(props) {
                 <Divider />
                 <TradePriceTable
                   head
-                  useGradient={settings.orderBookFlash}
+                  useGradient={!settings.disableOrderBookFlash}
                   adClass="no-space"
                   currentMarket={props.currentMarket}
                   priceTableData={bidBins}
@@ -216,7 +216,7 @@ export default function OrdersBook(props) {
                 <TradePriceTable
                   head
                   className="trade_table_asks sell-side"
-                  useGradient={settings.orderBookFlash}
+                  useGradient={!settings.disableOrderBookFlash}
                   priceTableData={askBins}
                   currentMarket={props.currentMarket}
                   scrollToBottom={true}
@@ -230,7 +230,7 @@ export default function OrdersBook(props) {
                 />
                 <Divider />
                 <TradePriceTable
-                  useGradient={settings.orderBookFlash}
+                  useGradient={!settings.disableOrderBookFlash}
                   currentMarket={props.currentMarket}
                   priceTableData={bidBins}
                   fixedPoint={fixedPoint}

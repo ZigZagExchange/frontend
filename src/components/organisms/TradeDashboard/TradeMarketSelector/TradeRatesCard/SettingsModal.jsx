@@ -112,7 +112,7 @@ const SettingsModal = ({ onDismiss }) => {
           <Text font='primarySmall' color="foregroundHighEmphasis">Disable high slippage warning</Text>
         </ToggleWrapper>
         <ToggleWrapper>
-          <Toggle isChecked={settings.orderBookFlash} scale="md" onChange={toggle} settingKey="orderBookFlash" />
+          <Toggle isChecked={settings.disableOrderBookFlash} scale="md" onChange={toggle} settingKey="disableOrderBookFlash" />
           <Text font='primarySmall' color="foregroundHighEmphasis">Disable orderbook and trade flashes</Text>
         </ToggleWrapper>
         <ToggleWrapper>
