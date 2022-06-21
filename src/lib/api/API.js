@@ -246,21 +246,21 @@ export default class API extends Emitter {
     if (msg.op === "marketinfo") {
       const marketInfo = msg.args[0];
       if (!marketInfo) return;
-      this.apiProvider.marketInfo[marketInfo.alias] = marketInfo;
+      this.marketInfo[marketInfo.alias] = marketInfo;
     }
     if (msg.op === "marketinfo2") {
       const marketInfos = msg.args[0];
       marketInfos.forEach(marketInfo => {
         if (!marketInfo) return;
-        this.apiProvider.marketInfo[marketInfo.alias] = marketInfo;
+        this.marketInfo[marketInfo.alias] = marketInfo;
       });
     }
     if (msg.op === "lastprice") {
-      const lastprices = msg.args[0];
-      lastprices.forEach((l) => (this.lastPrices[l[0]] = l));
-      const noInfoPairs = lastprices
+      const lastpricesUpdate = msg.args[0];
+      lastpricesUpdate.forEach((l) => (this.lastPrices[l[0]] = l));
+      const noInfoPairs = lastpricesUpdate
         .map((l) => l[0])
-        .filter((pair) => !this.apiProvider.marketInfo[pair]);
+        .filter((pair) => !this.marketInfo[pair]);
       this.cacheMarketInfoFromNetwork(noInfoPairs);
     }
   }
@@ -723,7 +723,7 @@ export default class API extends Emitter {
     const quoteQuantity = order[4] * order[5];
     const remaining = isNaN(Number(order[11])) ? order[5] : order[11];
     const market = order[2];
-    const marketInfo = this.apiProvider.marketInfo[market];
+    const marketInfo = this.marketInfo[market];
     let baseQuantityWithoutFee,
       quoteQuantityWithoutFee,
       priceWithoutFee,
