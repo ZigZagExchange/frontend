@@ -21,7 +21,7 @@ const ButtonMenu = ({
 }) => {
   return (
     <Wrapper left={left} row={row} {...props}>
-      {Children.map(children, (child, index, value) => {
+      {Children.map(children, (child, index) => {
         return cloneElement(child, {
           isActive: activeIndex === index,
           row,

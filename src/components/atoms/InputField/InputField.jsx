@@ -47,6 +47,7 @@ const Input = styled.input`
   outline: 0;
   text-align: left;
   width: 100%;
+  transition: color .25s;
   &::placeholder {
     color: ${({ theme }) => theme.colors.foregroundLowEmphasis};
   }
@@ -61,6 +62,7 @@ const Input = styled.input`
       linear-gradient(${({ theme }) => theme.colors.backgroundLowEmphasis}, ${({ theme }) => theme.colors.backgroundLowEmphasis}) padding-box,
       linear-gradient(93.46deg, ${({ theme }) => theme.colors.primary500} 16.94%, ${({ theme }) => theme.colors.secondary500} 97.24%) border-box;
     border: 1px solid transparent;
+    color: ${({ show, theme }) => !show ? `${theme.colors.primaryHighEmphasis} !important` : ""
   }
 `;
 

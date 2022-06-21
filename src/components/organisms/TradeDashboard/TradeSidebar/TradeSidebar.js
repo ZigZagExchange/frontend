@@ -7,7 +7,7 @@ import { DiscordIcon } from "components/atoms/Svg";
 import { liquiditySelector, marketSummarySelector, marketInfoSelector } from "lib/store/features/api/apiSlice";
 import { Button, ConnectWalletButton } from "components/molecules/Button"
 
-const StyledTradeSidebar = styled.aside `
+const StyledTradeSidebar = styled.aside`
   display: grid;
   grid-auto-flow: row;
   grid-area: sidebar;
@@ -16,7 +16,7 @@ const StyledTradeSidebar = styled.aside `
   border: 1px solid ${({ theme }) => theme.colors.foreground300};
 `;
 
-const InfoWrapper = styled.div `
+const InfoWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -35,40 +35,30 @@ export default function TradeSidebar(props) {
     const joinDiscord = () => {
         window.open('https://discord.gg/zigzag', '_blank')
     }
-    return ( <
-        StyledTradeSidebar > {
-            isMobile ? < > < /> : <
-            InfoWrapper >
-            <
-            Text font = "primarySmall"
-            color = "foregroundHighEmphasis" > { props.user.id ? 'Have a question? Need live support?' : 'You have not connected your wallet.' } <
-            /Text> {
-                props.user.id ? ( <
-                    Button width = "150px"
-                    startIcon = { < DiscordIcon / > }
-                    variant = "outlined"
-                    scale = "imd"
-                    mr = "8px"
-                    onClick = { joinDiscord } >
-                    <
-                    Text font = "primaryBoldDisplay"
-                    color = "foregroundHighEmphasis"
-                    textAlign = "center" > JOIN DISCORD < /Text> <
-                    /Button>
-                ) : ( <
-                    ConnectWalletButton width = "fit-content" / >
-                )
-            } <
-            /InfoWrapper>
-        } <
-        SpotBox lastPrice = { marketSummary.price }
-        user = { props.user }
-        activeOrderCount = { props.activeOrderCount }
-        liquidity = { liquidity }
-        currentMarket = { props.currentMarket }
-        marketSummary = { marketSummary }
-        marketInfo = { marketInfo }
-        /> <
-        /StyledTradeSidebar>
+    return (
+        <StyledTradeSidebar>
+            {isMobile ? <></> :
+                <InfoWrapper>
+                    <Text font="primarySmall" color="foregroundHighEmphasis" > {props.user.id ? 'Have a question? Need live support?' : 'You have not connected your wallet.'}
+                    </Text>
+                    {
+                        props.user.id ? (
+                            <Button width="150px" startIcon={<DiscordIcon />} variant="outlined" scale="imd" mr="8px"
+                                onClick={joinDiscord} >
+                                <Text font="primaryBoldDisplay"
+                                    color="foregroundHighEmphasis"
+                                    textAlign="center" > JOIN DISCORD </Text> </Button>
+                        ) : (<ConnectWalletButton width="fit-content" />)
+                    } </InfoWrapper>
+            }
+            <SpotBox lastPrice={marketSummary.price}
+                user={props.user}
+                activeOrderCount={props.activeOrderCount}
+                liquidity={liquidity}
+                currentMarket={props.currentMarket}
+                marketSummary={marketSummary}
+                marketInfo={marketInfo}
+            />
+        </StyledTradeSidebar>
     );
 }

@@ -395,6 +395,7 @@ export const Header = (props) => {
               clickFunction={changeNetwork}
               leftIcon={true}
             />
+
             {user.address ? (
               <AccountDropdown networkName={networkName} />
             ) : (
