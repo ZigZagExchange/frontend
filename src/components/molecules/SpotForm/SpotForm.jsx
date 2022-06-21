@@ -621,7 +621,7 @@ export class SpotForm extends React.Component {
       )
     } else if (this.props.side === "s") {
       buttonType = "SELL"
-      buttonText = buttonType + " " + (marketInfo && marketInfo.quoteAsset?.symbol);
+      buttonText = buttonType + " " + (marketInfo && marketInfo.baseAsset?.symbol);
       feeAmount = (
         <FormHeader>
           <InfoWrapper>
