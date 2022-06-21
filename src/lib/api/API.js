@@ -355,13 +355,11 @@ export default class API extends Emitter {
 
           await this.refreshNetwork();
           await this.sleep(1000);
-          if (this.isZksyncChain()) {
-            const web3Provider = await this.web3Modal.connect();
-            this.web3.setProvider(web3Provider);
-            this.ethersProvider = new ethers.providers.Web3Provider(
-              web3Provider
-            );
-          }
+          const web3Provider = await this.web3Modal.connect();
+          this.web3.setProvider(web3Provider);
+          this.ethersProvider = new ethers.providers.Web3Provider(
+            web3Provider
+          );
 
           // set up polygon providers. mumbai for testnet. polygon for mainnet
           this.polygonProvider = new ethers.providers.JsonRpcProvider(
