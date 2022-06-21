@@ -23,6 +23,7 @@ export default class APIZKProvider extends APIProvider {
   syncProvider = null;
   batchTransferService = null;
   zksyncCompatible = true;
+  evmCompatible = false;
   _tokenWithdrawFees = {};
   eligibleFastWithdrawTokens = ["ETH", "FRAX", "UST"];
   fastWithdrawContractAddress = ZKSYNC_ETHEREUM_FAST_BRIDGE.address;
