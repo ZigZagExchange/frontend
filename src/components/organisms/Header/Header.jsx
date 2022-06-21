@@ -384,7 +384,7 @@ export const Header = (props) => {
               clickFunction={changeNetwork}
               leftIcon={true}
             />
-            {user.address ? 
+            {user.address ?
               <AccountDropdown networkName={networkName} /> :
               <ConnectWalletButton />
             }

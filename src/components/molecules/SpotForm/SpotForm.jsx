@@ -60,7 +60,7 @@ export class SpotForm extends React.Component {
 
   updateAmount(e) {
     const newState = { ...this.state };
-    if(Number.isNaN(e.target.value) || Number(e.target.value) === 0) {
+    if (Number.isNaN(e.target.value) || Number(e.target.value) === 0) {
       newState.orderButtonDisabled = true;
     } else {
       newState.orderButtonDisabled = false;
@@ -71,7 +71,7 @@ export class SpotForm extends React.Component {
       newState.totalAmount = this.props.orderType === "limit" ?
         (this.currentPrice() * newState.baseAmount).toPrecision(6) :
         (this.props.marketSummary.price * newState.baseAmount).toPrecision(6);
-        
+
     this.setState(newState);
   }
 
@@ -371,12 +371,12 @@ export class SpotForm extends React.Component {
     newstate.orderButtonDisabled = true;
     this.setState(newstate);
     let orderPendingToast;
-    if (this.props.settings.showFillNotification) {
+    if (!this.props.settings.disableOrderNotification) {
       orderPendingToast = toast.info(
         renderGuidContent(), {
         toastId: "Order pending",
         autoClose: false,
-        }
+      }
       );
     }
 
@@ -391,7 +391,7 @@ export class SpotForm extends React.Component {
         this.props.orderType
       );
 
-      if (this.props.settings.showFillNotification) {
+      if (!this.props.settings.disableOrderNotification) {
         toast.info(
           "Order placed", {
           toastId: "Order placed.",
@@ -401,7 +401,10 @@ export class SpotForm extends React.Component {
       toast.error(e.message);
     }
 
-    toast.dismiss(orderPendingToast);
+    if (!this.props.settings.disableOrderNotification) {
+      toast.dismiss(orderPendingToast);
+    }
+
     newstate = { ...this.state };
     newstate.orderButtonDisabled = false;
     this.setState(newstate);

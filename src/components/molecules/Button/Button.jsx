@@ -4,7 +4,7 @@ import StyledButton from "./StyledButton";
 import { scales, variants } from "./types";
 
 const Button = (props) => {
-  const {  startIcon, endIcon, className, isLoading, disabled, children, ...rest } = props;
+  const { startIcon, endIcon, className, isLoading, disabled, children, ...rest } = props;
   const isDisabled = isLoading || disabled;
   const classNames = className ? [className] : [];
 
@@ -15,18 +15,18 @@ const Button = (props) => {
       disabled={isDisabled}
       {...rest}
     >
-      {isLoading && <LoadingSpinner size={16} style={{paddingRight: '8px'}} />}
-			<>
-			{isValidElement(startIcon) &&
+      {isLoading && <LoadingSpinner size={16} style={{ paddingRight: '8px' }} />}
+      <>
+        {isValidElement(startIcon) &&
           cloneElement(startIcon, {
-            style: {marginRight: "8px"},
+            style: { marginRight: "8px" },
           })}
-      {children}
-			{isValidElement(endIcon) &&
+        {children}
+        {isValidElement(endIcon) &&
           cloneElement(endIcon, {
-            style: {marginLeft: "8px"},
+            style: { marginLeft: "8px" },
           })}
-			</>
+      </>
     </StyledButton>
   );
 };

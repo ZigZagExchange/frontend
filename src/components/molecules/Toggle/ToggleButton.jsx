@@ -31,6 +31,14 @@ const ToggleItem = styled.li`
         show && leftLabel === 'BUY' ? theme.colors.successHighEmphasis :
             show && rightLabel === 'SELL' ? theme.colors.dangerHighEmphasis :
                 'transparent'};
+
+    div {
+        transition: color .25s;
+    }
+
+    &:hover div {
+        color: ${({ show, theme }) => !show ? `${theme.colors.primaryHighEmphasis} !important` : ""
+    }
 `;
 
 const ToggleButton = ({ ...props }) => {

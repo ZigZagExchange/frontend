@@ -96,8 +96,8 @@ const SettingsModal = ({ onDismiss }) => {
           <Text font='primarySmall' color="foregroundHighEmphasis">Cancel all orders button enabled</Text>
         </ToggleWrapper>
         <ToggleWrapper>
-          <Toggle isChecked={settings.showFillNotification} scale="md" onChange={toggle} settingKey="showFillNotification" />
-          <Text font='primarySmall' color="foregroundHighEmphasis">Show notifications for fills</Text>
+          <Toggle isChecked={settings.disableOrderNotification} scale="md" onChange={toggle} settingKey="disableOrderNotification" />
+          <Text font='primarySmall' color="foregroundHighEmphasis">Disable order notifications (pending, placed and filled orders)</Text>
         </ToggleWrapper>
         <ToggleWrapper>
           <Toggle isChecked={settings.showSizeInUSD} scale="md" onChange={toggle} settingKey="showSizeInUSD" />
@@ -112,7 +112,7 @@ const SettingsModal = ({ onDismiss }) => {
           <Text font='primarySmall' color="foregroundHighEmphasis">Disable high slippage warning</Text>
         </ToggleWrapper>
         <ToggleWrapper>
-          <Toggle isChecked={settings.orderBookFlash} scale="md" onChange={toggle} settingKey="orderBookFlash" />
+          <Toggle isChecked={settings.disableOrderBookFlash} scale="md" onChange={toggle} settingKey="disableOrderBookFlash" />
           <Text font='primarySmall' color="foregroundHighEmphasis">Disable orderbook and trade flashes</Text>
         </ToggleWrapper>
         <ToggleWrapper>
