@@ -97,7 +97,7 @@ const SettingsModal = ({ onDismiss }) => {
         </ToggleWrapper>
         <ToggleWrapper>
           <Toggle isChecked={settings.showFillNotification} scale="md" onChange={toggle} settingKey="showFillNotification" />
-          <Text font='primarySmall' color="foregroundHighEmphasis">Show notifications for fills</Text>
+          <Text font='primarySmall' color="foregroundHighEmphasis">Disable order notifications (pending, placed and filled orders)</Text>
         </ToggleWrapper>
         <ToggleWrapper>
           <Toggle isChecked={settings.showSizeInUSD} scale="md" onChange={toggle} settingKey="showSizeInUSD" />
