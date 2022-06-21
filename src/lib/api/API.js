@@ -33,7 +33,7 @@ export default class API extends Emitter {
     currencies = null
     isArgent = false
     marketInfo = {}
-    lastprices = {}
+    lastPrices = {}
     _signInProgress = null
     _profiles = {}
     _pendingOrders = []
@@ -258,9 +258,9 @@ export default class API extends Emitter {
       });
     }
     if (msg.op === "lastprice") {
-      const lastpricesUpdate = msg.args[0];
-      lastpricesUpdate.forEach((l) => (this.lastPrices[l[0]] = l));
-      const noInfoPairs = lastpricesUpdate
+      const lastPricesUpdate = msg.args[0];
+      lastPricesUpdate.forEach((l) => (this.lastPrices[l[0]] = l));
+      const noInfoPairs = lastPricesUpdate
         .map((l) => l[0])
         .filter((pair) => !this.marketInfo[pair]);
       this.cacheMarketInfoFromNetwork(noInfoPairs);
@@ -414,7 +414,7 @@ export default class API extends Emitter {
 
       
     this.marketInfo = {}
-    this.lastprices = {}
+    this.lastPrices = {}
     this._profiles = {}
     this._pendingOrders = []
     this._pendingFills = []

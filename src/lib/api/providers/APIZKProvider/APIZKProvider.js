@@ -277,8 +277,8 @@ export default class APIZKProvider extends APIProvider {
     const account = await this.getAccountState();
     const balances = {};
 
-    this.getCurrencies().forEach((ticker) => {
-      const currencyInfo = this.getCurrencyInfo(ticker);
+    this.api.getCurrencies().forEach((ticker) => {
+      const currencyInfo = this.api.getCurrencyInfo(ticker);
       const balance =
         account && account.committed
           ? account.committed.balances[ticker] || 0
@@ -303,7 +303,7 @@ export default class APIZKProvider extends APIProvider {
   depositL2 = async (amountDecimals, token = "ETH", address = "") => {
     let transfer;
 
-    const currencyInfo = this.getCurrencyInfo(token);
+    const currencyInfo = this.api.getCurrencyInfo(token);
     const amount = toBaseUnit(amountDecimals, currencyInfo.decimals);
 
     try {
@@ -331,7 +331,7 @@ export default class APIZKProvider extends APIProvider {
   ) => {
     let transfer;
 
-    const currencyInfo = this.getCurrencyInfo(token);
+    const currencyInfo = this.api.getCurrencyInfo(token);
     const amount = toBaseUnit(amountDecimals, currencyInfo.decimals);
     const packableAmount = closestPackableTransactionAmount(amount);
     const feeToken = await this.getWithdrawFeeToken(token);
@@ -455,7 +455,7 @@ export default class APIZKProvider extends APIProvider {
 
   withdrawL2GasFee = async (token) => {
     const feeToken = await this.getWithdrawFeeToken(token);
-    const currencyInfo = this.getCurrencyInfo(feeToken);
+    const currencyInfo = this.api.getCurrencyInfo(feeToken);
     if (!this._tokenWithdrawFees[token]) {
       const fee = await this.syncProvider.getTransactionFee(
         "Withdraw",
@@ -470,7 +470,7 @@ export default class APIZKProvider extends APIProvider {
 
   transferL2GasFee = async (token) => {
     const feeToken = await this.getWithdrawFeeToken(token);
-    const feeCurrencyInfo = this.getCurrencyInfo(feeToken);
+    const feeCurrencyInfo = this.api.getCurrencyInfo(feeToken);
     const address = this.syncWallet.address();
 
     let totalFee;
@@ -500,7 +500,7 @@ export default class APIZKProvider extends APIProvider {
      * Returns the fee taken by ZigZag when sending on L1. If the token is not ETH,
      * the notional amount of the ETH tx fee will be taken in the currency being bridged
      * */
-    const currencyInfo = this.getCurrencyInfo(token);
+    const currencyInfo = this.api.getCurrencyInfo(token);
     const getNumberFormatted = (atoms) => {
       return parseInt(atoms) / 10 ** currencyInfo.decimals;
     };
