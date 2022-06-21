@@ -52,44 +52,71 @@ export class SpotForm extends React.Component {
     );
   }
 
-  getLadderPrice() {
-    const marketInfo = this.props.marketInfo;
-    if (!marketInfo) return 0;
-
+  /*
+   * zkSync does not allow partial fills, so the ladder price is the first
+   * liquidity that can fill the order size. 
+   */
+  getLadderPriceZkSync_v1() {
     let baseAmount = this.state.baseAmount;
     const side = this.props.side;
 
     if (!baseAmount) baseAmount = 0;
 
-    let price,
-      unfilled = baseAmount;
+    let price;
     if (side === "b") {
       const asks = this.props.liquidity.filter((l) => l[0] === "s");
       asks.sort((a, b) => a[1] - b[1]);
+
       for (let i = 0; i < asks.length; i++) {
-        if (asks[i][2] >= unfilled || i === asks.length - 1) {
+        if (asks[i][2] >= baseAmount || i === asks.length - 1) {
           price = asks[i][1];
           break;
-        } else {
-          unfilled -= asks[i][2];
         }
       }
     } else if (side === "s") {
       const bids = this.props.liquidity.filter((l) => l[0] === "b");
-
       bids.sort((a, b) => b[1] - a[1]);
+
       for (let i = 0; i < bids.length; i++) {
-        if (bids[i][2] >= unfilled || i === bids.length - 1) {
+        if (bids[i][2] >= baseAmount || i === bids.length - 1) {
           price = bids[i][1];
           break;
-        } else {
-          unfilled -= bids[i][2];
         }
       }
     }
     if (!price) return 0;
     return formatPrice(price);
   }
+
+  //getLadderPrice() {    
+  //  let baseAmount = this.state.baseAmount;
+  //  const side = this.props.side;
+  //
+  //  if (!baseAmount) baseAmount = 0;
+  //
+  //  let price;
+  //  if (side === "b") {
+  //    // get order book
+  //
+  //    for (let i = 0; i < asks.length; i++) {
+  //      if (asks[i][2] >= baseAmount || i === asks.length - 1) {
+  //        price = asks[i][1];
+  //        break;
+  //      }
+  //    }
+  //  } else if (side === "s") {
+  //    // get order book
+  //
+  //    for (let i = 0; i < bids.length; i++) {
+  //      if (bids[i][2] >= baseAmount || i === bids.length - 1) {
+  //        price = bids[i][1];
+  //        break;
+  //      }
+  //    }
+  //  }
+  //  if (!price) return 0;
+  //  return formatPrice(price);
+  //}
 
   async buySellHandler(e) {
     let baseAmount, quoteAmount;
@@ -254,11 +281,11 @@ export class SpotForm extends React.Component {
 
     const renderGuidContent = () => {
       return <div>
-        <p style={{fontSize: '14px', lineHeight:'24px'}}>{this.props.side === 's' ? 'Sell' : 'Buy'} Order pending</p>
-        <p style={{fontSize: '14px', lineHeight:'24px'}}>{baseAmountMsg} {marketInfo.baseAsset.symbol} @ {
-            ['USDC', 'USDT', 'DAI', 'FRAX'].includes(marketInfo.quoteAsset.symbol) ? price.toFixed(2) : formatPrice(price)
-          } {marketInfo.quoteAsset.symbol}</p>
-        <p style={{fontSize: '14px', lineHeight:'24px'}}>Sign or Cancel to continue...</p>
+        <p style={{ fontSize: '14px', lineHeight: '24px' }}>{this.props.side === 's' ? 'Sell' : 'Buy'} Order pending</p>
+        <p style={{ fontSize: '14px', lineHeight: '24px' }}>{baseAmountMsg} {marketInfo.baseAsset.symbol} @ {
+          ['USDC', 'USDT', 'DAI', 'FRAX'].includes(marketInfo.quoteAsset.symbol) ? price.toFixed(2) : formatPrice(price)
+        } {marketInfo.quoteAsset.symbol}</p>
+        <p style={{ fontSize: '14px', lineHeight: '24px' }}>Sign or Cancel to continue...</p>
       </div>
     }
 
@@ -269,7 +296,7 @@ export class SpotForm extends React.Component {
       renderGuidContent(), {
       toastId: "Order pending",
       autoClose: false,
-      }
+    }
     );
 
 
@@ -327,8 +354,12 @@ export class SpotForm extends React.Component {
     if (this.props.orderType === "limit" && this.state.price) {
       return this.state.price;
     } else {
-      var ladderPrice = this.getLadderPrice();
-      return ladderPrice;
+      if (api.isZksyncChain()) {
+        return this.getLadderPriceZkSync_v1();
+      } else {
+        console.log('this.getLadderPrice() not implemented for not zkSync_v1')
+        // return this.getLadderPrice();
+      }
     }
   }
 
@@ -482,9 +513,7 @@ export class SpotForm extends React.Component {
             <input
               type="text"
               value={
-                this.priceIsDisabled()
-                  ? this.props.marketSummary && this.props.marketSummary?.price
-                  : this.state.userHasEditedPrice ? this.state.price : this.currentPrice()
+                this.state.userHasEditedPrice ? this.state.price : this.currentPrice()
               }
               onChange={this.updatePrice.bind(this)}
               disabled={this.priceIsDisabled()}
@@ -514,19 +543,10 @@ export class SpotForm extends React.Component {
               <div className="spf_head">
                 <span>Total</span>
                 <strong>
-                  {this.props.orderType === "limit" ? (
-                    <>
-                      {(this.currentPrice() * this.state.baseAmount).toPrecision(6)}{" "}
-                      {marketInfo && marketInfo.quoteAsset.symbol}
-                    </>
-                  ) : (
-                    <>
-                      {(
-                        this.props.marketSummary.price * this.state.baseAmount
-                      ).toPrecision(6)}{" "}
-                      {marketInfo && marketInfo.quoteAsset.symbol}
-                    </>
-                  )}
+                  <>
+                    {(this.currentPrice() * this.state.baseAmount).toPrecision(6)}{" "}
+                    {marketInfo && marketInfo.quoteAsset.symbol}
+                  </>
                 </strong>
               </div>
               <div className="spf_btn">
