@@ -17,16 +17,34 @@ const StyledButton = styled.button`
   outline: 0;
 
   ${variant({
-    prop: "scale",
-    variants: scaleVariants,
-  })}
+  prop: "scale",
+  variants: scaleVariants,
+})}
 
-  ${({theme})=> variant({
-    variants: styleVariants(theme),
-  })}
+  ${({ theme }) => variant({
+  variants: styleVariants(theme),
+})}
 
   ${layout}
   ${space}
+
+  div {
+    transition: color .25s;
+  }
+
+  svg path {
+    transition: fill .25s;
+  }
+
+  &:hover {
+    svg path {
+      fill: ${({ show, theme }) => !show ? `${theme.colors.primaryHighEmphasis} !important` : ""
+  }}
+
+  &:hover {
+    div {
+      color: ${({ show, theme }) => !show ? `${theme.colors.primaryHighEmphasis} !important` : ""
+  }}
 `;
 
 export default StyledButton;

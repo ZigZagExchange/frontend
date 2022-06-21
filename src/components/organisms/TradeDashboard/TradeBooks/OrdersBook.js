@@ -57,6 +57,12 @@ const OrderButtonWrapper = styled.div`
   rect {
       fill: ${({ theme }) => theme.colors.foregroundHighEmphasis}
   }
+
+  &:hover {
+    rect {
+      fill: ${({ theme }) => theme.colors.primaryHighEmphasis}
+    }
+  }
 `
 
 const fixedPoints = [
