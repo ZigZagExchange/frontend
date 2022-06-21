@@ -24,7 +24,7 @@ const SwapContianer = ({
   onClickMax,
 }) => {
   return (
-    <div className="p-4 mt-4 border-t border-b border-l border-r rounded-lg dark:border-foreground-400 border-primary-500">
+    <div className="p-4 mt-5 border-t border-b border-l border-r rounded-lg dark:border-foreground-400 border-primary-500">
       <div className="flex items-center justify-between">
         <p className="text-lg font-work">From</p>
         <p className="text-sm font-normal ">
@@ -35,7 +35,7 @@ const SwapContianer = ({
           {` ${fromToken?.name}`}
         </p>
       </div>
-      <div className="flex items-center justify-between px-3 py-2 mt-3 rounded-lg dark:bg-foreground-200 bg-primary-300">
+      <div className="flex items-center justify-between px-3 py-2 mt-3 rounded-lg dark:bg-foreground-200 bg-primary-300 hover:ring-1 hover:ring-offset-0 hover:dark:ring-foreground-500 hover:ring-primary-600">
         {fromTokenOptions.length > 0 && (
           <TokenDropDownModal
             tickers={fromTokenOptions}
@@ -62,10 +62,10 @@ const SwapContianer = ({
       </p>
       <div className="relative h-px mx-2 my-5 dark:bg-foreground-400 bg-primary-500">
         <button
-          className="absolute inset-x-0 w-10 h-10 mx-auto -mt-5 rounded-full shadow-xl bg-gradient-to-r from-primary-900 to-secondary-900"
+          className="absolute inset-x-0 w-10 h-10 mx-auto -mt-5 rounded-full shadow-xl bg-gradient-to-r from-primary-900 to-secondary-900 hover:brightness-105"
           onClick={onSwitchTokenBtn}
         >
-          <SwitchVerticalIcon className="absolute inset-x-0 mx-auto -mt-3.5 w-7 hover:opacity-80 text-white" />
+          <SwitchVerticalIcon className="absolute inset-x-0 mx-auto -mt-3.5 w-7 hover:opacity-80 text-white origin-center hover:rotate-180 transition-all duration-300 ease-in-out" />
         </button>
       </div>
       <div className="flex items-center justify-between">

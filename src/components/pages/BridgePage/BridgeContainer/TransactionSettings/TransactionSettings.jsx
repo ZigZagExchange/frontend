@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { InfoIcon } from "components/atoms/Svg";
 import classNames from "classnames";
-import { formatUSD, formatPrice } from "lib/utils";
+import { formatUSD, formatPrice, shortenAddress } from "lib/utils";
 import { RadioGroup } from "@headlessui/react";
 const TransactionSettings = ({
   user,
@@ -43,7 +43,7 @@ const TransactionSettings = ({
       </div>
       {user.address && (
         <div className="py-2 mt-2 font-sans text-sm tracking-wider text-center border rounded-lg dark:border-foreground-400 border-primary-500 text-slate-400 ">
-          {user.address}
+          {shortenAddress(user.address, 10)}
         </div>
       )}
       {user.address && user.id && !isSwapAmountEmpty && (
