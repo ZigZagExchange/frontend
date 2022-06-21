@@ -96,7 +96,7 @@ const SettingsModal = ({ onDismiss }) => {
           <Text font='primarySmall' color="foregroundHighEmphasis">Cancel all orders button enabled</Text>
         </ToggleWrapper>
         <ToggleWrapper>
-          <Toggle isChecked={settings.showFillNotification} scale="md" onChange={toggle} settingKey="showFillNotification" />
+          <Toggle isChecked={settings.disableOrderNotification} scale="md" onChange={toggle} settingKey="disableOrderNotification" />
           <Text font='primarySmall' color="foregroundHighEmphasis">Disable order notifications (pending, placed and filled orders)</Text>
         </ToggleWrapper>
         <ToggleWrapper>

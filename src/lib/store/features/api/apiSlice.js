@@ -9,7 +9,7 @@ const makeScope = (state) => `${state.network}-${state.userId}`;
 const initialUISettings = {
   showNightPriceChange: true,
   cancelOrders: false,
-  showFillNotification: false,
+  disableOrderNotification: false,
   showSizeInUSD: false,
   stackOrderbook: true,
   highSlippageWarning: true,
@@ -146,7 +146,7 @@ export const apiSlice = createSlice({
             const price = Number(fillDetails[4]);
             const baseQuantity = Number(fillDetails[5]);
 
-            if (state.settings.showFillNotification) {
+            if (state.settings.disableOrderNotification) {
               toast.success(
                 `Your ${sideText} order for ${Number(
                   baseQuantity.toPrecision(4)

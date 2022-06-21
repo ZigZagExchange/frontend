@@ -60,7 +60,7 @@ export class SpotForm extends React.Component {
 
   updateAmount(e) {
     const newState = { ...this.state };
-    if(Number.isNaN(e.target.value) || Number(e.target.value) === 0) {
+    if (Number.isNaN(e.target.value) || Number(e.target.value) === 0) {
       newState.orderButtonDisabled = true;
     } else {
       newState.orderButtonDisabled = false;
@@ -71,7 +71,7 @@ export class SpotForm extends React.Component {
       newState.totalAmount = this.props.orderType === "limit" ?
         (this.currentPrice() * newState.baseAmount).toPrecision(6) :
         (this.props.marketSummary.price * newState.baseAmount).toPrecision(6);
-        
+
     this.setState(newState);
   }
 
@@ -332,11 +332,11 @@ export class SpotForm extends React.Component {
 
     const renderGuidContent = () => {
       return <div>
-        <p style={{fontSize: '14px', lineHeight:'24px'}}>{this.props.side === 's' ? 'Sell' : 'Buy'} Order pending</p>
-        <p style={{fontSize: '14px', lineHeight:'24px'}}>{baseAmountMsg} {marketInfo.baseAsset.symbol} @ {
-            ['USDC', 'USDT', 'DAI', 'FRAX'].includes(marketInfo.quoteAsset.symbol) ? price.toFixed(2) : formatPrice(price)
-          } {marketInfo.quoteAsset.symbol}</p>
-        <p style={{fontSize: '14px', lineHeight:'24px'}}>Sign or Cancel to continue...</p>
+        <p style={{ fontSize: '14px', lineHeight: '24px' }}>{this.props.side === 's' ? 'Sell' : 'Buy'} Order pending</p>
+        <p style={{ fontSize: '14px', lineHeight: '24px' }}>{baseAmountMsg} {marketInfo.baseAsset.symbol} @ {
+          ['USDC', 'USDT', 'DAI', 'FRAX'].includes(marketInfo.quoteAsset.symbol) ? price.toFixed(2) : formatPrice(price)
+        } {marketInfo.quoteAsset.symbol}</p>
+        <p style={{ fontSize: '14px', lineHeight: '24px' }}>Sign or Cancel to continue...</p>
       </div>
     }
 
@@ -344,12 +344,12 @@ export class SpotForm extends React.Component {
     newstate.orderButtonDisabled = true;
     this.setState(newstate);
     let orderPendingToast;
-    if (this.props.settings.showFillNotification) {
+    if (!this.props.settings.disableOrderNotification) {
       orderPendingToast = toast.info(
         renderGuidContent(), {
         toastId: "Order pending",
         autoClose: false,
-        }
+      }
       );
     }
 
@@ -364,7 +364,7 @@ export class SpotForm extends React.Component {
         this.props.orderType
       );
 
-      if (this.props.settings.showFillNotification) {
+      if (!this.props.settings.disableOrderNotification) {
         toast.info(
           "Order placed", {
           toastId: "Order placed.",
