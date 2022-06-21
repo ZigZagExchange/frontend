@@ -146,7 +146,7 @@ export const apiSlice = createSlice({
             const price = Number(fillDetails[4]);
             const baseQuantity = Number(fillDetails[5]);
 
-            if (state.settings.disableOrderNotification) {
+            if (!state.settings.disableOrderNotification) {
               toast.success(
                 `Your ${sideText} order for ${Number(
                   baseQuantity.toPrecision(4)
