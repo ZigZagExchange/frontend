@@ -381,9 +381,6 @@ export default class API extends Emitter {
 
           this.emit("signIn", accountState);
 
-          accountState.profile = await this.getProfile(accountState.address)
-          this.emit('accountState', accountState)
-
           // fetch blances
           await this.getBalances();
           await this.getWalletBalances();

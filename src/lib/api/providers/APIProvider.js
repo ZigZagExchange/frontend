@@ -74,7 +74,7 @@ export default class APIProvider {
     return Object.keys(this.lastPrices);
   };
 
-  getCurrencyInfo(currency) {
+  getCurrencyInfo = (currency) => {
     const pairs = this.getPairs();
     for (let i = 0; i < pairs.length; i++) {
       const pair = pairs[i];
@@ -87,7 +87,7 @@ export default class APIProvider {
       }
     }
     return null;
-  }
+  };
 
   getCurrencies = () => {
     const tickers = new Set();
