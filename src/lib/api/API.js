@@ -842,6 +842,20 @@ export default class API extends Emitter {
       }
     }
   }
+  
+  // marketinfo calls can get expesnive so it's good to cache them
+  cacheMarketInfoFromNetwork = async (pairs) => {
+    if (pairs.length === 0) return;
+    if (!this.apiProvider.network) return;
+    const pairText = pairs.join(",");
+    const url = (this.apiProvider.network === 1)
+      ? `https://zigzag-markets.herokuapp.com/markets?id=${pairText}&chainid=${this.apiProvider.network}`
+      : `https://secret-thicket-93345.herokuapp.com/api/v1/marketinfos?chain_id=${this.apiProvider.network}&market=${pairText}`
+    const marketInfoArray = await fetch(url).then((r) => r.json());
+    if (!(marketInfoArray instanceof Array)) return;
+    marketInfoArray.forEach((info) => (this.marketInfo[info.alias] = info));
+    return;
+  }
 
   get fastWithdrawTokenAddresses() {
     if (this.apiProvider.network === 1) {
