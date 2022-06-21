@@ -12,7 +12,6 @@ import { TokenPairDropdown } from "components/molecules/Dropdown";
 import useModal from "components/hooks/useModal";
 
 const TradeRatesCard = ({ updateMarketChain, marketSummary, rowData, currentMarket, marketInfo }) => {
-  console.log("marketsummary is", marketSummary);
   const handleOnModalClose = () => {
     onSettingsModalClose()
   }

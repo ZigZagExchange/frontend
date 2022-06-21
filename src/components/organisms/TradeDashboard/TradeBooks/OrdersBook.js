@@ -5,7 +5,7 @@ import TradePriceTable from "./TradePriceTable/TradePriceTable";
 import TradePriceHeadSecond from "./TradePriceHeadSecond/TradePriceHeadSecond";
 import Text from "components/atoms/Text/Text";
 import { Dropdown } from "components/molecules/Dropdown";
-import { liquiditySelector, marketSummarySelector, marketInfoSelector } from "lib/store/features/api/apiSlice";
+import { liquiditySelector, marketSummarySelector, marketInfoSelector, settingsSelector } from "lib/store/features/api/apiSlice";
 import { SideAllButton, SideSellButton, SideBuyButton } from "./OrdersFooter/SideButtons";
 
 const StyledTradeBooks = styled.section`
@@ -57,6 +57,12 @@ const OrderButtonWrapper = styled.div`
   rect {
       fill: ${({ theme }) => theme.colors.foregroundHighEmphasis}
   }
+
+  &:hover {
+    rect {
+      fill: ${({ theme }) => theme.colors.primaryHighEmphasis}
+    }
+  }
 `
 
 const fixedPoints = [
@@ -69,6 +75,7 @@ export default function OrdersBook(props) {
   const marketInfo = useSelector(marketInfoSelector);
   const marketSummary = useSelector(marketSummarySelector);
   const liquidity = useSelector(liquiditySelector);
+  const settings = useSelector(settingsSelector);
   const [fixedPoint, setFixedPoint] = useState(2);
   const [side, setSide] = useState('all');
   const [fixedPointItems, setFixedPointItems] = useState(fixedPoints);
@@ -174,7 +181,7 @@ export default function OrdersBook(props) {
                 <TradePriceTable
                   head
                   className="trade_table_asks sell-side"
-                  useGradient="true"
+                  useGradient={!settings.disableOrderBookFlash}
                   adClass="no-space"
                   priceTableData={askBins}
                   currentMarket={props.currentMarket}
@@ -195,7 +202,7 @@ export default function OrdersBook(props) {
                 <Divider />
                 <TradePriceTable
                   head
-                  useGradient="true"
+                  useGradient={!settings.disableOrderBookFlash}
                   adClass="no-space"
                   currentMarket={props.currentMarket}
                   priceTableData={bidBins}
@@ -209,7 +216,7 @@ export default function OrdersBook(props) {
                 <TradePriceTable
                   head
                   className="trade_table_asks sell-side"
-                  useGradient="true"
+                  useGradient={!settings.disableOrderBookFlash}
                   priceTableData={askBins}
                   currentMarket={props.currentMarket}
                   scrollToBottom={true}
@@ -223,7 +230,7 @@ export default function OrdersBook(props) {
                 />
                 <Divider />
                 <TradePriceTable
-                  useGradient="true"
+                  useGradient={!settings.disableOrderBookFlash}
                   currentMarket={props.currentMarket}
                   priceTableData={bidBins}
                   fixedPoint={fixedPoint}

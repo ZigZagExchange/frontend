@@ -6,6 +6,7 @@ const StyledTradeTables = styled.section`
   display: flex;
   grid-area: tables;
   background-color: ${({theme}) => theme.colors.backgroundMediumEmphasis};
+  min-height: 316px;
 `;
 
 export default function TradeTables(props) {

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { InfoIcon } from "components/atoms/Svg";
 import classNames from "classnames";
-import { formatUSD, formatPrice } from "lib/utils";
+import { formatUSD, formatPrice, shortenAddress } from "lib/utils";
 import { RadioGroup } from "@headlessui/react";
 const TransactionSettings = ({
   user,
@@ -43,7 +43,7 @@ const TransactionSettings = ({
       </div>
       {user.address && (
         <div className="py-2 mt-2 font-sans text-sm tracking-wider text-center border rounded-lg dark:border-foreground-400 border-primary-500 text-slate-400 ">
-          {user.address}
+          {shortenAddress(user.address, 10)}
         </div>
       )}
       {user.address && user.id && !isSwapAmountEmpty && (
@@ -102,9 +102,15 @@ const TransactionSettings = ({
                   </RadioGroup>
                 </div>
               )}
-              {L2Fee && fromNetwork.id === "zksync" && (
+              {L2Fee && toNetwork.id === "ethereum" && (
                 <div className="flex items-center justify-between mt-3">
                   <p className="font-sans text-sm ">zkSync L2 gas fee:</p>
+                  <p className="font-sans text-sm ">{`~${L2Fee} ${L2FeeToken}`}</p>
+                </div>
+              )}
+              {L2Fee && toNetwork.id === "polygon" && (
+                <div className="flex items-center justify-between mt-3">
+                  <p className="font-sans text-sm ">zkSync L2 gas fee + bridge fee:</p>
                   <p className="font-sans text-sm ">{`~${L2Fee} ${L2FeeToken}`}</p>
                 </div>
               )}
@@ -162,7 +168,7 @@ const TransactionSettings = ({
               {L1Fee && fromNetwork.id === "ethereum" && (
                 <div className="flex items-center justify-between mt-3">
                   <p className="font-sans text-sm ">
-                    {fromNetwork.id === "ethereum" && `Gas fee: `}
+                    {fromNetwork.id === "ethereum" && `Maximum Ethereum gas fee: `}
                   </p>
                   <p className="font-sans text-sm ">
                     {fromNetwork.id === "ethereum" &&
@@ -170,14 +176,25 @@ const TransactionSettings = ({
                   </p>
                 </div>
               )}
-              {L2Fee && fromNetwork.id === "polygon" && (
+              {L1Fee && fromNetwork.id === "polygon" && (
                 <div className="flex items-center justify-between mt-3">
                   <p className="font-sans text-sm ">
-                    {fromNetwork.id === "polygon" && `Polygon gas fee: `}
+                    {fromNetwork.id === "polygon" && `Maximum Polygon gas fee: `}
                   </p>
                   <p className="font-sans text-sm ">
                     {fromNetwork.id === "polygon" &&
-                      `~${formatPrice(L2Fee)} ${L2FeeToken}`}
+                      `~${formatPrice(L1Fee)} MATIC`}
+                  </p>
+                </div>
+              )}
+              {L2Fee && fromNetwork.id === "polygon" && (
+                <div className="flex items-center justify-between mt-3">
+                  <p className="font-sans text-sm ">
+                    {fromNetwork.id === "polygon" && `Bridge fee: `}
+                  </p>
+                  <p className="font-sans text-sm ">
+                    {fromNetwork.id === "polygon" &&
+                      `${formatPrice(L2Fee)} ${L2FeeToken}`}
                   </p>
                 </div>
               )}

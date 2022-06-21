@@ -20,6 +20,7 @@ import {
   ActionWrapper
 } from "./StyledComponents"
 import { Dropdown } from "components/molecules/Dropdown";
+import Button from "components/molecules/Button/Button";
 
 export default function OrdersTable(props) {
   const network = useSelector(networkSelector);
@@ -1085,6 +1086,10 @@ export default function OrdersTable(props) {
               <Tab>Order History ({getFills().length})</Tab>
               <Tab>Balances</Tab>
             </StyledTabMenu>
+
+            {/* <Button variant="outlined" width="50px" scale="sm">
+                SELL
+            </Button> */}
           </div>
           {
             isMobile ?

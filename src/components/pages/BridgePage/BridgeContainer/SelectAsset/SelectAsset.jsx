@@ -61,7 +61,7 @@ const SelectAsset = ({
       max = parseFloat(
         (balances[swapDetails.currency] &&
           balances[swapDetails.currency].valueReadable) ||
-        0
+          0
       );
     }
 
@@ -74,10 +74,10 @@ const SelectAsset = ({
           Select an Asset
         </p>
         {swapDetails.currency !== "ETH" &&
-          fromNetwork.id !== "polygon" &&
-          (swapCurrencyInfo?.decimals
-            ? swapDetails.amount * 10 ** swapCurrencyInfo?.decimals
-            : "") > allowance ? (
+        fromNetwork.id !== "polygon" &&
+        (swapCurrencyInfo?.decimals
+          ? swapDetails.amount * 10 ** swapCurrencyInfo?.decimals
+          : "") > allowance ? (
           <p className="text-xs font-work">
             Available allowance:{" "}
             {ethersUtils.formatUnits(allowance, swapCurrencyInfo?.decimals)}
@@ -92,7 +92,7 @@ const SelectAsset = ({
           {` ${swapDetails.currency}`}
         </p>
       </div>
-      <div className="flex items-center justify-between px-3 py-2 mt-2 rounded-lg dark:bg-foreground-200 bg-primary-300">
+      <div className="flex items-center justify-between px-3 py-2 mt-2 rounded-lg dark:bg-foreground-200 bg-primary-300 hover:ring-1 hover:ring-offset-0 hover:dark:ring-foreground-500 hover:ring-primary-600">
         {isOpenable && fromTokenOptions.length > 0 && (
           <TokenDropDownModal
             tickers={fromTokenOptions}
@@ -122,7 +122,7 @@ const SelectAsset = ({
           className="ml-3 text-2xl font-semibold text-right bg-transparent w-36 sm:w-auto focus:outline-none"
           placeholder="0.00"
           onChange={(e) => onChangeFromAmounts(e.target.value)}
-          value={fromAmounts===0 ? "" : fromAmounts}
+          value={fromAmounts === 0 ? "" : fromAmounts}
         />
       </div>
       <p className="mt-1 text-sm font-normal text-right text-slate-400 font-work">

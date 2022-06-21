@@ -31,7 +31,7 @@ export class SpotForm extends React.Component {
     newState.price = (rx_live.test(e.target.value)) ? e.target.value : this.state.price;
     newState.userHasEditedPrice = true;
     newState.totalAmount = this.props.orderType === "limit" ?
-      (this.currentPrice() * newState.baseAmount).toPrecision(6) :
+      (newState.price * newState.baseAmount).toPrecision(6) :
       (this.props.marketSummary.price * newState.baseAmount).toPrecision(6);
     this.setState(newState);
   }
@@ -60,7 +60,7 @@ export class SpotForm extends React.Component {
 
   updateAmount(e) {
     const newState = { ...this.state };
-    if(Number.isNaN(e.target.value) || Number(e.target.value) === 0) {
+    if (Number.isNaN(e.target.value) || Number(e.target.value) === 0) {
       newState.orderButtonDisabled = true;
     } else {
       newState.orderButtonDisabled = false;
@@ -71,12 +71,17 @@ export class SpotForm extends React.Component {
       newState.totalAmount = this.props.orderType === "limit" ?
         (this.currentPrice() * newState.baseAmount).toPrecision(6) :
         (this.props.marketSummary.price * newState.baseAmount).toPrecision(6);
-        
+
     this.setState(newState);
   }
 
   updateTotalAmount(e) {
     const newState = { ...this.state };
+    if(Number.isNaN(e.target.value) || Number(e.target.value) === 0) {
+      newState.orderButtonDisabled = true;
+    } else {
+      newState.orderButtonDisabled = false;
+    }
     newState.totalAmount = (rx_live.test(e.target.value)) ? e.target.value : this.state.totalAmount;
     newState.quoteAmount = "";
     newState.totalAmount === "" ? newState.baseAmount = "" :
@@ -129,44 +134,71 @@ export class SpotForm extends React.Component {
     );
   }
 
-  getLadderPrice() {
-    const marketInfo = this.props.marketInfo;
-    if (!marketInfo) return 0;
-
+  /*
+   * zkSync does not allow partial fills, so the ladder price is the first
+   * liquidity that can fill the order size. 
+   */
+  getLadderPriceZkSync_v1() {
     let baseAmount = this.state.baseAmount;
     const side = this.props.side;
 
     if (!baseAmount) baseAmount = 0;
 
-    let price,
-      unfilled = baseAmount;
+    let price;
     if (side === "b") {
       const asks = this.props.liquidity.filter((l) => l[0] === "s");
       asks.sort((a, b) => a[1] - b[1]);
+
       for (let i = 0; i < asks.length; i++) {
-        if (asks[i][2] >= unfilled || i === asks.length - 1) {
+        if (asks[i][2] >= baseAmount || i === asks.length - 1) {
           price = asks[i][1];
           break;
-        } else {
-          unfilled -= asks[i][2];
         }
       }
     } else if (side === "s") {
       const bids = this.props.liquidity.filter((l) => l[0] === "b");
-
       bids.sort((a, b) => b[1] - a[1]);
+
       for (let i = 0; i < bids.length; i++) {
-        if (bids[i][2] >= unfilled || i === bids.length - 1) {
+        if (bids[i][2] >= baseAmount || i === bids.length - 1) {
           price = bids[i][1];
           break;
-        } else {
-          unfilled -= bids[i][2];
         }
       }
     }
     if (!price) return 0;
     return formatPrice(price);
   }
+
+  //getLadderPrice() {    
+  //  let baseAmount = this.state.baseAmount;
+  //  const side = this.props.side;
+  //
+  //  if (!baseAmount) baseAmount = 0;
+  //
+  //  let price;
+  //  if (side === "b") {
+  //    // get order book
+  //
+  //    for (let i = 0; i < asks.length; i++) {
+  //      if (asks[i][2] >= baseAmount || i === asks.length - 1) {
+  //        price = asks[i][1];
+  //        break;
+  //      }
+  //    }
+  //  } else if (side === "s") {
+  //    // get order book
+  //
+  //    for (let i = 0; i < bids.length; i++) {
+  //      if (bids[i][2] >= baseAmount || i === bids.length - 1) {
+  //        price = bids[i][1];
+  //        break;
+  //      }
+  //    }
+  //  }
+  //  if (!price) return 0;
+  //  return formatPrice(price);
+  //}
 
   async buySellHandler(e) {
     e.preventDefault();
@@ -199,6 +231,7 @@ export class SpotForm extends React.Component {
       return;
     }
 
+    price = Number(price);
     if (price < 0) {
       toast.error(`Price (${price}) can't be below 0`, {
         toastId: `Price (${price}) can't be below 0`,
@@ -331,11 +364,11 @@ export class SpotForm extends React.Component {
 
     const renderGuidContent = () => {
       return <div>
-        <p style={{fontSize: '14px', lineHeight:'24px'}}>{this.props.side === 's' ? 'Sell' : 'Buy'} Order pending</p>
-        <p style={{fontSize: '14px', lineHeight:'24px'}}>{baseAmountMsg} {marketInfo.baseAsset.symbol} @ {
-            ['USDC', 'USDT', 'DAI', 'FRAX'].includes(marketInfo.quoteAsset.symbol) ? price.toFixed(2) : formatPrice(price)
-          } {marketInfo.quoteAsset.symbol}</p>
-        <p style={{fontSize: '14px', lineHeight:'24px'}}>Sign or Cancel to continue...</p>
+        <p style={{ fontSize: '14px', lineHeight: '24px' }}>{this.props.side === 's' ? 'Sell' : 'Buy'} Order pending</p>
+        <p style={{ fontSize: '14px', lineHeight: '24px' }}>{baseAmountMsg} {marketInfo.baseAsset.symbol} @ {
+          ['USDC', 'USDT', 'DAI', 'FRAX'].includes(marketInfo.quoteAsset.symbol) ? price.toFixed(2) : formatPrice(price)
+        } {marketInfo.quoteAsset.symbol}</p>
+        <p style={{ fontSize: '14px', lineHeight: '24px' }}>Sign or Cancel to continue...</p>
       </div>
     }
 
@@ -343,12 +376,12 @@ export class SpotForm extends React.Component {
     newstate.orderButtonDisabled = true;
     this.setState(newstate);
     let orderPendingToast;
-    if (this.props.settings.showFillNotification) {
+    if (!this.props.settings.disableOrderNotification) {
       orderPendingToast = toast.info(
         renderGuidContent(), {
         toastId: "Order pending",
         autoClose: false,
-        }
+      }
       );
     }
 
@@ -363,7 +396,7 @@ export class SpotForm extends React.Component {
         this.props.orderType
       );
 
-      if (this.props.settings.showFillNotification) {
+      if (!this.props.settings.disableOrderNotification) {
         toast.info(
           "Order placed", {
           toastId: "Order placed.",
@@ -373,7 +406,10 @@ export class SpotForm extends React.Component {
       toast.error(e.message);
     }
 
-    toast.dismiss(orderPendingToast);
+    if (!this.props.settings.disableOrderNotification) {
+      toast.dismiss(orderPendingToast);
+    }
+
     newstate = { ...this.state };
     newstate.orderButtonDisabled = false;
     this.setState(newstate);
@@ -413,8 +449,12 @@ export class SpotForm extends React.Component {
     if (this.props.orderType === "limit" && this.state.price) {
       return this.state.price;
     } else {
-      var ladderPrice = this.getLadderPrice();
-      return ladderPrice;
+      if (api.isZksyncChain()) {
+        return this.getLadderPriceZkSync_v1();
+      } else {
+        console.log('this.getLadderPrice() not implemented for not zkSync_v1')
+        // return this.getLadderPrice();
+      }
     }
   }
 
@@ -503,6 +543,11 @@ export class SpotForm extends React.Component {
     if (isNaN(newstate.baseAmount)) newstate.baseAmount = 0;
     if (isNaN(newstate.totalAmount)) newstate.totalAmount = 0;
     if (isNaN(newstate.quoteAmount)) newstate.quoteAmount = 0;
+    if(newstate.totalAmount === 0) {
+      newstate.orderButtonDisabled = true;
+    } else {
+      newstate.orderButtonDisabled = false;
+    }
     this.setState(newstate);
   }
 
@@ -586,7 +631,7 @@ export class SpotForm extends React.Component {
       )
     } else if (this.props.side === "s") {
       buttonType = "SELL"
-      buttonText = buttonType + " " + (marketInfo && marketInfo.quoteAsset?.symbol);
+      buttonText = buttonType + " " + (marketInfo && marketInfo.baseAsset?.symbol);
       feeAmount = (
         <FormHeader>
           <InfoWrapper>
@@ -611,11 +656,7 @@ export class SpotForm extends React.Component {
               type="text"
               pattern="\d+(?:[.,]\d+)?"
               placeholder={`Price (${marketInfo && marketInfo.quoteAsset?.symbol})`}
-              value={
-                this.priceIsDisabled()
-                  ? this.props.marketSummary && this.props.marketSummary?.price
-                  : this.state.userHasEditedPrice ? this.state.price : this.currentPrice()
-              }
+              value={this.state.userHasEditedPrice ? this.state.price : this.currentPrice()}
               onChange={this.updatePrice.bind(this)}
               disabled={this.priceIsDisabled()}
             />

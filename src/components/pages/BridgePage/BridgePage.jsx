@@ -1,8 +1,14 @@
 import React, { useState } from "react";
 import useTheme from "components/hooks/useTheme";
+import { useSelector } from "react-redux";
+import { userSelector } from "lib/store/features/auth/authSlice";
+import { settingsSelector } from "lib/store/features/api/apiSlice";
 import { DefaultTemplate } from "components";
 import BridgeContainer from "./BridgeContainer";
 import TransferHistory from "./TransferHistory";
+import GuidePopup from "./Popup/GuidePopup";
+import GetStartedPopup from "./Popup/GetStartedPopup";
+import WalletConnectedPopup from "./Popup/WalletConnectedPopup";
 import classNames from "classnames";
 
 import { LoadingSpinner } from "components/atoms/LoadingSpinner";
@@ -20,6 +26,9 @@ export default function BridgePage() {
 
   const { isDark } = useTheme();
   const [loading, setLoading] = useState(false);
+  const [popup, setpopup] = useState("walletconnected");
+  const user = useSelector(userSelector);
+  const settings = useSelector(settingsSelector);
 
   return (
     <DefaultTemplate>
@@ -32,10 +41,26 @@ export default function BridgePage() {
           <LoadingSpinner />
         </div>
       )}
+      <div className="flex justify-center">
+        {user.address && !user.id && popup === "walletconnected" && (
+          <WalletConnectedPopup
+            onClickGetStarted={() => setpopup("getstarted")}
+          />
+        )}
+        {user.address && !user.id && popup === "getstarted" && (
+          <GetStartedPopup onCloseBtn={() => setpopup("")} />
+        )}
+      </div>
       {!loading && (
-        <div className={classNames("flex justify-center", { dark: isDark })}>
+        <div
+          className={classNames("flex flex-col items-center", {
+            dark: isDark,
+          })}
+        >
           <div className="w-full max-w-lg px-1 sm:px-0">
-            <p className="mt-20 text-3xl font-semibold ">ZigZag Bridge</p>
+            <p className="mt-10 text-3xl font-semibold md:mt-10 md: ">
+              ZigZag Bridge
+            </p>
             <div className="px-2 py-3 sm:px-0">
               <Tab.Group>
                 <Tab.List className="flex space-x-5 border-b dark:border-foreground-500 border-primary-500">
@@ -49,7 +74,7 @@ export default function BridgePage() {
                             "ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 focus:outline-none",
                             selected
                               ? "text-white-900 font-bold border-b-[4px] border-secondary-900"
-                              : "text-gray-500 "
+                              : "text-gray-500 hover:text-gray-400"
                           )
                         }
                       >
@@ -69,6 +94,7 @@ export default function BridgePage() {
               </Tab.Group>
             </div>
           </div>
+          {!settings.hideGuidePopup && <GuidePopup />}
         </div>
       )}
     </DefaultTemplate>

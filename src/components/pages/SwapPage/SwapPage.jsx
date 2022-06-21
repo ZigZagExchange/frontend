@@ -24,6 +24,7 @@ import {
   liquiditySelector,
   setCurrentMarket,
   resetData,
+  settingsSelector,
 } from "lib/store/features/api/apiSlice";
 import { formatPrice } from "lib/utils";
 import { LoadingSpinner } from "components/atoms/LoadingSpinner";
@@ -41,6 +42,7 @@ export default function SwapPage() {
 
   const dispatch = useDispatch();
   const user = useSelector(userSelector);
+  const settings = useSelector(settingsSelector);
   const balanceData = useSelector(balancesSelector);
   const pairPrices = useSelector(lastPricesSelector);
   const liquidity = useSelector(liquiditySelector);
@@ -334,7 +336,8 @@ export default function SwapPage() {
         baseBalance === undefined
       ) {
         toast.error(
-          `Minimum order size is ${marketInfo.baseFee.toPrecision(5)} ${marketInfo.baseAsset.symbol
+          `Minimum order size is ${marketInfo.baseFee.toPrecision(5)} ${
+            marketInfo.baseAsset.symbol
           }`
         );
         return;
@@ -352,7 +355,8 @@ export default function SwapPage() {
         baseBalance === undefined
       ) {
         toast.error(
-          `Minimum order size is ${marketInfo.quoteFee.toPrecision(5)} ${marketInfo.quoteAsset.symbol
+          `Minimum order size is ${marketInfo.quoteFee.toPrecision(5)} ${
+            marketInfo.quoteAsset.symbol
           }`
         );
         return;
@@ -416,9 +420,9 @@ export default function SwapPage() {
         <div className={classNames("flex justify-center", { dark: isDark })}>
           <div>
             <p className="mt-10 text-3xl font-semibold font-work ">
-              Quick DEX Swap
+              ZigZag Convert
             </p>
-            <p className="mt-2 text-sm text-gray-500">
+            {/* <p className="mt-2 text-sm text-gray-500">
               Swap into more than 200 tokens, using the best quotes from over 8
               sources.
             </p>
@@ -428,7 +432,7 @@ export default function SwapPage() {
             >
               <p className="mr-2">Learn More</p>
               <ExternalLinkIcon size={11} />
-            </Link>
+            </Link> */}
             {/* <div className="flex items-center justify-between mt-4">
               <p className="text-sm font-work">Network</p>
               <InfoIcon size={16} />
@@ -464,7 +468,7 @@ export default function SwapPage() {
               onClick={onClickExchange}
               disabled={orderButtonDisabled || !user.address}
             >
-              Exchange
+              Convert
             </Button>
           </div>
         </div>

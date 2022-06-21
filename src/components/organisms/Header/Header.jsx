@@ -4,9 +4,12 @@ import { useHistory } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import CheckIcon from "@mui/icons-material/Check";
-import { useLocation } from 'react-router-dom'
+import { useLocation } from "react-router-dom";
 import { userSelector } from "lib/store/features/auth/authSlice";
-import { networkSelector, isConnectingSelector } from "lib/store/features/api/apiSlice";
+import {
+  networkSelector,
+  isConnectingSelector,
+} from "lib/store/features/api/apiSlice";
 import api from "lib/api";
 import logo from "assets/images/logo.png";
 import { TabMenu, Tab } from "components/molecules/TabMenu";
@@ -46,8 +49,6 @@ const accountLists = [
   { text: "0x12BV...b89G", url: "#", icon: <DeleteIcon /> },
 ];
 
-
-
 const HeaderWrapper = styled.div`
   display: grid;
   grid-auto-flow: column;
@@ -65,13 +66,16 @@ const HeaderWrapper = styled.div`
 
   button {
     &:hover {
-      // background-color: ${({ theme }) => `${theme.colors.foregroundHighEmphasis} !important`};
+      // background-color: ${({ theme }) =>
+        `${theme.colors.foregroundHighEmphasis} !important`};
 
       div {
-        color: ${({ theme }) => `${theme.colors.primaryHighEmphasis} !important`};
-  
+        color: ${({ theme }) =>
+          `${theme.colors.primaryHighEmphasis} !important`};
+
         svg path {
-          fill: ${({ theme }) => `${theme.colors.primaryHighEmphasis} !important`};
+          fill: ${({ theme }) =>
+            `${theme.colors.primaryHighEmphasis} !important`};
         }
       }
     }
@@ -213,27 +217,28 @@ export const Header = (props) => {
   }, [networkName]);
 
   useEffect(() => {
-    api.emit("connecting", props.isLoading)
+    api.emit("connecting", props.isLoading);
     // setConnecting(props.isLoading)
-  }, [props.isLoading])
+  }, [props.isLoading]);
 
   useEffect(() => {
     switch (location.pathname) {
-      case '/':
+      case "/":
         setIndex(0);
         break;
-      case '/bridge':
+      case "/convert":
         setIndex(1);
         break;
-      case '/list-pair':
+      case "/bridge":
         setIndex(2);
         break;
-      case '/dsl':
-        setIndex(4);
+      case "/list-pair":
+        setIndex(3);
         break;
-      case '/swap':
+      case "/dsl":
         setIndex(5);
         break;
+
       default:
         setIndex(0);
         break;
@@ -263,22 +268,28 @@ export const Header = (props) => {
         history.push("/");
         break;
       case 1:
-        history.push("/bridge");
+        setIndex(newIndex);
+        localStorage.setItem("tab_index", newIndex);
+        history.push("/convert");
         break;
+
       case 2:
-        history.push("/list-pair");
+        setIndex(newIndex);
+        localStorage.setItem("tab_index", newIndex);
+        history.push("bridge");
         break;
       case 3:
-        window.open("https://docs.zigzag.exchange/", "_blank");
+        setIndex(newIndex);
+        localStorage.setItem("tab_index", newIndex);
+        history.push("/list-pair");
         break;
       case 4:
-        history.push("/dsl");
+        window.open("https://docs.zigzag.exchange/", "_blank");
         break;
       case 5:
-        history.push("/swap");
-        break;
-      case 6:
-        history.push("/");
+        setIndex(newIndex);
+        localStorage.setItem("tab_index", newIndex);
+        history.push("/dsl");
         break;
       default:
         break;
@@ -325,7 +336,7 @@ export const Header = (props) => {
               style={{ paddingTop: "20px" }}
             >
               <Tab>TRADE</Tab>
-
+              {hasBridge && <Tab>CONVERT</Tab>}
               {hasBridge && <Tab>BRIDGE</Tab>}
               <Tab>LIST PAIR</Tab>
               {hasBridge && (
@@ -335,7 +346,7 @@ export const Header = (props) => {
                 </Tab>
               )}
               {hasBridge && <Tab>DSL</Tab>}
-              {hasBridge && <Tab>SWAP</Tab>}
+
               {/* {hasBridge && <Tab>Old BRIDGE</Tab>} */}
             </TabMenu>
           </NavWrapper>
@@ -384,10 +395,12 @@ export const Header = (props) => {
               clickFunction={changeNetwork}
               leftIcon={true}
             />
-            {user.address ? 
-              <AccountDropdown networkName={networkName} /> :
+
+            {user.address ? (
+              <AccountDropdown networkName={networkName} />
+            ) : (
               <ConnectWalletButton />
-            }
+            )}
           </ActionsWrapper>
         </>
       )}
@@ -409,6 +422,7 @@ export const Header = (props) => {
           )}
           <TabMenu row activeIndex={index} onItemClick={handleClick}>
             <Tab>TRADE</Tab>
+            {hasBridge && <Tab>CONVERT</Tab>}
             {hasBridge && <Tab>BRIDGE</Tab>}
             <Tab>LIST PAIR</Tab>
             {hasBridge && (
@@ -418,7 +432,6 @@ export const Header = (props) => {
               </Tab>
             )}
             {hasBridge && <Tab>DSL</Tab>}
-            {hasBridge && <Tab>SWAP</Tab>}
           </TabMenu>
           <HorizontalDivider />
           <ActionSideMenuWrapper>
