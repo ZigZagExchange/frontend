@@ -20,14 +20,14 @@ export default class APIArbitrumProvider extends APIProvider {
     if (!this.accountState.address) return {};
 
     // allways get ETH - generate token list
-    const tokens = super.getCurrencies();
+    const tokens = this.getCurrencies();
     const tokenInfo = [{ decimals: 18, }];
     const tokenList = [ethers.constants.AddressZero];
 
     for(let i = 1; i < tokens.length; i++) {
       const token = tokens[i];
 
-      tokenInfo.push(super.getCurrencyInfo(token));
+      tokenInfo.push(this.getCurrencyInfo(token));
       tokenList.push(tokenInfo[token].address);
     }
 
@@ -98,4 +98,31 @@ export default class APIArbitrumProvider extends APIProvider {
 
   cacheMarketInfoFromNetwork = async (pairs) => {
   }
+  getPairs = () => {
+    return Object.keys(this.lastPrices);
+  };
+
+  getCurrencyInfo = (currency) => {
+    const pairs = this.getPairs();
+    for (let i = 0; i < pairs.length; i++) {
+      const pair = pairs[i];
+      const baseCurrency = pair.split("-")[0];
+      const quoteCurrency = pair.split("-")[1];
+      if (baseCurrency === currency && this.marketInfo[pair]) {
+        return this.marketInfo[pair].baseAsset;
+      } else if (quoteCurrency === currency && this.marketInfo[pair]) {
+        return this.marketInfo[pair].quoteAsset;
+      }
+    }
+    return null;
+  };
+
+  getCurrencies = () => {
+    const tickers = new Set();
+    for (let market in this.lastPrices) {
+      tickers.add(this.lastPrices[market][0].split("-")[0]);
+      tickers.add(this.lastPrices[market][0].split("-")[1]);
+    }
+    return [...tickers];
+  };
 }

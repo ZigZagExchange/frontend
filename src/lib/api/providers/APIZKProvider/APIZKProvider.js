@@ -25,6 +25,9 @@ export default class APIZKProvider extends APIProvider {
   zksyncCompatible = true;
   evmCompatible = false;
   _tokenWithdrawFees = {};
+  marketInfo = {};
+  lastPrices = {};
+  _tokenInfo = {};
   eligibleFastWithdrawTokens = ["ETH", "FRAX", "UST"];
   fastWithdrawContractAddress = ZKSYNC_ETHEREUM_FAST_BRIDGE.address;
   
@@ -111,7 +114,7 @@ export default class APIZKProvider extends APIProvider {
       let maxValue = 0;
       const tokens = Object.keys(balances);
       const result = tokens.map(async (token) => {
-        const tokenInfo = await super.getTokenInfo(token);
+        const tokenInfo = await this.getTokenInfo(token);
         if (tokenInfo.enabledForFees) {
           const priceInfo = await this.tokenPrice(token);
           const usdValue = priceInfo.price * balances[token] / 10 ** tokenInfo.decimals;
@@ -276,8 +279,8 @@ export default class APIZKProvider extends APIProvider {
     const account = await this.getAccountState();
     const balances = {};
 
-    super.getCurrencies().forEach((ticker) => {
-      const currencyInfo = super.getCurrencyInfo(ticker);
+    this.getCurrencies().forEach((ticker) => {
+      const currencyInfo = this.getCurrencyInfo(ticker);
       const balance =
         account && account.committed
           ? account.committed.balances[ticker] || 0
@@ -302,7 +305,7 @@ export default class APIZKProvider extends APIProvider {
   depositL2 = async (amountDecimals, token = "ETH", address = "") => {
     let transfer;
 
-    const currencyInfo = super.getCurrencyInfo(token);
+    const currencyInfo = this.getCurrencyInfo(token);
     const amount = toBaseUnit(amountDecimals, currencyInfo.decimals);
 
     try {
@@ -330,7 +333,7 @@ export default class APIZKProvider extends APIProvider {
   ) => {
     let transfer;
 
-    const currencyInfo = super.getCurrencyInfo(token);
+    const currencyInfo = this.getCurrencyInfo(token);
     const amount = toBaseUnit(amountDecimals, currencyInfo.decimals);
     const packableAmount = closestPackableTransactionAmount(amount);
     const feeToken = await this.getWithdrawFeeToken(token);
@@ -448,13 +451,13 @@ export default class APIZKProvider extends APIProvider {
 
   getWithdrawFeeToken = async (tokenToWithdraw) => {
     const backupFeeToken = "ETH";
-    const tokenInfo = await super.getTokenInfo(tokenToWithdraw);
+    const tokenInfo = await this.getTokenInfo(tokenToWithdraw);
     return tokenInfo.enabledForFees ? tokenToWithdraw : backupFeeToken;
   };
 
   withdrawL2GasFee = async (token) => {
     const feeToken = await this.getWithdrawFeeToken(token);
-    const currencyInfo = super.getCurrencyInfo(feeToken);
+    const currencyInfo = this.getCurrencyInfo(feeToken);
     if (!this._tokenWithdrawFees[token]) {
       const fee = await this.syncProvider.getTransactionFee(
         "Withdraw",
@@ -469,7 +472,7 @@ export default class APIZKProvider extends APIProvider {
 
   transferL2GasFee = async (token) => {
     const feeToken = await this.getWithdrawFeeToken(token);
-    const feeCurrencyInfo = super.getCurrencyInfo(feeToken);
+    const feeCurrencyInfo = this.getCurrencyInfo(feeToken);
     const address = this.syncWallet.address();
 
     let totalFee;
@@ -499,7 +502,7 @@ export default class APIZKProvider extends APIProvider {
      * Returns the fee taken by ZigZag when sending on L1. If the token is not ETH,
      * the notional amount of the ETH tx fee will be taken in the currency being bridged
      * */
-    const currencyInfo = super.getCurrencyInfo(token);
+    const currencyInfo = this.getCurrencyInfo(token);
     const getNumberFormatted = (atoms) => {
       return parseInt(atoms) / 10 ** currencyInfo.decimals;
     };
@@ -706,9 +709,9 @@ export default class APIZKProvider extends APIProvider {
   };
 
   getZkSyncBaseUrl = (chainId) => {
-    if (super.getChainName(chainId) === "mainnet") {
+    if (this.getChainName(chainId) === "mainnet") {
       return "https://api.zksync.io/api/v0.2";
-    } else if (super.getChainName(chainId) === "rinkeby") {
+    } else if (this.getChainName(chainId) === "rinkeby") {
       return "https://rinkeby-api.zksync.io/api/v0.2";
     } else {
       throw Error("Uknown chain");
@@ -723,6 +726,70 @@ export default class APIZKProvider extends APIProvider {
       return res.data.result;
     } catch (e) {
       console.error("Could not get token price", e);
+    }
+  };
+
+  /*
+   * Gets token info from zkSync REST API
+   * @param  {String} tokenLike:            Symbol or Internal ID
+   * @param  {Number or String} _chainId:   Network ID to query (1 for mainnet, 1000 for rinkeby)
+   * @return {Object}                       {address: string, decimals: number, enabledForFees: bool, id: number, symbol: string}
+   * */
+  getTokenInfo = async (tokenLike, _chainId = this.network) => {
+    const chainId = _chainId.toString();
+    const returnFromCache =
+      this._tokenInfo[chainId] && this._tokenInfo[chainId][tokenLike];
+    try {
+      if (returnFromCache) {
+        return this._tokenInfo[chainId][tokenLike];
+      } else {
+        const res = await axios.get(
+          this.getZkSyncBaseUrl(chainId) + `/tokens/${tokenLike}`
+        );
+        this._tokenInfo[chainId] = {
+          ...this._tokenInfo[chainId],
+          [tokenLike]: res.data.result,
+        };
+        return this._tokenInfo[chainId][tokenLike];
+      }
+    } catch (e) {
+      console.error("Could not get token info", e);
+    }
+  };
+
+  getPairs = () => {
+    return Object.keys(this.lastPrices);
+  };
+
+  getCurrencyInfo = (currency) => {
+    const pairs = this.getPairs();
+    for (let i = 0; i < pairs.length; i++) {
+      const pair = pairs[i];
+      const baseCurrency = pair.split("-")[0];
+      const quoteCurrency = pair.split("-")[1];
+      if (baseCurrency === currency && this.marketInfo[pair]) {
+        return this.marketInfo[pair].baseAsset;
+      } else if (quoteCurrency === currency && this.marketInfo[pair]) {
+        return this.marketInfo[pair].quoteAsset;
+      }
+    }
+    return null;
+  };
+
+  getCurrencies = () => {
+    const tickers = new Set();
+    for (let market in this.lastPrices) {
+      tickers.add(this.lastPrices[market][0].split("-")[0]);
+      tickers.add(this.lastPrices[market][0].split("-")[1]);
+    }
+    return [...tickers];
+  };
+
+  getChainName = (chainId) => {
+    switch (Number(chainId)) {
+      case 1: return 'mainnet';
+      case 1000: return 'rinkeby';
+      default: throw Error("Chain ID not understood");
     }
   };
 }
