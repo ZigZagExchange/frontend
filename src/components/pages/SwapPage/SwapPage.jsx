@@ -24,6 +24,7 @@ import {
   liquiditySelector,
   setCurrentMarket,
   resetData,
+  settingsSelector,
 } from "lib/store/features/api/apiSlice";
 import { formatPrice } from "lib/utils";
 import { LoadingSpinner } from "components/atoms/LoadingSpinner";
@@ -41,6 +42,7 @@ export default function SwapPage() {
 
   const dispatch = useDispatch();
   const user = useSelector(userSelector);
+  const settings = useSelector(settingsSelector);
   const balanceData = useSelector(balancesSelector);
   const pairPrices = useSelector(lastPricesSelector);
   const liquidity = useSelector(liquiditySelector);
