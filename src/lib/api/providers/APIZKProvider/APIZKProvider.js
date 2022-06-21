@@ -25,8 +25,6 @@ export default class APIZKProvider extends APIProvider {
   zksyncCompatible = true;
   evmCompatible = false;
   _tokenWithdrawFees = {};
-  marketInfo = {};
-  lastPrices = {};
   _tokenInfo = {};
   eligibleFastWithdrawTokens = ["ETH", "FRAX", "UST"];
   fastWithdrawContractAddress = ZKSYNC_ETHEREUM_FAST_BRIDGE.address;
@@ -171,7 +169,7 @@ export default class APIZKProvider extends APIProvider {
       );
       return;
     }
-    const marketInfo = this.marketInfo[market];
+    const marketInfo = this.api.marketInfo[market];
 
     if (!APIZKProvider.VALID_SIDES.includes(side)) {
       throw new Error("Invalid side");
@@ -755,34 +753,6 @@ export default class APIZKProvider extends APIProvider {
     } catch (e) {
       console.error("Could not get token info", e);
     }
-  };
-
-  getPairs = () => {
-    return Object.keys(this.lastPrices);
-  };
-
-  getCurrencyInfo = (currency) => {
-    const pairs = this.getPairs();
-    for (let i = 0; i < pairs.length; i++) {
-      const pair = pairs[i];
-      const baseCurrency = pair.split("-")[0];
-      const quoteCurrency = pair.split("-")[1];
-      if (baseCurrency === currency && this.marketInfo[pair]) {
-        return this.marketInfo[pair].baseAsset;
-      } else if (quoteCurrency === currency && this.marketInfo[pair]) {
-        return this.marketInfo[pair].quoteAsset;
-      }
-    }
-    return null;
-  };
-
-  getCurrencies = () => {
-    const tickers = new Set();
-    for (let market in this.lastPrices) {
-      tickers.add(this.lastPrices[market][0].split("-")[0]);
-      tickers.add(this.lastPrices[market][0].split("-")[1]);
-    }
-    return [...tickers];
   };
 
   getChainName = (chainId) => {

@@ -11,6 +11,7 @@ export default class APIArbitrumProvider extends APIProvider {
   evmCompatible = true;
   zksyncCompatible = false;
   balances = {};
+  _tokenInfo = {};
 
   getAccountState = async () => {
     return this.accountState;
@@ -37,7 +38,7 @@ export default class APIArbitrumProvider extends APIProvider {
       balanceBundleABI,
       this.api.ethersProvider
     );
-    const balanceList = await ethContract.balances(this.accountState.address, tokenList);
+    const balanceList = await ethContract.balances([this.accountState.address], tokenList);
 
     // generate object
     for(let i = 0; i < tokens.length; i++) {
@@ -58,7 +59,7 @@ export default class APIArbitrumProvider extends APIProvider {
   };
 
   settleOrderFill = (market, side, baseAmount, quoteAmount) => {
-    const marketInfo = this.marketInfo[market];
+    const marketInfo = this.api.marketInfo[market];
     const [base, quote] = market.split('-');
 
     if(side === 's') {
@@ -94,35 +95,5 @@ export default class APIArbitrumProvider extends APIProvider {
     this.accountState.address = address;
 
     return this.accountState;
-  }
-
-  cacheMarketInfoFromNetwork = async (pairs) => {
-  }
-  getPairs = () => {
-    return Object.keys(this.lastPrices);
-  };
-
-  getCurrencyInfo = (currency) => {
-    const pairs = this.getPairs();
-    for (let i = 0; i < pairs.length; i++) {
-      const pair = pairs[i];
-      const baseCurrency = pair.split("-")[0];
-      const quoteCurrency = pair.split("-")[1];
-      if (baseCurrency === currency && this.marketInfo[pair]) {
-        return this.marketInfo[pair].baseAsset;
-      } else if (quoteCurrency === currency && this.marketInfo[pair]) {
-        return this.marketInfo[pair].quoteAsset;
-      }
-    }
-    return null;
-  };
-
-  getCurrencies = () => {
-    const tickers = new Set();
-    for (let market in this.lastPrices) {
-      tickers.add(this.lastPrices[market][0].split("-")[0]);
-      tickers.add(this.lastPrices[market][0].split("-")[1]);
-    }
-    return [...tickers];
-  };
+  }  
 }
