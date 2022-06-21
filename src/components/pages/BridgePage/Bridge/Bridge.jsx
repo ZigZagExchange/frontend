@@ -705,9 +705,9 @@ const Bridge = (props) => {
                     </>
                   )}
                   {L2FeeAmount && (
-                    <>
+                    <div>
                       {fromNetwork.from.key === "polygon" && `Bridge fee: ~${formatPrice(L2FeeAmount)} ${L2FeeToken}`}
-                    </>
+                    </div>
                   )}                  
                   {!L1FeeAmount && !hasError && fromNetwork.from.key === "ethereum" && (
                     <div style={{ display: "inline-flex", margin: "0 5px" }}>
