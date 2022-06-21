@@ -102,9 +102,15 @@ const TransactionSettings = ({
                   </RadioGroup>
                 </div>
               )}
-              {L2Fee && fromNetwork.id === "zksync" && (
+              {L2Fee && toNetwork.id === "ethereum" && (
                 <div className="flex items-center justify-between mt-3">
                   <p className="font-sans text-sm ">zkSync L2 gas fee:</p>
+                  <p className="font-sans text-sm ">{`~${L2Fee} ${L2FeeToken}`}</p>
+                </div>
+              )}
+              {L2Fee && toNetwork.id === "polygon" && (
+                <div className="flex items-center justify-between mt-3">
+                  <p className="font-sans text-sm ">zkSync L2 gas fee + bridge fee:</p>
                   <p className="font-sans text-sm ">{`~${L2Fee} ${L2FeeToken}`}</p>
                 </div>
               )}
@@ -162,7 +168,7 @@ const TransactionSettings = ({
               {L1Fee && fromNetwork.id === "ethereum" && (
                 <div className="flex items-center justify-between mt-3">
                   <p className="font-sans text-sm ">
-                    {fromNetwork.id === "ethereum" && `Gas fee: `}
+                    {fromNetwork.id === "ethereum" && `Maximum Ethereum gas fee: `}
                   </p>
                   <p className="font-sans text-sm ">
                     {fromNetwork.id === "ethereum" &&
@@ -170,14 +176,25 @@ const TransactionSettings = ({
                   </p>
                 </div>
               )}
-              {L2Fee && fromNetwork.id === "polygon" && (
+              {L1Fee && fromNetwork.id === "polygon" && (
                 <div className="flex items-center justify-between mt-3">
                   <p className="font-sans text-sm ">
-                    {fromNetwork.id === "polygon" && `Polygon gas fee: `}
+                    {fromNetwork.id === "polygon" && `Maximum Polygon gas fee: `}
                   </p>
                   <p className="font-sans text-sm ">
                     {fromNetwork.id === "polygon" &&
-                      `~${formatPrice(L2Fee)} ${L2FeeToken}`}
+                      `~${formatPrice(L1Fee)} MATIC`}
+                  </p>
+                </div>
+              )}
+              {L2Fee && fromNetwork.id === "polygon" && (
+                <div className="flex items-center justify-between mt-3">
+                  <p className="font-sans text-sm ">
+                    {fromNetwork.id === "polygon" && `Bridge fee: `}
+                  </p>
+                  <p className="font-sans text-sm ">
+                    {fromNetwork.id === "polygon" &&
+                      `${formatPrice(L2Fee)} ${L2FeeToken}`}
                   </p>
                 </div>
               )}
