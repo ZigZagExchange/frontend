@@ -10,8 +10,6 @@ export default class APIArbitrumProvider extends APIProvider {
   ethWallet = {};
   evmCompatible = true;
   zksyncCompatible = false;
-  lastPrices = {};
-  marketInfo = {};
   balances = {};
 
   getAccountState = async () => {
@@ -56,17 +54,37 @@ export default class APIArbitrumProvider extends APIProvider {
         valueReadable:
           (balance && currencyInfo && balance / 10 ** currencyInfo.decimals) ||
           0,
-        valueAvailable: balance,
-        valueAvailableReadable: 
-          (balance && currencyInfo && balance / 10 ** currencyInfo.decimals) ||
-          0,
         allowance: 0,
       }
     }
 
-    return balances;
+    return this.balances;
   };
 
+  settleOrderFill = (market, side, baseAmount, quoteAmount) => {
+    const marketInfo = this.marketInfo[market];
+    const [base, quote] = market.split('-');
+
+    if(side === 's') {
+      this.balances[base].valueReadable -= baseAmount;
+      this.balances[quote].valueReadable += quoteAmount;
+    } else {
+      this.balances[base].valueReadable += baseAmount;
+      this.balances[quote].valueReadable -= quoteAmount;
+    }
+
+    const newBaseAmountBn = ethers.utils.parseUnits(
+      (this.balances[base].valueReadable).toFixed(marketInfo.baseAsset.decimals),
+      marketInfo.baseAsset.decimals
+    );
+    const newQuoteAmountBn = ethers.utils.parseUnits(
+      (this.balances[quote].valueReadable).toFixed(marketInfo.quoteAsset.decimals),
+      marketInfo.quoteAsset.decimals
+    );
+    this.balances[base].value = newBaseAmountBn.toString();
+    this.balances[quote].value = newQuoteAmountBn.toSTring();
+  }
+  
   submitOrder = async (product, side, price, baseAmount, quoteAmount) => {
       
   }
