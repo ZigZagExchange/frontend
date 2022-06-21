@@ -102,13 +102,13 @@ const TransactionSettings = ({
                   </RadioGroup>
                 </div>
               )}
-              {L2Fee && fromNetwork.id === "ethereum" && (
+              {L2Fee && toNetwork.id === "ethereum" && (
                 <div className="flex items-center justify-between mt-3">
                   <p className="font-sans text-sm ">zkSync L2 gas fee:</p>
                   <p className="font-sans text-sm ">{`~${L2Fee} ${L2FeeToken}`}</p>
                 </div>
               )}
-              {L2Fee && fromNetwork.id === "polygon" && (
+              {L2Fee && toNetwork.id === "polygon" && (
                 <div className="flex items-center justify-between mt-3">
                   <p className="font-sans text-sm ">zkSync L2 gas fee + bridge fee:</p>
                   <p className="font-sans text-sm ">{`~${L2Fee} ${L2FeeToken}`}</p>
