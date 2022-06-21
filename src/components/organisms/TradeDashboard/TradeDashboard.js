@@ -354,7 +354,9 @@ export function TradeDashboard() {
           marketInfo={marketInfo}
           wallet={wallet}
         />
-        <TradeFooter />
+        <TradeFooter 
+          network={network}
+        />
       </TradeGrid>
     </TradeContainer>
   );

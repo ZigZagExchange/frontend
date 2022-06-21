@@ -27,9 +27,10 @@ export default class APIArbitrumProvider extends APIProvider {
 
     for(let i = 1; i < tokens.length; i++) {
       const token = tokens[i];
+      const tokenInfo = this.api.getCurrencyInfo(token);
 
-      tokenInfo.push(this.api.getCurrencyInfo(token));
-      tokenList.push(tokenInfo[token].address);
+      tokenInfo.push(tokenInfo);
+      tokenList.push(tokenInfo.address);
     }
 
     // get token balance
