@@ -374,7 +374,10 @@ export class SpotForm extends React.Component {
       toast.error(e.message);
     }
 
-    toast.dismiss(orderPendingToast);
+    if (!this.props.settings.disableOrderNotification) {
+      toast.dismiss(orderPendingToast);
+    }
+
     newstate = { ...this.state };
     newstate.orderButtonDisabled = false;
     this.setState(newstate);
