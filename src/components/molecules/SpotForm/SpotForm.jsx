@@ -77,6 +77,11 @@ export class SpotForm extends React.Component {
 
   updateTotalAmount(e) {
     const newState = { ...this.state };
+    if(Number.isNaN(e.target.value) || Number(e.target.value) === 0) {
+      newState.orderButtonDisabled = true;
+    } else {
+      newState.orderButtonDisabled = false;
+    }
     newState.totalAmount = (rx_live.test(e.target.value)) ? e.target.value : this.state.totalAmount;
     newState.quoteAmount = "";
     newState.totalAmount === "" ? newState.baseAmount = "" :
@@ -535,6 +540,11 @@ export class SpotForm extends React.Component {
     if (isNaN(newstate.baseAmount)) newstate.baseAmount = 0;
     if (isNaN(newstate.totalAmount)) newstate.totalAmount = 0;
     if (isNaN(newstate.quoteAmount)) newstate.quoteAmount = 0;
+    if(newstate.totalAmount === 0) {
+      newstate.orderButtonDisabled = true;
+    } else {
+      newstate.orderButtonDisabled = false;
+    }
     this.setState(newstate);
   }
 
