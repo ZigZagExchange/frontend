@@ -31,7 +31,7 @@ export class SpotForm extends React.Component {
     newState.price = (rx_live.test(e.target.value)) ? e.target.value : this.state.price;
     newState.userHasEditedPrice = true;
     newState.totalAmount = this.props.orderType === "limit" ?
-      (this.currentPrice() * newState.baseAmount).toPrecision(6) :
+      (newState.price * newState.baseAmount).toPrecision(6) :
       (this.props.marketSummary.price * newState.baseAmount).toPrecision(6);
     this.setState(newState);
   }
