@@ -389,7 +389,6 @@ const Bridge = (props) => {
         error = "Insufficient balance";
       } else if (inputValue > max) {
         error = "Insufficient balance for fees"
-
       } else if (isFastWithdraw()) {
         if (swapDetails.currency in fastWithdrawCurrencyMaxes) {
           const maxAmount = fastWithdrawCurrencyMaxes[swapCurrency];
@@ -406,9 +405,10 @@ const Bridge = (props) => {
             error = "Amount too small";
           }
         }
-      }
-      else if (inputValue < 0.0001 && (fromNetwork.from.key === 'polygon' || toNetwork.key === 'polygon')) {
-        error = "Insufficient amount";
+      } 
+      // 0.0005 -> poly bridge min size
+      else if ((inputValue - L2FeeAmount) < 0.0005 && (toNetwork.key === 'polygon' || fromNetwork.from.key === 'polygon')) {
+        error = "Amount too small";
       }
 
       const userOrderArray = Object.values(userOrders);
@@ -494,15 +494,15 @@ const Bridge = (props) => {
     if(fromNetwork.from.key === 'polygon' && toNetwork.key === 'zksync') {
       const gasFee = await api.getPolygonFee();
       if(gasFee){
-        setL1Fee(null);
-        setL2Fee(swapDetails, 35000 * gasFee.fast.maxFee / 10**9, 'MATIC')
+        setL1Fee(35000 * gasFee.fast.maxFee / 10**9);
+        setL2Fee(swapDetails, 0.0005, 'ETH') // ZigZag fee
       }
     }
     // zkSync -> polygon
     else if(fromNetwork.from.key === 'zksync' && toNetwork.key === 'polygon') {
       let res = await api.transferL2GasFee(swapDetails.currency);
       setL1Fee(null);
-      setL2Fee(swapDetails, res.amount, res.feeToken);
+      setL2Fee(swapDetails, (res.amount * 10), res.feeToken); // 10x => ZigZag fee
     }
     // Ethereum -> zkSync aka deposit
     else if (transfer.type === "deposit") {
@@ -875,11 +875,11 @@ const Bridge = (props) => {
                 {L2FeeAmount && (
                   <Box className="layer">
                     <Box component="h4">
-                      {fromNetwork.from.key === "zksync" &&
-                        `zkSync L2 gas fee: `}
+                      {toNetwork.key === "ethereum" && `zkSync L2 gas fee: `}
+                      {toNetwork.key === "polygon" && `zkSync L2 gas fee + bridge fee: `}
                     </Box>
                     <Box component="h4">
-                      {fromNetwork.from.key === "zksync" &&
+                      {(toNetwork.key === "ethereum" || toNetwork.key === "polygon") &&
                         `~${L2FeeAmount} ${L2FeeToken}`}
                     </Box>
                   </Box>
@@ -921,15 +921,22 @@ const Bridge = (props) => {
                 {L1FeeAmount && (
                   <Box className="layer">
                     <Box component="h4">
-                      {fromNetwork.from.key === "polygon" &&
-                        `Polygon gas fee: `}
-                      {fromNetwork.from.key === "ethereum" && `Gas fee: `}
+                      {fromNetwork.from.key === "polygon" && 'Maximum Polygon gas fee: '}
+                      {fromNetwork.from.key === "ethereum" && 'Maximum Ethereum gas fee: '}
                     </Box>
                     <Box component="h4">
-                      {fromNetwork.from.key === "polygon" &&
-                        `~${formatPrice(L1FeeAmount)} MATIC`}
-                      {fromNetwork.from.key === "ethereum" &&
-                        `~${formatPrice(L1FeeAmount)} ETH`}
+                      {fromNetwork.from.key === "polygon" && `~${formatPrice(L1FeeAmount)} MATIC`}
+                      {fromNetwork.from.key === "ethereum" && `~${formatPrice(L1FeeAmount)} ETH`}
+                    </Box>
+                  </Box>
+                )}
+                {L2FeeAmount && (
+                  <Box className="layer">
+                    <Box component="h4">
+                      {fromNetwork.from.key === "polygon" && 'Bridge fee: '}
+                    </Box>
+                    <Box component="h4">
+                      {fromNetwork.from.key === "polygon" && `~${formatPrice(L2FeeAmount)} ${L2FeeToken}`}
                     </Box>
                   </Box>
                 )}

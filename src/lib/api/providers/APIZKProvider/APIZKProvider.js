@@ -574,7 +574,7 @@ export default class APIZKProvider extends APIProvider {
         .add(feeData.maxPriorityFeePerGas)
         .mul(21000);
 
-      bridgeFee *= 1.5; // ZigZag fee
+      bridgeFee *= 4; // ZigZag fee
 
       if (token === "ETH") {
         return getNumberFormatted(bridgeFee);
