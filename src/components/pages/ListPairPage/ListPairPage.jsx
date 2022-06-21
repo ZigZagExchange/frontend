@@ -8,7 +8,7 @@ import { x } from "@xstyled/styled-components";
 import styled from "styled-components";
 import "bootstrap";
 
-import { BridgeTemplate } from "components";
+import { DefaultTemplate } from "components";
 import Text from "../../atoms/Text/Text";
 import AllocationModal from "./AllocationModal";
 import { Button, ConnectWalletButton } from "components/molecules/Button";
@@ -150,7 +150,7 @@ export default function ListPairPage() {
   }, [arweaveAllocation]);
 
   return (
-    <BridgeTemplate>
+    <DefaultTemplate>
       <ListPage>
         <ListContainer>
           <x.div mb={4}>
@@ -248,6 +248,6 @@ export default function ListPairPage() {
         }}
       />
       <TradeFooter />
-    </BridgeTemplate>
+    </DefaultTemplate>
   );
 }

@@ -4,7 +4,7 @@ import { useHistory } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import CheckIcon from "@mui/icons-material/Check";
-
+import { useLocation } from 'react-router-dom'
 import { userSelector } from "lib/store/features/auth/authSlice";
 import { networkSelector, isConnectingSelector } from "lib/store/features/api/apiSlice";
 import api from "lib/api";
@@ -24,6 +24,7 @@ import { toNumber } from "lodash";
 import ToggleTheme from "components/molecules/Toggle/ToggleTheme";
 import useTheme from "components/hooks/useTheme";
 import { formatAmount } from "../../../lib/utils";
+import { SwapVerticalCircleSharp } from "@material-ui/icons";
 
 const langList = [
   { text: "EN", url: "#" },
@@ -192,7 +193,7 @@ export const Header = (props) => {
   const [networkName, setNetworkName] = useState("");
   const [networkItems, setNetWorkItems] = useState(networkLists);
   const { isDark, toggleTheme } = useTheme();
-
+  const location = useLocation();
   useEffect(() => {
     const netName = networkLists.filter((item, i) => {
       return item.value === network;
@@ -217,8 +218,26 @@ export const Header = (props) => {
   }, [props.isLoading])
 
   useEffect(() => {
-    const tabIndex = localStorage.getItem("tab_index");
-    if (tabIndex !== null) setIndex(toNumber(tabIndex));
+    switch (location.pathname) {
+      case '/':
+        setIndex(0);
+        break;
+      case '/bridge':
+        setIndex(1);
+        break;
+      case '/list-pair':
+        setIndex(2);
+        break;
+      case '/dsl':
+        setIndex(4);
+        break;
+      case '/swap':
+        setIndex(5);
+        break;
+      default:
+        setIndex(0);
+        break;
+    }
   }, []);
 
   const changeLanguage = (text) => {
@@ -241,37 +260,25 @@ export const Header = (props) => {
   const handleClick = (newIndex) => {
     switch (newIndex) {
       case 0:
-        setIndex(newIndex);
-        localStorage.setItem("tab_index", newIndex);
         history.push("/");
         break;
       case 1:
-        setIndex(newIndex);
-        localStorage.setItem("tab_index", newIndex);
-        history.push("bridge");
+        history.push("/bridge");
         break;
       case 2:
-        setIndex(newIndex);
-        localStorage.setItem("tab_index", newIndex);
         history.push("/list-pair");
         break;
       case 3:
         window.open("https://docs.zigzag.exchange/", "_blank");
         break;
       case 4:
-        setIndex(newIndex);
-        localStorage.setItem("tab_index", newIndex);
         history.push("/dsl");
         break;
       case 5:
-        setIndex(newIndex);
-        localStorage.setItem("tab_index", newIndex);
         history.push("/swap");
         break;
       case 6:
-        setIndex(newIndex);
-        localStorage.setItem("tab_index", newIndex);
-        history.push("oldbridge");
+        history.push("/");
         break;
       default:
         break;
@@ -368,21 +375,19 @@ export const Header = (props) => {
               <ToggleTheme isDark={isDark} toggleTheme={toggleTheme} />
             </LanguageWrapper>
             <VerticalDivider />
-            {user.address ? (
-              <>
-                <Dropdown
-                  adClass="network-dropdown"
-                  width={162}
-                  item={networkItems}
-                  context={networkName}
-                  clickFunction={changeNetwork}
-                  leftIcon={true}
-                />
-                <AccountDropdown networkName={networkName} />
-              </>
-            ) : (
+
+            <Dropdown
+              adClass="network-dropdown"
+              width={162}
+              item={networkItems}
+              context={networkName}
+              clickFunction={changeNetwork}
+              leftIcon={true}
+            />
+            {user.address ? 
+              <AccountDropdown networkName={networkName} /> :
               <ConnectWalletButton />
-            )}
+            }
           </ActionsWrapper>
         </>
       )}
