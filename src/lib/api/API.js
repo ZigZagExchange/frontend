@@ -965,10 +965,10 @@ export default class API extends Emitter {
       const pair = pairs[i];
       const baseCurrency = pair.split("-")[0];
       const quoteCurrency = pair.split("-")[1];
-      if (baseCurrency === currency && this.api.marketInfo[pair]) {
-        return this.api.marketInfo[pair].baseAsset;
-      } else if (quoteCurrency === currency && this.api.marketInfo[pair]) {
-        return this.api.marketInfo[pair].quoteAsset;
+      if (baseCurrency === currency && this.marketInfo[pair]) {
+        return this.marketInfo[pair].baseAsset;
+      } else if (quoteCurrency === currency && this.marketInfo[pair]) {
+        return this.marketInfo[pair].quoteAsset;
       }
     }
     return null;
