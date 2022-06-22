@@ -148,7 +148,6 @@ export default class API extends Emitter {
         return `https://${subdomain}etherscan.io/address/${address}`;
       }
 
-      const network = this.apiProvider.network
       const subdomain = this.apiProvider.network === 1 ? "" : "rinkeby.";
       switch(network) {
         case 1000: return `https://${subdomain}zkscan.io/explorer/accounts/${address}`;
