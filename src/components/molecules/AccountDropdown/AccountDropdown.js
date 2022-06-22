@@ -329,8 +329,9 @@ export const AccountDropdown = () => {
 
   const wallet =
     selectedLayer === 1 ? balanceData.wallet : balanceData[network];
-  const explorer = user.address ? api.getExplorer(user.address, selectedLayer) : null;
-  const networkName = user.address ? api.getNetworkName(selectedLayer) : '--';
+  const explorer = user.address ? api.getExplorer(user.address, selectedLayer, network) : null;
+  const networkName = selectedLayer === 1 ? 'Etherscan' : api.getNetworkDisplayName(network);
+  
   
   useEffect(() => {
     const hideDisplay = () => setShow(false);

@@ -43,7 +43,7 @@ const StyledLinkBox = styled.div`
 `;
 
 export default function TradeFooter(props) {
-  const networkName = api.getNetworkName(props.network);
+  const networkName = api.getNetworkDisplayName(props.network);
   
   return (
     <StyledTradeFooter>

@@ -22,14 +22,14 @@ export default class APIArbitrumProvider extends APIProvider {
 
     // allways get ETH - generate token list
     const tokens = this.api.getCurrencies();
-    const tokenInfo = [{ decimals: 18, }];
+    const tokenInfoList = [{ decimals: 18, }];
     const tokenList = [ethers.constants.AddressZero];
 
     for(let i = 1; i < tokens.length; i++) {
       const token = tokens[i];
       const tokenInfo = this.api.getCurrencyInfo(token);
 
-      tokenInfo.push(tokenInfo);
+      tokenInfoList.push(tokenInfo);
       tokenList.push(tokenInfo.address);
     }
 
@@ -45,7 +45,7 @@ export default class APIArbitrumProvider extends APIProvider {
     for(let i = 0; i < tokens.length; i++) {
       const balance = balanceList[i];
       const token = tokens[i];
-      const currencyInfo = tokenInfo[token];
+      const currencyInfo = tokenInfoList[token];
 
       this.balances[tokens[i]] = {
         value: balance,

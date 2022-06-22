@@ -142,7 +142,7 @@ export default class API extends Emitter {
           this.emit('providerChange', network)
     }
 
-    getExplorer = (address, layer) => {
+    getExplorer = (address, layer, network) => {
       if (layer === 1) {
         const subdomain = this.apiProvider.network === 1 ? "" : "rinkeby.";
         return `https://${subdomain}etherscan.io/address/${address}`;
@@ -542,6 +542,17 @@ export default class API extends Emitter {
   };
 
   getNetworkName = (network) => {
+    const keys = Object.keys(this.networks);
+    return keys[keys.findIndex((key) => network === this.networks[key][0])];
+  };
+
+  getNetworkDisplayName = (network) => {
+    switch(network) {
+      case 1: case 1000: return 'zkSync';
+      case 42161: return 'Arbitrum';
+      default: return 'ZigZag';
+    }
+
     const keys = Object.keys(this.networks);
     return keys[keys.findIndex((key) => network === this.networks[key][0])];
   };
