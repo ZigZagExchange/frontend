@@ -21,8 +21,8 @@ export default class APIArbitrumProvider extends APIProvider {
     if (!this.accountState.address) return {};
 
     // allways get ETH - generate token list     
-    // const tokens = this.api.getCurrencies(); // TODO re-enable
-    const tokens = [];
+    // const tokens = ['ETH'].concat(this.api.getCurrencies()); // TODO re-enable
+    const tokens = ['ETH'];
     const tokenInfoList = [{ decimals: 18, }];
     const tokenList = [ethers.constants.AddressZero];
 
