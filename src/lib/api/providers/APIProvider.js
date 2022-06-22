@@ -24,5 +24,8 @@ export default class APIProvider {
     if (network === 1000 && process.env.REACT_APP_ZIGZAG_WS_RINKEBY) {
       this.websocketUrl = process.env.REACT_APP_ZIGZAG_WS_RINKEBY;
     }
+    if (network === 42161 && process.env.REACT_APP_ZIGZAG_WS_ARBITRUM) {
+      this.websocketUrl = process.env.REACT_APP_ZIGZAG_WS_ARBITRUM;
+    }
   }  
 }
