@@ -416,7 +416,7 @@ const Bridge = (props) => {
           setL1Fee(L1res);
           setL2Fee(swapDetails, L2res.amount, L2res.feeToken);
           setZigZagFeeToken(L2res.feeToken);
-          setZigZagFee(L2res.amount * 4);
+          setZigZagFee(L2res.amount * 3);
         } else {
           let res = await api.withdrawL2GasFee(swapDetails.currency);
           setL1Fee(null);
@@ -721,8 +721,8 @@ const Bridge = (props) => {
                   )}
                   {L1FeeAmount && (
                     <div>
-                     {fromNetwork.from.key === "ethereum" && `Maximum Ethereum gas fee: ~${formatPrice(L1FeeAmount)} ETH`}
-                     {fromNetwork.from.key === "polygon" && `Maximum Polygon gas fee: ~${formatPrice(L1FeeAmount)} MATIC`}
+                     {fromNetwork.from.key === "ethereum" && `Ethereum gas fee: ~${formatPrice(L1FeeAmount)} ETH`}
+                     {fromNetwork.from.key === "polygon" && `Polygon gas fee: ~${formatPrice(L1FeeAmount)} MATIC`}
                     </div>
                   )}
                   {L2FeeAmount && (
