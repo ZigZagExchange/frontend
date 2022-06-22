@@ -578,8 +578,8 @@ const TokenPairDropdown = ({ width, transparent, context, currentMarket, marketI
     return (
         <DropdownWrapper ref={wrapperRef}>
             <ButtonWrapper>
-                <img src={api.getCurrencyLogo(marketInfo?.baseAsset.symbol)} alt={marketInfo?.baseAsset.symbol} />
-                <ExpandableButton width={width} transparent={transparent} expanded={isOpened} onClick={toggle}>{context}</ExpandableButton>
+                {marketInfo && <img src={api.getCurrencyLogo(marketInfo?.baseAsset.symbol)} alt={marketInfo?.baseAsset.symbol} />}
+                <ExpandableButton width={width} transparent={transparent} expanded={isOpened} onClick={toggle}>{marketInfo && context}</ExpandableButton>
             </ButtonWrapper>
             {isOpened &&
                 <DropdownDisplay isMobile={isMobile}>
