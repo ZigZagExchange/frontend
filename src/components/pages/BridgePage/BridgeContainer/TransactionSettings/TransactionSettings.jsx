@@ -4,8 +4,6 @@ import { formatUSD, formatPrice, shortenAddress } from "lib/utils";
 import { RadioGroup } from "@headlessui/react";
 import { QuestionHelper } from "components";
 import { x } from "@xstyled/styled-components";
-import {HiExternalLink} from "react-icons/hi";
-import ExternalLink from "../../../ListPairPage/ExternalLink";
 
 const TransactionSettings = ({
   user,
