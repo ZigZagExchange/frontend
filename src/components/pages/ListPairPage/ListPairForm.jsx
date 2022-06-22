@@ -185,7 +185,7 @@ const ListPairForm = ({
               ]}
               rightOfLabel={
                 <QuestionHelper text="zkSync token ID of the first asset appearing in the pair
-                (BASE/QUOTE)">
+                (BASE/QUOTE)" placement="top">
                 </QuestionHelper>
               }
             />
@@ -221,7 +221,7 @@ const ListPairForm = ({
               ]}
               rightOfLabel={
                 <QuestionHelper text="zkSync token ID of the second asset appearing in the pair
-                (BASE/QUOTE)">
+                (BASE/QUOTE)" placement="top">
                 </QuestionHelper>
               }
             />
@@ -238,7 +238,7 @@ const ListPairForm = ({
                 <x.span fontSize={{ xs: 'xs', md: '14px' }}>Base Swap Fee</x.span>}
               validate={[required, min(0)]}
               rightOfLabel={
-                <QuestionHelper text="Swap fee collected by market makers">
+                <QuestionHelper text="Swap fee collected by market makers" placement="left">
                 </QuestionHelper>
               }
             />
@@ -255,7 +255,7 @@ const ListPairForm = ({
                 <x.span fontSize={{ xs: 'xs', md: '14px' }}>Quote Swap Fee</x.span>}
               validate={[required, min(0)]}
               rightOfLabel={
-                <QuestionHelper text="Swap fee collected by market makers">
+                <QuestionHelper text="Swap fee collected by market makers" placement="right">
                 </QuestionHelper>
               }
             />
@@ -282,7 +282,7 @@ const ListPairForm = ({
                     <x.div>(0.075225)</x.div>
                   </x.div>
                 </>
-              }>
+              } placement="bottom">
               </QuestionHelper>
             }
           />
@@ -299,7 +299,7 @@ const ListPairForm = ({
             ]}
             validate={required}
             rightOfLabel={
-              <QuestionHelper text="zkSync network on which the pair will be listed">
+              <QuestionHelper text="zkSync network on which the pair will be listed" placement="right">
               </QuestionHelper>
             }
           />

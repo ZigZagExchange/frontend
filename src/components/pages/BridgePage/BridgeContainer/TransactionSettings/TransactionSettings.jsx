@@ -3,6 +3,8 @@ import { InfoIcon } from "components/atoms/Svg";
 import classNames from "classnames";
 import { formatUSD, formatPrice, shortenAddress } from "lib/utils";
 import { RadioGroup } from "@headlessui/react";
+import { QuestionHelper } from "components";
+
 const TransactionSettings = ({
   user,
   transfer,
@@ -242,7 +244,9 @@ const TransactionSettings = ({
               </p>
               <p className="font-sans text-sm ">(~${usdFee})</p>
             </div>
-            <InfoIcon size={16} className="mt-1" />
+            <QuestionHelper text="The account activation fee is a one-time fee to register your account with zkSync."
+              placement="top">
+            </QuestionHelper>
           </div>
           <p className="font-sans text-sm ">
             {activationFee} {swapDetails.currency} (~${usdFee})
