@@ -13,6 +13,7 @@ const TransactionSettings = ({
   toNetwork,
   L1Fee,
   L2Fee,
+  ZigZagFee,
   swapDetails,
   isFastWithdraw,
   balances,
@@ -21,6 +22,7 @@ const TransactionSettings = ({
   withdrawSpeed,
   activationFee,
   L2FeeToken,
+  ZigZagFeeToken,
   hasError,
   formErr,
   fastWithdrawDisabled,
@@ -114,25 +116,18 @@ const TransactionSettings = ({
                   </RadioGroup>
                 </div>
               )}
-              {L2Fee && toNetwork.id === "ethereum" && (
+              {ZigZagFee && (
                 <div className="flex items-center justify-between mt-3">
-                  <p className="font-sans text-sm ">zkSync L2 gas fee:</p>
-                  <p className="font-sans text-sm ">{`~${L2Fee} ${L2FeeToken}`}</p>
+                  <p className="font-sans text-sm ">Bridge fee:</p>
+                  <p className="font-sans text-sm ">{`~${ZigZagFee} ${ZigZagFeeToken}`}</p>
                 </div>
               )}
-              {L2Fee && toNetwork.id === "polygon" && (
-                <div className="flex items-center justify-between mt-3">
-                  <p className="font-sans text-sm ">zkSync L2 gas fee + bridge fee:</p>
-                  <p className="font-sans text-sm ">{`~${L2Fee} ${L2FeeToken}`}</p>
-                </div>
-              )}
-              {!L2Fee && <div>Loading...</div>}
               {transfer.type === "withdraw" && toNetwork.id === "ethereum" && (
                 <>
                   {isFastWithdraw && L1Fee && (
                     <div className="flex items-center justify-between mt-3">
                       <p className="font-sans text-sm ">
-                        Ethereum L1 gas + bridge fee:
+                        Ethereum L1 gas:
                       </p>
                       <p className="font-sans text-sm ">
                         {" "}
@@ -161,26 +156,37 @@ const TransactionSettings = ({
                       <p className="font-sans text-sm ">
                         {toNetwork.id === "polygon" &&
                           ` ~${formatPrice(
-                            swapDetails.amount
+                            swapDetails.amount - ZigZagFee
                           )} WETH on Polygon`}
                         {toNetwork.key === "ethereum" &&
-                          (L1Fee
-                            ? ` ~${formatPrice(swapDetails.amount - L1Fee)}`
-                            : ` ${formatPrice(swapDetails.amount)}`)}
+                          ` ~${formatPrice(swapDetails.amount - ZigZagFee)}`}
                         {toNetwork.key === "ethereum" &&
                           ` ${swapDetails.currency} on Ethereum L1`}
                       </p>
                     </div>
                   </>
+                )}                
+                {L2Fee && (
+                  <div className="flex items-center justify-between mt-3">
+                    <p className="font-sans text-sm ">zkSync L2 gas fee:</p>
+                    <p className="font-sans text-sm ">{`~${L2Fee} ${L2FeeToken}`}</p>
+                  </div>
                 )}
+              {!L2Fee && <div>Loading...</div>}
             </>
           )}
           {transfer.type === "deposit" && (
             <>
+              {ZigZagFee && (
+                <div className="flex items-center justify-between mt-3">
+                  <p className="font-sans text-sm ">Bridge fee:</p>
+                  <p className="font-sans text-sm ">{`~${ZigZagFee} ${ZigZagFeeToken}`}</p>
+                </div>
+              )}
               {L1Fee && fromNetwork.id === "ethereum" && (
                 <div className="flex items-center justify-between mt-3">
                   <p className="font-sans text-sm ">
-                    {fromNetwork.id === "ethereum" && `Maximum Ethereum gas fee: `}
+                    {fromNetwork.id === "ethereum" && `Ethereum gas fee: `}
                   </p>
                   <p className="font-sans text-sm ">
                     {fromNetwork.id === "ethereum" &&
@@ -191,25 +197,14 @@ const TransactionSettings = ({
               {L1Fee && fromNetwork.id === "polygon" && (
                 <div className="flex items-center justify-between mt-3">
                   <p className="font-sans text-sm ">
-                    {fromNetwork.id === "polygon" && `Maximum Polygon gas fee: `}
+                    {fromNetwork.id === "polygon" && `Polygon gas fee: `}
                   </p>
                   <p className="font-sans text-sm ">
                     {fromNetwork.id === "polygon" &&
                       `~${formatPrice(L1Fee)} MATIC`}
                   </p>
                 </div>
-              )}
-              {L2Fee && fromNetwork.id === "polygon" && (
-                <div className="flex items-center justify-between mt-3">
-                  <p className="font-sans text-sm ">
-                    {fromNetwork.id === "polygon" && `Bridge fee: `}
-                  </p>
-                  <p className="font-sans text-sm ">
-                    {fromNetwork.id === "polygon" &&
-                      `${formatPrice(L2Fee)} ${L2FeeToken}`}
-                  </p>
-                </div>
-              )}
+              )}              
               {!L1Fee && !hasError && fromNetwork.id === "ethereum" && (
                 <div>Loading</div>
               )}
@@ -218,12 +213,12 @@ const TransactionSettings = ({
                   <p className="font-sans text-sm ">You'll receive:</p>
                   <p className="font-sans text-sm ">
                     {fromNetwork.id === "polygon" &&
-                      ` ~${formatPrice(swapDetails.amount)}`}
+                      ` ~${formatPrice(swapDetails.amount - ZigZagFee)}`}
                     {toNetwork.id === "polygon" &&
-                      ` ~${formatPrice(swapDetails.amount)}`}
+                      ` ~${formatPrice(swapDetails.amount - ZigZagFee)}`}
                     {fromNetwork.id === "ethereum" &&
                       toNetwork.id === "zksync" &&
-                      ` ${formatPrice(swapDetails.amount)}`}
+                      ` ${formatPrice(swapDetails.amount - ZigZagFee)}`}
 
                     {fromNetwork.id === "polygon" && ` ETH on zkSync L2`}
                     {toNetwork.id === "polygon" && ` WETH on Polygon`}
