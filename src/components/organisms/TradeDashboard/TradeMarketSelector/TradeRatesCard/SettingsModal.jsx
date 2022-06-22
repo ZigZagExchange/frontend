@@ -92,7 +92,7 @@ const SettingsModal = ({ onDismiss }) => {
           <Text font='primarySmall' color="foregroundHighEmphasis">Show price change since midnight UTC instead of 24h change</Text>
         </ToggleWrapper>
         <ToggleWrapper>
-          <Toggle isChecked={settings.cancelOrders} scale="md" onChange={toggle} settingKey="cancelOrders" />
+          <Toggle isChecked={settings.showCancelOrders} scale="md" onChange={toggle} settingKey="showCancelOrders" />
           <Text font='primarySmall' color="foregroundHighEmphasis">Cancel all orders button enabled</Text>
         </ToggleWrapper>
         <ToggleWrapper>

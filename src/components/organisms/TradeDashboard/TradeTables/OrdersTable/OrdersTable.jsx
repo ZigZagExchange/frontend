@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import "./OrdersTable.css";
 import { useCoinEstimator } from "components";
+import styled from 'styled-components'
 import loadingGif from "assets/icons/loading.svg";
 import { balancesSelector, networkSelector, settingsSelector } from "lib/store/features/api/apiSlice";
 import api from "lib/api";
@@ -21,6 +22,17 @@ import {
 } from "./StyledComponents"
 import { Dropdown } from "components/molecules/Dropdown";
 import Button from "components/molecules/Button/Button";
+
+const StyledButton = styled(Button)`
+  margin-right: 7vw
+`
+
+const TableHeaderWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.foreground400};
+`
 
 export default function OrdersTable(props) {
   const network = useSelector(networkSelector);
@@ -79,6 +91,10 @@ export default function OrdersTable(props) {
 
   const getUserOrders = () => {
     return Object.values(props.userOrders).filter(i => i[9] !== 'f' && (selectedSide === 'All' || i[3] === selectedSide.toLowerCase()[0])).sort((a, b) => b[1] - a[1]);
+  }
+
+  const isOpenStatus = (orders) => {
+    return orders.findIndex(order => order[9] === 'o') !== -1;
   }
 
   const changeSide = (newSide) => {
@@ -1080,17 +1096,21 @@ export default function OrdersTable(props) {
     <>
       <FooterWrapper>
         <FooterContainer>
-          <div>
+          <TableHeaderWrapper>
             <StyledTabMenu left activeIndex={tab} onItemClick={(newIndex) => setTab(newIndex)} >
               <Tab>Open Orders ({getUserOrders().length})</Tab>
               <Tab>Order History ({getFills().length})</Tab>
               <Tab>Balances</Tab>
             </StyledTabMenu>
 
-            {/* <Button variant="outlined" width="50px" scale="sm">
-                SELL
-            </Button> */}
-          </div>
+            {
+              isOpenStatus(getUserOrders()) && settings.showCancelOrders ?
+                <StyledButton variant="outlined" width="50px" scale="sm" onClick={api.cancelAllOrders}>
+                  Cancel
+                </StyledButton> : ""
+            }
+
+          </TableHeaderWrapper>
           {
             isMobile ?
               <MobileWrapper>{footerContent}</MobileWrapper> :
