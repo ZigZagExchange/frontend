@@ -382,7 +382,7 @@ const Bridge = (props) => {
     else if(fromNetwork.from.key === 'zksync' && toNetwork.key === 'polygon') {
       let res = await api.transferL2GasFee(swapDetails.currency);
       setL1Fee(null);
-      setL2Fee(swapDetails, (res.amount + 0.001), res.feeToken); // 10x => ZigZag fee
+      setL2Fee(swapDetails, res.amount + 0.001, res.feeToken); // ZigZag fee
     }
     // Ethereum -> zkSync aka deposit
     else if (transfer.type === "deposit") {
@@ -685,7 +685,7 @@ const Bridge = (props) => {
                       
                       <x.div color={"blue-gray-300"}>
                         You'll receive: 
-                          {toNetwork.key === "polygon" && ` ~${formatPrice(swapDetails.amount)} WETH on Polygon`}
+                          {toNetwork.key === "polygon" && ` ~${formatPrice(swapDetails.amount - L2FeeAmount)} WETH on Polygon`}
                           {toNetwork.key === "ethereum" && (L1FeeAmount 
                             ? ` ~${formatPrice(swapDetails.amount - L1FeeAmount)}`
                             : ` ${formatPrice(swapDetails.amount)}`)
@@ -723,7 +723,7 @@ const Bridge = (props) => {
                     <x.div>
                       <x.div color={"blue-gray-300"}>
                       You'll receive: 
-                        {fromNetwork.from.key === "polygon" && ` ~${formatPrice(swapDetails.amount)}`}
+                        {fromNetwork.from.key === "polygon" && ` ~${formatPrice(swapDetails.amount - L2FeeAmount)}`}
                         {fromNetwork.from.key === "ethereum" && toNetwork.key === "zksync" && ` ${formatPrice(swapDetails.amount)}`}
 
                         {fromNetwork.from.key === "polygon" && ` ETH on zkSync L2`}
