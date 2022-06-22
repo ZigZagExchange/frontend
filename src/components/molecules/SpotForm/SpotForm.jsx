@@ -37,6 +37,7 @@ export class SpotForm extends React.Component {
   getBaseBalance() {
     const marketInfo = this.props.marketInfo;
     if (!marketInfo) return 0;
+    if (!this.props.user.committed) return 0;
     return (
       this.props.user.committed.balances[marketInfo.baseAsset.symbol] /
       Math.pow(10, marketInfo.baseAsset.decimals)
