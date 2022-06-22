@@ -375,14 +375,14 @@ const Bridge = (props) => {
       const gasFee = await api.getPolygonFee();
       if(gasFee){
         setL1Fee(35000 * gasFee.fast.maxFee / 10**9);
-        setL2Fee(swapDetails, 0.0005, 'ETH') // ZigZag fee
+        setL2Fee(swapDetails, 0.001, 'ETH') // ZigZag fee
       }
     }
     // zkSync -> polygon
     else if(fromNetwork.from.key === 'zksync' && toNetwork.key === 'polygon') {
       let res = await api.transferL2GasFee(swapDetails.currency);
       setL1Fee(null);
-      setL2Fee(swapDetails, (res.amount * 10), res.feeToken); // 10x => ZigZag fee
+      setL2Fee(swapDetails, (res.amount + 0.001), res.feeToken); // 10x => ZigZag fee
     }
     // Ethereum -> zkSync aka deposit
     else if (transfer.type === "deposit") {
@@ -660,8 +660,8 @@ const Bridge = (props) => {
                 <x.div>
                   {L2FeeAmount && (
                     <>
-                      {toNetwork.key === "ethereum" && `zkSync L2 gas fee: ~${L2FeeAmount} ${L2FeeToken}`}
-                      {toNetwork.key === "polygon" && `zkSync L2 gas fee + bridge fee: ~${L2FeeAmount} ${L2FeeToken}`}
+                      {toNetwork.key === "ethereum" && `zkSync L2 gas fee: ~${formatPrice(L2FeeAmount)} ${L2FeeToken}`}
+                      {toNetwork.key === "polygon" && `zkSync L2 gas fee + bridge fee: ~${formatPrice(L2FeeAmount)} ${L2FeeToken}`}
                     </>
                   )}
                   {!L2FeeAmount && (
