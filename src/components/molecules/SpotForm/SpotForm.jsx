@@ -47,6 +47,7 @@ export class SpotForm extends React.Component {
   getQuoteBalance() {
     const marketInfo = this.props.marketInfo;
     if (!marketInfo) return 0;
+    if (!this.props.user.committed) return 0;
     return (
       this.props.user.committed.balances[marketInfo.quoteAsset.symbol] /
       Math.pow(10, marketInfo.quoteAsset.decimals)

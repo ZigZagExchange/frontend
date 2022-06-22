@@ -1,4 +1,3 @@
-import { toast } from "react-toastify";
 import { ethers } from 'ethers';
 import APIProvider from "./APIProvider";
 import balanceBundleABI from "lib/contracts/BalanceBundle.json";

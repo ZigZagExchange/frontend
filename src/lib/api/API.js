@@ -322,7 +322,8 @@ export default class API extends Emitter {
                 ethereumChainId = "0x4";
             break;
             case 42161: 
-              ethereumChainId = "0xf00";
+              ethereumChainId = "0xa4b1";
+            break;
             default:
                 return
         }
@@ -552,8 +553,8 @@ export default class API extends Emitter {
       default: return 'ZigZag';
     }
 
-    const keys = Object.keys(this.networks);
-    return keys[keys.findIndex((key) => network === this.networks[key][0])];
+    //const keys = Object.keys(this.networks);
+    //return keys[keys.findIndex((key) => network === this.networks[key][0])];
   };
 
   subscribeToMarket = (market) => {
