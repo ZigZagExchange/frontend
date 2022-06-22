@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { InfoIcon } from "components/atoms/Svg";
 import classNames from "classnames";
 import { formatUSD, formatPrice, shortenAddress } from "lib/utils";
 import { RadioGroup } from "@headlessui/react";
 import { QuestionHelper } from "components";
+import { x } from "@xstyled/styled-components";
 
 const TransactionSettings = ({
   user,
@@ -56,7 +56,17 @@ const TransactionSettings = ({
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <p className="font-sans text-sm ">Withdraw speed:</p>
-                    <InfoIcon size={16} />
+                    <QuestionHelper text={
+                      <x.div>
+                        <x.div mb={2}>
+                          Fast: receive ETH, UST and FRAX within seconds through ZigZag's Fast Withdrawal bridge.
+                        </x.div>
+                        <x.div mb={2}>
+                          Normal: use zkSync's bridge and receive funds after a few hours.
+                        </x.div>
+                      </x.div>
+                    } placement="bottom">
+                    </QuestionHelper>
                   </div>
                   <RadioGroup
                     value={withdrawSpeed}
