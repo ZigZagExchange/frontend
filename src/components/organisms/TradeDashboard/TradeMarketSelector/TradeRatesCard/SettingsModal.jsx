@@ -100,10 +100,6 @@ const SettingsModal = ({ onDismiss }) => {
           <Text font='primarySmall' color="foregroundHighEmphasis">Disable order notifications (pending, placed and filled orders)</Text>
         </ToggleWrapper>
         <ToggleWrapper>
-          <Toggle isChecked={settings.showSizeInUSD} scale="md" onChange={toggle} settingKey="showSizeInUSD" />
-          <Text font='primarySmall' color="foregroundHighEmphasis">Show order and trade sizes in USD</Text>
-        </ToggleWrapper>
-        <ToggleWrapper>
           <Toggle isChecked={settings.stackOrderbook} scale="md" onChange={toggle} settingKey="stackOrderbook" />
           <Text font='primarySmall' color="foregroundHighEmphasis">Stack orderbooks</Text>
         </ToggleWrapper>
