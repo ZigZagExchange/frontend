@@ -269,11 +269,14 @@ const Bridge = (props) => {
     const getCurrencyBalance = (cur) => (balances[cur] && swapCurrencyInfo?.decimals ? balances[cur].value / (10 ** (swapCurrencyInfo.decimals)) : 0);
     const detailBalance = getCurrencyBalance(swapCurrency);
     const max = getMax(swapCurrency, L2FeeToken);
-    const bridgeAmount = inputValue - ZigZagFeeAmount;
 
     let error = null;
-    if (bridgeAmount > 0) {
-      if (!user.id && bridgeAmount <= activationFee) {
+    if (inputValue > 0) {
+      const bridgeAmount = inputValue - ZigZagFeeAmount;
+
+      if (bridgeAmount <= 0) {
+        error = "Insufficient amount for fees"
+      } else if (!user.id && bridgeAmount <= activationFee) {
         error = `Must be more than ${activationFee} ${swapCurrency}`
       } else if (bridgeAmount >= detailBalance) {
         error = "Insufficient balance";
