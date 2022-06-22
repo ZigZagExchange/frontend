@@ -382,7 +382,7 @@ const Bridge = (props) => {
     else if(fromNetwork.from.key === 'zksync' && toNetwork.key === 'polygon') {
       let res = await api.transferL2GasFee(swapDetails.currency);
       setL1Fee(null);
-      setL2Fee(swapDetails, 0.001, res.feeToken); // ZigZag fee
+      setL2Fee(swapDetails, res.amount + 0.001, res.feeToken); // ZigZag fee
     }
     // Ethereum -> zkSync aka deposit
     else if (transfer.type === "deposit") {
