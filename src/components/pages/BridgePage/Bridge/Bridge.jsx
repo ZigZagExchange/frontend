@@ -660,8 +660,8 @@ const Bridge = (props) => {
                 <x.div>
                   {L2FeeAmount && (
                     <>
-                      {toNetwork.key === "ethereum" && `zkSync L2 gas fee: ~${L2FeeAmount} ${L2FeeToken}`}
-                      {toNetwork.key === "polygon" && `zkSync L2 gas fee + bridge fee: ~${L2FeeAmount} ${L2FeeToken}`}
+                      {toNetwork.key === "ethereum" && `zkSync L2 gas fee: ~${formatPrice(L2FeeAmount)} ${L2FeeToken}`}
+                      {toNetwork.key === "polygon" && `zkSync L2 gas fee + bridge fee: ~${formatPrice(L2FeeAmount)} ${L2FeeToken}`}
                     </>
                   )}
                   {!L2FeeAmount && (
