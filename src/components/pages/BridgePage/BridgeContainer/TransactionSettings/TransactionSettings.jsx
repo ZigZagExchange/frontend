@@ -135,21 +135,18 @@ const TransactionSettings = ({
                       </p>
                     </div>
                   )}
-                  {/* <div className="flex items-center justify-between mt-3">
-                    <p className="font-sans text-sm ">You'll receive:</p>
-                    <p className="font-sans text-sm ">
-                      {isFastWithdraw ? " ~" : " "}
-                      {isFastWithdraw && L1Fee
-                        ? formatPrice(swapDetails.amount - L1Fee)
-                        : formatPrice(swapDetails.amount)}
-                      {" " + swapDetails.currency} on Ethereum L1
-                    </p>
-                  </div> */}
                 </>
               )}
+              {L2Fee && (
+                <div className="flex items-center justify-between mt-3">
+                  <p className="font-sans text-sm ">zkSync L2 gas fee:</p>
+                  <p className="font-sans text-sm ">{`~${L2Fee} ${L2FeeToken}`}</p>
+                </div>
+              )}
+            {!L2Fee && <div>Loading...</div>}
               {transfer.type === "withdraw" &&
                 !formErr &&
-                swapDetails.amount > 0 && (
+                (swapDetails.amount - ZigZagFee) > 0 && (
                   <>
                     <div className="flex items-center justify-between mt-3">
                       <p className="font-sans text-sm ">You'll receive:</p>
@@ -165,14 +162,7 @@ const TransactionSettings = ({
                       </p>
                     </div>
                   </>
-                )}                
-                {L2Fee && (
-                  <div className="flex items-center justify-between mt-3">
-                    <p className="font-sans text-sm ">zkSync L2 gas fee:</p>
-                    <p className="font-sans text-sm ">{`~${L2Fee} ${L2FeeToken}`}</p>
-                  </div>
                 )}
-              {!L2Fee && <div>Loading...</div>}
             </>
           )}
           {transfer.type === "deposit" && (
@@ -208,7 +198,7 @@ const TransactionSettings = ({
               {!L1Fee && !hasError && fromNetwork.id === "ethereum" && (
                 <div>Loading</div>
               )}
-              {transfer.type === "deposit" && (
+              {transfer.type === "deposit" && (swapDetails.amount - ZigZagFee) > 0 && (
                 <div className="flex items-center justify-between mt-3">
                   <p className="font-sans text-sm ">You'll receive:</p>
                   <p className="font-sans text-sm ">
