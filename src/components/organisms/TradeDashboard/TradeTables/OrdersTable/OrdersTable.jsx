@@ -1474,7 +1474,7 @@ export default function OrdersTable(props) {
                 scale="sm"
                 onClick={api.cancelAllOrders}
               >
-                Cancel
+                Cancel All
               </StyledButton>
             ) : (
               ""
