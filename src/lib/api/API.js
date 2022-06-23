@@ -905,7 +905,7 @@ export default class API extends Emitter {
           this._pendingFills.push(fillId);
         }
       }
-    })    
+    })
     // request status update
     this.send("fillreceiptreq", [this.apiProvider.network, Number(fillRequestIds)])
   }

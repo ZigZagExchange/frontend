@@ -18,6 +18,7 @@ import {
   setCurrentMarket,
   resetData,
   layoutSelector,
+  settingsSelector,
 } from "lib/store/features/api/apiSlice";
 import { userSelector } from "lib/store/features/auth/authSlice";
 import api from "lib/api";
@@ -37,25 +38,42 @@ const TradeContainer = styled.div`
 const TradeGrid = styled.article`
   display: grid;
   grid-template-rows: 75px 528px 1fr 57px;
-  grid-template-columns: 300px 253.5px 253.5px 1fr;
-  grid-template-areas:
-    "marketSelector marketSelector marketSelector marketSelector"
-    "sidebar orders trades chart"
-    "sidebar tables tables tables"
-    "sidebar footer footer footer";
+  grid-template-columns: ${({ isLeft }) =>
+    isLeft ? "300px 253.5px 253.5px 1fr" : "300px 1fr 253.5px 253.5px"};
+  grid-template-areas: ${({ isLeft }) =>
+    isLeft
+      ? `"marketSelector marketSelector marketSelector marketSelector"
+  "sidebar orders trades chart"
+  "sidebar tables tables tables"
+  "sidebar footer footer footer"`
+      : `"marketSelector marketSelector marketSelector marketSelector"
+  "sidebar chart orders trades"
+  "sidebar tables tables tables"
+  "sidebar footer footer footer"`};
+
   min-height: calc(100vh - 56px);
   gap: 0px;
 
   @media screen and (max-width: 991px) {
-    grid-template-rows: 74px 410px 427px 508px 362px 1fr;
+    grid-template-rows: ${({ isLeft }) =>
+      isLeft
+        ? "74px 410px 459px 508px 362px 1fr"
+        : "74px 459px 508px 410px 362px 1fr"};
     grid-template-columns: 1fr 1fr;
-    grid-template-areas:
-      "marketSelector marketSelector"
+    grid-template-areas: ${({ isLeft }) =>
+      isLeft
+        ? `"marketSelector marketSelector"
       "chart chart"
       "sidebar orders"
       "trades trades"
       "tables tables"
-      "footer footer";
+      "footer footer"`
+        : `"marketSelector marketSelector"
+      "sidebar orders"
+      "trades trades"
+      "chart chart"
+      "tables tables"
+      "footer footer"`};
   }
 
   > div,
@@ -75,6 +93,7 @@ export function TradeDashboard() {
   const userOrders = useSelector(userOrdersSelector);
   const userFills = useSelector(userFillsSelector);
   const layout = useSelector(layoutSelector);
+  const settings = useSelector(settingsSelector);
   const [fixedPoint, setFixedPoint] = useState(2);
   const [side, setSide] = useState("all");
   const dispatch = useDispatch();
@@ -157,7 +176,7 @@ export function TradeDashboard() {
 
   return (
     <TradeContainer>
-      <TradeGrid layout={layout}>
+      <TradeGrid layout={layout} isLeft={settings.stackOrderbook}>
         <TradeMarketSelector
           updateMarketChain={updateMarketChain}
           currentMarket={currentMarket}
