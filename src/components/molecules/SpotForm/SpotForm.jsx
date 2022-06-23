@@ -96,7 +96,7 @@ export class SpotForm extends React.Component {
   
     let price;
     let unfilled = baseAmount;
-    if (side === "b") {  
+    if (side === "b" && this.props.orderbookAsks) {  
       const asks = this.props.orderbookAsks;
       for (let i = 0; i < asks.length; i++) {
         if (asks[i].td2 >= unfilled  || i === asks.length - 1) {
@@ -106,7 +106,7 @@ export class SpotForm extends React.Component {
           unfilled -= asks[i].td2;
         }
       }
-    } else if (side === "s") {
+    } else if (side === "s" && this.props.orderbookBids) {
       const bids = this.props.orderbookBids;
       for (let i = 0; i < bids.length; i++) {
         if (bids[i].td2 >= unfilled  || i === bids - 1) {
@@ -483,7 +483,7 @@ export class SpotForm extends React.Component {
     const balanceHtml =
       this.props.side === "b" ? (
         <strong>
-          {quoteBalance.toPrecision(8)}{" "}
+          {isNaN(Number(quoteBalance)) ? quoteBalance : Number(quoteBalance).toPrecision(8)}{" "}
           {marketInfo && marketInfo.quoteAsset?.symbol}
         </strong>
       ) : (
