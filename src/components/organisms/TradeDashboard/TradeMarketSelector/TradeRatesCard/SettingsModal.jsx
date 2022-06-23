@@ -140,7 +140,7 @@ const SettingsModal = ({ onDismiss }) => {
             settingKey="disableOrderNotification"
           />
           <Text font="primarySmall" color="foregroundHighEmphasis">
-            Disable order notifications (pending, placed and filled orders)
+            Disable order notifications (pending/placed/filled/cancelled)
           </Text>
         </ToggleWrapper>
         <ToggleWrapper>

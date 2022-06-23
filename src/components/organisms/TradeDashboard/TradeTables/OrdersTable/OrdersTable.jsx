@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
 import "./OrdersTable.css";
 import { useCoinEstimator } from "components";
 import styled from "styled-components";
@@ -202,6 +203,20 @@ export default function OrdersTable(props) {
     setWalletList(walletArray);
   };
 
+  const cancelOrder = async(orderId) => {
+    try {
+      await api.cancelOrder(orderId);
+
+      if (!settings.disableOrderNotification) {
+        toast.info("Order cancelled", {
+          toastId: "Order cancelled.",
+        });
+      }
+    } catch (e) {
+      toast.error(e.message);
+    }
+  }
+
   const renderOrderTable = (orders) => {
     return isMobile ? (
       <table>
@@ -351,7 +366,7 @@ export default function OrdersTable(props) {
                             font="primaryExtraSmallSemiBold"
                             color="primaryHighEmphasis"
                             textAlign="right"
-                            onClick={() => api.cancelOrder(orderId)}
+                            onClick={() => cancelOrder(orderId)}
                           >
                             Cancel
                           </ActionWrapper>
