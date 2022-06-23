@@ -125,7 +125,10 @@ const TokenDropDownModal = ({
                       >
                         <Combobox.Options
                           open
-                          className=" mt-1 max-h-72 w-full overflow-auto rounded-md dark:bg-[#2B2E4A] bg-sky-100 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none "
+                          className={`mt-1 max-h-72 w-full overflow-auto rounded-md dark:bg-[#2B2E4A] 
+                            bg-sky-100 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none 
+                            ${isDark? "zig_scrollstyle_dark":"zig_scrollstyle_light" }
+                          `}
                         >
                           {filteredToken.length === 0 && query !== "" ? (
                             <div className="relative px-4 py-2 cursor-default select-none font-work">

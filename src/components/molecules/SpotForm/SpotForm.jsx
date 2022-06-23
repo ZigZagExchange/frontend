@@ -26,6 +26,13 @@ export class SpotForm extends React.Component {
     };
   }
 
+  isInvalidNumber(val) {
+    if (Number.isNaN(val) || Number(val) === 0)
+      return true;
+    else
+      return false;
+  }
+
   updatePrice(e) {
     const newState = { ...this.state };
     newState.price = (rx_live.test(e.target.value)) ? e.target.value : this.state.price;
@@ -33,6 +40,7 @@ export class SpotForm extends React.Component {
     newState.totalAmount = this.props.orderType === "limit" ?
       (newState.price * newState.baseAmount).toPrecision(6) :
       (this.props.marketSummary.price * newState.baseAmount).toPrecision(6);
+    newState.orderButtonDisabled = this.isInvalidNumber(newState.totalAmount);
     this.setState(newState);
   }
 
@@ -44,6 +52,7 @@ export class SpotForm extends React.Component {
     newState.totalAmount = this.props.orderType === "limit" ?
       (this.currentPrice() * newState.baseAmount).toPrecision(6) :
       (this.props.marketSummary.price * newState.baseAmount).toPrecision(6);
+    newState.orderButtonDisabled = this.isInvalidNumber(newState.totalAmount);
     this.setState(newState);
   }
 
@@ -55,39 +64,34 @@ export class SpotForm extends React.Component {
     newState.totalAmount = this.props.orderType === "limit" ?
       (this.currentPrice() * newState.baseAmount).toPrecision(6) :
       (this.props.marketSummary.price * newState.baseAmount).toPrecision(6);
+    newState.orderButtonDisabled = this.isInvalidNumber(newState.totalAmount);
     this.setState(newState);
   }
 
   updateAmount(e) {
     const newState = { ...this.state };
-    if (Number.isNaN(e.target.value) || Number(e.target.value) === 0) {
-      newState.orderButtonDisabled = true;
-    } else {
-      newState.orderButtonDisabled = false;
-    }
+    
+
     newState.baseAmount = (rx_live.test(e.target.value)) ? e.target.value : this.state.baseAmount;
     newState.quoteAmount = "";
     newState.baseAmount === "" ? newState.totalAmount = "" :
       newState.totalAmount = this.props.orderType === "limit" ?
         (this.currentPrice() * newState.baseAmount).toPrecision(6) :
         (this.props.marketSummary.price * newState.baseAmount).toPrecision(6);
-
+    newState.orderButtonDisabled = this.isInvalidNumber(newState.totalAmount);
     this.setState(newState);
   }
 
   updateTotalAmount(e) {
     const newState = { ...this.state };
-    if(Number.isNaN(e.target.value) || Number(e.target.value) === 0) {
-      newState.orderButtonDisabled = true;
-    } else {
-      newState.orderButtonDisabled = false;
-    }
+
     newState.totalAmount = (rx_live.test(e.target.value)) ? e.target.value : this.state.totalAmount;
     newState.quoteAmount = "";
     newState.totalAmount === "" ? newState.baseAmount = "" :
       newState.baseAmount = this.props.orderType === "limit" ?
         (newState.totalAmount / this.currentPrice()).toPrecision(6) :
         (newState.totalAmount / this.props.marketSummary.price).toPrecision(6);
+    newState.orderButtonDisabled = this.isInvalidNumber(newState.totalAmount);
     this.setState(newState);
   }
 
@@ -100,6 +104,7 @@ export class SpotForm extends React.Component {
       newState.totalAmount = this.props.orderType === "limit" ?
         (this.currentPrice() * newState.baseAmount).toPrecision(6) :
         (this.props.marketSummary.price * newState.baseAmount).toPrecision(6);
+    newState.orderButtonDisabled = this.isInvalidNumber(newState.totalAmount);
     this.setState(newState);
   }
 
@@ -113,6 +118,7 @@ export class SpotForm extends React.Component {
       newState.totalAmount = this.props.orderType === "limit" ?
         (this.currentPrice() * newState.baseAmount).toPrecision(6) :
         (this.props.marketSummary.price * newState.baseAmount).toPrecision(6);
+    newState.orderButtonDisabled = this.isInvalidNumber(newState.totalAmount);
     this.setState(newState);
   }
 
@@ -543,11 +549,7 @@ export class SpotForm extends React.Component {
     if (isNaN(newstate.baseAmount)) newstate.baseAmount = 0;
     if (isNaN(newstate.totalAmount)) newstate.totalAmount = 0;
     if (isNaN(newstate.quoteAmount)) newstate.quoteAmount = 0;
-    if(newstate.totalAmount === 0) {
-      newstate.orderButtonDisabled = true;
-    } else {
-      newstate.orderButtonDisabled = false;
-    }
+    newstate.orderButtonDisabled = this.isInvalidNumber(newstate.totalAmount);
     this.setState(newstate);
   }
 
