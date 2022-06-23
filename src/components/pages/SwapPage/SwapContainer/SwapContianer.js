@@ -91,6 +91,9 @@ const SwapContianer = ({
           readOnly
         />
       </div>
+      <p className="mt-1 text-sm font-normal text-right text-slate-400 ">
+        Estimated value: ~ ${formatUSD(estimatedValue)}
+      </p>
     </div>
   );
 };

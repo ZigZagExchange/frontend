@@ -193,7 +193,7 @@ const DropdownContent = styled.div`
   overflow-y: auto;
 `;
 
-const TokenPairDropdown = ({ width, transparent, context, currentMarket, marketInfo, updateMarketChain, rowData }) => {
+const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, updateMarketChain, rowData }) => {
     // const [foundPairs, setFoundPairs] = useState([])
     const [pairs, setPairs] = useState([])
     const [categorySelected, setCategorySelected] = useState(0)
@@ -211,6 +211,7 @@ const TokenPairDropdown = ({ width, transparent, context, currentMarket, marketI
     const [isOpened, setIsOpened] = useState(false)
     const isMobile = window.innerWidth < 430
     const wrapperRef = useRef(null)
+    const [_marketInfo, setMarketInfo] = useState(null);
 
     HideMenuOnOutsideClicked(wrapperRef, setIsOpened)
 
@@ -263,6 +264,16 @@ const TokenPairDropdown = ({ width, transparent, context, currentMarket, marketI
             setPairsByCategory(rowData.map((r) => r.td1));
         }
     }, [rowData])
+
+    useEffect(() => {
+        if(
+            marketInfo &&
+            marketInfo !== _marketInfo
+        ) {      
+            setMarketInfo(marketInfo);
+        }
+    }, [marketInfo])
+
 
     const categorizePairs = (category_index) => {
         let foundPairs = [];
@@ -575,11 +586,16 @@ const TokenPairDropdown = ({ width, transparent, context, currentMarket, marketI
         );
     }
 
+    let marketDisplay = "--/--";
+    if (_marketInfo) {
+        marketDisplay = `${_marketInfo.baseAsset.symbol}/${_marketInfo.quoteAsset.symbol}`;
+    }
+
     return (
         <DropdownWrapper ref={wrapperRef}>
             <ButtonWrapper>
-                <img src={api.getCurrencyLogo(marketInfo?.baseAsset.symbol)} alt={marketInfo?.baseAsset.symbol} />
-                <ExpandableButton width={width} transparent={transparent} expanded={isOpened} onClick={toggle}>{context}</ExpandableButton>
+                <img src={api.getCurrencyLogo(_marketInfo?.baseAsset.symbol)} alt={_marketInfo?.baseAsset.symbol} />
+                <ExpandableButton width={width} transparent={transparent} expanded={isOpened} onClick={toggle}>{marketDisplay}</ExpandableButton>
             </ButtonWrapper>
             {isOpened &&
                 <DropdownDisplay isMobile={isMobile}>

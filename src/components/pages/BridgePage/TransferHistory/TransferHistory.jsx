@@ -42,7 +42,7 @@ const TransferHistory = () => {
             Viewing {receipts.length} transfers
           </p>
           <button
-            className="text-base hover:underline text-primary-900 underline-offset-1"
+            className="bg-[#000000] px-2 py-1 rounded-md text-sm font-semibold text-primary-900 ml-2.5 hover:bg-slate-800 font-work"
             onClick={() => dispatch(clearBridgeReceipts())}
           >
             Clear all
