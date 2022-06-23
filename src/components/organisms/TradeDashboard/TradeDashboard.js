@@ -55,7 +55,10 @@ const TradeGrid = styled.article`
   gap: 0px;
 
   @media screen and (max-width: 991px) {
-    grid-template-rows: 74px 410px 459px 508px 362px 1fr;
+    grid-template-rows: ${({ isLeft }) =>
+      isLeft
+        ? "74px 410px 459px 508px 362px 1fr"
+        : "74px 459px 508px 410px 362px 1fr"};
     grid-template-columns: 1fr 1fr;
     grid-template-areas: ${({ isLeft }) =>
       isLeft
