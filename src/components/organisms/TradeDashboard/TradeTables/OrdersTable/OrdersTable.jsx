@@ -21,7 +21,6 @@ import {
   ActionWrapper
 } from "./StyledComponents"
 import { Dropdown } from "components/molecules/Dropdown";
-import Button from "components/molecules/Button/Button";
 
 const StyledButton = styled(Button)`
   margin-right: 7vw
@@ -1013,6 +1012,7 @@ export default function OrdersTable(props) {
               <tr>
                 <td data-label="Token"><Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{token.token}</Text></td>
                 <td data-label="Balance"><Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{settings.hideBalance ? "****.****" : token.valueReadable}</Text></td>
+                <td data-label="Balance"><Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{settings.hideBalance ? "****.****" : token.valueReadable * coinEstimator(token.token)}</Text></td>
               </tr>
             );
           });
@@ -1043,6 +1043,22 @@ export default function OrdersTable(props) {
                       <th scope="col" style={{ cursor: 'pointer' }} onClick={() => { sortByBalance() }}>
                         <HeaderWrapper>
                           <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Balance</Text>
+                          {balanceSorted ? (
+                            <SortIconWrapper>
+                              {balanceDirection ? <SortUpIcon /> : <SortUpFilledIcon />}
+                              {balanceDirection ? <SortDownFilledIcon /> : <SortDownIcon />}
+                            </SortIconWrapper>
+                          ) : (
+                            <SortIconWrapper>
+                              <SortUpIcon />
+                              <SortDownIcon />
+                            </SortIconWrapper>
+                          )}
+                        </HeaderWrapper>
+                      </th>
+                      <th scope="col" style={{ cursor: 'pointer' }} onClick={() => { sortByBalance() }}>
+                        <HeaderWrapper>
+                          <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">USD</Text>
                           {balanceSorted ? (
                             <SortIconWrapper>
                               {balanceDirection ? <SortUpIcon /> : <SortUpFilledIcon />}

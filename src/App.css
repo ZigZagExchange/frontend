@@ -4,25 +4,38 @@
   box-sizing: border-box;
 }
 
-.zig_scrollstyle::-webkit-scrollbar-track {
-  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-  background-color: #171c28;
-  border-radius: 10px;
-}
-
-.zig_scrollstyle::-webkit-scrollbar {
+.zig_scrollstyle_light::-webkit-scrollbar {
   width: 5px;
-  background-color: #171c28;
+  position: relative;
+  z-index: 20;
 }
 
-.zig_scrollstyle::-webkit-scrollbar-thumb {
-  background-image: -webkit-gradient(linear,
-      left bottom,
-      left top,
-      color-stop(0, #1b2d52),
-      color-stop(0.44, rgb(19, 34, 80)),
-      color-stop(0.55, #1b2d52));
+.zig_scrollstyle_light::-webkit-scrollbar-track {
+  border-radius: 4px;
+  background: transparent;
+  height: 23px;
+}
+
+.zig_scrollstyle_light::-webkit-scrollbar-thumb {
+  border-radius: 4px;         
+  background: #292D3F21;
+}
+
+.zig_scrollstyle_dark::-webkit-scrollbar {
+  width: 5px;
+  position: relative;
+  z-index: 20;
+}
+
+.zig_scrollstyle_dark::-webkit-scrollbar-track {
+  border-radius: 4px;
+  background: transparent;
+  height: 23px;
+}
+
+.zig_scrollstyle_dark::-webkit-scrollbar-thumb {
+  border-radius: 4px;         
+  background: #FFFFFF21;
 }
 
 h1,

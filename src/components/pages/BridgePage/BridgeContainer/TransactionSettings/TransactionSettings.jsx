@@ -1,8 +1,10 @@
 import React, { useState } from "react";
-import { InfoIcon } from "components/atoms/Svg";
 import classNames from "classnames";
 import { formatUSD, formatPrice, shortenAddress } from "lib/utils";
 import { RadioGroup } from "@headlessui/react";
+import { QuestionHelper } from "components";
+import { x } from "@xstyled/styled-components";
+
 const TransactionSettings = ({
   user,
   transfer,
@@ -11,6 +13,7 @@ const TransactionSettings = ({
   toNetwork,
   L1Fee,
   L2Fee,
+  ZigZagFee,
   swapDetails,
   isFastWithdraw,
   balances,
@@ -19,6 +22,7 @@ const TransactionSettings = ({
   withdrawSpeed,
   activationFee,
   L2FeeToken,
+  ZigZagFeeToken,
   hasError,
   formErr,
   fastWithdrawDisabled,
@@ -54,7 +58,17 @@ const TransactionSettings = ({
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <p className="font-sans text-sm ">Withdraw speed:</p>
-                    <InfoIcon size={16} />
+                    <QuestionHelper text={
+                      <x.div>
+                        <x.div mb={2}>
+                          Fast: receive ETH, UST and FRAX within seconds through ZigZag's Fast Withdrawal bridge.
+                        </x.div>
+                        <x.div mb={2}>
+                          Normal: use zkSync's bridge and receive funds after a few hours.
+                        </x.div>
+                      </x.div>
+                    } placement="bottom">
+                    </QuestionHelper>
                   </div>
                   <RadioGroup
                     value={withdrawSpeed}
@@ -102,73 +116,58 @@ const TransactionSettings = ({
                   </RadioGroup>
                 </div>
               )}
-              {L2Fee && toNetwork.id === "ethereum" && (
+              {ZigZagFee && (
+                <div className="flex items-center justify-between mt-3">
+                  <p className="font-sans text-sm ">Bridge fee:</p>
+                  <p className="font-sans text-sm ">{`~${ZigZagFee} ${ZigZagFeeToken}`}</p>
+                </div>
+              )}
+              {isFastWithdraw && L1Fee && toNetwork.id === "ethereum" && (
+                <div className="flex items-center justify-between mt-3">
+                  <p className="font-sans text-sm ">
+                    Ethereum L1 gas:
+                  </p>
+                  <p className="font-sans text-sm ">
+                    {" "}
+                    ~{formatPrice(L1Fee)} {swapDetails.currency}
+                  </p>
+                </div>
+              )}
+              {L2Fee && (
                 <div className="flex items-center justify-between mt-3">
                   <p className="font-sans text-sm ">zkSync L2 gas fee:</p>
                   <p className="font-sans text-sm ">{`~${L2Fee} ${L2FeeToken}`}</p>
                 </div>
               )}
-              {L2Fee && toNetwork.id === "polygon" && (
+              {!L2Fee && <div>Loading...</div>}
+              {!formErr && (swapDetails.amount - ZigZagFee) > 0 && (
                 <div className="flex items-center justify-between mt-3">
-                  <p className="font-sans text-sm ">zkSync L2 gas fee + bridge fee:</p>
-                  <p className="font-sans text-sm ">{`~${L2Fee} ${L2FeeToken}`}</p>
+                  <p className="font-sans text-sm ">You'll receive:</p>
+                  <p className="font-sans text-sm ">
+                    {toNetwork.id === "polygon" &&
+                      ` ~${formatPrice(
+                        swapDetails.amount - ZigZagFee
+                      )} WETH on Polygon`}
+                    {toNetwork.id === "ethereum" &&
+                      ` ~${formatPrice(swapDetails.amount - ZigZagFee)} ${
+                        swapDetails.currency} on Ethereum L1`}
+                  </p>
                 </div>
               )}
-              {!L2Fee && <div>Loading...</div>}
-              {transfer.type === "withdraw" && toNetwork.id === "ethereum" && (
-                <>
-                  {isFastWithdraw && L1Fee && (
-                    <div className="flex items-center justify-between mt-3">
-                      <p className="font-sans text-sm ">
-                        Ethereum L1 gas + bridge fee:
-                      </p>
-                      <p className="font-sans text-sm ">
-                        {" "}
-                        ~{formatPrice(L1Fee)} {swapDetails.currency}
-                      </p>
-                    </div>
-                  )}
-                  {/* <div className="flex items-center justify-between mt-3">
-                    <p className="font-sans text-sm ">You'll receive:</p>
-                    <p className="font-sans text-sm ">
-                      {isFastWithdraw ? " ~" : " "}
-                      {isFastWithdraw && L1Fee
-                        ? formatPrice(swapDetails.amount - L1Fee)
-                        : formatPrice(swapDetails.amount)}
-                      {" " + swapDetails.currency} on Ethereum L1
-                    </p>
-                  </div> */}
-                </>
-              )}
-              {transfer.type === "withdraw" &&
-                !formErr &&
-                swapDetails.amount > 0 && (
-                  <>
-                    <div className="flex items-center justify-between mt-3">
-                      <p className="font-sans text-sm ">You'll receive:</p>
-                      <p className="font-sans text-sm ">
-                        {toNetwork.id === "polygon" &&
-                          ` ~${formatPrice(
-                            swapDetails.amount
-                          )} WETH on Polygon`}
-                        {toNetwork.key === "ethereum" &&
-                          (L1Fee
-                            ? ` ~${formatPrice(swapDetails.amount - L1Fee)}`
-                            : ` ${formatPrice(swapDetails.amount)}`)}
-                        {toNetwork.key === "ethereum" &&
-                          ` ${swapDetails.currency} on Ethereum L1`}
-                      </p>
-                    </div>
-                  </>
-                )}
             </>
           )}
           {transfer.type === "deposit" && (
             <>
+              {ZigZagFee && (
+                <div className="flex items-center justify-between mt-3">
+                  <p className="font-sans text-sm ">Bridge fee:</p>
+                  <p className="font-sans text-sm ">{`~${ZigZagFee} ${ZigZagFeeToken}`}</p>
+                </div>
+              )}
               {L1Fee && fromNetwork.id === "ethereum" && (
                 <div className="flex items-center justify-between mt-3">
                   <p className="font-sans text-sm ">
-                    {fromNetwork.id === "ethereum" && `Maximum Ethereum gas fee: `}
+                    {fromNetwork.id === "ethereum" && `Ethereum gas fee: `}
                   </p>
                   <p className="font-sans text-sm ">
                     {fromNetwork.id === "ethereum" &&
@@ -179,39 +178,28 @@ const TransactionSettings = ({
               {L1Fee && fromNetwork.id === "polygon" && (
                 <div className="flex items-center justify-between mt-3">
                   <p className="font-sans text-sm ">
-                    {fromNetwork.id === "polygon" && `Maximum Polygon gas fee: `}
+                    {fromNetwork.id === "polygon" && `Polygon gas fee: `}
                   </p>
                   <p className="font-sans text-sm ">
                     {fromNetwork.id === "polygon" &&
                       `~${formatPrice(L1Fee)} MATIC`}
                   </p>
                 </div>
-              )}
-              {L2Fee && fromNetwork.id === "polygon" && (
-                <div className="flex items-center justify-between mt-3">
-                  <p className="font-sans text-sm ">
-                    {fromNetwork.id === "polygon" && `Bridge fee: `}
-                  </p>
-                  <p className="font-sans text-sm ">
-                    {fromNetwork.id === "polygon" &&
-                      `${formatPrice(L2Fee)} ${L2FeeToken}`}
-                  </p>
-                </div>
-              )}
+              )}              
               {!L1Fee && !hasError && fromNetwork.id === "ethereum" && (
                 <div>Loading</div>
               )}
-              {transfer.type === "deposit" && (
+              {!formErr && (swapDetails.amount - ZigZagFee) > 0 && (
                 <div className="flex items-center justify-between mt-3">
                   <p className="font-sans text-sm ">You'll receive:</p>
                   <p className="font-sans text-sm ">
                     {fromNetwork.id === "polygon" &&
-                      ` ~${formatPrice(swapDetails.amount)}`}
+                      ` ~${formatPrice(swapDetails.amount - ZigZagFee)}`}
                     {toNetwork.id === "polygon" &&
-                      ` ~${formatPrice(swapDetails.amount)}`}
+                      ` ~${formatPrice(swapDetails.amount - ZigZagFee)}`}
                     {fromNetwork.id === "ethereum" &&
                       toNetwork.id === "zksync" &&
-                      ` ${formatPrice(swapDetails.amount)}`}
+                      ` ${formatPrice(swapDetails.amount - ZigZagFee)}`}
 
                     {fromNetwork.id === "polygon" && ` ETH on zkSync L2`}
                     {toNetwork.id === "polygon" && ` WETH on Polygon`}
@@ -242,7 +230,9 @@ const TransactionSettings = ({
               </p>
               <p className="font-sans text-sm ">(~${usdFee})</p>
             </div>
-            <InfoIcon size={16} className="mt-1" />
+            <QuestionHelper text="The account activation fee is a one-time fee to register your account with zkSync."
+              placement="top">
+            </QuestionHelper>
           </div>
           <p className="font-sans text-sm ">
             {activationFee} {swapDetails.currency} (~${usdFee})

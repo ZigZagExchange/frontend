@@ -15,14 +15,12 @@ const QuestionWrapper = styled.div`
   border-radius: 36px;
 `
 
-export default function QuestionHelper({ text }) {
+export default function QuestionHelper({ text, placement }) {
   const [show, setShow] = useState(false)
 
-  const open = () => setShow(!show)
-
   return (
-    <Tooltip text={text} show={show}>
-        <QuestionWrapper onClick={open}>
+    <Tooltip text={text} show={show} placement={placement}>
+        <QuestionWrapper onMouseEnter={()=>setShow(true)} onMouseLeave={()=>setShow(false)}>
             <InfoIcon />
         </QuestionWrapper>
     </Tooltip>
