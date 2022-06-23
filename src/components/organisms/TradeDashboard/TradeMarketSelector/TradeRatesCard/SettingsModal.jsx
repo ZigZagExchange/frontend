@@ -24,6 +24,7 @@ const ResetAllSettingsWrapper = styled.div`
   display: flex;
   flex-direction: row;
   gap: 7px;
+  justify-content: end;
   svg path {
     fill: ${({ theme }) => theme.colors.primaryHighEmphasis};
   }
@@ -38,13 +39,14 @@ const ActionWrapper = styled.div`
 const ActionsWrapper = styled.div`
   display: flex;
   flex-direction: row;
+  padding-top: 10px;
   gap: 34px;
 `;
 
 const Divider = styled.div`
   height: 1px;
   background: ${({ theme }) => theme.colors.foreground400};
-  margin: 20px 0px;
+  margin: 15px 0px;
 `;
 
 const ModalBody = styled.div`
@@ -75,30 +77,7 @@ const SettingsModal = ({ onDismiss }) => {
         <Text font="primaryHeading6" color="foregroundHighEmphasis">
           Settings
         </Text>
-        <ResetAllSettingsWrapper onClick={resetSettings}>
-          <RestartIcon />
-          <Text
-            font="primaryMediumBody"
-            color="primaryHighEmphasis"
-            style={{ textDecoration: "underline", cursor: "pointer" }}
-          >
-            Reset All Settings
-          </Text>
-        </ResetAllSettingsWrapper>
-      </ModalHeader>
-      <Divider />
-      <ModalBody>
         <ActionsWrapper>
-          <ActionWrapper>
-            <RestartIcon />
-            <Text
-              font="primaryMediumBody"
-              color="foregroundHighEmphasis"
-              style={{ cursor: "pointer" }}
-            >
-              Reset Layout
-            </Text>
-          </ActionWrapper>
           <ActionWrapper>
             <EditIcon />
             <Text
@@ -109,7 +88,20 @@ const SettingsModal = ({ onDismiss }) => {
               Edit Layout
             </Text>
           </ActionWrapper>
+          <ActionWrapper>
+            <RestartIcon />
+            <Text
+              font="primaryMediumBody"
+              color="foregroundHighEmphasis"
+              style={{ cursor: "pointer" }}
+            >
+              Reset Layout
+            </Text>
+          </ActionWrapper>
         </ActionsWrapper>
+      </ModalHeader>
+      <Divider />
+      <ModalBody>
         <ToggleWrapper>
           <Toggle
             isChecked={settings.showNightPriceChange}
@@ -198,6 +190,16 @@ const SettingsModal = ({ onDismiss }) => {
             Hide balances
           </Text>
         </ToggleWrapper>
+        <ResetAllSettingsWrapper onClick={resetSettings}>
+          <RestartIcon />
+          <Text
+            font="primaryMediumBody"
+            color="primaryHighEmphasis"
+            style={{ textDecoration: "underline", cursor: "pointer" }}
+          >
+            Reset All Settings
+          </Text>
+        </ResetAllSettingsWrapper>
       </ModalBody>
     </SettingModalWrapper>
   );
