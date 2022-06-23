@@ -868,7 +868,7 @@ export default class API extends Emitter {
         if (index > -1) {
           this._pendingOrders.splice(index, 1);
           // request status update
-          this.send("orderreceiptreq", [this.apiProvider.network, orderId])
+          this.send("orderreceiptreq", [this.apiProvider.network, Number(orderId)])
         } else {
           this._pendingOrders.push(orderId);
         }
@@ -892,6 +892,6 @@ export default class API extends Emitter {
       }
     })    
     // request status update
-    this.send("fillreceiptreq", [this.apiProvider.network, fillRequestIds])
+    this.send("fillreceiptreq", [this.apiProvider.network, Number(fillRequestIds)])
   }
 }
