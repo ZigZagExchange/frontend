@@ -516,7 +516,9 @@ export default class API extends Emitter {
   };
 
   cancelOrder = async (orderId) => {
-    await this.send("cancelorder", [this.apiProvider.network, orderId]);
+    const message = `cancelorder2:${this.apiProvider.network}:${orderId}`
+    const signedMessage = this.apiProvider.signMessage(message);
+    await this.send("cancelorder2", [this.apiProvider.network, orderId, signedMessage]);
     return true;
   };
 
@@ -576,8 +578,11 @@ export default class API extends Emitter {
   };
 
   cancelAllOrders = async () => {
+    const validUntil = (Date.now() / 1000) + 10;
+    const message = `cancelall2:${this.apiProvider.network}:${validUntil}`
+    const signedMessage = this.apiProvider.signMessage(message);
     const { id: userId } = await this.getAccountState();
-    await this.send("cancelall", [this.apiProvider.network, userId]);
+    await this.send("cancelall2", [this.apiProvider.network, userId, signedMessage]);
     return true;
   };
 
