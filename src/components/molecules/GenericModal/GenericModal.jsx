@@ -1,18 +1,18 @@
-import React from 'react'
-import styled from 'styled-components'
-import { CloseIcon } from '../../atoms/Svg'
+import React from "react";
+import styled from "styled-components";
+import { CloseIcon } from "../../atoms/Svg";
 
 const ModalOverlay = styled.div`
-    position: fixed;
-    display: grid;
-    justify-content: center;
-    align-content: center;
-    width: 100%;
-    height: 100%;
-    background: #2527277D;
-    backdrop-filter: blur(4px);
-    z-index: 999;
-`
+  position: fixed;
+  display: grid;
+  justify-content: center;
+  align-content: center;
+  width: 100%;
+  height: 100%;
+  background: #2527277d;
+  backdrop-filter: blur(0.8px);
+  z-index: 999;
+`;
 
 const Modal = styled.div`
   max-width: ${({ width }) => `${width}px`};
@@ -20,10 +20,10 @@ const Modal = styled.div`
   height: ${({ height }) => `${height}px`};
   background: ${({ theme }) => theme.colors.backgroundHighEmphasis};
   border: 1px solid ${({ theme }) => theme.colors.foreground400};
-  box-shadow: 0px 8px 16px 0px #0101011A;
+  box-shadow: 0px 8px 16px 0px #0101011a;
   padding: 20px;
   border-radius: 8px;
-`
+`;
 
 const CloseWrapper = styled.div`
   position: absolute;
@@ -32,39 +32,46 @@ const CloseWrapper = styled.div`
   width: 100%;
   display: grid;
   justify-content: flex-end;
-`
+`;
 
 const CloseButton = styled.button`
-//   margin: 25px 25px 25px 0;
+  //   margin: 25px 25px 25px 0;
   border: none;
   background: transparent;
   cursor: pointer;
-`
+`;
 
 const GenericModal = ({
-    width = 528,
-    height = 402,
-    isOpened = false,
-    onClose,
-    children,
-    ...props
+  width = 528,
+  height = 402,
+  isOpened = false,
+  onClose,
+  children,
+  ...props
 }) => {
-    return isOpened ? (
-        <>
-            <ModalOverlay onClick={onClose}>
-                <Modal width={width} height={height} {...props} onClick={(e) => e.stopPropagation()}>
-                    {onClose && (
-                        <CloseWrapper>
-                            <CloseButton onClick={onClose}>
-                                <CloseIcon />
-                            </CloseButton>
-                        </CloseWrapper>
-                    )}
-                    {children}
-                </Modal>
-            </ModalOverlay>
-        </>
-    ) : (<></>)
-}
+  return isOpened ? (
+    <>
+      <ModalOverlay onClick={onClose}>
+        <Modal
+          width={width}
+          height={height}
+          {...props}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {onClose && (
+            <CloseWrapper>
+              <CloseButton onClick={onClose}>
+                <CloseIcon />
+              </CloseButton>
+            </CloseWrapper>
+          )}
+          {children}
+        </Modal>
+      </ModalOverlay>
+    </>
+  ) : (
+    <></>
+  );
+};
 
-export default GenericModal
+export default GenericModal;
