@@ -11,7 +11,7 @@ import {
   balancesSelector,
   layoutSelector,
 } from "lib/store/features/api/apiSlice";
-import { formatUSD } from "lib/utils";
+import { formatUSD, formatPrice} from "lib/utils";
 import api from "lib/api";
 import { setLayout } from "lib/helpers/storage/layouts";
 import { Modal, Tooltip } from "components";
@@ -436,7 +436,9 @@ export const AccountDropdown = () => {
                       />
                       <div>
                         <strong>
-                          {wallet[ticker].valueReadable} {ticker}
+                          {formatPrice(
+                            wallet[ticker].valueReadable
+                          )} {ticker}
                         </strong>
                         <small>
                           $

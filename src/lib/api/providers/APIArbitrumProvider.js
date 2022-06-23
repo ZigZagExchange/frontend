@@ -43,15 +43,15 @@ export default class APIArbitrumProvider extends APIProvider {
 
     // generate object
     for(let i = 0; i < tokens.length; i++) {
-      const balance = balanceList[i];
-      const token = tokens[i];
-      const currencyInfo = tokenInfoList[token];
+      const balanceBN = balanceList[i];
+      const currencyInfo = tokenInfoList[i];
+      const valueReadable = (balanceBN && currencyInfo)
+        ? ethers.utils.formatUnits(balanceBN.toString(), currencyInfo.decimals)
+        : 0 
 
       this.balances[tokens[i]] = {
-        value: balance,
-        valueReadable:
-          (balance && currencyInfo && balance / 10 ** currencyInfo.decimals) ||
-          0,
+        value: balanceBN.toString(),
+        valueReadable,
         allowance: 0,
       }
     }

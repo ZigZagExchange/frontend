@@ -144,7 +144,7 @@ export default class API extends Emitter {
 
     getExplorer = (address, layer, network) => {
       if (layer === 1) {
-        const subdomain = this.apiProvider.network === 1 ? "" : "rinkeby.";
+        const subdomain = [1, 42161].includes(this.apiProvider.network) ? "" : "rinkeby.";
         return `https://${subdomain}etherscan.io/address/${address}`;
       }
 

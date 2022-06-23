@@ -37,20 +37,18 @@ export class SpotForm extends React.Component {
   getBaseBalance() {
     const marketInfo = this.props.marketInfo;
     if (!marketInfo) return 0;
-    if (!this.props.user.committed) return 0;
+    if (!this.props.balances?.[marketInfo.baseAsset.symbol]?.valueReadable) return 0;
     return (
-      this.props.user.committed.balances[marketInfo.baseAsset.symbol] /
-      Math.pow(10, marketInfo.baseAsset.decimals)
+      this.props.balances[marketInfo.baseAsset.symbol].valueReadable
     );
   }
 
   getQuoteBalance() {
     const marketInfo = this.props.marketInfo;
     if (!marketInfo) return 0;
-    if (!this.props.user.committed) return 0;
+    if (!this.props.balances?.[marketInfo.quoteAsset.symbol]?.valueReadable) return 0;
     return (
-      this.props.user.committed.balances[marketInfo.quoteAsset.symbol] /
-      Math.pow(10, marketInfo.quoteAsset.decimals)
+      this.props.balances[marketInfo.quoteAsset.symbol].valueReadable
     );
   }
 
@@ -90,35 +88,38 @@ export class SpotForm extends React.Component {
     return formatPrice(price);
   }
 
-  //getLadderPrice() {    
-  //  let baseAmount = this.state.baseAmount;
-  //  const side = this.props.side;
-  //
-  //  if (!baseAmount) baseAmount = 0;
-  //
-  //  let price;
-  //  if (side === "b") {
-  //    // get order book
-  //
-  //    for (let i = 0; i < asks.length; i++) {
-  //      if (asks[i][2] >= baseAmount || i === asks.length - 1) {
-  //        price = asks[i][1];
-  //        break;
-  //      }
-  //    }
-  //  } else if (side === "s") {
-  //    // get order book
-  //
-  //    for (let i = 0; i < bids.length; i++) {
-  //      if (bids[i][2] >= baseAmount || i === bids.length - 1) {
-  //        price = bids[i][1];
-  //        break;
-  //      }
-  //    }
-  //  }
-  //  if (!price) return 0;
-  //  return formatPrice(price);
-  //}
+  getLadderPrice() {    
+    let baseAmount = this.state.baseAmount;
+    const side = this.props.side;
+  
+    if (!baseAmount) baseAmount = 0;
+  
+    let price;
+    let unfilled = baseAmount;
+    if (side === "b") {  
+      const asks = this.props.orderbookAsks;
+      for (let i = 0; i < asks.length; i++) {
+        if (asks[i].td2 >= unfilled  || i === asks.length - 1) {
+          price = asks[i].td1;
+          break;
+        } else {
+          unfilled -= asks[i].td2;
+        }
+      }
+    } else if (side === "s") {
+      const bids = this.props.orderbookBids;
+      for (let i = 0; i < bids.length; i++) {
+        if (bids[i].td2 >= unfilled  || i === bids - 1) {
+          price = bids[i].td1;
+          break;
+        } else {
+          unfilled -= bids[i].td2;
+        }
+      }
+    }
+    if (!price) return 0;
+    return formatPrice(price);
+  }
 
   async buySellHandler(e) {
     let baseAmount, quoteAmount;
@@ -359,8 +360,7 @@ export class SpotForm extends React.Component {
       if (api.isZksyncChain()) {
         return this.getLadderPriceZkSync_v1();
       } else {
-        console.log('this.getLadderPrice() not implemented for not zkSync_v1')
-        // return this.getLadderPrice();
+        return this.getLadderPrice();
       }
     }
   }

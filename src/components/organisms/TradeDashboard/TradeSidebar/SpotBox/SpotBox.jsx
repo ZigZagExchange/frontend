@@ -15,6 +15,9 @@ const SpotBox = ({
   activeOrderCount,
   liquidity,
   marketSummary,
+  orderbookAsks,
+  orderbookBids,
+  balances
 }) => {
   const [orderType, updateOrderType] = useState("market");
   const orderTypeTabClassName = (o) =>
@@ -52,6 +55,9 @@ const SpotBox = ({
                 side="b"
                 lastPrice={lastPrice}
                 user={user}
+                orderbookAsks={orderbookAsks}
+                orderbookBids={orderbookBids}
+                balances={balances}
                 currentMarket={currentMarket}
                 orderType={orderType}
                 activeOrderCount={activeOrderCount}
