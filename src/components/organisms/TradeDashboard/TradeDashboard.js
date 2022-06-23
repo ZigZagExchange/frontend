@@ -55,15 +55,22 @@ const TradeGrid = styled.article`
   gap: 0px;
 
   @media screen and (max-width: 991px) {
-    grid-template-rows: 74px 410px 427px 508px 362px 1fr;
+    grid-template-rows: 74px 410px 459px 508px 362px 1fr;
     grid-template-columns: 1fr 1fr;
-    grid-template-areas:
-      "marketSelector marketSelector"
+    grid-template-areas: ${({ isLeft }) =>
+      isLeft
+        ? `"marketSelector marketSelector"
       "chart chart"
       "sidebar orders"
       "trades trades"
       "tables tables"
-      "footer footer";
+      "footer footer"`
+        : `"marketSelector marketSelector"
+      "sidebar orders"
+      "trades trades"
+      "chart chart"
+      "tables tables"
+      "footer footer"`};
   }
 
   > div,
