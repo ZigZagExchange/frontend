@@ -20,8 +20,6 @@ import {
   ActionWrapper
 } from "./StyledComponents"
 import { Dropdown } from "components/molecules/Dropdown";
-import { lastPricesSelector } from "lib/store/features/api/apiSlice";
-import Button from "components/molecules/Button/Button";
 
 export default function OrdersTable(props) {
   const network = useSelector(networkSelector);
@@ -42,11 +40,6 @@ export default function OrdersTable(props) {
   const isMobile = window.innerWidth < 1064
 
   const wallet = balanceData[network];
-
-  const marketFills = useSelector(lastPricesSelector);
-
-  // Only display recent trades
-  // There's a bunch of user trades in this list that are too old to display
 
   useEffect(() => {
     let walletArray = [];
