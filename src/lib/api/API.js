@@ -22,7 +22,7 @@ import get from "lodash/get";
 const chainMap = {
   "0x1": 1,
   "0x4": 1000,
-  "0xf00": 42161,
+  "0xa4b1": 42161,
 };
 
 export default class API extends Emitter {
@@ -463,6 +463,10 @@ export default class API extends Emitter {
       this.apiProvider.network
     );
     if(!this.polygonProvider) return 0;
+
+    // Arbitrum doesn't return a Polygon WETH address. Maybe it should return the same one as zksync mainnet
+    if(!polygonEthAddress) return 0;
+
     const ethContract = new ethers.Contract(
       polygonEthAddress,
       erc20ContractABI,
