@@ -174,7 +174,7 @@ export const MobileWrapper = styled.div`
   }
 
   @media screen and (max-width: 992px) {
-    max-height: calc(100% - 54px);
+    max-height: calc(100% - 90px);
   }
 `;
 
