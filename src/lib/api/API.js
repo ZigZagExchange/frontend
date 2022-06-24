@@ -586,6 +586,15 @@ export default class API extends Emitter {
     return true;
   };
 
+  cancelAllOrdersAllChains = async () => {
+    const validUntil = (Date.now() / 1000) + 10;
+    const message = `cancelall2:0:${validUntil}`
+    const signedMessage = await this.apiProvider.signMessage(message);
+    const { id: userId } = await this.getAccountState();
+    await this.send("cancelall2", [0, userId, signedMessage]);
+    return true;
+  };
+
   isImplemented = (method) => {
     return this.apiProvider[method] && !this.apiProvider[method].notImplemented;
   };
