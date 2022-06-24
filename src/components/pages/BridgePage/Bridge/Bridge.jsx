@@ -375,14 +375,14 @@ const Bridge = (props) => {
       const gasFee = await api.getPolygonFee();
       if(gasFee){
         setL1Fee(35000 * gasFee.fast.maxFee / 10**9);
-        setL2Fee(swapDetails, 0.001, 'ETH') // ZigZag fee
+        setL2Fee(swapDetails, 0.003, 'ETH') // ZigZag fee
       }
     }
     // zkSync -> polygon
     else if(fromNetwork.from.key === 'zksync' && toNetwork.key === 'polygon') {
       let res = await api.transferL2GasFee(swapDetails.currency);
       setL1Fee(null);
-      setL2Fee(swapDetails, res.amount + 0.001, res.feeToken); // ZigZag fee
+      setL2Fee(swapDetails, res.amount + 0.003, res.feeToken); // ZigZag fee
     }
     // Ethereum -> zkSync aka deposit
     else if (transfer.type === "deposit") {
