@@ -153,6 +153,24 @@ export default function OrdersTable(props) {
 
   const filterSmallBalances = (currency) => {
     const balance = wallet[currency].valueReadable;
+    const usd_balance = coinEstimator(currency) * wallet[currency].valueReadable;
+
+    if(usd_balance < 0.02) return false;
+
+    if (balance) {
+      return Number(balance) > 0;
+    } else {
+      return 0;
+    }
+  };
+
+  const filterSmallBalancesForBalancesTable = (item) => {
+    const balance = item.valueReadable;
+    const usd_balance = coinEstimator(item.token) * item.valueReadable;
+    console.log(usd_balance)
+
+    if(usd_balance < 0.02) return false;
+
     if (balance) {
       return Number(balance) > 0;
     } else {
@@ -163,6 +181,8 @@ export default function OrdersTable(props) {
   const sortByToken = () => {
     let walletArray = [...walletList];
     const toggled = !tokenDirection;
+    const filteredArray = walletArray.filter(filterSmallBalancesForBalancesTable)
+    walletArray = filteredArray
     walletArray.sort((a, b) => {
       if (toggled) {
         return a["token"] > b["token"] ? 1 : -1;
@@ -180,6 +200,8 @@ export default function OrdersTable(props) {
   const sortByBalance = () => {
     let walletArray = [...walletList];
     const toggled = !balanceDirection;
+    const filteredArray = walletArray.filter(filterSmallBalancesForBalancesTable)
+    walletArray = filteredArray
     walletArray.sort((a, b) => {
       const notionalCur1 = coinEstimator(a["token"]) * a["valueReadable"];
       const notionalCur2 = coinEstimator(b["token"]) * b["valueReadable"];
