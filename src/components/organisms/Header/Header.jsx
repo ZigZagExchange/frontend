@@ -345,7 +345,7 @@ export const Header = (props) => {
                   <ExternalLinkIcon size={12} />
                 </Tab>
               )}
-              {hasBridge && <Tab>DSL</Tab>}
+              {/* {hasBridge && <Tab>DSL</Tab>} */}
 
               {/* {hasBridge && <Tab>Old BRIDGE</Tab>} */}
             </TabMenu>
@@ -431,7 +431,7 @@ export const Header = (props) => {
                 <ExternalLinkIcon size={12} />
               </Tab>
             )}
-            {hasBridge && <Tab>DSL</Tab>}
+            {/* {hasBridge && <Tab>DSL</Tab>} */}
           </TabMenu>
           <HorizontalDivider />
           <ActionSideMenuWrapper>
