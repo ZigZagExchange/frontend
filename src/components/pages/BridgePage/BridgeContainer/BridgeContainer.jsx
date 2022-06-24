@@ -651,9 +651,10 @@ const BridgeContainer = () => {
 
   const onChangeFromAmounts = (value) => {
     // if (e.target.value.length > 10) return;
-    setFromAmounts(value.replace(/[^0-9.]/g));
+    const amount = value.replace(/[^0-9.]/g,'');
+    setFromAmounts(amount);
     const sDetails = {};
-    sDetails["amount"] = value.replace(/[^0-9.]/g);
+    sDetails["amount"] = amount;
     setSwapDetails(sDetails);
   };
 
