@@ -722,7 +722,7 @@ export default function OrdersTable(props) {
                       <ActionWrapper
                         font="primaryExtraSmallSemiBold"
                         color="primaryHighEmphasis"
-                        onClick={() => api.cancelOrder(orderId)}
+                        onClick={() => cancelOrder(orderId)}
                       >
                         Cancel
                       </ActionWrapper>
@@ -1485,8 +1485,8 @@ export default function OrdersTable(props) {
             {isOpenStatus(getUserOrders()) && settings.showCancelOrders ? (
               <StyledButton
                 variant="outlined"
-                width="50px"
-                scale="sm"
+                width="100px"
+                scale="md"
                 onClick={api.cancelAllOrders}
               >
                 Cancel All
