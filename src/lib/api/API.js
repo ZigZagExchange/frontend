@@ -944,7 +944,7 @@ export default class API extends Emitter {
         if (index > -1) {
           this._pendingOrders.splice(index, 1);
           // request status update
-          this.send("orderreceiptreq", [this.apiProvider.network, orderId])
+          this.send("orderreceiptreq", [this.apiProvider.network, Number(orderId)])
         } else {
           this._pendingOrders.push(orderId);
         }
@@ -955,6 +955,8 @@ export default class API extends Emitter {
   updatePendingFills = (userFills) => {
     const fillRequestIds = [];
     Object.keys(userFills).forEach(fillId => {
+      if (!fillId) return;
+
       const fillStatus = userFills[fillId][6];
       if (['b', 'm', 'pm'].includes(fillStatus)) {
         // _pendingFills is used to only request on the 2nd time
@@ -966,9 +968,11 @@ export default class API extends Emitter {
           this._pendingFills.push(fillId);
         }
       }
-    })    
+    })
     // request status update
-    this.send("fillreceiptreq", [this.apiProvider.network, fillRequestIds])
+    if (fillRequestIds.length > 0) {
+      this.send("fillreceiptreq", [this.apiProvider.network, Number(fillRequestIds)])
+    }
   }
 
   getPairs = () => {
