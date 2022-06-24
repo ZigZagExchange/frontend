@@ -341,6 +341,7 @@ export default function OrdersBook(props) {
                     fixedPoint={fixedPoint}
                   />
                   <TradePriceTable
+                    head
                     useGradient={!settings.disableOrderBookFlash}
                     currentMarket={props.currentMarket}
                     priceTableData={bidBins}

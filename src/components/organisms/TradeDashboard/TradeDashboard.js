@@ -58,7 +58,7 @@ const TradeGrid = styled.article`
     grid-template-rows: ${({ isLeft }) =>
       isLeft
         ? "74px 410px 459px 508px 362px 1fr"
-        : "74px 410px 459px 800px 362px 1fr"};
+        : "74px 410px 459px 519px 362px 1fr"};
     grid-template-columns: ${({ isLeft }) => isLeft ? '1fr 1fr' : '1fr'};
     grid-template-areas: ${({ isLeft }) =>
       isLeft
