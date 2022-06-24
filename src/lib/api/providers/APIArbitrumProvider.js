@@ -1,15 +1,13 @@
 import { ethers } from 'ethers';
 import APIProvider from "./APIProvider";
 import balanceBundleABI from "lib/contracts/BalanceBundle.json";
+import { balanceBundlerAddress } from "./../constants";
 
 export default class APIArbitrumProvider extends APIProvider {
-  balanceBundleAddress = '0x1b7ad12c73b9fea574cd2320650676c0a0bde8a0';
 
   accountState = {};
-  ethWallet = {};
   evmCompatible = true;
   zksyncCompatible = false;
-  balances = {};
   _tokenInfo = {};
 
   getAccountState = async () => {
@@ -17,7 +15,8 @@ export default class APIArbitrumProvider extends APIProvider {
   };
 
   getBalances = async () => {
-    if (!this.accountState.address) return {};
+    const balances = {}
+    if (!this.accountState.address) return balances;
 
     // allways get ETH - generate token list     
     // const tokens = ['ETH'].concat(this.api.getCurrencies()); // TODO re-enable
@@ -35,9 +34,9 @@ export default class APIArbitrumProvider extends APIProvider {
 
     // get token balance
     const ethContract = new ethers.Contract(
-      this.balanceBundleAddress,
+      balanceBundlerAddress,
       balanceBundleABI,
-      this.api.ethersProvider
+      this.api.rollupProvider
     );
     const balanceList = await ethContract.balances([this.accountState.address], tokenList);
 
@@ -49,14 +48,14 @@ export default class APIArbitrumProvider extends APIProvider {
         ? ethers.utils.formatUnits(balanceBN.toString(), currencyInfo.decimals)
         : 0 
 
-      this.balances[tokens[i]] = {
+      balances[tokens[i]] = {
         value: balanceBN.toString(),
         valueReadable,
         allowance: 0,
       }
     }
 
-    return this.balances;
+    return balances;
   };
 
   settleOrderFill = (market, side, baseAmount, quoteAmount) => {
@@ -89,12 +88,14 @@ export default class APIArbitrumProvider extends APIProvider {
 
   signIn = async () => {
     console.log('signing in to arbitrum');
-    this.ethWallet = this.api.ethersProvider.getSigner();
-
-    const address = await this.ethWallet.getAddress();
+    const [account] = await this.api.web3.eth.getAccounts();
+    const balances = await this.getBalances();
     this.accountState = {
-      id: address,
-      address,
+      id: account,
+      address: account,
+      committed: {
+        balances,
+      },
     };
 
     return this.accountState;

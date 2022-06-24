@@ -505,14 +505,14 @@ export default class APIZKProvider extends APIProvider {
       return parseInt(atoms) / 10 ** currencyInfo.decimals;
     };
 
-    if (this.api.ethersProvider) {
+    if (this.api.rollupProvider) {
       if (
         !ZKSYNC_ETHEREUM_FAST_BRIDGE.eligibleTokensZkSync.includes(token) &&
         !ZKSYNC_POLYGON_BRIDGE.eligibleTokensZkSync.includes(token)
       ) {
         throw Error("Token not eligible for fast withdraw");
       }
-      const feeData = await this.api.ethersProvider.getFeeData();
+      const feeData = await this.api.rollupProvider.getFeeData();
       let bridgeFee = feeData.maxFeePerGas
         .add(feeData.maxPriorityFeePerGas)
         .mul(21000)
@@ -547,9 +547,9 @@ export default class APIZKProvider extends APIProvider {
 
     try {
       if (this.api.isArgent) {
-        this.syncWallet = await zksync.RemoteWallet.fromEthSigner(this.api.ethersProvider, this.syncProvider);
+        this.syncWallet = await zksync.RemoteWallet.fromEthSigner(this.api.rollupProvider, this.syncProvider);
       } else {
-        this.ethWallet = this.api.ethersProvider.getSigner();
+        this.ethWallet = this.api.rollupProvider.getSigner();
         const { seed, ethSignatureType } = await this.getSeed(this.ethWallet);
         const syncSigner = await zksync.Signer.fromSeed(seed);
         this.syncWallet = await zksync.Wallet.fromEthSigner(
