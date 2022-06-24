@@ -516,7 +516,7 @@ export class SpotForm extends React.Component {
     const marketInfo = this.props.marketInfo;
     if (!marketInfo) return 0;
 
-    if (this.props.orderType === "limit" && this.state.price) {
+    if (this.props.orderType === "limit") {
       return this.state.price;
     } else {
       if (api.isZksyncChain()) {
