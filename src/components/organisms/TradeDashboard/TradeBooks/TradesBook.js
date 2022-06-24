@@ -4,13 +4,14 @@ import styled from "@xstyled/styled-components";
 import TradeRecentTable from "./TradeRecentTable/TradeRecentTable";
 import { marketFillsSelector } from "lib/store/features/api/apiSlice";
 import Text from "components/atoms/Text/Text";
+import { settingsSelector } from "lib/store/features/api/apiSlice";
 
 const StyledTradeBooks = styled.section`
   display: flex;
   grid-area: trades;
   flex-direction: row;
   justify-content: space-between;
-  padding: 21px 20px 12px 10px;
+  padding: ${({ isLeft }) => isLeft ? '21px 20px 12px 10px' : '10px'};
   border-top: 1px solid ${({ theme }) => theme.colors.foreground400};
 `;
 
@@ -23,6 +24,7 @@ const TradesWrapper = styled.div`
 
 export default function TradesBook(props) {
   const marketFills = useSelector(marketFillsSelector);
+  const settings = useSelector(settingsSelector);
 
   // Only display recent trades
   // There's a bunch of user trades in this list that are too old to display
@@ -43,7 +45,7 @@ export default function TradesBook(props) {
 
   return (
     <>
-      <StyledTradeBooks>
+      <StyledTradeBooks isStack={settings.stackOrderbook}>
         <TradesWrapper>
           {/* TradePriceTable*/}
           <Text font="primaryTitleDisplay" color="foregroundHighEmphasis">Market Trades</Text>

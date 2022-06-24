@@ -28,6 +28,7 @@ import {
   marketQueryParam,
   networkQueryParam,
 } from "../../pages/ListPairPage/SuccessModal";
+import TradesTable from "./TradeBooks/TradesTable";
 
 const TradeContainer = styled.div`
   color: #aeaebf;
@@ -38,17 +39,17 @@ const TradeContainer = styled.div`
 const TradeGrid = styled.article`
   display: grid;
   grid-template-rows: 75px 528px 1fr 57px;
-  grid-template-columns: 300px 253.5px 253.5px 1fr;
+  grid-template-columns: ${({ isLeft }) => isLeft ? '300px 253.5px 253.5px 1fr' : '300px 507px 1fr'};
   grid-template-areas: ${({ isLeft }) =>
     isLeft
       ? `"marketSelector marketSelector marketSelector marketSelector"
   "sidebar orders trades chart"
   "sidebar tables tables tables"
   "sidebar footer footer footer"`
-      : `"marketSelector marketSelector marketSelector marketSelector"
-  "sidebar orders trades chart"
-  "sidebar tables tables tables"
-  "sidebar footer footer footer"`};
+      : `"marketSelector marketSelector marketSelector"
+  "sidebar stack chart"
+  "sidebar tables tables"
+  "sidebar footer footer"`};
 
   min-height: calc(100vh - 56px);
   gap: 0px;
@@ -57,8 +58,8 @@ const TradeGrid = styled.article`
     grid-template-rows: ${({ isLeft }) =>
       isLeft
         ? "74px 410px 459px 508px 362px 1fr"
-        : "74px 459px 508px 410px 362px 1fr"};
-    grid-template-columns: 1fr 1fr;
+        : "74px 410px 459px 800px 362px 1fr"};
+    grid-template-columns: ${({ isLeft }) => isLeft ? '1fr 1fr' : '1fr'};
     grid-template-areas: ${({ isLeft }) =>
       isLeft
         ? `"marketSelector marketSelector"
@@ -67,12 +68,12 @@ const TradeGrid = styled.article`
       "trades trades"
       "tables tables"
       "footer footer"`
-        : `"marketSelector marketSelector"
-      "sidebar orders"
-      "trades trades"
-      "chart chart"
-      "tables tables"
-      "footer footer"`};
+        : `"marketSelector"
+      "chart"
+      "sidebar"
+      "stack"
+      "tables"
+      "footer"`};
   }
 
   > div,
@@ -187,17 +188,23 @@ export function TradeDashboard() {
           user={user}
           activeOrderCount={activeUserOrders}
         />
-        {/* TradePriceTable, TradePriceHeadSecond */}
-        <OrdersBook
-          currentMarket={currentMarket}
-          changeFixedPoint={changeFixedPoint}
-          changeSide={changeSide}
-        />
-        <TradesBook
-          currentMarket={currentMarket}
-          fixedPoint={fixedPoint}
-          side={side}
-        />
+        {
+          settings.stackOrderbook ?
+          <>
+            {/* TradePriceTable, TradePriceHeadSecond */}
+            <OrdersBook
+              currentMarket={currentMarket}
+              changeFixedPoint={changeFixedPoint}
+              changeSide={changeSide}
+            />
+            <TradesBook
+              currentMarket={currentMarket}
+              fixedPoint={fixedPoint}
+              side={side}
+            />
+          </> :
+          <TradesTable />
+        }
         {/* TradeChartArea */}
         <TradeChartArea />
         {/* OrdersTable */}
