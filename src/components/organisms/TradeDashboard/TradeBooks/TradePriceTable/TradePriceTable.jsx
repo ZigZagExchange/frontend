@@ -12,9 +12,11 @@ const TradePriceTable = (props) => {
 
   useEffect(()=>{
     if(!ref.current) return;
-    if(props.priceTableData.length === 0) setUpdateScroll(false);
-    if (props.scrollToBottom) {
-      if(isUpdateScroll) return;
+    if(props.priceTableData.length === 0){
+      setUpdateScroll(false);
+      return;
+    }
+    if (props.scrollToBottom && !isUpdateScroll) {
       setUpdateScroll(true);
       ref.current?.scrollTo(0, ref.current.scrollHeight)
     }
