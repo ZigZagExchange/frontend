@@ -312,7 +312,7 @@ export const Header = (props) => {
           <ButtonWrapper>
             {user.address ? (
               <>
-                <AccountDropdown notext networkName={networkName} />
+                <AccountDropdown networkName={networkName} />
               </>
             ) : (
               <ConnectWalletButton />
