@@ -5,7 +5,7 @@ import { stables } from "lib/helpers/categories";
 
 export function useCoinEstimator() {
   const pairPrices = useSelector(lastPricesSelector);
-  let prices = {};
+  let prices = { ZZ: 3 };
   // add all stablecoins
   stables.forEach((stable) => {
     prices[stable] = 1;
