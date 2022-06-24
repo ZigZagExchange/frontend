@@ -31,17 +31,16 @@ const ToggleItem = styled.li`
         show && leftLabel === 'BUY' ? theme.colors.successHighEmphasis :
             show && rightLabel === 'SELL' ? theme.colors.dangerHighEmphasis :
                 'transparent'};
-    opacity: 0.7;
-
+    opacity: 1;
     div {
         transition: color .25s;
     }
 
     &:hover div {
-        color: ${({ show, theme }) => !show ? `${theme.colors.primaryHighEmphasis} !important` : ""};
+        color: ${({ show, theme, leftLabel }) => !show ? `${theme.colors.primaryHighEmphasis} !important` : leftLabel ? `${theme.colors.backgroundHighEmphasis}` : `${theme.colors.foregroundHighEmphasis}`};
     }
     &:hover {
-        opacity: 1;
+        opacity: 0.7;
     }
 `;
 
