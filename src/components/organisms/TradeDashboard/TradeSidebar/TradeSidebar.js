@@ -23,6 +23,9 @@ export default function TradeSidebar(props) {
         <SpotBox
           lastPrice={props.lastPrice}
           user={props.user}
+          orderbookAsks={props.orderbookAsks}
+          orderbookBids={props.orderbookBids}
+          balances={props.balances}
           activeOrderCount={props.activeOrderCount}
           liquidity={props.liquidity}
           currentMarket={props.currentMarket}

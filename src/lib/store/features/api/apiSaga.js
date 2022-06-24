@@ -33,11 +33,21 @@ export function* userPollingSaga() {
       return state.auth.user && state.auth.user.address;
     });
 
+    const userOrders = yield select((state) => {
+      return state.api.userOrders;
+    });
+
+    const userFills = yield select((state) => {
+      return state.api.userFills;
+    });
+
     if (address) {
       try {
         const allSagas = [
           apply(api, api.getAccountState),
           apply(api, api.getBalances),
+          apply(api, api.updatePendingOrders, [userOrders]),
+          apply(api, api.updatePendingFills, [userFills]),
         ];
 
         yield all(allSagas);
@@ -46,7 +56,7 @@ export function* userPollingSaga() {
       }
     }
 
-    yield delay(4000);
+    yield delay(6000);
   }
 }
 

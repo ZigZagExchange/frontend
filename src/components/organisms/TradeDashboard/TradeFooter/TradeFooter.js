@@ -1,6 +1,7 @@
 import React from "react";
 import { HiExternalLink } from "react-icons/hi";
 import styled from "@xstyled/styled-components";
+import api from "lib/api";
 
 const StyledTradeFooter = styled.footer`
   display: flex;
@@ -41,7 +42,9 @@ const StyledLinkBox = styled.div`
   display: flex;
 `;
 
-export default function TradeFooter() {
+export default function TradeFooter(props) {
+  const networkName = api.getNetworkDisplayName(props.network);
+  
   return (
     <StyledTradeFooter>
       <StyledLinkBox>
@@ -57,7 +60,7 @@ export default function TradeFooter() {
           <HiExternalLink />
         </StyledTokenInfo>
       </StyledLinkBox>
-      <div>Powered By zkSync</div>
+      <div>Powered By {networkName}</div>
     </StyledTradeFooter>
   );
 }

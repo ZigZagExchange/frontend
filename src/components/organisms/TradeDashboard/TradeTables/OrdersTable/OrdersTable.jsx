@@ -15,7 +15,7 @@ export class OrdersTable extends React.Component {
   }
 
   getFills() {
-    return Object.values(this.props.userFills).sort((a, b) => b[1] - a[1]);
+    return Object.values(this.props.userFills).filter(i=>i[6]==='f').sort((a, b) => b[1] - a[1]);
   }
 
   getUserOrders() {
@@ -224,8 +224,8 @@ export class OrdersTable extends React.Component {
             const feeamount = fill[10];
             const feetoken = fill[11];
             let feeText = "1 USDC";
-            const marketInfo = api.marketInfo[market];
-            if(feeamount && feetoken) {           
+            const marketInfo = this.props.marketInfo;
+            if(!Number.isNaN(feeamount) && feetoken) {
               const displayFee = (feeamount > 9999) ? feeamount.toFixed(0) : feeamount.toPrecision(4);
               feeText = (feeamount !== 0) ? `${displayFee} ${feetoken}` : "--";
             } else if(["b", "o", "m", "r", "e"].includes(fillstatus)) {
@@ -378,16 +378,13 @@ export class OrdersTable extends React.Component {
         classNameFills = "selected";
         break;
       case "balances":
-        if (this.props.user.committed) {
+        if (this.props.wallet) {
           const balancesContent = Object.keys(
-            this.props.user.committed.balances
+            this.props.wallet
           )
             .sort()
             .map((token) => {
-              const currencyInfo = api.getCurrencyInfo(token);
-              if (!currencyInfo) return "";
-              let balance = this.props.user.committed.balances[token];
-              balance = parseInt(balance) / Math.pow(10, currencyInfo.decimals);
+              const balance = this.props.wallet[token].valueReadable;
               return (
                 <tr>
                   <td data-label="Token">{token}</td>

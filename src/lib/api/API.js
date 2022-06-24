@@ -22,7 +22,9 @@ import get from "lodash/get";
 const chainMap = {
   "0x1": 1,
   "0x4": 1000,
+  "0xa4b1": 42161,
 };
+
 export default class API extends Emitter {
     networks = {}
     ws = null
@@ -31,9 +33,11 @@ export default class API extends Emitter {
     currencies = null
     isArgent = false
     marketInfo = {}
-    lastprices = {}
+    lastPrices = {}
     _signInProgress = null
     _profiles = {}
+    _pendingOrders = []
+    _pendingFills = []
 
     constructor({ infuraId, networks, currencies, validMarkets }) {
         super()
@@ -92,44 +96,42 @@ export default class API extends Emitter {
             }
         }
         
-        if (this.isZksyncChain()) {
-            this.web3 = new Web3(
-                window.ethereum || new Web3.providers.HttpProvider(
-                    `https://${networkName}.infura.io/v3/${this.infuraId}`
-                )
+        this.web3 = new Web3(
+            window.ethereum || new Web3.providers.HttpProvider(
+                `https://${networkName}.infura.io/v3/${this.infuraId}`
             )
-    
-            this.web3Modal = new Web3Modal({
-                network: networkName,
-                cacheProvider: true,
-                theme: "dark",
-                providerOptions: {
-                    walletconnect: {
-                        package: WalletConnectProvider,
-                        options: {
-                            infuraId: this.infuraId,
-                        }
+        )
+
+        this.web3Modal = new Web3Modal({
+            network: networkName,
+            cacheProvider: true,
+            theme: "dark",
+            providerOptions: {
+                walletconnect: {
+                    package: WalletConnectProvider,
+                    options: {
+                        infuraId: this.infuraId,
+                    }
+                },
+                "custom-argent": {
+                    display: {
+                        logo: "https://images.prismic.io/argentwebsite/313db37e-055d-42ee-9476-a92bda64e61d_logo.svg?auto=format%2Ccompress&fit=max&q=50",
+                        name: "Argent zkSync",
+                        description: "Connect to your Argent zkSync wallet"
                     },
-                    "custom-argent": {
-                        display: {
-                            logo: "https://images.prismic.io/argentwebsite/313db37e-055d-42ee-9476-a92bda64e61d_logo.svg?auto=format%2Ccompress&fit=max&q=50",
-                            name: "Argent zkSync",
-                            description: "Connect to your Argent zkSync wallet"
-                        },
-                        package: WalletConnectProvider,
-                        options: {
-                            infuraId: this.infuraId,
-                        },
-                        connector: async (ProviderPackage, options) => {
-                            const provider = new ProviderPackage(options);
-                            await provider.enable();
-                            this.isArgent = true;
-                            return provider;
-                        }
+                    package: WalletConnectProvider,
+                    options: {
+                        infuraId: this.infuraId,
+                    },
+                    connector: async (ProviderPackage, options) => {
+                        const provider = new ProviderPackage(options);
+                        await provider.enable();
+                        this.isArgent = true;
+                        return provider;
                     }
                 }
-            })
-        }
+            }
+        })
 
         this.getAccountState()
             .catch(err => {
@@ -140,6 +142,20 @@ export default class API extends Emitter {
           this.emit('providerChange', network)
     }
 
+    getExplorer = (address, layer, network) => {
+      if (layer === 1) {
+        const subdomain = [1, 42161].includes(this.apiProvider.network) ? "" : "rinkeby.";
+        return `https://${subdomain}etherscan.io/address/${address}`;
+      }
+
+      const subdomain = this.apiProvider.network === 1000 ? "rinkeby." : "";
+      switch(network) {
+        case 1000: return `https://${subdomain}zkscan.io/explorer/accounts/${address}`;
+        case 42161: return `https://${subdomain}arbiscan.io/address/${address}`;
+        default: return `https://${subdomain}etherscan.io/address/${address}`;
+      }
+    }
+    
     getProfile = async (address) => {
       const getProfileFromIPFS  = async (address) => {
       try {
@@ -232,21 +248,21 @@ export default class API extends Emitter {
     if (msg.op === "marketinfo") {
       const marketInfo = msg.args[0];
       if (!marketInfo) return;
-      this.apiProvider.marketInfo[marketInfo.alias] = marketInfo;
+      this.marketInfo[marketInfo.alias] = marketInfo;
     }
     if (msg.op === "marketinfo2") {
       const marketInfos = msg.args[0];
       marketInfos.forEach(marketInfo => {
         if (!marketInfo) return;
-        this.apiProvider.marketInfo[marketInfo.alias] = marketInfo;
+        this.marketInfo[marketInfo.alias] = marketInfo;
       });
     }
     if (msg.op === "lastprice") {
-      const lastprices = msg.args[0];
-      lastprices.forEach((l) => (this.apiProvider.lastPrices[l[0]] = l));
-      const noInfoPairs = lastprices
+      const lastPricesUpdate = msg.args[0];
+      lastPricesUpdate.forEach((l) => (this.lastPrices[l[0]] = l));
+      const noInfoPairs = lastPricesUpdate
         .map((l) => l[0])
-        .filter((pair) => !this.apiProvider.marketInfo[pair]);
+        .filter((pair) => !this.marketInfo[pair]);
       this.cacheMarketInfoFromNetwork(noInfoPairs);
     }
   }
@@ -306,7 +322,8 @@ export default class API extends Emitter {
                 ethereumChainId = "0x4";
             break;
             case 42161: 
-            ethereumChainId = "0xf00";
+              ethereumChainId = "0xa4b1";
+            break;
             default:
                 return
         }
@@ -339,13 +356,11 @@ export default class API extends Emitter {
 
           await this.refreshNetwork();
           await this.sleep(1000);
-          if (this.isZksyncChain()) {
-            const web3Provider = await this.web3Modal.connect();
-            this.web3.setProvider(web3Provider);
-            this.ethersProvider = new ethers.providers.Web3Provider(
-              web3Provider
-            );
-          }
+          const web3Provider = await this.web3Modal.connect();
+          this.web3.setProvider(web3Provider);
+          this.ethersProvider = new ethers.providers.Web3Provider(
+            web3Provider
+          );
 
           // set up polygon providers. mumbai for testnet. polygon for mainnet
           this.polygonProvider = new ethers.providers.JsonRpcProvider(
@@ -366,6 +381,8 @@ export default class API extends Emitter {
               accountState.id && accountState.id.toString(),
             ]);
           }
+
+          accountState.profile = await this.getProfile(accountState.address)
 
           this.emit("signIn", accountState);
 
@@ -395,6 +412,13 @@ export default class API extends Emitter {
       window.localStorage.clear();
     else
       window.localStorage.removeItem('walletconnect');
+
+      
+    this.marketInfo = {}
+    this.lastPrices = {}
+    this._profiles = {}
+    this._pendingOrders = []
+    this._pendingFills = []
 
     this.web3 = null;
     this.web3Modal = null;
@@ -439,6 +463,10 @@ export default class API extends Emitter {
       this.apiProvider.network
     );
     if(!this.polygonProvider) return 0;
+
+    // Arbitrum doesn't return a Polygon WETH address. Maybe it should return the same one as zksync mainnet
+    if(!polygonEthAddress) return 0;
+
     const ethContract = new ethers.Contract(
       polygonEthAddress,
       erc20ContractABI,
@@ -468,10 +496,10 @@ export default class API extends Emitter {
       const polygonProvider = new ethers.providers.Web3Provider(
         window.web3.currentProvider
       );
-      const currentNetwork = await polygonProvider.getNetwork();
+      // const currentNetwork = await polygonProvider.getNetwork(); // This is not correct on the brave browser.
 
-      if ("0x"+currentNetwork.chainId.toString(16) !== polygonChainId)
-        throw new Error("Must approve network change");
+      // if ("0x"+currentNetwork.chainId.toString(16) !== polygonChainId)
+      //   throw new Error("Must approve network change");
       // const signer = polygonProvider.getSigner();
 
       networkSwitched = true;
@@ -522,6 +550,17 @@ export default class API extends Emitter {
     return keys[keys.findIndex((key) => network === this.networks[key][0])];
   };
 
+  getNetworkDisplayName = (network) => {
+    switch(network) {
+      case 1: case 1000: return 'zkSync';
+      case 42161: return 'Arbitrum';
+      default: return 'ZigZag';
+    }
+
+    //const keys = Object.keys(this.networks);
+    //return keys[keys.findIndex((key) => network === this.networks[key][0])];
+  };
+
   subscribeToMarket = (market) => {
     this.send("subscribemarket", [this.apiProvider.network, market]);
   };
@@ -552,6 +591,13 @@ export default class API extends Emitter {
     return res.data;
   }
 
+  getEthereumFee = async () => {
+    if (this.ethersProvider) {
+      const feeData = await this.ethersProvider.getFeeData();
+      return feeData;
+    }
+  };
+
   withdrawL2 = async (amount, token) => {
     return this.apiProvider.withdrawL2(amount, token);
   };
@@ -565,15 +611,30 @@ export default class API extends Emitter {
   };
 
   withdrawL2GasFee = async (token) => {
-    return await this.apiProvider.withdrawL2GasFee(token);
+    try {
+      return await this.apiProvider.withdrawL2GasFee(token);
+    } catch (err) {
+      console.log(err);
+      return { amount: 0, feeToken: 'ETH' };
+    }
   };
 
-  withdrawL2FastGasFee = async (token) => {
-    return await this.apiProvider.withdrawL2FastGasFee(token);
+  transferL2GasFee = async (token) => {
+    try {
+      return await this.apiProvider.transferL2GasFee(token);
+    } catch (err) {
+      console.log(err);
+      return { amount: 0, feeToken: 'ETH' };
+    }
   };
 
   withdrawL2FastBridgeFee = async (token) => {
-    return await this.apiProvider.withdrawL2FastBridgeFee(token);
+    try {
+      return await this.apiProvider.withdrawL2FastBridgeFee(token);
+     } catch (err) {
+      console.log(err);
+      return 0;
+    }
   };
 
   cancelAllOrders = async () => {
@@ -680,7 +741,7 @@ export default class API extends Emitter {
     const quoteQuantity = order[4] * order[5];
     const remaining = isNaN(Number(order[11])) ? order[5] : order[11];
     const market = order[2];
-    const marketInfo = this.apiProvider.marketInfo[market];
+    const marketInfo = this.marketInfo[market];
     let baseQuantityWithoutFee,
       quoteQuantityWithoutFee,
       priceWithoutFee,
@@ -804,6 +865,20 @@ export default class API extends Emitter {
       }
     }
   }
+  
+  // marketinfo calls can get expesnive so it's good to cache them
+  cacheMarketInfoFromNetwork = async (pairs) => {
+    if (pairs.length === 0) return;
+    if (!this.apiProvider.network) return;
+    const pairText = pairs.join(",");
+    const url = (this.apiProvider.network === 1)
+      ? `https://zigzag-markets.herokuapp.com/markets?id=${pairText}&chainid=${this.apiProvider.network}`
+      : `https://secret-thicket-93345.herokuapp.com/api/v1/marketinfos?chain_id=${this.apiProvider.network}&market=${pairText}`
+    const marketInfoArray = await fetch(url).then((r) => r.json());
+    if (!(marketInfoArray instanceof Array)) return;
+    marketInfoArray.forEach((info) => (this.marketInfo[info.alias] = info));
+    return;
+  }
 
   get fastWithdrawTokenAddresses() {
     if (this.apiProvider.network === 1) {
@@ -859,19 +934,72 @@ export default class API extends Emitter {
       return {};
     }
   }
+  
+  updatePendingOrders = (userOrders) => {
+    Object.keys(userOrders).forEach(orderId => {
+      const orderStatus = userOrders[orderId][9];
+      if (['b', 'm', 'pm'].includes(orderStatus)) {
+        // _pendingOrders is used to only request on the 2nd time
+        const index = this._pendingOrders.indexOf(orderId);
+        if (index > -1) {
+          this._pendingOrders.splice(index, 1);
+          // request status update
+          this.send("orderreceiptreq", [this.apiProvider.network, Number(orderId)])
+        } else {
+          this._pendingOrders.push(orderId);
+        }
+      }
+    })
+  }
 
-  // marketinfo calls can get expesnive so it's good to cache them
-  cacheMarketInfoFromNetwork = async (pairs) => {
-    if (pairs.length === 0) return;
-    if (!this.apiProvider.network) return;
-    const pairText = pairs.join(",");
-    const url = (this.apiProvider.network === 1)
-      ? `https://zigzag-markets.herokuapp.com/markets?id=${pairText}&chainid=${this.apiProvider.network}`
-      : `https://secret-thicket-93345.herokuapp.com/api/v1/marketinfos?chain_id=${this.apiProvider.network}&market=${pairText}`
-    const marketInfoArray = await fetch(url).then((r) => r.json());
-    if (!(marketInfoArray instanceof Array)) return;
-    marketInfoArray.forEach((info) => (this.marketInfo[info.alias] = info));
-    return;
+  updatePendingFills = (userFills) => {
+    const fillRequestIds = [];
+    Object.keys(userFills).forEach(fillId => {
+      if (!fillId) return;
+
+      const fillStatus = userFills[fillId][6];
+      if (['b', 'm', 'pm'].includes(fillStatus)) {
+        // _pendingFills is used to only request on the 2nd time
+        const index = this._pendingFills.indexOf(fillId);
+        if (index > -1) {
+          this._pendingFills.splice(index, 1);
+          fillRequestIds.push(fillId);
+        } else {
+          this._pendingFills.push(fillId);
+        }
+      }
+    })
+    // request status update
+    if (fillRequestIds.length > 0) {
+      this.send("fillreceiptreq", [this.apiProvider.network, Number(fillRequestIds)])
+    }
+  }
+
+  getPairs = () => {
+    return Object.keys(this.lastPrices);
   };
 
+  getCurrencyInfo = (currency) => {
+    const pairs = this.getPairs();
+    for (let i = 0; i < pairs.length; i++) {
+      const pair = pairs[i];
+      const baseCurrency = pair.split("-")[0];
+      const quoteCurrency = pair.split("-")[1];
+      if (baseCurrency === currency && this.marketInfo[pair]) {
+        return this.marketInfo[pair].baseAsset;
+      } else if (quoteCurrency === currency && this.marketInfo[pair]) {
+        return this.marketInfo[pair].quoteAsset;
+      }
+    }
+    return null;
+  };
+
+  getCurrencies = () => {
+    const tickers = new Set();
+    for (let market in this.lastPrices) {
+      tickers.add(this.lastPrices[market][0].split("-")[0]);
+      tickers.add(this.lastPrices[market][0].split("-")[1]);
+    }
+    return [...tickers];
+  };
 }

@@ -6,10 +6,10 @@ const FixedHeaderTemplate = styled.div`
   min-height: 100vh;
 `;
 
-export const DefaultTemplate = ({ children }) => {
+export const DefaultTemplate = ({ children, isLoading }) => {
   return (
     <>
-      <Header />
+      <Header isLoading={isLoading} />
       <FixedHeaderTemplate>{children}</FixedHeaderTemplate>
     </>
   );

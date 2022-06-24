@@ -2,6 +2,7 @@ import { createSlice, createAction } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 import { formatPrice } from "lib/utils";
 import api from "lib/api";
+import { getLayout } from "lib/helpers/storage/layouts";
 
 const makeScope = (state) => `${state.network}-${state.userId}`;
 
@@ -10,6 +11,7 @@ export const apiSlice = createSlice({
   initialState: {
     network: 1,
     userId: null,
+    layout: getLayout() || 0,
     currentMarket: "ETH-USDC",
     marketFills: {},
     bridgeReceipts: [],
@@ -22,6 +24,7 @@ export const apiSlice = createSlice({
     userFills: {},
     orders: {},
     arweaveAllocation: 0,
+    isConnecting: false,
   },
   reducers: {
     _error(state, { payload }) {
@@ -87,11 +90,13 @@ export const apiSlice = createSlice({
         if (fill[2] === state.currentMarket && fill[0] === state.network) {
           state.marketFills[fillid] = fill;
         }
-        if (
-          state.userId &&
-          (fill[8] === state.userId.toString() ||
-            fill[9] === state.userId.toString())
-        ) {
+        if (state.userId && fill[8] === state.userId.toString()) {
+          state.userFills[fillid] = fill;
+        }
+        // for maker fills we need to flip the side and set fee to 0
+        if (state.userId && fill[9] === state.userId.toString()) {
+          fill[3] = (fill[3] === "b") ? "s" : "b";
+          fill[10] = 0;
           state.userFills[fillid] = fill;
         }
       });
@@ -150,6 +155,23 @@ export const apiSlice = createSlice({
         }
       });
     },
+    _fillreceipt(state, { payload }) {
+      payload[0].forEach((fill) => {
+        const fillid = fill[1];
+        if (fill[2] === state.currentMarket && fill[0] === state.network) {
+          state.marketFills[fillid] = fill;
+        }
+        if (state.userId && fill[8] === state.userId.toString()) {
+          state.userFills[fillid] = fill;
+        }
+        // for maker fills we need to flip the side and set fee to 0
+        if (state.userId && fill[9] === state.userId.toString()) {
+          fill[3] = (fill[3] === "b") ? "s" : "b";
+          fill[10] = 0;
+          state.userFills[fillid] = fill;
+        }
+      });
+    },
     _marketsummary(state, { payload }) {
       state.marketSummary = {
         market: payload[0],
@@ -166,6 +188,8 @@ export const apiSlice = createSlice({
         const market = update[0];
         const price = update[1];
         const change = update[2];
+
+        if (!price || Number.isNaN(price)) return;
         state.lastPrices[market] = {
           price: update[1],
           change: update[2],
@@ -280,10 +304,7 @@ export const apiSlice = createSlice({
     },
     _orders(state, { payload }) {
       const orders = payload[0]
-        .filter(
-          (order) =>
-            order[2] === state.currentMarket && order[0] === state.network
-        )
+        .filter((order) => order[0] === state.network)
         .reduce((res, order) => {
           res[order[1]] = order;
           return res;
@@ -302,6 +323,10 @@ export const apiSlice = createSlice({
           }
         }
       }
+    },
+    _orderreceipt(state, { payload }) {
+      const orderId = payload[1];
+      state.userOrders[orderId] = payload;      
     },
     setBalances(state, { payload }) {
       const scope = makeScope(state);
@@ -476,6 +501,12 @@ export const apiSlice = createSlice({
     setArweaveAllocation(state, { payload }) {
       state.arweaveAllocation = payload;
     },
+    setLayout(state, { payload }){
+      state.layout = payload;
+    },
+    setConnecting(state,{payload}) {
+      state.isConnecting = payload
+    }
   },
 });
 
@@ -490,8 +521,10 @@ export const {
   clearUserOrders,
   clearLastPrices,
   setArweaveAllocation,
+  setConnecting,
 } = apiSlice.actions;
 
+export const layoutSelector = (state) => state.api.layout;
 export const networkSelector = (state) => state.api.network;
 export const userOrdersSelector = (state) => state.api.userOrders;
 export const userFillsSelector = (state) => state.api.userFills;
@@ -504,6 +537,7 @@ export const currentMarketSelector = (state) => state.api.currentMarket;
 export const bridgeReceiptsSelector = (state) => state.api.bridgeReceipts;
 export const marketInfoSelector = (state) => state.api.marketinfo;
 export const arweaveAllocationSelector = (state) => state.api.arweaveAllocation;
+export const isConnectingSelector = (state) => state.api.isConnecting;
 export const balancesSelector = (state) =>
   state.api.balances[makeScope(state.api)] || {};
 

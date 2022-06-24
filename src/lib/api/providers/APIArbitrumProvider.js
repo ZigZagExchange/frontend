@@ -1,4 +1,3 @@
-import { toast } from "react-toastify";
 import { ethers } from 'ethers';
 import APIProvider from "./APIProvider";
 import balanceBundleABI from "lib/contracts/BalanceBundle.json";
@@ -11,28 +10,27 @@ export default class APIArbitrumProvider extends APIProvider {
   evmCompatible = true;
   zksyncCompatible = false;
   balances = {};
+  _tokenInfo = {};
 
   getAccountState = async () => {
-    return this._accountState;
-  };
-
-  getProfile = async () => {
-    return {};
+    return this.accountState;
   };
 
   getBalances = async () => {
     if (!this.accountState.address) return {};
 
-    // allways get ETH - generate token list
-    const tokens = super.getCurrencies();
-    const tokenInfo = [{ decimals: 18, }];
+    // allways get ETH - generate token list     
+    // const tokens = ['ETH'].concat(this.api.getCurrencies()); // TODO re-enable
+    const tokens = ['ETH'];
+    const tokenInfoList = [{ decimals: 18, }];
     const tokenList = [ethers.constants.AddressZero];
 
     for(let i = 1; i < tokens.length; i++) {
       const token = tokens[i];
+      const tokenInfo = this.api.getCurrencyInfo(token);
 
-      tokenInfo.push(super.getCurrencyInfo(token));
-      tokenList.push(tokenInfo[token].address);
+      tokenInfoList.push(tokenInfo);
+      tokenList.push(tokenInfo.address);
     }
 
     // get token balance
@@ -41,19 +39,19 @@ export default class APIArbitrumProvider extends APIProvider {
       balanceBundleABI,
       this.api.ethersProvider
     );
-    const balanceList = await ethContract.balances(this.accountState.address, tokenList);
+    const balanceList = await ethContract.balances([this.accountState.address], tokenList);
 
     // generate object
     for(let i = 0; i < tokens.length; i++) {
-      const balance = balanceList[i];
-      const token = tokens[i];
-      const currencyInfo = tokenInfo[token];
+      const balanceBN = balanceList[i];
+      const currencyInfo = tokenInfoList[i];
+      const valueReadable = (balanceBN && currencyInfo)
+        ? ethers.utils.formatUnits(balanceBN.toString(), currencyInfo.decimals)
+        : 0 
 
       this.balances[tokens[i]] = {
-        value: balance,
-        valueReadable:
-          (balance && currencyInfo && balance / 10 ** currencyInfo.decimals) ||
-          0,
+        value: balanceBN.toString(),
+        valueReadable,
         allowance: 0,
       }
     }
@@ -62,7 +60,7 @@ export default class APIArbitrumProvider extends APIProvider {
   };
 
   settleOrderFill = (market, side, baseAmount, quoteAmount) => {
-    const marketInfo = this.marketInfo[market];
+    const marketInfo = this.api.marketInfo[market];
     const [base, quote] = market.split('-');
 
     if(side === 's') {
@@ -93,13 +91,12 @@ export default class APIArbitrumProvider extends APIProvider {
     console.log('signing in to arbitrum');
     this.ethWallet = this.api.ethersProvider.getSigner();
 
-    const address = await this.api.ethWallet.getAddress();
-    this.accountState.id = address;
-    this.accountState.address = address;
+    const address = await this.ethWallet.getAddress();
+    this.accountState = {
+      id: address,
+      address,
+    };
 
     return this.accountState;
-  }
-
-  cacheMarketInfoFromNetwork = async (pairs) => {
-  }
+  }  
 }

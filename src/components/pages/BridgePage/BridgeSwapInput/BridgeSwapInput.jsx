@@ -2,6 +2,7 @@ import React, { useCallback } from "react";
 import styled from "@xstyled/styled-components";
 import BridgeCurrencySelector from "../BridgeCurrencySelector/BridgeCurrencySelector";
 import api from "lib/api";
+import { toast } from "react-toastify";
 
 const BridgeInputBox = styled.div`
   display: flex;
@@ -57,6 +58,8 @@ const BridgeSwapInput = ({ value = {}, onChange, balances = {}, L1Fee, L2Fee, fe
   }, [onChange])
   const setAmount = useCallback(e => {
     if(e.target.value.length > 10) return;
+    const regExp = /^(\d+\.?\d*|\.\d+)$/
+    if(!regExp.test(e.target.value)) return;
     onChange({ amount: e.target.value.replace(/[^0-9.]/g,'') })
   }, [onChange])
 
@@ -91,7 +94,14 @@ const BridgeSwapInput = ({ value = {}, onChange, balances = {}, L1Fee, L2Fee, fe
           max = actualBalance;
         }
         // one number to protect against overflow
-        if(receiveAmount < 0) max = 0;
+        if(receiveAmount < 0) {
+          max = 0;
+          toast.error(
+            `Your balance is too low to pay fees`,
+            { toastId: `Your balance is too low to pay fees` },
+            { autoClose: 5000 },
+          );
+        }
         else {
           max = Math.round(max * 10**roundedDecimalDigits - 1) / 10**roundedDecimalDigits;
         }
