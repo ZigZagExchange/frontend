@@ -8,7 +8,7 @@ import { getENSName } from "lib/ens";
 import { formatAmount } from "lib/utils";
 import erc20ContractABI from "lib/contracts/ERC20.json";
 import wethContractABI from "lib/contracts/WETH.json";
-import { MAX_ALLOWANCE } from "./constants";
+import { MAX_ALLOWANCE, balanceBundlerMainnet } from "./constants";
 import { 
   ZKSYNC_POLYGON_BRIDGE,
   POLYGON_MUMBAI_WETH_ADDRESS,
@@ -29,7 +29,8 @@ export default class API extends Emitter {
     networks = {}
     ws = null
     apiProvider = null
-    ethersProvider = null
+    mainnetProvider = null
+    rollupProvider = null
     currencies = null
     isArgent = false
     marketInfo = {}
@@ -317,13 +318,13 @@ export default class API extends Emitter {
         switch (this.apiProvider.network) {
             case 1:
                 ethereumChainId = "0x1";
-            break;
+                break;
             case 1000:
                 ethereumChainId = "0x4";
-            break;
+                break;
             case 42161: 
-              ethereumChainId = "0xa4b1";
-            break;
+                ethereumChainId = "0xa4b1";
+                break;
             default:
                 return
         }
@@ -358,9 +359,14 @@ export default class API extends Emitter {
           await this.sleep(1000);
           const web3Provider = await this.web3Modal.connect();
           this.web3.setProvider(web3Provider);
-          this.ethersProvider = new ethers.providers.Web3Provider(
+          this.rollupProvider = new ethers.providers.Web3Provider(
             web3Provider
           );
+
+          this.mainnetProvider = new ethers.providers.InfuraProvider(
+            'mainnet',
+            this.infuraId
+          )
 
           // set up polygon providers. mumbai for testnet. polygon for mainnet
           this.polygonProvider = new ethers.providers.JsonRpcProvider(
@@ -422,8 +428,9 @@ export default class API extends Emitter {
 
     this.web3 = null;
     this.web3Modal = null;
-    this.ethersProvider = null;
-    this.isArgent = false
+    this.rollupProvider = null;
+    this.mainnetProvider = null;
+    this.isArgent = false;
     this.setAPIProvider(this.apiProvider.network, false);
     this.emit("balanceUpdate", "wallet", {});
     this.emit("balanceUpdate", this.apiProvider.network, {});
@@ -592,8 +599,8 @@ export default class API extends Emitter {
   }
 
   getEthereumFee = async () => {
-    if (this.ethersProvider) {
-      const feeData = await this.ethersProvider.getFeeData();
+    if (this.mainnetProvider) {
+      const feeData = await this.mainnetProvider.getFeeData();
       return feeData;
     }
   };
@@ -672,25 +679,29 @@ export default class API extends Emitter {
   getBalanceOfCurrency = async (currency) => {
     const currencyInfo = this.getCurrencyInfo(currency);
     let result = { balance: 0, allowance: ethersConstants.Zero };
-    if (!this.ethersProvider) return result;
+    if (!this.mainnetProvider) return result;
 
     try {
       const netContract = this.getNetworkContract();
       const [account] = await this.web3.eth.getAccounts();
+      if (!account) return result;
+      
       if (currency === "ETH") {
-        result.balance = await this.web3.eth.getBalance(account);
+        result = await this.mainnetProvider.getBalance(account);
         return result;
       }
 
       if (!currencyInfo) return result;
-      const contract = new this.web3.eth.Contract(
+      
+      const contract = new ethers.Contract(
+        currencyInfo.address,
         erc20ContractABI,
-        currencyInfo.address
+        this.mainnetProvider
       );
-      result.balance = await contract.methods.balanceOf(account).call();
+      result.balance = await contract.balanceOf(account);
       if (netContract) {
         result.allowance = ethers.BigNumber.from(
-          await contract.methods.allowance(account, netContract).call()
+          await contract.allowance(account, netContract)
         );
       }
       return result;
@@ -717,6 +728,7 @@ export default class API extends Emitter {
         balances[ticker].valueReadable = formatAmount(balance, { decimals: 18 });
       }
 
+      console.log(balances)
       this.emit("balanceUpdate", "wallet", { ...balances });
     };
 
@@ -899,21 +911,21 @@ export default class API extends Emitter {
   }
 
   async getL2FastWithdrawLiquidity() {
-    if (this.ethersProvider) {
+    if (this.mainnetProvider) {
       const currencyMaxes = {};
       if(!this.apiProvider.eligibleFastWithdrawTokens) return currencyMaxes;
       for (const currency of this.apiProvider.eligibleFastWithdrawTokens) {
         let max = 0;
         try {
           if (currency === "ETH") {
-            max = await this.ethersProvider.getBalance(
+            max = await this.mainnetProvider.getBalance(
               this.apiProvider.fastWithdrawContractAddress
             );
           } else {
             const contract = new ethers.Contract(
               this.fastWithdrawTokenAddresses[currency],
               erc20ContractABI,
-              this.ethersProvider
+              this.mainnetProvider
             );
             max = await contract.balanceOf(
               this.apiProvider.fastWithdrawContractAddress
