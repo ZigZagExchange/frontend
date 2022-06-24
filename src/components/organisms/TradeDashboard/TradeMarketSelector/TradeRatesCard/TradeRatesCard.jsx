@@ -35,7 +35,6 @@ const TradeRatesCard = ({ updateMarketChain, marketSummary, rowData, currentMark
           <TokenPairDropdown
             width={isMobile ? 83 : 223}
             transparent
-            context={currentMarket}
             rowData={rowData}
             updateMarketChain={updateMarketChain}
             currentMarket={currentMarket}

@@ -293,7 +293,7 @@ export default function SwapPage() {
     if (tType === "buy") {
       const bidPrice = getFirstBid();
       const delta = ((price - bidPrice) / bidPrice) * 100;
-      if (delta > 2) {
+      if (delta > 2 && !settings.disableSlippageWarning) {
         toast.error(
           `You are buying ${delta.toFixed(
             2
@@ -308,7 +308,7 @@ export default function SwapPage() {
     } else {
       const askPrice = getFirstAsk();
       const delta = ((askPrice - price) / askPrice) * 100;
-      if (delta > 2) {
+      if (delta > 2 && !settings.disableSlippageWarning) {
         toast.error(
           `You are selling ${delta.toFixed(
             2

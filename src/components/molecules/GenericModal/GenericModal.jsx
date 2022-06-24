@@ -43,7 +43,7 @@ const CloseButton = styled.button`
 
 const GenericModal = ({
     width = 528,
-    height = 436,
+    height = 402,
     isOpened = false,
     onClose,
     children,
@@ -51,18 +51,18 @@ const GenericModal = ({
 }) => {
     return isOpened ? (
         <>
-                <ModalOverlay onClick={onClose}>
-                    <Modal width={width} height={height} {...props} onClick={(e) => e.stopPropagation()}>
-                        {onClose && (
-                            <CloseWrapper>
-                                <CloseButton onClick={onClose}>
-                                    <CloseIcon />
-                                </CloseButton>
-                            </CloseWrapper>
-                        )}
-                        {children}
-                    </Modal>
-                </ModalOverlay>
+            <ModalOverlay onClick={onClose}>
+                <Modal width={width} height={height} {...props} onClick={(e) => e.stopPropagation()}>
+                    {onClose && (
+                        <CloseWrapper>
+                            <CloseButton onClick={onClose}>
+                                <CloseIcon />
+                            </CloseButton>
+                        </CloseWrapper>
+                    )}
+                    {children}
+                </Modal>
+            </ModalOverlay>
         </>
     ) : (<></>)
 }
