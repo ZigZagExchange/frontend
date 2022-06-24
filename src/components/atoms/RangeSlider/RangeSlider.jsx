@@ -15,7 +15,6 @@ const useStyles = makeStyles(() => ({
     marginLeft: "-11px",
     position: "absolute",
     boxSizing: "border-box",
-    border: "1px solid #000",
     transition: "box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
     "&::after": {
       position: "absolute",
@@ -24,8 +23,8 @@ const useStyles = makeStyles(() => ({
       transform: "translate(-50%,-50%)",
       backgroundColor: "#2AABEE",
       content: "",
-      width: "13px",
-      height: "13px",
+      width: "20px",
+      height: "20px",
     },
   },
   root: {
