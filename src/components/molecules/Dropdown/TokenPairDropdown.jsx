@@ -71,6 +71,9 @@ const TableContent = styled.div`
   
   table tbody tr {
     cursor: pointer;
+    &:hover{
+        background-color: ${({ theme }) => theme.colors.foreground400};
+    }
   }
 
   tbody {
