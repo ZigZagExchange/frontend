@@ -157,7 +157,25 @@ export const MobileWrapper = styled.div`
   }
 
   table {
+    display: block;
     width: 100%;
+    height: calc(100% - 53px);
+
+    thead {
+      display: table;
+      width: 100%;
+      table-layout: fixed;
+
+      th {
+        padding: 10px 20px 0px 20px;
+      }
+    }
+
+    tbody tr {
+      display: table;
+      width: 100%;
+      table-layout: fixed;
+    }
   }
 
   table tbody td {

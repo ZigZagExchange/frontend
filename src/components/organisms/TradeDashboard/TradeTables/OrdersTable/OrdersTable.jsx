@@ -35,6 +35,7 @@ import { Button } from "components/molecules/Button";
 
 const StyledButton = styled(Button)`
   margin-right: 7vw;
+  white-space: nowrap;
 `;
 
 const TableHeaderWrapper = styled.div`
@@ -203,7 +204,7 @@ export default function OrdersTable(props) {
     setWalletList(walletArray);
   };
 
-  const cancelOrder = async(orderId) => {
+  const cancelOrder = async (orderId) => {
     try {
       await api.cancelOrder(orderId);
 
@@ -215,7 +216,7 @@ export default function OrdersTable(props) {
     } catch (e) {
       toast.error(e.message);
     }
-  }
+  };
 
   const renderOrderTable = (orders) => {
     return isMobile ? (
@@ -1325,117 +1326,153 @@ export default function OrdersTable(props) {
       break;
     case 2:
       if (props.user.committed) {
-        const balancesContent = walletList
-          .map((token) => {
-            return (
-              <tr>
-                <td data-label="Token"><Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{token.token}</Text></td>
-                <td data-label="Balance"><Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{settings.hideBalance ? "****.****" : token.valueReadable}</Text></td>
-                <td data-label="Balance"><Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">{settings.hideBalance ? "****.****" : token.valueReadable * coinEstimator(token.token)}</Text></td>
-              </tr>
-            );
-          });
+        const balancesContent = walletList.map((token) => {
+          return (
+            <tr>
+              <td data-label="Token">
+                <Text
+                  font="primaryExtraSmallSemiBold"
+                  color="foregroundHighEmphasis"
+                >
+                  {token.token}
+                </Text>
+              </td>
+              <td data-label="Balance">
+                <Text
+                  font="primaryExtraSmallSemiBold"
+                  color="foregroundHighEmphasis"
+                >
+                  {settings.hideBalance ? "****.****" : token.valueReadable}
+                </Text>
+              </td>
+              <td data-label="Balance">
+                <Text
+                  font="primaryExtraSmallSemiBold"
+                  color="foregroundHighEmphasis"
+                >
+                  {settings.hideBalance
+                    ? "****.****"
+                    : token.valueReadable * coinEstimator(token.token)}
+                </Text>
+              </td>
+            </tr>
+          );
+        });
         footerContent = (
           <div style={{ textAlign: "center", marginTop: "8px" }}>
-            {isMobile ? (
-              <table>
-                <tbody>{balancesContent}</tbody>
-              </table>
-            ) : (
-              <table>
-                <thead>
-                  <tr>
-                    <th
-                      scope="col"
-                      style={{ cursor: "pointer" }}
-                      onClick={() => {
-                        sortByToken();
-                      }}
-                    >
-                      <HeaderWrapper>
-                        <Text
-                          font="primaryExtraSmallSemiBold"
-                          color="foregroundLowEmphasis"
-                        >
-                          Token
-                        </Text>
-                        {tokenSorted ? (
-                          <SortIconWrapper>
-                            {tokenDirection ? (
-                              <SortUpIcon />
-                            ) : (
-                              <SortUpFilledIcon />
-                            )}
-                            {tokenDirection ? (
-                              <SortDownFilledIcon />
-                            ) : (
-                              <SortDownIcon />
-                            )}
-                          </SortIconWrapper>
-                        ) : (
-                          <SortIconWrapper>
+            <table>
+              <thead>
+                <tr>
+                  <th
+                    scope="col"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => {
+                      sortByToken();
+                    }}
+                  >
+                    <HeaderWrapper>
+                      <Text
+                        font="primaryExtraSmallSemiBold"
+                        color="foregroundLowEmphasis"
+                      >
+                        Token
+                      </Text>
+                      {tokenSorted ? (
+                        <SortIconWrapper>
+                          {tokenDirection ? (
                             <SortUpIcon />
+                          ) : (
+                            <SortUpFilledIcon />
+                          )}
+                          {tokenDirection ? (
+                            <SortDownFilledIcon />
+                          ) : (
                             <SortDownIcon />
-                          </SortIconWrapper>
-                        )}
-                      </HeaderWrapper>
-                    </th>
-                    <th
-                      scope="col"
-                      style={{ cursor: "pointer" }}
-                      onClick={() => {
-                        sortByBalance();
-                      }}
-                    >
-                      <HeaderWrapper>
-                        <Text
-                          font="primaryExtraSmallSemiBold"
-                          color="foregroundLowEmphasis"
-                        >
-                          Balance
-                        </Text>
-                        {balanceSorted ? (
-                          <SortIconWrapper>
-                            {balanceDirection ? (
-                              <SortUpIcon />
-                            ) : (
-                              <SortUpFilledIcon />
-                            )}
-                            {balanceDirection ? (
-                              <SortDownFilledIcon />
-                            ) : (
-                              <SortDownIcon />
-                            )}
-                          </SortIconWrapper>
-                        ) : (
-                          <SortIconWrapper>
+                          )}
+                        </SortIconWrapper>
+                      ) : (
+                        <SortIconWrapper>
+                          <SortUpIcon />
+                          <SortDownIcon />
+                        </SortIconWrapper>
+                      )}
+                    </HeaderWrapper>
+                  </th>
+                  <th
+                    scope="col"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => {
+                      sortByBalance();
+                    }}
+                  >
+                    <HeaderWrapper>
+                      <Text
+                        font="primaryExtraSmallSemiBold"
+                        color="foregroundLowEmphasis"
+                      >
+                        Balance
+                      </Text>
+                      {balanceSorted ? (
+                        <SortIconWrapper>
+                          {balanceDirection ? (
                             <SortUpIcon />
+                          ) : (
+                            <SortUpFilledIcon />
+                          )}
+                          {balanceDirection ? (
+                            <SortDownFilledIcon />
+                          ) : (
                             <SortDownIcon />
-                          </SortIconWrapper>
-                        )}
-                      </HeaderWrapper>
-                    </th>
-                    <th scope="col" style={{ cursor: 'pointer' }} onClick={() => { sortByBalance() }}>
-                      <HeaderWrapper>
-                        <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">USD</Text>
-                        {balanceSorted ? (
-                          <SortIconWrapper>
-                            {balanceDirection ? <SortUpIcon /> : <SortUpFilledIcon />}
-                            {balanceDirection ? <SortDownFilledIcon /> : <SortDownIcon />}
-                          </SortIconWrapper>
-                        ) : (
-                          <SortIconWrapper>
+                          )}
+                        </SortIconWrapper>
+                      ) : (
+                        <SortIconWrapper>
+                          <SortUpIcon />
+                          <SortDownIcon />
+                        </SortIconWrapper>
+                      )}
+                    </HeaderWrapper>
+                  </th>
+                  <th
+                    scope="col"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => {
+                      sortByBalance();
+                    }}
+                  >
+                    <HeaderWrapper>
+                      <Text
+                        font="primaryExtraSmallSemiBold"
+                        color="foregroundLowEmphasis"
+                      >
+                        USD
+                      </Text>
+                      {balanceSorted ? (
+                        <SortIconWrapper>
+                          {balanceDirection ? (
                             <SortUpIcon />
+                          ) : (
+                            <SortUpFilledIcon />
+                          )}
+                          {balanceDirection ? (
+                            <SortDownFilledIcon />
+                          ) : (
                             <SortDownIcon />
-                          </SortIconWrapper>
-                        )}
-                      </HeaderWrapper>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>{balancesContent}</tbody>
-              </table>
-            )}
+                          )}
+                        </SortIconWrapper>
+                      ) : (
+                        <SortIconWrapper>
+                          <SortUpIcon />
+                          <SortDownIcon />
+                        </SortIconWrapper>
+                      )}
+                    </HeaderWrapper>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>{balancesContent}</tbody>
+            </table>
+
             <ActionWrapper
               font="primaryExtraSmallSemiBold"
               color="primaryHighEmphasis"
