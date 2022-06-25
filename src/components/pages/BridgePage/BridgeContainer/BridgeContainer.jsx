@@ -389,7 +389,7 @@ const BridgeContainer = () => {
         setL1Fee(35000 * gasFee.fast.maxFee / 10**9);
         setL2Fee(swapDetails, null, null)
         setZigZagFeeToken('ETH');
-        setZigZagFee(0.001);
+        setZigZagFee(0.003);
       }
     }
     // zkSync -> polygon
@@ -398,7 +398,7 @@ const BridgeContainer = () => {
       setL1Fee(null);
       setL2Fee(swapDetails, res.amount, res.feeToken); // ZigZag fee
       setZigZagFeeToken(res.feeToken);
-      setZigZagFee(0.001);
+      setZigZagFee(0.003);
     }
     // Ethereum -> zkSync aka deposit
     else if (transfer.type === "deposit") {
