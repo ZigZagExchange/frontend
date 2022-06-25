@@ -88,18 +88,18 @@ export class SpotForm extends React.Component {
     return formatPrice(price);
   }
 
-  getLadderPrice() {    
+  getLadderPrice() {
     let baseAmount = this.state.baseAmount;
     const side = this.props.side;
-  
+
     if (!baseAmount) baseAmount = 0;
-  
+
     let price;
     let unfilled = baseAmount;
-    if (side === "b" && this.props.orderbookAsks) {  
+    if (side === "b" && this.props.orderbookAsks) {
       const asks = this.props.orderbookAsks;
       for (let i = 0; i < asks.length; i++) {
-        if (asks[i].td2 >= unfilled  || i === asks.length - 1) {
+        if (asks[i].td2 >= unfilled || i === asks.length - 1) {
           price = asks[i].td1;
           break;
         } else {
@@ -109,7 +109,7 @@ export class SpotForm extends React.Component {
     } else if (side === "s" && this.props.orderbookBids) {
       const bids = this.props.orderbookBids;
       for (let i = 0; i < bids.length; i++) {
-        if (bids[i].td2 >= unfilled  || i === bids - 1) {
+        if (bids[i].td2 >= unfilled || i === bids - 1) {
           price = bids[i].td1;
           break;
         } else {
@@ -483,12 +483,12 @@ export class SpotForm extends React.Component {
     const balanceHtml =
       this.props.side === "b" ? (
         <strong>
-          {isNaN(Number(quoteBalance)) ? quoteBalance : Number(quoteBalance).toPrecision(8)}{" "}
+          {Number(quoteBalance).toPrecision(8)}{" "}
           {marketInfo && marketInfo.quoteAsset?.symbol}
         </strong>
       ) : (
         <strong>
-          {baseBalance.toPrecision(8)}{" "}
+          {Number(baseBalance).toPrecision(8)}{" "}
           {marketInfo && marketInfo.baseAsset?.symbol}
         </strong>
       );
