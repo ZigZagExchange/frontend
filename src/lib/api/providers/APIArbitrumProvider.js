@@ -45,18 +45,44 @@ export default class APIArbitrumProvider extends APIProvider {
     for(let i = 0; i < tokens.length; i++) {
       const balanceBN = balanceList[i];
       const currencyInfo = tokenInfoList[i];
+      /* TODO replace */
+      const allowanceBN = await this.allowance(currencyInfo.address);
+      /* ** */ 
       const valueReadable = (balanceBN && currencyInfo)
+        ? ethers.utils.formatUnits(balanceBN.toString(), currencyInfo.decimals)
+        : 0 
+      const allowanceReadable = (allowanceBN && currencyInfo)
         ? ethers.utils.formatUnits(balanceBN.toString(), currencyInfo.decimals)
         : 0 
 
       balances[tokens[i]] = {
         value: balanceBN.toString(),
         valueReadable,
-        allowance: 0,
+        allowance: allowanceBN.toString(),
+        allowanceReadable
       }
     }
+    console.log(balances)
 
     return balances;
+  };
+
+  // TODO replace
+  allowance = async (tokenAddress) => {
+    if (!this.accountState.address) return 0;
+
+    const erc20Contract = new ethers.Contract(
+      tokenAddress,
+      erc20ContractABI,
+      this.api.rollupProvider
+    );
+
+    const allowance = await erc20Contract.allowance(
+      this.accountState.address,
+      ARBITRUM_EXCHANGE_ADDRESS
+    );
+
+    return ethers.BigNumber.from(allowance);
   };
 
   settleOrderFill = (market, side, baseAmount, quoteAmount) => {
