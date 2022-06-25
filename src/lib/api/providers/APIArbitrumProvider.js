@@ -139,18 +139,10 @@ export default class APIArbitrumProvider extends APIProvider {
       salt: (Math.random() * 123456789).toFixed(0),
     };
     
-    /*
     const domain = {
-      name: 'ZigZag Order',
+      name: 'ZigZag',
       version: '1',
       chainId: this.network,
-      //verifyingContract: "0x48caa485547760cae44b82f1d8caeebfe63c9312"
-    };
-    */
-    const domain = {
-      name: 'SetTest',
-      version: '1',
-      chainId: '1',
     };
     
     const types = {
