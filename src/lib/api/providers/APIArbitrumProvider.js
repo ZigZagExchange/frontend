@@ -142,7 +142,7 @@ export default class APIArbitrumProvider extends APIProvider {
     const domain = {
       name: 'ZigZag Order',
       version: '1',
-      chainId: this.chainId,
+      chainId: this.network,
       //verifyingContract: "0x48caa485547760cae44b82f1d8caeebfe63c9312"
     };
     
