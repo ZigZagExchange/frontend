@@ -150,7 +150,7 @@ export default class APIArbitrumProvider extends APIProvider {
     const domain = {
       name: 'SetTest',
       version: '1',
-      chainId: 1,
+      chainId: '1',
     };
     
     const types = {
