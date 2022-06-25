@@ -19,14 +19,14 @@ export default class APIArbitrumProvider extends APIProvider {
     if (!this.accountState.address) return balances;
 
     // allways get ETH - generate token list     
-    // const tokens = ['ETH'].concat(this.api.getCurrencies()); // TODO re-enable
-    const tokens = ['ETH'];
+    const tokens = ['ETH'].concat(this.api.getCurrencies());
     const tokenInfoList = [{ decimals: 18, }];
     const tokenList = [ethers.constants.AddressZero];
 
     for(let i = 1; i < tokens.length; i++) {
       const token = tokens[i];
       const tokenInfo = this.api.getCurrencyInfo(token);
+      if (!tokenInfo || !tokenInfo.address) return;
 
       tokenInfoList.push(tokenInfo);
       tokenList.push(tokenInfo.address);
@@ -139,11 +139,18 @@ export default class APIArbitrumProvider extends APIProvider {
       salt: (Math.random() * 123456789).toFixed(0),
     };
     
+    /*
     const domain = {
       name: 'ZigZag Order',
       version: '1',
       chainId: this.network,
       //verifyingContract: "0x48caa485547760cae44b82f1d8caeebfe63c9312"
+    };
+    */
+    const domain = {
+      name: 'SetTest',
+      version: '1',
+      chainId: 1,
     };
     
     const types = {
