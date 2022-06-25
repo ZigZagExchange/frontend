@@ -130,13 +130,13 @@ export default class APIArbitrumProvider extends APIProvider {
       makerToken: makerToken,
       takerToken: takerToken,
       feeRecipientAddress: ARBITRUM_FEE_RECIPIENT_ADDRESS,
-      makerAssetAmount:  makerAmountBN,
-      takerAssetAmount: takerAmountBN,
-      makerVolumeFee: ethers.BigNumber.from('0'),
-      takerVolumeFee: ethers.BigNumber.from('0'),
-      gasFee: ethers.BigNumber.from(gasFee),
-      expirationTimeSeconds: ethers.BigNumber.from(expirationTimeSeconds.toFixed(0)),
-      salt: ethers.BigNumber.from((Math.random() * 123456789).toFixed(0)),
+      makerAssetAmount:  makerAmountBN.toString(),
+      takerAssetAmount: takerAmountBN.toString(),
+      makerVolumeFee: '0',
+      takerVolumeFee: '0',
+      gasFee: gasFee.toString(),
+      expirationTimeSeconds: expirationTimeSeconds.toFixed(0),
+      salt: (Math.random() * 123456789).toFixed(0),
     };
     
     const domain = {
