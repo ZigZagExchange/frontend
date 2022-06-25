@@ -84,6 +84,10 @@ export default class APIArbitrumProvider extends APIProvider {
   
   submitOrder = async (market, side, price, baseAmount, quoteAmount, orderType) => {
     const marketInfo = this.api.marketInfo[market];
+
+    if (!quoteAmount) quoteAmount = baseAmount * price;
+    if (!baseAmount) baseAmount = quoteAmount / price;
+
     let makerToken, takerToken, makerAmountBN, takerAmountBN, gasFee;
     if(side === 's') {
       makerToken = marketInfo.baseAsset.address;
@@ -126,19 +130,20 @@ export default class APIArbitrumProvider extends APIProvider {
       makerToken: makerToken,
       takerToken: takerToken,
       feeRecipientAddress: ARBITRUM_FEE_RECIPIENT_ADDRESS,
-      makerAssetAmount:  makerAmountBN.toString(),
-      takerAssetAmount: takerAmountBN.toString(),
-      makerVolumeFee: '0.0',
-      takerVolumeFee: '0.005',
-      gasFee: gasFee.toString(),
-      expirationTimeSeconds: expirationTimeSeconds.toString(),
-      salt: (Math.random() * 123456789).toString().split('.')[0],
-    }
+      makerAssetAmount:  makerAmountBN,
+      takerAssetAmount: takerAmountBN,
+      makerVolumeFee: ethers.BigNumber.from('0'),
+      takerVolumeFee: ethers.BigNumber.from('0'),
+      gasFee: ethers.BigNumber.from(gasFee),
+      expirationTimeSeconds: ethers.BigNumber.from(expirationTimeSeconds.toFixed(0)),
+      salt: ethers.BigNumber.from((Math.random() * 123456789).toFixed(0)),
+    };
     
     const domain = {
       name: 'ZigZag Order',
       version: '1',
       chainId: this.chainId,
+      //verifyingContract: "0x48caa485547760cae44b82f1d8caeebfe63c9312"
     };
     
     const types = {
@@ -156,20 +161,18 @@ export default class APIArbitrumProvider extends APIProvider {
         { "name": 'salt', "type": 'uint256' }
       ]
     };
-    
-    const value  = {Order};
-    console.log(Order)
 
+    console.log(domain, types, Order);
     const signer = await this.api.rollupProvider.getSigner();
-    const signature = await signer._signTypedData(domain, types, value);
+    const signature = await signer._signTypedData(domain, types, Order);
 
     Order.signature = signature;
     console.log(Order)
     
-    /*
-    this.api.send("submitorder2", [this.network, market, Order]);
+    
+    this.api.send("submitorder3", [this.network, market, Order]);
     return Order;
-    */
+    
   }
 
   signIn = async () => {
