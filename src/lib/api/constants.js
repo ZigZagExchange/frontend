@@ -6,3 +6,5 @@ export const MAX_ALLOWANCE = ethers.BigNumber.from(
 
 export const balanceBundlerMainnet = '0xb1f8e55c7f64d203c1400b9d8555d050f94adf39';
 export const balanceBundlerAddress = '0x1b7ad12c73b9fea574cd2320650676c0a0bde8a0';
+
+export const ARBITRUM_FEE_RECIPIENT_ADDRESS = "0x4216a98F0CA83bCc11ea4CAA4e5Db1ef8967d836";

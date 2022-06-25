@@ -687,7 +687,7 @@ export default class API extends Emitter {
       if (!account) return result;
       
       if (currency === "ETH") {
-        result = await this.mainnetProvider.getBalance(account);
+        result.balance = await this.mainnetProvider.getBalance(account);
         return result;
       }
 
@@ -728,7 +728,6 @@ export default class API extends Emitter {
         balances[ticker].valueReadable = formatAmount(balance, { decimals: 18 });
       }
 
-      console.log(balances)
       this.emit("balanceUpdate", "wallet", { ...balances });
     };
 

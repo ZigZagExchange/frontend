@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import APIProvider from "./APIProvider";
 import balanceBundleABI from "lib/contracts/BalanceBundle.json";
-import { balanceBundlerAddress } from "./../constants";
+import { balanceBundlerAddress, ARBITRUM_FEE_RECIPIENT_ADDRESS } from "./../constants";
 
 export default class APIArbitrumProvider extends APIProvider {
 
@@ -82,8 +82,94 @@ export default class APIArbitrumProvider extends APIProvider {
     this.balances[quote].value = newQuoteAmountBn.toSTring();
   }
   
-  submitOrder = async (product, side, price, baseAmount, quoteAmount) => {
-      
+  submitOrder = async (market, side, price, baseAmount, quoteAmount, orderType) => {
+    const marketInfo = this.api.marketInfo[market];
+    let makerToken, takerToken, makerAmountBN, takerAmountBN, gasFee;
+    if(side === 's') {
+      makerToken = marketInfo.baseAsset.address;
+      takerToken = marketInfo.quoteAsset.address;
+      makerAmountBN = ethers.utils.parseUnits (
+        baseAmount.toFixed(marketInfo.baseAsset.decimals),
+        marketInfo.baseAsset.decimals
+      );
+      takerAmountBN = ethers.utils.parseUnits (
+        quoteAmount.toFixed(marketInfo.quoteAsset.decimals),
+        marketInfo.quoteAsset.decimals
+      );
+      gasFee = ethers.utils.parseUnits (
+        marketInfo.baseFee.toFixed(marketInfo.baseAsset.decimals),
+        marketInfo.baseAsset.decimals
+      )
+    } else {
+      makerToken = marketInfo.quoteAsset.address;
+      takerToken = marketInfo.baseAsset.address;
+      makerAmountBN = ethers.utils.parseUnits (
+        quoteAmount.toFixed(marketInfo.quoteAsset.decimals),
+        marketInfo.quoteAsset.decimals
+      )
+      takerAmountBN = ethers.utils.parseUnits (
+        baseAmount.toFixed(marketInfo.baseAsset.decimals),
+        marketInfo.baseAsset.decimals
+      )
+      gasFee = ethers.utils.parseUnits (
+        marketInfo.quoteFee.toFixed(marketInfo.quoteAsset.decimals),
+        marketInfo.quoteAsset.decimals
+      )
+    }
+
+    const expirationTimeSeconds = (orderType === 'market')
+      ? Date.now() / 1000 + 60 // one minute
+      : Date.now() / 1000 + 60 * 60 * 24 * 7 // one week
+
+    const Order = {
+      makerAddress: this.accountState.address,
+      makerToken: makerToken,
+      takerToken: takerToken,
+      feeRecipientAddress: ARBITRUM_FEE_RECIPIENT_ADDRESS,
+      makerAssetAmount:  makerAmountBN.toString(),
+      takerAssetAmount: takerAmountBN.toString(),
+      makerVolumeFee: '0.0',
+      takerVolumeFee: '0.005',
+      gasFee: gasFee.toString(),
+      expirationTimeSeconds: expirationTimeSeconds.toString(),
+      salt: (Math.random() * 123456789).toString().split('.')[0],
+    }
+    
+    const domain = {
+      name: 'ZigZag Order',
+      version: '1',
+      chainId: this.chainId,
+    };
+    
+    const types = {
+      "Order": [
+        { "name": 'makerAddress', "type": 'address' },
+        { "name": 'makerToken', "type": 'address' },
+        { "name": 'takerToken', "type": 'address' },
+        { "name": 'feeRecipientAddress', "type": 'address' },
+        { "name": 'makerAssetAmount', "type": 'uint256' },
+        { "name": 'takerAssetAmount', "type": 'uint256' },
+        { "name": 'makerVolumeFee', "type": 'uint256' },
+        { "name": 'takerVolumeFee', "type": 'uint256' },
+        { "name": 'gasFee', "type": 'uint256' },
+        { "name": 'expirationTimeSeconds', "type": 'uint256' },
+        { "name": 'salt', "type": 'uint256' }
+      ]
+    };
+    
+    const value  = {Order};
+    console.log(Order)
+
+    const signer = await this.api.rollupProvider.getSigner();
+    const signature = await signer._signTypedData(domain, types, value);
+
+    Order.signature = signature;
+    console.log(Order)
+    
+    /*
+    this.api.send("submitorder2", [this.network, market, Order]);
+    return Order;
+    */
   }
 
   signIn = async () => {
