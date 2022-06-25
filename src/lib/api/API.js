@@ -826,6 +826,10 @@ export default class API extends Emitter {
     return this.apiProvider.signMessage(message);
   };
 
+  approveExchangeContract = async (token, amount) => {
+    return this.apiProvider.approveExchangeContract(token, amount);
+  }
+
   uploadArweaveFile = async (sender, timestamp, signature, file) => {
     const formData = new FormData();
     formData.append("sender", sender);

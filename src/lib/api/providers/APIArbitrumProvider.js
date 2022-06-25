@@ -219,8 +219,15 @@ export default class APIArbitrumProvider extends APIProvider {
   approveExchangeContract = async (token, amount) => {
     const currencyInfo = this.api.getCurrencyInfo(token);
     if (!currencyInfo.address) throw new Error(`ERC20 address for ${token} not found`);
-    if(!amount) amount = ethers.constants.MaxUint256;
-
+    let amountBN;
+    if(!amount) {
+      amountBN = ethers.constants.MaxUint256;
+    } else {
+      amountBN = ethers.utils.parseUnits (
+        amount.toFixed(currencyInfo.decimals),
+        currencyInfo.decimals
+      );
+    }
 
     const erc20Contract = new ethers.Contract(
       currencyInfo.address,

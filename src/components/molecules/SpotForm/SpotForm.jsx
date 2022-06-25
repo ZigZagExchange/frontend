@@ -139,6 +139,68 @@ export class SpotForm extends React.Component {
     return formatPrice(price);
   }
 
+  async approveHandler(e) {
+    let baseAmount, quoteAmount;
+    if (typeof this.state.baseAmount === "string") {
+      baseAmount = parseFloat(this.state.baseAmount.replace(",", "."));
+    } else {
+      baseAmount = this.state.baseAmount;
+    }
+    if (typeof this.state.quoteAmount === "string") {
+      quoteAmount = parseFloat(this.state.quoteAmount.replace(",", "."));
+    } else {
+      quoteAmount = this.state.quoteAmount;
+    }
+
+    quoteAmount = isNaN(quoteAmount) ? 0 : quoteAmount
+    baseAmount = isNaN(baseAmount) ? 0 : baseAmount
+    if (!baseAmount && !quoteAmount) {
+      toast.error("No amount available", {
+        toastId: 'No amount available',
+      });
+      return;
+    }
+
+    const marketInfo = this.props.marketInfo;
+    let token, amount;
+    if (this.props.side === "s") {
+      amount = baseAmount ? baseAmount : (quoteAmount / price);
+      token = marketInfo.baseAsset.symbol;
+    } else if (this.props.side === "b") {
+      amount = quoteAmount ? quoteAmount : (baseAmount * price);
+      token = marketInfo.quoteAsset.symbol;
+    } else {
+      toast.error("Bad side", {
+        toastId: 'Bad side',
+      });
+      return;
+    }
+
+    let newstate = { ...this.state };
+    newstate.orderButtonDisabled = true;
+    this.setState(newstate);
+    let orderApproveToast = toast.info(
+      "Approve pending. Sign or Cancel to continue...", {
+      toastId: "Approve pending. Sign or Cancel to continue...",
+      autoClose: false,
+    });
+
+    try {
+      await api.approveExchangeContract(
+        token,
+        amount
+      );
+    } catch (e) {
+      console.log(e);
+      toast.error(e.message);
+    }
+
+    toast.dismiss(orderApproveToast);
+    newstate = { ...this.state };
+    newstate.orderButtonDisabled = false;
+    this.setState(newstate);
+  }
+
   async buySellHandler(e) {
     let baseAmount, quoteAmount;
     if (typeof this.state.baseAmount === "string") {
@@ -499,17 +561,32 @@ export class SpotForm extends React.Component {
 
   render() {
     const marketInfo = this.props.marketInfo;
+    let baseAmount, quoteAmount;
+    if (typeof this.state.baseAmount === "string") {
+      baseAmount = parseFloat(this.state.baseAmount.replace(",", "."));
+    } else {
+      baseAmount = this.state.baseAmount;
+    }
+    if (typeof this.state.quoteAmount === "string") {
+      quoteAmount = parseFloat(this.state.quoteAmount.replace(",", "."));
+    } else {
+      quoteAmount = this.state.quoteAmount;
+    }
 
     let price = this.currentPrice();
     if (price === 0) price = "";
 
-    let baseBalance, quoteBalance;
+    let baseBalance, quoteBalance, baseAllowance, quoteAllowance;
     if (this.props.user.id) {
       baseBalance = this.getBaseBalance();
       quoteBalance = this.getQuoteBalance();
+      baseAllowance = this.getBaseAllowance();
+      quoteAllowance = this.getQuoteAllowance();
     } else {
-      baseBalance = "-";
-      quoteBalance = "-";
+      baseBalance = 0;
+      quoteBalance = 0;
+      baseAllowance = 0;
+      quoteAllowance = 0;
     }
     if (isNaN(baseBalance)) {
       baseBalance = 0;
@@ -531,13 +608,23 @@ export class SpotForm extends React.Component {
         </strong>
       );
 
-    let buySellBtnClass, buttonText;
+    let buySellBtnClass, buttonText, approveNeeded = false;
     if (this.props.side === "b") {
       buySellBtnClass = "bg_btn buy_btn";
-      buttonText = "BUY";
+      if (quoteAmount > quoteAllowance)  {
+        buttonText = `Approve ${marketInfo.quoteAsset.symbol}`;
+        approveNeeded = true;
+      } else {
+        buttonText = `BUY ${marketInfo.quoteAsset.symbol}`;
+      }
     } else if (this.props.side === "s") {
       buySellBtnClass = "bg_btn sell_btn";
-      buttonText = "SELL";
+      if (baseAmount > baseAllowance)  {
+        buttonText = `Approve ${marketInfo.baseAsset.symbol}`;
+        approveNeeded = true;
+      } else {
+        buttonText = `BUY ${marketInfo.baseAsset.symbol}`;
+      }
     }
 
     return (
@@ -593,7 +680,7 @@ export class SpotForm extends React.Component {
                 <button
                   type="button"
                   className={buySellBtnClass}
-                  onClick={this.buySellHandler.bind(this)}
+                  onClick={approveNeeded ? this.approveHandler.bind(this) : this.buySellHandler.bind(this)}
                   disabled={this.state.orderButtonDisabled}
                 >
                   {buttonText}
