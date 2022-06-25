@@ -52,6 +52,24 @@ export class SpotForm extends React.Component {
     );
   }
 
+  getBaseAllowance() {
+    const marketInfo = this.props.marketInfo;
+    if (!marketInfo) return 0;
+    if (!this.props.balances?.[marketInfo.baseAsset.symbol]?.allowanceReadable) return 0;
+    return (
+      this.props.balances[marketInfo.baseAsset.symbol].allowanceReadable
+    );
+  }
+
+  getQuoteAllowance() {
+    const marketInfo = this.props.marketInfo;
+    if (!marketInfo) return 0;
+    if (!this.props.balances?.[marketInfo.quoteAsset.symbol]?.allowanceReadable) return 0;
+    return (
+      this.props.balances[marketInfo.quoteAsset.symbol].allowanceReadable
+    );
+  }
+
   /*
    * zkSync does not allow partial fills, so the ladder price is the first
    * liquidity that can fill the order size. 
@@ -165,13 +183,17 @@ export class SpotForm extends React.Component {
       });
       return;
     }
-    let baseBalance, quoteBalance;
+    let baseBalance, quoteBalance, baseAllowance, quoteAllowance;
     if (this.props.user.id) {
       baseBalance = this.getBaseBalance();
       quoteBalance = this.getQuoteBalance();
+      baseAllowance = this.getBaseAllowance();
+      quoteAllowance = this.getQuoteAllowance();
     } else {
       baseBalance = 0;
       quoteBalance = 0;
+      baseAllowance = 0;
+      quoteAllowance = 0;
     }
 
     const marketInfo = this.props.marketInfo;
@@ -202,6 +224,13 @@ export class SpotForm extends React.Component {
           `Minimum order size is ${marketInfo.baseFee.toPrecision(5)
           } ${marketInfo.baseAsset.symbol}`
         );
+        return;
+      }
+
+      if (baseAmount && baseAmount < baseAllowance) {
+        toast.error(`Amount exceeds ${marketInfo.baseAsset.symbol} allowance`, {
+          toastId: `Amount exceeds ${marketInfo.baseAsset.symbol} allowance`,
+        });
         return;
       }
 
@@ -251,8 +280,17 @@ export class SpotForm extends React.Component {
       if (quoteAmount && quoteAmount < marketInfo.quoteFee) {
         toast.error(
           `Minimum order size is ${marketInfo.quoteFee.toPrecision(5)
-          } ${marketInfo.quoteAsset.symbol}`
-        );
+          } ${marketInfo.quoteAsset.symbol}`, {
+            toastId: `Minimum order size is ${marketInfo.quoteFee.toPrecision(5)
+            } ${marketInfo.quoteAsset.symbol}`,
+          });
+        return;
+      }
+
+      if (quoteAmount && quoteAmount < quoteAllowance) {
+        toast.error(`Total exceeds ${marketInfo.quoteAsset.symbol} allowance`, {
+          toastId: `Total exceeds ${marketInfo.quoteAsset.symbol} allowance`,
+        });
         return;
       }
 
