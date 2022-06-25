@@ -45,9 +45,10 @@ export default class APIArbitrumProvider extends APIProvider {
     for(let i = 0; i < tokens.length; i++) {
       const balanceBN = balanceList[i];
       const currencyInfo = tokenInfoList[i];
-      /* TODO replace */
-      const allowanceBN = await this.allowance(currencyInfo.address);
-      /* ** */ 
+      
+      const allowanceBN = (tokens[i] === 'ETH') 
+        ? ethers.constants.MaxUint256
+        : await this.allowance(currencyInfo.address); // TODO replace
       const valueReadable = (balanceBN && currencyInfo)
         ? ethers.utils.formatUnits(balanceBN.toString(), currencyInfo.decimals)
         : 0 
@@ -62,7 +63,6 @@ export default class APIArbitrumProvider extends APIProvider {
         allowanceReadable
       }
     }
-    console.log(balances)
 
     return balances;
   };
