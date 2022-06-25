@@ -1,6 +1,7 @@
 import { ethers } from 'ethers';
 import APIProvider from "./APIProvider";
-import { balanceBundleABI, erc20ContractABI }  from "lib/contracts/BalanceBundle.json";
+import balanceBundleABI  from "lib/contracts/BalanceBundle.json";
+import erc20ContractABI from "lib/contracts/ERC20.json";
 import { balanceBundlerAddress, ARBITRUM_FEE_RECIPIENT_ADDRESS, ARBITRUM_EXCHANGE_ADDRESS } from "./../constants";
 
 export default class APIArbitrumProvider extends APIProvider {
