@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import APIProvider from "./APIProvider";
-import balanceBundleABI from "lib/contracts/BalanceBundle.json";
-import { balanceBundlerAddress, ARBITRUM_FEE_RECIPIENT_ADDRESS } from "./../constants";
+import { balanceBundleABI, erc20ContractABI }  from "lib/contracts/BalanceBundle.json";
+import { balanceBundlerAddress, ARBITRUM_FEE_RECIPIENT_ADDRESS, ARBITRUM_EXCHANGE_ADDRESS } from "./../constants";
 
 export default class APIArbitrumProvider extends APIProvider {
 
@@ -33,12 +33,12 @@ export default class APIArbitrumProvider extends APIProvider {
     }
 
     // get token balance
-    const ethContract = new ethers.Contract(
+    const erc20Contract = new ethers.Contract(
       balanceBundlerAddress,
       balanceBundleABI,
       this.api.rollupProvider
     );
-    const balanceList = await ethContract.balances([this.accountState.address], tokenList);
+    const balanceList = await erc20Contract.balances([this.accountState.address], tokenList);
 
     // generate object
     for(let i = 0; i < tokens.length; i++) {
@@ -144,7 +144,7 @@ export default class APIArbitrumProvider extends APIProvider {
       version: '1',
       chainId: this.network,
     };
-    
+
     const types = {
       "Order": [
         { "name": 'makerAddress', "type": 'address' },
@@ -187,5 +187,25 @@ export default class APIArbitrumProvider extends APIProvider {
     };
 
     return this.accountState;
-  }  
+  }
+
+  approveExchangeContract = async (token, amount) => {
+    const currencyInfo = this.api.getCurrencyInfo(token);
+    if (!currencyInfo.address) throw new Error(`ERC20 address for ${token} not found`);
+    if(!amount) amount = ethers.constants.MaxUint256;
+
+
+    const erc20Contract = new ethers.Contract(
+      currencyInfo.address,
+      erc20ContractABI,
+      this.api.rollupProvider
+    );
+
+    await erc20Contract.approve(
+      ARBITRUM_EXCHANGE_ADDRESS,
+      amount
+    );
+
+    return true;
+  };
 }
