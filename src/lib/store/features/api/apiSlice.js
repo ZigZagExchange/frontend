@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import { formatPrice } from "lib/utils";
 import api from "lib/api";
 import { getLayout } from "lib/helpers/storage/layouts";
+import { ethers } from 'ethers';
 
 const makeScope = (state) => `${state.network}-${state.userId}`;
 
@@ -146,23 +147,23 @@ export const apiSlice = createSlice({
 
             // update the balances of the user account
             if(api.apiProvider.evmCompatible) {              
-              const marketInfo = api.api.marketInfo[market];
-              const [base, quote] = market.split('-');
+              const marketInfo = api.api.marketInfo[fillDetails[2]];
+              const [base, quote] = fillDetails[2].split('-');
               const scope = makeScope(state);
               const balances = state.balances[scope];
-              if(side === 's') {
-                balances[base].valueReadable -= baseAmount;
-                balances[quote].valueReadable += quoteAmount;
-                balances[base].allowanceReadable -= baseAmount;
+              if(fillDetails[3] === 's') {
+                balances[base].valueReadable -= baseQuantity;
+                balances[quote].valueReadable += quoteQuantity;
+                balances[base].allowanceReadable -= baseQuantity;
                 
                 balances[base].allowance = ethers.utils.parseUnits(
                   (balances[base].allowanceReadable).toFixed(marketInfo.baseAsset.decimals),
                   marketInfo.baseAsset.decimals
                 ).toString();
               } else {
-                balances[base].valueReadable += baseAmount;
-                balances[quote].valueReadable -= quoteAmount;
-                balances[quote].allowanceReadable -= quoteAmount;
+                balances[base].valueReadable += baseQuantity;
+                balances[quote].valueReadable -= quoteQuantity;
+                balances[quote].allowanceReadable -= quoteQuantity;
                 
                 balances[quote].allowance = ethers.utils.parseUnits(
                   (balances[quote].allowanceReadable).toFixed(marketInfo.quoteAsset.decimals),
