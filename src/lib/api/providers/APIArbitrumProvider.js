@@ -2,7 +2,11 @@ import { ethers } from 'ethers';
 import APIProvider from "./APIProvider";
 import balanceBundleABI  from "lib/contracts/BalanceBundle.json";
 import erc20ContractABI from "lib/contracts/ERC20.json";
-import { balanceBundlerAddress, ARBITRUM_FEE_RECIPIENT_ADDRESS, ARBITRUM_EXCHANGE_ADDRESS } from "./../constants";
+import wethContractABI from "lib/contracts/WETH.json";
+import { 
+  balanceBundlerAddress,
+  ARBITRUM_ADDRESSES
+} from "./../constants";
 
 export default class APIArbitrumProvider extends APIProvider {
 
@@ -79,7 +83,7 @@ export default class APIArbitrumProvider extends APIProvider {
 
     const allowance = await erc20Contract.allowance(
       this.accountState.address,
-      ARBITRUM_EXCHANGE_ADDRESS
+      ARBITRUM_ADDRESSES.EXCHANGE_ADDRESS
     );
 
     return ethers.BigNumber.from(allowance);
@@ -132,7 +136,7 @@ export default class APIArbitrumProvider extends APIProvider {
       makerAddress: this.accountState.address,
       makerToken: makerToken,
       takerToken: takerToken,
-      feeRecipientAddress: ARBITRUM_FEE_RECIPIENT_ADDRESS,
+      feeRecipientAddress: ARBITRUM_ADDRESSES.FEE_RECIPIENT_ADDRESS,
       makerAssetAmount:  makerAmountBN.toString(),
       takerAssetAmount: takerAmountBN.toString(),
       makerVolumeFee: '0',
@@ -209,9 +213,39 @@ export default class APIArbitrumProvider extends APIProvider {
     );
 
     await erc20Contract.approve(
-      ARBITRUM_EXCHANGE_ADDRESS,
+      ARBITRUM_ADDRESSES.EXCHANGE_ADDRESS,
       amountBN
     );
+
+    // update account balance
+    await this.api.getBalances();
+    return true;
+  };
+
+  warpETH = async (amountBN) => {
+    const signer = await this.api.rollupProvider.getSigner();
+    const wethContract = new ethers.Contract(
+      ARBITRUM_ADDRESSES.WETH_ADDRESS,
+      wethContractABI,
+      signer
+    );
+
+    await wethContract.deposit(amountBN);
+
+    // update account balance
+    await this.api.getBalances();
+    return true;
+  };
+
+  unWarpETH = async (amountBN) => {
+    const signer = await this.api.rollupProvider.getSigner();
+    const wethContract = new ethers.Contract(
+      ARBITRUM_ADDRESSES.WETH_ADDRESS,
+      wethContractABI,
+      signer
+    );
+
+    await wethContract.withdraw(amountBN);
 
     // update account balance
     await this.api.getBalances();

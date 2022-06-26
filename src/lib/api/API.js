@@ -830,6 +830,24 @@ export default class API extends Emitter {
     return this.apiProvider.approveExchangeContract(token, amount);
   }
 
+  warpETH = async (amount) => {
+    if(!amount) throw new Error('No amount set');
+    let amountBN = ethers.utils.parseEther(
+      amount.toFixed(18)
+    );
+
+    return this.apiProvider.warpETH(amountBN);
+  }
+
+  unWarpETH = async (amount) => {
+    if(!amount) throw new Error('No amount set');
+    let amountBN = ethers.utils.parseEther(
+      amount.toFixed(18)
+    );
+
+    return this.apiProvider.unWarpETH(amountBN);
+  }
+
   uploadArweaveFile = async (sender, timestamp, signature, file) => {
     const formData = new FormData();
     formData.append("sender", sender);
