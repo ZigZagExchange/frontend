@@ -290,6 +290,7 @@ export default class APIZKProvider extends APIProvider {
           (balance && currencyInfo && balance / 10 ** currencyInfo.decimals) ||
           0,
         allowance: MAX_ALLOWANCE,
+        allowanceReadable: 9007199254740991 // max save int
       };
     });
 

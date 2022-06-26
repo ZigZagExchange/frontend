@@ -85,30 +85,6 @@ export default class APIArbitrumProvider extends APIProvider {
     return ethers.BigNumber.from(allowance);
   };
 
-  settleOrderFill = (market, side, baseAmount, quoteAmount) => {
-    const marketInfo = this.api.marketInfo[market];
-    const [base, quote] = market.split('-');
-
-    if(side === 's') {
-      this.balances[base].valueReadable -= baseAmount;
-      this.balances[quote].valueReadable += quoteAmount;
-    } else {
-      this.balances[base].valueReadable += baseAmount;
-      this.balances[quote].valueReadable -= quoteAmount;
-    }
-
-    const newBaseAmountBn = ethers.utils.parseUnits(
-      (this.balances[base].valueReadable).toFixed(marketInfo.baseAsset.decimals),
-      marketInfo.baseAsset.decimals
-    );
-    const newQuoteAmountBn = ethers.utils.parseUnits(
-      (this.balances[quote].valueReadable).toFixed(marketInfo.quoteAsset.decimals),
-      marketInfo.quoteAsset.decimals
-    );
-    this.balances[base].value = newBaseAmountBn.toString();
-    this.balances[quote].value = newQuoteAmountBn.toSTring();
-  }
-  
   submitOrder = async (market, side, price, baseAmount, quoteAmount, orderType) => {
     const marketInfo = this.api.marketInfo[market];
 

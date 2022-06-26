@@ -143,13 +143,42 @@ export const apiSlice = createSlice({
                   }!`,
               }
             );
-            if(api.apiProvider.evmCompatible) {
-              api.apiProvider.settleOrderFill(
-                fillDetails[2], // market
-                fillDetails[3], // side
-                baseQuantity,
-                quoteQuantity
-              )
+
+            // update the balances of the user account
+            if(api.apiProvider.evmCompatible) {              
+              const marketInfo = api.api.marketInfo[market];
+              const [base, quote] = market.split('-');
+              const scope = makeScope(state);
+              const balances = state.balances[scope];
+              if(side === 's') {
+                balances[base].valueReadable -= baseAmount;
+                balances[quote].valueReadable += quoteAmount;
+                balances[base].allowanceReadable -= baseAmount;
+                
+                balances[base].allowance = ethers.utils.parseUnits(
+                  (balances[base].allowanceReadable).toFixed(marketInfo.baseAsset.decimals),
+                  marketInfo.baseAsset.decimals
+                ).toString();
+              } else {
+                balances[base].valueReadable += baseAmount;
+                balances[quote].valueReadable -= quoteAmount;
+                balances[quote].allowanceReadable -= quoteAmount;
+                
+                balances[quote].allowance = ethers.utils.parseUnits(
+                  (balances[quote].allowanceReadable).toFixed(marketInfo.quoteAsset.decimals),
+                  marketInfo.quoteAsset.decimals
+                ).toString();
+              }
+
+              balances[base].value = ethers.utils.parseUnits(
+                (balances[base].valueReadable).toFixed(marketInfo.baseAsset.decimals),
+                marketInfo.baseAsset.decimals
+              ).toString();
+              balances[quote].value = ethers.utils.parseUnits(
+                (balances[quote].valueReadable).toFixed(marketInfo.quoteAsset.decimals),
+                marketInfo.quoteAsset.decimals
+              ).toString();
+              state.balances[scope] = balances;
             }
           }
         }
