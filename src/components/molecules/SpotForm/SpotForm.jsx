@@ -140,41 +140,10 @@ export class SpotForm extends React.Component {
   }
 
   async approveHandler(e) {
-    let baseAmount, quoteAmount;
-    if (typeof this.state.baseAmount === "string") {
-      baseAmount = parseFloat(this.state.baseAmount.replace(",", "."));
-    } else {
-      baseAmount = this.state.baseAmount;
-    }
-    if (typeof this.state.quoteAmount === "string") {
-      quoteAmount = parseFloat(this.state.quoteAmount.replace(",", "."));
-    } else {
-      quoteAmount = this.state.quoteAmount;
-    }
-
-    quoteAmount = isNaN(quoteAmount) ? 0 : quoteAmount
-    baseAmount = isNaN(baseAmount) ? 0 : baseAmount
-    if (!baseAmount && !quoteAmount) {
-      toast.error("No amount available", {
-        toastId: 'No amount available',
-      });
-      return;
-    }
-
     const marketInfo = this.props.marketInfo;
-    let token, amount;
-    if (this.props.side === "s") {
-      amount = baseAmount ? baseAmount : (quoteAmount / price);
-      token = marketInfo.baseAsset.symbol;
-    } else if (this.props.side === "b") {
-      amount = quoteAmount ? quoteAmount : (baseAmount * price);
-      token = marketInfo.quoteAsset.symbol;
-    } else {
-      toast.error("Bad side", {
-        toastId: 'Bad side',
-      });
-      return;
-    }
+    const token = (this.props.side === "s")
+      ? marketInfo.baseAsset.symbol
+      : marketInfo.quoteAsset.symbol;    
 
     let newstate = { ...this.state };
     newstate.orderButtonDisabled = true;
@@ -188,7 +157,7 @@ export class SpotForm extends React.Component {
     try {
       await api.approveExchangeContract(
         token,
-        amount
+        0 // amount = 0 ==> MAX_ALLOWANCE
       );
     } catch (e) {
       console.log(e);
@@ -595,16 +564,18 @@ export class SpotForm extends React.Component {
       quoteBalance = 0;
     }
 
+    const baseSymbol = marketInfo?.baseAsset?.symbol ? marketInfo.baseAsset.symbol : '';
+    const quoteSymbol = marketInfo?.quoteAsset?.symbol ? marketInfo.quoteAsset.symbol : '';
     const balanceHtml =
       this.props.side === "b" ? (
         <strong>
           {Number(quoteBalance).toPrecision(8)}{" "}
-          {marketInfo && marketInfo.quoteAsset?.symbol}
+          {quoteSymbol}
         </strong>
       ) : (
         <strong>
           {Number(baseBalance).toPrecision(8)}{" "}
-          {marketInfo && marketInfo.baseAsset?.symbol}
+          {baseSymbol}
         </strong>
       );
 
@@ -612,18 +583,18 @@ export class SpotForm extends React.Component {
     if (this.props.side === "b") {
       buySellBtnClass = "bg_btn buy_btn";
       if (quoteAmount > quoteAllowance)  {
-        buttonText = `Approve ${marketInfo.quoteAsset.symbol}`;
+        buttonText = `Approve ${quoteSymbol}`;
         approveNeeded = true;
       } else {
-        buttonText = `BUY ${marketInfo.quoteAsset.symbol}`;
+        buttonText = `BUY ${baseSymbol}`;
       }
     } else if (this.props.side === "s") {
       buySellBtnClass = "bg_btn sell_btn";
       if (baseAmount > baseAllowance)  {
-        buttonText = `Approve ${marketInfo.baseAsset.symbol}`;
+        buttonText = `Approve ${baseSymbol}`;
         approveNeeded = true;
       } else {
-        buttonText = `BUY ${marketInfo.baseAsset.symbol}`;
+        buttonText = `SELL ${baseSymbol}`;
       }
     }
 
@@ -646,7 +617,7 @@ export class SpotForm extends React.Component {
               disabled={this.priceIsDisabled()}
             />
             <span className={this.priceIsDisabled() ? "text-disabled" : ""}>
-              {marketInfo && marketInfo.quoteAsset.symbol}
+              {quoteSymbol}
             </span>
           </div>
           <div className="spf_input_box">
@@ -657,7 +628,7 @@ export class SpotForm extends React.Component {
               placeholder="0.00"
               onChange={this.updateAmount.bind(this)}
             />
-            <span>{marketInfo && marketInfo.baseAsset.symbol}</span>
+            <span>{baseSymbol}</span>
           </div>
           <div className="spf_range">
             <RangeSlider
@@ -672,7 +643,7 @@ export class SpotForm extends React.Component {
                 <strong>
                   <>
                     {(this.currentPrice() * this.state.baseAmount).toPrecision(6)}{" "}
-                    {marketInfo && marketInfo.quoteAsset.symbol}
+                    {quoteSymbol}
                   </>
                 </strong>
               </div>

@@ -53,7 +53,7 @@ export default class APIArbitrumProvider extends APIProvider {
         ? ethers.utils.formatUnits(balanceBN.toString(), currencyInfo.decimals)
         : 0 
       const allowanceReadable = (allowanceBN && currencyInfo)
-        ? ethers.utils.formatUnits(balanceBN.toString(), currencyInfo.decimals)
+        ? ethers.utils.formatUnits(allowanceBN.toString(), currencyInfo.decimals)
         : 0 
 
       balances[tokens[i]] = {
@@ -192,13 +192,9 @@ export default class APIArbitrumProvider extends APIProvider {
     const signer = await this.api.rollupProvider.getSigner();
     const signature = await signer._signTypedData(domain, types, Order);
 
-    Order.signature = signature;
-    console.log(Order)
-    
-    
+    Order.signature = signature;    
     this.api.send("submitorder3", [this.network, market, Order]);
-    return Order;
-    
+    return Order;    
   }
 
   signIn = async () => {
@@ -229,17 +225,20 @@ export default class APIArbitrumProvider extends APIProvider {
       );
     }
 
+    const signer = await this.api.rollupProvider.getSigner();
     const erc20Contract = new ethers.Contract(
       currencyInfo.address,
       erc20ContractABI,
-      this.api.rollupProvider
+      signer
     );
 
     await erc20Contract.approve(
       ARBITRUM_EXCHANGE_ADDRESS,
-      amount
+      amountBN
     );
 
+    // update account balance
+    await this.api.getBalances();
     return true;
   };
 }
