@@ -415,8 +415,8 @@ const Bridge = (props) => {
           ]);
           setL1Fee(L1res);
           setL2Fee(swapDetails, L2res.amount, L2res.feeToken);
-          setZigZagFeeToken(L2res.feeToken);
-          setZigZagFee(L2res.amount * 3);
+          setZigZagFeeToken('ETH');
+          setZigZagFee(L1res * 3);
         } else {
           let res = await api.withdrawL2GasFee(swapDetails.currency);
           setL1Fee(null);
