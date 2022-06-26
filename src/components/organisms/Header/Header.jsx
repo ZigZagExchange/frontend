@@ -138,17 +138,15 @@ export const Header = (props) => {
                     List Pair
                   </NavLink>
                 </li>
-                {hasBridge && (
-                  <li>
-                    <a
-                      href="https://docs.zigzag.exchange/"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Docs <HiExternalLink />
-                    </a>
-                  </li>
-                )}
+                <li>
+                  <a
+                    href="https://docs.zigzag.exchange/"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Docs <HiExternalLink />
+                  </a>
+                </li>
                 
                 <Dev>
                   <li>
