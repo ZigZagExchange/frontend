@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { toast } from "react-toastify";
 import api from "lib/api";
 import { RangeSlider, QuestionHelper } from "components";
-import { formatPrice } from "lib/utils";
+import { formatPrice, formatToken } from "lib/utils";
 import "./SpotForm.css";
 import { Button, ConnectWalletButton } from "components/molecules/Button";
 import InputField from "components/atoms/InputField/InputField";
@@ -684,7 +684,7 @@ export class SpotForm extends React.Component {
         color="foregroundMediumEmphasis"
         textAlign="right"
       >
-        {quoteBalance.toPrecision(8)}{" "}
+        {formatToken(quoteBalance)}{" "}
         {marketInfo && marketInfo.quoteAsset?.symbol}
       </Text>
     );
@@ -695,8 +695,7 @@ export class SpotForm extends React.Component {
         color="foregroundMediumEmphasis"
         textAlign="right"
       >
-        {baseBalance.toPrecision(8)}{" "}
-        {marketInfo && marketInfo.baseAsset?.symbol}
+        {formatToken(baseBalance)} {marketInfo && marketInfo.baseAsset?.symbol}
       </Text>
     );
 
@@ -767,7 +766,7 @@ export class SpotForm extends React.Component {
               })`}
               value={
                 this.state.userHasEditedPrice
-                  ? this.state.price
+                  ? formatToken(this.state.price)
                   : this.currentPrice()
               }
               onChange={this.updatePrice.bind(this)}
@@ -795,7 +794,7 @@ export class SpotForm extends React.Component {
               placeholder={`Amount (${
                 marketInfo && marketInfo.baseAsset?.symbol
               })`}
-              value={this.state.baseAmount}
+              value={formatToken(this.state.baseAmount)}
               onChange={this.updateAmount.bind(this)}
             />
             <IconButton
@@ -831,7 +830,7 @@ export class SpotForm extends React.Component {
               placeholder={`Total (${
                 marketInfo && marketInfo.quoteAsset?.symbol
               })`}
-              value={this.state.totalAmount}
+              value={formatToken(this.state.totalAmount)}
               onChange={this.updateTotalAmount.bind(this)}
             />
             {/* <IconButton variant="secondary" startIcon={<PlusIcon />}></IconButton> */}
