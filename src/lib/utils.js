@@ -14,6 +14,10 @@ export function formatUSD(floatNum) {
   return num.join(".");
 }
 
+export function formatToken(floatNum, decimalPoints = 2) {
+  return floatNum === "" ? "" : parseFloat(floatNum).toFixed(decimalPoints);
+}
+
 export function formatAmount(amount, currency) {
   return parseFloat(amount / Math.pow(10, currency.decimals)).toFixed(
     Math.min(5, currency.decimals)
