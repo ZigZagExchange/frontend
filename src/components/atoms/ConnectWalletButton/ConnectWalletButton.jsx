@@ -23,7 +23,12 @@ const ConnectWalletButton = (props) => {
 
   const pushToBridgeMaybe = async (state) => {
     const walletBalance = formatAmount(state.committed.balances['ETH'], { decimals: 18 });
-    const activationFee = await api.apiProvider.changePubKeyFee('ETH');
+    let activationFee;
+    if (api.apiProvider.changePubKeyFee) {
+        activationFee = await api.apiProvider.changePubKeyFee('ETH');
+    } else {
+        activationFee = 0;
+    }
 
     if (!state.id && (!/^\/bridge(\/.*)?/.test(location.pathname)) && (isNaN(walletBalance) || walletBalance < activationFee)) {
       history.push("/bridge");
