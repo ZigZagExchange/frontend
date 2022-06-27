@@ -7,7 +7,7 @@ import { getLayout } from "lib/helpers/storage/layouts";
 const makeScope = (state) => `${state.network}-${state.userId}`;
 
 const initialUISettings = {
-  showNightPriceChange: true,
+  showNightPriceChange: false,
   showCancelOrders: false,
   disableOrderNotification: false,
   stackOrderbook: true,

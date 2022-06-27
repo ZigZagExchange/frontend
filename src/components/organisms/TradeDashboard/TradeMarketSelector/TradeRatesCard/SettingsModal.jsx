@@ -104,17 +104,6 @@ const SettingsModal = ({ onDismiss }) => {
       <ModalBody>
         <ToggleWrapper>
           <Toggle
-            isChecked={settings.showNightPriceChange}
-            scale="md"
-            onChange={toggle}
-            settingKey="showNightPriceChange"
-          />
-          <Text font="primarySmall" color="foregroundHighEmphasis">
-            Show price change since midnight UTC instead of 24h change
-          </Text>
-        </ToggleWrapper>
-        <ToggleWrapper>
-          <Toggle
             isChecked={settings.showCancelOrders}
             scale="md"
             onChange={toggle}
@@ -122,28 +111,6 @@ const SettingsModal = ({ onDismiss }) => {
           />
           <Text font="primarySmall" color="foregroundHighEmphasis">
             Cancel all orders button enabled
-          </Text>
-        </ToggleWrapper>
-        <ToggleWrapper>
-          <Toggle
-            isChecked={settings.disableOrderNotification}
-            scale="md"
-            onChange={toggle}
-            settingKey="disableOrderNotification"
-          />
-          <Text font="primarySmall" color="foregroundHighEmphasis">
-            Disable order notifications (pending/placed/filled/cancelled)
-          </Text>
-        </ToggleWrapper>
-        <ToggleWrapper>
-          <Toggle
-            isChecked={settings.stackOrderbook}
-            scale="md"
-            onChange={toggle}
-            settingKey="stackOrderbook"
-          />
-          <Text font="primarySmall" color="foregroundHighEmphasis">
-            Stack orderbooks
           </Text>
         </ToggleWrapper>
         <ToggleWrapper>
@@ -170,6 +137,17 @@ const SettingsModal = ({ onDismiss }) => {
         </ToggleWrapper>
         <ToggleWrapper>
           <Toggle
+            isChecked={settings.disableOrderNotification}
+            scale="md"
+            onChange={toggle}
+            settingKey="disableOrderNotification"
+          />
+          <Text font="primarySmall" color="foregroundHighEmphasis">
+            Disable order notifications (pending/placed/filled/cancelled)
+          </Text>
+        </ToggleWrapper>
+        <ToggleWrapper>
+          <Toggle
             isChecked={settings.hideAddress}
             scale="md"
             onChange={toggle}
@@ -188,6 +166,28 @@ const SettingsModal = ({ onDismiss }) => {
           />
           <Text font="primarySmall" color="foregroundHighEmphasis">
             Hide balances
+          </Text>
+        </ToggleWrapper>
+        <ToggleWrapper>
+          <Toggle
+            isChecked={settings.showNightPriceChange}
+            scale="md"
+            onChange={toggle}
+            settingKey="showNightPriceChange"
+          />
+          <Text font="primarySmall" color="foregroundHighEmphasis">
+            Show price change since midnight UTC instead of 24h change
+          </Text>
+        </ToggleWrapper>
+        <ToggleWrapper>
+          <Toggle
+            isChecked={settings.stackOrderbook}
+            scale="md"
+            onChange={toggle}
+            settingKey="stackOrderbook"
+          />
+          <Text font="primarySmall" color="foregroundHighEmphasis">
+            Stack orderbooks
           </Text>
         </ToggleWrapper>
         <ResetAllSettingsWrapper onClick={resetSettings}>
