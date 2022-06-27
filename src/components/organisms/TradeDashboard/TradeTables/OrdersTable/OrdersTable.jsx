@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
+
 import "./OrdersTable.css";
 import { useCoinEstimator } from "components";
 import styled from "styled-components";
 import loadingGif from "assets/icons/loading.svg";
+
+import FillCard from "./FillCard";
 import {
   balancesSelector,
   networkSelector,
@@ -14,6 +17,7 @@ import api from "lib/api";
 import { formatDate, formatDateTime } from "lib/utils";
 import { Tab } from "components/molecules/TabMenu";
 import Text from "components/atoms/Text/Text";
+
 import {
   SortUpIcon,
   SortDownIcon,
@@ -153,9 +157,10 @@ export default function OrdersTable(props) {
 
   const filterSmallBalances = (currency) => {
     const balance = wallet[currency].valueReadable;
-    const usd_balance = coinEstimator(currency) * wallet[currency].valueReadable;
+    const usd_balance =
+      coinEstimator(currency) * wallet[currency].valueReadable;
 
-    if(usd_balance < 0.02) return false;
+    if (usd_balance < 0.02) return false;
 
     if (balance) {
       return Number(balance) > 0;
@@ -167,9 +172,9 @@ export default function OrdersTable(props) {
   const filterSmallBalancesForBalancesTable = (item) => {
     const balance = item.valueReadable;
     const usd_balance = coinEstimator(item.token) * item.valueReadable;
-    console.log(usd_balance)
+    console.log(usd_balance);
 
-    if(usd_balance < 0.02) return false;
+    if (usd_balance < 0.02) return false;
 
     if (balance) {
       return Number(balance) > 0;
@@ -181,8 +186,10 @@ export default function OrdersTable(props) {
   const sortByToken = () => {
     let walletArray = [...walletList];
     const toggled = !tokenDirection;
-    const filteredArray = walletArray.filter(filterSmallBalancesForBalancesTable)
-    walletArray = filteredArray
+    const filteredArray = walletArray.filter(
+      filterSmallBalancesForBalancesTable
+    );
+    walletArray = filteredArray;
     walletArray.sort((a, b) => {
       if (toggled) {
         return a["token"] > b["token"] ? 1 : -1;
@@ -200,8 +207,10 @@ export default function OrdersTable(props) {
   const sortByBalance = () => {
     let walletArray = [...walletList];
     const toggled = !balanceDirection;
-    const filteredArray = walletArray.filter(filterSmallBalancesForBalancesTable)
-    walletArray = filteredArray
+    const filteredArray = walletArray.filter(
+      filterSmallBalancesForBalancesTable
+    );
+    walletArray = filteredArray;
     walletArray.sort((a, b) => {
       const notionalCur1 = coinEstimator(a["token"]) * a["valueReadable"];
       const notionalCur2 = coinEstimator(b["token"]) * b["valueReadable"];
@@ -238,6 +247,20 @@ export default function OrdersTable(props) {
     } catch (e) {
       toast.error(e.message);
     }
+  };
+
+  const onClickOrder = (fill) => {
+    toast(
+      ({ closeToast }) => <FillCard closeToast={closeToast} fill={fill} />,
+      {
+        className: "fillToastCard",
+        bodyClassName: "!p-0",
+        closeOnClick: false,
+        autoClose: false,
+        icon: false,
+        closeButton: false,
+      }
+    );
   };
 
   const renderOrderTable = (orders) => {
@@ -1296,12 +1319,12 @@ export default function OrdersTable(props) {
                   </Text>
                 </td>
                 <td data-label="TradeID">
-                  <Text
-                    font="primaryExtraSmallSemiBold"
-                    color="foregroundHighEmphasis"
+                  <button
+                    className="text-xs font-semibold text-primary-900 hover:underline hover:underline-offset-1 font-work"
+                    onClick={() => onClickOrder(fill)}
                   >
-                    &nbsp;
-                  </Text>
+                    #{fillid}
+                  </button>
                 </td>
                 <td data-label="Action">
                   {txhash ? (
