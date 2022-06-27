@@ -20,10 +20,11 @@ export const ChartHeaderItem = styled.div`
     display: flex;
     flex-direction: row;
     flex-wrap: no-wrap;
-    padding: 8px 16px;
     min-width: 95px;
+    height: 39px;
     justify-content: space-between;
     align-items: center;
+    padding: 8px 16px;
     border-left: 1px solid rgba(250, 250, 250, .1);
     -webkit-touch-callout: none;
     -webkit-user-select: none;

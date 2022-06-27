@@ -3,6 +3,7 @@ import { binanceFetcher } from "./binance.fetch";
 import { coinbaseFetcher } from "./coinbase.fetch";
 import { coinexFetcher } from "./coinex.fetch";
 import { ftxFetcher } from "./ftx.fetch";
+import { kucoinFetcher } from "./kucoin.fetch";
 
 // fetchers, do any pair manipulating inside of here
 export const fetcher = async (pair, interval, exchange) => {
@@ -32,6 +33,14 @@ export const fetcher = async (pair, interval, exchange) => {
             formattedPair = _p[0] + "/" + _p[1];
             formattedInterval = formatCoinbaseInterval(interval);
             fnc = ftxFetcher;
+            break;
+        case "kucoin":
+            if(pair.length === 8) _p = pair.match(/.{1,4}/g);
+            if(pair.length === 6) _p = pair.match(/.{1,3}/g);
+
+            formattedPair = _p[0] + "/" + _p[1];
+            formattedInterval = formatCoinexInterval(interval);
+            fnc = kucoinFetcher;
             break;
         case "binance":
         default:

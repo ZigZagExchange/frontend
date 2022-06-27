@@ -31,10 +31,10 @@ const coinbaseListener = (
         let candle = coinbaseSocketAdaptor(transformedData);
 
         //set candle OHLC correctly
-        const product = await getCoinbaseProduct(dependencies.productIds[0]);
-        candle.high = product.high;
-        candle.open = product.open;
-        console.log("product:", product, candle);
+        //const product = await getCoinbaseProduct(dependencies.productIds[0]);
+        //candle.high = product.high;
+        //candle.open = product.open;
+        //console.log("product:", product, candle);
 
         //add candle
         fnc(candle);

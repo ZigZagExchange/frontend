@@ -13,7 +13,6 @@ const ChartContainer = styled.div`
   flex-direction: column;
   flex: 1;
   background: #131722;
-  border: 1px solid rgba(250, 250, 250, .15);
 `;
 
 class ErrorBoundary extends React.Component {
@@ -58,26 +57,13 @@ class ErrorBoundary extends React.Component {
 
 const TradeChart = (({
   marketInfo,  
-  pair, exchange
+  pair,
+  exchange,
+  interval,
+  setInterval,
+  intervals,
 }) => {
   const [error, setError] = useState(undefined);
-
-  const [interval, setInterval] = useState('1h');
-  const intervals = [
-    {value: undefined, string: 'MINUTES'},
-    {value: '1m', string: '1 Minute'},
-    {value: '3m', string: '3 Minutes'},
-    {value: '5m', string: '5 Minutes'},
-    {value: '15m', string: '15 Minutes'},
-    {value: '30m', string: '30 Minutes'},
-    {value: undefined, string: 'HOURS'},
-    {value: '1h', string: 'Hourly'},
-    {value: '4h', string: '4 Hours'},
-    {value: undefined, string: 'DAYS'},
-    {value: '1d', string: 'Daily'},
-    {value: '1w', string: 'Weekly'},
-    {value: '1M', string: 'Monthly'},
-  ];
   
   const [candleData, setData] = useState(undefined);
   const [updateData, setUpdateData] = useState(undefined);
@@ -141,7 +127,6 @@ const TradeChart = (({
     switch(exchange.toLowerCase()){
 
       case "coinbase":
-        //setError({message: "Not implemented"});
         var _p;
         if(pair.length === 8) _p = pair.match(/.{1,4}/g);
         if(pair.length === 6) _p = pair.match(/.{1,3}/g);
@@ -154,14 +139,11 @@ const TradeChart = (({
         console.log("set listener", dependencies);
         break;
       case "coinex":
-        //setError({message: "Not implemented"});
         break;
       case "ftx":
-        //setError({message: "Not implemented"});
         break;
       case "kucoin":
-          //setError({message: "Not implemented"});
-          break;
+        break;
       case "binance":
       default:
         formattedInterval = interval;
