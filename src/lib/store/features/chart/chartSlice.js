@@ -14,8 +14,12 @@ export const chartSlice = createSlice({
         playSound: false,
       },
       background: {
-        background: {
-          gradient: false,
+        gradient: false,
+        color: {
+          r: 19,
+          g: 23,
+          b: 34,
+          a: 1
         },
         watermark: {
           enabled: true,
@@ -33,10 +37,30 @@ export const chartSlice = createSlice({
       state.interval = "1d";
       state.favouriteIntervals = [];
     },
-    updateInterval(state, payload ){
+    resetTrading(state) {
+      state.settings.trading = {
+        showOrders: true,
+        showExecutions: true,
+        extendLines: true,
+        playSound: false,
+      }
+    },
+    resetBackground(state){
+      state.settings.background = {
+        gradient: false,
+        color: {
+          r: 19,
+          g: 23,
+          b: 34,
+          a: 1,
+        },
+      }
+    },
+
+    updateInterval(state, { payload } ){
       return {
         ...state,
-        interval: payload.payload,
+        interval: payload,
       };
     },
     addFavouriteInterval(state, { payload } ){
@@ -56,32 +80,56 @@ export const chartSlice = createSlice({
           ...payload, 
         }
       };
-      console.log(newState);
-      state.settings = newState;
-    }
-  },
-  setTradingSetting(state, payload ){
-    console.log("payload: ", payload);
-    return {
-      ...state,
-      settings: {
-        ...state.settings,
-        trading: {
-          ...state.settings.trading,
-          ...payload,
-        }
-      }
-    };
-  },
+      state = newState;
+      return state;
+    },
+    setTradingSetting(state, { payload } ){
+      const newState = {
+        ...state,
+        settings: {
+          ...state.settings,
+          trading: {
+            ...state.settings.trading,
+            ...payload,
 
+          },
+        },
+      };
+
+      state = newState;
+      return state;
+    },
+    setBackgroundSetting(state, { payload } ){
+      const newState = {
+        ...state,
+        settings: {
+          ...state.settings,
+          background: {
+            ...state.settings.background,
+            ...payload,
+
+          },
+        },
+      };
+
+      state = newState;
+      return state;
+    },
+
+
+  },
 });
 
 export const {
   resetData,
+  resetTrading,
+  resetBackground,
+
   updateInterval,
   addFavouriteInterval,
   setSetting,
-  setTradingSetting
+  setTradingSetting,
+  setBackgroundSetting
 } = chartSlice.actions;
 
 export const tradingSettingsSelector = (state) => state.chart.settings.trading;

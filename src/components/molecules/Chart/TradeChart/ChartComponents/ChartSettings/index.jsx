@@ -2,13 +2,13 @@ import { useRef, useState } from "react";
 import styled from "styled-components";
 import { useHandleClickOutside } from "../../ChartUtils/helpers";
 import { ChartHeaderItem } from "../ChartHeader";
-import { ChartDropdown, ChartDropdownContent } from "../ChartDropdown";
-import Draggable from "components/atoms/Draggable";
+import { ChartDropdownContent } from "../ChartDropdown";
 import TradingSettings from "./TradingSettings";
 import TimezoneSettings from "./TimezoneSettings";
 import BackgroundSettings from "./BackgroundSettings";
 import { BiX } from "react-icons/bi";
 import { HiCog } from "react-icons/hi";
+import Draggable from 'react-draggable';
 
 const Settings = styled.div`
     min-width: 400px;
@@ -26,13 +26,12 @@ const SettingsHeader = styled.div`
     align-items: center;
     padding: 8px 8px;
     cursor: grab;
-    -webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none; /* Safari */
-     -khtml-user-select: none; /* Konqueror HTML */
-       -moz-user-select: none; /* Old versions of Firefox */
-        -ms-user-select: none; /* Internet Explorer/Edge */
-            user-select: none; /* Non-prefixed version, currently
-                                  supported by Chrome, Edge, Opera and Firefox */
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 `;
 const HeaderItem = styled.div`
     flex: 1;
@@ -93,10 +92,10 @@ const ChartSettings = () => {
 
         </ChartHeaderItem>
              {/* dropdown */}
-             <ChartDropdown ref={ref}>
-                <Draggable initialPos={{x: -614, y: 100}} >
-                    <ChartDropdownContent display={show} position='left'>
-                        <Settings>
+             <Draggable bounds="body"  handle="span">
+                <ChartDropdownContent display={show}  ref={ref}>
+                    <Settings>
+                        <span>
                             <SettingsHeader >
                                 <h5>Trading Settings</h5>
 
@@ -107,21 +106,21 @@ const ChartSettings = () => {
                                     <BiX size="25"/>
                                 </SettingsExit>
                             </SettingsHeader>
-                                <Tabs>
-                                    {headerItems.map((item, key) => (
-                                        <HeaderItem key={key}
-                                            selected={tab === item.title}
-                                            onClick={() => setTab(item.title)}>
-                                            {item.title}
-                                        </HeaderItem>
-                                    ))}
-                                </Tabs>
+                        </span>
+                        <Tabs>
+                            {headerItems.map((item, key) => (
+                                <HeaderItem key={key}
+                                    selected={tab === item.title}
+                                    onClick={() => setTab(item.title)}>
+                                    {item.title}
+                                </HeaderItem>
+                            ))}
+                        </Tabs>
 
-                            <SettingsContent>{content[0].component}</SettingsContent>
-                        </Settings>
-                    </ChartDropdownContent>
-                </Draggable>
-            </ChartDropdown>
+                        <SettingsContent>{content[0].component}</SettingsContent>
+                    </Settings>
+                </ChartDropdownContent>
+            </Draggable>
         </>
     );
 }

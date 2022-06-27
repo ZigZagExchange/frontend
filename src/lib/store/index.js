@@ -45,7 +45,7 @@ const authPersistConfig = {
 
 const chartPersistConfig = {
   key: "chart",
-  whitelist: ['interval', 'favouriteIntervals'],
+  whitelist: ['interval', 'favouriteIntervals', 'settings'],
   storage,
 }
 

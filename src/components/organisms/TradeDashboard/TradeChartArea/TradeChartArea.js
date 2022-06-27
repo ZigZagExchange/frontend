@@ -4,6 +4,7 @@ import TradeChart from "components/molecules/Chart/TradeChart/TradeChart";
 import { ChartLoaderSpinner } from "components/molecules/Chart/TradeChart/ChartComponents/ChartLoaderSpinner";
 import { useDispatch, useSelector } from "react-redux";
 import { intervalSelector, updateInterval } from "lib/store/features/chart/chartSlice";
+import { userFillsSelector, userOrdersSelector } from "lib/store/features/api/apiSlice";
 
 const StyledTradeChart = styled.section`
   display: flex;
@@ -15,6 +16,8 @@ const StyledTradeChart = styled.section`
 
 export default function TradeChartArea({marketInfo}) {
   const dispatch = useDispatch();
+  const userOrders = useSelector(userOrdersSelector);
+  const userFills = useSelector(userFillsSelector);
   const interval = useSelector(intervalSelector);
   const setInterval = (value) => {
     dispatch(updateInterval(value));
@@ -46,6 +49,8 @@ export default function TradeChartArea({marketInfo}) {
     <StyledTradeChart>
         <TradeChart
           marketInfo={marketInfo} 
+          userOrders={userOrders}
+          userFills={userFills}
           pair={pair}
           exchange={exchange}
           interval={interval}

@@ -10,6 +10,9 @@ import binanceListener from "./ChartUtils/listeners/binance.listen";
 
 import { fetcher } from "./ChartUtils/fetchers";
 import { candleStickFormatter } from "./ChartUtils/formatters";
+import { useSelector } from "react-redux";
+import { chartSettingsSelector } from "lib/store/features/chart/chartSlice";
+import { darkTheme } from "./themes";
 
 const ChartContainer = styled.div`
   display: flex;
@@ -17,6 +20,7 @@ const ChartContainer = styled.div`
   flex: 1;
   background: #131722;
 `;
+
 class ErrorBoundary extends React.Component {
   constructor(props){
     super(props);
@@ -57,7 +61,9 @@ class ErrorBoundary extends React.Component {
 }
 
 const TradeChart = (({
-  marketInfo,  
+  marketInfo,
+  userOrders,
+  userFills, 
   pair,
   exchange,
   interval,
@@ -65,7 +71,15 @@ const TradeChart = (({
   intervals,
 }) => {
   const [error, setError] = useState(undefined);
-  
+  const chartLayout = darkTheme.chartLayout;
+  const settings = useSelector(chartSettingsSelector);
+
+
+  //chart color
+  const background = settings.background.color;
+  chartLayout.layout.backgroundColor = `rgba(${background.r},${background.g},${background.b},${background.a})`;
+
+  //data
   const [candleData, setData] = useState(undefined);
   const [updateData, setUpdateData] = useState(undefined);
 
@@ -136,7 +150,7 @@ const TradeChart = (({
         if(pair.length === 8) _p = pair.match(/.{1,4}/g);
         if(pair.length === 7) _p = pair.match(/.{1,4}/g);
         if(pair.length === 6) _p = pair.match(/.{1,3}/g);
-        
+
         console.log("pair", _p);
         //pair not found
         if(!_p) return; 
@@ -219,7 +233,9 @@ const TradeChart = (({
         <ChartView
           initialChartData={candleData}
           updateData={updateData}
-
+          orders={userOrders} userFills={userFills}
+          marketAlias={marketInfo.alias}
+          chartLayout={chartLayout}
           legends={legends}
           candleStickConfig={{
             priceFormat: {

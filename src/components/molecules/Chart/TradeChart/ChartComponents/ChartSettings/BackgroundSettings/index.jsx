@@ -1,9 +1,8 @@
 import { RgbaColorPicker } from "react-colorful";
 import { Checkbox } from "@material-ui/core";
 import styled from "styled-components";
-import { useState } from "react";
-import { useSelector } from "react-redux";
-import { chartSettingsSelector } from "lib/store/features/chart/chartSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { chartSettingsSelector, resetBackground, setBackgroundSetting } from "lib/store/features/chart/chartSlice";
 
 const Item = styled.div`
     display: flex;
@@ -41,15 +40,30 @@ const ResetButton = styled.div`
 `;
 
 const BackgroundSettings = () => {
-    const [color, setColor] = useState({ r: 200, g: 150, b: 35, a: 0.5 });
+    const dispatch = useDispatch();
+    const color = useSelector(chartSettingsSelector).background.color;
     const settings = useSelector(chartSettingsSelector);
 
+    const updateSetting = (payload) => {
+        let p = {
+            [payload.type]: payload.value
+        };
+        console.log("updating setting:" , p);
+        dispatch(setBackgroundSetting(p));
+        return payload.value;
+    }
+    
     return (
         <Items>
             {/* orders */}
             <Items>
                 <Item>
-                    <Checkbox color="primary" checked={settings.background.gradient} />Background gradient
+                    <Checkbox
+                        color="primary" 
+                        onChange={(e) => updateSetting({ type: 'gradient', value: !settings.background.gradient})}
+                        checked={settings.background.gradient}
+                    />
+                    Background gradient
                 </Item>
                 <Items>
                     <Item>
@@ -58,11 +72,13 @@ const BackgroundSettings = () => {
                            height: '100%',
                            margin: '20px',
                            padding: '4px',
-
                            background: `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`,
                         }}>Color</div>
                     </Item>
-                    <Item><RgbaColorPicker color={color} onChange={setColor} /></Item>
+                    <Item><RgbaColorPicker color={color} onChange={(color) => {
+                        updateSetting({type: 'color', value: color});
+                        console.log(color);
+                    }} /></Item>
                 </Items>
             </Items>
             <Item>
@@ -80,7 +96,7 @@ const BackgroundSettings = () => {
 
             {/* reset */}
             <Item>
-                <ResetButton>Defaults</ResetButton>
+                <ResetButton onClick={() => {dispatch(resetBackground());}}>Reset</ResetButton>
             </Item>
         </Items>
     );

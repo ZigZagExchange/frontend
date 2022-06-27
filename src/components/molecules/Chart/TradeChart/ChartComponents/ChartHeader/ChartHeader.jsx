@@ -1,6 +1,6 @@
 import api from "lib/api";
 import styled from "styled-components";
-//import ChartSettings from "../ChartSettings/index.js";
+import ChartSettings from "../ChartSettings";
 import { IntervalSwitch } from "../IntervalSwitch";
 
 const ChartHeaderContainer = styled.div`
@@ -67,11 +67,9 @@ export const ChartHeader = ({
                         setInterval={setInterval}
                     />
                 </ChartHeaderContainer>
-                {/*
                 <ChartHeaderContainer>
                     <ChartSettings/>
                 </ChartHeaderContainer>
-                */}
             </ChartHeaderItems>
         </ChartHeaderContainer>
     );

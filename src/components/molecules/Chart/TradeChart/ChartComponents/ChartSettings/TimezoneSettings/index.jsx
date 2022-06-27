@@ -50,7 +50,7 @@ const TimezoneSettings = () => {
 
             {/* reset */}
             <Item>
-                <ResetButton>Defaults</ResetButton>
+                <ResetButton>Reset</ResetButton>
             </Item>
         </Items>
     );

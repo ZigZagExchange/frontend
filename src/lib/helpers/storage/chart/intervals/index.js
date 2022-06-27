@@ -1,7 +1,7 @@
-import ftxIntervals from '../intervals/ftx';
-import binanceIntervals from '../intervals/binance';
-import coinbaseIntervals from '../intervals/coinbase';
-import coinexIntervals from '../intervals/coinex';
+import ftxIntervals from './ftx';
+import binanceIntervals from './binance';
+import coinbaseIntervals from './coinbase';
+import coinexIntervals from './coinex';
 
 //get intervals formatted to the corresponding exchange's usage
 const getIntervals = (exchange) => {
