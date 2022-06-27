@@ -17,7 +17,6 @@ const ModalOverlay = styled.div`
 const Modal = styled.div`
   max-width: ${({ width }) => `${width}px`};
   width: 100%;
-  height: ${({ height }) => `${height}px`};
   background: ${({ theme }) => theme.colors.backgroundHighEmphasis};
   border: 1px solid ${({ theme }) => theme.colors.foreground400};
   box-shadow: 0px 8px 16px 0px #0101011a;
@@ -43,7 +42,6 @@ const CloseButton = styled.button`
 
 const GenericModal = ({
   width = 528,
-  height = 402,
   isOpened = false,
   onClose,
   children,
@@ -54,7 +52,6 @@ const GenericModal = ({
       <ModalOverlay onClick={onClose}>
         <Modal
           width={width}
-          height={height}
           {...props}
           onClick={(e) => e.stopPropagation()}
         >
