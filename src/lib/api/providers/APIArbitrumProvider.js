@@ -130,7 +130,7 @@ export default class APIArbitrumProvider extends APIProvider {
     }
 
     const expirationTimeSeconds = (orderType === 'market')
-      ? Date.now() / 1000 + 60 // one minute
+      ? Date.now() / 1000 + 60 * 2 // two minutes
       : Date.now() / 1000 + 60 * 60 * 24 * 7 // one week
 
     const Order = {

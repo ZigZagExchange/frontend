@@ -318,7 +318,7 @@ export class SpotForm extends React.Component {
         return;
       }
 
-      if (quoteAmount && quoteAmount < quoteAllowance) {
+      if (quoteAmount && quoteAmount > quoteAllowance) {
         toast.error(`Total exceeds ${marketInfo.quoteAsset.symbol} allowance`, {
           toastId: `Total exceeds ${marketInfo.quoteAsset.symbol} allowance`,
         });
