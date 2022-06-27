@@ -94,7 +94,7 @@ export function TradeDashboard() {
   const userFills = useSelector(userFillsSelector);
   const layout = useSelector(layoutSelector);
   const settings = useSelector(settingsSelector);
-  const [fixedPoint, setFixedPoint] = useState(2);
+  const [fixedPoint, setFixedPoint] = useState(7);
   const [side, setSide] = useState("all");
   const dispatch = useDispatch();
 

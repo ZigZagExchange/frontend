@@ -91,7 +91,7 @@ export default function OrdersBook(props) {
   const marketSummary = useSelector(marketSummarySelector);
   const liquidity = useSelector(liquiditySelector);
   const settings = useSelector(settingsSelector);
-  const [fixedPoint, setFixedPoint] = useState(2);
+  const [fixedPoint, setFixedPoint] = useState(7);
   const [side, setSide] = useState('all');
   const [fixedPointItems, setFixedPointItems] = useState(fixedPoints);
 
