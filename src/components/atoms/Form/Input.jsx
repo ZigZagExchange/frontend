@@ -2,6 +2,16 @@ import React, { useEffect } from "react";
 import { useField } from "formik";
 import { x } from "@xstyled/styled-components";
 import { composeValidators, required, requiredError } from "./validation";
+import styled from "styled-components";
+
+const Wrapper = styled.div`
+  input[type=number]::-webkit-inner-spin-button, 
+  input[type=number]::-webkit-outer-spin-button { 
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none; 
+  }
+`
 
 const Input = ({
   name,
@@ -47,7 +57,7 @@ const Input = ({
           {label}
         </Label>
       )}
-      <x.div>
+      <Wrapper>
         <Component
           {...field}
           {...rest}
@@ -62,7 +72,7 @@ const Input = ({
           value={field.value}
           children={children}
         />
-      </x.div>
+      </Wrapper>
       {isError && !hideValidation && <ErrorMessage error={meta.error} />}
     </FieldSet>
   );
