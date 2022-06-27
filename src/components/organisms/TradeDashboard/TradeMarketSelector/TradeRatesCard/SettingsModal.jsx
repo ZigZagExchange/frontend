@@ -77,7 +77,7 @@ const SettingsModal = ({ onDismiss }) => {
         <Text font="primaryHeading6" color="foregroundHighEmphasis">
           Settings
         </Text>
-        <ActionsWrapper>
+        {/* <ActionsWrapper>
           <ActionWrapper>
             <EditIcon />
             <Text
@@ -98,7 +98,7 @@ const SettingsModal = ({ onDismiss }) => {
               Reset Layout
             </Text>
           </ActionWrapper>
-        </ActionsWrapper>
+        </ActionsWrapper> */}
       </ModalHeader>
       <Divider />
       <ModalBody>
