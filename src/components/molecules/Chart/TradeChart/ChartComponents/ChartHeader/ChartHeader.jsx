@@ -1,5 +1,6 @@
 import api from "lib/api";
 import styled from "styled-components";
+//import ChartSettings from "../ChartSettings/index.js";
 import { IntervalSwitch } from "../IntervalSwitch";
 
 const ChartHeaderContainer = styled.div`
@@ -15,17 +16,14 @@ const ChartHeaderItems = styled.div`
     flex: 1;
     border-bottom: 1px solid rgba(250, 250, 250, .1);
 `;
-
 export const ChartHeaderItem = styled.div`
     display: flex;
     flex-direction: row;
     flex-wrap: no-wrap;
-    min-width: 95px;
     height: 39px;
     justify-content: space-between;
     align-items: center;
     padding: 8px 16px;
-    border-left: 1px solid rgba(250, 250, 250, .1);
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -57,18 +55,23 @@ export const ChartHeader = ({
     return ( 
         <ChartHeaderContainer>
             <ChartHeaderItems>
-                <ChartHeaderItem>
-                    <img src={api.getCurrencyLogo(marketInfo.baseAsset.symbol)} alt=""/>
-                    <ChartHeaderSymbol>
-                        <span>{marketInfo.baseAsset.symbol}/{marketInfo.quoteAsset.symbol}</span>                            
-                    </ChartHeaderSymbol>
-                </ChartHeaderItem>
-                <IntervalSwitch
-                    exchange={exchange}
-                    interval={interval}
-                    intervals={intervals} 
-                    setInterval={setInterval}
-                />
+                <ChartHeaderContainer>
+                    <ChartHeaderItem>
+                        <img src={api.getCurrencyLogo(marketInfo.baseAsset.symbol)} alt=""/>
+                        <ChartHeaderSymbol>
+                            <span>{marketInfo.baseAsset.symbol}/{marketInfo.quoteAsset.symbol}</span>                            
+                        </ChartHeaderSymbol>
+                    </ChartHeaderItem>
+                    <IntervalSwitch exchange={exchange}
+                        interval={interval} intervals={intervals} 
+                        setInterval={setInterval}
+                    />
+                </ChartHeaderContainer>
+                {/*
+                <ChartHeaderContainer>
+                    <ChartSettings/>
+                </ChartHeaderContainer>
+                */}
             </ChartHeaderItems>
         </ChartHeaderContainer>
     );

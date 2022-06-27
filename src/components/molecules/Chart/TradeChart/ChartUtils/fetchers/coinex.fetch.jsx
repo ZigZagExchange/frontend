@@ -7,7 +7,6 @@ export const coinexFetcher = async (pair, interval) => {
     })
     .then((rsp) => rsp.json())
     .then((json) => {
-        console.log(json);
         if(json.code) throw new Error(json.message);
         return json.data;
     });

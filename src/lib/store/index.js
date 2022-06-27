@@ -19,6 +19,7 @@ import apiReducer, {
   setCurrentMarket,
   setConnecting
 } from "lib/store/features/api/apiSlice";
+import chartReducer from "lib/store/features/chart/chartSlice";
 import autoMergeLevel2 from "redux-persist/lib/stateReconciler/autoMergeLevel2";
 import api from "lib/api";
 import sagas from "./sagas";
@@ -42,11 +43,18 @@ const authPersistConfig = {
   storage,
 };
 
+const chartPersistConfig = {
+  key: "chart",
+  whitelist: [],
+  storage,
+}
+
 const sagaMiddleware = createSagaMiddleware();
 
 const rootReducer = combineReducers({
   auth: persistReducer(authPersistConfig, authReducer),
   api: persistReducer(apiPersistConfig, apiReducer),
+  chart: persistReducer(chartPersistConfig, chartReducer)
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

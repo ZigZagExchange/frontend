@@ -23,7 +23,7 @@ const LegendContainer = styled.div`
   position: absolute;
   display: flex;
   flex-direction: column;
-  z-index: 99;
+  z-index: 4;
   margin: 8px;
 `;
 
@@ -77,9 +77,11 @@ const ChartView = ({
       timeScale: {
         timeVisible: true,
         secondsVisible: true,
+        minBarSpacing: 1,
+        rightOffset: 10,
       },
       rightPriceScale: {
-        
+        width: '95px',
       },
       crosshair: {
         mode: 0,

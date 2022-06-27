@@ -5,16 +5,20 @@ import { coinexFetcher } from "./coinex.fetch";
 import { ftxFetcher } from "./ftx.fetch";
 import { kucoinFetcher } from "./kucoin.fetch";
 
-// fetchers, do any pair manipulating inside of here
-export const fetcher = async (pair, interval, exchange) => {
+//fetchers, do any pair manipulating inside of here
+export const fetcher = async (pair, interval, exchange, setError) => {
     var fnc, formattedPair, formattedInterval;
     var _p;
 
     switch(exchange.toLowerCase()){
         case "coinbase":
+            console.log(pair, pair.length)
             if(pair.length === 8) _p = pair.match(/.{1,4}/g);
             if(pair.length === 6) _p = pair.match(/.{1,3}/g);
-            
+
+            //invalid pair found, unable to format
+            if(!_p) return; 
+
             formattedPair = _p[0] + "-" + _p[1];
             formattedInterval = formatCoinbaseInterval(interval);
             fnc = coinbaseFetcher;
@@ -26,7 +30,7 @@ export const fetcher = async (pair, interval, exchange) => {
             break;
         case "ftx":
             // https://ftx.com/api/markets/btc/usd/candles?resolution=3600
-            // has to be split
+            //has to be split
             if(pair.length === 8) _p = pair.match(/.{1,4}/g);
             if(pair.length === 6) _p = pair.match(/.{1,3}/g);
             
@@ -37,7 +41,7 @@ export const fetcher = async (pair, interval, exchange) => {
         case "kucoin":
             if(pair.length === 8) _p = pair.match(/.{1,4}/g);
             if(pair.length === 6) _p = pair.match(/.{1,3}/g);
-
+            
             formattedPair = _p[0] + "/" + _p[1];
             formattedInterval = formatCoinexInterval(interval);
             fnc = kucoinFetcher;
@@ -50,6 +54,7 @@ export const fetcher = async (pair, interval, exchange) => {
             break;
     }
     //request data
-    var transformedData = await fnc(formattedPair, formattedInterval);
+    var transformedData = await fnc(formattedPair, formattedInterval, setError);
+    
     return transformedData;
 }

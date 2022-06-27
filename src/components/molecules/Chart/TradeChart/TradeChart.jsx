@@ -1,12 +1,15 @@
 import React, { memo, useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
-import { ChartHeader } from "./ChartComponents/ChartHeader";
-import { fetcher } from "./ChartUtils/fetchers";
 import ChartView from "./ChartView";
-import { candleStickFormatter } from "./ChartUtils/formatters";
-import binanceListener from "./ChartUtils/listeners/binance.listen";
+import { ChartHeader } from "./ChartComponents/ChartHeader";
 import { ChartLegend } from "./ChartComponents/ChartLegend";
+
 import coinbaseListener from "./ChartUtils/listeners/coinbase.listen";
+import kucoinListener from "./ChartUtils/listeners/kucoin.listen";
+import binanceListener from "./ChartUtils/listeners/binance.listen";
+
+import { fetcher } from "./ChartUtils/fetchers";
+import { candleStickFormatter } from "./ChartUtils/formatters";
 
 const ChartContainer = styled.div`
   display: flex;
@@ -14,7 +17,6 @@ const ChartContainer = styled.div`
   flex: 1;
   background: #131722;
 `;
-
 class ErrorBoundary extends React.Component {
   constructor(props){
     super(props);
@@ -36,13 +38,12 @@ class ErrorBoundary extends React.Component {
 
   render(){
     const {error} = this.state;
-    if(error) console.error("error: ", error);
 
     return (
       <>
         { error ? (
           <>
-            An error occured
+            {typeof error === "string" ? `${error}` : 'An error occured'}
           </>
         ) : (
           <>
@@ -77,7 +78,7 @@ const TradeChart = (({
       name: 'Last Candle Information (OHLC)',
       type: "crosshair",
       fnc: (param) => {
-        console.log(param);
+        //console.log(param);
         //nothing in current row
         if(param.time === undefined){
           setLegendCandle(undefined);
@@ -106,7 +107,11 @@ const TradeChart = (({
 
   //fetch and set candle data once pair or interval changes
   const fetchCandleData = useCallback(async () => {
-    const transformedData = await fetcher(pair, interval, exchange);
+    const transformedData = await fetcher(pair, interval, exchange, (value) => {
+      
+      console.error("error: ", value);
+      setError(value);
+    });
     const formattedData = candleStickFormatter(transformedData, exchange);
     const priorCandle = formattedData[formattedData.length - 2];
     const lastCandle = formattedData[formattedData.length - 1];
@@ -130,19 +135,23 @@ const TradeChart = (({
         var _p;
         if(pair.length === 8) _p = pair.match(/.{1,4}/g);
         if(pair.length === 6) _p = pair.match(/.{1,3}/g);
-        
+
+        //pair not found
+        if(!_p) return; 
+
         var formattedPair = _p[0] + "-" + _p[1];
 
         ws = new WebSocket(`wss://ws-feed.exchange.coinbase.com`);
         dependencies = {productIds: [formattedPair], interval, exchange};
         listener = coinbaseListener;
-        console.log("set listener", dependencies);
         break;
       case "coinex":
         break;
       case "ftx":
         break;
       case "kucoin":
+        ws = new WebSocket(`wss://ws-feed.exchange.coinbase.com`);
+        listener = kucoinListener;
         break;
       case "binance":
       default:
@@ -191,28 +200,29 @@ const TradeChart = (({
 
   }, [fetchCandleData, interval ])
 
+  if(error) return <ChartContainer>{ typeof error === "string" ? error : 'An error occured'}</ChartContainer>;
 
   return (
     <ChartContainer>
-      <ChartHeader
-        marketInfo={marketInfo} exchange={exchange}     
-        interval={interval} 
-        intervals={intervals}
-        setInterval={(i)  => {
-          setInterval(i);
-        }}
-      />
       <ErrorBoundary error={error}>
+        <ChartHeader
+          marketInfo={marketInfo}
+          exchange={exchange}     
+          interval={interval} 
+          intervals={intervals}
+          setInterval={(i)  => {
+            setInterval(i);
+          }}
+        />
         <ChartView
           initialChartData={candleData}
           updateData={updateData}
 
           legends={legends}
           candleStickConfig={{
-
             priceFormat: {
               type: 'price',
-              precision: 8,
+              precision: marketInfo.pricePresicionDecimal,
               minMove: 0.001,
             }
           }}

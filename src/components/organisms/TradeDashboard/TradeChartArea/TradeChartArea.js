@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import styled from "@xstyled/styled-components";
 import TradeChart from "components/molecules/Chart/TradeChart/TradeChart";
 import { ChartLoaderSpinner } from "components/molecules/Chart/TradeChart/ChartComponents/ChartLoaderSpinner";
+import { useDispatch, useSelector } from "react-redux";
+import { intervalSelector, updateInterval } from "lib/store/features/chart/chartSlice";
 
 const StyledTradeChart = styled.section`
   display: flex;
@@ -12,16 +14,12 @@ const StyledTradeChart = styled.section`
 `;
 
 export default function TradeChartArea({marketInfo}) {
-  const [interval, setInterval] = useState(JSON.parse(localStorage.getItem('persist:chart') || '{"interval": "1m"}').interval);
-  const setIntervalStorage = (value) => {
-    let chartStorage = JSON.parse(localStorage.getItem('persist:chart')) || {interval: '1h'};
-    chartStorage.interval = value;
-
-    console.log(value);
-    setInterval(value);
-    localStorage.setItem('persist:chart', JSON.stringify(chartStorage));
+  const dispatch = useDispatch();
+  const interval = useSelector(intervalSelector);
+  const setInterval = (value) => {
+    dispatch(updateInterval(value));
   }
-  
+
   const intervals = [
     {value: undefined, string: 'MINUTES'},
     {value: '1m', string: '1 Minute'},
@@ -51,7 +49,7 @@ export default function TradeChartArea({marketInfo}) {
           pair={pair}
           exchange={exchange}
           interval={interval}
-          setInterval={setIntervalStorage}
+          setInterval={setInterval}
           intervals={intervals}
         />
     </StyledTradeChart>

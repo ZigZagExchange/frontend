@@ -1,4 +1,4 @@
-import { socketAdaptor } from "../adaptors/kucoinAdaptor";
+import { socketAdaptor } from "../adaptors/kucoin.adapt";
 
 // /market/candles:{symbol}_{type}
 const kucoinListener = async (ws1, fnc) => {
@@ -9,6 +9,7 @@ const kucoinListener = async (ws1, fnc) => {
 
     const endpoint = data.instanceServers[0].endpoint;
     const token = data.token;
+    if(!token) return;
 
     //needs to ping endpoint to keep connection alive
     var ws = new WebSocket(`${endpoint}?token=${token}`)
@@ -16,7 +17,6 @@ const kucoinListener = async (ws1, fnc) => {
     ws.onmessage = (e) => {
         const msg = JSON.parse(e.data);
         if(!msg.type === "message"){
-            console.log("KuCoin WS type: ", msg.type);
             return;
         }
         const rawCandles = msg.data.candles;
