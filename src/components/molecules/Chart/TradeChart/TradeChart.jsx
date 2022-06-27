@@ -34,7 +34,8 @@ class ErrorBoundary extends React.Component {
 
   render(){
     const {error} = this.state;
-    console.error("error: ", error);
+    if(error) console.error("error: ", error);
+    
     return (
       <>
         { error ? (
@@ -78,7 +79,6 @@ const TradeChart = (({
 
   //fetch and set candle data once pair or interval changes
   const fetchCandleData = useCallback(async () => {
-    console.log(marketInfo);
     const transformedData = await fetcher(pair, interval, exchange);
     const formattedData = candleStickFormatter(transformedData, exchange);
     setData(formattedData);
