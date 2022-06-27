@@ -684,7 +684,7 @@ export default class API extends Emitter {
     try {
       const netContract = this.getNetworkContract();
       const [account] = await this.web3.eth.getAccounts();
-      if (!account) return result;
+      if (!account || account === '0x') return result;
       
       if (currency === "ETH") {
         result.balance = await this.mainnetProvider.getBalance(account);
