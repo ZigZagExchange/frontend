@@ -163,7 +163,7 @@ const ListPairForm = ({
                 <x.span fontSize={{ xs: 'xs', md: '14px' }} col>
                   Base Asset{" "}
                   <x.a
-                    color={{ _: "blue-gray-500", hover: "teal-200" }}
+                    color={{ _: "blue-gray-500", hover: "primaryHighEmphasis" }}
                     target={"_blank"}
                     href={
                       zigZagChainId === 1
@@ -199,7 +199,7 @@ const ListPairForm = ({
                 <x.span fontSize={{ xs: 'xs', md: '14px' }}>
                   Quote Asset{" "}
                   <x.a
-                    color={{ _: "blue-gray-500", hover: "teal-200" }}
+                    color={{ _: "blue-gray-500", hover: "primaryHighEmphasis" }}
                     target={"_blank"}
                     href={
                       zigZagChainId === 1
