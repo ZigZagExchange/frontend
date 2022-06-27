@@ -24,18 +24,14 @@ export const formatCoinbaseInterval = (interval) => {
             return 300;
         case '15m':
             return 900;
-        case "30m":
-            return 1800;
         case "1h":
             return 3600;
-        case "4h":
-            return 14400;
         case "1d":
-            return 56400;
+            return 86400;
         case "1w":
             return 604800;
         default:
-            return 1800;
+            return 86400;
     }
 }
 

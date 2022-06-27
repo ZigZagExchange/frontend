@@ -14,9 +14,11 @@ export const fetcher = async (pair, interval, exchange, setError) => {
         case "coinbase":
             console.log(pair, pair.length)
             if(pair.length === 8) _p = pair.match(/.{1,4}/g);
+            if(pair.length === 7) _p = pair.match(/.{1,4}/g);
             if(pair.length === 6) _p = pair.match(/.{1,3}/g);
-
-            //invalid pair found, unable to format
+            
+            console.log("pair", _p);
+            //pair not found
             if(!_p) return; 
 
             formattedPair = _p[0] + "-" + _p[1];
