@@ -21,8 +21,8 @@ const ModalHeader = styled.div`
 `;
 
 const ResetAllSettingsWrapper = styled.div`
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-auto-flow: column;
   gap: 7px;
   justify-content: end;
   svg path {
@@ -196,6 +196,7 @@ const SettingsModal = ({ onDismiss }) => {
             font="primaryMediumBody"
             color="primaryHighEmphasis"
             style={{ textDecoration: "underline", cursor: "pointer" }}
+            textAlign="right"
           >
             Reset All Settings
           </Text>
