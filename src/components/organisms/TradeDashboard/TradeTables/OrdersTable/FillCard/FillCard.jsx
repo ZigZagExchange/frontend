@@ -14,6 +14,7 @@ import {
 import logo from "assets/images/logo.png";
 
 const FillCard = ({ fill, closeToast }) => {
+  console.log(fill);
   const { isDark } = useTheme();
   const componentRef = useRef();
   const tradeId = fill[1];
@@ -23,7 +24,7 @@ const FillCard = ({ fill, closeToast }) => {
   const feetoken = fill[11];
   const side = fill[3];
   let feeText = "1 USDC";
-  const marketInfo = api.marketInfo[market];
+  const marketInfo = api.marketInfo["ETH-USDC"];
   if (feeamount && feetoken) {
     const displayFee =
       feeamount > 9999 ? feeamount.toFixed(0) : feeamount.toPrecision(4);
@@ -68,7 +69,7 @@ const FillCard = ({ fill, closeToast }) => {
           <div className="flex items-center gap-3 text-xl font-semibold dark:text-foreground-900 text-background-900 font-work">
             <img src={logo} alt="logo" className="w-6" />
             <p>
-              {fill[2]} {fill[3] === "b" ? "Buy" : "Sell"} Order Success
+              {fill[2]} {fill[3] === "b" ? "Buy" : "Sell"} Order Successful
             </p>
           </div>
           <XIcon
@@ -94,7 +95,7 @@ const FillCard = ({ fill, closeToast }) => {
                 Trade ID:{" "}
                 <button
                   onClick={() => {
-                    window.open(getHashViewURL() + fill[1], "_blank");
+                    window.open(getHashViewURL() + fill[7], "_blank");
                   }}
                   className="flex items-center gap-2 text-sm font-semibold underline hover:no-underline text-primary-900 underline-offset-1 font-work"
                 >
@@ -111,15 +112,13 @@ const FillCard = ({ fill, closeToast }) => {
                 Average buy price:
                 <span className="font-bold">
                   {" "}
-                  {fill[4]?.toPrecision(6) / 1}
+                  {Number(fill[4])?.toPrecision(6) / 1} {market.split("-")[1]}
                 </span>
               </div>
               <div className="mt-3 text-sm font-normal font-work dark:text-foreground-900 text-background-900">
                 Amount:
                 <span className="font-bold">
-                  {" "}
-                  {fill[5]?.toPrecision(6) / 1}{" "}
-                  {marketInfo && marketInfo.baseAsset.symbol}
+                  {Number(fill[5])?.toPrecision(6) / 1} {market.split("-")[0]}
                 </span>
               </div>
               <div className="mt-3 text-sm font-normal font-work dark:text-foreground-900 text-background-900">
