@@ -3,7 +3,7 @@ import styled from "styled-components";
 // css
 import "./TradeRecentTable.css";
 import useTheme from "components/hooks/useTheme";
-import { numStringToSymbol, formatToken } from "lib/utils";
+import { numStringToSymbol } from "lib/utils";
 import Text from "components/atoms/Text/Text";
 
 const Table = styled.table`
@@ -160,7 +160,7 @@ const TradeRecentTable = (props) => {
                 ? d.td2.toFixed(props.fixedPoint)
                 : d.td2;
             const amount =
-              typeof d.td3 === "number" ? formatToken(d.td3) : d.td3;
+              typeof d.td3 === "number" ? d.td3.toPrecision(6) : d.td3;
             return (
               <tr key={i} style={rowStyle} onClick={() => onClickRow(d)}>
                 {(props.side === "sell" && d.side === "s") ||

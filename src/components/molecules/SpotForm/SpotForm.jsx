@@ -718,7 +718,7 @@ export class SpotForm extends React.Component {
           >
             {marketInfo &&
               marketInfo.quoteFee &&
-              Number(marketInfo.quoteFee).toPrecision(4)}{" "}
+              formatToken(Number(marketInfo.quoteFee).toPrecision(4))}{" "}
             {marketInfo && marketInfo.quoteAsset.symbol}
           </Text>
         </FormHeader>
@@ -741,7 +741,7 @@ export class SpotForm extends React.Component {
           >
             {marketInfo &&
               marketInfo.baseFee &&
-              Number(marketInfo.baseFee).toPrecision(4)}{" "}
+              formatToken(Number(marketInfo.baseFee).toPrecision(4))}{" "}
             {marketInfo && marketInfo.baseAsset.symbol}
           </Text>
         </FormHeader>
@@ -766,7 +766,7 @@ export class SpotForm extends React.Component {
               })`}
               value={
                 this.state.userHasEditedPrice
-                  ? formatToken(this.state.price)
+                  ? this.state.price
                   : this.currentPrice()
               }
               onChange={this.updatePrice.bind(this)}
@@ -794,7 +794,7 @@ export class SpotForm extends React.Component {
               placeholder={`Amount (${
                 marketInfo && marketInfo.baseAsset?.symbol
               })`}
-              value={formatToken(this.state.baseAmount)}
+              value={this.state.baseAmount}
               onChange={this.updateAmount.bind(this)}
             />
             <IconButton
@@ -830,7 +830,7 @@ export class SpotForm extends React.Component {
               placeholder={`Total (${
                 marketInfo && marketInfo.quoteAsset?.symbol
               })`}
-              value={formatToken(this.state.totalAmount)}
+              value={this.state.totalAmount}
               onChange={this.updateTotalAmount.bind(this)}
             />
             {/* <IconButton variant="secondary" startIcon={<PlusIcon />}></IconButton> */}

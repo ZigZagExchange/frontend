@@ -332,7 +332,10 @@ const AccountDropdown = ({ notext, networkName }) => {
                           >
                             {settings.hideBalance
                               ? "****.****"
-                              : formatToken(wallet[ticker].valueReadable) +
+                              : formatToken(
+                                  wallet[ticker].valueReadable,
+                                  ticker
+                                ) +
                                 " " +
                                 ticker}
                           </Text>

@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import styled from "styled-components";
 import useTheme from "components/hooks/useTheme";
 import { marketInfoSelector } from "lib/store/features/api/apiSlice";
-import { numStringToSymbol, formatToken } from "lib/utils";
+import { numStringToSymbol } from "lib/utils";
 import Text from "components/atoms/Text/Text";
 
 const Table = styled.table`
@@ -108,8 +108,7 @@ const TradePriceTable = (props) => {
 
   useEffect(() => {
     if (!ref.current) return;
-    if (props.priceTableData.length === 0) 
-    {
+    if (props.priceTableData.length === 0) {
       setUpdateScroll(false);
       return;
     }
@@ -177,8 +176,10 @@ const TradePriceTable = (props) => {
           }
           const price =
             typeof d.td1 === "number" ? d.td1.toFixed(props.fixedPoint) : d.td1;
-          const amount = typeof d.td2 === "number" ? formatToken(d.td2) : d.td2;
-          const total = typeof d.td3 === "number" ? formatToken(d.td3) : d.td3;
+          const amount =
+            typeof d.td2 === "number" ? d.td2.toPrecision(6) : d.td2;
+          const total =
+            typeof d.td3 === "number" ? d.td3.toPrecision(6) : d.td3;
 
           // reduce after, net one needs to be this percentage
           if (props.className === "trade_table_asks") {

@@ -804,10 +804,7 @@ export default function OrdersTable(props) {
                 feeamount > 9999
                   ? feeamount.toFixed(0)
                   : feeamount.toPrecision(4);
-              feeText =
-                feeamount !== 0
-                  ? `${formatToken(displayFee)} ${feetoken}`
-                  : "--";
+              feeText = feeamount !== 0 ? `${displayFee} ${feetoken}` : "--";
             } else if (["b", "o", "m", "r"].includes(fillstatus)) {
               feeText = "--";
               // cases below make it backward compatible:
@@ -966,7 +963,7 @@ export default function OrdersTable(props) {
                           color="foregroundHighEmphasis"
                           textAlign="right"
                         >
-                          {formatToken(price.toPrecision(6) / 1)}
+                          {price.toPrecision(6) / 1}
                         </Text>
                       </td>
                     </tr>
@@ -985,9 +982,7 @@ export default function OrdersTable(props) {
                           color="foregroundHighEmphasis"
                           textAlign="right"
                         >
-                          {formatToken(
-                            formatToken(baseQuantity.toPrecision(6) / 1)
-                          )}{" "}
+                          {baseQuantity.toPrecision(6) / 1}{" "}
                           {marketInfo && marketInfo.baseAsset.symbol}
                         </Text>
                       </td>
@@ -1165,10 +1160,7 @@ export default function OrdersTable(props) {
                 feeamount > 9999
                   ? feeamount.toFixed(0)
                   : feeamount.toPrecision(4);
-              feeText =
-                feeamount !== 0
-                  ? `${formatToken(displayFee)} ${feetoken}`
-                  : "--";
+              feeText = feeamount !== 0 ? `${displayFee} ${feetoken}` : "--";
             } else if (["b", "o", "m", "r", "e"].includes(fillstatus)) {
               feeText = "--";
               // cases below make it backward compatible:
@@ -1177,10 +1169,7 @@ export default function OrdersTable(props) {
             } else if (fillstatus === "r" || !api.isZksyncChain()) {
               feeText = "0 " + marketInfo.baseAsset.symbol;
             } else if (side === "s") {
-              feeText =
-                formatToken(marketInfo.baseFee) +
-                " " +
-                marketInfo.baseAsset.symbol;
+              feeText = marketInfo.baseFee + " " + marketInfo.baseAsset.symbol;
             } else if (side === "b") {
               feeText =
                 marketInfo.quoteFee + " " + marketInfo.quoteAsset.symbol;
@@ -1274,7 +1263,7 @@ export default function OrdersTable(props) {
                     font="primaryExtraSmallSemiBold"
                     color="foregroundHighEmphasis"
                   >
-                    {formatToken(price.toPrecision(6) / 1)}
+                    {price.toPrecision(6) / 1}
                   </Text>
                 </td>
                 <td data-label="Side">
@@ -1287,7 +1276,7 @@ export default function OrdersTable(props) {
                     font="primaryExtraSmallSemiBold"
                     color="foregroundHighEmphasis"
                   >
-                    {formatToken(baseQuantity.toPrecision(6) / 1)}{" "}
+                    {baseQuantity.toPrecision(6) / 1}{" "}
                     {marketInfo && marketInfo.baseAsset.symbol}
                   </Text>
                 </td>
@@ -1383,7 +1372,7 @@ export default function OrdersTable(props) {
                 >
                   {settings.hideBalance
                     ? "****.****"
-                    : formatToken(token.valueReadable)}
+                    : formatToken(token.valueReadable, token.token)}
                 </Text>
               </td>
               <td data-label="Balance">
