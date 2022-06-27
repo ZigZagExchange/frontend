@@ -257,7 +257,7 @@ export default function OrdersBook(props) {
             }
             <Divider />
             <OrderFooterWrapper>
-              <Dropdown adClass="side-dropdown" transparent={true} width={162} item={fixedPointItems} context={`${fixedPoint} decimal`} leftIcon={false} clickFunction={changeFixedPoint} />
+              {/* <Dropdown adClass="side-dropdown" transparent={true} width={162} item={fixedPointItems} context={`${fixedPoint} decimal`} leftIcon={false} clickFunction={changeFixedPoint} /> */}
 
               <OrderFooterRight>
                 <OrderButtonWrapper onClick={() => { changeSide('all') }}>
@@ -282,7 +282,7 @@ export default function OrdersBook(props) {
                 fixedPoint={fixedPoint}
               />
               <OrderFooterWrapper>
-                <Dropdown adClass="side-dropdown" transparent={true} width={162} item={fixedPointItems} context={`${fixedPoint} decimal`} leftIcon={false} clickFunction={changeFixedPoint} />
+                {/* <Dropdown adClass="side-dropdown" transparent={true} width={162} item={fixedPointItems} context={`${fixedPoint} decimal`} leftIcon={false} clickFunction={changeFixedPoint} /> */}
 
                 <OrderFooterRight>
                   <OrderButtonWrapper onClick={() => { changeSide('all') }}>

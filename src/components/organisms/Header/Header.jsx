@@ -375,7 +375,7 @@ export const Header = (props) => {
               </SocialLink>
             </SocialWrapper>
             <VerticalDivider />
-            <LanguageWrapper>
+            {/* <LanguageWrapper>
               <StyledDropdown
                 adClass="lang-dropdown"
                 transparent
@@ -385,7 +385,7 @@ export const Header = (props) => {
               />
               <ToggleTheme isDark={isDark} toggleTheme={toggleTheme} />
             </LanguageWrapper>
-            <VerticalDivider />
+            <VerticalDivider /> */}
 
             <Dropdown
               adClass="network-dropdown"
