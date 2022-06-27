@@ -9,11 +9,11 @@ export const candleAdaptor = (currCandle) => {
 
     const candle = {
         time: time,
-        open: open,
-        high: high,
-        low: low,
-        close: close,
-        value: volume,
+        open: parseFloat(open),
+        high: parseFloat(high),
+        low: parseFloat(low),
+        close: parseFloat(close),
+        value: parseFloat(volume),
     };
 
     return candle;

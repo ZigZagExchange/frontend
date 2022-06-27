@@ -19,12 +19,21 @@ const ContainerStyle = styled.div`
   }
 `;
 
+const LegendContainer = styled.div`
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  z-index: 99;
+  margin: 8px;
+`;
+
 const ChartView = ({
   initialChartData,
   updateData = null,
   candleStickConfig,
   histogramConfig,
   chartLayout = darkTheme.chartLayout,
+  legends = { items: [] }
 }) => {
   const resizeObserver = useRef();
   const chartContainerRef = useRef();
@@ -32,9 +41,22 @@ const ChartView = ({
   const candleSeries = useRef();
   const volumeSeries = useRef();
 
+
   const setInitialData = useCallback(() => {
     candleSeries.current = chart.current.addCandlestickSeries(candleStickConfig);
     volumeSeries.current = chart.current.addHistogramSeries(histogramConfig);
+    
+    legends.items.forEach((legend) => {
+      if(!legend.fnc) return;
+
+      switch (legend.type) {
+        case "crosshair":
+          chart.current.subscribeCrosshairMove(legend.fnc);
+          break;
+        default:
+          break;
+      }
+    });
 
     candleSeries.current.setData(initialChartData);
     volumeSeries.current.setData(initialChartData);
@@ -47,6 +69,8 @@ const ChartView = ({
 
   useEffect(() => {
     if(!chartContainerRef.current) return;
+    chartContainerRef.current.innerHTML = "";
+    
     chart.current = createChart(chartContainerRef.current, {
       layout: chartLayout.layout,
       grid: chartLayout.grid,
@@ -55,7 +79,7 @@ const ChartView = ({
         secondsVisible: true,
       },
       rightPriceScale: {
-
+        
       },
       crosshair: {
         mode: 0,
@@ -84,8 +108,13 @@ const ChartView = ({
 
 
   if(!initialChartData) return <ChartLoaderSpinner text={"Loading data"}/>;
+
+  //setup legends
+  const legendList = legends.items.map((legend, key) => <div key={key}>{legend.component}</div>);
+
   return (
     <ContainerStyle>
+      <LegendContainer>{legendList}</LegendContainer>
       <div ref={chartContainerRef} style={{
         width: '100%',
         height: '100%',

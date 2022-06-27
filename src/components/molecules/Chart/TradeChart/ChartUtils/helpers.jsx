@@ -15,9 +15,10 @@ export function useHandleClickOutside(ref, fnc) {
     }, [ref]);
 }
 
+//format interval from string to seconds
 export const formatCoinbaseInterval = (interval) => {
     switch(interval.toLowerCase()){
-        case '1m':
+        case '1m': 
             return 60;
         case '5m':
             return 300;
@@ -47,7 +48,7 @@ export const formatCoinexInterval = (interval) => {
         case '15m':
             return "15min";
         case "30m":
-            return "30m";
+            return "30min";
         case "1h":
             return "1hour";
         case "4h":
@@ -57,6 +58,13 @@ export const formatCoinexInterval = (interval) => {
         case "1w":
             return "1week";
         default:
-            return "30m";
+            return "1hour";
     }
+}
+
+//get product information from coinbase
+export const getCoinbaseProduct = async (pair) => {
+    let response = await fetch(`https://api.exchange.coinbase.com/products/${pair}/stats`);
+    let stats = response.json();
+    return stats;
 }

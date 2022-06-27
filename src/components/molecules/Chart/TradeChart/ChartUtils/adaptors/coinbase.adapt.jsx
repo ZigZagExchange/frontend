@@ -18,3 +18,28 @@ export const candleAdaptor = (currCandle) => {
 
     return candle;
 }
+
+//coinbase socket adaptor
+export const socketAdaptor = (
+    data, 
+    resolution=60 //interval in seconds
+) => {
+    var {time, price, size} = data;
+
+    let roundedTime = Math.floor(new Date(time) / 60000) * resolution;
+    price = parseFloat(price);
+    size = parseFloat(size);
+
+    // we parse the prices at 
+    // a later point where we have access to candle history
+    const candle = {
+        time: roundedTime,
+        open: price,
+        high: price,
+        low: price,
+        close: price,
+        value: size,
+    };
+
+    return candle;
+}

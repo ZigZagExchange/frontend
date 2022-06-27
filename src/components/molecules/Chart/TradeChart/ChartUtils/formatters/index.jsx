@@ -1,6 +1,7 @@
 import { binanceFormatter } from "./binance.format";
 import { coinbaseFormatter } from "./coinbase.format";
 import { coinexFormatter } from "./coinex.format";
+import { ftxFormatter } from "./ftx.format";
 
 //formatters
 export const candleStickFormatter = (transformedData, exchange) => {
@@ -13,12 +14,14 @@ export const candleStickFormatter = (transformedData, exchange) => {
         case 'coinex':
             formattedData = coinexFormatter(transformedData);
             break;
+        case 'ftx':
+            formattedData = ftxFormatter(transformedData);
+            return transformedData;
         case 'binance':
         default:
             formattedData = binanceFormatter(transformedData);
             break;
     }
-
     return formattedData;
 
 }

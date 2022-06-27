@@ -6,7 +6,6 @@ const ChartHeaderContainer = styled.div`
     display: flex;
     flex-direction: row;
     flex-wrap: no-wrap;
-    border: 1px solid rgba(250, 250, 250, .1);
 `;
 
 const ChartHeaderItems = styled.div`
@@ -22,7 +21,7 @@ export const ChartHeaderItem = styled.div`
     flex-direction: row;
     flex-wrap: no-wrap;
     padding: 8px 16px;
-    min-width: 100px;
+    min-width: 95px;
     justify-content: space-between;
     align-items: center;
     border-left: 1px solid rgba(250, 250, 250, .1);
@@ -37,7 +36,6 @@ export const ChartHeaderItem = styled.div`
         height: 18px;
         margin: 4px;
         margin-right: 10px;
-        
     }
 `;
 
@@ -49,8 +47,10 @@ const ChartHeaderSymbol = styled.div`
 `;
 
 export const ChartHeader = ({
-    marketInfo, 
-    interval, intervals, 
+    marketInfo,
+    exchange,
+    interval,
+    intervals, 
     setInterval
 }) => {
     return ( 
@@ -62,8 +62,10 @@ export const ChartHeader = ({
                         <span>{marketInfo.baseAsset.symbol}/{marketInfo.quoteAsset.symbol}</span>                            
                     </ChartHeaderSymbol>
                 </ChartHeaderItem>
-                <IntervalSwitch 
-                    interval={interval} intervals={intervals} 
+                <IntervalSwitch
+                    exchange={exchange}
+                    interval={interval}
+                    intervals={intervals} 
                     setInterval={setInterval}
                 />
             </ChartHeaderItems>

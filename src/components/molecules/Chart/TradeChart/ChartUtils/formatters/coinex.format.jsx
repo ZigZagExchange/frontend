@@ -18,9 +18,5 @@ export const coinexFormatter = (transformedData) => {
         accus.push(candle);
         return accu;
     }, []);
-
-    //reverse data
-    const formattedData = accus.reverse();
-
-    return formattedData;
+    return accus;
 }
