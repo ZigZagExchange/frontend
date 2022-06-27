@@ -1,22 +1,17 @@
-import React, { useRef } from "react";
+import React, { useRef, useCallback, useEffect } from "react";
 import api from "lib/api";
 import QRCode from "qrcode.react";
 import { XIcon, SaveAsIcon } from "@heroicons/react/solid";
 import useTheme from "components/hooks/useTheme";
 import classNames from "classnames";
-
-import {
-  exportComponentAsJPEG,
-  exportComponentAsPDF,
-  exportComponentAsPNG,
-} from "react-component-export-image";
+import * as htmlToImage from "html-to-image";
 
 import logo from "assets/images/logo.png";
 
 const FillCard = ({ fill, closeToast }) => {
-  console.log(fill);
+  const ref = useRef(null);
   const { isDark } = useTheme();
-  const componentRef = useRef();
+
   const tradeId = fill[1];
   const market = fill[2];
   const fillstatus = fill[6];
@@ -42,9 +37,30 @@ const FillCard = ({ fill, closeToast }) => {
     feeText = marketInfo.quoteFee + " " + marketInfo.quoteAsset.symbol;
   }
 
-  const downloadQRCode = () => {
-    exportComponentAsPNG(componentRef, { fileName: tradeId });
-  };
+  useEffect(() => {
+    ref.current.lastElementChild.lastElementChild.classList.toggle("hidden");
+  }, []);
+
+  const downloadQRCode = useCallback(() => {
+    if (ref.current === null) {
+      return;
+    }
+    ref.current.lastElementChild.lastElementChild.classList.toggle("hidden");
+    htmlToImage
+      .toPng(ref.current, { cacheBust: true })
+      .then((dataUrl) => {
+        const link = document.createElement("a");
+        link.download = `${tradeId}.png`;
+        link.href = dataUrl;
+        link.click();
+        ref.current.lastElementChild.lastElementChild.classList.toggle(
+          "hidden"
+        );
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [ref]);
 
   const getHashViewURL = () => {
     let baseExplorerUrl;
@@ -63,13 +79,22 @@ const FillCard = ({ fill, closeToast }) => {
   };
 
   return (
-    <div ref={componentRef} className={classNames({ dark: isDark })}>
-      <div className="dark:bg-[#2B2E4A] bg-[#ddf1f7] border dark:border-foreground-400 border-slate-300 shadow-lg rounded-lg p-4">
+    <div ref={ref} className={classNames({ dark: isDark })}>
+      <div className="dark:bg-[#2B2E4A] relative bg-[#ddf1f7] border dark:border-foreground-400 border-slate-300 shadow-lg rounded-lg p-4">
         <div className="flex justify-between pb-3 border-b dark:border-foreground-500 border-slate-300">
           <div className="flex items-center gap-3 text-xl font-semibold dark:text-foreground-900 text-background-900 font-work">
             <img src={logo} alt="logo" className="w-6" />
             <p>
-              {fill[2]} {fill[3] === "b" ? "Buy" : "Sell"} Order Successful
+              {fill[2]}{" "}
+              <span
+                className={classNames({
+                  "text-danger-900": fill[3] === "s",
+                  "text-success-900": fill[3] === "b",
+                })}
+              >
+                {fill[3] === "b" ? "Buy" : "Sell"}
+              </span>{" "}
+              Order Successful
             </p>
           </div>
           <XIcon
@@ -78,7 +103,7 @@ const FillCard = ({ fill, closeToast }) => {
           />
         </div>
         <div className="pt-3">
-          <p className="font-normal font-work dark:text-foreground-900 text-background-900">
+          <p className="font-normal font-work dark:text-foreground-900 text-background-900 secret-div">
             Use the Trade ID to identify old trades.
           </p>
           <div className="flex items-start gap-6 mt-3">
@@ -133,6 +158,12 @@ const FillCard = ({ fill, closeToast }) => {
               </button>
             </div>
           </div>
+        </div>
+        <div
+          id="url"
+          className="absolute bottom-4 right-2 dark:text-foreground-900 text-background-900 font-work"
+        >
+          zigzag.exchange
         </div>
       </div>
     </div>
