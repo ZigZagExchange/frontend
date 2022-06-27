@@ -67,6 +67,7 @@ export default class APIArbitrumProvider extends APIProvider {
         allowanceReadable
       }
     }
+    console.log(balances);
 
     return balances;
   };
@@ -150,6 +151,7 @@ export default class APIArbitrumProvider extends APIProvider {
       name: 'ZigZag',
       version: '1',
       chainId: this.network,
+      //verifyingContract: 0x5998a3569ec138b19c07d3369aecc5871a9c0f61
     };
 
     const types = {

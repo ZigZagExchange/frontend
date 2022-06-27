@@ -153,7 +153,7 @@ export class OrdersTable extends React.Component {
                   {baseQuantity.toPrecision(6) / 1} {baseCurrency}
                 </td>
                 <td data-label="Remaining">
-                  {remaining.toPrecision(6) / 1} {baseCurrency}
+                  {remaining ? remaining.toPrecision(6) / 1 : baseQuantity.toPrecision(6) / 1} {baseCurrency}
                 </td>
                 <td className={sideclassname} data-label="Side">
                   {side}
