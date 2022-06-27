@@ -38,18 +38,18 @@ const TradeContainer = styled.div`
 
 const TradeGrid = styled.article`
   display: grid;
-  grid-template-rows: 75px 528px 1fr 57px;
+  grid-template-rows: 75px 528px 1fr;
   grid-template-columns: ${({ isLeft }) => isLeft ? '300px 253.5px 253.5px 1fr' : '300px 507px 1fr'};
   grid-template-areas: ${({ isLeft }) =>
     isLeft
       ? `"marketSelector marketSelector marketSelector marketSelector"
   "sidebar orders trades chart"
-  "sidebar tables tables tables"
-  "sidebar footer footer footer"`
+  "tables tables tables tables"
+  `
       : `"marketSelector marketSelector marketSelector"
   "sidebar stack chart"
-  "sidebar tables tables"
-  "sidebar footer footer"`};
+  "tables tables tables"
+  `};
 
   min-height: calc(100vh - 56px);
   gap: 0px;
@@ -57,8 +57,8 @@ const TradeGrid = styled.article`
   @media screen and (max-width: 991px) {
     grid-template-rows: ${({ isLeft }) =>
       isLeft
-        ? "74px 410px 459px 508px 362px 1fr"
-        : "74px 410px 459px 519px 362px 1fr"};
+        ? "74px 410px 459px 508px 1fr"
+        : "74px 410px 459px 519px 1fr"};
     grid-template-columns: ${({ isLeft }) => isLeft ? '1fr 1fr' : '1fr'};
     grid-template-areas: ${({ isLeft }) =>
       isLeft
@@ -67,19 +67,18 @@ const TradeGrid = styled.article`
       "sidebar orders"
       "trades trades"
       "tables tables"
-      "footer footer"`
+      `
         : `"marketSelector"
       "chart"
       "sidebar"
       "stack"
       "tables"
-      "footer"`};
+      `};
   }
 
   > div,
   > aside,
   > header,
-  > footer,
   > section,
   > main {
     background: ${(p) => p.theme.colors.zzDarkest};
@@ -213,7 +212,7 @@ export function TradeDashboard() {
           userOrders={userOrders}
           user={user}
         />
-        <TradeFooter />
+        {/* <TradeFooter /> */}
       </TradeGrid>
     </TradeContainer>
   );
