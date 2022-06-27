@@ -1,0 +1,24 @@
+import { binanceFormatter } from "./binance.format";
+import { coinbaseFormatter } from "./coinbase.format";
+import { coinexFormatter } from "./coinex.format";
+
+//formatters
+export const candleStickFormatter = (transformedData, exchange) => {
+    var formattedData = [];
+
+    switch(exchange.toLowerCase()){
+        case 'coinbase':
+            formattedData = coinbaseFormatter(transformedData);
+            break;
+        case 'coinex':
+            formattedData = coinexFormatter(transformedData);
+            break;
+        case 'binance':
+        default:
+            formattedData = binanceFormatter(transformedData);
+            break;
+    }
+
+    return formattedData;
+
+}
