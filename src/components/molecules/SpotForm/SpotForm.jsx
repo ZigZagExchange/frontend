@@ -467,11 +467,11 @@ export class SpotForm extends React.Component {
         this.props.orderType
       );
 
-      if (!this.props.settings.disableOrderNotification) {
-        toast.info("Order placed", {
-          toastId: "Order placed.",
-        });
-      }
+      // if (!this.props.settings.disableOrderNotification) {
+      //   toast.info("Order placed", {
+      //     toastId: "Order placed.",
+      //   });
+      // }
     } catch (e) {
       toast.error(e.message);
     }
