@@ -58,24 +58,29 @@ const TradeRatesCard = ({ updateMarketChain, marketSummary, rowData, currentMark
           {
             isMobile ? <></> :
               <>
+                <Divider />
                 <RatesCard>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h Change</Text>
                   <Text font="primaryMediumSmallSemiBold" color={percentChange === 'NaN' ? "black" : (parseFloat(marketSummary["priceChange"]) >= 0 ? "successHighEmphasis" : "dangerHighEmphasis")}>
-                    {marketSummary.priceChange && formatPrice(marketSummary.priceChange / 1)}{" "}{percentChange !== 'NaN' ? `${percentChange}%` : '--'}
+                    {marketSummary.priceChange && formatPrice(marketSummary.priceChange / 1)}{" "}{percentChange !== 'NaN' ? `(${percentChange}%)` : '--'}
                   </Text>
                 </RatesCard>
+                <Divider />
                 <RatesCard>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h High</Text>
                   <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{marketSummary["24hi"] ?? '--'}</Text>
                 </RatesCard>
+                <Divider />
                 <RatesCard>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h Low</Text>
                   <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{marketSummary["24lo"] ?? '--'}</Text>
                 </RatesCard>
+                <Divider />
                 <RatesCard>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h Volume({marketInfo && marketInfo.baseAsset.symbol})</Text>
                   <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{marketSummary.baseVolume ?? '--'}</Text>
                 </RatesCard>
+                <Divider />
                 <RatesCard>
                   <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h Volume({marketInfo && marketInfo.quoteAsset.symbol})</Text>
                   <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">{marketSummary.quoteVolume ?? '--'}</Text>
@@ -114,7 +119,7 @@ const RatesCardsWrapper = styled.div`
   display: grid;
   grid-auto-flow: column;
   align-items: center;
-  gap: 40px;
+  gap: 20px;
   padding-left: 20px;
 `
 
@@ -134,4 +139,10 @@ const RatesCard = styled.div`
   align-items: center;
   justify-content: center;
   gap: 2px;
+`
+
+const Divider = styled.div`
+  width: 1px;
+  height: 32px;
+  background-color: ${({ theme }) => theme.colors.backgroundLowEmphasis};
 `
