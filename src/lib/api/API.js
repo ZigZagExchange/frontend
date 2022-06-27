@@ -691,7 +691,7 @@ export default class API extends Emitter {
         return result;
       }
 
-      if (!currencyInfo) return result;
+      if (!currencyInfo || !currencyInfo.address) return result;
       
       const contract = new ethers.Contract(
         currencyInfo.address,
@@ -722,7 +722,7 @@ export default class API extends Emitter {
         allowance,
         valueReadable: "0",
       };
-      if (currencyInfo) {
+      if (balance && currencyInfo) {
         balances[ticker].valueReadable = formatAmount(balance, currencyInfo);
       } else if (ticker === "ETH") {
         balances[ticker].valueReadable = formatAmount(balance, { decimals: 18 });
