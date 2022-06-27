@@ -21,7 +21,7 @@ const ButtonWrapper = styled.div`
   gap: 8px;
   width: 130px;
   img {
-    height: 1.3rem;
+    height: 1.6rem;
   }
 `
 
@@ -35,7 +35,7 @@ const DropdownDisplay = styled.div`
   border-radius: 8px;
   transition: all 0.2s ease-in-out;
   box-shadow: 0px 8px 16px 0px #0101011A;
-  width: ${({ isMobile }) => isMobile ? '350px' : '419px'};
+  width: ${({ isMobile }) => isMobile ? '350px' : '469px'};
   height: 531px;
   background: ${({ theme }) => theme.colors.backgroundLowEmphasis};
   border: 1px solid ${({ theme }) => theme.colors.foreground400};
@@ -505,7 +505,7 @@ const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, upda
                             <Text font="tableContent" color={d.td3 < 0 ? 'dangerHighEmphasis' : 'successHighEmphasis'} align="right">{d.td2}</Text>
                         </td>
                         <td>
-                            <Text font="tableContent" color={d.td3 < 0 ? 'dangerHighEmphasis' : 'successHighEmphasis'} align="right">{d.usdVolume.toFixed(2)}</Text>
+                            <Text font="tableContent" color='foregroundHighEmphasis' align="right">{d.usdVolume.toFixed(2).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</Text>
                         </td>
                         <td>
                             <Text font="tableContent" color={d.td3 < 0 ? 'dangerHighEmphasis' : 'successHighEmphasis'} align="right">{d.td3}%</Text>
@@ -520,7 +520,7 @@ const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, upda
                     <tr>
                         <th onClick={() => togglePairSorting()}>
                             <HeaderWrapper>
-                                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Pair</Text>
+                                <Text style={{marginLeft: '22px'}} font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Pair</Text>
                                 {pairSorted ? (
                                     <SortIconWrapper>
                                         {pairDirection ? <SortUpIcon /> : <SortUpFilledIcon />}
