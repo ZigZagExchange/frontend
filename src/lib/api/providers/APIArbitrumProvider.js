@@ -67,7 +67,6 @@ export default class APIArbitrumProvider extends APIProvider {
         allowanceReadable
       }
     }
-    console.log(balances);
 
     return balances;
   };
