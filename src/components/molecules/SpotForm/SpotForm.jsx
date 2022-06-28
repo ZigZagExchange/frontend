@@ -580,6 +580,7 @@ export class SpotForm extends React.Component {
       );
 
     let buySellBtnClass, buttonText, approveNeeded = false;
+    quoteAmount = quoteAmount ? quoteAmount : this.currentPrice() * this.state.baseAmount;
     if (this.props.side === "b") {
       buySellBtnClass = "bg_btn buy_btn";
       if (quoteAmount > quoteAllowance)  {
