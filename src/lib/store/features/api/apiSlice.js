@@ -88,7 +88,11 @@ export const apiSlice = createSlice({
     _fills(state, { payload }) {
       payload[0].forEach((fill) => {
         const fillid = fill[1];
-        if (fill[2] === state.currentMarket && fill[0] === state.network) {
+        if (
+          ['f', 'pf'].includes(fill[6]) &&
+          fill[2] === state.currentMarket &&
+          fill[0] === state.network
+        ) {
           state.marketFills[fillid] = fill;
         }
         if (state.userId && fill[8] === state.userId.toString()) {

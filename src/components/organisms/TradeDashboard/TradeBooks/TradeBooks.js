@@ -64,7 +64,7 @@ export default function TradeBooks(props) {
               head
               className="trade_table_asks"
               useGradient="true"
-              priceTableData={props.priceTableData}
+              priceTableData={props.askBins}
               currentMarket={props.currentMarket}
               scrollToBottom={true}
             />
