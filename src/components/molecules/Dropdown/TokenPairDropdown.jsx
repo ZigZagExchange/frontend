@@ -35,7 +35,7 @@ const DropdownDisplay = styled.div`
   border-radius: 8px;
   transition: all 0.2s ease-in-out;
   box-shadow: 0px 8px 16px 0px #0101011A;
-  width: ${({ isMobile }) => isMobile ? '350px' : '469px'};
+  width: ${({ isMobile }) => isMobile ? '400px' : '469px'};
   height: 531px;
   background: ${({ theme }) => theme.colors.backgroundLowEmphasis};
   border: 1px solid ${({ theme }) => theme.colors.foreground400};
@@ -160,11 +160,13 @@ const TableContent = styled.div`
 `
 
 const HeaderWrapper = styled.div`
-  display: grid;
-  grid-auto-flow: column;
+  /* display: grid; */
+  /* grid-auto-flow: column; */
+  /* justify-content: end; */
   align-items: center;
-  justify-content: end;
-  gap: 10px;
+  display: flex;
+  justify-content: flex-end;
+  /* gap: 10px; */
   svg {
       justify-self: center;
   }
@@ -212,7 +214,7 @@ const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, upda
     const [priceDirection, setPriceDirection] = useState(false)
     const [searchValue, setSearchValue] = useState('')
     const [isOpened, setIsOpened] = useState(false)
-    const isMobile = window.innerWidth < 430
+    const isMobile = window.innerWidth < 500
     const wrapperRef = useRef(null)
     const [_marketInfo, setMarketInfo] = useState(null);
 
@@ -501,7 +503,7 @@ const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, upda
                                 <span>{d.span}</span>
                             </PairWrapper>
                         </td>
-                        <td>
+                        <td style={{paddingLeft: '30px'}}>
                             <Text font="tableContent" color={d.td3 < 0 ? 'dangerHighEmphasis' : 'successHighEmphasis'} align="right">{d.td2}</Text>
                         </td>
                         <td>
@@ -520,7 +522,7 @@ const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, upda
                     <tr>
                         <th onClick={() => togglePairSorting()}>
                             <HeaderWrapper>
-                                <Text style={{marginLeft: '22px'}} font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Pair</Text>
+                                <Text style={{marginLeft: '22px', marginRight: '10px'}} font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">Pair</Text>
                                 {pairSorted ? (
                                     <SortIconWrapper>
                                         {pairDirection ? <SortUpIcon /> : <SortUpFilledIcon />}
@@ -536,7 +538,7 @@ const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, upda
                         </th>
                         <th onClick={() => togglePriceSorting()}>
                             <HeaderWrapper>
-                                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis" align="right">Last Price</Text>
+                                <Text style={{marginRight: isMobile? '3px':'10px'}} font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis" align="right">Last Price</Text>
                                 {priceSorted ? (
                                     <SortIconWrapper>
                                         {priceDirection ? <SortUpIcon /> : <SortUpFilledIcon />}
@@ -552,7 +554,7 @@ const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, upda
                         </th>
                         <th onClick={() => toggleVolumeSorting()}>
                             <HeaderWrapper>
-                                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis" align="right">Volume(24h)</Text>
+                                <Text  style={{marginRight: isMobile? '3px':'10px'}} font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis" align="right">Volume(24h)</Text>
                                 {volumeSorted ? (
                                     <SortIconWrapper>
                                         {volumeDirection ? <SortUpIcon /> : <SortUpFilledIcon />}
@@ -568,7 +570,7 @@ const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, upda
                         </th>
                         <th onClick={() => toggleChangeSorting()}>
                             <HeaderWrapper>
-                                <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis" align="right">Change</Text>
+                                <Text  style={{marginRight: isMobile? '3px':'10px'}} font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis" align="right">Change</Text>
                                 {changeSorted ? (
                                     <SortIconWrapper>
                                         {changeDirection ? <SortUpIcon /> : <SortUpFilledIcon />}
