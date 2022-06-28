@@ -684,14 +684,14 @@ export default class API extends Emitter {
     try {
       const netContract = this.getNetworkContract();
       const [account] = await this.web3.eth.getAccounts();
-      if (!account) return result;
+      if (!account || account === '0x') return result;
       
       if (currency === "ETH") {
         result.balance = await this.mainnetProvider.getBalance(account);
         return result;
       }
 
-      if (!currencyInfo) return result;
+      if (!currencyInfo || !currencyInfo.address) return result;
       
       const contract = new ethers.Contract(
         currencyInfo.address,
@@ -722,7 +722,7 @@ export default class API extends Emitter {
         allowance,
         valueReadable: "0",
       };
-      if (currencyInfo) {
+      if (balance && currencyInfo) {
         balances[ticker].valueReadable = formatAmount(balance, currencyInfo);
       } else if (ticker === "ETH") {
         balances[ticker].valueReadable = formatAmount(balance, { decimals: 18 });
