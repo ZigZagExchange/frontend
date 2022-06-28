@@ -370,7 +370,7 @@ export function TradeDashboard() {
         {/* TradePriceTable, TradePriceHeadSecond */}
         <TradeBooks
           currentMarket={currentMarket}
-          priceTableData={askBins}
+          askBins={askBins}
           lastPrice={marketSummary.price}
           marketInfo={marketInfo}
           bidBins={bidBins}
