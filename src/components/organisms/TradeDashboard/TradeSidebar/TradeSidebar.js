@@ -13,7 +13,7 @@ const StyledTradeSidebar = styled.aside`
   grid-area: sidebar;
   position: relative;
   height: fit-content;
-  border: 1px solid ${({ theme }) => theme.colors.foreground300};
+  border: 1px solid ${({ theme }) => theme.colors.foreground400};
 `;
 
 const InfoWrapper = styled.div`
