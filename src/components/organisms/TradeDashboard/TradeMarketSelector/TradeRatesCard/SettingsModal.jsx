@@ -21,8 +21,8 @@ const ModalHeader = styled.div`
 `;
 
 const ResetAllSettingsWrapper = styled.div`
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-auto-flow: column;
   gap: 7px;
   justify-content: end;
   svg path {
@@ -77,7 +77,7 @@ const SettingsModal = ({ onDismiss }) => {
         <Text font="primaryHeading6" color="foregroundHighEmphasis">
           Settings
         </Text>
-        <ActionsWrapper>
+        {/* <ActionsWrapper>
           <ActionWrapper>
             <EditIcon />
             <Text
@@ -98,21 +98,10 @@ const SettingsModal = ({ onDismiss }) => {
               Reset Layout
             </Text>
           </ActionWrapper>
-        </ActionsWrapper>
+        </ActionsWrapper> */}
       </ModalHeader>
       <Divider />
       <ModalBody>
-        <ToggleWrapper>
-          <Toggle
-            isChecked={settings.showNightPriceChange}
-            scale="md"
-            onChange={toggle}
-            settingKey="showNightPriceChange"
-          />
-          <Text font="primarySmall" color="foregroundHighEmphasis">
-            Show price change since midnight UTC instead of 24h change
-          </Text>
-        </ToggleWrapper>
         <ToggleWrapper>
           <Toggle
             isChecked={settings.showCancelOrders}
@@ -122,28 +111,6 @@ const SettingsModal = ({ onDismiss }) => {
           />
           <Text font="primarySmall" color="foregroundHighEmphasis">
             Cancel all orders button enabled
-          </Text>
-        </ToggleWrapper>
-        <ToggleWrapper>
-          <Toggle
-            isChecked={settings.disableOrderNotification}
-            scale="md"
-            onChange={toggle}
-            settingKey="disableOrderNotification"
-          />
-          <Text font="primarySmall" color="foregroundHighEmphasis">
-            Disable order notifications (pending/placed/filled/cancelled)
-          </Text>
-        </ToggleWrapper>
-        <ToggleWrapper>
-          <Toggle
-            isChecked={settings.stackOrderbook}
-            scale="md"
-            onChange={toggle}
-            settingKey="stackOrderbook"
-          />
-          <Text font="primarySmall" color="foregroundHighEmphasis">
-            Stack orderbooks
           </Text>
         </ToggleWrapper>
         <ToggleWrapper>
@@ -170,6 +137,17 @@ const SettingsModal = ({ onDismiss }) => {
         </ToggleWrapper>
         <ToggleWrapper>
           <Toggle
+            isChecked={settings.disableOrderNotification}
+            scale="md"
+            onChange={toggle}
+            settingKey="disableOrderNotification"
+          />
+          <Text font="primarySmall" color="foregroundHighEmphasis">
+            Disable order notifications (pending/placed/filled/cancelled)
+          </Text>
+        </ToggleWrapper>
+        <ToggleWrapper>
+          <Toggle
             isChecked={settings.hideAddress}
             scale="md"
             onChange={toggle}
@@ -192,6 +170,28 @@ const SettingsModal = ({ onDismiss }) => {
         </ToggleWrapper>
         <ToggleWrapper>
           <Toggle
+            isChecked={settings.showNightPriceChange}
+            scale="md"
+            onChange={toggle}
+            settingKey="showNightPriceChange"
+          />
+          <Text font="primarySmall" color="foregroundHighEmphasis">
+            Show price change since midnight UTC instead of 24h change
+          </Text>
+        </ToggleWrapper>
+        <ToggleWrapper>
+          <Toggle
+            isChecked={settings.stackOrderbook}
+            scale="md"
+            onChange={toggle}
+            settingKey="stackOrderbook"
+          />
+          <Text font="primarySmall" color="foregroundHighEmphasis">
+            Stack orderbooks
+          </Text>
+        </ToggleWrapper>
+        <ToggleWrapper>
+          <Toggle
             isChecked={settings.disableTradeIDCard}
             scale="md"
             onChange={toggle}
@@ -207,6 +207,7 @@ const SettingsModal = ({ onDismiss }) => {
             font="primaryMediumBody"
             color="primaryHighEmphasis"
             style={{ textDecoration: "underline", cursor: "pointer" }}
+            textAlign="right"
           >
             Reset All Settings
           </Text>

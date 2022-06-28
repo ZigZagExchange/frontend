@@ -373,13 +373,13 @@ export const Header = (props) => {
             </SocialWrapper>
             <VerticalDivider />
             <LanguageWrapper>
-              <StyledDropdown
+              {/* <StyledDropdown
                 adClass="lang-dropdown"
                 transparent
                 item={langList}
                 context={language}
                 clickFunction={changeLanguage}
-              />
+              /> */}
               <ToggleTheme isDark={isDark} toggleTheme={toggleTheme} />
             </LanguageWrapper>
             <VerticalDivider />

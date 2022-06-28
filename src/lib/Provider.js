@@ -11,13 +11,19 @@ import ModalContext from "components/contexts/ModalContext";
 import "react-toastify/dist/ReactToastify.css";
 
 function Provider({ children }) {
+  const isMobile = window.innerWidth < 500;
   return (
     <ThemeContextProvider>
       <GlobalStyle />
       <PersistGate loading={null} persistor={persistor}>
         <ReduxProvider store={store}>
           <ModalContext>{children}</ModalContext>
-          <ToastContainer position="bottom-right" theme="colored" limit={1} />
+          <ToastContainer
+            position="bottom-right"
+            theme="colored"
+            limit={1}
+            style={{ width: isMobile ? "100%" : "400px" }}
+          />
         </ReduxProvider>
       </PersistGate>
     </ThemeContextProvider>

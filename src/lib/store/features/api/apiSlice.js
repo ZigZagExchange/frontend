@@ -8,7 +8,7 @@ import FillCard from "components/organisms/TradeDashboard/TradeTables/OrdersTabl
 const makeScope = (state) => `${state.network}-${state.userId}`;
 
 const initialUISettings = {
-  showNightPriceChange: true,
+  showNightPriceChange: false,
   showCancelOrders: false,
   disableOrderNotification: false,
   stackOrderbook: true,

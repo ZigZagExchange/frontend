@@ -29,7 +29,7 @@ const DropdownDisplay = styled.div`
   border-radius: 8px;
   transition: all 0.2s ease-in-out;
   box-shadow: 0px 8px 16px 0px #0101011A;
-  width: ${({ isMobile }) => isMobile ? '250px' : '400px'};
+  width: ${({ isMobile }) => isMobile ? '280px' : '400px'};
   // height: 331px;
   max-height: 617px;
   background: ${({ theme }) => theme.colors.backgroundLowEmphasis};
@@ -170,7 +170,7 @@ const AccountDropdown = ({ notext, networkName }) => {
   const [totalBalance, setTotalBalance] = useState(0);
   const [selectedLayer, setSelectedLayer] = useState(2);
   const coinEstimator = useCoinEstimator();
-  const isMobile = window.innerWidth < 430
+  const isMobile = window.innerWidth < 490
   const wrapperRef = useRef(null)
 
   HideMenuOnOutsideClicked(wrapperRef, setIsOpened)

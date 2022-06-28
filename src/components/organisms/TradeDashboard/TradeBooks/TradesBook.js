@@ -20,6 +20,7 @@ const TradesWrapper = styled.div`
   flex-direction: column;
   width: 100%;
   gap: 8px;
+  padding-top: 10px;
 `
 
 export default function TradesBook(props) {
@@ -48,7 +49,7 @@ export default function TradesBook(props) {
       <StyledTradeBooks isStack={settings.stackOrderbook}>
         <TradesWrapper>
           {/* TradePriceTable*/}
-          <Text font="primaryTitleDisplay" color="foregroundHighEmphasis">Market Trades</Text>
+          <Text style={{paddingBottom: '5px'}} font="primaryTitleDisplay" color="foregroundHighEmphasis">Market Trades</Text>
           <TradeRecentTable
             head
             value="up_value"
