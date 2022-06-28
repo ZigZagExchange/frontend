@@ -46,7 +46,6 @@ export default function TradeSidebar(props) {
                         <Text font="primaryBoldDisplay"
                             color="foregroundHighEmphasis"
                             textAlign="center" > JOIN DISCORD </Text> </Button>
-                        {!props.user.id && <ConnectWalletButton width="fit-content" />}
                     </InfoWrapper>
             }
             <SpotBox lastPrice={marketSummary.price}
