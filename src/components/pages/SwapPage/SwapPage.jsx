@@ -3,10 +3,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import useTheme from "components/hooks/useTheme";
 import api from "lib/api";
-import { Link } from "react-router-dom";
+
 import { DefaultTemplate } from "components";
-import { ExternalLinkIcon, InfoIcon } from "components/atoms/Svg";
-import NetworkSelection from "components/organisms/NetworkSelection";
 import SwapContianer from "./SwapContainer";
 
 import classNames from "classnames";
@@ -422,22 +420,6 @@ export default function SwapPage() {
             <p className="mt-10 text-3xl font-semibold font-work ">
               ZigZag Convert
             </p>
-            {/* <p className="mt-2 text-sm text-gray-500">
-              Swap into more than 200 tokens, using the best quotes from over 8
-              sources.
-            </p>
-            <Link
-              to="/"
-              className="flex items-center mt-1 dark:hover:text-foreground-700 dark:text-foreground-900 text-background-900 hover:text-background-800"
-            >
-              <p className="mr-2">Learn More</p>
-              <ExternalLinkIcon size={11} />
-            </Link> */}
-            {/* <div className="flex items-center justify-between mt-4">
-              <p className="text-sm font-work">Network</p>
-              <InfoIcon size={16} />
-            </div>
-            <NetworkSelection className="mt-2" /> */}
             <SwapContianer
               setTransactionType={(type) => setTtype(type)}
               transactionType={tType}

@@ -17,6 +17,7 @@ const initialUISettings = {
   hideAddress: false,
   hideBalance: false,
   hideGuidePopup: false,
+  disableTradeIDCard: false,
 };
 
 export const apiSlice = createSlice({
@@ -144,10 +145,10 @@ export const apiSlice = createSlice({
           if (newstatus === "f") {
             const fillDetails = state.userFills[fillid];
 
-            // const baseCurrency = fillDetails[2].split("-")[0];
-            // const sideText = fillDetails[3] === "b" ? "buy" : "sell";
-            // const price = Number(fillDetails[4]);
-            // const baseQuantity = Number(fillDetails[5]);
+            const baseCurrency = fillDetails[2].split("-")[0];
+            const sideText = fillDetails[3] === "b" ? "buy" : "sell";
+            const price = Number(fillDetails[4]);
+            const baseQuantity = Number(fillDetails[5]);
             let p = [];
             for (var i = 0; i < 13; i++) {
               if (i === 4) {
@@ -156,7 +157,27 @@ export const apiSlice = createSlice({
                 p.push(fillDetails[i]);
               }
             }
-            if (!state.settings.disableOrderNotification) {
+            if (
+              !state.settings.disableOrderNotification &&
+              state.settings.disableTradeIDCard
+            ) {
+              toast.success(
+                `Your ${sideText} order for ${Number(
+                  baseQuantity.toPrecision(4)
+                )} ${baseCurrency} was filled @ ${Number(formatPrice(price))}!`,
+                {
+                  toastId: `Your ${sideText} order for ${Number(
+                    baseQuantity.toPrecision(4)
+                  )} ${baseCurrency} was filled @ ${Number(
+                    formatPrice(price)
+                  )}!`,
+                }
+              );
+            }
+            if (
+              !state.settings.disableOrderNotification &&
+              !state.settings.disableTradeIDCard
+            ) {
               toast(
                 ({ closeToast }) => (
                   <FillCard closeToast={closeToast} fill={p} />
@@ -170,18 +191,6 @@ export const apiSlice = createSlice({
                   closeButton: false,
                 }
               );
-              // toast.success(
-              //   `Your ${sideText} order for ${Number(
-              //     baseQuantity.toPrecision(4)
-              //   )} ${baseCurrency} was filled @ ${Number(formatPrice(price))}!`,
-              //   {
-              //     toastId: `Your ${sideText} order for ${Number(
-              //       baseQuantity.toPrecision(4)
-              //     )} ${baseCurrency} was filled @ ${Number(
-              //       formatPrice(price)
-              //     )}!`,
-              //   }
-              // );
             }
           }
         }

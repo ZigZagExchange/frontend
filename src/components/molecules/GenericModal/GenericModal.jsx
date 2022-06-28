@@ -43,7 +43,7 @@ const CloseButton = styled.button`
 
 const GenericModal = ({
   width = 528,
-  height = 402,
+  height,
   isOpened = false,
   onClose,
   children,

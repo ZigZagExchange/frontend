@@ -143,6 +143,7 @@ const FillCard = ({ fill, closeToast }) => {
               <div className="mt-3 text-sm font-normal font-work dark:text-foreground-900 text-background-900">
                 Amount:
                 <span className="font-bold">
+                  {" "}
                   {Number(fill[5])?.toPrecision(6) / 1} {market.split("-")[0]}
                 </span>
               </div>

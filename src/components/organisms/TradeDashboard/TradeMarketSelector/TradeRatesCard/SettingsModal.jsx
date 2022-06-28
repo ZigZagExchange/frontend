@@ -190,6 +190,17 @@ const SettingsModal = ({ onDismiss }) => {
             Hide balances
           </Text>
         </ToggleWrapper>
+        <ToggleWrapper>
+          <Toggle
+            isChecked={settings.disableTradeIDCard}
+            scale="md"
+            onChange={toggle}
+            settingKey="disableTradeIDCard"
+          />
+          <Text font="primarySmall" color="foregroundHighEmphasis">
+            Disable Trade ID card notification
+          </Text>
+        </ToggleWrapper>
         <ResetAllSettingsWrapper onClick={resetSettings}>
           <RestartIcon />
           <Text
