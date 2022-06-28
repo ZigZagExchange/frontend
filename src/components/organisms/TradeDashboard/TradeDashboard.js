@@ -38,8 +38,9 @@ const TradeContainer = styled.div`
 
 const TradeGrid = styled.article`
   display: grid;
-  grid-template-rows: 75px 528px 1fr 57px;
-  grid-template-columns: ${({ isLeft }) => isLeft ? '300px 253.5px 253.5px 1fr' : '300px 507px 1fr'};
+  grid-template-rows: 56px 528px 1fr 57px;
+  grid-template-columns: ${({ isLeft }) =>
+    isLeft ? "300px 253.5px 253.5px 1fr" : "300px 507px 1fr"};
   grid-template-areas: ${({ isLeft }) =>
     isLeft
       ? `"marketSelector marketSelector marketSelector marketSelector"
@@ -59,7 +60,7 @@ const TradeGrid = styled.article`
       isLeft
         ? "74px 410px 459px 508px 362px 1fr"
         : "74px 410px 459px 519px 362px 1fr"};
-    grid-template-columns: ${({ isLeft }) => isLeft ? '1fr 1fr' : '1fr'};
+    grid-template-columns: ${({ isLeft }) => (isLeft ? "1fr 1fr" : "1fr")};
     grid-template-areas: ${({ isLeft }) =>
       isLeft
         ? `"marketSelector marketSelector"
@@ -188,8 +189,7 @@ export function TradeDashboard() {
           user={user}
           activeOrderCount={activeUserOrders}
         />
-        {
-          settings.stackOrderbook ?
+        {settings.stackOrderbook ? (
           <>
             {/* TradePriceTable, TradePriceHeadSecond */}
             <OrdersBook
@@ -202,9 +202,10 @@ export function TradeDashboard() {
               fixedPoint={fixedPoint}
               side={side}
             />
-          </> :
+          </>
+        ) : (
           <TradesTable />
-        }
+        )}
         {/* TradeChartArea */}
         <TradeChartArea />
         {/* OrdersTable */}
