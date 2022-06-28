@@ -26,7 +26,7 @@ const ListPage = styled.div`
   width: 100%;
   height: 100%;
   min-height: calc(100vh - 113px);
-  padding: 4rem 0 2rem;
+  padding: 0 2rem;
   // background-color: ${(p) => p.theme.colors.bridgeBackground};
   background-repeat: no-repeat;
   background-size: cover;
@@ -154,9 +154,9 @@ export default function ListPairPage() {
       <ListPage>
         <ListContainer>
           <x.div mb={4}>
-            <Text font="primaryHeading4" marginBottom="1rem">
+            <p className="mb-5 mt-10 text-3xl font-semibold font-work ">
               List New Pair
-            </Text>
+            </p>
 
             <x.div fontSize={{ xs: 'xs', md: '14px' }} lineHeight={1} color={"blue-gray-400"}>
               <x.div marginBottom="4px">No Internal ID?</x.div>
