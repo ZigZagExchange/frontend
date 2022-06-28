@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { BigNumber } from "ethers";
 import isString from "lodash/isString";
 import get from "lodash/get";
+import { float } from "@xstyled/system";
 
 export const getThemeValue = (path, fallback) => (theme) =>
   get(theme, path, fallback);
@@ -12,6 +13,19 @@ export function formatUSD(floatNum) {
     .split(".");
   num[0] = parseInt(num[0]).toLocaleString();
   return num.join(".");
+}
+
+export function formatToken(floatNum, token = "USDC") {
+  let isUSD = false;
+  if (
+    token === "USDC" ||
+    token === "USDT" ||
+    token === "BUSD" ||
+    token === "DAI" ||
+    token === "FRAX"
+  )
+    isUSD = true;
+  return floatNum !== "" && isUSD ? parseFloat(floatNum).toFixed(2) : floatNum;
 }
 
 export function formatAmount(amount, currency) {
