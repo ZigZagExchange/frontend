@@ -38,21 +38,21 @@ const TradeContainer = styled.div`
 
 const TradeGrid = styled.article`
   display: grid;
-  grid-template-rows: 56px 528px 1fr 57px;
+  grid-template-rows: 56px 2fr 1fr 57px;
   grid-template-columns: ${({ isLeft }) =>
     isLeft ? "300px 253.5px 253.5px 1fr" : "300px 507px 1fr"};
   grid-template-areas: ${({ isLeft }) =>
     isLeft
       ? `"marketSelector marketSelector marketSelector marketSelector"
   "sidebar orders trades chart"
-  "sidebar tables tables tables"
-  "sidebar footer footer footer"`
+  "space tables tables tables"
+  "space footer footer footer"`
       : `"marketSelector marketSelector marketSelector"
   "sidebar stack chart"
-  "sidebar tables tables"
-  "sidebar footer footer"`};
+  "space tables tables"
+  "space footer footer"`};
 
-  min-height: calc(100vh - 56px);
+  height: calc(100vh - 56px);
   gap: 0px;
 
   @media screen and (max-width: 991px) {

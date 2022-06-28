@@ -25,6 +25,7 @@ const StyledTradeBooks = styled.section`
   padding: ${({ isLeft }) =>
     isLeft ? "21px 10px 12px 20px" : "21px 10px 10px 10px"};
   border-top: 1px solid ${({ theme }) => theme.colors.foreground400};
+  overflow: hidden;
 `;
 
 const BooksWrapper = styled.div`

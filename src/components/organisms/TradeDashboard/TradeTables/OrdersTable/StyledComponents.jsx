@@ -91,7 +91,7 @@ export const LaptopWrapper = styled.div`
   tbody {
     display: block;
     height: 100%; // 111px;
-    min-height: 217px;
+    // min-height: 217px;
     max-height: calc(100% - 42px);
     overflow: auto;
 
@@ -105,11 +105,13 @@ export const LaptopWrapper = styled.div`
       border-radius: 0px;
       background: hsla(0, 0%, 100%, 0.15);
       height: 23px;
+      border-radius: 5px;
     }
 
     ::-webkit-scrollbar-thumb {
       border-radius: 0px;
       background: hsla(0, 0%, 100%, 0.4);
+      border-radius: 5px;
     }
 
     ::-webkit-scrollbar-thumb:window-inactive {
