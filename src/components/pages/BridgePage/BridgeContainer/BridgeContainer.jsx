@@ -301,7 +301,7 @@ const BridgeContainer = () => {
       const bridgeAmount = inputValue - ZigZagFeeAmount;
 
       if (bridgeAmount <= 0) {
-        error = "Insufficient amount for fees"
+        error = "Insufficient amount for fees";
       } else if (!user.id && bridgeAmount <= activationFee) {
         error = `Must be more than ${activationFee} ${swapCurrency}`;
       } else if (bridgeAmount >= detailBalance) {
@@ -317,9 +317,12 @@ const BridgeContainer = () => {
             )}`;
           }
         }
-      } 
+      }
       // 0.0005 -> poly bridge min size
-      else if (bridgeAmount < 0.0005 && (toNetwork.key === 'polygon' || fromNetwork.from.key === 'polygon')) {
+      else if (
+        bridgeAmount < 0.0005 &&
+        (toNetwork.key === "polygon" || fromNetwork.from.key === "polygon")
+      ) {
         error = "Amount too small";
       }
     }
@@ -386,9 +389,9 @@ const BridgeContainer = () => {
     if (fromNetwork.id === "polygon" && toNetwork.id === "zksync") {
       const gasFee = await api.getPolygonFee();
       if (gasFee) {
-        setL1Fee(35000 * gasFee.fast.maxFee / 10**9);
-        setL2Fee(swapDetails, null, null)
-        setZigZagFeeToken('ETH');
+        setL1Fee((35000 * gasFee.fast.maxFee) / 10 ** 9);
+        setL2Fee(swapDetails, null, null);
+        setZigZagFeeToken("ETH");
         setZigZagFee(0.003);
       }
     }
@@ -422,7 +425,7 @@ const BridgeContainer = () => {
           ]);
           setL1Fee(L1res);
           setL2Fee(swapDetails, L2res.amount, L2res.feeToken);
-          setZigZagFeeToken('ETH');
+          setZigZagFeeToken("ETH");
           setZigZagFee(L1res * 3);
         } else {
           let res = await api.withdrawL2GasFee(swapDetails.currency);
@@ -651,7 +654,7 @@ const BridgeContainer = () => {
 
   const onChangeFromAmounts = (value) => {
     // if (e.target.value.length > 10) return;
-    const amount = value.replace(/[^0-9.]/g,'');
+    const amount = value.replace(/[^0-9.]/g, "");
     setFromAmounts(amount);
     const sDetails = {};
     sDetails["amount"] = amount;
