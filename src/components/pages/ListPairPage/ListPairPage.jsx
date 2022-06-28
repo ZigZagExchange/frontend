@@ -247,7 +247,7 @@ export default function ListPairPage() {
           setTxId(null);
         }}
       />
-      <TradeFooter />
+      {/* <TradeFooter /> */}
     </DefaultTemplate>
   );
 }
