@@ -29,7 +29,7 @@ const TransactionSettings = ({
         <p className="flex items-center h-6 gap-2 text-base ">
           {!editableSlippage ? (
             <>
-              {slippageValue}%
+              {Number(slippageValue).toFixed(2)}%
               <EditIcon
                 size={16}
                 className="cursor-pointer hover:opacity-75"

@@ -411,11 +411,12 @@ export default function SwapPage() {
   };
 
   const onChangeSlippageValue = (value) => {
-    let amount = value.replace(/[^0-9.]/g, "");
-    if (amount < 0 || amount > 10) {
-      return;
+    let amount = value.replace(/[^1-9.]/g, ""); //^[1-9][0-9]?$|^100$
+    if (parseFloat(amount) < 1 || parseFloat(amount) > 10) {
+      setSlippageValue("1.00");
+    } else {
+      setSlippageValue(amount);
     }
-    setSlippageValue(amount);
   };
 
   return (
