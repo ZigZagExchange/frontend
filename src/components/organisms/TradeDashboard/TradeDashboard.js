@@ -45,10 +45,10 @@ const TradeGrid = styled.article`
     isLeft
       ? `"marketSelector marketSelector marketSelector marketSelector"
   "sidebar orders trades chart"
-  "space tables tables tables"`
+  "tables tables tables tables"`
       : `"marketSelector marketSelector marketSelector"
   "sidebar stack chart"
-  "space tables tables"`};
+  "tables tables tables"`};
 
   height: calc(100vh - 56px);
   gap: 0px;
