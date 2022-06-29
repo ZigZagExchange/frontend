@@ -1442,7 +1442,7 @@ export default function OrdersTable(props) {
                         font="primaryExtraSmallSemiBold"
                         color="foregroundLowEmphasis"
                       >
-                        Balance
+                        Token balance
                       </Text>
                       {balanceSorted ? (
                         <SortIconWrapper>
@@ -1477,7 +1477,7 @@ export default function OrdersTable(props) {
                         font="primaryExtraSmallSemiBold"
                         color="foregroundLowEmphasis"
                       >
-                        USD
+                        USD balance
                       </Text>
                       {balanceSorted ? (
                         <SortIconWrapper>
