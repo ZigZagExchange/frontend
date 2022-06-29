@@ -148,9 +148,8 @@ export default class APIArbitrumProvider extends APIProvider {
     
     const domain = {
       name: 'ZigZag',
-      version: '1',
+      version: '2',
       chainId: this.network,
-      //verifyingContract: 0x5998a3569ec138b19c07d3369aecc5871a9c0f61
     };
 
     const types = {
@@ -172,6 +171,7 @@ export default class APIArbitrumProvider extends APIProvider {
     console.log(domain, types, Order);
     const signer = await this.api.rollupProvider.getSigner();
     const signature = await signer._signTypedData(domain, types, Order);
+    console.log(signature);
 
     Order.signature = signature;    
     this.api.send("submitorder3", [this.network, market, Order]);
