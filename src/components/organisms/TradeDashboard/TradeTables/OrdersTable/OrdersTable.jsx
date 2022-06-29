@@ -333,7 +333,7 @@ export class OrdersTable extends React.Component {
                 <td data-label="Action">
                   {txhash ? (
                     <a
-                      href={baseExplorerUrl + txhash}
+                      href={api.getExplorerTxLink(api.apiProvider.network, txhash)}
                       target="_blank"
                       rel="noreferrer"
                     >
@@ -352,18 +352,6 @@ export class OrdersTable extends React.Component {
   }
 
   render() {
-    let explorerLink;
-    switch (api.apiProvider.network) {
-      case 1000:
-        explorerLink =
-          "https://rinkeby.zkscan.io/explorer/accounts/" +
-          this.props.user.address;
-        break;
-      case 1:
-      default:
-        explorerLink =
-          "https://zkscan.io/explorer/accounts/" + this.props.user.address;
-    }
     let footerContent,
       classNameOrders = "",
       classNameBalances = "",
@@ -404,7 +392,7 @@ export class OrdersTable extends React.Component {
                 <tbody>{balancesContent}</tbody>
               </table>
 
-              <a href={explorerLink} target="_blank" rel="noreferrer">
+              <a href={api.getExplorerAccountLink(api.apiProvider.network, this.props.user.address)} target="_blank" rel="noreferrer">
                 View Account on Explorer
               </a>
             </div>
@@ -412,7 +400,7 @@ export class OrdersTable extends React.Component {
         } else {
           footerContent = (
             <div>
-              <a href={explorerLink} target="_blank" rel="noreferrer">
+              <a href={api.getExplorerAccountLink(api.apiProvider.network, this.props.user.address)} target="_blank" rel="noreferrer">
                 View Account on Explorer
               </a>
             </div>

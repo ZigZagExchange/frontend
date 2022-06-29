@@ -1025,4 +1025,22 @@ export default class API extends Emitter {
     }
     return [...tickers];
   };
+
+  getExplorerTxLink(chainId, txhash) {
+      switch (Number(chainId)) {
+          case 1: return 'https://zkscan.io/explorer/transactions/' + txhash;
+          case 1000: return 'https://rinkeby.zkscan.io/explorer/transactions/' + txhash;
+          case 42161: return 'https://arbiscan.io/tx/' + txhash;
+          default: throw Error("Chain ID not understood");
+      }
+  }
+
+  getExplorerAccountLink(chainId, address) {
+      switch (Number(chainId)) {
+          case 1: return 'https://zkscan.io/explorer/accounts/' + address;
+          case 1000: return 'https://rinkeby.zkscan.io/explorer/accounts/' + address;
+          case 42161: return 'https://arbiscan.io/address/' + address;
+          default: throw Error("Chain ID not understood");
+      }
+  }
 }
