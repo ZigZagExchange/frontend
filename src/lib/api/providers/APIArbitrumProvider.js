@@ -4,8 +4,7 @@ import balanceBundleABI  from "lib/contracts/BalanceBundle.json";
 import erc20ContractABI from "lib/contracts/ERC20.json";
 import wethContractABI from "lib/contracts/WETH.json";
 import { 
-  balanceBundlerAddress,
-  ARBITRUM_ADDRESSES
+  balanceBundlerAddress
 } from "./../constants";
 
 export default class APIArbitrumProvider extends APIProvider {

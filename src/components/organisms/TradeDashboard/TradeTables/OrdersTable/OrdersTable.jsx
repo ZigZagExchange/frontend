@@ -183,18 +183,6 @@ export class OrdersTable extends React.Component {
   }
 
   renderFillTable(fills) {
-    let baseExplorerUrl;
-    switch (api.apiProvider.network) {
-      case 1001:
-        baseExplorerUrl = "https://goerli.voyager.online/tx/";
-        break;
-      case 1000:
-        baseExplorerUrl = "https://rinkeby.zkscan.io/explorer/transactions/";
-        break;
-      case 1:
-      default:
-        baseExplorerUrl = "https://zkscan.io/explorer/transactions/";
-    }
     return (
       <table>
         <thead>

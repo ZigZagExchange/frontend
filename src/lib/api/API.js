@@ -8,7 +8,7 @@ import { getENSName } from "lib/ens";
 import { formatAmount } from "lib/utils";
 import erc20ContractABI from "lib/contracts/ERC20.json";
 import wethContractABI from "lib/contracts/WETH.json";
-import { MAX_ALLOWANCE, balanceBundlerMainnet } from "./constants";
+import { MAX_ALLOWANCE } from "./constants";
 import { 
   ZKSYNC_POLYGON_BRIDGE,
   POLYGON_MUMBAI_WETH_ADDRESS,
