@@ -95,7 +95,7 @@ export default class APIArbitrumProvider extends APIProvider {
     if (!quoteAmount) quoteAmount = baseAmount * price;
     if (!baseAmount) baseAmount = quoteAmount / price;
 
-    let makerToken, takerToken, makerAmountBN, takerAmountBN, gasFee;
+    let makerToken, takerToken, makerAmountBN, takerAmountBN, gasFee, makerVolumeFee, takerVolumeFee;
     if(side === 's') {
       makerToken = marketInfo.baseAsset.address;
       takerToken = marketInfo.quoteAsset.address;
@@ -109,6 +109,14 @@ export default class APIArbitrumProvider extends APIProvider {
       );
       gasFee = ethers.utils.parseUnits (
         marketInfo.baseFee.toString(),
+        marketInfo.baseAsset.decimals 
+      )
+      makerVolumeFee = ethers.utils.parseUnits (
+        baseAmount * Number(marketInfo.makerVolumeFee),
+        marketInfo.baseAsset.decimals 
+      )
+      takerVolumeFee = ethers.utils.parseUnits (
+        baseAmount * Number(marketInfo.takerVolumeFee),
         marketInfo.baseAsset.decimals 
       )
     } else {
@@ -126,6 +134,14 @@ export default class APIArbitrumProvider extends APIProvider {
         marketInfo.quoteFee.toString(),
         marketInfo.quoteAsset.decimals
       )
+      makerVolumeFee = ethers.utils.parseUnits (
+        quoteAmount * Number(marketInfo.makerVolumeFee),
+        marketInfo.quoteAsset.decimals 
+      )
+      takerVolumeFee = ethers.utils.parseUnits (
+        quoteAmount * Number(marketInfo.takerVolumeFee),
+        marketInfo.quoteAsset.decimals 
+      )
     }
 
     const expirationTimeSeconds = (orderType === 'market')
@@ -139,8 +155,8 @@ export default class APIArbitrumProvider extends APIProvider {
       feeRecipientAddress: ARBITRUM_ADDRESSES.FEE_RECIPIENT_ADDRESS,
       makerAssetAmount:  makerAmountBN.toString(),
       takerAssetAmount: takerAmountBN.toString(),
-      makerVolumeFee: '0',
-      takerVolumeFee: '0',
+      makerVolumeFee: makerVolumeFee,
+      takerVolumeFee: takerVolumeFee,
       gasFee: gasFee.toString(),
       expirationTimeSeconds: expirationTimeSeconds.toFixed(0),
       salt: (Math.random() * 123456789).toFixed(0),
