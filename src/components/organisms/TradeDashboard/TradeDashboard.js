@@ -213,7 +213,7 @@ export function TradeDashboard() {
           userOrders={userOrders}
           user={user}
         />
-        {/* <TradeFooter /> */}
+        <TradeFooter />
       </TradeGrid>
     </TradeContainer>
   );
