@@ -108,8 +108,8 @@ export default class APIArbitrumProvider extends APIProvider {
         marketInfo.quoteAsset.decimals
       );
       gasFee = ethers.utils.parseUnits (
-        marketInfo.baseFee,
-        marketInfo.baseAsset.decimals
+        marketInfo.baseFee.toString(),
+        marketInfo.baseAsset.decimals 
       )
     } else {
       makerToken = marketInfo.quoteAsset.address;
@@ -123,10 +123,11 @@ export default class APIArbitrumProvider extends APIProvider {
         marketInfo.baseAsset.decimals
       )
       gasFee = ethers.utils.parseUnits (
-        marketInfo.quoteFee,
+        marketInfo.quoteFee.toString(),
         marketInfo.quoteAsset.decimals
       )
     }
+    console.log("here");
 
     const expirationTimeSeconds = (orderType === 'market')
       ? Date.now() / 1000 + 60 * 2 // two minutes
@@ -168,10 +169,8 @@ export default class APIArbitrumProvider extends APIProvider {
       ]
     };
 
-    console.log(domain, types, Order);
     const signer = await this.api.rollupProvider.getSigner();
     const signature = await signer._signTypedData(domain, types, Order);
-    console.log(signature);
 
     Order.signature = signature;    
     this.api.send("submitorder3", [this.network, market, Order]);
