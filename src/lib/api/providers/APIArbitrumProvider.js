@@ -111,12 +111,14 @@ export default class APIArbitrumProvider extends APIProvider {
         marketInfo.baseFee.toString(),
         marketInfo.baseAsset.decimals 
       )
+      const makerFee = baseAmount * Number(marketInfo.makerVolumeFee)
       makerVolumeFee = ethers.utils.parseUnits (
-        baseAmount * Number(marketInfo.makerVolumeFee),
+        makerFee.toFixed(marketInfo.baseAsset.decimals),
         marketInfo.baseAsset.decimals 
       )
+      const takerFee = baseAmount * Number(marketInfo.takerVolumeFee)
       takerVolumeFee = ethers.utils.parseUnits (
-        baseAmount * Number(marketInfo.takerVolumeFee),
+        takerFee.toFixed(marketInfo.baseAsset.decimals),
         marketInfo.baseAsset.decimals 
       )
     } else {
@@ -134,12 +136,14 @@ export default class APIArbitrumProvider extends APIProvider {
         marketInfo.quoteFee.toString(),
         marketInfo.quoteAsset.decimals
       )
+      const makerFee = quoteAmount * Number(marketInfo.makerVolumeFee)
       makerVolumeFee = ethers.utils.parseUnits (
-        quoteAmount * Number(marketInfo.makerVolumeFee),
+        makerFee.toFixed(marketInfo.quoteAsset.decimals),
         marketInfo.quoteAsset.decimals 
       )
+      const takerFee = quoteAmount * Number(marketInfo.takerVolumeFee)
       takerVolumeFee = ethers.utils.parseUnits (
-        quoteAmount * Number(marketInfo.takerVolumeFee),
+        takerFee.toFixed(marketInfo.quoteAsset.decimals),
         marketInfo.quoteAsset.decimals 
       )
     }
