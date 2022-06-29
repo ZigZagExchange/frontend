@@ -23,15 +23,13 @@ const SpotBox = ({
   const [index, setIndex] = useState(1);
   const [orderType, updateOrderType] = useState("market");
 
-  const toggleClick = (num) => setSelectedLayer(num)
+  const toggleClick = (num) => setSelectedLayer(num);
   const settings = useSelector(settingsSelector);
   const handleTabClick = (newIndex) => {
     setIndex(newIndex);
-    if (newIndex === 0)
-      updateOrderType("limit")
-    else
-      updateOrderType("market")
-  }
+    if (newIndex === 0) updateOrderType("limit");
+    else updateOrderType("market");
+  };
 
   const BuyForm = (
     <SpotForm
@@ -46,7 +44,7 @@ const SpotBox = ({
       marketSummary={marketSummary}
       settings={settings}
     />
-  )
+  );
 
   const SellForm = (
     <SpotForm
@@ -61,28 +59,30 @@ const SpotBox = ({
       marketSummary={marketSummary}
       settings={settings}
     />
-  )
+  );
 
   const renderSpotForm = () => {
-    return selectedLayer === 1
-      ? BuyForm
-      : SellForm
-  }
-  const isMobile = window.innerWidth < 992
+    return selectedLayer === 1 ? BuyForm : SellForm;
+  };
+  const isMobile = window.innerWidth < 992;
 
   return (
     <Wrapper isMobile={isMobile}>
       <ToggleWrapper>
-        <StyledToggleButton width={window.innerWidth < 600 ? 70 : 126} leftLabel="BUY" rightLabel="SELL" selectedLayer={selectedLayer} toggleClick={toggleClick} />
+        <StyledToggleButton
+          width={window.innerWidth < 600 ? 70 : 126}
+          leftLabel="BUY"
+          rightLabel="SELL"
+          selectedLayer={selectedLayer}
+          toggleClick={toggleClick}
+        />
         {/* <IconButton variant="secondary" startIcon={<CalculatorIcon />}></IconButton> */}
       </ToggleWrapper>
       <StyledTabMenu left activeIndex={index} onItemClick={handleTabClick}>
         <Tab>Limit</Tab>
         <Tab>Market</Tab>
       </StyledTabMenu>
-      <SpotFormWrapper>
-        {lastPrice ? renderSpotForm() : ""}
-      </SpotFormWrapper>
+      <SpotFormWrapper>{lastPrice ? renderSpotForm() : ""}</SpotFormWrapper>
     </Wrapper>
   );
 };
@@ -93,8 +93,8 @@ const Wrapper = styled.div`
   // display: grid;
   grid-auto-flow: row;
   background-color: ${({ theme }) => theme.colors.backgroundMediumEmphasis};
-  height: ${({ isMobile }) => isMobile ? '457px' : '428px'};
-`
+  height: ${({ isMobile }) => (isMobile ? "457px" : "428px")};
+`;
 
 const ToggleWrapper = styled.div`
   display: flex;
@@ -103,11 +103,11 @@ const ToggleWrapper = styled.div`
   justify-content: center;
   gap: 8px;
   padding: 20px 0px;
-`
+`;
 
 const StyledToggleButton = styled(ToggleButton)`
   border: 1px solid ${({ theme }) => theme.colors.foreground400} !important;
-`
+`;
 
 const IconButton = styled(baseIcon)`
   width: 32px;
@@ -116,15 +116,14 @@ const IconButton = styled(baseIcon)`
   border-radius: 8px;
   padding: 0px !important;
   svg {
-      margin-right: 0px !important;
-      margin-left: 0px !important;
+    margin-right: 0px !important;
+    margin-left: 0px !important;
   }
-`
+`;
 
 const StyledTabMenu = styled(TabMenu)`
   margin: 0px 20px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.foreground400};
-`
+`;
 
-const SpotFormWrapper = styled.div`
-`
+const SpotFormWrapper = styled.div``;

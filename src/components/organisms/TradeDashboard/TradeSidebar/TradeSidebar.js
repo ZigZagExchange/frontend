@@ -12,7 +12,7 @@ import {
 import { Button, ConnectWalletButton } from "components/molecules/Button";
 
 const StyledTradeSidebar = styled.aside`
-  display: grid;
+  // display: grid;
   grid-auto-flow: row;
   grid-area: sidebar;
   position: relative;

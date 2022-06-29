@@ -76,9 +76,9 @@ export const FooterContainer = styled.div`
     text-overflow: ellipsis;
   }
 
-  @media screen and (min-width: 993px) {
-    max-height: calc(100vh - 720px);
-  }
+  // @media screen and (min-width: 993px) {
+  //   max-height: calc(100vh - 720px);
+  // }
 `;
 
 export const LaptopWrapper = styled.div`
