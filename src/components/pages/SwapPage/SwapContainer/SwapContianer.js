@@ -21,6 +21,7 @@ const SwapContianer = ({
   toTokenOptions,
   onChangeToToken,
   toAmounts,
+  onChangeToAmounts,
   onClickMax,
 }) => {
   return (
@@ -51,7 +52,7 @@ const SwapContianer = ({
           Max
         </button>
         <input
-          className="ml-3 text-2xl font-semibold text-right bg-transparent focus:outline-none"
+          className="ml-3 text-2xl font-semibold text-right bg-transparent w-36 md:w-auto focus:outline-none"
           placeholder="0.00"
           onChange={onChangeFromAmounts}
           value={fromAmounts}
@@ -75,7 +76,7 @@ const SwapContianer = ({
           <SwitchHorizontalIcon className="w-4" />
         </p>
       </div>
-      <div className="flex items-center justify-between px-3 py-2 mt-3 rounded-lg">
+      <div className="flex items-center justify-between px-3 py-2 mt-3 rounded-lg dark:bg-foreground-200 bg-primary-300 hover:ring-1 hover:ring-offset-0 hover:dark:ring-foreground-500 hover:ring-primary-600">
         {toTokenOptions?.length > 0 && (
           <TokenDropDownModal
             tickers={toTokenOptions}
@@ -85,10 +86,10 @@ const SwapContianer = ({
           />
         )}
         <input
-          className="ml-3 text-2xl font-semibold text-right bg-transparent focus:outline-none"
+          className="ml-3 text-2xl font-semibold text-right bg-transparent focus:outline-none w-36 md:w-auto"
           placeholder="0.00"
-          value={toAmounts?.toPrecision(6)}
-          readOnly
+          value={toAmounts}
+          onChange={onChangeToAmounts}
         />
       </div>
       <p className="mt-1 text-sm font-normal text-right text-slate-400 ">
