@@ -15,7 +15,7 @@ export class OrdersTable extends React.Component {
   }
 
   getFills() {
-    return Object.values(this.props.userFills).filter(i=>i[6]==='f').sort((a, b) => b[1] - a[1]);
+    return Object.values(this.props.userFills).sort((a, b) => b[1] - a[1]);
   }
 
   getUserOrders() {
@@ -45,7 +45,7 @@ export class OrdersTable extends React.Component {
             const time = order[7] && formatDate(new Date(order[7]*1000));
             let price = order[4];
             let baseQuantity = order[5];
-            let remaining = isNaN(Number(order[11])) ? order[5] : order[11];
+            let remaining = isNaN(Number(order[10])) ? order[5] : order[10];
             let orderStatus = order[9];
             const baseCurrency = order[2].split("-")[0];
             const side = order[3] === "b" ? "buy" : "sell";
