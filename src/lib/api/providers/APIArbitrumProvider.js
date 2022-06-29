@@ -95,7 +95,7 @@ export default class APIArbitrumProvider extends APIProvider {
     if (!quoteAmount) quoteAmount = baseAmount * price;
     if (!baseAmount) baseAmount = quoteAmount / price;
 
-    let makerToken, takerToken, makerAmountBN, takerAmountBN, gasFee, makerVolumeFee, takerVolumeFee;
+    let makerToken, takerToken, makerAmountBN, takerAmountBN, gasFee, makerVolumeFeeBN, takerVolumeFeeBN;
     if(side === 's') {
       makerToken = marketInfo.baseAsset.address;
       takerToken = marketInfo.quoteAsset.address;
@@ -112,12 +112,12 @@ export default class APIArbitrumProvider extends APIProvider {
         marketInfo.baseAsset.decimals 
       )
       const makerFee = baseAmount * Number(marketInfo.makerVolumeFee)
-      makerVolumeFee = ethers.utils.parseUnits (
+      makerVolumeFeeBN = ethers.utils.parseUnits (
         makerFee.toFixed(marketInfo.baseAsset.decimals),
         marketInfo.baseAsset.decimals 
       )
       const takerFee = baseAmount * Number(marketInfo.takerVolumeFee)
-      takerVolumeFee = ethers.utils.parseUnits (
+      takerVolumeFeeBN = ethers.utils.parseUnits (
         takerFee.toFixed(marketInfo.baseAsset.decimals),
         marketInfo.baseAsset.decimals 
       )
@@ -137,12 +137,12 @@ export default class APIArbitrumProvider extends APIProvider {
         marketInfo.quoteAsset.decimals
       )
       const makerFee = quoteAmount * Number(marketInfo.makerVolumeFee)
-      makerVolumeFee = ethers.utils.parseUnits (
+      makerVolumeFeeBN = ethers.utils.parseUnits (
         makerFee.toFixed(marketInfo.quoteAsset.decimals),
         marketInfo.quoteAsset.decimals 
       )
       const takerFee = quoteAmount * Number(marketInfo.takerVolumeFee)
-      takerVolumeFee = ethers.utils.parseUnits (
+      takerVolumeFeeBN = ethers.utils.parseUnits (
         takerFee.toFixed(marketInfo.quoteAsset.decimals),
         marketInfo.quoteAsset.decimals 
       )
@@ -159,8 +159,8 @@ export default class APIArbitrumProvider extends APIProvider {
       feeRecipientAddress: marketInfo.feeAddress,
       makerAssetAmount:  makerAmountBN.toString(),
       takerAssetAmount: takerAmountBN.toString(),
-      makerVolumeFee: makerVolumeFee,
-      takerVolumeFee: takerVolumeFee,
+      makerVolumeFee: makerVolumeFeeBN.toString(),
+      takerVolumeFee: takerVolumeFeeBN.toString(),
       gasFee: gasFee.toString(),
       expirationTimeSeconds: expirationTimeSeconds.toFixed(0),
       salt: (Math.random() * 123456789).toFixed(0),
