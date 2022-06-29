@@ -127,7 +127,6 @@ export default class APIArbitrumProvider extends APIProvider {
         marketInfo.quoteAsset.decimals
       )
     }
-    console.log("here");
 
     const expirationTimeSeconds = (orderType === 'market')
       ? Date.now() / 1000 + 60 * 2 // two minutes
