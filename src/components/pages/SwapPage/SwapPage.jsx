@@ -55,6 +55,7 @@ export default function SwapPage() {
   const [buyToken, setBuyToken] = useState();
   const [basePrice, setBasePrice] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [slippageValue, setSlippageValue] = useState("2.00");
 
   const [sellAmounts, setSellAmounts] = useState();
   const [buyAmounts, setBuyAmounts] = useState(0);
@@ -249,8 +250,9 @@ export default function SwapPage() {
   };
 
   const onChangeSellAmounts = (event) => {
-    setSellAmounts(event.target.value);
-    const x = event.target.value * basePrice;
+    const amount = event.target.value.replace(/[^0-9.]/g, "");
+    setSellAmounts(amount);
+    const x = amount * basePrice;
     setBuyAmounts(x);
   };
 
@@ -375,10 +377,13 @@ export default function SwapPage() {
     }
 
     try {
+      console.log(1 + slippageValue / 100);
       await api.submitOrder(
         currentMarket,
         tType === "buy" ? "b" : "s",
-        tType === "buy" ? price * 1.0015 : price * 0.9985,
+        tType === "buy"
+          ? price * (1 + slippageValue / 100)
+          : price * (1 - slippageValue / 100),
         tType === "sell" ? baseAmount : 0,
         tType === "buy" ? baseAmount : 0,
         "market"
@@ -402,6 +407,15 @@ export default function SwapPage() {
     if (balance && fees) {
       const s_amounts = balance - fees;
       setSellAmounts(s_amounts);
+    }
+  };
+
+  const onChangeSlippageValue = (value) => {
+    let amount = value.replace(/[^1-9.]/g, ""); //^[1-9][0-9]?$|^100$
+    if (parseFloat(amount) < 1 || parseFloat(amount) > 10) {
+      setSlippageValue("1.00");
+    } else {
+      setSlippageValue(amount);
     }
   };
 
@@ -460,7 +474,11 @@ export default function SwapPage() {
               }
               onClickMax={onClickMax}
             />
-            <TransactionSettings transactionType={tType} />
+            <TransactionSettings
+              transactionType={tType}
+              onSetSlippageValue={onChangeSlippageValue}
+              slippageValue={slippageValue}
+            />
             <Button
               isLoading={false}
               className="w-full py-3 mt-3 uppercase"
