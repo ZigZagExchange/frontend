@@ -19,6 +19,7 @@ import Form from "../../atoms/Form/Form";
 import { TRADING_VIEW_CHART_KEY } from "./ListPairPage";
 import api from "../../../lib/api";
 import { debounce } from "lodash";
+import useTheme from "components/hooks/useTheme";
 
 const ListPairContainer = styled.div`
   margin-top: 10px;
@@ -55,6 +56,7 @@ const ListPairForm = ({
   const [isQuoteAssetIdInvalid, setIsQuoteAssetIdInvalid] = useState(false)
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false)
   const [zigZagChainId, setZigZagChainId] = useState(1)
+  const { isDark } = useTheme();
 
   const getTokenInfo = async (
     assetId,
@@ -157,6 +159,7 @@ const ListPairForm = ({
         >
           <x.div display={"flex"} flexDirection={"column"} h={"100%"}>
             <NumberInput
+              className={`rounded-lg ${isDark ? 'bg-foreground-200 hover:ring-foreground-500' : 'bg-primary-300 hover:ring-primary-600'} hover:ring-1 hover:ring-offset-0`}
               block
               {...model(baseAssetId, setBaseAssetId)}
               label={
@@ -193,6 +196,7 @@ const ListPairForm = ({
 
           <x.div display={"flex"} flexDirection={"column"} h={"100%"}>
             <NumberInput
+              className={`rounded-lg ${isDark ? 'bg-foreground-200 hover:ring-foreground-500' : 'bg-primary-300 hover:ring-primary-600'} hover:ring-1 hover:ring-offset-0`}
               block
               {...model(quoteAssetId, setQuoteAssetId)}
               label={
@@ -228,6 +232,7 @@ const ListPairForm = ({
           </x.div>
           <x.div display={"flex"} flexDirection={"column"} h={"100%"}>
             <NumberInput
+              className={`rounded-lg ${isDark ? 'bg-foreground-200 hover:ring-foreground-500' : 'bg-primary-300 hover:ring-primary-600'} hover:ring-1 hover:ring-offset-0`}
               block
               name={"baseFee"}
               fontSize={14}
@@ -246,6 +251,7 @@ const ListPairForm = ({
           </x.div>
           <x.div display={"flex"} flexDirection={"column"} h={"100%"}>
             <NumberInput
+              className={`rounded-lg ${isDark ? 'bg-foreground-200 hover:ring-foreground-500' : 'bg-primary-300 hover:ring-primary-600'} hover:ring-1 hover:ring-offset-0`}
               block
               fontSize={14}
               borderRadius={8}
@@ -262,6 +268,7 @@ const ListPairForm = ({
             {renderFeeHint(quotePrice, quoteFee, quoteSymbol, setQuoteFee)}
           </x.div>
           <NumberInput
+            className={`rounded-lg ${isDark ? 'bg-foreground-200 hover:ring-foreground-500' : 'bg-primary-300 hover:ring-primary-600'} hover:ring-1 hover:ring-offset-0`}
             block
             fontSize={14}
             borderRadius={8}
@@ -287,6 +294,7 @@ const ListPairForm = ({
             }
           />
           <SelectInput
+            className={`rounded-lg ${isDark ? 'bg-foreground-200 hover:ring-foreground-500' : 'bg-primary-300 hover:ring-primary-600'} hover:ring-1 hover:ring-offset-0`}
             fontSize={14}
             padding={5}
             borderRadius={8}
@@ -332,6 +340,7 @@ const ListPairForm = ({
               /> */}
               <x.div display={"grid"} gridTemplateColumns={2} columnGap={6} mb={21}>
                 <TextInput
+                  className={`rounded-lg ${isDark ? 'bg-foreground-200 hover:ring-foreground-500' : 'bg-primary-300 hover:ring-primary-600'} hover:ring-1 hover:ring-offset-0`}
                   block
                   fontSize={10}
                   padding={5}
