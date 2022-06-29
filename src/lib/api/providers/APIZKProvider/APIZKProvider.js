@@ -3,7 +3,6 @@ import { ethers } from "ethers";
 import { toast } from "react-toastify";
 import { toBaseUnit } from "lib/utils";
 import APIProvider from "../APIProvider";
-import { MAX_ALLOWANCE } from "../../constants";
 import axios from "axios";
 import { closestPackableTransactionAmount } from "zksync";
 import BatchTransferService from "./BatchTransferService";
@@ -289,7 +288,7 @@ export default class APIZKProvider extends APIProvider {
         valueReadable:
           (balance && currencyInfo && balance / 10 ** currencyInfo.decimals) ||
           0,
-        allowance: MAX_ALLOWANCE,
+        allowance: ethers.constants.MaxUint256,
         allowanceReadable: 9007199254740991 // max save int
       };
     });

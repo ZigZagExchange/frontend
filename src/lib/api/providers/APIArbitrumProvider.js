@@ -73,7 +73,8 @@ export default class APIArbitrumProvider extends APIProvider {
 
   // TODO replace
   allowance = async (tokenAddress) => {
-    if (!this.accountState.address) return 0;
+    const marketInfo = this.api.marketInfo[market];
+    if (!this.accountState.address || !marketInfo) return 0;
 
     const erc20Contract = new ethers.Contract(
       tokenAddress,
@@ -83,7 +84,7 @@ export default class APIArbitrumProvider extends APIProvider {
 
     const allowance = await erc20Contract.allowance(
       this.accountState.address,
-      ARBITRUM_ADDRESSES.EXCHANGE_ADDRESS
+      marketInfo.exchangeAddress
     );
 
     return ethers.BigNumber.from(allowance);
@@ -152,7 +153,7 @@ export default class APIArbitrumProvider extends APIProvider {
       makerAddress: this.accountState.address,
       makerToken: makerToken,
       takerToken: takerToken,
-      feeRecipientAddress: ARBITRUM_ADDRESSES.FEE_RECIPIENT_ADDRESS,
+      feeRecipientAddress: marketInfo.feeAddress,
       makerAssetAmount:  makerAmountBN.toString(),
       takerAssetAmount: takerAmountBN.toString(),
       makerVolumeFee: makerVolumeFee,
@@ -208,8 +209,12 @@ export default class APIArbitrumProvider extends APIProvider {
   }
 
   approveExchangeContract = async (token, amount) => {
+    const marketInfo = this.api.marketInfo[market];
+    if (!marketInfo) throw new Error(`No exchange contract address`);
+
     const currencyInfo = this.api.getCurrencyInfo(token);
     if (!currencyInfo.address) throw new Error(`ERC20 address for ${token} not found`);
+
     let amountBN;
     if(!amount) {
       amountBN = ethers.constants.MaxUint256;
@@ -228,7 +233,7 @@ export default class APIArbitrumProvider extends APIProvider {
     );
 
     await erc20Contract.approve(
-      ARBITRUM_ADDRESSES.EXCHANGE_ADDRESS,
+      marketInfo.exchangeAddress,
       amountBN
     );
 
@@ -238,9 +243,12 @@ export default class APIArbitrumProvider extends APIProvider {
   };
 
   warpETH = async (amountBN) => {
+    const wethInfo = this.api.getCurrencyInfo('WETH');
+    if (!wethInfo) throw new Error('No WETH contract address')
+
     const signer = await this.api.rollupProvider.getSigner();
     const wethContract = new ethers.Contract(
-      ARBITRUM_ADDRESSES.WETH_ADDRESS,
+      wethInfo.address,
       wethContractABI,
       signer
     );
@@ -253,9 +261,12 @@ export default class APIArbitrumProvider extends APIProvider {
   };
 
   unWarpETH = async (amountBN) => {
+    const wethInfo = this.api.getCurrencyInfo('WETH');
+    if (!wethInfo) throw new Error('No WETH contract address')
+
     const signer = await this.api.rollupProvider.getSigner();
     const wethContract = new ethers.Contract(
-      ARBITRUM_ADDRESSES.WETH_ADDRESS,
+      wethInfo.address,
       wethContractABI,
       signer
     );
