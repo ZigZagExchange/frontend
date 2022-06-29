@@ -648,7 +648,7 @@ export class SpotForm extends React.Component {
   showLabel() {
     return (
       <div>
-        <p>zkSync's network swap fees are dynamic and sit around ~$0.50</p>
+        <p>zkSync's network swap fees are dynamic and sit around ~$0.10</p>
         <p>covered by the market maker, but paid by the trader</p>
       </div>
     );
