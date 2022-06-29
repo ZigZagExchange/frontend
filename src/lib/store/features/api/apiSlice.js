@@ -279,15 +279,16 @@ export const apiSlice = createSlice({
             const matchedOrder = state.orders[orderId];
             if (!matchedOrder) return;
             matchedOrder[9] = "m";
+            matchedOrder[10] = 0;
+            const takerUserId = matchedOrder[8] && matchedOrder[8].toLowerCase();
+            const makerUserId = matchedOrder[9] && matchedOrder[9].toLowerCase();
+            const orderUserId = state.userId && state.userId.toString().toLowerCase();
             delete state.orders[orderId];
             if (
               matchedOrder &&
-              state.userId &&
-              matchedOrder[8] === state.userId.toString()
+              (takerUserId === orderUserId || makerUserId === orderUserId)
             ) {
-              if (!state.userOrders[matchedOrder[1]]) {
-                state.userOrders[matchedOrder[1]] = matchedOrder;
-              }
+              state.userOrders[matchedOrder[1]] = matchedOrder;
             }
             break;
           case "f":
