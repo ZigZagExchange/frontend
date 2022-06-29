@@ -38,19 +38,17 @@ const TradeContainer = styled.div`
 
 const TradeGrid = styled.article`
   display: grid;
-  grid-template-rows: 56px 2fr 1fr 57px;
+  grid-template-rows: 56px 2fr 1fr;
   grid-template-columns: ${({ isLeft }) =>
     isLeft ? "300px 253.5px 253.5px 1fr" : "300px 507px 1fr"};
   grid-template-areas: ${({ isLeft }) =>
     isLeft
       ? `"marketSelector marketSelector marketSelector marketSelector"
   "sidebar orders trades chart"
-  "space tables tables tables"
-  "space footer footer footer"`
+  "space tables tables tables"`
       : `"marketSelector marketSelector marketSelector"
   "sidebar stack chart"
-  "space tables tables"
-  "space footer footer"`};
+  "space tables tables"`};
 
   height: calc(100vh - 56px);
   gap: 0px;
@@ -58,8 +56,8 @@ const TradeGrid = styled.article`
   @media screen and (max-width: 991px) {
     grid-template-rows: ${({ isLeft }) =>
       isLeft
-        ? "74px 410px 459px 508px 362px 1fr"
-        : "74px 410px 459px 519px 362px 1fr"};
+        ? "74px 410px 459px 508px 362px"
+        : "74px 410px 459px 519px 362px"};
     grid-template-columns: ${({ isLeft }) => (isLeft ? "1fr 1fr" : "1fr")};
     grid-template-areas: ${({ isLeft }) =>
       isLeft
@@ -213,7 +211,7 @@ export function TradeDashboard() {
           userOrders={userOrders}
           user={user}
         />
-        <TradeFooter />
+        {/* <TradeFooter /> */}
       </TradeGrid>
     </TradeContainer>
   );
