@@ -73,8 +73,8 @@ export default class APIArbitrumProvider extends APIProvider {
 
   // TODO replace
   allowance = async (tokenAddress) => {
-    const marketInfo = this.api.marketInfo[market];
-    if (!this.accountState.address || !marketInfo) return 0;
+    const exchangeAddress = getExchangeAddress();
+    if (!this.accountState.address || !exchangeAddress) return 0;
 
     const erc20Contract = new ethers.Contract(
       tokenAddress,
@@ -84,7 +84,7 @@ export default class APIArbitrumProvider extends APIProvider {
 
     const allowance = await erc20Contract.allowance(
       this.accountState.address,
-      marketInfo.exchangeAddress
+      exchangeAddress
     );
 
     return ethers.BigNumber.from(allowance);
@@ -209,7 +209,7 @@ export default class APIArbitrumProvider extends APIProvider {
   }
 
   approveExchangeContract = async (token, amount) => {
-    const marketInfo = this.api.marketInfo[market];
+    const exchangeAddress = getExchangeAddress();
     if (!marketInfo) throw new Error(`No exchange contract address`);
 
     const currencyInfo = this.api.getCurrencyInfo(token);
@@ -233,7 +233,7 @@ export default class APIArbitrumProvider extends APIProvider {
     );
 
     await erc20Contract.approve(
-      marketInfo.exchangeAddress,
+      exchangeAddress,
       amountBN
     );
 
@@ -277,4 +277,9 @@ export default class APIArbitrumProvider extends APIProvider {
     await this.api.getBalances();
     return true;
   };
+
+  getExchangeAddress = () => {
+    const marketInfoArray = Object.values(this.api.marketInfo);
+    return marketInfoArray[0].exchangeAddress;
+  }
 }
