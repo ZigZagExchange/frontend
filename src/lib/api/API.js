@@ -142,20 +142,6 @@ export default class API extends Emitter {
         if(networkChanged)
           this.emit('providerChange', network)
     }
-
-    getExplorer = (address, layer, network) => {
-      if (layer === 1) {
-        const subdomain = [1, 42161].includes(this.apiProvider.network) ? "" : "rinkeby.";
-        return `https://${subdomain}etherscan.io/address/${address}`;
-      }
-
-      const subdomain = this.apiProvider.network === 1000 ? "rinkeby." : "";
-      switch(network) {
-        case 1000: return `https://${subdomain}zkscan.io/explorer/accounts/${address}`;
-        case 42161: return `https://${subdomain}arbiscan.io/address/${address}`;
-        default: return `https://${subdomain}etherscan.io/address/${address}`;
-      }
-    }
     
     getProfile = async (address) => {
       const getProfileFromIPFS  = async (address) => {

@@ -329,7 +329,7 @@ export const AccountDropdown = () => {
 
   const wallet =
     selectedLayer === 1 ? balanceData.wallet : balanceData[network];
-  const explorer = user.address ? api.getExplorer(user.address, selectedLayer, network) : null;
+  const explorer = user.address ? api.getExplorerAccountLink(network, user.address) : null;
   const networkName = selectedLayer === 1 ? 'Etherscan' : api.getNetworkDisplayName(network);
   
   
