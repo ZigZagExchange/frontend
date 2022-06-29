@@ -73,7 +73,7 @@ export default class APIArbitrumProvider extends APIProvider {
 
   // TODO replace
   allowance = async (tokenAddress) => {
-    const exchangeAddress = getExchangeAddress();
+    const exchangeAddress = this.getExchangeAddress();
     if (!this.accountState.address || !exchangeAddress) return 0;
 
     const erc20Contract = new ethers.Contract(
@@ -209,8 +209,8 @@ export default class APIArbitrumProvider extends APIProvider {
   }
 
   approveExchangeContract = async (token, amount) => {
-    const exchangeAddress = getExchangeAddress();
-    if (!marketInfo) throw new Error(`No exchange contract address`);
+    const exchangeAddress = this.getExchangeAddress();
+    if (!exchangeAddress) throw new Error(`No exchange contract address`);
 
     const currencyInfo = this.api.getCurrencyInfo(token);
     if (!currencyInfo.address) throw new Error(`ERC20 address for ${token} not found`);
