@@ -992,7 +992,9 @@ export default class API extends Emitter {
     })
     // request status update
     if (fillRequestIds.length > 0) {
-      this.send("fillreceiptreq", [this.apiProvider.network, Number(fillRequestIds)])
+      for (let i in fillRequestIds) {
+        this.send("fillreceiptreq", [this.apiProvider.network, Number(fillRequestIds[i])])
+      }
     }
   }
 
