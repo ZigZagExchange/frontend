@@ -505,7 +505,7 @@ const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, upda
                             <Text font="tableContent" color={d.td3 < 0 ? 'dangerHighEmphasis' : 'successHighEmphasis'} align="right">{d.td2}</Text>
                         </td>
                         <td>
-                            <Text font="tableContent" color='foregroundHighEmphasis' align="right">{d.usdVolume.toFixed(2).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</Text>
+                            <Text font="tableContent" color='foregroundHighEmphasis' align="right">{d.usdVolume.toLocaleString("en-US", {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Text>
                         </td>
                         <td>
                             <Text font="tableContent" color={d.td3 < 0 ? 'dangerHighEmphasis' : 'successHighEmphasis'} align="right">{d.td3}%</Text>

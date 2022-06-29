@@ -274,7 +274,7 @@ export default function OrdersBook(props) {
               )}
               <Divider />
               <OrderFooterWrapper>
-                <Dropdown
+                {/* <Dropdown
                   adClass="side-dropdown"
                   transparent={true}
                   width={162}
@@ -282,7 +282,7 @@ export default function OrdersBook(props) {
                   context={`${fixedPoint} decimal`}
                   leftIcon={false}
                   clickFunction={changeFixedPoint}
-                />
+                /> */}
 
                 <OrderFooterRight>
                   <OrderButtonWrapper

@@ -68,19 +68,18 @@ const TradeGrid = styled.article`
       "sidebar orders"
       "trades trades"
       "tables tables"
-      "footer footer"`
+      `
         : `"marketSelector"
       "chart"
       "sidebar"
       "stack"
       "tables"
-      "footer"`};
+      `};
   }
 
   > div,
   > aside,
   > header,
-  > footer,
   > section,
   > main {
     background: ${(p) => p.theme.colors.zzDarkest};
@@ -214,7 +213,7 @@ export function TradeDashboard() {
           userOrders={userOrders}
           user={user}
         />
-        <TradeFooter />
+        {/* <TradeFooter /> */}
       </TradeGrid>
     </TradeContainer>
   );
