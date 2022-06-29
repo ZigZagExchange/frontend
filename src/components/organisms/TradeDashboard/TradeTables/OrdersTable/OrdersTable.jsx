@@ -14,7 +14,7 @@ import {
   settingsSelector,
 } from "lib/store/features/api/apiSlice";
 import api from "lib/api";
-import { formatDate, formatDateTime } from "lib/utils";
+import { formatDate, formatDateTime, formatToken } from "lib/utils";
 import { Tab } from "components/molecules/TabMenu";
 import Text from "components/atoms/Text/Text";
 
@@ -1125,9 +1125,10 @@ export default function OrdersTable(props) {
                 >
                   Order Status
                 </Text>
-                {/* <SortIconWrapper>
-                    <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper> */}
+                <SortIconWrapper>
+                  <SortUpIcon />
+                  <SortDownIcon />
+                </SortIconWrapper>
               </HeaderWrapper>
             </th>
             <th>
@@ -1170,7 +1171,7 @@ export default function OrdersTable(props) {
             const txhash = fill[7];
             const feeamount = fill[10];
             const feetoken = fill[11];
-            let feeText = "1 USDC";
+            let feeText = "1.00 USDC";
             const marketInfo = api.marketInfo[market];
             if (feeamount && feetoken) {
               const displayFee =
@@ -1182,7 +1183,7 @@ export default function OrdersTable(props) {
               feeText = "--";
               // cases below make it backward compatible:
             } else if (!marketInfo) {
-              feeText = "1 USDC";
+              feeText = "1.00 USDC";
             } else if (fillstatus === "r" || !api.isZksyncChain()) {
               feeText = "0 " + marketInfo.baseAsset.symbol;
             } else if (side === "s") {
@@ -1387,7 +1388,9 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundHighEmphasis"
                 >
-                  {settings.hideBalance ? "****.****" : token.valueReadable}
+                  {settings.hideBalance
+                    ? "****.****"
+                    : formatToken(token.valueReadable, token.token)}
                 </Text>
               </td>
               <td data-label="Balance">
@@ -1397,7 +1400,9 @@ export default function OrdersTable(props) {
                 >
                   {settings.hideBalance
                     ? "****.****"
-                    : token.valueReadable * coinEstimator(token.token)}
+                    : formatToken(
+                        token.valueReadable * coinEstimator(token.token)
+                      )}
                 </Text>
               </td>
             </tr>
@@ -1455,7 +1460,7 @@ export default function OrdersTable(props) {
                         font="primaryExtraSmallSemiBold"
                         color="foregroundLowEmphasis"
                       >
-                        Balance
+                        Token balance
                       </Text>
                       {balanceSorted ? (
                         <SortIconWrapper>
@@ -1490,7 +1495,7 @@ export default function OrdersTable(props) {
                         font="primaryExtraSmallSemiBold"
                         color="foregroundLowEmphasis"
                       >
-                        USD
+                        USD balance
                       </Text>
                       {balanceSorted ? (
                         <SortIconWrapper>

@@ -58,7 +58,7 @@ export default function BridgePage() {
           })}
         >
           <div className="w-full max-w-lg px-1 sm:px-0">
-            <p className="mt-10 text-3xl font-semibold md:mt-10 md: ">
+            <p className="mt-10 text-3xl font-semibold font-work ">
               ZigZag Bridge
             </p>
             <div className="px-2 py-3 sm:px-0">

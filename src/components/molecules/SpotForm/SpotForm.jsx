@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { toast } from "react-toastify";
 import api from "lib/api";
 import { RangeSlider, QuestionHelper } from "components";
-import { formatPrice } from "lib/utils";
+import { formatPrice, formatToken } from "lib/utils";
 import "./SpotForm.css";
 import { Button, ConnectWalletButton } from "components/molecules/Button";
 import InputField from "components/atoms/InputField/InputField";
@@ -648,7 +648,7 @@ export class SpotForm extends React.Component {
   showLabel() {
     return (
       <div>
-        <p>zkSync's network swap fees are dynamic and sit around ~$0.50</p>
+        <p>zkSync's network swap fees are dynamic and sit around ~$0.10</p>
         <p>covered by the market maker, but paid by the trader</p>
       </div>
     );
@@ -684,7 +684,7 @@ export class SpotForm extends React.Component {
         color="foregroundMediumEmphasis"
         textAlign="right"
       >
-        {quoteBalance.toPrecision(8)}{" "}
+        {formatToken(quoteBalance)}{" "}
         {marketInfo && marketInfo.quoteAsset?.symbol}
       </Text>
     );
@@ -695,8 +695,7 @@ export class SpotForm extends React.Component {
         color="foregroundMediumEmphasis"
         textAlign="right"
       >
-        {baseBalance.toPrecision(8)}{" "}
-        {marketInfo && marketInfo.baseAsset?.symbol}
+        {formatToken(baseBalance)} {marketInfo && marketInfo.baseAsset?.symbol}
       </Text>
     );
 
@@ -719,7 +718,7 @@ export class SpotForm extends React.Component {
           >
             {marketInfo &&
               marketInfo.quoteFee &&
-              Number(marketInfo.quoteFee).toPrecision(4)}{" "}
+              formatToken(Number(marketInfo.quoteFee).toPrecision(4))}{" "}
             {marketInfo && marketInfo.quoteAsset.symbol}
           </Text>
         </FormHeader>
@@ -742,7 +741,7 @@ export class SpotForm extends React.Component {
           >
             {marketInfo &&
               marketInfo.baseFee &&
-              Number(marketInfo.baseFee).toPrecision(4)}{" "}
+              formatToken(Number(marketInfo.baseFee).toPrecision(4))}{" "}
             {marketInfo && marketInfo.baseAsset.symbol}
           </Text>
         </FormHeader>
