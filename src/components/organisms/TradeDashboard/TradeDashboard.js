@@ -281,7 +281,7 @@ export function TradeDashboard() {
       const order = allOrders[orderid];
       const side = order[3];
       const price = order[4];
-      const remaining = isNaN(Number(order[11])) ? order[5] : order[11];
+      const remaining = isNaN(Number(order[10])) ? order[5] : order[10];
       const remainingQuote = remaining * price;
       const orderStatus = order[9];
 

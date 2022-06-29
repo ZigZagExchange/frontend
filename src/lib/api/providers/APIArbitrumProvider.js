@@ -108,7 +108,7 @@ export default class APIArbitrumProvider extends APIProvider {
         marketInfo.quoteAsset.decimals
       );
       gasFee = ethers.utils.parseUnits (
-        marketInfo.baseFee.toFixed(marketInfo.baseAsset.decimals),
+        Number(marketInfo.baseFee).toFixed(marketInfo.baseAsset.decimals),
         marketInfo.baseAsset.decimals
       )
     } else {
@@ -123,7 +123,7 @@ export default class APIArbitrumProvider extends APIProvider {
         marketInfo.baseAsset.decimals
       )
       gasFee = ethers.utils.parseUnits (
-        marketInfo.quoteFee.toFixed(marketInfo.quoteAsset.decimals),
+        Number(marketInfo.quoteFee).toFixed(marketInfo.quoteAsset.decimals),
         marketInfo.quoteAsset.decimals
       )
     }

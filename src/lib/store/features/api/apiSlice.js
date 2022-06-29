@@ -261,10 +261,10 @@ export const apiSlice = createSlice({
           case "pm":
             const remaining = update[4];
             if (state.orders[orderId]) {
-              state.orders[orderId][11] = remaining;
+              state.orders[orderId][10] = remaining;
             }
             if (state.userOrders[orderId]) {
-              state.userOrders[orderId][11] = remaining;
+              state.userOrders[orderId][10] = remaining;
             }
             break;
           case "m":
@@ -286,14 +286,14 @@ export const apiSlice = createSlice({
             filledOrder = state.userOrders[orderId];
             if (filledOrder) {
               filledOrder[9] = "f";
-              filledOrder[10] = txHash;
+              filledOrder[11] = txHash;
             }
             break;
           case "b":
             filledOrder = state.userOrders[orderId];
             if (filledOrder) {
               filledOrder[9] = "b";
-              filledOrder[10] = txHash;
+              filledOrder[11] = txHash;
             }
             break;
           case "r":
@@ -303,7 +303,7 @@ export const apiSlice = createSlice({
               const error = update[4];
               const baseCurrency = filledOrder[2].split("-")[0];
               filledOrder[9] = "r";
-              filledOrder[10] = txHash;
+              filledOrder[11] = txHash;
               const noFeeOrder = api.getOrderDetailsWithoutFee(filledOrder);
               toast.error(
                 `Your ${sideText} order for ${noFeeOrder.baseQuantity.toPrecision(4) / 1
