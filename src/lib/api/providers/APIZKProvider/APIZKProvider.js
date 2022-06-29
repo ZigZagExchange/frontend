@@ -759,6 +759,6 @@ export default class APIZKProvider extends APIProvider {
       case 1: return 'mainnet';
       case 1000: return 'rinkeby';
       default: throw Error("Chain ID not understood");
-    }
-  };
+    };
+  }
 }
