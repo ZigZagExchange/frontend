@@ -88,6 +88,10 @@ export const apiSlice = createSlice({
     _fills(state, { payload }) {
       payload[0].forEach((fill) => {
         const fillid = fill[1];
+        // taker and maker user ids have to be matched lowercase because addresses
+        // sometimes come back in camelcase checksum format
+        const takerUserId = fill[8] && fill[8].toLowerCase();
+        const makerUserId = fill[9] && fill[9].toLowerCase();
         if (
           ['f', 'pf'].includes(fill[6]) &&
           fill[2] === state.currentMarket &&
@@ -95,11 +99,12 @@ export const apiSlice = createSlice({
         ) {
           state.marketFills[fillid] = fill;
         }
-        if (state.userId && fill[8] === state.userId.toString()) {
+        if (state.userId && takerUserId === state.userId.toString().toLowerCase()) {
+          
           state.userFills[fillid] = fill;
         }
         // for maker fills we need to flip the side and set fee to 0
-        if (state.userId && fill[9] === state.userId.toString()) {
+        if (state.userId && makerUserId === state.userId.toString().toLowerCase()) {
           fill[3] = (fill[3] === "b") ? "s" : "b";
           fill[10] = 0;
           state.userFills[fillid] = fill;
@@ -191,15 +196,18 @@ export const apiSlice = createSlice({
     },
     _fillreceipt(state, { payload }) {
       payload[0].forEach((fill) => {
+        if (!fill) return;
+        const takerUserId = fill[8] && fill[8].toLowerCase();
+        const makerUserId = fill[9] && fill[9].toLowerCase();
         const fillid = fill[1];
         if (fill[2] === state.currentMarket && fill[0] === state.network) {
           state.marketFills[fillid] = fill;
         }
-        if (state.userId && fill[8] === state.userId.toString()) {
+        if (state.userId && takerUserId === state.userId.toString().toLowerCase()) {
           state.userFills[fillid] = fill;
         }
         // for maker fills we need to flip the side and set fee to 0
-        if (state.userId && fill[9] === state.userId.toString()) {
+        if (state.userId && makerUserId === state.userId.toString().toLowerCase()) {
           fill[3] = (fill[3] === "b") ? "s" : "b";
           fill[10] = 0;
           state.userFills[fillid] = fill;
