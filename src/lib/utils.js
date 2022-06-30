@@ -25,7 +25,7 @@ export function formatToken(floatNum, token = "USDC") {
     token === "FRAX"
   )
     isUSD = true;
-  return floatNum !== "" && isUSD ? parseFloat(floatNum).toFixed(2) : floatNum;
+  return floatNum !== "" && isUSD ? parseFloat(floatNum).toFixed(2) : parseFloat(floatNum).toFixed(7);
 }
 
 export function formatAmount(amount, currency) {
