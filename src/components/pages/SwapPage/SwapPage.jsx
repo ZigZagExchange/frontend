@@ -84,8 +84,11 @@ export default function SwapPage() {
   useEffect(async () => {
     if (!user.address) return;
     setBalances(zkBalances);
-    dispatch(setCurrentMarket("ZZ-USDC"));
   }, [user.address, zkBalances]);
+
+  useEffect(() => {
+    dispatch(setCurrentMarket("ZZ-USDC"));
+  }, []);
 
   useEffect(() => {
     if (sellToken && buyToken) {
