@@ -795,17 +795,17 @@ export default function OrdersTable(props) {
             const sideclassname =
               fill[3] === "b" ? "successHighEmphasis" : "dangerHighEmphasis";
             const txhash = fill[7];
-            const feeamount = fill[10];
+            const feeamount = Number(fill[10]);
             const feetoken = fill[11];
             let feeText = "1 USDC";
             const marketInfo = api.marketInfo[market];
-            if (feeamount && feetoken) {
+            if(feeamount && feetoken) {
               const displayFee =
                 feeamount > 9999
                   ? feeamount.toFixed(0)
                   : feeamount.toPrecision(4);
               feeText = feeamount !== 0 ? `${displayFee} ${feetoken}` : "--";
-            } else if (["b", "o", "m", "r"].includes(fillstatus)) {
+            } else if(["b", "o", "m", "r", "e"].includes(fillstatus)) {
               feeText = "--";
               // cases below make it backward compatible:
             } else if (!marketInfo) {
