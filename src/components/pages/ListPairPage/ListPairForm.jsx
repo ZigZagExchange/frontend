@@ -26,6 +26,7 @@ const ListPairContainer = styled.div`
   padding: 1rem 18px;
   border: 1px solid ${(p) => p.theme.colors.foreground400};
   border-radius: 8px;
+  margin-bottom: 20px;
 
   .custom-form-label {
     margin-bottom: 5px;
@@ -57,6 +58,7 @@ const ListPairForm = ({
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false)
   const [zigZagChainId, setZigZagChainId] = useState(1)
   const { isDark } = useTheme();
+  const isMobile = window.innerWidth < 500;
 
   const getTokenInfo = async (
     assetId,
@@ -151,7 +153,7 @@ const ListPairForm = ({
       >
         <x.div
           display={"grid"}
-          gridTemplateColumns={2}
+          gridTemplateColumns={isMobile ? 1 : 2}
           rowGap={21}
           columnGap={24}
           mb={16}
@@ -338,7 +340,7 @@ const ListPairForm = ({
                 borderRadius={10}
                 mt={21}
               /> */}
-              <x.div display={"grid"} gridTemplateColumns={2} columnGap={6} mb={21}>
+              <x.div display={"grid"} gridTemplateColumns={isMobile ? 1 : 2} columnGap={6} mb={21}>
                 <TextInput
                   className={`rounded-lg ${isDark ? 'bg-foreground-200 hover:ring-foreground-500' : 'bg-primary-300 hover:ring-primary-600'} hover:ring-1 hover:ring-offset-0`}
                   block
@@ -376,10 +378,11 @@ const PairPreview = ({
   baseSymbol,
   quoteSymbol,
 }) => {
+  const isMobile = window.innerWidth < 500;
   return (
     <>
       {(baseAssetId || quoteAssetId) && (
-        <x.div display={"flex"} fontSize={35} justifyContent={"center"} my={4}>
+        <x.div display={"flex"} fontSize={isMobile ? 24 : 35} justifyContent={"center"} my={4}>
           <x.span color={baseSymbol ? "blue-gray-400" : "blue-gray-800"}>
             {baseSymbol ? baseSymbol : "XXX"}
           </x.span>
