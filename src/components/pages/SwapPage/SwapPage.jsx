@@ -25,6 +25,7 @@ import {
   setCurrentMarket,
   resetData,
   settingsSelector,
+  userOrdersSelector
 } from "lib/store/features/api/apiSlice";
 import { formatPrice } from "lib/utils";
 import { LoadingSpinner } from "components/atoms/LoadingSpinner";
@@ -36,6 +37,7 @@ export default function SwapPage() {
   // );
   // const tab = useParams().tab || "swap";
   const coinEstimator = useCoinEstimator();
+  const userOrders = useSelector(userOrdersSelector);
 
   const { isDark } = useTheme();
   const [tType, setTtype] = useState("buy");
@@ -257,6 +259,23 @@ export default function SwapPage() {
   };
 
   const onClickExchange = async () => {
+    const userOrderArray = Object.values(userOrders);
+    if(userOrderArray.length > 0) {
+      const openOrders = userOrderArray.filter((o) => ['o', 'b', 'm'].includes(o[9]));
+      if(
+        [1, 1000].includes(network) &&
+        openOrders.length > 0
+      ) {
+        toast.warn(
+          'zkSync 1.0 allows one open order at a time. Please cancel your limit order or wait for it to be filled before converting. Otherwise your limit order will fail.',
+          {
+            toastId: 'zkSync 1.0 allows one open order at a time. Please cancel your limit order or wait for it to be filled before converting. Otherwise your limit order will fail.',
+            autoClose: 20000,
+          }
+        );
+        return;
+      }
+    }
     let baseAmount, quoteAmount;
     if (typeof sellAmounts === "string") {
       baseAmount = parseFloat(sellAmounts.replace(",", "."));
