@@ -298,6 +298,7 @@ class SpotForm extends React.Component {
       baseAmount = baseAmount ? baseAmount : quoteAmount / price;
       quoteAmount = 0;
       baseAmountMsg = formatPrice(baseAmount);
+      this.props.setHighSlippageModal({ type: "sell" });
 
       if (isNaN(baseBalance)) {
         toast.error(`No ${marketInfo.baseAsset.symbol} balance`, {
@@ -330,8 +331,8 @@ class SpotForm extends React.Component {
         !this.props.settings.disableSlippageWarning
       ) {
         this.props.setHighSlippageModal({ open: true, delta: delta });
+        return;
       }
-      this.props.setHighSlippageModal({ open: true, delta: delta });
 
       if (
         this.props.orderType === "market" &&
@@ -340,28 +341,28 @@ class SpotForm extends React.Component {
         price *= 0.9985;
         if (delta > 2) {
           this.props.setHighSlippageModal({ open: true, delta: delta });
+          return;
         }
       }
     } else if (this.props.side === "b") {
+      this.props.setHighSlippageModal({ type: "buy" });
+
       quoteAmount = quoteAmount ? quoteAmount : baseAmount * price;
       baseAmount = 0;
       baseAmountMsg = formatPrice(quoteAmount / price);
 
       if (isNaN(quoteBalance)) {
         this.props.setHighSlippageModal({ open: true, delta: delta });
-
         return;
       }
 
       if (quoteAmount && quoteAmount + marketInfo.quoteFee > quoteBalance) {
         this.props.setHighSlippageModal({ open: true, delta: delta });
-
         return;
       }
 
       if (quoteAmount && quoteAmount < marketInfo.quoteFee) {
         this.props.setHighSlippageModal({ open: true, delta: delta });
-
         return;
       }
 
@@ -374,6 +375,7 @@ class SpotForm extends React.Component {
         !this.props.settings.disableSlippageWarning
       ) {
         this.props.setHighSlippageModal({ open: true, delta: delta });
+        return;
       }
 
       if (
@@ -383,9 +385,12 @@ class SpotForm extends React.Component {
         price *= 1.0015;
         if (delta > 2) {
           this.props.setHighSlippageModal({ open: true, delta: delta });
+          return;
         }
       }
     }
+
+    this.handleOrder();
   }
 
   async handleOrder() {
@@ -409,7 +414,7 @@ class SpotForm extends React.Component {
             {["USDC", "USDT", "DAI", "FRAX"].includes(
               marketInfo.quoteAsset.symbol
             )
-              ? price.toFixed(2)
+              ? parseFloat(price).toFixed(2)
               : formatPrice(price)}{" "}
             {marketInfo.quoteAsset.symbol}
           </p>
@@ -420,45 +425,43 @@ class SpotForm extends React.Component {
       );
     };
 
-    if (this.props.confirmed) {
-      let newstate = { ...this.state };
-      newstate.orderButtonDisabled = true;
-      this.setState(newstate);
-      let orderPendingToast;
+    let newstate = { ...this.state };
+    newstate.orderButtonDisabled = true;
+    this.setState(newstate);
+    let orderPendingToast;
+    if (!this.props.settings.disableOrderNotification) {
+      orderPendingToast = toast.info(renderGuidContent(), {
+        toastId: "Order pending",
+        autoClose: false,
+      });
+    }
+
+    try {
+      await api.submitOrder(
+        this.props.currentMarket,
+        this.props.side,
+        price,
+        baseAmount,
+        quoteAmount,
+        this.props.orderType
+      );
+
       if (!this.props.settings.disableOrderNotification) {
-        orderPendingToast = toast.info(renderGuidContent(), {
-          toastId: "Order pending",
-          autoClose: false,
+        toast.info("Order placed", {
+          toastId: "Order placed.",
         });
       }
-
-      try {
-        await api.submitOrder(
-          this.props.currentMarket,
-          this.props.side,
-          price,
-          baseAmount,
-          quoteAmount,
-          this.props.orderType
-        );
-
-        if (!this.props.settings.disableOrderNotification) {
-          toast.info("Order placed", {
-            toastId: "Order placed.",
-          });
-        }
-      } catch (e) {
-        toast.error(e.message);
-      }
-
-      if (!this.props.settings.disableOrderNotification) {
-        toast.dismiss(orderPendingToast);
-      }
-
-      newstate = { ...this.state };
-      newstate.orderButtonDisabled = false;
-      this.setState(newstate);
+    } catch (e) {
+      toast.error(e.message);
     }
+
+    if (!this.props.settings.disableOrderNotification) {
+      toast.dismiss(orderPendingToast);
+    }
+
+    newstate = { ...this.state };
+    newstate.orderButtonDisabled = false;
+    this.setState(newstate);
   }
 
   priceIsDisabled() {

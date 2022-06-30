@@ -42,6 +42,7 @@ export const apiSlice = createSlice({
       open: false,
       confirmed: "",
       delta: 0,
+      type: "sell",
     },
   },
   reducers: {
@@ -536,6 +537,7 @@ export const apiSlice = createSlice({
         open: payload.open ? payload.open : false,
         confirmed: payload.confirmed ? payload.confirmed : false,
         delta: payload.delta ? payload.delta : 0,
+        type: payload.type ? payload.type : "buy",
       };
     },
     setUISettings(state, { payload }) {

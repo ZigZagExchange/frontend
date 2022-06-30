@@ -71,6 +71,11 @@ const ModalWrapper = styled(Dialog)`
     cursor: pointer;
   }
 
+  .confirm-button.disabled {
+    opacity: 0.45;
+    pointer-events: none;
+  }
+
   h2 {
     margin-left: auto;
     line-height: 0;
@@ -88,12 +93,8 @@ const ModalWrapper = styled(Dialog)`
 const FormDialog = () => {
   const [textValue, setTextValue] = useState("");
   const [confirmed, setConfirmed] = useState(false);
-  const openHighSlippageModal = useSelector(highSlippageModalSelector);
+  const highSlippageModal = useSelector(highSlippageModalSelector);
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    console.log("openHighSlippageModal", openHighSlippageModal);
-  }, [openHighSlippageModal]);
 
   const handleClose = () => {
     dispatch(setHighSlippageModal({ open: false }));
@@ -108,9 +109,14 @@ const FormDialog = () => {
     );
   };
 
+  const onChangeTextValue = (e) => {
+    setConfirmed(e.currentTarget.value === "CONFIRM" ? true : false);
+    setTextValue(e.currentTarget.value);
+  };
+
   return (
     <ModalWrapper
-      open={openHighSlippageModal.open}
+      open={highSlippageModal.open}
       onClose={handleClose}
       className="modal-wrapper"
       aria-labelledby="form-dialog-title"
@@ -130,18 +136,21 @@ const FormDialog = () => {
             color="foregroundHighEmphasis"
             style={{ marginTop: "28px" }}
           >
-            This transaction has high slippage
+            You are {highSlippageModal.type}ing{" "}
+            {highSlippageModal.delta.toFixed(2)}% above the current market
+            price.
           </Text>
           <Text
-            font="primarySmall"
-            color="foregroundHighEmphasis"
+            font="primaryHeading6"
+            color="warningHighEmphasis"
             style={{ marginTop: "20px", lineHeight: "25px" }}
           >
-            At the current pool depth, this trade will result in
+            You will lose money when signing this transaction!{" "}
           </Text>
-          <Text font="primaryHeading6" color="warningHighEmphasis">
-            {openHighSlippageModal.deta * 100}% price slippage.
-          </Text>
+
+          {/* <Text font="primaryHeading6" color="warningHighEmphasis">
+            {highSlippageModal.delta.toFixed(2)}% price slippage.
+          </Text> */}
 
           <Text
             font="primarySmall"
@@ -156,7 +165,7 @@ const FormDialog = () => {
             pattern="\d+(?:[.,]\d+)?"
             style={{ marginTop: "20px", textAlign: "center" }}
             onChange={(e) => {
-              setTextValue(e.currentTarget.value);
+              onChangeTextValue(e);
             }}
           />
           <CustomButton
@@ -165,7 +174,9 @@ const FormDialog = () => {
               width: "100%",
               marginTop: "20px",
             }}
-            className="py-3 mt-3 uppercase"
+            className={`py-3 mt-3 uppercase confirm-button ${
+              !confirmed ? "disabled" : ""
+            }`}
             onClick={handleSubmit}
           >
             continue with high slippage
