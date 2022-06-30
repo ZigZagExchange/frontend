@@ -110,7 +110,7 @@ const TokenDropDownModal = ({
                       <div className="relative mx-3 overflow-hidden text-left rounded-md shadow-md cursor-default focus:outline-none ">
                         <Combobox.Input
                           className="w-full border-none py-2.5 pl-3 pr-10 text-base leading-5 focus:ring-0 dark:bg-foreground-100  font-work"
-                          displayValue={(token) => token.name}
+                          // displayValue={(token) => token.name}
                           onChange={(event) => setQuery(event.target.value)}
                           placeholder="Search..."
                         />
@@ -127,7 +127,11 @@ const TokenDropDownModal = ({
                           open
                           className={`mt-1 max-h-72 w-full overflow-auto rounded-md dark:bg-[#2B2E4A] 
                             bg-sky-100 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none 
-                            ${isDark? "zig_scrollstyle_dark":"zig_scrollstyle_light" }
+                            ${
+                              isDark
+                                ? "zig_scrollstyle_dark"
+                                : "zig_scrollstyle_light"
+                            }
                           `}
                         >
                           {filteredToken.length === 0 && query !== "" ? (

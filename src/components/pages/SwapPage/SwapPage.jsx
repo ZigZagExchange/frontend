@@ -84,6 +84,7 @@ export default function SwapPage() {
   useEffect(async () => {
     if (!user.address) return;
     setBalances(zkBalances);
+    dispatch(setCurrentMarket("ZZ-USDC"));
   }, [user.address, zkBalances]);
 
   useEffect(() => {
@@ -187,10 +188,9 @@ export default function SwapPage() {
       const p = sellTokenList.map((item, index) => {
         return { id: index, name: item };
       });
-      const f = p.find((item) => item.name === currentMarket.split("-")[0]);
-      const t = p.find((item) => item.name === currentMarket.split("-")[1]);
+      const f = p.find((item) => item.name === currentMarket.split("-")[1]);
+      // const t = p.find((item) => item.name === currentMarket.split("-")[0]);
       setSellToken(f);
-      setBuyToken(t);
       return p;
     } else {
       return [];
@@ -224,13 +224,12 @@ export default function SwapPage() {
         setBuyToken(d);
       }
     } else {
-      setBuyToken(filtered[0]);
+      setBuyToken(filtered.find((item) => item.name === "ZZ"));
     }
     filtered = filtered.filter(
       (value, index, self) =>
         index === self.findIndex((t) => t.name === value.name)
     );
-    console.log(filtered);
     return filtered;
   }, [sellToken, pairs]);
 
@@ -471,7 +470,7 @@ export default function SwapPage() {
             />
             <Button
               isLoading={false}
-              className="w-full py-3 mt-3 uppercase"
+              className="w-full py-3 my-3 uppercase"
               scale="imd"
               onClick={onClickExchange}
               disabled={orderButtonDisabled || !user.address}
