@@ -11,6 +11,7 @@ import { userSelector } from "lib/store/features/auth/authSlice";
 import {
   networkSelector,
   balancesSelector,
+  userOrdersSelector
 } from "lib/store/features/api/apiSlice";
 import { MAX_ALLOWANCE } from "lib/api/constants";
 import { formatUSD, formatPrice } from "lib/utils";
@@ -67,6 +68,7 @@ const BridgeContainer = () => {
 
   const coinEstimator = useCoinEstimator();
   const currencyValue = coinEstimator(swapDetails.currency);
+  const userOrders = useSelector(userOrdersSelector);
 
   const estimatedValue =
     +swapDetails.amount * coinEstimator(swapDetails.currency) || 0;
@@ -321,9 +323,28 @@ const BridgeContainer = () => {
       // 0.0005 -> poly bridge min size
       else if (
         bridgeAmount < 0.0005 &&
-        (toNetwork.key === "polygon" || fromNetwork.from.key === "polygon")
+        (toNetwork.id === "polygon" || fromNetwork.id === "polygon")
       ) {
         error = "Amount too small";
+      }
+
+      const userOrderArray = Object.values(userOrders);
+      if(userOrderArray.length > 0) {
+        const openOrders = userOrderArray.filter((o) => ['o', 'b', 'm'].includes(o[9]));
+        if(
+          [1, 1000].includes(network) &&
+          fromNetwork.id === 'zksync' && 
+           openOrders.length > 0
+        ) {
+          error = 'Open limit order prevents you from bridging';
+        }
+        toast.warn(
+          'zkSync 1.0 allows one open order at a time. Please cancel your limit order or wait for it to be filled before bridging. Otherwise your limit order will fail.',
+          {
+            toastId: 'zkSync 1.0 allows one open order at a time. Please cancel your limit order or wait for it to be filled before bridging. Otherwise your limit order will fail.',
+            autoClose: 20000,
+          }
+        );
       }
     }
 
