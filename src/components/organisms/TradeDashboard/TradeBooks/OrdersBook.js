@@ -206,6 +206,7 @@ export default function OrdersBook(props) {
                 <>
                   <TradePriceHeadSecond
                     lastPrice={marketSummary.price}
+                    marketSummary={marketSummary}
                     marketInfo={marketInfo}
                     fixedPoint={fixedPoint}
                   />
@@ -228,6 +229,7 @@ export default function OrdersBook(props) {
                 <>
                   <TradePriceHeadSecond
                     lastPrice={marketSummary.price}
+                    marketSummary={marketSummary}
                     marketInfo={marketInfo}
                     fixedPoint={fixedPoint}
                   />
@@ -258,6 +260,7 @@ export default function OrdersBook(props) {
                   <Divider />
                   <TradePriceHeadSecond
                     lastPrice={marketSummary.price}
+                    marketSummary={marketSummary}
                     marketInfo={marketInfo}
                     fixedPoint={fixedPoint}
                   />
@@ -318,11 +321,12 @@ export default function OrdersBook(props) {
               <HeaderWrapper>
                 <TradePriceHeadSecond
                   lastPrice={marketSummary.price}
+                  marketSummary={marketSummary}
                   marketInfo={marketInfo}
                   fixedPoint={fixedPoint}
                 />
                 <OrderFooterWrapper>
-                  <Dropdown
+                  {/* <Dropdown
                     adClass="side-dropdown"
                     transparent={true}
                     width={162}
@@ -330,7 +334,7 @@ export default function OrdersBook(props) {
                     context={`${fixedPoint} decimal`}
                     leftIcon={false}
                     clickFunction={changeFixedPoint}
-                  />
+                  /> */}
 
                   <OrderFooterRight>
                     <OrderButtonWrapper

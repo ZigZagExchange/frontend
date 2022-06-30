@@ -52,16 +52,26 @@ const TradeRatesCard = ({
         <RatesCardsWrapper>
           <RatesCard>
             <Text
-              font="primaryExtraSmallSemiBold"
-              color="foregroundLowEmphasis"
+              font="primaryMediumSmallSemiBold"
+              color={
+                percentChange === "NaN"
+                  ? "black"
+                  : parseFloat(marketSummary["priceChange"]) >= 0
+                  ? "successHighEmphasis"
+                  : "dangerHighEmphasis"
+              }
             >
-              Price
+              {marketSummary.price ? marketSummary.price : "--"}
             </Text>
             <Text
               font="primaryMediumSmallSemiBold"
               color="foregroundHighEmphasis"
             >
-              {marketSummary.price ? marketSummary.price : "--"}
+              $ {
+                (marketInfo?.baseAsset?.usdPrice)
+                  ? marketInfo.baseAsset.usdPrice
+                  : "--"
+              }
             </Text>
           </RatesCard>
           {/* <RatesCard>
