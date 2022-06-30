@@ -54,12 +54,12 @@ const TokenDropDownModal = ({
         >
           {
             <img
-              src={api.getCurrencyLogo(selectedOption.name)}
+              src={api.getCurrencyLogo(selectedOption?.name)}
               alt={selectedOption}
               style={{ width: 25, height: 25 }}
             />
           }
-          <p className="ml-3 text-lg ">{selectedOption.name}</p>
+          <p className="ml-3 text-lg ">{selectedOption?.name}</p>
           <ChevronDownIcon className="w-5 h-5 ml-1 -mr-1" aria-hidden="true" />
         </button>
       </div>
