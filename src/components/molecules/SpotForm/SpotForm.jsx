@@ -324,22 +324,13 @@ class SpotForm extends React.Component {
 
       const askPrice = this.getFirstAsk();
       const delta = ((askPrice - price) / askPrice) * 100;
-      // if (
-      //   delta > 10 &&
-      //   this.props.orderType === "limit" &&
-      //   !this.props.settings.disableSlippageWarning
-      // ) {
-      //   toast.error(
-      //     `You are selling ${delta.toFixed(
-      //       2
-      //     )}% under the current market price. You will lose money when signing this transaction!`,
-      //     {
-      //       toastId: `You are selling ${delta.toFixed(
-      //         2
-      //       )}% under the current market price. You will lose money when signing this transaction!`,
-      //     }
-      //   );
-      // }
+      if (
+        delta > 10 &&
+        this.props.orderType === "limit" &&
+        !this.props.settings.disableSlippageWarning
+      ) {
+        this.props.setHighSlippageModal({ open: true, delta: delta });
+      }
       this.props.setHighSlippageModal({ open: true, delta: delta });
 
       if (
@@ -348,16 +339,7 @@ class SpotForm extends React.Component {
       ) {
         price *= 0.9985;
         if (delta > 2) {
-          toast.error(
-            `You are selling ${delta.toFixed(
-              2
-            )}% under the current market price. You could lose money when signing this transaction!`,
-            {
-              toastId: `You are selling ${delta.toFixed(
-                2
-              )}% under the current market price. You could lose money when signing this transaction!`,
-            }
-          );
+          this.props.setHighSlippageModal({ open: true, delta: delta });
         }
       }
     } else if (this.props.side === "b") {
@@ -366,25 +348,20 @@ class SpotForm extends React.Component {
       baseAmountMsg = formatPrice(quoteAmount / price);
 
       if (isNaN(quoteBalance)) {
-        toast.error(`No ${marketInfo.quoteAsset.symbol} balance`, {
-          toastId: `No ${marketInfo.quoteAsset.symbol} balance`,
-        });
+        this.props.setHighSlippageModal({ open: true, delta: delta });
+
         return;
       }
 
       if (quoteAmount && quoteAmount + marketInfo.quoteFee > quoteBalance) {
-        toast.error(`Total exceeds ${marketInfo.quoteAsset.symbol} balance`, {
-          toastId: `Total exceeds ${marketInfo.quoteAsset.symbol} balance`,
-        });
+        this.props.setHighSlippageModal({ open: true, delta: delta });
+
         return;
       }
 
       if (quoteAmount && quoteAmount < marketInfo.quoteFee) {
-        toast.error(
-          `Minimum order size is ${marketInfo.quoteFee.toPrecision(5)} ${
-            marketInfo.quoteAsset.symbol
-          }`
-        );
+        this.props.setHighSlippageModal({ open: true, delta: delta });
+
         return;
       }
 
@@ -396,16 +373,7 @@ class SpotForm extends React.Component {
         this.props.orderType === "limit" &&
         !this.props.settings.disableSlippageWarning
       ) {
-        toast.error(
-          `You are buying ${delta.toFixed(
-            2
-          )}% above the current market price. You will lose money when signing this transaction!`,
-          {
-            toastId: `You are buying ${delta.toFixed(
-              2
-            )}% above the current market price. You will lose money when signing this transaction!`,
-          }
-        );
+        this.props.setHighSlippageModal({ open: true, delta: delta });
       }
 
       if (
@@ -414,16 +382,7 @@ class SpotForm extends React.Component {
       ) {
         price *= 1.0015;
         if (delta > 2) {
-          toast.error(
-            `You are buying ${delta.toFixed(
-              2
-            )}% above the current market price. You could lose money when signing this transaction!`,
-            {
-              toastId: `You are buying ${delta.toFixed(
-                2
-              )}% above the current market price. You could lose money when signing this transaction!`,
-            }
-          );
+          this.props.setHighSlippageModal({ open: true, delta: delta });
         }
       }
     }

@@ -61,6 +61,16 @@ const ModalWrapper = styled(Dialog)`
     }
   }
 
+  .modal-close {
+    display: block;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+  }
+
   h2 {
     margin-left: auto;
     line-height: 0;
@@ -68,13 +78,6 @@ const ModalWrapper = styled(Dialog)`
 
   div {
     text-align: center;
-  }
-
-  button {
-    display: block;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
   }
 
   b {
@@ -113,7 +116,7 @@ const FormDialog = () => {
       aria-labelledby="form-dialog-title"
     >
       <DialogTitle id="form-dialog-title">
-        <button onClick={handleClose}>
+        <button onClick={handleClose} className="modal-close">
           <CloseIcon />
         </button>
       </DialogTitle>
