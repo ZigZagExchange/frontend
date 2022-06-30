@@ -1151,7 +1151,7 @@ export default function OrdersTable(props) {
             const sideclassname =
               fill[3] === "b" ? "successHighEmphasis" : "dangerHighEmphasis";
             const txhash = fill[7];
-            const feeamount = fill[10];
+            const feeamount = Number(fill[10]);
             const feetoken = fill[11];
             let feeText = "1.00 USDC";
             const marketInfo = api.marketInfo[market];
