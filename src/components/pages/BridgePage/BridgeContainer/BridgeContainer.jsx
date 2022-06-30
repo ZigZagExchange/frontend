@@ -323,7 +323,7 @@ const BridgeContainer = () => {
       // 0.0005 -> poly bridge min size
       else if (
         bridgeAmount < 0.0005 &&
-        (toNetwork.key === "polygon" || fromNetwork.from.key === "polygon")
+        (toNetwork.id === "polygon" || fromNetwork.id === "polygon")
       ) {
         error = "Amount too small";
       }
@@ -333,7 +333,7 @@ const BridgeContainer = () => {
         const openOrders = userOrderArray.filter((o) => ['o', 'b', 'm'].includes(o[9]));
         if(
           [1, 1000].includes(network) &&
-          fromNetwork.from.key === 'zksync' && 
+          fromNetwork.id === 'zksync' && 
            openOrders.length > 0
         ) {
           error = 'Open limit order prevents you from bridging';
