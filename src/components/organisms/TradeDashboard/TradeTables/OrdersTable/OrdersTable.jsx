@@ -250,7 +250,7 @@ export default function OrdersTable(props) {
   };
 
   const onClickOrder = (fill) => {
-    toast(
+    toast.warning(
       ({ closeToast }) => <FillCard closeToast={closeToast} fill={fill} />,
       {
         className: "fillToastCard",

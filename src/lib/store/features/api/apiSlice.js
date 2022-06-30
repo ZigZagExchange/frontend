@@ -178,7 +178,8 @@ export const apiSlice = createSlice({
               !state.settings.disableOrderNotification &&
               !state.settings.disableTradeIDCard
             ) {
-              toast(
+              toast.dismiss("Order placed.");
+              toast.warning(
                 ({ closeToast }) => (
                   <FillCard closeToast={closeToast} fill={p} />
                 ),

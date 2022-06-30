@@ -21,7 +21,6 @@ function Provider({ children }) {
           <ToastContainer
             position="bottom-right"
             theme="colored"
-            limit={1}
             style={{ width: isMobile ? "100%" : "400px" }}
           />
         </ReduxProvider>
