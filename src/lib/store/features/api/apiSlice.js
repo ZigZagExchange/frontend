@@ -38,6 +38,11 @@ export const apiSlice = createSlice({
     arweaveAllocation: 0,
     isConnecting: false,
     settings: initialUISettings,
+    highSlippageModal: {
+      open: false,
+      confirmed: "",
+      delta: 0,
+    },
   },
   reducers: {
     _error(state, { payload }) {
@@ -526,6 +531,13 @@ export const apiSlice = createSlice({
     setConnecting(state, { payload }) {
       state.isConnecting = payload;
     },
+    setHighSlippageModal(state, { payload }) {
+      state.highSlippageModal = {
+        open: payload.open ? payload.open : false,
+        confirmed: payload.confirmed ? payload.confirmed : false,
+        delta: payload.delta ? payload.delta : 0,
+      };
+    },
     setUISettings(state, { payload }) {
       state.settings[payload.key] = payload.value;
     },
@@ -547,6 +559,7 @@ export const {
   clearLastPrices,
   setArweaveAllocation,
   setConnecting,
+  setHighSlippageModal,
   setUISettings,
   resetUISettings,
 } = apiSlice.actions;
@@ -566,6 +579,7 @@ export const marketInfoSelector = (state) => state.api.marketinfo;
 export const arweaveAllocationSelector = (state) => state.api.arweaveAllocation;
 export const isConnectingSelector = (state) => state.api.isConnecting;
 export const settingsSelector = (state) => state.api.settings;
+export const highSlippageModalSelector = (state) => state.api.highSlippageModal;
 export const balancesSelector = (state) =>
   state.api.balances[makeScope(state.api)] || {};
 
