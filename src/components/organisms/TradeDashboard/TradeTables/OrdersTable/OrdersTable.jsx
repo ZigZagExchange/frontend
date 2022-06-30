@@ -879,6 +879,7 @@ export default function OrdersTable(props) {
                 break;
             }
 
+            const marketInfo = api.marketInfo[market];
             return (
               <tr key={fillid}>
                 <table>
@@ -1222,6 +1223,7 @@ export default function OrdersTable(props) {
                 break;
             }
 
+            const marketInfo = api.marketInfo[market];
             return (
               <tr key={fillid}>
                 <td data-label="Market">
