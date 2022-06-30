@@ -64,7 +64,7 @@ const TradeRatesCard = ({
               {marketSummary.price ? marketSummary.price : "--"}
             </Text>
             <Text
-              font="primaryMediumSmallSemiBold"
+              font="primarySmall"
               color="foregroundHighEmphasis"
             >
               $ {
