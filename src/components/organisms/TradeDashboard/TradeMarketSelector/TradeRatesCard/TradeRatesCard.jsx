@@ -52,7 +52,7 @@ const TradeRatesCard = ({
         <RatesCardsWrapper>
           <RatesCard>
             <Text
-              font="primaryMediumSmallSemiBold"
+              font="primaryTitleDisplay"
               color={
                 percentChange === "NaN"
                   ? "black"
