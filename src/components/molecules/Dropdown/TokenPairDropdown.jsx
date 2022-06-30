@@ -35,7 +35,8 @@ const DropdownDisplay = styled.div`
   border-radius: 8px;
   transition: all 0.2s ease-in-out;
   box-shadow: 0px 8px 16px 0px #0101011A;
-  width: ${({ isMobile }) => isMobile ? '400px' : '469px'};
+  max-width: 469px;
+  width: calc(100vw - 8px);
   height: 531px;
   background: ${({ theme }) => theme.colors.backgroundLowEmphasis};
   border: 1px solid ${({ theme }) => theme.colors.foreground400};
