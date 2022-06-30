@@ -25,9 +25,11 @@ const NumberInput = ({
   rightOfLabel,
   borderRadius = 4,
   fontSize = 18,
+  className
 }) => {
   return (
     <InputField
+      styles={className}
       name={name}
       placeholder={placeholder}
       validate={validate}

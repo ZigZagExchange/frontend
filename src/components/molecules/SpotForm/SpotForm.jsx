@@ -630,7 +630,7 @@ class SpotForm extends React.Component {
   showLabel() {
     return (
       <div>
-        <p>zkSync's network swap fees are dynamic and sit around ~$0.50</p>
+        <p>zkSync's network swap fees are dynamic and sit around ~$0.10</p>
         <p>covered by the market maker, but paid by the trader</p>
       </div>
     );
@@ -666,7 +666,7 @@ class SpotForm extends React.Component {
         color="foregroundMediumEmphasis"
         textAlign="right"
       >
-        {formatToken(quoteBalance)}{" "}
+        {formatToken(quoteBalance, marketInfo && marketInfo.quoteAsset?.symbol)}{" "}
         {marketInfo && marketInfo.quoteAsset?.symbol}
       </Text>
     );
@@ -677,7 +677,7 @@ class SpotForm extends React.Component {
         color="foregroundMediumEmphasis"
         textAlign="right"
       >
-        {formatToken(baseBalance)} {marketInfo && marketInfo.baseAsset?.symbol}
+        {formatToken(baseBalance, marketInfo && marketInfo.baseAsset?.symbol)} {marketInfo && marketInfo.baseAsset?.symbol}
       </Text>
     );
 
@@ -700,7 +700,7 @@ class SpotForm extends React.Component {
           >
             {marketInfo &&
               marketInfo.quoteFee &&
-              formatToken(Number(marketInfo.quoteFee).toPrecision(4))}{" "}
+              formatToken(Number(marketInfo.quoteFee), marketInfo && marketInfo.quoteAsset.symbol)}{" "}
             {marketInfo && marketInfo.quoteAsset.symbol}
           </Text>
         </FormHeader>
@@ -723,7 +723,7 @@ class SpotForm extends React.Component {
           >
             {marketInfo &&
               marketInfo.baseFee &&
-              formatToken(Number(marketInfo.baseFee).toPrecision(4))}{" "}
+              formatToken(Number(marketInfo.baseFee), marketInfo && marketInfo.baseAsset.symbol)}{" "}
             {marketInfo && marketInfo.baseAsset.symbol}
           </Text>
         </FormHeader>

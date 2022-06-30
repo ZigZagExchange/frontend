@@ -22,6 +22,7 @@ const Input = ({
   value,
   onChange,
   hideValidation,
+  styles,
   children,
   rightOfLabel,
   ...rest
@@ -57,7 +58,7 @@ const Input = ({
           {label}
         </Label>
       )}
-      <Wrapper>
+      <Wrapper className={styles}>
         <Component
           {...field}
           {...rest}

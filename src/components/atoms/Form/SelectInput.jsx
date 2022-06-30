@@ -48,10 +48,12 @@ const SelectInput = ({
   rightOfLabel,
   fontSize = 18,
   borderRadius = 3,
+  className
 }) => {
   return (
     <SelectWrapper>
       <InputField
+        styles={className}
         name={name}
         validate={validate}
         label={label}

@@ -11,6 +11,7 @@ import { userSelector } from "lib/store/features/auth/authSlice";
 import {
   networkSelector,
   balancesSelector,
+  userOrdersSelector
 } from "lib/store/features/api/apiSlice";
 import { MAX_ALLOWANCE } from "lib/api/constants";
 import { formatUSD, formatPrice } from "lib/utils";
@@ -67,6 +68,7 @@ const BridgeContainer = () => {
 
   const coinEstimator = useCoinEstimator();
   const currencyValue = coinEstimator(swapDetails.currency);
+  const userOrders = useSelector(userOrdersSelector);
 
   const estimatedValue =
     +swapDetails.amount * coinEstimator(swapDetails.currency) || 0;
@@ -301,7 +303,7 @@ const BridgeContainer = () => {
       const bridgeAmount = inputValue - ZigZagFeeAmount;
 
       if (bridgeAmount <= 0) {
-        error = "Insufficient amount for fees"
+        error = "Insufficient amount for fees";
       } else if (!user.id && bridgeAmount <= activationFee) {
         error = `Must be more than ${activationFee} ${swapCurrency}`;
       } else if (bridgeAmount >= detailBalance) {
@@ -317,10 +319,32 @@ const BridgeContainer = () => {
             )}`;
           }
         }
-      } 
+      }
       // 0.0005 -> poly bridge min size
-      else if (bridgeAmount < 0.0005 && (toNetwork.key === 'polygon' || fromNetwork.from.key === 'polygon')) {
+      else if (
+        bridgeAmount < 0.0005 &&
+        (toNetwork.id === "polygon" || fromNetwork.id === "polygon")
+      ) {
         error = "Amount too small";
+      }
+
+      const userOrderArray = Object.values(userOrders);
+      if(userOrderArray.length > 0) {
+        const openOrders = userOrderArray.filter((o) => ['o', 'b', 'm'].includes(o[9]));
+        if(
+          [1, 1000].includes(network) &&
+          fromNetwork.id === 'zksync' && 
+           openOrders.length > 0
+        ) {
+          error = 'Open limit order prevents you from bridging';
+        }
+        toast.warn(
+          'zkSync 1.0 allows one open order at a time. Please cancel your limit order or wait for it to be filled before bridging. Otherwise your limit order will fail.',
+          {
+            toastId: 'zkSync 1.0 allows one open order at a time. Please cancel your limit order or wait for it to be filled before bridging. Otherwise your limit order will fail.',
+            autoClose: 20000,
+          }
+        );
       }
     }
 
@@ -386,9 +410,9 @@ const BridgeContainer = () => {
     if (fromNetwork.id === "polygon" && toNetwork.id === "zksync") {
       const gasFee = await api.getPolygonFee();
       if (gasFee) {
-        setL1Fee(35000 * gasFee.fast.maxFee / 10**9);
-        setL2Fee(swapDetails, null, null)
-        setZigZagFeeToken('ETH');
+        setL1Fee((35000 * gasFee.fast.maxFee) / 10 ** 9);
+        setL2Fee(swapDetails, null, null);
+        setZigZagFeeToken("ETH");
         setZigZagFee(0.003);
       }
     }
@@ -422,7 +446,7 @@ const BridgeContainer = () => {
           ]);
           setL1Fee(L1res);
           setL2Fee(swapDetails, L2res.amount, L2res.feeToken);
-          setZigZagFeeToken('ETH');
+          setZigZagFeeToken("ETH");
           setZigZagFee(L1res * 3);
         } else {
           let res = await api.withdrawL2GasFee(swapDetails.currency);
@@ -651,7 +675,7 @@ const BridgeContainer = () => {
 
   const onChangeFromAmounts = (value) => {
     // if (e.target.value.length > 10) return;
-    const amount = value.replace(/[^0-9.]/g,'');
+    const amount = value.replace(/[^0-9.]/g, "");
     setFromAmounts(amount);
     const sDetails = {};
     sDetails["amount"] = amount;
