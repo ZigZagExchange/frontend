@@ -11,10 +11,10 @@ import { userSelector } from "lib/store/features/auth/authSlice";
 import {
   networkSelector,
   balancesSelector,
-  userOrdersSelector
+  userOrdersSelector,
 } from "lib/store/features/api/apiSlice";
 import { MAX_ALLOWANCE } from "lib/api/constants";
-import { formatUSD, formatPrice } from "lib/utils";
+import { formatUSD } from "lib/utils";
 import SwitchNetwork from "./SwitchNetwork";
 import SelectAsset from "./SelectAsset";
 import TransactionSettings from "./TransactionSettings";
@@ -329,18 +329,21 @@ const BridgeContainer = () => {
       }
 
       const userOrderArray = Object.values(userOrders);
-      if(userOrderArray.length > 0) {
-        const openOrders = userOrderArray.filter((o) => ['o', 'b', 'm'].includes(o[9]));
-        if(
+      if (userOrderArray.length > 0) {
+        const openOrders = userOrderArray.filter((o) =>
+          ["o", "b", "m"].includes(o[9])
+        );
+        if (
           [1, 1000].includes(network) &&
-          fromNetwork.id === 'zksync' && 
-           openOrders.length > 0
+          fromNetwork.id === "zksync" &&
+          openOrders.length > 0
         ) {
-          error = 'Open limit order prevents you from bridging';
+          error = "Open limit order prevents you from bridging";
           toast.warn(
-            'zkSync 1.0 allows one open order at a time. Please cancel your limit order or wait for it to be filled before bridging. Otherwise your limit order will fail.',
+            "zkSync 1.0 allows one open order at a time. Please cancel your limit order or wait for it to be filled before bridging. Otherwise your limit order will fail.",
             {
-              toastId: 'zkSync 1.0 allows one open order at a time. Please cancel your limit order or wait for it to be filled before bridging. Otherwise your limit order will fail.',
+              toastId:
+                "zkSync 1.0 allows one open order at a time. Please cancel your limit order or wait for it to be filled before bridging. Otherwise your limit order will fail.",
               autoClose: 20000,
             }
           );

@@ -30,6 +30,8 @@ export default function BridgePage() {
   const user = useSelector(userSelector);
   const settings = useSelector(settingsSelector);
 
+  console.log("asdf");
+
   return (
     <DefaultTemplate>
       {loading && (

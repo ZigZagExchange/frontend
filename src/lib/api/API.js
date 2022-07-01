@@ -93,9 +93,9 @@ export default class API extends Emitter {
     if (this.isZksyncChain()) {
       this.web3 = new Web3(
         window.ethereum ||
-        new Web3.providers.HttpProvider(
-          `https://${networkName}.infura.io/v3/${this.infuraId}`
-        )
+          new Web3.providers.HttpProvider(
+            `https://${networkName}.infura.io/v3/${this.infuraId}`
+          )
       );
 
       this.web3Modal = new Web3Modal({
@@ -875,29 +875,32 @@ export default class API extends Emitter {
   }
 
   updatePendingOrders = (userOrders) => {
-    Object.keys(userOrders).forEach(orderId => {
+    Object.keys(userOrders).forEach((orderId) => {
       const orderStatus = userOrders[orderId][9];
-      if (['b', 'm', 'pm'].includes(orderStatus)) {
+      if (["b", "m", "pm"].includes(orderStatus)) {
         // _pendingOrders is used to only request on the 2nd time
         const index = this._pendingOrders.indexOf(orderId);
         if (index > -1) {
           this._pendingOrders.splice(index, 1);
           // request status update
-          this.send("orderreceiptreq", [this.apiProvider.network, Number(orderId)])
+          this.send("orderreceiptreq", [
+            this.apiProvider.network,
+            Number(orderId),
+          ]);
         } else {
           this._pendingOrders.push(orderId);
         }
       }
-    })
-  }
+    });
+  };
 
   updatePendingFills = (userFills) => {
     const fillRequestIds = [];
-    Object.keys(userFills).forEach(fillId => {
+    Object.keys(userFills).forEach((fillId) => {
       if (!fillId) return;
 
       const fillStatus = userFills[fillId][6];
-      if (['b', 'm', 'pm'].includes(fillStatus)) {
+      if (["b", "m", "pm"].includes(fillStatus)) {
         // _pendingFills is used to only request on the 2nd time
         const index = this._pendingFills.indexOf(fillId);
         if (index > -1) {
@@ -907,10 +910,13 @@ export default class API extends Emitter {
           this._pendingFills.push(fillId);
         }
       }
-    })
+    });
     // request status update
     if (fillRequestIds.length > 0) {
-      this.send("fillreceiptreq", [this.apiProvider.network, Number(fillRequestIds)])
+      this.send("fillreceiptreq", [
+        this.apiProvider.network,
+        Number(fillRequestIds),
+      ]);
     }
-  }
+  };
 }
