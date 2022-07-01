@@ -565,9 +565,6 @@ export default class API extends Emitter {
       case 42161: return 'Arbitrum';
       default: return 'ZigZag';
     }
-
-    //const keys = Object.keys(this.networks);
-    //return keys[keys.findIndex((key) => network === this.networks[key][0])];
   };
 
   subscribeToMarket = (market) => {
