@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { formatPrice } from "lib/utils";
 import Text from "components/atoms/Text/Text";
-import { ArrowUpIcon } from "components/atoms/Svg";
+import { ArrowUpIcon, ArrowDownIcon } from "components/atoms/Svg";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -16,7 +16,7 @@ const Wrapper = styled.div`
     align-items: center;
 
     svg path {
-      fill: ${({ theme }) => theme.colors.successHighEmphasis};
+      fill: ${({ theme, isIncrease }) => (isIncrease ? theme.colors.successHighEmphasis : theme.colors.dangerHighEmphasis)};
     }
   }
 
@@ -30,11 +30,21 @@ const Wrapper = styled.div`
 `
 
 const TradePriceHeadSecond = (props) => {
+  const [lastPrice, setLastPrice] = useState(0);
+  const [isIncrease, setIncrease] = useState(true);
+
+  useEffect(()=>{
+    if(props.lastPrice > lastPrice)
+      setIncrease(true)
+    else if(props.lastPrice < lastPrice)
+      setIncrease(false)
+    setLastPrice(props.lastPrice)
+  },[props.lastPrice])
   return (
-    <Wrapper>
+    <Wrapper isIncrease={isIncrease}>
       <div>
-        <Text font="primaryTitleDisplay" color="successHighEmphasis">{parseFloat(formatPrice(props.lastPrice))}</Text>
-        <ArrowUpIcon />
+        <Text font="primaryTitleDisplay" color={isIncrease ? "successHighEmphasis" : "dangerHighEmphasis"}>{parseFloat(formatPrice(lastPrice)).toFixed(props.fixedPoint)}</Text>
+        {isIncrease ? <ArrowUpIcon /> : <ArrowDownIcon />} 
       </div>
       {/* <span>$ {
         formatPrice(
