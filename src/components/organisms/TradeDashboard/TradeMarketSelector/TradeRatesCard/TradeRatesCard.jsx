@@ -10,6 +10,7 @@ import "./TradeRatesCard.css";
 import SettingsModal from "./SettingsModal";
 import { TokenPairDropdown } from "components/molecules/Dropdown";
 import useModal from "components/hooks/useModal";
+import useTheme from "components/hooks/useTheme";
 
 const TradeRatesCard = ({
   updateMarketChain,
@@ -18,6 +19,7 @@ const TradeRatesCard = ({
   currentMarket,
   marketInfo,
 }) => {
+  const { isDark } = useTheme()
   const handleOnModalClose = () => {
     onSettingsModalClose();
   };
@@ -228,5 +230,5 @@ const RatesCard = styled.div`
 const Divider = styled.div`
   width: 1px;
   height: 32px;
-  background-color: ${({ theme }) => theme.colors.backgroundLowEmphasis};
+  background-color: ${({theme, isDark}) => isDark === "false" ? theme.colors.backgroundMediumEmphasis : theme.colors.foreground400};
 `;
