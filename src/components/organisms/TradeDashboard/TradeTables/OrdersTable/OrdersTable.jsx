@@ -786,6 +786,7 @@ export default function OrdersTable(props) {
           {fills.map((fill, i) => {
             const fillid = fill[1];
             const market = fill[2];
+            const baseCurrency = fill[2].split("-")[0];
             const time = fill[12] && formatDateTime(new Date(fill[12]));
             const side = fill[3];
             let price = fill[4];
@@ -983,7 +984,7 @@ export default function OrdersTable(props) {
                           textAlign="right"
                         >
                           {baseQuantity.toPrecision(6) / 1}{" "}
-                          {marketInfo && marketInfo.baseAsset.symbol}
+                          {baseCurrency}
                         </Text>
                       </td>
                     </tr>
@@ -1146,6 +1147,7 @@ export default function OrdersTable(props) {
             const side = fill[3];
             let price = fill[4];
             let baseQuantity = fill[5];
+            const baseCurrency = fill[2].split("-")[0];
             const fillstatus = fill[6];
             const sidetext = fill[3] === "b" ? "buy" : "sell";
             const sideclassname =
@@ -1277,7 +1279,7 @@ export default function OrdersTable(props) {
                     color="foregroundHighEmphasis"
                   >
                     {baseQuantity.toPrecision(6) / 1}{" "}
-                    {marketInfo && marketInfo.baseAsset.symbol}
+                    {baseCurrency}
                   </Text>
                 </td>
                 <td data-label="Fee">

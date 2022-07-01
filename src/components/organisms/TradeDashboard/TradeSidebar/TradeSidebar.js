@@ -65,32 +65,24 @@ export default function TradeSidebar(props) {
       ) : (
         <InfoWrapper>
           <Text font="primarySmall" color="foregroundHighEmphasis">
-            {" "}
-            {props.user.id
-              ? "Have a question? Need live support?"
-              : "You have not connected your wallet."}
+              Have a question? Need live support?
           </Text>
-          {props.user.id ? (
-            <Button
-              width="150px"
-              startIcon={<DiscordIcon />}
-              variant="outlined"
-              scale="imd"
-              mr="8px"
-              onClick={joinDiscord}
+          <Button
+            width="150px"
+            startIcon={<DiscordIcon />}
+            variant="outlined"
+            scale="imd"
+            mr="8px"
+            onClick={joinDiscord}
+          >
+            <Text
+              font="primaryBoldDisplay"
+              color="foregroundHighEmphasis"
+              textAlign="center"
             >
-              <Text
-                font="primaryBoldDisplay"
-                color="foregroundHighEmphasis"
-                textAlign="center"
-              >
-                {" "}
-                JOIN DISCORD{" "}
-              </Text>{" "}
-            </Button>
-          ) : (
-            <ConnectWalletButton width="fit-content" />
-          )}{" "}
+              JOIN DISCORD
+            </Text>
+          </Button>
         </InfoWrapper>
       )}
       <SpotBox

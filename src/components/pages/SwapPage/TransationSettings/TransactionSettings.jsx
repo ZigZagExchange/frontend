@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { InfoIcon, EditIcon } from "components/atoms/Svg";
+import { EditIcon } from "components/atoms/Svg";
 import { CheckIcon } from "@heroicons/react/solid";
 import { marketInfoSelector } from "lib/store/features/api/apiSlice";
+import { QuestionHelper } from "components";
 
 const TransactionSettings = ({
   transactionType,
@@ -24,7 +25,20 @@ const TransactionSettings = ({
       <div className="flex justify-between mt-4">
         <p className="flex items-center gap-2 text-base ">
           Slippage Tolerance
-          <InfoIcon size={16} />
+          <QuestionHelper
+            text={
+              <div>
+                <p>
+                  Your order will only get filled within your slippage
+                  tolerance.
+                </p>
+                <p>
+                  Otherwise the order stays open and turns into a limit order.
+                </p>
+              </div>
+            }
+            placement="bottom"
+          ></QuestionHelper>
         </p>
         <p className="flex items-center h-6 gap-2 text-base ">
           {!editableSlippage ? (

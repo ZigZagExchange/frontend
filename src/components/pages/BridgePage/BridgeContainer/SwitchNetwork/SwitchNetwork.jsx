@@ -22,7 +22,7 @@ const SwitchNetwork = ({
           selectedItem={fromNetwork}
         />
       </div>
-      <div className="flex items-end justify-center">
+      <div className="flex items-end justify-center pb-2">
         <button
           className="flex items-center justify-center w-10 h-10 border rounded-full shadow-xl border-foreground-500"
           onClick={onClickSwitchNetwork}

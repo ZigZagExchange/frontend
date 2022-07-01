@@ -25,17 +25,14 @@ import {
   setCurrentMarket,
   resetData,
   settingsSelector,
+  userOrdersSelector
 } from "lib/store/features/api/apiSlice";
 import { formatPrice } from "lib/utils";
 import { LoadingSpinner } from "components/atoms/LoadingSpinner";
 
 export default function SwapPage() {
-  // const isSwapCompatible = useMemo(
-  //   () => network && api.isImplemented("depositL2"),
-  //   [network]
-  // );
-  // const tab = useParams().tab || "swap";
   const coinEstimator = useCoinEstimator();
+  const userOrders = useSelector(userOrdersSelector);
 
   const { isDark } = useTheme();
   const [tType, setTtype] = useState("buy");
@@ -58,7 +55,7 @@ export default function SwapPage() {
   const [slippageValue, setSlippageValue] = useState("2.00");
 
   const [sellAmounts, setSellAmounts] = useState();
-  const [buyAmounts, setBuyAmounts] = useState(0);
+  const [buyAmounts, setBuyAmounts] = useState();
 
   const [balances, setBalances] = useState([]);
 
@@ -90,6 +87,10 @@ export default function SwapPage() {
     if (!user.address) return;
     setBalances(zkBalances);
   }, [user.address, zkBalances]);
+
+  useEffect(() => {
+    dispatch(setCurrentMarket("ZZ-USDC"));
+  }, []);
 
   useEffect(() => {
     if (sellToken && buyToken) {
@@ -192,10 +193,9 @@ export default function SwapPage() {
       const p = sellTokenList.map((item, index) => {
         return { id: index, name: item };
       });
-      const f = p.find((item) => item.name === currentMarket.split("-")[0]);
-      const t = p.find((item) => item.name === currentMarket.split("-")[1]);
+      const f = p.find((item) => item.name === currentMarket.split("-")[1]);
+      // const t = p.find((item) => item.name === currentMarket.split("-")[0]);
       setSellToken(f);
-      setBuyToken(t);
       return p;
     } else {
       return [];
@@ -224,14 +224,17 @@ export default function SwapPage() {
     if (buyToken) {
       const d = filtered.find((item) => item.name === buyToken.name);
       if (d === undefined) {
-        // setBuyToken(filtered[0]);
+        setBuyToken(filtered[0]);
       } else {
         setBuyToken(d);
       }
     } else {
-      setBuyToken(filtered[0]);
+      setBuyToken(filtered.find((item) => item.name === "ZZ"));
     }
-
+    filtered = filtered.filter(
+      (value, index, self) =>
+        index === self.findIndex((t) => t.name === value.name)
+    );
     return filtered;
   }, [sellToken, pairs]);
 
@@ -253,10 +256,34 @@ export default function SwapPage() {
     const amount = event.target.value.replace(/[^0-9.]/g, "");
     setSellAmounts(amount);
     const x = amount * basePrice;
-    setBuyAmounts(x);
+    setBuyAmounts(x.toPrecision(6));
+  };
+
+  const onChangeBuyAmounts = (event) => {
+    const amount = event.target.value.replace(/[^0-9.]/g, "");
+    setBuyAmounts(amount);
+    const x = amount / basePrice;
+    setSellAmounts(x.toPrecision(6));
   };
 
   const onClickExchange = async () => {
+    const userOrderArray = Object.values(userOrders);
+    if(userOrderArray.length > 0) {
+      const openOrders = userOrderArray.filter((o) => ['o', 'b', 'm'].includes(o[9]));
+      if(
+        [1, 1000].includes(network) &&
+        openOrders.length > 0
+      ) {
+        toast.warn(
+          'zkSync 1.0 allows one open order at a time. Please cancel your limit order or wait for it to be filled before converting. Otherwise your limit order will fail.',
+          {
+            toastId: 'zkSync 1.0 allows one open order at a time. Please cancel your limit order or wait for it to be filled before converting. Otherwise your limit order will fail.',
+            autoClose: 20000,
+          }
+        );
+        return;
+      }
+    }
     let baseAmount, quoteAmount;
     if (typeof sellAmounts === "string") {
       baseAmount = parseFloat(sellAmounts.replace(",", "."));
@@ -377,7 +404,6 @@ export default function SwapPage() {
     }
 
     try {
-      console.log(1 + slippageValue / 100);
       await api.submitOrder(
         currentMarket,
         tType === "buy" ? "b" : "s",
@@ -432,26 +458,10 @@ export default function SwapPage() {
       )}
       {!loading && (
         <div className={classNames("flex justify-center", { dark: isDark })}>
-          <div>
+          <div className="w-full max-w-lg px-1 sm:px-0">
             <p className="mt-10 text-3xl font-semibold font-work ">
               ZigZag Convert
             </p>
-            {/* <p className="mt-2 text-sm text-gray-500">
-              Swap into more than 200 tokens, using the best quotes from over 8
-              sources.
-            </p>
-            <Link
-              to="/"
-              className="flex items-center mt-1 dark:hover:text-foreground-700 dark:text-foreground-900 text-background-900 hover:text-background-800"
-            >
-              <p className="mr-2">Learn More</p>
-              <ExternalLinkIcon size={11} />
-            </Link> */}
-            {/* <div className="flex items-center justify-between mt-4">
-              <p className="text-sm font-work">Network</p>
-              <InfoIcon size={16} />
-            </div>
-            <NetworkSelection className="mt-2" /> */}
             <SwapContianer
               setTransactionType={(type) => setTtype(type)}
               transactionType={tType}
@@ -469,10 +479,11 @@ export default function SwapPage() {
               onChangeToToken={onChangeBuyToken}
               toAmounts={
                 isNaN(buyAmounts) || Number.isSafeInteger(buyAmounts)
-                  ? 0
+                  ? ""
                   : buyAmounts
               }
               onClickMax={onClickMax}
+              onChangeToAmounts={onChangeBuyAmounts}
             />
             <TransactionSettings
               transactionType={tType}
@@ -481,7 +492,7 @@ export default function SwapPage() {
             />
             <Button
               isLoading={false}
-              className="w-full py-3 mt-3 uppercase"
+              className="w-full py-3 my-3 uppercase"
               scale="imd"
               onClick={onClickExchange}
               disabled={orderButtonDisabled || !user.address}
