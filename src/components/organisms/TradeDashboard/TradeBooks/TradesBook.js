@@ -13,6 +13,7 @@ const StyledTradeBooks = styled.section`
   justify-content: space-between;
   padding: ${({ isLeft }) => isLeft ? '21px 20px 12px 10px' : '10px'};
   border-top: 1px solid ${({ theme }) => theme.colors.foreground400};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.foreground400};
 `;
 
 const TradesWrapper = styled.div`
