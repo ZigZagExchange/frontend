@@ -136,23 +136,26 @@ export const apiSlice = createSlice({
           if (feeamount) state.userFills[fillid][10] = feeamount;
           if (feetoken) state.userFills[fillid][11] = feetoken;
 
-          if (newstatus === 'f') {
+          if (['f', 'pf'].includes(newstatus)) {
             const fillDetails = state.userFills[fillid];
             const baseCurrency = fillDetails[2].split("-")[0];
             const sideText = fillDetails[3] === "b" ? "buy" : "sell";
             const price = Number(fillDetails[4]);
             const baseQuantity = Number(fillDetails[5]);
             const quoteQuantity = Number(fillDetails[6]);
-            toast.success(
-              `Your ${sideText} order for ${Number(baseQuantity.toPrecision(4))
+
+            let text;
+            if (newstatus === 'pf') {
+              const orderSize = Number(state.userFills[fillid][5]);
+              text = `Your ${sideText} order #${fillid} for ${Number(orderSize.toPrecision(4))
+              } ${baseCurrency} was partially  filled @ ${Number(formatPrice(price))
+              } with ${baseQuantity} ${baseCurrency}!`
+            } else {
+              text = `Your ${sideText} order #${fillid} for ${Number(baseQuantity.toPrecision(4))
               } ${baseCurrency} was filled @ ${Number(formatPrice(price))
-              }!`,
-              {
-                toastId: `Your ${sideText} order for ${Number(baseQuantity.toPrecision(4))
-                  } ${baseCurrency} was filled @ ${Number(formatPrice(price))
-                  }!`,
-              }
-            );
+              }!`
+            }                          
+            toast.success(text, { toastId: text, });
 
             // update the balances of the user account
             if(api.apiProvider.evmCompatible) {              
