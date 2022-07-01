@@ -161,6 +161,7 @@ export const apiSlice = createSlice({
               !state.settings.disableOrderNotification &&
               state.settings.disableTradeIDCard
             ) {
+              toast.dismiss("Order placed.");
               toast.success(
                 `Your ${sideText} order for ${Number(
                   baseQuantity.toPrecision(4)
