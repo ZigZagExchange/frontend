@@ -275,6 +275,11 @@ class SpotForm extends React.Component {
       return;
     }
 
+    this.props.setHighSlippageModal({
+      xToken: baseAmount,
+      yToken: baseAmount * price,
+    });
+
     if (this.props.activeOrderCount > 0 && api.isZksyncChain()) {
       toast.error("Only one active order permitted at a time", {
         toastId: "Only one active order permitted at a time",
@@ -602,6 +607,10 @@ class SpotForm extends React.Component {
     if (isNaN(newstate.quoteAmount)) newstate.quoteAmount = 0;
     newstate.orderButtonDisabled = this.isInvalidNumber(newstate.totalAmount);
     this.setState(newstate);
+  }
+
+  componentDidMount() {
+    this.props.setHighSlippageModal({ marketInfo: this.props.currentMarket });
   }
 
   componentDidUpdate(prevProps, prevState) {

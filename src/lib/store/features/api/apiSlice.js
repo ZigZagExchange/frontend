@@ -43,6 +43,9 @@ export const apiSlice = createSlice({
       confirmed: "",
       delta: 0,
       type: "sell",
+      marketInfo: " ",
+      xToken: 0,
+      yToken: 0,
     },
   },
   reducers: {
@@ -536,8 +539,17 @@ export const apiSlice = createSlice({
       state.highSlippageModal = {
         open: payload.open ? payload.open : false,
         confirmed: payload.confirmed ? payload.confirmed : false,
-        delta: payload.delta ? payload.delta : 0,
-        type: payload.type ? payload.type : "buy",
+        delta: payload.delta ? payload.delta : state.highSlippageModal.delta,
+        type: payload.type ? payload.type : state.highSlippageModal.type,
+        marketInfo: payload.marketInfo
+          ? payload.marketInfo
+          : state.highSlippageModal.marketInfo,
+        xToken: payload.xToken
+          ? payload.xToken
+          : state.highSlippageModal.xToken,
+        yToken: payload.yToken
+          ? payload.yToken
+          : state.highSlippageModal.yToken,
       };
     },
     setUISettings(state, { payload }) {

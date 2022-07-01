@@ -94,6 +94,8 @@ const FormDialog = () => {
   const [textValue, setTextValue] = useState("");
   const [confirmed, setConfirmed] = useState(false);
   const highSlippageModal = useSelector(highSlippageModalSelector);
+  const baseToken = highSlippageModal.marketInfo?.split("-")[0];
+  const quoteToken = highSlippageModal.marketInfo?.split("-")[1];
   const dispatch = useDispatch();
 
   const handleClose = () => {
@@ -112,6 +114,10 @@ const FormDialog = () => {
   const onChangeTextValue = (e) => {
     setConfirmed(e.currentTarget.value === "CONFIRM" ? true : false);
     setTextValue(e.currentTarget.value);
+  };
+
+  const getCapitalize = (text) => {
+    return text[0].toUpperCase() + text.substring(1, text.length);
   };
 
   return (
@@ -134,9 +140,11 @@ const FormDialog = () => {
           <Text
             font="primaryHeading6"
             color="foregroundHighEmphasis"
-            style={{ marginTop: "28px" }}
+            style={{ marginTop: "28px", display: "block", lineHeight: "25px" }}
           >
-            You are {highSlippageModal.type}ing{" "}
+            You placing a {getCapitalize(highSlippageModal.type)} Order for
+            <br /> {highSlippageModal.xToken} {baseToken} @{" "}
+            {highSlippageModal.yToken} {quoteToken} <br /> which is{" "}
             {highSlippageModal.delta.toFixed(2)}% above the current market
             price.
           </Text>
