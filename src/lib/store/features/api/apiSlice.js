@@ -258,7 +258,7 @@ export const apiSlice = createSlice({
     _orderstatus(state, { payload }) {
       (payload[0] || []).forEach(async (update) => {
         let filledOrder;
-        const [, orderId, newStatus, txHash] = update;
+        const [, orderId, newStatus, txHash, remaining] = update;
         switch (newStatus) {
           case "c":
             delete state.orders[orderId];
@@ -266,8 +266,7 @@ export const apiSlice = createSlice({
               state.userOrders[orderId][9] = "c";
             }
             break;
-          case "pm":
-            const remaining = update[4];
+          case "pm": case "pf":
             if (state.orders[orderId]) {
               state.orders[orderId][10] = remaining;
             }
