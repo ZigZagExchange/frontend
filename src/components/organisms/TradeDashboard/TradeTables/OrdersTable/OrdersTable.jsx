@@ -91,16 +91,9 @@ export class OrdersTable extends React.Component {
                 break;
               case "pm":
                 statusText = (
-                  <span>
-                    partial match
-                    <img
-                      className="loading-gif"
-                      src={loadingGif}
-                      alt="Pending"
-                    />
-                  </span>
+                  <span>partial match</span>
                 );
-                statusClass = "matched";
+                statusClass = "open";
                 break;
               case "m":
                 statusText = (
