@@ -157,39 +157,7 @@ export const apiSlice = createSlice({
 
             // update the balances of the user account
             if (api.apiProvider.evmCompatible) {
-              const marketInfo = api.api.marketInfo[fillDetails[2]];
-              const [base, quote] = fillDetails[2].split('-');
-              const scope = makeScope(state);
-              const balances = state.balances[scope];
-              if (fillDetails[3] === 's') {
-                balances[base].valueReadable -= baseQuantity;
-                balances[quote].valueReadable += quoteQuantity;
-                balances[base].allowanceReadable -= baseQuantity;
-
-                balances[base].allowance = ethers.utils.parseUnits(
-                  (balances[base].allowanceReadable).toFixed(marketInfo.baseAsset.decimals),
-                  marketInfo.baseAsset.decimals
-                ).toString();
-              } else {
-                balances[base].valueReadable += baseQuantity;
-                balances[quote].valueReadable -= quoteQuantity;
-                balances[quote].allowanceReadable -= quoteQuantity;
-
-                balances[quote].allowance = ethers.utils.parseUnits(
-                  (balances[quote].allowanceReadable).toFixed(marketInfo.quoteAsset.decimals),
-                  marketInfo.quoteAsset.decimals
-                ).toString();
-              }
-
-              balances[base].value = ethers.utils.parseUnits(
-                (balances[base].valueReadable).toFixed(marketInfo.baseAsset.decimals),
-                marketInfo.baseAsset.decimals
-              ).toString();
-              balances[quote].value = ethers.utils.parseUnits(
-                (balances[quote].valueReadable).toFixed(marketInfo.quoteAsset.decimals),
-                marketInfo.quoteAsset.decimals
-              ).toString();
-              state.balances[scope] = balances;
+                api.getBalances();
             }
           }
         }
