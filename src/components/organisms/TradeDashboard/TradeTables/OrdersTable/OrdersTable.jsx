@@ -163,7 +163,7 @@ export class OrdersTable extends React.Component {
                   {statusText}
                 </td>
                 <td data-label="Action">
-                  {["o", "pf"].includes(orderStatus) ? (
+                  {["o", "pf", "pm"].includes(orderStatus) ? (
                     <span
                       className="cancel_order_link"
                       onClick={() => api.cancelOrder(orderId)}
