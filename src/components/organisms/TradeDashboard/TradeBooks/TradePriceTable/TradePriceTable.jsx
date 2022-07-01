@@ -105,6 +105,7 @@ const TradePriceTable = (props) => {
   const marketInfo = useSelector(marketInfoSelector);
   const ref = useRef(null);
   const [isUpdateScroll, setUpdateScroll] = useState(false);
+  const isMobile = window.innerWidth < 500
 
   useEffect(() => {
     if (!ref.current) return;
@@ -145,7 +146,7 @@ const TradePriceTable = (props) => {
                 Amount
               </Text>
             </th>
-            <th>
+            {!isMobile && <th>
               <Text
                 font="tableHeader"
                 color="foregroundLowEmphasis"
@@ -153,7 +154,7 @@ const TradePriceTable = (props) => {
               >
                 Total({marketInfo && marketInfo.quoteAsset.symbol})
               </Text>
-            </th>
+            </th>}
           </tr>
         </thead>
       )}
@@ -208,7 +209,7 @@ const TradePriceTable = (props) => {
                   {numStringToSymbol(amount, 2)}
                 </Text>
               </td>
-              <td>
+              {!isMobile && <td>
                 <Text
                   font="tableContent"
                   color="foregroundHighEmphasis"
@@ -216,7 +217,7 @@ const TradePriceTable = (props) => {
                 >
                   {numStringToSymbol(total, 2)}
                 </Text>
-              </td>
+              </td>}
             </tr>
           );
         })}
