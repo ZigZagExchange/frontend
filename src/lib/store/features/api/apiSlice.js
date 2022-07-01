@@ -72,7 +72,8 @@ export const apiSlice = createSlice({
       };
       const toastContent = renderToastContent(op, errorMessage)
       toast.error(toastContent,
-        { toastId: op,
+        {
+          toastId: op,
           closeOnClick: false,
           autoClose: false,
         },
@@ -100,7 +101,7 @@ export const apiSlice = createSlice({
           state.marketFills[fillid] = fill;
         }
         if (state.userId && takerUserId === state.userId.toString().toLowerCase()) {
-          
+
           state.userFills[fillid] = fill;
         }
         // for maker fills we need to flip the side and set fee to 0
@@ -136,7 +137,7 @@ export const apiSlice = createSlice({
           if (feeamount) state.userFills[fillid][10] = feeamount;
           if (feetoken) state.userFills[fillid][11] = feetoken;
 
-          if (['f', 'pf'].includes(newstatus)) {
+          if (newstatus === 'f') {
             const fillDetails = state.userFills[fillid];
             const baseCurrency = fillDetails[2].split("-")[0];
             const sideText = fillDetails[3] === "b" ? "buy" : "sell";
@@ -144,30 +145,27 @@ export const apiSlice = createSlice({
             const baseQuantity = Number(fillDetails[5]);
             const quoteQuantity = Number(fillDetails[6]);
 
-            let text;
-            if (newstatus === 'pf') {
-              const orderSize = Number(state.userFills[fillid][5]);
-              text = `Your ${sideText} order #${fillid} for ${Number(orderSize.toPrecision(4))
-              } ${baseCurrency} was partially  filled @ ${Number(formatPrice(price))
-              } with ${baseQuantity} ${baseCurrency}!`
-            } else {
-              text = `Your ${sideText} order #${fillid} for ${Number(baseQuantity.toPrecision(4))
+            toast.success(
+              `Your ${sideText} order #${fillid} for ${Number(baseQuantity.toPrecision(4))
               } ${baseCurrency} was filled @ ${Number(formatPrice(price))
-              }!`
-            }                          
-            toast.success(text, { toastId: text, });
+              }!`, {
+                toastId: 
+                  `Your ${sideText} order #${fillid} for ${Number(baseQuantity.toPrecision(4))
+                  } ${baseCurrency} was filled @ ${Number(formatPrice(price))
+                  }!`,
+            });
 
             // update the balances of the user account
-            if(api.apiProvider.evmCompatible) {              
+            if (api.apiProvider.evmCompatible) {
               const marketInfo = api.api.marketInfo[fillDetails[2]];
               const [base, quote] = fillDetails[2].split('-');
               const scope = makeScope(state);
               const balances = state.balances[scope];
-              if(fillDetails[3] === 's') {
+              if (fillDetails[3] === 's') {
                 balances[base].valueReadable -= baseQuantity;
                 balances[quote].valueReadable += quoteQuantity;
                 balances[base].allowanceReadable -= baseQuantity;
-                
+
                 balances[base].allowance = ethers.utils.parseUnits(
                   (balances[base].allowanceReadable).toFixed(marketInfo.baseAsset.decimals),
                   marketInfo.baseAsset.decimals
@@ -176,7 +174,7 @@ export const apiSlice = createSlice({
                 balances[base].valueReadable += baseQuantity;
                 balances[quote].valueReadable -= quoteQuantity;
                 balances[quote].allowanceReadable -= quoteQuantity;
-                
+
                 balances[quote].allowance = ethers.utils.parseUnits(
                   (balances[quote].allowanceReadable).toFixed(marketInfo.quoteAsset.decimals),
                   marketInfo.quoteAsset.decimals
@@ -371,7 +369,7 @@ export const apiSlice = createSlice({
     },
     _orderreceipt(state, { payload }) {
       const orderId = payload[1];
-      state.userOrders[orderId] = payload;      
+      state.userOrders[orderId] = payload;
     },
     setBalances(state, { payload }) {
       const scope = makeScope(state);
@@ -439,7 +437,7 @@ export const apiSlice = createSlice({
           successMsg = "withdrew";
           targetMsg = "into your Ethereum wallet. Fast withdrawals should be confirmed within a few minutes";
           extraInfoLink = { text: "Fast Bridge FAQ", link: "https://docs.zigzag.exchange/zksync/fast-withdraw-bridge" };
-          ethWallet = {text: "Ethereum wallet", link: state.network === 1?`https://etherscan.io/address/${walletAddress}`:`https://rinkeby.etherscan.io/address/${walletAddress}`}
+          ethWallet = { text: "Ethereum wallet", link: state.network === 1 ? `https://etherscan.io/address/${walletAddress}` : `https://rinkeby.etherscan.io/address/${walletAddress}` }
           break;
         case "zkSync_to_polygon":
           successMsg = "transferred";
@@ -467,8 +465,8 @@ export const apiSlice = createSlice({
             {targetMsg}
             {type !== "zkSync_to_polygon" && type !== "eth_to_zksync" && type !== "polygon_to_zkSync" &&
               <>
-              <br />
-              <br />
+                <br />
+                <br />
               </>
             }
             <a
@@ -484,24 +482,24 @@ export const apiSlice = createSlice({
               View transaction
             </a>
             {type === "withdraw_fast" ? <br /> : " • "}
-            {(type === "eth_to_zksync" || type === "zkSync_to_polygon" || type === "polygon_to_zkSync")&& 
+            {(type === "eth_to_zksync" || type === "zkSync_to_polygon" || type === "polygon_to_zkSync") &&
               <>
                 <br />
                 Confirm that your funds have arrived {targetMsg}
-                <a 
-                  href={walletAddress} 
-                  rel="noreferrer" 
+                <a
+                  href={walletAddress}
+                  rel="noreferrer"
                   target="_blank"
                   style={{
                     color: "white",
                     textDecoration: "underline",
                     fontWeight: "bold",
                   }}
-                > {type === "zkSync_to_polygon" ? 'Polygon wallet':' zkSync wallet'} </a>
+                > {type === "zkSync_to_polygon" ? 'Polygon wallet' : ' zkSync wallet'} </a>
                 {" • "}
               </>
             }
-            { 
+            {
               extraInfoLink &&
               renderBridgeLink(
                 extraInfoLink.text,
@@ -509,7 +507,7 @@ export const apiSlice = createSlice({
               )
             }
             <br />
-            { ethWallet && 
+            {ethWallet &&
               renderBridgeLink(
                 ethWallet.text,
                 ethWallet.link
@@ -546,10 +544,10 @@ export const apiSlice = createSlice({
     setArweaveAllocation(state, { payload }) {
       state.arweaveAllocation = payload;
     },
-    setLayout(state, { payload }){
+    setLayout(state, { payload }) {
       state.layout = payload;
     },
-    setConnecting(state,{payload}) {
+    setConnecting(state, { payload }) {
       state.isConnecting = payload
     }
   },
