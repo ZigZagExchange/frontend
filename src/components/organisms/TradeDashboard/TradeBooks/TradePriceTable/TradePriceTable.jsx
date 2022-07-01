@@ -11,7 +11,7 @@ const Table = styled.table`
   flex: auto;
   overflow: auto;
   padding: 0px;
-  height: 175px;
+  // height: 175px;
   flex-direction: column;
 
   &:not(.no-space) {
