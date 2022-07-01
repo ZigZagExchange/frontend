@@ -190,7 +190,7 @@ const ListPairForm = ({
               ]}
               rightOfLabel={
                 <QuestionHelper text="zkSync token ID of the first asset appearing in the pair
-                (BASE/QUOTE)" placement="top">
+                (BASE/QUOTE)" placement={"top"}>
                 </QuestionHelper>
               }
             />
@@ -245,7 +245,7 @@ const ListPairForm = ({
                 <x.span fontSize={{ xs: 'xs', md: '14px' }}>Base Swap Fee</x.span>}
               validate={[required, min(0)]}
               rightOfLabel={
-                <QuestionHelper text="Swap fee collected by market makers" placement="left">
+                <QuestionHelper text="Swap fee collected by market makers" placement={isMobile ? "top" : "left"}>
                 </QuestionHelper>
               }
             />
@@ -263,7 +263,7 @@ const ListPairForm = ({
                 <x.span fontSize={{ xs: 'xs', md: '14px' }}>Quote Swap Fee</x.span>}
               validate={[required, min(0)]}
               rightOfLabel={
-                <QuestionHelper text="Swap fee collected by market makers" placement="right">
+                <QuestionHelper text="Swap fee collected by market makers" placement={isMobile ? "top" : "right"}>
                 </QuestionHelper>
               }
             />
@@ -291,7 +291,7 @@ const ListPairForm = ({
                     <x.div>(0.075225)</x.div>
                   </x.div>
                 </>
-              } placement="bottom">
+              } placement={isMobile ? "top" : "bottom"}>
               </QuestionHelper>
             }
           />
@@ -309,7 +309,7 @@ const ListPairForm = ({
             ]}
             validate={required}
             rightOfLabel={
-              <QuestionHelper text="zkSync network on which the pair will be listed" placement="right">
+              <QuestionHelper text="zkSync network on which the pair will be listed" placement={isMobile ? "top":"right"}>
               </QuestionHelper>
             }
           />
