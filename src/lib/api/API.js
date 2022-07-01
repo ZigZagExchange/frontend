@@ -103,36 +103,52 @@ export default class API extends Emitter {
             )
         )
 
-        this.web3Modal = new Web3Modal({
+        if (networkName === 'arbitrum') {
+          this.web3Modal = new Web3Modal({
             network: networkName,
             cacheProvider: true,
             theme: "dark",
             providerOptions: {
-                walletconnect: {
-                    package: WalletConnectProvider,
-                    options: {
-                        infuraId: this.infuraId,
-                    }
-                },
-                "custom-argent": {
-                    display: {
-                        logo: "https://images.prismic.io/argentwebsite/313db37e-055d-42ee-9476-a92bda64e61d_logo.svg?auto=format%2Ccompress&fit=max&q=50",
-                        name: "Argent zkSync",
-                        description: "Connect to your Argent zkSync wallet"
-                    },
-                    package: WalletConnectProvider,
-                    options: {
-                        infuraId: this.infuraId,
-                    },
-                    connector: async (ProviderPackage, options) => {
-                        const provider = new ProviderPackage(options);
-                        await provider.enable();
-                        this.isArgent = true;
-                        return provider;
-                    }
+              walletconnect: {
+                package: WalletConnectProvider,
+                options: {
+                  infuraId: this.infuraId,
                 }
+              },
             }
-        })
+          })
+        } else {
+          this.web3Modal = new Web3Modal({
+            network: networkName,
+            cacheProvider: true,
+            theme: "dark",
+            providerOptions: {
+              walletconnect: {
+                package: WalletConnectProvider,
+                options: {
+                  infuraId: this.infuraId,
+                }
+              },
+              "custom-argent": {
+                display: {
+                  logo: "https://images.prismic.io/argentwebsite/313db37e-055d-42ee-9476-a92bda64e61d_logo.svg?auto=format%2Ccompress&fit=max&q=50",
+                  name: "Argent zkSync",
+                  description: "Connect to your Argent zkSync wallet"
+                },
+                package: WalletConnectProvider,
+                options: {
+                  infuraId: this.infuraId,
+                },
+                connector: async (ProviderPackage, options) => {
+                  const provider = new ProviderPackage(options);
+                  await provider.enable();
+                  this.isArgent = true;
+                  return provider;
+                }
+              }
+            }
+          })
+        }
 
         this.getAccountState()
             .catch(err => {
@@ -549,9 +565,6 @@ export default class API extends Emitter {
       case 42161: return 'Arbitrum';
       default: return 'ZigZag';
     }
-
-    //const keys = Object.keys(this.networks);
-    //return keys[keys.findIndex((key) => network === this.networks[key][0])];
   };
 
   subscribeToMarket = (market) => {
