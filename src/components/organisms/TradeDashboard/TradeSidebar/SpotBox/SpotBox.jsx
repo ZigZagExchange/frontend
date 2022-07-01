@@ -22,7 +22,7 @@ const SpotBox = ({
   const [orderType, updateOrderType] = useState("market");
   const orderTypeTabClassName = (o) =>
     orderType === o ? "trade_price_active_tab" : "";
-    
+
   return (
     <>
       <div className="spot_box">
@@ -104,15 +104,26 @@ const SpotBox = ({
               <Tooltip
                 placement={"left"}
                 label={
-                  <x.div>
+                  marketInfo && marketInfo.zigzagChainId === 42161 ?
                     <x.div>
-                      zkSync's network swap fees are dynamic and sit around
-                      ~$0.50
+                      <x.div>
+                        Arbitrum's network swap fees are dynamic and sit around
+                        ~$1
+                      </x.div>
+                      <x.div>
+                        covered by the ZigZag operator, but paid by the taker
+                      </x.div>
                     </x.div>
+                    :
                     <x.div>
-                      covered by the market maker, but paid by the trader
+                      <x.div>
+                        zkSync's network swap fees are dynamic and sit around
+                        ~$0.50
+                      </x.div>
+                      <x.div>
+                        covered by the market maker, but paid by the trader
+                      </x.div>
                     </x.div>
-                  </x.div>
                 }
               >
                 <x.div
@@ -125,7 +136,11 @@ const SpotBox = ({
               </Tooltip>
             </Tooltip>
             <x.div ml={"12px"} fontSize={"12px"}>
-              This fee covers zkSync's{" "}
+              This fee covers {
+                marketInfo && marketInfo.zigzagChainId === 42161 
+                  ? "Arbitrum's "
+                  : "zkSync's "
+              }
               <ExternalLink href={"https://l2fees.info"}>
                 swap fees<HiExternalLink />
               </ExternalLink>
