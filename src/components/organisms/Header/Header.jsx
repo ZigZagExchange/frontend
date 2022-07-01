@@ -434,7 +434,7 @@ export const Header = (props) => {
             {/* {hasBridge && <Tab>DSL</Tab>} */}
           </TabMenu>
           <HorizontalDivider />
-          <ActionSideMenuWrapper>
+          {/* <ActionSideMenuWrapper>
             <span>Language: </span>
             <StyledDropdown
               adClass="lang-dropdown"
@@ -443,7 +443,7 @@ export const Header = (props) => {
               context={language}
               clickFunction={changeLanguage}
             />
-          </ActionSideMenuWrapper>
+          </ActionSideMenuWrapper> */}
           <ActionSideMenuWrapper>
             <span>Theme: </span>
             <ToggleTheme isDark={isDark} toggleTheme={toggleTheme} />
