@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { formatPrice } from "lib/utils";
 import { SettingsIcon } from "components/atoms/Svg";
@@ -20,6 +20,17 @@ const TradeRatesCard = ({
   marketInfo,
 }) => {
   const { isDark } = useTheme()
+  const [lastPrice, setLastPrice] = useState(0);
+  const [isIncrease, setIncrease] = useState(true);
+
+  useEffect(()=>{
+    if(marketSummary.price > lastPrice)
+      setIncrease(true)
+    else if(marketSummary.price < lastPrice)
+      setIncrease(false)
+    setLastPrice(marketSummary.price)
+  },[marketSummary.price])
+
   const handleOnModalClose = () => {
     onSettingsModalClose();
   };
@@ -58,7 +69,7 @@ const TradeRatesCard = ({
               color={
                 percentChange === "NaN"
                   ? "black"
-                  : parseFloat(marketSummary["priceChange"]) >= 0
+                  : isIncrease
                   ? "successHighEmphasis"
                   : "dangerHighEmphasis"
               }
