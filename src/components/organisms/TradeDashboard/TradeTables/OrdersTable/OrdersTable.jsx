@@ -786,37 +786,25 @@ export default function OrdersTable(props) {
           {fills.map((fill, i) => {
             const fillid = fill[1];
             const market = fill[2];
+            const baseCurrency = fill[2].split("-")[0];
             const time = fill[12] && formatDateTime(new Date(fill[12]));
             const side = fill[3];
             let price = fill[4];
             let baseQuantity = fill[5];
             const fillstatus = fill[6];
-            const sidetext = fill[3] === "b" ? "buy" : "sell";
+            const sidetext = side === "b" ? "buy" : "sell";
             const sideclassname =
-              fill[3] === "b" ? "successHighEmphasis" : "dangerHighEmphasis";
+              side === "b" ? "successHighEmphasis" : "dangerHighEmphasis";
             const txhash = fill[7];
-            const feeamount = fill[10];
+            const feeamount = Number(fill[10]);
             const feetoken = fill[11];
-            let feeText = "1 USDC";
-            const marketInfo = api.marketInfo[market];
+            let feeText = "--";
             if (feeamount && feetoken) {
               const displayFee =
                 feeamount > 9999
                   ? feeamount.toFixed(0)
                   : feeamount.toPrecision(4);
-              feeText = feeamount !== 0 ? `${displayFee} ${feetoken}` : "--";
-            } else if (["b", "o", "m", "r"].includes(fillstatus)) {
-              feeText = "--";
-              // cases below make it backward compatible:
-            } else if (!marketInfo) {
-              feeText = "1 USDC";
-            } else if (fillstatus === "r" || !api.isZksyncChain()) {
-              feeText = "0 " + marketInfo.baseAsset.symbol;
-            } else if (side === "s") {
-              feeText = marketInfo.baseFee + " " + marketInfo.baseAsset.symbol;
-            } else if (side === "b") {
-              feeText =
-                marketInfo.quoteFee + " " + marketInfo.quoteAsset.symbol;
+              feeText = `${displayFee} ${feetoken}`;
             }
             if (api.isZksyncChain()) {
               price = Number(fill[4]);
@@ -892,6 +880,7 @@ export default function OrdersTable(props) {
                 break;
             }
 
+            const marketInfo = api.marketInfo[market];
             return (
               <tr key={fillid}>
                 <table>
@@ -983,7 +972,7 @@ export default function OrdersTable(props) {
                           textAlign="right"
                         >
                           {baseQuantity.toPrecision(6) / 1}{" "}
-                          {marketInfo && marketInfo.baseAsset.symbol}
+                          {baseCurrency}
                         </Text>
                       </td>
                     </tr>
@@ -1146,33 +1135,21 @@ export default function OrdersTable(props) {
             const side = fill[3];
             let price = fill[4];
             let baseQuantity = fill[5];
+            const baseCurrency = fill[2].split("-")[0];
             const fillstatus = fill[6];
-            const sidetext = fill[3] === "b" ? "buy" : "sell";
+            const sidetext = side === "b" ? "buy" : "sell";
             const sideclassname =
-              fill[3] === "b" ? "successHighEmphasis" : "dangerHighEmphasis";
+              side === "b" ? "successHighEmphasis" : "dangerHighEmphasis";
             const txhash = fill[7];
-            const feeamount = fill[10];
+            const feeamount = Number(fill[10]);
             const feetoken = fill[11];
-            let feeText = "1.00 USDC";
-            const marketInfo = api.marketInfo[market];
+            let feeText = "--";
             if (feeamount && feetoken) {
               const displayFee =
                 feeamount > 9999
                   ? feeamount.toFixed(0)
                   : feeamount.toPrecision(4);
-              feeText = feeamount !== 0 ? `${displayFee} ${feetoken}` : "--";
-            } else if (["b", "o", "m", "r", "e"].includes(fillstatus)) {
-              feeText = "--";
-              // cases below make it backward compatible:
-            } else if (!marketInfo) {
-              feeText = "1.00 USDC";
-            } else if (fillstatus === "r" || !api.isZksyncChain()) {
-              feeText = "0 " + marketInfo.baseAsset.symbol;
-            } else if (side === "s") {
-              feeText = marketInfo.baseFee + " " + marketInfo.baseAsset.symbol;
-            } else if (side === "b") {
-              feeText =
-                marketInfo.quoteFee + " " + marketInfo.quoteAsset.symbol;
+              feeText = `${displayFee} ${feetoken}`;
             }
             if (api.isZksyncChain()) {
               price = Number(fill[4]);
@@ -1248,6 +1225,7 @@ export default function OrdersTable(props) {
                 break;
             }
 
+            const marketInfo = api.marketInfo[market];
             return (
               <tr key={fillid}>
                 <td data-label="Market">
@@ -1277,7 +1255,7 @@ export default function OrdersTable(props) {
                     color="foregroundHighEmphasis"
                   >
                     {baseQuantity.toPrecision(6) / 1}{" "}
-                    {marketInfo && marketInfo.baseAsset.symbol}
+                    {baseCurrency}
                   </Text>
                 </td>
                 <td data-label="Fee">

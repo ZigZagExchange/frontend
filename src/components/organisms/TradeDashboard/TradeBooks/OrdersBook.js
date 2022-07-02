@@ -19,14 +19,12 @@ import {
 
 const StyledTradeBooks = styled.section`
   display: flex;
-  margin-bottom: -8rem;
   grid-area: orders;
   flex-direction: row;
   justify-content: space-between;
-  padding: ${({ isLeft }) =>
-    isLeft ? "21px 10px 12px 20px" : "21px 10px 10px 10px"};
-  padding-bottom: 138px;
+  padding: ${({ isLeft }) => isLeft ? '21px 10px 12px 20px' : '21px 10px 0px 10px'};
   border-top: 1px solid ${({ theme }) => theme.colors.foreground400};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.foreground400};
   overflow: hidden;
 `;
 

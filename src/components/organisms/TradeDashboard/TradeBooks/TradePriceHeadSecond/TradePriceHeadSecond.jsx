@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { formatPrice } from "lib/utils";
 import Text from "components/atoms/Text/Text";
@@ -17,7 +17,7 @@ const Wrapper = styled.div`
     align-items: center;
 
     svg path {
-      fill: ${({ theme, isUp }) => isUp ? theme.colors.successHighEmphasis : theme.colors.dangerHighEmphasis};
+      fill: ${({ theme, isIncrease }) => (isIncrease ? theme.colors.successHighEmphasis : theme.colors.dangerHighEmphasis)};
     }
   }
 
@@ -31,32 +31,21 @@ const Wrapper = styled.div`
 `
 
 const TradePriceHeadSecond = (props) => {
-  const percentChange = (
-    (props.marketSummary.priceChange / props.marketSummary.price) *
-    100
-  ).toFixed(2);
+  const [lastPrice, setLastPrice] = useState(0);
+  const [isIncrease, setIncrease] = useState(true);
+
+  useEffect(()=>{
+    if(props.lastPrice > lastPrice)
+      setIncrease(true)
+    else if(props.lastPrice < lastPrice)
+      setIncrease(false)
+    setLastPrice(props.lastPrice)
+  },[props.lastPrice])
   return (
-    <Wrapper isUp={parseFloat(props.marketSummary.priceChange) >= 0}>
+    <Wrapper isIncrease={isIncrease}>
       <div>
-        <Text 
-         font="primaryTitleDisplay" 
-         color={
-           percentChange === "NaN"
-             ? "black"
-             : parseFloat(props.marketSummary["priceChange"]) >= 0
-             ? "successHighEmphasis"
-             : "dangerHighEmphasis"
-         }
-        >
-          {parseFloat(formatPrice(props.lastPrice)).toFixed(props.fixedPoint)}
-        </Text>
-        {
-           percentChange === "NaN"
-             ? <></>
-             : parseFloat(props.marketSummary["priceChange"]) >= 0
-             ? <ArrowUpIcon />
-             : <ArrowDownIcon />
-         }
+        <Text font="primaryTitleDisplay" color={isIncrease ? "successHighEmphasis" : "dangerHighEmphasis"}>{parseFloat(formatPrice(lastPrice)).toFixed(props.fixedPoint)}</Text>
+        {isIncrease ? <ArrowUpIcon /> : <ArrowDownIcon />} 
       </div>
       <Text font="primaryMediumSmallSemiBold" color="foregroundMediumEmphasis">
         $ {
