@@ -383,37 +383,6 @@ export default class API extends Emitter {
     return this.ws.send(JSON.stringify({ op, args }));
   };
 
-  refreshNetwork = async () => {
-    if (!window.ethereum) return;
-    let ethereumChainId;
-
-    // await this.signOut();
-
-    switch (this.apiProvider.network) {
-      case 1:
-        ethereumChainId = "0x1";
-        break;
-      case 1000:
-        ethereumChainId = "0x4";
-        break;
-      case 42161:
-        ethereumChainId = "0xa4b1";
-        break;
-      default:
-        return;
-    }
-
-    await window.ethereum.request({
-      method: "eth_requestAccounts",
-      params: [{ eth_accounts: {} }],
-    });
-
-    await window.ethereum.request({
-      method: "wallet_switchEthereumChain",
-      params: [{ chainId: ethereumChainId }],
-    });
-  };
-
   sleep = (ms) => {
     return new Promise((resolve) => setTimeout(resolve, ms));
   };

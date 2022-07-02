@@ -556,7 +556,7 @@ export default class APIZKProvider extends APIProvider {
   signIn = async () => {
     try {
       this.syncProvider = await zksync.getDefaultProvider(
-        this.api.getNetworkName(this.network)
+        this.network === 1 ? 'mainnet' : 'rinkeby'
       );
     } catch (e) {
       toast.error("Zksync is down. Try again later");
