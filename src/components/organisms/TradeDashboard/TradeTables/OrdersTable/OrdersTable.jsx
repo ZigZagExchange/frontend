@@ -249,7 +249,7 @@ export default function OrdersTable(props) {
     }
   };
 
-  const onClickOrder = (fill) => {
+  const onClickTradeId = (fill) => {
     toast.warning(
       ({ closeToast }) => <FillCard closeToast={closeToast} fill={fill} />,
       {
@@ -1001,9 +1001,28 @@ export default function OrdersTable(props) {
                           color="foregroundHighEmphasis"
                           textAlign="right"
                         >
-                          {baseQuantity.toPrecision(6) / 1}{" "}
-                          {baseCurrency}
+                          {baseQuantity.toPrecision(6) / 1} {baseCurrency}
                         </Text>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <Text
+                          font="primaryExtraSmallSemiBold"
+                          color="foregroundLowEmphasis"
+                        >
+                          Trade ID
+                        </Text>
+                      </td>
+                      <td>
+                        <ActionWrapper
+                          font="primaryExtraSmallSemiBold"
+                          color="primaryHighEmphasis"
+                          textAlign="right"
+                          onClick={() => onClickTradeId(fill)}
+                        >
+                          #{fillid}
+                        </ActionWrapper>
                       </td>
                     </tr>
                     <tr>
@@ -1296,8 +1315,7 @@ export default function OrdersTable(props) {
                     font="primaryExtraSmallSemiBold"
                     color="foregroundHighEmphasis"
                   >
-                    {baseQuantity.toPrecision(6) / 1}{" "}
-                    {baseCurrency}
+                    {baseQuantity.toPrecision(6) / 1} {baseCurrency}
                   </Text>
                 </td>
                 <td data-label="Fee">
@@ -1324,7 +1342,7 @@ export default function OrdersTable(props) {
                 <td data-label="TradeID">
                   <button
                     className="text-xs font-semibold text-primary-900 hover:underline hover:underline-offset-1 font-work"
-                    onClick={() => onClickOrder(fill)}
+                    onClick={() => onClickTradeId(fill)}
                   >
                     #{fillid}
                   </button>

@@ -160,7 +160,7 @@ html {
 }
 
 .Toastify__toast-container{
-  min-width: 450px;
+  min-width: 350px;
 }
 
 .Toastify__toast-theme--colored.Toastify__toast--info {
