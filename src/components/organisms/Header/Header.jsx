@@ -341,15 +341,13 @@ export const Header = (props) => {
               style={{ paddingTop: "20px" }}
             >
               <Tab>TRADE</Tab>
-              {hasBridge && <Tab>CONVERT</Tab>}
+              <Tab>CONVERT</Tab>
               {hasBridge && <Tab>BRIDGE</Tab>}
               <Tab>LIST PAIR</Tab>
-              {hasBridge && (
-                <Tab>
-                  DOCS
-                  <ExternalLinkIcon size={12} />
-                </Tab>
-              )}
+              <Tab>
+                DOCS
+                <ExternalLinkIcon size={12} />
+              </Tab>
               {/* {hasBridge && <Tab>DSL</Tab>} */}
 
               {/* {hasBridge && <Tab>Old BRIDGE</Tab>} */}
@@ -427,15 +425,13 @@ export const Header = (props) => {
           )}
           <TabMenu row activeIndex={index} onItemClick={handleClick}>
             <Tab>TRADE</Tab>
-            {hasBridge && <Tab>CONVERT</Tab>}
+            <Tab>CONVERT</Tab>
             {hasBridge && <Tab>BRIDGE</Tab>}
             <Tab>LIST PAIR</Tab>
-            {hasBridge && (
-              <Tab>
-                DOCS
-                <ExternalLinkIcon size={12} />
-              </Tab>
-            )}
+            <Tab>
+              DOCS
+              <ExternalLinkIcon size={12} />
+            </Tab>
             {/* {hasBridge && <Tab>DSL</Tab>} */}
           </TabMenu>
           <HorizontalDivider />

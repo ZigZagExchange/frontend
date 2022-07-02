@@ -24,7 +24,9 @@ const ConnectWalletButton = (props) => {
       // setConnecting(true);
       const state = await api.signIn(network);
       const walletBalance = formatAmount(state.committed.balances['ETH'], { decimals: 18 });
-      const activationFee = await api.apiProvider.changePubKeyFee('ETH');
+      const activationFee = api.apiProvider.zksyncCompatible
+        ? await api.apiProvider.changePubKeyFee('ETH')
+        : 0
 
       if (!state.id && (!/^\/bridge(\/.*)?/.test(location.pathname)) && (isNaN(walletBalance) || walletBalance < activationFee)) {
         history.push("/bridge");

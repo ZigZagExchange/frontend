@@ -323,12 +323,13 @@ export const AccountDropdown = () => {
 
   const [selectedLayer, setSelectedLayer] = useState(2);
   const coinEstimator = useCoinEstimator();
-  const { profile } = user;
+  const { profile, address } = user;
 
   const wallet =
     selectedLayer === 1 ? balanceData.wallet : balanceData[network];
-  const explorer = user.address ? api.getExplorerAccountLink(network, user.address) : null;
+  const explorer = address ? api.getExplorerAccountLink(network, address) : null;
   const networkName = selectedLayer === 1 ? 'Etherscan' : api.getNetworkDisplayName(network);
+
   useEffect(() => {
     const hideDisplay = () => setShow(false);
     document.addEventListener("click", hideDisplay, false);

@@ -8,6 +8,8 @@ import {
   liquiditySelector,
   marketSummarySelector,
   marketInfoSelector,
+  balancesSelector,
+  allOrdersSelector,
 } from "lib/store/features/api/apiSlice";
 import { Button, ConnectWalletButton } from "components/molecules/Button";
 
@@ -51,6 +53,8 @@ const InfoWrapper = styled.div`
 `;
 
 export default function TradeSidebar(props) {
+  const allOrders = useSelector(allOrdersSelector);
+  const balances = useSelector(balancesSelector);
   const marketInfo = useSelector(marketInfoSelector);
   const marketSummary = useSelector(marketSummarySelector);
   const liquidity = useSelector(liquiditySelector);
@@ -93,6 +97,8 @@ export default function TradeSidebar(props) {
         currentMarket={props.currentMarket}
         marketSummary={marketSummary}
         marketInfo={marketInfo}
+        balances={balances}
+        allOrders={allOrders}
       />
     </StyledTradeSidebar>
   );

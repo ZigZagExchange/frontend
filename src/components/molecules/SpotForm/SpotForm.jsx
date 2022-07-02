@@ -153,36 +153,36 @@ export class SpotForm extends React.Component {
   getBaseBalance() {
     const marketInfo = this.props.marketInfo;
     if (!marketInfo) return 0;
-    if (!this.props.balances?.[marketInfo.baseAsset.symbol]?.valueReadable) return 0;
+    if (!this.props.balances?.[marketInfo.zigzagChainId]?.[marketInfo.baseAsset.symbol]?.valueReadable) return 0;
     return (
-      this.props.balances[marketInfo.baseAsset.symbol].valueReadable
+      this.props.balances[marketInfo.zigzagChainId][marketInfo.baseAsset.symbol].valueReadable
     );
   }
 
   getQuoteBalance() {
     const marketInfo = this.props.marketInfo;
     if (!marketInfo) return 0;
-    if (!this.props.balances?.[marketInfo.quoteAsset.symbol]?.valueReadable) return 0;
+    if (!this.props.balances?.[marketInfo.zigzagChainId]?.[marketInfo.quoteAsset.symbol]?.valueReadable) return 0;
     return (
-      this.props.balances[marketInfo.quoteAsset.symbol].valueReadable
+      this.props.balances[marketInfo.zigzagChainId][marketInfo.quoteAsset.symbol].valueReadable
     );
   }
 
   getBaseAllowance() {
     const marketInfo = this.props.marketInfo;
     if (!marketInfo) return 0;
-    if (!this.props.balances?.[marketInfo.baseAsset.symbol]?.allowanceReadable) return 0;
+    if (!this.props.balances?.[marketInfo.zigzagChainId]?.[marketInfo.baseAsset.symbol]?.allowanceReadable) return 0;
     return (
-      this.props.balances[marketInfo.baseAsset.symbol].allowanceReadable
+      this.props.balances[marketInfo.zigzagChainId][marketInfo.baseAsset.symbol].allowanceReadable
     );
   }
 
   getQuoteAllowance() {
     const marketInfo = this.props.marketInfo;
     if (!marketInfo) return 0;
-    if (!this.props.balances?.[marketInfo.quoteAsset.symbol]?.allowanceReadable) return 0;
+    if (!this.props.balances?.[marketInfo.zigzagChainId]?.[marketInfo.quoteAsset.symbol]?.allowanceReadable) return 0;
     return (
-      this.props.balances[marketInfo.quoteAsset.symbol].allowanceReadable
+      this.props.balances[marketInfo.zigzagChainId][marketInfo.quoteAsset.symbol].allowanceReadable
     );
   }
 
@@ -223,15 +223,39 @@ export class SpotForm extends React.Component {
   }
 
   getLadderPrice() {
+    const orderbookAsks = [];
+    const orderbookBids = [];
     let baseAmount = this.state.baseAmount;
     const side = this.props.side;
-
     if (!baseAmount) baseAmount = 0;
+
+    for (let orderid in this.props.allOrders) {
+      const order = this.props.allOrders[orderid];
+      const side = order[3];
+      const price = order[4];
+      const remaining = isNaN(Number(order[10])) ? order[5] : order[10];
+      const remainingQuote = remaining * price;
+      const orderStatus = order[9];
+
+      const orderRow = {
+        td1: price,
+        td2: remaining,
+        td3: remainingQuote,
+        side,
+        order: order,
+      };
+
+      if (side === "b" && ["o", "pm", "pf"].includes(orderStatus)) {
+        orderbookBids.push(orderRow);
+      } else if (side === "s" && ["o", "pm", "pf"].includes(orderStatus)) {
+        orderbookAsks.push(orderRow);
+      }
+    }
 
     let price;
     let unfilled = baseAmount;
-    if (side === "b" && this.props.orderbookAsks) {
-      const asks = this.props.orderbookAsks;
+    if (side === "b" && orderbookAsks) {
+      const asks = orderbookAsks;
       for (let i = 0; i < asks.length; i++) {
         if (asks[i].td2 >= unfilled || i === asks.length - 1) {
           price = asks[i].td1;
@@ -240,8 +264,8 @@ export class SpotForm extends React.Component {
           unfilled -= asks[i].td2;
         }
       }
-    } else if (side === "s" && this.props.orderbookBids) {
-      const bids = this.props.orderbookBids;
+    } else if (side === "s" && orderbookBids) {
+      const bids = orderbookBids;
       for (let i = 0; i < bids.length; i++) {
         if (bids[i].td2 >= unfilled || i === bids - 1) {
           price = bids[i].td1;
@@ -734,8 +758,6 @@ export class SpotForm extends React.Component {
   }
 
   render() {
-    // const ethInput = useRef(null);
-    // const usdInput = useRef(null);
     const isMobile = window.innerWidth < 430;
     const marketInfo = this.props.marketInfo;
     let baseAmount, quoteAmount;
@@ -772,8 +794,6 @@ export class SpotForm extends React.Component {
       quoteBalance = 0;
     }
 
-    const baseSymbol = marketInfo?.baseAsset?.symbol ? marketInfo.baseAsset.symbol : '';
-    const quoteSymbol = marketInfo?.quoteAsset?.symbol ? marketInfo.quoteAsset.symbol : '';
     const balance1Html = (
       <Text
         font="primaryExtraSmallSemiBold"

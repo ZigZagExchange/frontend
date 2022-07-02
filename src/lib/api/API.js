@@ -396,6 +396,9 @@ export default class API extends Emitter {
       case 1000:
         ethereumChainId = "0x4";
         break;
+      case 42161:
+        ethereumChainId = "0xa4b1";
+        break;
       default:
         return;
     }
@@ -627,6 +630,10 @@ export default class API extends Emitter {
   getNetworkName = (network) => {
     const keys = Object.keys(this.networks);
     return keys[keys.findIndex((key) => network === this.networks[key][0])];
+  };
+
+  getChainIdFromName = (name) => {
+    return this.networks?.[name]?.[1];
   };
 
   getNetworkDisplayName = (network) => {

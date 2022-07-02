@@ -1297,18 +1297,6 @@ export default function OrdersTable(props) {
     );
   };
 
-  let explorerLink;
-  switch (api.apiProvider.network) {
-    case 1000:
-      explorerLink =
-        "https://rinkeby.zkscan.io/explorer/accounts/" + props.user.address;
-      break;
-    case 1:
-    default:
-      explorerLink =
-        "https://zkscan.io/explorer/accounts/" + props.user.address;
-  }
-
   let footerContent;
   switch (tab) {
     case 0:
@@ -1475,7 +1463,7 @@ export default function OrdersTable(props) {
               textAlign="center"
               className="view-account-button"
               onClick={() => window.open(
-                api.getExplorerAccountLink(api.apiProvider.network, this.props.user.address),
+                api.getExplorerAccountLink(api.apiProvider.network, props.user.address),
                 "_blank"
               )}
             >
@@ -1492,7 +1480,7 @@ export default function OrdersTable(props) {
               textAlign="center"
               className="view-account-button"
               onClick={() => window.open(
-                api.getExplorerAccountLink(api.apiProvider.network, this.props.user.address),
+                api.getExplorerAccountLink(api.apiProvider.network, props.user.address),
                 "_blank"
               )}
             >
