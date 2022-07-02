@@ -157,9 +157,9 @@ const ListPairForm = ({
           rowGap={21}
           columnGap={24}
           mb={16}
-          alignItems="flex-end"
+          alignItems="flex-start"
         >
-          <x.div display={"flex"} flexDirection={"column"} h={"100%"}>
+          <x.div>
             <NumberInput
               className={`rounded-lg ${isDark ? 'bg-foreground-200 hover:ring-foreground-500' : 'bg-primary-300 hover:ring-primary-600'} hover:ring-1 hover:ring-offset-0`}
               block
@@ -196,7 +196,7 @@ const ListPairForm = ({
             />
           </x.div>
 
-          <x.div display={"flex"} flexDirection={"column"} h={"100%"}>
+          <x.div>
             <NumberInput
               className={`rounded-lg ${isDark ? 'bg-foreground-200 hover:ring-foreground-500' : 'bg-primary-300 hover:ring-primary-600'} hover:ring-1 hover:ring-offset-0`}
               block
@@ -232,7 +232,7 @@ const ListPairForm = ({
               }
             />
           </x.div>
-          <x.div display={"flex"} flexDirection={"column"} h={"100%"}>
+          <x.div>
             <NumberInput
               className={`rounded-lg ${isDark ? 'bg-foreground-200 hover:ring-foreground-500' : 'bg-primary-300 hover:ring-primary-600'} hover:ring-1 hover:ring-offset-0`}
               block
@@ -251,7 +251,7 @@ const ListPairForm = ({
             />
             {renderFeeHint(basePrice, baseFee, baseSymbol, setBaseFee)}
           </x.div>
-          <x.div display={"flex"} flexDirection={"column"} h={"100%"}>
+          <x.div>
             <NumberInput
               className={`rounded-lg ${isDark ? 'bg-foreground-200 hover:ring-foreground-500' : 'bg-primary-300 hover:ring-primary-600'} hover:ring-1 hover:ring-offset-0`}
               block
@@ -269,50 +269,54 @@ const ListPairForm = ({
             />
             {renderFeeHint(quotePrice, quoteFee, quoteSymbol, setQuoteFee)}
           </x.div>
-          <NumberInput
-            className={`rounded-lg ${isDark ? 'bg-foreground-200 hover:ring-foreground-500' : 'bg-primary-300 hover:ring-primary-600'} hover:ring-1 hover:ring-offset-0`}
-            block
-            fontSize={14}
-            borderRadius={8}
-            name={"pricePrecisionDecimals"}
-            label={<x.span fontSize={{ xs: 'xs', md: '14px' }}>Price Precision Decimals</x.span>}
-            validate={[required, max(10), min(0)]}
-            rightOfLabel={
-              <QuestionHelper text={
-                <>
-                  <x.div>
-                    Number of decimal places in the price of the asset pair.
-                  </x.div>
+          <x.div>
+            <NumberInput
+              className={`rounded-lg ${isDark ? 'bg-foreground-200 hover:ring-foreground-500' : 'bg-primary-300 hover:ring-primary-600'} hover:ring-1 hover:ring-offset-0`}
+              block
+              fontSize={14}
+              borderRadius={8}
+              name={"pricePrecisionDecimals"}
+              label={<x.span fontSize={{ xs: 'xs', md: '14px' }}>Price Precision Decimals</x.span>}
+              validate={[required, max(10), min(0)]}
+              rightOfLabel={
+                <QuestionHelper text={
+                  <>
+                    <x.div>
+                      Number of decimal places in the price of the asset pair.
+                    </x.div>
 
-                  <x.div display={"grid"} gridTemplateColumns={2} mt={2} gap={0}>
-                    <x.div>ex: ETH/USDC has '2'</x.div>
-                    <x.div>($3250.61)</x.div>
-                    <x.div>ex: ETH/WBTC has '6'</x.div>
-                    <x.div>(0.075225)</x.div>
-                  </x.div>
-                </>
-              } placement={isMobile ? "top" : "bottom"}>
-              </QuestionHelper>
-            }
-          />
-          <SelectInput
-            className={`rounded-lg ${isDark ? 'bg-foreground-200 hover:ring-foreground-500' : 'bg-primary-300 hover:ring-primary-600'} hover:ring-1 hover:ring-offset-0`}
-            fontSize={14}
-            padding={5}
-            borderRadius={8}
-            {...model(zigZagChainId, setZigZagChainId)}
-            name={"zigzagChainId"}
-            label={<x.span fontSize={{ xs: 'xs', md: '14px' }}>Network</x.span>}
-            items={[
-              { name: "zkSync - Mainnet", id: 1 },
-              { name: "zkSync - Rinkeby", id: 1000 },
-            ]}
-            validate={required}
-            rightOfLabel={
-              <QuestionHelper text="zkSync network on which the pair will be listed" placement={isMobile ? "top":"right"}>
-              </QuestionHelper>
-            }
-          />
+                    <x.div display={"grid"} gridTemplateColumns={2} mt={2} gap={0}>
+                      <x.div>ex: ETH/USDC has '2'</x.div>
+                      <x.div>($3250.61)</x.div>
+                      <x.div>ex: ETH/WBTC has '6'</x.div>
+                      <x.div>(0.075225)</x.div>
+                    </x.div>
+                  </>
+                } placement={isMobile ? "top" : "bottom"}>
+                </QuestionHelper>
+              }
+            />
+          </x.div>
+          <x.div>
+            <SelectInput
+              className={`rounded-lg ${isDark ? 'bg-foreground-200 hover:ring-foreground-500' : 'bg-primary-300 hover:ring-primary-600'} hover:ring-1 hover:ring-offset-0`}
+              fontSize={14}
+              padding={5}
+              borderRadius={8}
+              {...model(zigZagChainId, setZigZagChainId)}
+              name={"zigzagChainId"}
+              label={<x.span fontSize={{ xs: 'xs', md: '14px' }}>Network</x.span>}
+              items={[
+                { name: "zkSync - Mainnet", id: 1 },
+                { name: "zkSync - Rinkeby", id: 1000 },
+              ]}
+              validate={required}
+              rightOfLabel={
+                <QuestionHelper text="zkSync network on which the pair will be listed" placement={isMobile ? "top":"right"}>
+                </QuestionHelper>
+              }
+            />
+          </x.div>
         </x.div>
 
         <x.div
@@ -322,49 +326,47 @@ const ListPairForm = ({
           borderRadius={10}
           mb={21}
         />
-        <x.div mb={4}
-          ml={5}>
-          <x.div
-            display={"flex"}
-            alignItems={"center"}
-            mb={21}
-          >
-            <Toggle scale="md" font="primarySmall" leftLabel="Advanced Settings" onChange={() => setShowAdvancedSettings(!showAdvancedSettings)} />
+
+        <x.div
+          display={"flex"}
+          alignItems={"center"}
+          mb={21}
+        >
+          <Toggle scale="md" font="primarySmall" leftLabel="Advanced Settings" onChange={() => setShowAdvancedSettings(!showAdvancedSettings)} />
+        </x.div>
+        <x.div
+          display={"grid"}
+          gridTemplateColumns={isMobile ? 1 : 2}
+          rowGap={21}
+          columnGap={24}
+          mb={16}
+          alignItems="flex-end"
+        >
+          <x.div>
+            {showAdvancedSettings && (
+              <TextInput
+                className={`rounded-lg ${isDark ? 'bg-foreground-200 hover:ring-foreground-500' : 'bg-primary-300 hover:ring-primary-600'} hover:ring-1 hover:ring-offset-0`}
+                block
+                fontSize={14}
+                padding={5}
+                borderRadius={8}
+                name={TRADING_VIEW_CHART_KEY}
+                label={<x.span fontSize={{ xs: 'xs', md: '14px' }}>Default Chart Ticker</x.span>}
+                rightOfLabel={
+                  <QuestionHelper text={
+                    <div>
+                      <x.div>
+                        Default TradingView chart to be seen on the trade page
+                      </x.div>
+                      <x.div mt={2}>
+                        (ex: show COINBASE:BTCUSD for WBTC-USD)
+                      </x.div>
+                    </div>}>
+                  </QuestionHelper>
+                }
+              />)
+            }
           </x.div>
-          {showAdvancedSettings && (
-            <>
-              {/* <x.div
-                h={"1px"}
-                w={"full"}
-                bg={"blue-gray-800"}
-                borderRadius={10}
-                mt={21}
-              /> */}
-              <x.div display={"grid"} gridTemplateColumns={isMobile ? 1 : 2} columnGap={6} mb={21}>
-                <TextInput
-                  className={`rounded-lg ${isDark ? 'bg-foreground-200 hover:ring-foreground-500' : 'bg-primary-300 hover:ring-primary-600'} hover:ring-1 hover:ring-offset-0`}
-                  block
-                  fontSize={10}
-                  padding={5}
-                  borderRadius={8}
-                  name={TRADING_VIEW_CHART_KEY}
-                  label={<x.span fontSize={{ xs: 'xs', md: '14px' }}>Default Chart Ticker</x.span>}
-                  rightOfLabel={
-                    <QuestionHelper text={
-                      <div>
-                        <x.div>
-                          Default TradingView chart to be seen on the trade page
-                        </x.div>
-                        <x.div mt={2}>
-                          (ex: show COINBASE:BTCUSD for WBTC-USD)
-                        </x.div>
-                      </div>}>
-                    </QuestionHelper>
-                  }
-                />
-              </x.div>
-            </>
-          )}
         </x.div>
         {children}
       </Form>
