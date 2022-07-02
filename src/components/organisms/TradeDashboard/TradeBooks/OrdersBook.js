@@ -202,24 +202,21 @@ export default function OrdersBook(props) {
     }
   }
 
-  let temp = [];
+  let bidBins = [];
   for (let i in orderbookBids) {
-    const lastBidIndex = temp.length - 1;
+    const lastBidIndex = bidBins.length - 1;
     if (i === "0") {
-      temp.push(orderbookBids[i]);
+      bidBins.push(orderbookBids[i]);
     } else if (
       orderbookBids[i].td1.toPrecision(6) ===
-      temp[lastBidIndex].td1.toPrecision(6)
+      bidBins[lastBidIndex].td1.toPrecision(6)
     ) {
-      temp[lastBidIndex].td2 += orderbookBids[i].td2;
-      temp[lastBidIndex].td3 += orderbookBids[i].td3;
+      bidBins[lastBidIndex].td2 += orderbookBids[i].td2;
+      bidBins[lastBidIndex].td3 += orderbookBids[i].td3;
     } else {
-      temp.push(orderbookBids[i]);
+      bidBins.push(orderbookBids[i]);
     }
   }
-  let arrayLength = askBins.length > temp.length ? temp.length : askBins.length;
-  const bidBins = temp.slice(0, arrayLength);
-  askBins = askBins.slice(0, arrayLength);
 
   return (
     <>
