@@ -9,7 +9,8 @@ const Wrapper = styled.div`
   margin: 0 auto;
   display: flex;
   // padding: 8px 0px;
-  align-items: start;
+  align-items: center;
+  justify-content: space-between;
 
   div {
     display: flex;
@@ -46,13 +47,15 @@ const TradePriceHeadSecond = (props) => {
         <Text font="primaryTitleDisplay" color={isIncrease ? "successHighEmphasis" : "dangerHighEmphasis"}>{parseFloat(formatPrice(lastPrice)).toFixed(props.fixedPoint)}</Text>
         {isIncrease ? <ArrowUpIcon /> : <ArrowDownIcon />} 
       </div>
-      {/* <span>$ {
-        formatPrice(
-          (props.marketInfo?.baseAsset?.usdPrice)
-            ? props.marketInfo.baseAsset.usdPrice
-            : "--"
-        )
-      }</span> */}
+      <Text font="primaryMediumSmallSemiBold" color="foregroundMediumEmphasis">
+        $ {
+          formatPrice(
+            (props.marketInfo?.baseAsset?.usdPrice)
+              ? props.marketInfo.baseAsset.usdPrice
+              : "--"
+          )
+        }
+      </Text>
     </Wrapper>
   );
 };

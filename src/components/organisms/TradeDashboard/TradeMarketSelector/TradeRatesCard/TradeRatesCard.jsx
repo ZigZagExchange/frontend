@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { formatPrice } from "lib/utils";
 import { SettingsIcon } from "components/atoms/Svg";
@@ -20,6 +20,17 @@ const TradeRatesCard = ({
   marketInfo,
 }) => {
   const { isDark } = useTheme()
+  const [lastPrice, setLastPrice] = useState(0);
+  const [isIncrease, setIncrease] = useState(true);
+
+  useEffect(()=>{
+    if(marketSummary.price > lastPrice)
+      setIncrease(true)
+    else if(marketSummary.price < lastPrice)
+      setIncrease(false)
+    setLastPrice(marketSummary.price)
+  },[marketSummary.price])
+
   const handleOnModalClose = () => {
     onSettingsModalClose();
   };
@@ -54,16 +65,26 @@ const TradeRatesCard = ({
         <RatesCardsWrapper>
           <RatesCard>
             <Text
-              font="primaryExtraSmallSemiBold"
-              color="foregroundLowEmphasis"
-            >
-              Price
-            </Text>
-            <Text
-              font="primaryMediumSmallSemiBold"
-              color="foregroundHighEmphasis"
+              font="primaryHeading6"
+              color={
+                percentChange === "NaN"
+                  ? "black"
+                  : isIncrease
+                  ? "successHighEmphasis"
+                  : "dangerHighEmphasis"
+              }
             >
               {marketSummary.price ? marketSummary.price : "--"}
+            </Text>
+            <Text
+              font="primaryTiny"
+              color="foregroundHighEmphasis"
+            >
+              $ {
+                (marketInfo?.baseAsset?.usdPrice)
+                  ? marketInfo.baseAsset.usdPrice
+                  : "--"
+              }
             </Text>
           </RatesCard>
           {/* <RatesCard>
