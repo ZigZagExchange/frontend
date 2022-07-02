@@ -23,11 +23,8 @@ import {
   DeleteIcon,
   MenuIcon,
 } from "components/atoms/Svg";
-import { toNumber } from "lodash";
 import ToggleTheme from "components/molecules/Toggle/ToggleTheme";
 import useTheme from "components/hooks/useTheme";
-import { formatAmount } from "../../../lib/utils";
-import { SwapVerticalCircleSharp } from "@material-ui/icons";
 
 const langList = [
   { text: "EN", url: "#" },
@@ -434,7 +431,7 @@ export const Header = (props) => {
             {/* {hasBridge && <Tab>DSL</Tab>} */}
           </TabMenu>
           <HorizontalDivider />
-          <ActionSideMenuWrapper>
+          {/* <ActionSideMenuWrapper>
             <span>Language: </span>
             <StyledDropdown
               adClass="lang-dropdown"
@@ -443,7 +440,7 @@ export const Header = (props) => {
               context={language}
               clickFunction={changeLanguage}
             />
-          </ActionSideMenuWrapper>
+          </ActionSideMenuWrapper> */}
           <ActionSideMenuWrapper>
             <span>Theme: </span>
             <ToggleTheme isDark={isDark} toggleTheme={toggleTheme} />

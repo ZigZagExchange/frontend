@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import { formatPrice } from "lib/utils";
 import api from "lib/api";
 import { getLayout } from "lib/helpers/storage/layouts";
+import FillCard from "components/organisms/TradeDashboard/TradeTables/OrdersTable/FillCard";
 
 const makeScope = (state) => `${state.network}-${state.userId}`;
 
@@ -16,6 +17,7 @@ const initialUISettings = {
   hideAddress: false,
   hideBalance: false,
   hideGuidePopup: false,
+  disableTradeIDCard: false,
 };
 
 export const apiSlice = createSlice({
@@ -125,6 +127,7 @@ export const apiSlice = createSlice({
     },
     _fillstatus(state, { payload }) {
       payload[0].forEach((update) => {
+        // console.log(update);
         const fillid = update[1];
         const newstatus = update[2];
         const timestamp = update[7];
@@ -150,12 +153,24 @@ export const apiSlice = createSlice({
 
           if (newstatus === "f") {
             const fillDetails = state.userFills[fillid];
+
             const baseCurrency = fillDetails[2].split("-")[0];
             const sideText = fillDetails[3] === "b" ? "buy" : "sell";
             const price = Number(fillDetails[4]);
             const baseQuantity = Number(fillDetails[5]);
-
-            if (!state.settings.disableOrderNotification) {
+            let p = [];
+            for (var i = 0; i < 13; i++) {
+              if (i === 4) {
+                p.push(Number(fillDetails[i]));
+              } else {
+                p.push(fillDetails[i]);
+              }
+            }
+            if (
+              !state.settings.disableOrderNotification &&
+              state.settings.disableTradeIDCard
+            ) {
+              toast.dismiss("Order placed.");
               toast.success(
                 `Your ${sideText} order for ${Number(
                   baseQuantity.toPrecision(4)
@@ -166,6 +181,25 @@ export const apiSlice = createSlice({
                   )} ${baseCurrency} was filled @ ${Number(
                     formatPrice(price)
                   )}!`,
+                }
+              );
+            }
+            if (
+              !state.settings.disableOrderNotification &&
+              !state.settings.disableTradeIDCard
+            ) {
+              toast.dismiss("Order placed.");
+              toast.warning(
+                ({ closeToast }) => (
+                  <FillCard closeToast={closeToast} fill={p} />
+                ),
+                {
+                  toastId: fillid,
+                  className: "fillToastCard",
+                  bodyClassName: "!p-0",
+                  closeOnClick: false,
+                  icon: false,
+                  closeButton: false,
                 }
               );
             }

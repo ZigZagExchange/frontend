@@ -19,14 +19,12 @@ import {
 
 const StyledTradeBooks = styled.section`
   display: flex;
-  margin-bottom: -8rem;
   grid-area: orders;
   flex-direction: row;
   justify-content: space-between;
-  padding: ${({ isLeft }) =>
-    isLeft ? "21px 10px 12px 20px" : "21px 10px 10px 10px"};
-  padding-bottom: 138px;
+  padding: ${({ isLeft }) => isLeft ? '21px 10px 12px 20px' : '21px 10px 0px 10px'};
   border-top: 1px solid ${({ theme }) => theme.colors.foreground400};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.foreground400};
   overflow: hidden;
 `;
 
@@ -206,6 +204,7 @@ export default function OrdersBook(props) {
                 <>
                   <TradePriceHeadSecond
                     lastPrice={marketSummary.price}
+                    marketSummary={marketSummary}
                     marketInfo={marketInfo}
                     fixedPoint={fixedPoint}
                   />
@@ -228,6 +227,7 @@ export default function OrdersBook(props) {
                 <>
                   <TradePriceHeadSecond
                     lastPrice={marketSummary.price}
+                    marketSummary={marketSummary}
                     marketInfo={marketInfo}
                     fixedPoint={fixedPoint}
                   />
@@ -258,6 +258,7 @@ export default function OrdersBook(props) {
                   <Divider />
                   <TradePriceHeadSecond
                     lastPrice={marketSummary.price}
+                    marketSummary={marketSummary}
                     marketInfo={marketInfo}
                     fixedPoint={fixedPoint}
                   />
@@ -318,11 +319,12 @@ export default function OrdersBook(props) {
               <HeaderWrapper>
                 <TradePriceHeadSecond
                   lastPrice={marketSummary.price}
+                  marketSummary={marketSummary}
                   marketInfo={marketInfo}
                   fixedPoint={fixedPoint}
                 />
                 <OrderFooterWrapper>
-                  <Dropdown
+                  {/* <Dropdown
                     adClass="side-dropdown"
                     transparent={true}
                     width={162}
@@ -330,7 +332,7 @@ export default function OrdersBook(props) {
                     context={`${fixedPoint} decimal`}
                     leftIcon={false}
                     clickFunction={changeFixedPoint}
-                  />
+                  /> */}
 
                   <OrderFooterRight>
                     <OrderButtonWrapper

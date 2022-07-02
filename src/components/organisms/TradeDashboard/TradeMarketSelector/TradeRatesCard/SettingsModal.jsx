@@ -148,6 +148,17 @@ const SettingsModal = ({ onDismiss }) => {
         </ToggleWrapper>
         <ToggleWrapper>
           <Toggle
+            isChecked={settings.disableTradeIDCard}
+            scale="md"
+            onChange={toggle}
+            settingKey="disableTradeIDCard"
+          />
+          <Text font="primarySmall" color="foregroundHighEmphasis">
+            Disable Trade ID card notification
+          </Text>
+        </ToggleWrapper>
+        <ToggleWrapper>
+          <Toggle
             isChecked={settings.hideAddress}
             scale="md"
             onChange={toggle}
