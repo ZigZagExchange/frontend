@@ -52,7 +52,7 @@ const TradeRatesCard = ({
         <RatesCardsWrapper>
           <RatesCard>
             <Text
-              font="primaryTitleDisplay"
+              font="primaryHeading6"
               color={
                 percentChange === "NaN"
                   ? "black"
@@ -64,7 +64,7 @@ const TradeRatesCard = ({
               {marketSummary.price ? marketSummary.price : "--"}
             </Text>
             <Text
-              font="primarySmall"
+              font="primaryTiny"
               color="foregroundHighEmphasis"
             >
               $ {
