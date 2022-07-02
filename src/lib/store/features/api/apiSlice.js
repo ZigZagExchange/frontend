@@ -3,7 +3,6 @@ import { toast } from "react-toastify";
 import { formatPrice } from "lib/utils";
 import api from "lib/api";
 import { getLayout } from "lib/helpers/storage/layouts";
-import { ethers } from 'ethers';
 
 const makeScope = (state) => `${state.network}-${state.userId}`;
 
@@ -143,7 +142,7 @@ export const apiSlice = createSlice({
             const sideText = fillDetails[3] === "b" ? "buy" : "sell";
             const price = Number(fillDetails[4]);
             const baseQuantity = Number(fillDetails[5]);
-            const quoteQuantity = Number(fillDetails[6]);
+            // const quoteQuantity = Number(fillDetails[6]);
 
             toast.success(
               `Your ${sideText} order #${fillid} for ${Number(baseQuantity.toPrecision(4))
@@ -156,9 +155,7 @@ export const apiSlice = createSlice({
             });
 
             // update the balances of the user account
-            if (api.apiProvider.evmCompatible) {
-                api.getBalances();
-            }
+            api.getBalances();
           }
         }
       });
