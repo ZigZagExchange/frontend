@@ -237,41 +237,36 @@ export class SpotForm extends React.Component {
       const remainingQuote = remaining * price;
       const orderStatus = order[9];
 
-      const orderRow = {
-        td1: price,
-        td2: remaining,
-        td3: remainingQuote,
-        side,
-        order: order,
-      };
+      const orderEntry = [
+        price,
+        remaining
+      ];
 
       if (side === "b" && ["o", "pm", "pf"].includes(orderStatus)) {
-        orderbookBids.push(orderRow);
+        orderbookBids.push(orderEntry);
       } else if (side === "s" && ["o", "pm", "pf"].includes(orderStatus)) {
-        orderbookAsks.push(orderRow);
+        orderbookAsks.push(orderEntry);
       }
     }
 
     let price;
     let unfilled = baseAmount;
     if (side === "b" && orderbookAsks) {
-      const asks = orderbookAsks;
-      for (let i = 0; i < asks.length; i++) {
-        if (asks[i].td2 >= unfilled || i === asks.length - 1) {
-          price = asks[i].td1;
+      for (let i = orderbookAsks.length - 1; i >= 0; i--) {
+        if (orderbookAsks[i][1] >= unfilled || i === 0) {
+          price = orderbookAsks[i][0];
           break;
         } else {
-          unfilled -= asks[i].td2;
+          unfilled -= orderbookAsks[i][1];
         }
       }
     } else if (side === "s" && orderbookBids) {
-      const bids = orderbookBids;
-      for (let i = 0; i < bids.length; i++) {
-        if (bids[i].td2 >= unfilled || i === bids - 1) {
-          price = bids[i].td1;
+      for (let i = 0; i < orderbookBids.length; i++) {
+        if (orderbookBids[i][1] >= unfilled || i === orderbookBids.length - 1) {
+          price = orderbookBids[i][0];
           break;
         } else {
-          unfilled -= bids[i].td2;
+          unfilled -= orderbookBids[i][1];
         }
       }
     }
