@@ -186,9 +186,6 @@ export function TradeDashboard() {
           updateMarketChain={updateMarketChain}
           currentMarket={currentMarket}
           user={user}
-          orderbookAsks={orderbookAsks}
-          orderbookBids={orderbookBids}
-          balances={wallet}
           activeOrderCount={activeUserOrders}
         />
         {settings.stackOrderbook ? (

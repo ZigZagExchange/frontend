@@ -10,12 +10,14 @@ import {
   marketSummarySelector,
   marketInfoSelector,
   settingsSelector,
+  allOrdersSelector,
 } from "lib/store/features/api/apiSlice";
 import {
   SideAllButton,
   SideSellButton,
   SideBuyButton,
 } from "./OrdersFooter/SideButtons";
+import api from "lib/api";
 
 const StyledTradeBooks = styled.section`
   display: flex;
@@ -103,6 +105,7 @@ export default function OrdersBook(props) {
   const marketSummary = useSelector(marketSummarySelector);
   const liquidity = useSelector(liquiditySelector);
   const settings = useSelector(settingsSelector);
+  const allOrders = useSelector(allOrdersSelector);
   const [fixedPoint, setFixedPoint] = useState(2);
   const [side, setSide] = useState("all");
   const [fixedPointItems, setFixedPointItems] = useState(fixedPoints);

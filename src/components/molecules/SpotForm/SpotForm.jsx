@@ -716,7 +716,7 @@ export class SpotForm extends React.Component {
   }
 
   showLabel() {    
-   if(api.getNetwork() === 'arbitrum') {
+   if(api.getNetworkName() === 'arbitrum') {
       return (
         <div>
           <p>Arbitrum's network swap fees are dynamic and sit around ~$1</p>
