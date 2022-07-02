@@ -50,10 +50,10 @@ export default class APIStarknetProvider extends APIProvider {
     }
     toast.dismiss(allowancesToast);
 
-    if(!baseAmount && quoteAmount) {
+    if (!baseAmount && quoteAmount) {
       baseAmount = quoteAmount / price;
     }
-    const expiration = Date.now() + 86400;    
+    const expiration = Date.now() + 86400;
     const orderhash = this._createOrderHash(
       product,
       side,

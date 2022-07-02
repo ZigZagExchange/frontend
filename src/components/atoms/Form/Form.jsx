@@ -52,13 +52,13 @@ const Debug = () => {
             </x.div>
           </x.div>
         )}
-        <Button
+        {/* <Button
           size={"xs"}
           variant={"secondary"}
           onClick={() => setShowDebug(!showDebug)}
         >
           {showDebug ? "hide debug" : "show debug"}
-        </Button>
+        </Button> */}
       </x.div>
     </Dev>
   );

@@ -1,8 +1,10 @@
 const notImplemented = function (method) {
-  const x = () => { throw new Error(`APIProvider method not implemented: ${method}`) }
-  x.notImplemented = true
-  return x
-}
+  const x = () => {
+    throw new Error(`APIProvider method not implemented: ${method}`);
+  };
+  x.notImplemented = true;
+  return x;
+};
 
 export default class APIProvider {
   // Methods required to be implemented
@@ -18,8 +20,8 @@ export default class APIProvider {
   getBalances             = notImplemented('getBalances')
   
   constructor(api, network) {
-    this.api = api
-    this.network = network
+    this.api = api;
+    this.network = network;
     this.websocketUrl = process.env.REACT_APP_ZIGZAG_WS;
     if (network === 1000 && process.env.REACT_APP_ZIGZAG_WS_RINKEBY) {
       this.websocketUrl = process.env.REACT_APP_ZIGZAG_WS_RINKEBY;
@@ -27,5 +29,5 @@ export default class APIProvider {
     if (network === 42161 && process.env.REACT_APP_ZIGZAG_WS_ARBITRUM) {
       this.websocketUrl = process.env.REACT_APP_ZIGZAG_WS_ARBITRUM;
     }
-  }  
+  }
 }

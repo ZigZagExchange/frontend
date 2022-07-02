@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import styled from "@xstyled/styled-components";
 import TradeSidebar from "./TradeSidebar/TradeSidebar";
@@ -6,24 +6,19 @@ import TradeMarketSelector from "./TradeMarketSelector/TradeMarketSelector";
 import TradeTables from "./TradeTables/TradeTables";
 import TradeFooter from "./TradeFooter/TradeFooter";
 import TradeChartArea from "./TradeChartArea/TradeChartArea";
-import TradeBooks from "./TradeBooks/TradeBooks";
+import OrdersBook from "./TradeBooks/OrdersBook";
+import TradesBook from "./TradeBooks/TradesBook";
 import "react-toastify/dist/ReactToastify.css";
 import { toast } from "react-toastify";
 import {
   networkSelector,
   userOrdersSelector,
   userFillsSelector,
-  allOrdersSelector,
-  marketFillsSelector,
-  lastPricesSelector,
-  marketSummarySelector,
-  liquiditySelector,
   currentMarketSelector,
-  marketInfoSelector,
   setCurrentMarket,
   resetData,
   layoutSelector,
-  balancesSelector,
+  settingsSelector,
 } from "lib/store/features/api/apiSlice";
 import { userSelector } from "lib/store/features/auth/authSlice";
 import api from "lib/api";
@@ -33,90 +28,56 @@ import {
   marketQueryParam,
   networkQueryParam,
 } from "../../pages/ListPairPage/SuccessModal";
+import TradesTable from "./TradeBooks/TradesTable";
 
 const TradeContainer = styled.div`
   color: #aeaebf;
-  height: calc(100vh - 48px);
-  background: ${(p) => p.theme.colors.zzLightBorder};
+  height: calc(100vh - 56px);
+  background: ${(p) => p.theme.colors.backgroundHighEmphasis};
 `;
 
 const TradeGrid = styled.article`
   display: grid;
-  grid-template-rows: 50px 4fr 3fr 50px;
-  grid-template-columns: ${(props) => {
-    let layout = undefined;
-    switch (props.layout) {
-        case 1:
-          layout = "325px 1fr 300px";
-          break;
-        case 2:
-          layout = "300px 1fr 325px";
-          break;
-        case 3:
-          layout = "1fr 300px 325px";
-          break;
-        default:
-          layout = "325px 300px 1fr";
-          break;
-      }
-      return (layout);
-     } };
-    
-  grid-template-areas:
-    "marketSelector marketSelector marketSelector"
-    ${(props) => {
-      let layout = undefined;
-      switch (props.layout) {
-        case 1:
-          layout = `
-          "sidebar chart books"
-          "sidebar tables books"
-          "sidebar footer footer"
-          `;          
-          break;
-        case 2:
-          layout = `
-          "books chart sidebar"
-          "books tables sidebar"
-          "footer footer sidebar"
-          `;          
-          break;
-        case 3:          
-          layout = `
-          "chart books sidebar"
-          "tables books sidebar"
-          "footer footer sidebar"
-          `;          
-          break;
-        default:
-          layout = `
-          "sidebar books chart"
-          "sidebar books tables"
-          "sidebar footer footer"
-          `;
-          break;
-      }
-      return (layout);
-     } };
-  min-height: calc(100vh - 48px);
-  gap: 1px;
+  grid-template-rows: 56px 2fr 1fr;
+  grid-template-columns: ${({ isLeft }) =>
+    isLeft ? "300px 253.5px 253.5px 1fr" : "300px 507px 1fr"};
+  grid-template-areas: ${({ isLeft }) =>
+    isLeft
+      ? `"marketSelector marketSelector marketSelector marketSelector"
+  "sidebar orders trades chart"
+  "tables tables tables tables"`
+      : `"marketSelector marketSelector marketSelector"
+  "sidebar stack chart"
+  "tables tables tables"`};
+
+  height: calc(100vh - 56px);
+  gap: 0px;
 
   @media screen and (max-width: 991px) {
-    grid-template-rows: 50px 300px auto 2fr 2fr 50px;
-    grid-template-columns: 100%;
-    grid-template-areas:
-      "marketSelector"
+    grid-template-rows: ${({ isLeft }) =>
+      isLeft
+        ? "56px 410px 459px 508px 362px"
+        : "56px 410px 459px 519px 362px"};
+    grid-template-columns: ${({ isLeft }) => (isLeft ? "1fr 1fr" : "1fr")};
+    grid-template-areas: ${({ isLeft }) =>
+      isLeft
+        ? `"marketSelector marketSelector"
+      "chart chart"
+      "sidebar orders"
+      "trades trades"
+      "tables tables"
+      `
+        : `"marketSelector"
       "chart"
       "sidebar"
-      "books"
+      "stack"
       "tables"
-      "footer";
+      `};
   }
 
   > div,
   > aside,
   > header,
-  > footer,
   > section,
   > main {
     background: ${(p) => p.theme.colors.zzDarkest};
@@ -129,17 +90,11 @@ export function TradeDashboard() {
   const currentMarket = useSelector(currentMarketSelector);
   const userOrders = useSelector(userOrdersSelector);
   const userFills = useSelector(userFillsSelector);
-  const allOrders = useSelector(allOrdersSelector);
-  const marketFills = useSelector(marketFillsSelector);
-  const lastPrices = useSelector(lastPricesSelector);
-  const marketSummary = useSelector(marketSummarySelector);
-  const liquidity = useSelector(liquiditySelector);
   const layout = useSelector(layoutSelector);
-  const marketInfo = useSelector(marketInfoSelector);
-  const balanceData = useSelector(balancesSelector);
+  const settings = useSelector(settingsSelector);
+  const [fixedPoint, setFixedPoint] = useState(2);
+  const [side, setSide] = useState("all");
   const dispatch = useDispatch();
-  const lastPriceTableData = [];
-  const markets = [];
 
   const { search } = useLocation();
   const history = useHistory();
@@ -147,8 +102,6 @@ export function TradeDashboard() {
   const updateMarketChain = (market) => {
     dispatch(setCurrentMarket(market));
   };
-
-  const wallet = balanceData[network];
 
   useEffect(() => {
     const urlParams = new URLSearchParams(search);
@@ -179,13 +132,12 @@ export function TradeDashboard() {
   }, [network, currentMarket]);
 
   useEffect(() => {
-    if(user.address && !user.id){
-      console.log('here')
+    if (user.address && !user.id) {
       history.push("/bridge");
       toast.error(
         "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
         {
-          autoClose: 60000
+          autoClose: 60000,
         }
       );
     }
@@ -209,132 +161,13 @@ export function TradeDashboard() {
     };
   }, [network, currentMarket, api.ws]);
 
-  Object.keys(lastPrices).forEach((market) => {
-    markets.push(market);
-    const price = lastPrices[market].price;
-    const change = lastPrices[market].change;
-    const pctchange = ((change / price) * 100).toFixed(2);
-    const quoteCurrency = market.split("-")[1];
-    const quoteCurrencyUSDC = quoteCurrency + "-USDC";
-    let quoteCurrencyPrice = 0;
-    if (quoteCurrency === "USDC" || quoteCurrency === "USDT") {
-      quoteCurrencyPrice = 1;
-    }
-    if (lastPrices[quoteCurrencyUSDC]) {
-      quoteCurrencyPrice = lastPrices[quoteCurrencyUSDC].price;
-    }
-    let usdVolume = 0;
-    usdVolume = lastPrices[market].quoteVolume * quoteCurrencyPrice;
-    lastPriceTableData.push({
-      td1: market,
-      td2: price,
-      td3: pctchange,
-      usdVolume,
-    });
-  });
-  lastPriceTableData.sort((a, b) => b.usdVolume - a.usdVolume);
+  const changeFixedPoint = (point) => {
+    setFixedPoint(point);
+  };
 
-  // Only display recent trades
-  // There's a bunch of user trades in this list that are too old to display
-  const fillData = [];
-  const maxFillId = Math.max(...Object.values(marketFills).map((f) => f[1]));
-  Object.values(marketFills)
-    .filter((fill) => fill[1] > maxFillId - 500 && fill[6] !== "r")
-    .sort((a, b) => b[1] - a[1])
-    .forEach((fill) => {
-      fillData.push({
-        td1: Number(fill[4]),
-        td2: Number(fill[5]),
-        td3: Number(fill[4] * fill[5]),
-        side: fill[3],
-      });
-    });
-  
-  const orderbookBids = [];
-  const orderbookAsks = [];
-  if (api.isZksyncChain()) {
-    liquidity.forEach((liq) => {
-      const side = liq[0];
-      const price = liq[1];
-      const quantity = liq[2];
-      if (side === "b") {
-        orderbookBids.push({
-          td1: price,
-          td2: quantity,
-          td3: price * quantity,
-          side: "b",
-        });
-      }
-      if (side === "s") {
-        orderbookAsks.push({
-          td1: price,
-          td2: quantity,
-          td3: price * quantity,
-          side: "s",
-        });
-      }
-    });
-  }
-
-  if (api.isEVMChain()) {
-    for (let orderid in allOrders) {
-      const order = allOrders[orderid];
-      const side = order[3];
-      const price = order[4];
-      const remaining = isNaN(Number(order[10])) ? order[5] : order[10];
-      const remainingQuote = remaining * price;
-      const orderStatus = order[9];
-
-      const orderRow = {
-        td1: price,
-        td2: remaining,
-        td3: remainingQuote,
-        side,
-        order: order,
-      };
-
-      if (side === "b" && ["o", "pm", "pf"].includes(orderStatus)) {
-        orderbookBids.push(orderRow);
-      } else if (side === "s" && ["o", "pm", "pf"].includes(orderStatus)) {
-        orderbookAsks.push(orderRow);
-      }
-    }
-  }
-
-  orderbookAsks.sort((a, b) => b.td1 - a.td1);
-  orderbookBids.sort((a, b) => b.td1 - a.td1);
-
-  const askBins = [];
-  for (let i = 0; i < orderbookAsks.length; i++) {
-    const lastAskIndex = askBins.length - 1;
-    if (i === 0) {
-      askBins.push(orderbookAsks[i]);
-    } else if (
-      orderbookAsks[i].td1.toPrecision(6) ===
-      askBins[lastAskIndex].td1.toPrecision(6)
-    ) {
-      askBins[lastAskIndex].td2 += orderbookAsks[i].td2;
-      askBins[lastAskIndex].td3 += orderbookAsks[i].td3;
-    } else {
-      askBins.push(orderbookAsks[i]);
-    }
-  }
-
-  const bidBins = [];
-  for (let i in orderbookBids) {
-    const lastBidIndex = bidBins.length - 1;
-    if (i === "0") {
-      bidBins.push(orderbookBids[i]);
-    } else if (
-      orderbookBids[i].td1.toPrecision(6) ===
-      bidBins[lastBidIndex].td1.toPrecision(6)
-    ) {
-      bidBins[lastBidIndex].td2 += orderbookBids[i].td2;
-      bidBins[lastBidIndex].td3 += orderbookBids[i].td3;
-    } else {
-      bidBins.push(orderbookBids[i]);
-    }
-  }
+  const changeSide = (side) => {
+    setSide(side);
+  };
 
   const activeOrderStatuses = ["o", "m", "b"];
   const activeUserOrders = Object.values(userOrders).filter((order) =>
@@ -343,51 +176,47 @@ export function TradeDashboard() {
 
   return (
     <TradeContainer>
-      <TradeGrid layout={layout}>
+      <TradeGrid layout={layout} isLeft={settings.stackOrderbook}>
         <TradeMarketSelector
           updateMarketChain={updateMarketChain}
-          marketSummary={marketSummary}
-          markets={markets}
           currentMarket={currentMarket}
-          marketInfo={marketInfo}
         />
         {/* TradePriceBtcTable, Spotbox */}
         <TradeSidebar
-          lastPriceTableData={lastPriceTableData}
           updateMarketChain={updateMarketChain}
-          markets={markets}
           currentMarket={currentMarket}
-          lastPrice={marketSummary.price}
           user={user}
           orderbookAsks={orderbookAsks}
           orderbookBids={orderbookBids}
           balances={wallet}
           activeOrderCount={activeUserOrders}
-          liquidity={liquidity}
-          marketInfo={marketInfo}
-          marketSummary={marketSummary}
         />
-        {/* TradePriceTable, TradePriceHeadSecond */}
-        <TradeBooks
-          currentMarket={currentMarket}
-          askBins={askBins}
-          lastPrice={marketSummary.price}
-          marketInfo={marketInfo}
-          bidBins={bidBins}
-        />
+        {settings.stackOrderbook ? (
+          <>
+            {/* TradePriceTable, TradePriceHeadSecond */}
+            <OrdersBook
+              currentMarket={currentMarket}
+              changeFixedPoint={changeFixedPoint}
+              changeSide={changeSide}
+            />
+            <TradesBook
+              currentMarket={currentMarket}
+              fixedPoint={fixedPoint}
+              side={side}
+            />
+          </>
+        ) : (
+          <TradesTable />
+        )}
         {/* TradeChartArea */}
-        <TradeChartArea marketInfo={marketInfo} />
+        <TradeChartArea />
         {/* OrdersTable */}
         <TradeTables
           userFills={userFills}
           userOrders={userOrders}
           user={user}
-          marketInfo={marketInfo}
-          wallet={wallet}
         />
-        <TradeFooter 
-          network={network}
-        />
+        {/* <TradeFooter /> */}
       </TradeGrid>
     </TradeContainer>
   );

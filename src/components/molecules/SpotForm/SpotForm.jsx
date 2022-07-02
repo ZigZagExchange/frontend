@@ -1,36 +1,152 @@
-import React from "react";
+import React, { useRef } from "react";
+import styled from "styled-components";
 import { toast } from "react-toastify";
 import api from "lib/api";
-import { RangeSlider } from "components";
-import { formatPrice } from "lib/utils";
+import { RangeSlider, QuestionHelper } from "components";
+import { formatPrice, formatToken } from "lib/utils";
 import "./SpotForm.css";
-import ConnectWalletButton from "../../atoms/ConnectWalletButton/ConnectWalletButton";
+import { Button, ConnectWalletButton } from "components/molecules/Button";
+import InputField from "components/atoms/InputField/InputField";
+import Text from "components/atoms/Text/Text";
+import { IconButton as BaseIcon } from "../IconButton";
+import { InfoIcon, MinusIcon, PlusIcon } from "components/atoms/Svg";
 
+const rx_live = /^\d*(?:[.,]\d*)?$/;
 export class SpotForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       userHasEditedPrice: false,
-      price: "",
+      price: props.lastPrice,
       baseAmount: "",
+      totalAmount: "",
       quoteAmount: "",
-      orderButtonDisabled: false,
+      orderButtonDisabled: true,
       maxSizeSelected: false,
     };
   }
 
+  isInvalidNumber(val) {
+    if (Number.isNaN(val) || Number(val) === 0) return true;
+    else return false;
+  }
+
   updatePrice(e) {
     const newState = { ...this.state };
-    newState.price = e.target.value;
+    newState.price = rx_live.test(e.target.value)
+      ? e.target.value
+      : this.state.price;
     newState.userHasEditedPrice = true;
+    newState.totalAmount =
+      this.props.orderType === "limit"
+        ? (newState.price * newState.baseAmount).toPrecision(6)
+        : (this.props.marketSummary.price * newState.baseAmount).toPrecision(6);
+    newState.orderButtonDisabled = this.isInvalidNumber(newState.totalAmount);
+    this.setState(newState);
+  }
+
+  increasePrice(e) {
+    e.preventDefault();
+    const newState = { ...this.state };
+    newState.price = (Number(this.state.price) + 1).toString();
+    newState.userHasEditedPrice = true;
+    newState.totalAmount =
+      this.props.orderType === "limit"
+        ? (this.currentPrice() * newState.baseAmount).toPrecision(6)
+        : (this.props.marketSummary.price * newState.baseAmount).toPrecision(6);
+    newState.orderButtonDisabled = this.isInvalidNumber(newState.totalAmount);
+    this.setState(newState);
+  }
+
+  decreasePrice(e) {
+    e.preventDefault();
+    const newState = { ...this.state };
+    newState.price =
+      Number(this.state.price) - 1 < 0
+        ? "0"
+        : (Number(this.state.price) - 1).toString();
+    newState.userHasEditedPrice = true;
+    newState.totalAmount =
+      this.props.orderType === "limit"
+        ? (this.currentPrice() * newState.baseAmount).toPrecision(6)
+        : (this.props.marketSummary.price * newState.baseAmount).toPrecision(6);
+    newState.orderButtonDisabled = this.isInvalidNumber(newState.totalAmount);
     this.setState(newState);
   }
 
   updateAmount(e) {
     const newState = { ...this.state };
-    newState.baseAmount = e.target.value;
+
+    newState.baseAmount = rx_live.test(e.target.value)
+      ? e.target.value
+      : this.state.baseAmount;
+    newState.quoteAmount = "";
+    newState.baseAmount === ""
+      ? (newState.totalAmount = "")
+      : (newState.totalAmount =
+          this.props.orderType === "limit"
+            ? (this.currentPrice() * newState.baseAmount).toPrecision(6)
+            : (
+                this.props.marketSummary.price * newState.baseAmount
+              ).toPrecision(6));
+    newState.orderButtonDisabled = this.isInvalidNumber(newState.totalAmount);
+    this.setState(newState);
+  }
+
+  updateTotalAmount(e) {
+    const newState = { ...this.state };
+
+    newState.totalAmount = rx_live.test(e.target.value)
+      ? e.target.value
+      : this.state.totalAmount;
+    newState.quoteAmount = "";
+    newState.totalAmount === ""
+      ? (newState.baseAmount = "")
+      : (newState.baseAmount =
+          this.props.orderType === "limit"
+            ? (newState.totalAmount / this.currentPrice()).toPrecision(6)
+            : (
+                newState.totalAmount / this.props.marketSummary.price
+              ).toPrecision(6));
+    newState.orderButtonDisabled = this.isInvalidNumber(newState.totalAmount);
+    this.setState(newState);
+  }
+
+  increaseAmount(e) {
+    e.preventDefault();
+    const newState = { ...this.state };
+    newState.baseAmount = (Number(this.state.baseAmount) + 1).toString();
+    newState.quoteAmount = "";
+    newState.baseAmount === ""
+      ? (newState.totalAmount = "")
+      : (newState.totalAmount =
+          this.props.orderType === "limit"
+            ? (this.currentPrice() * newState.baseAmount).toPrecision(6)
+            : (
+                this.props.marketSummary.price * newState.baseAmount
+              ).toPrecision(6));
+    newState.orderButtonDisabled = this.isInvalidNumber(newState.totalAmount);
+    this.setState(newState);
+  }
+
+  decreaseAmount(e) {
+    e.preventDefault();
+    const newState = { ...this.state };
+    newState.baseAmount =
+      Number(this.state.baseAmount) - 1 < 0
+        ? "0"
+        : (Number(this.state.baseAmount) - 1).toString();
     newState.quoteAmount = "";
     newState.maxSizeSelected = false;
+    newState.baseAmount === ""
+      ? (newState.totalAmount = "")
+      : (newState.totalAmount =
+          this.props.orderType === "limit"
+            ? (this.currentPrice() * newState.baseAmount).toPrecision(6)
+            : (
+                this.props.marketSummary.price * newState.baseAmount
+              ).toPrecision(6));
+    newState.orderButtonDisabled = this.isInvalidNumber(newState.totalAmount);
     this.setState(newState);
   }
 
@@ -72,7 +188,7 @@ export class SpotForm extends React.Component {
 
   /*
    * zkSync does not allow partial fills, so the ladder price is the first
-   * liquidity that can fill the order size. 
+   * liquidity that can fill the order size.
    */
   getLadderPriceZkSync_v1() {
     let baseAmount = this.state.baseAmount;
@@ -171,6 +287,7 @@ export class SpotForm extends React.Component {
   }
 
   async buySellHandler(e) {
+    e.preventDefault();
     let baseAmount, quoteAmount;
     if (typeof this.state.baseAmount === "string") {
       baseAmount = parseFloat(this.state.baseAmount.replace(",", "."));
@@ -183,11 +300,11 @@ export class SpotForm extends React.Component {
       quoteAmount = this.state.quoteAmount;
     }
 
-    quoteAmount = isNaN(quoteAmount) ? 0 : quoteAmount
-    baseAmount = isNaN(baseAmount) ? 0 : baseAmount
+    quoteAmount = isNaN(quoteAmount) ? 0 : quoteAmount;
+    baseAmount = isNaN(baseAmount) ? 0 : baseAmount;
     if (!baseAmount && !quoteAmount) {
       toast.error("No amount available", {
-        toastId: 'No amount available',
+        toastId: "No amount available",
       });
       return;
     }
@@ -195,7 +312,7 @@ export class SpotForm extends React.Component {
     let price = this.currentPrice();
     if (!price) {
       toast.error("No price available", {
-        toastId: 'No price available',
+        toastId: "No price available",
       });
       return;
     }
@@ -210,7 +327,7 @@ export class SpotForm extends React.Component {
 
     if (this.props.activeOrderCount > 0 && api.isZksyncChain()) {
       toast.error("Only one active order permitted at a time", {
-        toastId: 'Only one active order permitted at a time',
+        toastId: "Only one active order permitted at a time",
       });
       return;
     }
@@ -232,7 +349,7 @@ export class SpotForm extends React.Component {
     quoteBalance = parseFloat(quoteBalance);
     let baseAmountMsg;
     if (this.props.side === "s") {
-      baseAmount = baseAmount ? baseAmount : (quoteAmount / price);
+      baseAmount = baseAmount ? baseAmount : quoteAmount / price;
       quoteAmount = 0;
       baseAmountMsg = formatPrice(baseAmount);
 
@@ -243,7 +360,7 @@ export class SpotForm extends React.Component {
         return;
       }
 
-      if (baseAmount && (baseAmount + marketInfo.baseFee) > baseBalance) {
+      if (baseAmount && baseAmount + marketInfo.baseFee > baseBalance) {
         toast.error(`Amount exceeds ${marketInfo.baseAsset.symbol} balance`, {
           toastId: `Amount exceeds ${marketInfo.baseAsset.symbol} balance`,
         });
@@ -252,8 +369,9 @@ export class SpotForm extends React.Component {
 
       if (baseAmount && baseAmount < marketInfo.baseFee) {
         toast.error(
-          `Minimum order size is ${marketInfo.baseFee.toPrecision(5)
-          } ${marketInfo.baseAsset.symbol}`
+          `Minimum order size is ${marketInfo.baseFee.toPrecision(5)} ${
+            marketInfo.baseAsset.symbol
+          }`
         );
         return;
       }
@@ -267,30 +385,43 @@ export class SpotForm extends React.Component {
 
       const askPrice = this.getFirstAsk();
       const delta = ((askPrice - price) / askPrice) * 100;
-      if (delta > 10 && this.props.orderType === "limit") {
+      if (
+        delta > 10 &&
+        this.props.orderType === "limit" &&
+        !this.props.settings.disableSlippageWarning
+      ) {
         toast.error(
-          `You are selling ${delta.toFixed(2)
-          }% under the current market price. You will lose money when signing this transaction!`,
+          `You are selling ${delta.toFixed(
+            2
+          )}% under the current market price. You will lose money when signing this transaction!`,
           {
-            toastId: `You are selling ${delta.toFixed(2)
-              }% under the current market price. You will lose money when signing this transaction!`,
-          });
+            toastId: `You are selling ${delta.toFixed(
+              2
+            )}% under the current market price. You will lose money when signing this transaction!`,
+          }
+        );
       }
 
-      if (this.props.orderType === "market") {
+      if (
+        this.props.orderType === "market" &&
+        !this.props.settings.disableSlippageWarning
+      ) {
         price *= 0.9985;
         if (delta > 2) {
           toast.error(
-            `You are selling ${delta.toFixed(2)
-            }% under the current market price. You could lose money when signing this transaction!`,
+            `You are selling ${delta.toFixed(
+              2
+            )}% under the current market price. You could lose money when signing this transaction!`,
             {
-              toastId: `You are selling ${delta.toFixed(2)
-                }% under the current market price. You could lose money when signing this transaction!`,
-            });
+              toastId: `You are selling ${delta.toFixed(
+                2
+              )}% under the current market price. You could lose money when signing this transaction!`,
+            }
+          );
         }
       }
     } else if (this.props.side === "b") {
-      quoteAmount = quoteAmount ? quoteAmount : (baseAmount * price);
+      quoteAmount = quoteAmount ? quoteAmount : baseAmount * price;
       baseAmount = 0;
       baseAmountMsg = formatPrice(quoteAmount / price);
 
@@ -301,7 +432,7 @@ export class SpotForm extends React.Component {
         return;
       }
 
-      if (quoteAmount && (quoteAmount + marketInfo.quoteFee) > quoteBalance) {
+      if (quoteAmount && quoteAmount + marketInfo.quoteFee > quoteBalance) {
         toast.error(`Total exceeds ${marketInfo.quoteAsset.symbol} balance`, {
           toastId: `Total exceeds ${marketInfo.quoteAsset.symbol} balance`,
         });
@@ -327,50 +458,75 @@ export class SpotForm extends React.Component {
 
       const bidPrice = this.getFirstBid();
       const delta = ((price - bidPrice) / bidPrice) * 100;
-      if (delta > 10 && this.props.orderType === "limit") {
+      if (
+        delta > 10 &&
+        this.props.orderType === "limit" &&
+        !this.props.settings.disableSlippageWarning
+      ) {
         toast.error(
-          `You are buying ${delta.toFixed(2)
-          }% above the current market price. You will lose money when signing this transaction!`,
+          `You are buying ${delta.toFixed(
+            2
+          )}% above the current market price. You will lose money when signing this transaction!`,
           {
-            toastId: `You are buying ${delta.toFixed(2)
-              }% above the current market price. You will lose money when signing this transaction!`,
-          });
+            toastId: `You are buying ${delta.toFixed(
+              2
+            )}% above the current market price. You will lose money when signing this transaction!`,
+          }
+        );
       }
 
-      if (this.props.orderType === "market") {
+      if (
+        this.props.orderType === "market" &&
+        !this.props.settings.disableSlippageWarning
+      ) {
         price *= 1.0015;
         if (delta > 2) {
           toast.error(
-            `You are buying ${delta.toFixed(2)
-            }% above the current market price. You could lose money when signing this transaction!`,
+            `You are buying ${delta.toFixed(
+              2
+            )}% above the current market price. You could lose money when signing this transaction!`,
             {
-              toastId: `You are buying ${delta.toFixed(2)
-                }% above the current market price. You could lose money when signing this transaction!`,
-            });
+              toastId: `You are buying ${delta.toFixed(
+                2
+              )}% above the current market price. You could lose money when signing this transaction!`,
+            }
+          );
         }
       }
     }
 
     const renderGuidContent = () => {
-      return <div>
-        <p style={{ fontSize: '14px', lineHeight: '24px' }}>{this.props.side === 's' ? 'Sell' : 'Buy'} Order pending</p>
-        <p style={{ fontSize: '14px', lineHeight: '24px' }}>{baseAmountMsg} {marketInfo.baseAsset.symbol} @ {
-          ['USDC', 'USDT', 'DAI', 'FRAX'].includes(marketInfo.quoteAsset.symbol) ? price.toFixed(2) : formatPrice(price)
-        } {marketInfo.quoteAsset.symbol}</p>
-        <p style={{ fontSize: '14px', lineHeight: '24px' }}>Sign or Cancel to continue...</p>
-      </div>
-    }
+      return (
+        <div>
+          <p style={{ fontSize: "14px", lineHeight: "24px" }}>
+            {this.props.side === "s" ? "Sell" : "Buy"} Order pending
+          </p>
+          <p style={{ fontSize: "14px", lineHeight: "24px" }}>
+            {baseAmountMsg} {marketInfo.baseAsset.symbol} @{" "}
+            {["USDC", "USDT", "DAI", "FRAX"].includes(
+              marketInfo.quoteAsset.symbol
+            )
+              ? price.toFixed(2)
+              : formatPrice(price)}{" "}
+            {marketInfo.quoteAsset.symbol}
+          </p>
+          <p style={{ fontSize: "14px", lineHeight: "24px" }}>
+            Sign or Cancel to continue...
+          </p>
+        </div>
+      );
+    };
 
     let newstate = { ...this.state };
     newstate.orderButtonDisabled = true;
     this.setState(newstate);
-    let orderPendingToast = toast.info(
-      renderGuidContent(), {
-      toastId: "Order pending",
-      autoClose: false,
+    let orderPendingToast;
+    if (!this.props.settings.disableOrderNotification) {
+      orderPendingToast = toast.info(renderGuidContent(), {
+        toastId: "Order pending",
+        autoClose: false,
+      });
     }
-    );
-
 
     try {
       await api.submitOrder(
@@ -381,12 +537,20 @@ export class SpotForm extends React.Component {
         quoteAmount,
         this.props.orderType
       );
+
+      if (!this.props.settings.disableOrderNotification) {
+        toast.info("Order placed", {
+          toastId: "Order placed.",
+        });
+      }
     } catch (e) {
-      console.log(e);
       toast.error(e.message);
     }
 
-    toast.dismiss(orderPendingToast);
+    if (!this.props.settings.disableOrderNotification) {
+      toast.dismiss(orderPendingToast);
+    }
+
     newstate = { ...this.state };
     newstate.orderButtonDisabled = false;
     this.setState(newstate);
@@ -407,7 +571,7 @@ export class SpotForm extends React.Component {
       const baseAmount = this.state.baseAmount || 0;
       return Math.round((baseAmount / baseBalance) * 100);
     } else if (this.props.side === "b") {
-      const quoteBalance = this.getQuoteBalance() - marketInfo.quoteFee;;
+      const quoteBalance = this.getQuoteBalance() - marketInfo.quoteFee;
       if (this.state.quoteAmount) {
         const quoteAmount = this.state.quoteAmount || 0;
         return Math.round((quoteAmount / quoteBalance) * 100);
@@ -474,26 +638,37 @@ export class SpotForm extends React.Component {
       const decimals = marketInfo.baseAsset.decimals;
       let displayAmount = (baseBalance * val) / 100;
       displayAmount -= marketInfo.baseFee;
-      displayAmount = parseFloat(displayAmount.toFixed(decimals))
-      displayAmount = (displayAmount > 9999)
-        ? displayAmount.toFixed(0)
-        : displayAmount.toPrecision(5)
+      displayAmount = parseFloat(displayAmount.toFixed(decimals));
+      displayAmount =
+        displayAmount > 9999
+          ? displayAmount.toFixed(0)
+          : displayAmount.toPrecision(5);
 
       if (displayAmount < 1e-5) {
         newstate.baseAmount = 0;
       } else {
         newstate.baseAmount = displayAmount;
       }
+
+      newstate.baseAmount === ""
+        ? (newstate.totalAmount = "")
+        : (newstate.totalAmount =
+            this.props.orderType === "limit"
+              ? (this.currentPrice() * newstate.baseAmount).toPrecision(6)
+              : (
+                  this.props.marketSummary.price * newstate.baseAmount
+                ).toPrecision(6));
     } else if (this.props.side === "b") {
       const quoteBalance = this.getQuoteBalance();
       const quoteDecimals = marketInfo.quoteAsset.decimals;
       const baseDecimals = marketInfo.baseAsset.decimals;
       let displayAmount = (quoteBalance * val) / 100;
       displayAmount -= marketInfo.quoteFee;
-      displayAmount = parseFloat(displayAmount.toFixed(quoteDecimals))
-      displayAmount = (displayAmount > 9999)
-        ? displayAmount.toFixed(0)
-        : displayAmount.toPrecision(5)
+      displayAmount = parseFloat(displayAmount.toFixed(quoteDecimals));
+      displayAmount =
+        displayAmount > 9999
+          ? displayAmount.toFixed(0)
+          : displayAmount.toPrecision(5);
 
       if (displayAmount < 1e-5) {
         newstate.quoteAmount = 0;
@@ -501,15 +676,22 @@ export class SpotForm extends React.Component {
         newstate.quoteAmount = displayAmount;
         const baseDisplayAmount = parseFloat(
           (displayAmount / this.currentPrice()).toFixed(baseDecimals)
-        )
-        newstate.baseAmount = (baseDisplayAmount > 9999)
-          ? baseDisplayAmount.toFixed(0)
-          : baseDisplayAmount.toPrecision(5)
+        );
+        newstate.baseAmount =
+          baseDisplayAmount > 9999
+            ? baseDisplayAmount.toFixed(0)
+            : baseDisplayAmount.toPrecision(5);
+        newstate.totalAmount =
+          baseDisplayAmount > 9999
+            ? baseDisplayAmount.toFixed(0) * this.currentPrice()
+            : baseDisplayAmount.toPrecision(5) * this.currentPrice();
       }
     }
 
     if (isNaN(newstate.baseAmount)) newstate.baseAmount = 0;
+    if (isNaN(newstate.totalAmount)) newstate.totalAmount = 0;
     if (isNaN(newstate.quoteAmount)) newstate.quoteAmount = 0;
+    newstate.orderButtonDisabled = this.isInvalidNumber(newstate.totalAmount);
     this.setState(newstate);
   }
 
@@ -524,11 +706,37 @@ export class SpotForm extends React.Component {
     }
 
     if (this.props.currentMarket !== prevProps.currentMarket) {
-      this.setState((state) => ({ ...state, price: "", baseAmount: "", quoteAmount: "" }));
+      this.setState((state) => ({
+        ...state,
+        price: "",
+        baseAmount: "",
+        quoteAmount: "",
+      }));
     }
   }
 
+  showLabel() {    
+   if(api.getNetwork() === 'arbitrum') {
+      return (
+        <div>
+          <p>Arbitrum's network swap fees are dynamic and sit around ~$1</p>
+          <p>covered by the ZigZag operator, but paid by the taker</p>
+        </div>
+      );
+    } else {
+      return (
+        <div>
+          <p>zkSync's network swap fees are dynamic and sit around ~$0.10</p>
+          <p>covered by the market maker, but paid by the trader</p>
+        </div>
+      );
+    }    
+  }
+
   render() {
+    // const ethInput = useRef(null);
+    // const usdInput = useRef(null);
+    const isMobile = window.innerWidth < 430;
     const marketInfo = this.props.marketInfo;
     let baseAmount, quoteAmount;
     if (typeof this.state.baseAmount === "string") {
@@ -566,106 +774,297 @@ export class SpotForm extends React.Component {
 
     const baseSymbol = marketInfo?.baseAsset?.symbol ? marketInfo.baseAsset.symbol : '';
     const quoteSymbol = marketInfo?.quoteAsset?.symbol ? marketInfo.quoteAsset.symbol : '';
-    const balanceHtml =
-      this.props.side === "b" ? (
-        <strong>
-          {Number(quoteBalance).toPrecision(8)}{" "}
-          {quoteSymbol}
-        </strong>
-      ) : (
-        <strong>
-          {Number(baseBalance).toPrecision(8)}{" "}
-          {baseSymbol}
-        </strong>
-      );
+    const balance1Html = (
+      <Text
+        font="primaryExtraSmallSemiBold"
+        color="foregroundMediumEmphasis"
+        textAlign="right"
+      >
+        {formatToken(quoteBalance, marketInfo && marketInfo.quoteAsset?.symbol)}{" "}
+        {marketInfo && marketInfo.quoteAsset?.symbol}
+      </Text>
+    );
 
-    let buySellBtnClass, buttonText, approveNeeded = false;
-    quoteAmount = quoteAmount ? quoteAmount : this.currentPrice() * this.state.baseAmount;
+    const balance2Html = (
+      <Text
+        font="primaryExtraSmallSemiBold"
+        color="foregroundMediumEmphasis"
+        textAlign="right"
+      >
+        {formatToken(baseBalance, marketInfo && marketInfo.baseAsset?.symbol)} {marketInfo && marketInfo.baseAsset?.symbol}
+      </Text>
+    );
+
+    let buttonText, feeAmount, buttonType, approveNeeded = false;
     if (this.props.side === "b") {
-      buySellBtnClass = "bg_btn buy_btn";
+      buttonType = "BUY";
       if (quoteAmount > quoteAllowance)  {
-        buttonText = `Approve ${quoteSymbol}`;
+        buttonText = `Approve ${(marketInfo && marketInfo.quoteAsset?.symbol)}`;
         approveNeeded = true;
       } else {
-        buttonText = `BUY ${baseSymbol}`;
+        buttonText = `BUY ${(marketInfo && marketInfo.baseAsset?.symbol)}`;
       }
+      feeAmount = (
+        <FormHeader>
+          <InfoWrapper>
+            <Text font="primaryTiny" color="foregroundMediumEmphasis">
+              Buy Fee
+            </Text>
+            <QuestionHelper text={this.showLabel()} />
+          </InfoWrapper>
+          <Text
+            font="primaryExtraSmallSemiBold"
+            color="foregroundMediumEmphasis"
+          >
+            {marketInfo &&
+              marketInfo.quoteFee &&
+              formatToken(Number(marketInfo.quoteFee), marketInfo && marketInfo.quoteAsset.symbol)}{" "}
+            {marketInfo && marketInfo.quoteAsset.symbol}
+          </Text>
+        </FormHeader>
+      );
     } else if (this.props.side === "s") {
-      buySellBtnClass = "bg_btn sell_btn";
+      buttonType = "SELL";
       if (baseAmount > baseAllowance)  {
-        buttonText = `Approve ${baseSymbol}`;
+        buttonText = `Approve ${marketInfo && marketInfo.baseAsset?.symbol}`;
         approveNeeded = true;
       } else {
-        buttonText = `SELL ${baseSymbol}`;
+        buttonText = `SELL ${marketInfo && marketInfo.baseAsset?.symbol}`;
       }
+      feeAmount = (
+        <FormHeader>
+          <InfoWrapper>
+            <Text font="primaryTiny" color="foregroundMediumEmphasis">
+              Sell Fee
+            </Text>
+            <QuestionHelper text={this.showLabel()} />
+          </InfoWrapper>
+          <Text
+            font="primaryExtraSmallSemiBold"
+            color="foregroundMediumEmphasis"
+          >
+            {marketInfo &&
+              marketInfo.baseFee &&
+              formatToken(Number(marketInfo.baseFee), marketInfo && marketInfo.baseAsset.symbol)}{" "}
+            {marketInfo && marketInfo.baseAsset.symbol}
+          </Text>
+        </FormHeader>
+      );
     }
 
     return (
       <>
-        <form className="spot_form">
-          <div className="spf_head">
-            <span>Available balance</span>
-            {balanceHtml}
-          </div>
-
-          <div className="spf_input_box">
-            <span className="spf_desc_text">Price</span>
-            <input
-              type="text"
-              value={
-                this.state.userHasEditedPrice ? this.state.price : this.currentPrice()
-              }
-              onChange={this.updatePrice.bind(this)}
-              disabled={this.priceIsDisabled()}
-            />
-            <span className={this.priceIsDisabled() ? "text-disabled" : ""}>
-              {quoteSymbol}
-            </span>
-          </div>
-          <div className="spf_input_box">
-            <span className="spf_desc_text">Amount</span>
-            <input
-              type="text"
-              value={this.state.baseAmount || 0.00}
-              placeholder="0.00"
-              onChange={this.updateAmount.bind(this)}
-            />
-            <span>{baseSymbol}</span>
-          </div>
-          <div className="spf_range">
-            <RangeSlider
-              value={this.amountPercentOfMax()}
-              onChange={this.rangeSliderHandler.bind(this)}
-            />
-          </div>
+      <StyledForm isMobile={isMobile}>
+        <InputBox>
+          <IconButton
+            variant="secondary"
+            startIcon={<MinusIcon />}
+            disabled={this.priceIsDisabled()}
+            onClick={this.decreasePrice.bind(this)}
+          ></IconButton>
+          <InputField
+            type="text"
+            pattern="\d+(?:[.,]\d+)?"
+            placeholder={`Price (${
+              marketInfo && marketInfo.quoteAsset?.symbol
+            })`}
+            value={
+              this.state.userHasEditedPrice
+                ? this.state.price
+                : this.currentPrice()
+            }
+            onChange={this.updatePrice.bind(this)}
+            disabled={this.priceIsDisabled()}
+          />
+          <IconButton
+            variant="secondary"
+            startIcon={<PlusIcon />}
+            disabled={this.priceIsDisabled()}
+            onClick={this.increasePrice.bind(this)}
+          ></IconButton>
+        </InputBox>
+        <InputBox>
+          <IconButton
+            variant="secondary"
+            startIcon={<MinusIcon />}
+            onClick={this.decreaseAmount.bind(this)}
+          ></IconButton>
+          <InputField
+            type="text"
+            pattern="\d+(?:[.,]\d+)?"
+            placeholder={`Amount (${
+              marketInfo && marketInfo.baseAsset?.symbol
+            })`}
+            value={this.state.baseAmount}
+            onChange={this.updateAmount.bind(this)}
+          />
+          <IconButton
+            variant="secondary"
+            startIcon={<PlusIcon />}
+            onClick={this.increaseAmount.bind(this)}
+          ></IconButton>
+        </InputBox>
+        <RangeWrapper>
+          <RangeSlider
+            value={this.amountPercentOfMax()}
+            onChange={this.rangeSliderHandler.bind(this)}
+          />
+        </RangeWrapper>
+        <FormHeader>
+          <Text font="primaryTiny" color="foregroundMediumEmphasis">
+            {marketInfo && marketInfo.quoteAsset?.symbol} balance
+          </Text>
+          {balance1Html}
+        </FormHeader>
+        <FormHeader>
+          <Text font="primaryTiny" color="foregroundMediumEmphasis">
+            {marketInfo && marketInfo.baseAsset?.symbol} balance
+          </Text>
+          {balance2Html}
+        </FormHeader>
+        <InputBox>
+          <InputField
+            type="text"
+            pattern="\d+(?:[.,]\d+)?"
+            placeholder={`Total (${
+              marketInfo && marketInfo.quoteAsset?.symbol
+            })`}
+            value={this.state.totalAmount}
+            onChange={this.updateTotalAmount.bind(this)}
+          />
+        </InputBox>
+          {feeAmount}
           {this.props.user.id ? (
             <div className="">
-              <div className="spf_head">
-                <span>Total</span>
-                <strong>
-                  <>
-                    {(this.currentPrice() * this.state.baseAmount).toPrecision(6)}{" "}
-                    {quoteSymbol}
-                  </>
-                </strong>
-              </div>
-              <div className="spf_btn">
-                <button
-                  type="button"
-                  className={buySellBtnClass}
-                  onClick={approveNeeded ? this.approveHandler.bind(this) : this.buySellHandler.bind(this)}
-                  disabled={this.state.orderButtonDisabled}
-                >
-                  {buttonText}
-                </button>
-              </div>
+              <Button
+                variant={buttonType.toLowerCase()}
+                width="100%"
+                scale="imd"
+                disabled={this.state.orderButtonDisabled}
+                onClick={approveNeeded ? this.approveHandler.bind(this) : this.buySellHandler.bind(this)}
+              >
+                {buttonText}
+              </Button>
             </div>
           ) : (
-            <div className="spf_btn">
-              <ConnectWalletButton />
-            </div>
+            <ConnectWalletButton />
           )}
-        </form>
+        </StyledForm>
       </>
     );
   }
 }
+
+const StyledForm = styled.form`
+  display: grid;
+  grid-auto-flow: row;
+  align-items: center;
+  gap: ${({ isMobile }) => (isMobile ? "11px" : "5px")};
+  padding: ${({ isMobile }) =>
+    isMobile ? "0px 5px 8px 5px" : "0px 20px 20px 20px"};
+`;
+
+const FormHeader = styled.div`
+  width: 100%;
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  justify-content: space-between;
+`;
+
+const InfoWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+`;
+
+const InputBox = styled.div`
+  margin-top: 10px;
+  width: 100%;
+  height: 35px;
+  border-radius: 8px;
+  padding: 0 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: ${({ theme }) => theme.colors.foreground200};
+  border: 1px solid ${({ theme }) => theme.colors.foreground300};
+
+  div {
+    div {
+      input {
+        text-align: center;
+        background: transparent;
+        border: unset;
+        text-shadow: 0px 1px 4px rgba(0, 0, 0, 0.1);
+
+        &::placeholder {
+          color: ${({ theme }) => theme.colors.foregroundMediumEmphasis};
+        }
+        &:disabled {
+          color: ${({ theme }) => theme.colors.foregroundDisabled};
+        }
+        &:focus:not(:disabled) {
+          background: transparent;
+          border: unset;
+        }
+        &:hover {
+          background: transparent;
+          border: unset;
+        }
+      }
+    }
+  }
+`;
+
+const RangeWrapper = styled.div`
+  width: 98%;
+  padding-left: 10px;
+
+  .custom_range {
+    &::before {
+      border: 2px solid ${({ theme }) => theme.colors.foregroundLowEmphasis} !important;
+      background-color: ${({ theme }) =>
+        theme.colors.backgroundMediumEmphasis} !important;
+    }
+
+    &::before {
+      width: 10px !important;
+      height: 10px !important;
+    }
+  }
+
+  .MuiSlider-rail {
+    top: 50%;
+    height: 6px;
+    transform: translateY(-50%);
+    background-color: ${({ theme }) =>
+      theme.colors.foregroundLowEmphasis} !important;
+  }
+
+  .MuiSlider-track {
+    top: 50%;
+    height: 6px;
+    transform: translateY(-50%);
+  }
+
+  .MuiSlider-thumb {
+    top: 50%;
+    margin: 0 !important;
+    padding: 10px !important;
+    transform: translate(-50%, -50%);
+  }
+`;
+
+const IconButton = styled(BaseIcon)`
+  width: 24px;
+  height: 24px;
+  background-color: ${({ theme }) => theme.colors.foreground300};
+  border-radius: 4px;
+  padding: 0px !important;
+  svg {
+    margin-right: 0px !important;
+    margin-left: 0px !important;
+  }
+`;

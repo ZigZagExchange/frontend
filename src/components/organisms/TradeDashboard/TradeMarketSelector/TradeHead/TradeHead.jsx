@@ -7,15 +7,13 @@ import TradeRatesCard from "../TradeRatesCard/TradeRatesCard";
 
 const TradeHead = (props) => {
   return (
-    <>
-      <div className="tl_head">
-        <TradeRatesCard
-          marketSummary={props.marketSummary}
-          currentMarket={props.currentMarket}
-          marketInfo={props.marketInfo}
-        />
-      </div>
-    </>
+    <TradeRatesCard
+      updateMarketChain={props.updateMarketChain}
+      marketSummary={props.marketSummary}
+      currentMarket={props.currentMarket}
+      marketInfo={props.marketInfo}
+      rowData={props.rowData}
+    />
   );
 };
 

@@ -1,23 +1,27 @@
 import React from "react";
 import { ToastContainer } from "react-toastify";
-import { ThemeProvider } from "@xstyled/styled-components";
 import { PersistGate } from "redux-persist/integration/react";
 import { Provider as ReduxProvider } from "react-redux";
-import theme from "lib/theme";
 import store, { persistor } from "lib/store";
+// import ThemeProvider from 'lib/ThemeProvider';
+import { ThemeContextProvider } from "components/contexts/ThemeContext";
+import { GlobalStyle } from "../global_style";
+import ModalContext from "components/contexts/ModalContext";
 
 import "react-toastify/dist/ReactToastify.css";
 
 function Provider({ children }) {
+  const isMobile = window.innerWidth < 500;
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeContextProvider>
+      <GlobalStyle />
       <PersistGate loading={null} persistor={persistor}>
         <ReduxProvider store={store}>
-          {children}
-          <ToastContainer position="bottom-right" theme="colored" />
+          <ModalContext>{children}</ModalContext>
+          <ToastContainer position="bottom-right" theme="colored" style={{width: isMobile ? '100%' : '400px'}} />
         </ReduxProvider>
       </PersistGate>
-    </ThemeProvider>
+    </ThemeContextProvider>
   );
 }
 

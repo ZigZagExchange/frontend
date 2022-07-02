@@ -8,9 +8,7 @@ export const BaseInputStyle = {
   },
   outline: { focus: "none" },
   background: "none",
-  color: "white",
-  borderRadius: 4,
-  fontSize: 18,
+  color: "white"
 };
 
 export default BaseInputStyle;
