@@ -23,11 +23,8 @@ import {
   DeleteIcon,
   MenuIcon,
 } from "components/atoms/Svg";
-import { toNumber } from "lodash";
 import ToggleTheme from "components/molecules/Toggle/ToggleTheme";
 import useTheme from "components/hooks/useTheme";
-import { formatAmount } from "../../../lib/utils";
-import { SwapVerticalCircleSharp } from "@material-ui/icons";
 
 const langList = [
   { text: "EN", url: "#" },

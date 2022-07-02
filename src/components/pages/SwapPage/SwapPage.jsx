@@ -3,10 +3,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import useTheme from "components/hooks/useTheme";
 import api from "lib/api";
-import { Link } from "react-router-dom";
+
 import { DefaultTemplate } from "components";
-import { ExternalLinkIcon, InfoIcon } from "components/atoms/Svg";
-import NetworkSelection from "components/organisms/NetworkSelection";
 import SwapContianer from "./SwapContainer";
 
 import classNames from "classnames";

@@ -155,8 +155,12 @@ html {
   appearance: none;
 }
 
+.Toastify__toast {
+  padding: 0px;
+}
+
 .Toastify__toast-container{
-  width: 400px;
+  min-width: 350px;
 }
 
 .Toastify__toast-theme--colored.Toastify__toast--info {
@@ -165,6 +169,7 @@ html {
   box-shadow: 0px 8px 16px rgba(1, 1, 1, 0.5);
   backdrop-filter: blur(16px);
   border-radius: 8px;
+  padding:8px;
 }
 
 .Toastify__toast-theme--colored.Toastify__toast--success {
@@ -173,6 +178,7 @@ html {
   box-shadow: 0px 8px 16px rgba(1, 1, 1, 0.5);
   backdrop-filter: blur(16px);
   border-radius: 8px;
+  padding: 8px;
 }
 
 .Toastify__toast-theme--colored.Toastify__toast--error {
@@ -181,13 +187,27 @@ html {
   box-shadow: 0px 8px 16px rgba(1, 1, 1, 0.5);
   backdrop-filter: blur(16px);
   border-radius: 8px;
+  padding: 8px;
 }
 
 .Toastify__toast-theme--colored.Toastify__toast--warning {
-  background: rgba(252, 201, 88, 0.72);
+  background-color: transparent;
+  border-radius: 8px;
+  padding: 0px;
+  box-shadow: 0px 8px 16px rgba(1, 1, 1, 0.5);
+  backdrop-filter: blur(16px);
+}
+
+.Toastify__toast-theme--colored.Toastify__toast--default {
+  /* background-color: #2B2E4A;
   border: 1px solid rgba(255, 255, 255, 0.13);
   box-shadow: 0px 8px 16px rgba(1, 1, 1, 0.5);
   backdrop-filter: blur(16px);
+  
+  padding: 10px; */
+  /* width: 500px; */
+  background-color: transparent;
   border-radius: 8px;
+  padding: 0px;
 }
 

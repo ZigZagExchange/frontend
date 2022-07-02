@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
+
 import "./OrdersTable.css";
 import { useCoinEstimator } from "components";
 import styled from "styled-components";
 import loadingGif from "assets/icons/loading.svg";
+
+import FillCard from "./FillCard";
 import {
   balancesSelector,
   networkSelector,
@@ -14,6 +17,7 @@ import api from "lib/api";
 import { formatDate, formatDateTime, formatToken } from "lib/utils";
 import { Tab } from "components/molecules/TabMenu";
 import Text from "components/atoms/Text/Text";
+
 import {
   SortUpIcon,
   SortDownIcon,
@@ -243,6 +247,20 @@ export default function OrdersTable(props) {
     } catch (e) {
       toast.error(e.message);
     }
+  };
+
+  const onClickTradeId = (fill) => {
+    toast.warning(
+      ({ closeToast }) => <FillCard closeToast={closeToast} fill={fill} />,
+      {
+        className: "fillToastCard",
+        bodyClassName: "!p-0",
+        closeOnClick: false,
+        autoClose: false,
+        icon: false,
+        closeButton: false,
+      }
+    );
   };
 
   const renderOrderTable = (orders) => {
@@ -971,9 +989,28 @@ export default function OrdersTable(props) {
                           color="foregroundHighEmphasis"
                           textAlign="right"
                         >
-                          {baseQuantity.toPrecision(6) / 1}{" "}
-                          {baseCurrency}
+                          {baseQuantity.toPrecision(6) / 1} {baseCurrency}
                         </Text>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <Text
+                          font="primaryExtraSmallSemiBold"
+                          color="foregroundLowEmphasis"
+                        >
+                          Trade ID
+                        </Text>
+                      </td>
+                      <td>
+                        <ActionWrapper
+                          font="primaryExtraSmallSemiBold"
+                          color="primaryHighEmphasis"
+                          textAlign="right"
+                          onClick={() => onClickTradeId(fill)}
+                        >
+                          #{fillid}
+                        </ActionWrapper>
                       </td>
                     </tr>
                     <tr>
@@ -1254,8 +1291,7 @@ export default function OrdersTable(props) {
                     font="primaryExtraSmallSemiBold"
                     color="foregroundHighEmphasis"
                   >
-                    {baseQuantity.toPrecision(6) / 1}{" "}
-                    {baseCurrency}
+                    {baseQuantity.toPrecision(6) / 1} {baseCurrency}
                   </Text>
                 </td>
                 <td data-label="Fee">
@@ -1280,12 +1316,12 @@ export default function OrdersTable(props) {
                   </Text>
                 </td>
                 <td data-label="TradeID">
-                  <Text
-                    font="primaryExtraSmallSemiBold"
-                    color="foregroundHighEmphasis"
+                  <button
+                    className="text-xs font-semibold text-primary-900 hover:underline hover:underline-offset-1 font-work"
+                    onClick={() => onClickTradeId(fill)}
                   >
-                    &nbsp;
-                  </Text>
+                    #{fillid}
+                  </button>
                 </td>
                 <td data-label="Action">
                   {txhash ? (
