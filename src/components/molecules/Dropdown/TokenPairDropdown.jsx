@@ -13,6 +13,8 @@ import {
     removeFavourite,
     fetchFavourites,
 } from "lib/helpers/storage/favourites";
+import _ from "lodash"
+import { useMemo } from "react";
 
 const ButtonWrapper = styled.div`
   display: grid;
@@ -218,6 +220,8 @@ const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, upda
     const isMobile = window.innerWidth < 500
     const wrapperRef = useRef(null)
     const [_marketInfo, setMarketInfo] = useState(null);
+    const [_rowData, setRowData] = useState([]);
+    const [isIncrease, setIsIncrease] = useState([]);
 
     HideMenuOnOutsideClicked(wrapperRef, setIsOpened)
 
@@ -260,16 +264,30 @@ const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, upda
         setChangeDirection(false)
     }
 
+    useMemo(()=>{
+        const tmp = [];
+        _.map(rowData, (each, i) => {
+            if(each.td2 > _rowData[i]?.td2)
+                tmp.push({td1: each.td1, increase: true})
+            else if(each.td2 < _rowData[i]?.td2)
+                tmp.push({td1: each.td1, increase: false})
+            else 
+                tmp.push({td1: each.td1, increase: isIncrease[i]?.increase})
+        });
+        setIsIncrease(tmp);
+        setRowData(rowData);
+    }, [rowData])
+
     useEffect(() => {
         if (
             categorySelected !== 4 &&
             pairsByCategory.length === 0 &&
-            rowData.length !== 0
+            _rowData.length !== 0
         ) {
-            setPairs(rowData.map((r) => r.td1));
-            setPairsByCategory(rowData.map((r) => r.td1));
+            setPairs(_rowData.map((r) => r.td1));
+            setPairsByCategory(_rowData.map((r) => r.td1));
         }
-    }, [rowData])
+    }, [_rowData])
 
     useEffect(() => {
         if(
@@ -297,11 +315,11 @@ const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, upda
 
         switch (category_index) {
             case 0:
-                setPairsByCategory(rowData.map((row) => row.td1))
-                setPairs(rowData.map((row) => row.td1))
+                setPairsByCategory(_rowData.map((row) => row.td1))
+                setPairs(_rowData.map((row) => row.td1))
                 break;
             case 1:
-                const eth = rowData
+                const eth = _rowData
                     .filter((item) => {
                         if (
                             item.td1.toLowerCase().includes("ETH".toLowerCase())
@@ -315,7 +333,7 @@ const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, upda
                 setPairs(eth)
                 break;
             case 2:
-                const wbtc = rowData
+                const wbtc = _rowData
                     .filter((item) => {
                         if (
                             item.td1.toLowerCase().includes("WBTC".toLowerCase())
@@ -330,7 +348,7 @@ const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, upda
                 break;
             case 3:
                 //look for pairs against stables.
-                foundPairs = getStables(rowData);
+                foundPairs = getStables(_rowData);
                 setPairsByCategory(foundPairs)
                 setPairs(foundPairs)
                 break;
@@ -340,7 +358,7 @@ const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, upda
                 foundPairs = [];
 
                 favourites.forEach((value) => {
-                    rowData.forEach((row) => {
+                    _rowData.forEach((row) => {
                         const pair_name = row.td1;
 
                         //if found query, push it to found pairs
@@ -467,7 +485,7 @@ const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, upda
 
     const renderPairs = (pairs) => {
         const shown_pairs = pairs
-            .map((pair) => [pair, rowData.find((row) => row.td1 === pair)])
+            .map((pair) => [pair, _rowData.find((row) => row.td1 === pair)])
             .sort(([_, d], [__, d2]) => {
                 if (changeSorted) {
                     return changeDirection ? d.td3 - d2.td3 : d2.td3 - d.td3;
@@ -485,7 +503,7 @@ const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, upda
                 if (!d) return "";
                 const selected = currentMarket === pair; //if current market selected
                 const isFavourited = favourites.includes(pair); //if contains, isFavourited
-
+                const increaseObj = _.find(isIncrease, {td1: pair})
                 return (
                     <tr
                         key={i}
@@ -505,7 +523,7 @@ const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, upda
                             </PairWrapper>
                         </td>
                         <td style={{paddingLeft: '30px'}}>
-                            <Text font="tableContent" color={d.td3 < 0 ? 'dangerHighEmphasis' : 'successHighEmphasis'} align="right">{d.td2}</Text>
+                            <Text font="tableContent" color={increaseObj.increase === false ? 'dangerHighEmphasis' : 'successHighEmphasis'} align="right">{d.td2}</Text>
                         </td>
                         <td>
                             <Text font="tableContent" color='foregroundHighEmphasis' align="right">{d.usdVolume.toLocaleString("en-US", {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Text>
