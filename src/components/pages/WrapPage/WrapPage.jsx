@@ -149,6 +149,7 @@ export default function WrapPage() {
       setOrderButtonDisabled(false);
     }
     await api.getBalances();
+    setAmount(0)
     toast.dismiss(orderPendingToast);
   };
 
