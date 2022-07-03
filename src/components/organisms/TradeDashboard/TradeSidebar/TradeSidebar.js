@@ -20,6 +20,8 @@ const StyledTradeSidebar = styled.aside`
   border: 1px solid ${({ theme }) => theme.colors.foreground300};
   background: ${({ theme }) => theme.colors.backgroundMediumEmphasis};
   overflow-y: auto;
+  scrollbar-color: ${({ theme }) => theme.colors.foreground400} rgba(0,0,0,0.1);
+  scrollbar-width: thin !important;
 
   ::-webkit-scrollbar {
     width: 5px;

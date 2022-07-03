@@ -13,7 +13,9 @@ const Table = styled.table`
   padding: 0px;
   // height: 175px;
   flex-direction: column;
-
+  scrollbar-color: ${({ theme }) => theme.colors.foreground400} rgba(0,0,0,0.1);
+  scrollbar-width: thin !important;
+  
   &:not(.no-space) {
     justify-content: space-between;
   }
