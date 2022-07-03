@@ -234,7 +234,6 @@ export class SpotForm extends React.Component {
       const side = order[3];
       const price = order[4];
       const remaining = isNaN(Number(order[10])) ? order[5] : order[10];
-      const remainingQuote = remaining * price;
       const orderStatus = order[9];
 
       const orderEntry = [
@@ -261,8 +260,8 @@ export class SpotForm extends React.Component {
         }
       }
     } else if (side === "s" && orderbookBids) {
-      for (let i = 0; i < orderbookBids.length; i++) {
-        if (orderbookBids[i][1] >= unfilled || i === orderbookBids.length - 1) {
+      for (let i = orderbookBids.length - 1; i >= 0; i--) {
+        if (orderbookBids[i][1] >= unfilled ||  i === 0) {
           price = orderbookBids[i][0];
           break;
         } else {
