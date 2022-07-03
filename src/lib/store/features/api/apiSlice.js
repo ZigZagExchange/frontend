@@ -46,6 +46,8 @@ export const apiSlice = createSlice({
       marketInfo: " ",
       xToken: 0,
       yToken: 0,
+      userPrice: 0,
+      pairPrice: 0,
     },
   },
   reducers: {
@@ -550,6 +552,12 @@ export const apiSlice = createSlice({
         yToken: payload.yToken
           ? payload.yToken
           : state.highSlippageModal.yToken,
+        userPrice: payload.userPrice
+          ? payload.userPrice
+          : state.highSlippageModal.userPrice,
+        pairPrice: payload.pairPrice
+          ? payload.pairPrice
+          : state.highSlippageModal.pairPrice,
       };
     },
     setUISettings(state, { payload }) {

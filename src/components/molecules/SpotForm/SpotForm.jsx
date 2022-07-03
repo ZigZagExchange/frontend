@@ -278,6 +278,8 @@ class SpotForm extends React.Component {
     this.props.setHighSlippageModal({
       xToken: baseAmount,
       yToken: baseAmount * price,
+      userPrice: price,
+      pairPrice: this.props.lastPrice,
     });
 
     if (this.props.activeOrderCount > 0 && api.isZksyncChain()) {
@@ -689,7 +691,8 @@ class SpotForm extends React.Component {
         color="foregroundMediumEmphasis"
         textAlign="right"
       >
-        {formatToken(baseBalance, marketInfo && marketInfo.baseAsset?.symbol)} {marketInfo && marketInfo.baseAsset?.symbol}
+        {formatToken(baseBalance, marketInfo && marketInfo.baseAsset?.symbol)}{" "}
+        {marketInfo && marketInfo.baseAsset?.symbol}
       </Text>
     );
 
@@ -712,7 +715,10 @@ class SpotForm extends React.Component {
           >
             {marketInfo &&
               marketInfo.quoteFee &&
-              formatToken(Number(marketInfo.quoteFee), marketInfo && marketInfo.quoteAsset.symbol)}{" "}
+              formatToken(
+                Number(marketInfo.quoteFee),
+                marketInfo && marketInfo.quoteAsset.symbol
+              )}{" "}
             {marketInfo && marketInfo.quoteAsset.symbol}
           </Text>
         </FormHeader>
@@ -735,7 +741,10 @@ class SpotForm extends React.Component {
           >
             {marketInfo &&
               marketInfo.baseFee &&
-              formatToken(Number(marketInfo.baseFee), marketInfo && marketInfo.baseAsset.symbol)}{" "}
+              formatToken(
+                Number(marketInfo.baseFee),
+                marketInfo && marketInfo.baseAsset.symbol
+              )}{" "}
             {marketInfo && marketInfo.baseAsset.symbol}
           </Text>
         </FormHeader>
