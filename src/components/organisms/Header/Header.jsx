@@ -196,6 +196,7 @@ export const Header = (props) => {
   const user = useSelector(userSelector);
   const network = useSelector(networkSelector);
   const hasBridge = api.isImplemented("depositL2");
+  const isEVM = api.isEVMChain();
   const history = useHistory();
   const [index, setIndex] = useState(0);
   const [language, setLanguage] = useState(langList[0].text);
@@ -243,6 +244,9 @@ export const Header = (props) => {
         break;
       case "/dsl":
         setIndex(5);
+        break;
+      case "/wrap":
+        setIndex(6);
         break;
       default:
         setIndex(0);
@@ -295,6 +299,10 @@ export const Header = (props) => {
         setIndex(newIndex);
         localStorage.setItem("tab_index", newIndex);
         history.push("/dsl");
+      case 6:
+        setIndex(newIndex);
+        localStorage.setItem("tab_index", newIndex);
+        history.push("/wrap");
         break;
       default:
         break;
@@ -348,9 +356,7 @@ export const Header = (props) => {
                 DOCS
                 <ExternalLinkIcon size={12} />
               </Tab>
-              {/* {hasBridge && <Tab>DSL</Tab>} */}
-
-              {/* {hasBridge && <Tab>Old BRIDGE</Tab>} */}
+              {isEVM && <Tab>WRAP</Tab>}
             </TabMenu>
           </NavWrapper>
           <ActionsWrapper>
@@ -432,7 +438,7 @@ export const Header = (props) => {
               DOCS
               <ExternalLinkIcon size={12} />
             </Tab>
-            {/* {hasBridge && <Tab>DSL</Tab>} */}
+              {isEVM && <Tab>WRAP</Tab>}
           </TabMenu>
           <HorizontalDivider />
           {/* <ActionSideMenuWrapper>

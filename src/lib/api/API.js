@@ -909,6 +909,10 @@ export default class API extends Emitter {
     return this.apiProvider.unWarpETH(amountBN);
   }
 
+  getWrapFees = async () => {
+    return this.apiProvider.getWrapFees();
+  }
+
   uploadArweaveFile = async (sender, timestamp, signature, file) => {
     const formData = new FormData();
     formData.append("sender", sender);
@@ -1087,7 +1091,7 @@ export default class API extends Emitter {
     return [...tickers];
   };
 
-  getExplorerTxLink(chainId, txhash) {
+  getExplorerTxLink = (chainId, txhash) => {
     switch (Number(chainId)) {
       case 1: return 'https://zkscan.io/explorer/transactions/' + txhash;
       case 1000: return 'https://rinkeby.zkscan.io/explorer/transactions/' + txhash;
@@ -1096,7 +1100,7 @@ export default class API extends Emitter {
     }
   }
 
-  getExplorerAccountLink(chainId, address) {
+  getExplorerAccountLink = (chainId, address) => {
     switch (Number(chainId)) {
       case 1: return 'https://zkscan.io/explorer/accounts/' + address;
       case 1000: return 'https://rinkeby.zkscan.io/explorer/accounts/' + address;
