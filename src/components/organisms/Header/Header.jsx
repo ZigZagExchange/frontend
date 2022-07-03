@@ -12,6 +12,8 @@ import {
 } from "lib/store/features/api/apiSlice";
 import api from "lib/api";
 import logo from "assets/images/logo.png";
+import zksyncLogo from "assets/images/networks/zksync-network.svg";
+import arbitrumLogo from "assets/images/networks/arbitrum-network.svg";
 import { TabMenu, Tab } from "components/molecules/TabMenu";
 import { Dropdown, AccountDropdown } from "components/molecules/Dropdown";
 import { ConnectWalletButton } from "components/molecules/Button";
@@ -32,12 +34,25 @@ const langList = [
 ];
 
 const networkLists = [
-  { text: "zkSync - Mainnet", value: 1, url: "#", selectedIcon: <CheckIcon /> },
+  { text: "zkSync - Mainnet",
+    value: 1,
+    url: "#",
+    selectedIcon: <CheckIcon />,
+    image: zksyncLogo,
+  },
   {
     text: "zkSync - Rinkeby",
     value: 1000,
     url: "#",
     selectedIcon: <CheckIcon />,
+    image: zksyncLogo,
+  },
+  {
+    text: "Arbitrum (soon)",
+    value: null,
+    url: "",
+    selectedIcon: <CheckIcon />,
+    image: arbitrumLogo,
   },
 ];
 
