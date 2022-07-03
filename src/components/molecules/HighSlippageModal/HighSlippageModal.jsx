@@ -24,7 +24,7 @@ const ModalWrapper = styled(Dialog)`
   }
 
   .MuiPaper-root {
-    width: 418px;
+    width: 550px;
     max-width: 100%;
     padding: 19px 20px 25px;
     margin: 2rem 1rem;
@@ -142,12 +142,12 @@ const FormDialog = () => {
             color="foregroundHighEmphasis"
             style={{ marginTop: "28px", display: "block", lineHeight: "25px" }}
           >
-            You are placing a {getCapitalize(highSlippageModal.type)} Order for
-            <br /> {highSlippageModal.xToken} {baseToken} @{" "}
-            {highSlippageModal.yToken} {quoteToken} <br /> which is{" "}
+            You are placing a {getCapitalize(highSlippageModal.type)} Order for<br />
+            {highSlippageModal.xToken} {baseToken} @{" "}
+            {highSlippageModal.yToken} {quoteToken}<br />which is{" "}
             {highSlippageModal.delta.toFixed(2)}% ({highSlippageModal.userPrice}{" "}
             {quoteToken}){" "}
-            {highSlippageModal.type === "sell" ? "under" : "above"} the current
+            {highSlippageModal.type === "sell" ? "under" : "above"}<br />the current
             market price ({highSlippageModal.pairPrice} {quoteToken}).
           </Text>
           <Text
