@@ -31,7 +31,7 @@ const SwapContianer = ({
         <p className="text-sm font-normal ">
           Available Balance:{" "}
           {balances[fromToken?.name]
-            ? balances[fromToken?.name].valueReadable.toPrecision(8)
+            ? Number(balances[fromToken?.name].valueReadable).toPrecision(8)
             : "0.00"}
           {` ${fromToken?.name}`}
         </p>
