@@ -1,11 +1,14 @@
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
+import styled from "styled-components";
 import "./SpotBox.css";
 // assets
-import { SpotForm, Tabs, Tooltip } from "components";
-import { HiExternalLink } from "react-icons/hi";
-import { x } from "@xstyled/styled-components";
-import { AiOutlineQuestionCircle } from "react-icons/all";
-import ExternalLink from "../../../../pages/ListPairPage/ExternalLink";
+import { SpotForm } from "components";
+import { ToggleButton } from "components/molecules/Toggle";
+import { IconButton as baseIcon } from "components/molecules/IconButton";
+import { CalculatorIcon } from "components/atoms/Svg";
+import { TabMenu, Tab } from "components/molecules/TabMenu";
+import { settingsSelector } from "lib/store/features/api/apiSlice";
 
 const SpotBox = ({
   marketInfo,
@@ -15,141 +18,118 @@ const SpotBox = ({
   activeOrderCount,
   liquidity,
   marketSummary,
-  orderbookAsks,
-  orderbookBids,
+  allOrders,
   balances
 }) => {
+  const [selectedLayer, setSelectedLayer] = useState(1);
+  const [index, setIndex] = useState(1);
   const [orderType, updateOrderType] = useState("market");
-  const orderTypeTabClassName = (o) =>
-    orderType === o ? "trade_price_active_tab" : "";
+
+  const toggleClick = (num) => setSelectedLayer(num);
+  const settings = useSelector(settingsSelector);
+  const handleTabClick = (newIndex) => {
+    setIndex(newIndex);
+    if (newIndex === 0) updateOrderType("limit");
+    else updateOrderType("market");
+  };
+
+  const BuyForm = (
+    <SpotForm
+      side="b"
+      lastPrice={lastPrice}
+      user={user}
+      currentMarket={currentMarket}
+      orderType={orderType}
+      activeOrderCount={activeOrderCount}
+      liquidity={liquidity}
+      marketInfo={marketInfo}
+      marketSummary={marketSummary}
+      settings={settings}
+      allOrders={allOrders}
+      balances={balances}
+    />
+  );
+
+  const SellForm = (
+    <SpotForm
+      side="s"
+      lastPrice={lastPrice}
+      user={user}
+      currentMarket={currentMarket}
+      orderType={orderType}
+      activeOrderCount={activeOrderCount}
+      liquidity={liquidity}
+      marketInfo={marketInfo}
+      marketSummary={marketSummary}
+      settings={settings}
+      allOrders={allOrders}
+      balances={balances}
+    />
+  );
+
+  const renderSpotForm = () => {
+    return selectedLayer === 1 ? BuyForm : SellForm;
+  };
+  const isMobile = window.innerWidth < 992;
 
   return (
-    <>
-      <div className="spot_box">
-        <div className="spot_head">
-          <div className="sh_l">
-            <h2 className="title">SPOT</h2>
-            <div className="spot_tabs">
-              <div className="st_l">
-                <h2
-                  className={orderTypeTabClassName("limit")}
-                  onClick={() => updateOrderType("limit")}
-                >
-                  Limit
-                </h2>
-                <h2
-                  className={orderTypeTabClassName("market")}
-                  onClick={() => updateOrderType("market")}
-                >
-                  Market
-                </h2>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="spot_bottom">
-          <Tabs className="spotOptions">
-            <div label="Buy">
-              <SpotForm
-                side="b"
-                lastPrice={lastPrice}
-                user={user}
-                orderbookAsks={orderbookAsks}
-                orderbookBids={orderbookBids}
-                balances={balances}
-                currentMarket={currentMarket}
-                orderType={orderType}
-                activeOrderCount={activeOrderCount}
-                liquidity={liquidity}
-                marketInfo={marketInfo}
-                marketSummary={marketSummary}
-              />
-              <x.div className="spf_head" mt={"5px"} mb={"10px"}>
-                <span>Buy Fee:</span>
-                <x.strong color={"#fff"}>
-                  {marketInfo && marketInfo.quoteFee &&
-                    Number(marketInfo.quoteFee).toPrecision(4)}{" "}
-                  {marketInfo && marketInfo.quoteAsset.symbol}
-                </x.strong>
-              </x.div>
-            </div>
-            <div label="Sell">
-              <SpotForm
-                side="s"
-                lastPrice={lastPrice}
-                user={user}
-                orderbookAsks={orderbookAsks}
-                orderbookBids={orderbookBids}
-                balances={balances}
-                currentMarket={currentMarket}
-                orderType={orderType}
-                activeOrderCount={activeOrderCount}
-                liquidity={liquidity}
-                marketInfo={marketInfo}
-                marketSummary={marketSummary}
-              />
-              <x.div className="spf_head" mt={"5px"} mb={"10px"}>
-                <span>Sell Fee</span>
-                <x.strong color={"#fff"}>
-                  {marketInfo && marketInfo.baseFee &&
-                    Number(marketInfo.baseFee).toPrecision(4)}{" "}
-                  {marketInfo && marketInfo.baseAsset.symbol}
-                </x.strong>
-              </x.div>
-            </div>
-          </Tabs>
-          <x.div mr={2} display={"flex"} alignItems={"center"}>
-            <Tooltip>
-              <Tooltip
-                placement={"left"}
-                label={
-                  marketInfo && marketInfo.zigzagChainId === 42161 ?
-                    <x.div>
-                      <x.div>
-                        Arbitrum's network swap fees are dynamic and sit around
-                        ~$1
-                      </x.div>
-                      <x.div>
-                        covered by the ZigZag operator, but paid by the taker
-                      </x.div>
-                    </x.div>
-                    :
-                    <x.div>
-                      <x.div>
-                        zkSync's network swap fees are dynamic and sit around
-                        ~$0.50
-                      </x.div>
-                      <x.div>
-                        covered by the market maker, but paid by the trader
-                      </x.div>
-                    </x.div>
-                }
-              >
-                <x.div
-                  display={"inline-flex"}
-                  color={"blue-gray-600"}
-                  alignItems={"center"}
-                >
-                  <AiOutlineQuestionCircle size={16} />
-                </x.div>
-              </Tooltip>
-            </Tooltip>
-            <x.div ml={"12px"} fontSize={"12px"}>
-              This fee covers {
-                marketInfo && marketInfo.zigzagChainId === 42161 
-                  ? "Arbitrum's "
-                  : "zkSync's "
-              }
-              <ExternalLink href={"https://l2fees.info"}>
-                swap fees<HiExternalLink />
-              </ExternalLink>
-            </x.div>
-          </x.div>
-        </div>
-      </div>
-    </>
+    <Wrapper isMobile={isMobile}>
+      <ToggleWrapper>
+        <StyledToggleButton
+          width={window.innerWidth < 600 ? 70 : 126}
+          leftLabel="BUY"
+          rightLabel="SELL"
+          selectedLayer={selectedLayer}
+          toggleClick={toggleClick}
+        />
+        {/* <IconButton variant="secondary" startIcon={<CalculatorIcon />}></IconButton> */}
+      </ToggleWrapper>
+      <StyledTabMenu left activeIndex={index} onItemClick={handleTabClick}>
+        <Tab>Limit</Tab>
+        <Tab>Market</Tab>
+      </StyledTabMenu>
+      <SpotFormWrapper>{lastPrice ? renderSpotForm() : ""}</SpotFormWrapper>
+    </Wrapper>
   );
 };
 
 export default SpotBox;
+
+const Wrapper = styled.div`
+  // display: grid;
+  grid-auto-flow: row;
+  background-color: ${({ theme }) => theme.colors.backgroundMediumEmphasis};
+  height: ${({ isMobile }) => (isMobile ? "457px" : "428px")};
+`;
+
+const ToggleWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px 0px;
+`;
+
+const StyledToggleButton = styled(ToggleButton)`
+  border: 1px solid ${({ theme }) => theme.colors.foreground400} !important;
+`;
+
+const IconButton = styled(baseIcon)`
+  width: 32px;
+  height: 32px;
+  background-color: ${({ theme }) => theme.colors.foreground300};
+  border-radius: 8px;
+  padding: 0px !important;
+  svg {
+    margin-right: 0px !important;
+    margin-left: 0px !important;
+  }
+`;
+
+const StyledTabMenu = styled(TabMenu)`
+  margin: 0px 20px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.foreground400};
+`;
+
+const SpotFormWrapper = styled.div``;

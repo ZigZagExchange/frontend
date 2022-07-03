@@ -7,6 +7,7 @@ import PoolPage from "components/pages/PoolPage/PoolPage";
 import ListPairPage from "components/pages/ListPairPage/ListPairPage";
 import { Dev } from "./lib/helpers/env";
 import DSLPage from "./components/pages/DSLPage/DSLPage";
+import WrapPage from "./components/pages/WrapPage/WrapPage";
 
 const AppRoutes = () => {
   return (
@@ -15,9 +16,10 @@ const AppRoutes = () => {
         <Switch>
           <Route exact path="/" component={TradePage} />
           <Route exact path="/bridge/:tab?" component={BridgePage} />
-          <Route exact path="/swap/:tab?" component={SwapPage} />
+          <Route exact path="/convert/:tab?" component={SwapPage} />
           <Route exact path="/pool" component={PoolPage} />
           <Route exact path="/list-pair" component={ListPairPage} />
+          <Route exact path="/wrap" component={WrapPage} />
           <Dev>
             <Route exact path="/dsl" component={DSLPage} />
           </Dev>
