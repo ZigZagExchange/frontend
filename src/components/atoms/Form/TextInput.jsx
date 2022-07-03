@@ -3,7 +3,7 @@ import styled from "styled-components";
 import Input from "./Input";
 
 const InputField = styled(Input)`
-  padding: 2px;
+  padding: 4px 2px;
   border: 1px solid;
   border-color: ${({theme}) => theme.colors.foreground300};
   &:focus {
