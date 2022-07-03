@@ -145,10 +145,10 @@ const FormDialog = () => {
             You are placing a {getCapitalize(highSlippageModal.type)} Order for
             <br /> {highSlippageModal.xToken} {baseToken} @{" "}
             {highSlippageModal.yToken} {quoteToken} <br /> which is{" "}
-            {highSlippageModal.delta.toFixed(2)}% ({" "}
-            {highSlippageModal.userPrice} {quoteToken} ){" "}
+            {highSlippageModal.delta.toFixed(2)}% ({highSlippageModal.userPrice}{" "}
+            {quoteToken}){" "}
             {highSlippageModal.type === "sell" ? "under" : "above"} the current
-            market price ( {highSlippageModal.pairPrice} {quoteToken} ).
+            market price ({highSlippageModal.pairPrice} {quoteToken}).
           </Text>
           <Text
             font="primaryHeading6"
