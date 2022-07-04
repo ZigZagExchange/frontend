@@ -42,7 +42,7 @@ const SwapContianer = ({
             tickers={fromTokenOptions}
             onSelectedOption={onChangeFromToken}
             selectedOption={fromToken}
-            label={"Select a token to Swap"}
+            label={"Select a token to Convert"}
           />
         )}
         <button
@@ -82,7 +82,7 @@ const SwapContianer = ({
             tickers={toTokenOptions}
             onSelectedOption={onChangeToToken}
             selectedOption={toToken}
-            label={"Select a token to Swap"}
+            label={"Select a token to Convert"}
           />
         )}
         <input
