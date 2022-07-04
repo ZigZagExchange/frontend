@@ -36,8 +36,8 @@ export default function WrapPage() {
   const [sellToken, setSellToken] = useState('ETH');
   const [buyToken, setBuyToken] = useState('WETH');
   const [fee, setFee] = useState({
-    'wrap': 0.0001,
-    'unwrap': 0.0001
+    'wrap': 0.0005,
+    'unwrap': 0.0005
   });
   const [orderButtonDisabled, setOrderButtonDisabled] = useState(false);
 
@@ -160,7 +160,7 @@ export default function WrapPage() {
     // for unwrap we dont have to leave dust or care about fees
     if (tType === 'wrap') {
       dust = 0.005;
-      fee = fee[tType];
+      fee = fee[tType] ? fee[tType] : 0.0005;
     }
     
     if (balance && dust && fee) {
