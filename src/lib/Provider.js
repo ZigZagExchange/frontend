@@ -1,5 +1,5 @@
 import React from "react";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import { PersistGate } from "redux-persist/integration/react";
 import { Provider as ReduxProvider } from "react-redux";
 import store, { persistor } from "lib/store";
@@ -18,7 +18,11 @@ function Provider({ children }) {
       <PersistGate loading={null} persistor={persistor}>
         <ReduxProvider store={store}>
           <ModalContext>{children}</ModalContext>
-          <ToastContainer position="bottom-right" theme="colored" style={{width: isMobile ? '100%' : '400px'}} />
+          <ToastContainer
+            position="bottom-right"
+            theme="colored"
+            style={{ width: isMobile ? "100%" : "400px" }}
+          />
         </ReduxProvider>
       </PersistGate>
     </ThemeContextProvider>
