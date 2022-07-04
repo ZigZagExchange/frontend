@@ -19,6 +19,7 @@ import {
   resetData,
   layoutSelector,
   settingsSelector,
+  marketSummarySelector,
 } from "lib/store/features/api/apiSlice";
 import { userSelector } from "lib/store/features/auth/authSlice";
 import api from "lib/api";
@@ -30,6 +31,7 @@ import {
 } from "../../pages/ListPairPage/SuccessModal";
 import TradesTable from "./TradeBooks/TradesTable";
 import { HighSlippageModal } from "components/molecules/HighSlippageModal";
+import _ from "lodash";
 
 const TradeContainer = styled.div`
   color: #aeaebf;
@@ -94,6 +96,7 @@ export function TradeDashboard() {
   const userFills = useSelector(userFillsSelector);
   const layout = useSelector(layoutSelector);
   const settings = useSelector(settingsSelector);
+  const marketSummary = useSelector(marketSummarySelector);
   const [fixedPoint, setFixedPoint] = useState(2);
   const [side, setSide] = useState("all");
   const dispatch = useDispatch();
@@ -104,6 +107,11 @@ export function TradeDashboard() {
   const updateMarketChain = (market) => {
     dispatch(setCurrentMarket(market));
   };
+
+  useEffect(()=>{
+    if(_.isEmpty(marketSummary)) return
+    document.title = `${marketSummary.price} | ${marketSummary.market??'--'} | ZigZag`;
+  }, [marketSummary])
 
   useEffect(() => {
     const urlParams = new URLSearchParams(search);
