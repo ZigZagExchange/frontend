@@ -163,7 +163,7 @@ export default function WrapPage() {
       fee = fee[tType] ? fee[tType] : 0.0005;
     }
     
-    if (balance && dust && fee) {
+    if (balance) {
       let s_amounts = balance - fee;
       if (s_amounts < 0) {
         toast.warn(
