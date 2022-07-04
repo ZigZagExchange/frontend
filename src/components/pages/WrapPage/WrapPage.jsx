@@ -42,7 +42,7 @@ export default function WrapPage() {
   const [orderButtonDisabled, setOrderButtonDisabled] = useState(false);
 
   const estimatedValueSell = amount * coinEstimator(sellToken) || 0;
-  const estimatedValueBuy = amount * coinEstimator(sellToken) || 0;
+  const estimatedValueBuy = amount * coinEstimator(buyToken) || 0;
 
   const zkBalances = useMemo(
     () => (balanceData[network] ? balanceData[network] : {}),
