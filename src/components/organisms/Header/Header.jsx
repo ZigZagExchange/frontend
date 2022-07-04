@@ -354,7 +354,7 @@ export const Header = (props) => {
           <ActionsWrapper>
             <VerticalDivider />
             <Dropdown
-              adClass="network-dropdown"
+              adClass="menu-dropdown"
               width={200}
               item={supportLists}
               context={'Support'}
@@ -362,7 +362,7 @@ export const Header = (props) => {
               transparent
             />
             <Dropdown
-              adClass="network-dropdown"
+              adClass="menu-dropdown"
               width={162}
               item={communityLists}
               context={'Community'}
@@ -468,7 +468,7 @@ export const Header = (props) => {
           </ActionSideMenuWrapper>
           <HorizontalDivider />
           <Dropdown
-            adClass="network-dropdown"
+            adClass="menu-dropdown"
             width={200}
             item={supportLists}
             context={'Support'}
@@ -476,7 +476,7 @@ export const Header = (props) => {
             transparent
           />
           <Dropdown
-            adClass="network-dropdown"
+            adClass="menu-dropdown"
             width={162}
             item={communityLists}
             context={'Community'}

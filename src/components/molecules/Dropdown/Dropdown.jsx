@@ -12,6 +12,19 @@ const DropdownWrapper = styled.div`
         position: static;
     }
 
+    &.menu-dropdown {
+        padding-top: 3px;
+        button > div {
+            text-transform: uppercase;
+            font-size: 12px !important;
+            line-height: 14px !important;
+            color: ${({ theme }) => `${theme.colors.foregroundMediumEmphasis} !important`};
+        }
+        svg path {
+            fill: ${({ theme }) => `${theme.colors.foregroundMediumEmphasis} !important`};
+        }
+    }
+
     &:hover {
         .button-title {
             color: ${({ theme }) => `${theme.colors.primaryHighEmphasis} !important`};
@@ -78,6 +91,12 @@ const DropdownListContainer = styled.div`
         width: 100%;
         padding: 8px 20px;
     }
+
+    &.menu-dropdown {
+        display: block;
+        width: 100%;
+        padding: 8px 20px;
+    }
 `
 
 const IconButton = styled(baseIcon)`
@@ -91,12 +110,16 @@ const IconButton = styled(baseIcon)`
         margin-left: 0px !important;
     }
 
-    &:not(.network-dropdown) {
+    &:not(.network-dropdown):not(.menu-dropdown) {
         border: 1px solid ${({ theme }) => theme.colors.foreground400};
     }
 
     &.network-dropdown path {
         fill: ${(p) => p.theme.colors.foregroundHighEmphasis};
+    }
+
+    &.menu-dropdown button svg path {
+        fill: ${(p) => p.theme.colors.foregroundMediumEmphasis};
     }
 `
 
