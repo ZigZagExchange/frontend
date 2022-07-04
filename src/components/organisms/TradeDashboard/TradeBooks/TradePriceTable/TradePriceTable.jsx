@@ -10,9 +10,8 @@ const Table = styled.table`
   display: flex;
   flex: auto;
   overflow: auto;
-  height: 200px;
   padding: 0px;
-  // height: 175px;
+  height: 200px;
   flex-direction: column;
 
   &:not(.no-space) {
