@@ -359,6 +359,7 @@ export const Header = (props) => {
               item={supportLists}
               context={'Support'}
               leftIcon={true}
+              transparent
             />
             <Dropdown
               adClass="network-dropdown"
@@ -366,6 +367,7 @@ export const Header = (props) => {
               item={communityLists}
               context={'Community'}
               leftIcon={true}
+              transparent
             />
             <SocialWrapper>
               <SocialLink
@@ -471,6 +473,7 @@ export const Header = (props) => {
             item={supportLists}
             context={'Support'}
             leftIcon={true}
+            transparent
           />
           <Dropdown
             adClass="network-dropdown"
@@ -478,6 +481,7 @@ export const Header = (props) => {
             item={communityLists}
             context={'Community'}
             leftIcon={true}
+            transparent
           />
           <SocialWrapper style={{ justifySelf: "center" }}>
             <SocialLink
