@@ -190,6 +190,7 @@ export default function OrdersBook(props) {
   let arrayLength = askBins.length > temp.length ? temp.length : askBins.length;
   const bidBins = temp.slice(0, arrayLength);
   askBins = askBins.slice(0, arrayLength);
+  if (!settings.stackOrderbook) askBins = askBins.reverse();
 
   return (
     <>
@@ -395,18 +396,18 @@ export default function OrdersBook(props) {
                   <>
                     <TradePriceTable
                       head
+                      useGradient={!settings.disableOrderBookFlash}
+                      currentMarket={props.currentMarket}
+                      priceTableData={bidBins}
+                      fixedPoint={fixedPoint}
+                    />
+                    <TradePriceTable
+                      head
                       className="trade_table_asks sell-side"
                       useGradient={!settings.disableOrderBookFlash}
                       priceTableData={askBins}
                       currentMarket={props.currentMarket}
                       scrollToBottom={true}
-                      fixedPoint={fixedPoint}
-                    />
-                    <TradePriceTable
-                      head
-                      useGradient={!settings.disableOrderBookFlash}
-                      currentMarket={props.currentMarket}
-                      priceTableData={bidBins}
                       fixedPoint={fixedPoint}
                     />
                   </>
