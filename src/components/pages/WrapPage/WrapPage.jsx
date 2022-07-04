@@ -36,8 +36,8 @@ export default function WrapPage() {
   const [sellToken, setSellToken] = useState('ETH');
   const [buyToken, setBuyToken] = useState('WETH');
   const [fee, setFee] = useState({
-    'wrap': 0.0001,
-    'unwrap': 0.0001
+    'wrap': 0.0005,
+    'unwrap': 0.0005
   });
   const [orderButtonDisabled, setOrderButtonDisabled] = useState(false);
 
@@ -155,9 +155,16 @@ export default function WrapPage() {
 
   const onClickMax = () => {
     const balance = balances[sellToken]?.valueReadable;
-    const dust = sellToken === "ETH" ? 0.005 : 0;
-    if (balance && dust && fee[tType]) {
-      let s_amounts = balance - fee[tType];
+    let dust = 0;
+    let fee = 0;
+    // for unwrap we dont have to leave dust or care about fees
+    if (tType === 'wrap') {
+      dust = 0.005;
+      fee = fee[tType] ? fee[tType] : 0.0005;
+    }
+    
+    if (balance) {
+      let s_amounts = balance - fee;
       if (s_amounts < 0) {
         toast.warn(
           "Can not set max amount, balance too low to pay gas fees.",
