@@ -29,7 +29,7 @@ const DropdownWrapper = styled.div`
 export const Wrapper = styled.div`
     position: absolute;
     // min-width: ${({ width }) => `${width}px`};
-    width: 100%;
+    width: ${({ width }) => width === 0 ? '100%' : `${width}px`};
     background-color: ${({ theme }) => theme.colors.backgroundMediumEmphasis};
     border: 1px solid ${({ theme }) => theme.colors.foreground400};
     box-shadow: 0px 8px 16px 0px #0101011A;
@@ -100,7 +100,7 @@ const IconButton = styled(baseIcon)`
     }
 `
 
-const Dropdown = ({ width, item, context, leftIcon, rightIcon, transparent, clickFunction, isMobile = false, adClass = "" }) => {
+const Dropdown = ({ width = 0, item, context, leftIcon, rightIcon, transparent, clickFunction, isMobile = false, adClass = "" }) => {
     const [isOpened, setIsOpened] = useState(false)
     const wrapperRef = useRef(null)
 
@@ -112,7 +112,7 @@ const Dropdown = ({ width, item, context, leftIcon, rightIcon, transparent, clic
 
     const handleClick = (url, text, value) => {
         if (url !== '#') {
-            window.location.href = url
+            window.open(url, "_blank");
         } else {
             clickFunction(text, value)
             toggle()
