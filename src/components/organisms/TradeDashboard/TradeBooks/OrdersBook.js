@@ -371,7 +371,7 @@ export default function OrdersBook(props) {
                       adClass="no-space"
                       priceTableData={askBins}
                       currentMarket={props.currentMarket}
-                      scrollToBottom={true}
+                      scrollToBottom={false}
                       fixedPoint={fixedPoint}
                     />
                   </>
@@ -407,7 +407,6 @@ export default function OrdersBook(props) {
                       useGradient={!settings.disableOrderBookFlash}
                       priceTableData={askBins}
                       currentMarket={props.currentMarket}
-                      scrollToBottom={true}
                       fixedPoint={fixedPoint}
                     />
                   </>
