@@ -15,7 +15,7 @@ const Table = styled.table`
   flex-direction: column;
 
   &:not(.no-space) {
-    justify-content: space-between;
+    justify-content: ${({ isLeft }) => isLeft ? 'space-between' : 'start'};
   }
 
   &:first-type-of {
