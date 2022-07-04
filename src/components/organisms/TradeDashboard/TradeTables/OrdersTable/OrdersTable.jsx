@@ -1052,7 +1052,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Market
+                  Time
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -1065,7 +1065,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Price
+                  Market
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -1105,7 +1105,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Fee
+                  Price
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -1118,7 +1118,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Time
+                  Fee
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -1133,10 +1133,6 @@ export default function OrdersTable(props) {
                 >
                   Order Status
                 </Text>
-                <SortIconWrapper>
-                  <SortUpIcon />
-                  <SortDownIcon />
-                </SortIconWrapper>
               </HeaderWrapper>
             </th>
             <th>
@@ -1265,20 +1261,20 @@ export default function OrdersTable(props) {
             const marketInfo = api.marketInfo[market];
             return (
               <tr key={fillid}>
+                <td data-label="Time">
+                  <Text
+                    font="primaryExtraSmallSemiBold"
+                    color="foregroundHighEmphasis"
+                  >
+                    {time}
+                  </Text>
+                </td>
                 <td data-label="Market">
                   <Text
                     font="primaryExtraSmallSemiBold"
                     color="foregroundHighEmphasis"
                   >
                     {market}
-                  </Text>
-                </td>
-                <td data-label="Price">
-                  <Text
-                    font="primaryExtraSmallSemiBold"
-                    color="foregroundHighEmphasis"
-                  >
-                    {price.toPrecision(6) / 1}
                   </Text>
                 </td>
                 <td data-label="Side">
@@ -1294,20 +1290,20 @@ export default function OrdersTable(props) {
                     {baseQuantity.toPrecision(6) / 1} {baseCurrency}
                   </Text>
                 </td>
+                <td data-label="Price">
+                  <Text
+                    font="primaryExtraSmallSemiBold"
+                    color="foregroundHighEmphasis"
+                  >
+                    {price.toPrecision(6) / 1}
+                  </Text>
+                </td>
                 <td data-label="Fee">
                   <Text
                     font="primaryExtraSmallSemiBold"
                     color="foregroundHighEmphasis"
                   >
                     {feeText}
-                  </Text>
-                </td>
-                <td data-label="Time">
-                  <Text
-                    font="primaryExtraSmallSemiBold"
-                    color="foregroundHighEmphasis"
-                  >
-                    {time}
                   </Text>
                 </td>
                 <td data-label="Order Status">
