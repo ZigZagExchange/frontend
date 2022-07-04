@@ -155,9 +155,16 @@ export default function WrapPage() {
 
   const onClickMax = () => {
     const balance = balances[sellToken]?.valueReadable;
-    const dust = sellToken === "ETH" ? 0.005 : 0;
-    if (balance && dust && fee[tType]) {
-      let s_amounts = balance - fee[tType];
+    let dust = 0;
+    let fee = 0;
+    // for unwrap we dont have to leave dust or care about fees
+    if (tType === 'wrap') {
+      dust = 0.005;
+      fee = fee[tType];
+    }
+    
+    if (balance && dust && fee) {
+      let s_amounts = balance - fee;
       if (s_amounts < 0) {
         toast.warn(
           "Can not set max amount, balance too low to pay gas fees.",
