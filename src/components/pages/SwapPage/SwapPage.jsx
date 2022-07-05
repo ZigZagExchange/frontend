@@ -274,7 +274,7 @@ export default function SwapPage() {
         [1, 1000].includes(network) &&
         openOrders.length > 0
       ) {
-        toast.warn(
+        toast.error(
           'zkSync 1.0 allows one open order at a time. Please cancel your limit order or wait for it to be filled before converting. Otherwise your limit order will fail.',
           {
             toastId: 'zkSync 1.0 allows one open order at a time. Please cancel your limit order or wait for it to be filled before converting. Otherwise your limit order will fail.',

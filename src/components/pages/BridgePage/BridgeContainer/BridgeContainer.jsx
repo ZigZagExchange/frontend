@@ -337,7 +337,7 @@ const BridgeContainer = () => {
            openOrders.length > 0
         ) {
           error = 'Open limit order prevents you from bridging';
-          toast.warn(
+          toast.error(
             'zkSync 1.0 allows one open order at a time. Please cancel your limit order or wait for it to be filled before bridging. Otherwise your limit order will fail.',
             {
               toastId: 'zkSync 1.0 allows one open order at a time. Please cancel your limit order or wait for it to be filled before bridging. Otherwise your limit order will fail.',
