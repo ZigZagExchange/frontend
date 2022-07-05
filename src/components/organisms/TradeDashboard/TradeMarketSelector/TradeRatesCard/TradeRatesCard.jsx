@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import styled from "styled-components";
 import { formatPrice } from "lib/utils";
 import { SettingsIcon } from "components/atoms/Svg";
 import Button from "components/molecules/Button/Button";
 import Text from "components/atoms/Text/Text";
 // css
-import api from "lib/api";
 import "./TradeRatesCard.css";
 import SettingsModal from "./SettingsModal";
 import { TokenPairDropdown } from "components/molecules/Dropdown";
 import useModal from "components/hooks/useModal";
 import useTheme from "components/hooks/useTheme";
+import { settingsSelector } from "lib/store/features/api/apiSlice";
 
 const TradeRatesCard = ({
   updateMarketChain,
@@ -20,8 +21,11 @@ const TradeRatesCard = ({
   marketInfo,
 }) => {
   const { isDark } = useTheme()
+
   const [lastPrice, setLastPrice] = useState(0);
   const [isIncrease, setIncrease] = useState(true);
+
+  const settings = useSelector(settingsSelector);
 
   useEffect(()=>{
     if(marketSummary.price > lastPrice)
@@ -87,15 +91,6 @@ const TradeRatesCard = ({
               }
             </Text>
           </RatesCard>
-          {/* <RatesCard>
-            <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h Change</Text>
-            <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">
-              {this.props.marketSummary.priceChange &&
-                formatPrice(this.props.marketSummary.priceChange / 1)
-              }{" "}
-              {percentChange !== 'NaN' && `${percentChange}%`}
-            </Text>
-          </RatesCard> */}
           {isMobile ? (
             <></>
           ) : (
@@ -106,7 +101,12 @@ const TradeRatesCard = ({
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  24h Change
+                <>
+                  {settings.showNightPriceChange 
+                    ? "UTC Change"
+                    : "24h Change"
+                  }
+                </>
                 </Text>
                 <Text
                   font="primaryMediumSmallSemiBold"
@@ -119,7 +119,7 @@ const TradeRatesCard = ({
                   }
                 >
                   {marketSummary.priceChange &&
-                    formatPrice(marketSummary.priceChange / 1)}{" "}
+                    formatPrice(marketSummary.priceChange / 1)}{" | "}
                   {percentChange !== "NaN" ? `(${percentChange}%)` : "--"}
                 </Text>
               </RatesCard>
@@ -129,7 +129,12 @@ const TradeRatesCard = ({
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  24h High
+                <>
+                  {settings.showNightPriceChange 
+                    ? "UTC High"
+                    : "24h High"
+                  }
+                </>
                 </Text>
                 <Text
                   font="primaryMediumSmallSemiBold"
@@ -144,7 +149,12 @@ const TradeRatesCard = ({
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  24h Low
+                <>
+                  {settings.showNightPriceChange 
+                    ? "UTC Low"
+                    : "24h Low"
+                  }
+                </>
                 </Text>
                 <Text
                   font="primaryMediumSmallSemiBold"
@@ -159,7 +169,12 @@ const TradeRatesCard = ({
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  24h Volume({marketInfo && marketInfo.baseAsset.symbol})
+                <>
+                  {settings.showNightPriceChange 
+                    ? `UTC Volume ${marketInfo && marketInfo.baseAsset.symbol}`
+                    : `24h Volume ${marketInfo && marketInfo.baseAsset.symbol}`
+                  }
+                </>
                 </Text>
                 <Text
                   font="primaryMediumSmallSemiBold"
@@ -174,7 +189,12 @@ const TradeRatesCard = ({
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  24h Volume({marketInfo && marketInfo.quoteAsset.symbol})
+                <>
+                  {settings.showNightPriceChange 
+                    ? `UTC Volume ${marketInfo && marketInfo.quoteAsset.symbol}`
+                    : `24h Volume ${marketInfo && marketInfo.quoteAsset.symbol}`
+                  }
+                </>
                 </Text>
                 <Text
                   font="primaryMediumSmallSemiBold"
