@@ -120,7 +120,7 @@ const TradeRatesCard = ({
                 >
                   {marketSummary.priceChange &&
                     formatPrice(marketSummary.priceChange / 1)}{" | "}
-                  {percentChange !== "NaN" ? `(${percentChange}%)` : "--"}
+                  {percentChange !== "NaN" ? `${percentChange}%` : "--"}
                 </Text>
               </RatesCard>
               <Divider />
