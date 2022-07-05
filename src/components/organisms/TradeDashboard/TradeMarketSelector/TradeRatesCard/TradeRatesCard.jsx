@@ -171,8 +171,8 @@ const TradeRatesCard = ({
                 >
                 <>
                   {settings.showNightPriceChange 
-                    ? `UTC Volume (${marketInfo && marketInfo.baseAsset.symbol})`
-                    : `24h Volume (${marketInfo && marketInfo.baseAsset.symbol})`
+                    ? `UTC Volume(${marketInfo && marketInfo.baseAsset.symbol})`
+                    : `24h Volume(${marketInfo && marketInfo.baseAsset.symbol})`
                   }
                 </>
                 </Text>
@@ -191,8 +191,8 @@ const TradeRatesCard = ({
                 >
                 <>
                   {settings.showNightPriceChange 
-                    ? `UTC Volume (${marketInfo && marketInfo.quoteAsset.symbol})`
-                    : `24h Volume (${marketInfo && marketInfo.quoteAsset.symbol})`
+                    ? `UTC Volume(${marketInfo && marketInfo.quoteAsset.symbol})`
+                    : `24h Volume(${marketInfo && marketInfo.quoteAsset.symbol})`
                   }
                 </>
                 </Text>
