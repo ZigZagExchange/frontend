@@ -546,7 +546,10 @@ const BridgeContainer = () => {
       );
     } else if (fromNetwork.id === "zksync" && toNetwork.id === "ethereum") {
       if (isFastWithdraw()) {
-        if (ZigZagFeeAmount >= swapDetails.amount * 0.1) {
+        let fee = ZigZagFeeAmount;
+        if (L2FeeToken === swapDetails.currency) fee += L2FeeAmount;
+        if (swapDetails.currency === "ETH") fee += L1FeeAmount;
+        if (fee >= swapDetails.amount * 0.1) {
           setIsOpen(true);
         } else {
           deferredXfer = api.transferToBridge(
