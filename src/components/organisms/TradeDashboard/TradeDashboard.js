@@ -152,7 +152,7 @@ export function TradeDashboard() {
     }
     const sub = () => {
       dispatch(resetData());
-      api.subscribeToMarket(currentMarket);
+      api.subscribeToMarket(currentMarket, settings.showNightPriceChange);
     };
 
     if (api.ws && api.ws.readyState === 0) {
@@ -168,7 +168,7 @@ export function TradeDashboard() {
         api.off("open", sub);
       }
     };
-  }, [network, currentMarket, api.ws]);
+  }, [network, currentMarket, api.ws, settings.showNightPriceChange]);
 
   const changeFixedPoint = (point) => {
     setFixedPoint(point);

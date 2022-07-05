@@ -117,7 +117,7 @@ export default function SwapPage() {
   useEffect(() => {
     const sub = () => {
       dispatch(resetData());
-      api.subscribeToMarket(currentMarket);
+      api.subscribeToMarket(currentMarket, settings.showNightPriceChange);
     };
 
     if (api.ws && api.ws.readyState === 0) {

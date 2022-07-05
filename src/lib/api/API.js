@@ -502,8 +502,8 @@ export default class API extends Emitter {
     return keys[keys.findIndex((key) => network === this.networks[key][0])];
   };
 
-  subscribeToMarket = (market) => {
-    this.send("subscribemarket", [this.apiProvider.network, market]);
+  subscribeToMarket = (market, showNightPriceChange = false) => {
+    this.send("subscribemarket", [this.apiProvider.network, market, showNightPriceChange]);
   };
 
   unsubscribeToMarket = (market) => {
