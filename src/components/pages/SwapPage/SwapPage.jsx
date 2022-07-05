@@ -89,6 +89,7 @@ export default function SwapPage() {
 
   useEffect(() => {
     dispatch(setCurrentMarket("ZZ-USDC"));
+    document.title = "ZigZag Convert";
   }, []);
 
   useEffect(() => {
