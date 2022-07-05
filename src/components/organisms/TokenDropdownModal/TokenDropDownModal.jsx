@@ -32,6 +32,7 @@ const TokenDropDownModal = ({
     // setSelected(e);
     onSelectedOption(e);
     setIsOpen(false);
+    setQuery("");
   };
 
   const filteredToken =
