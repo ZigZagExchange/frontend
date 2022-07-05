@@ -119,7 +119,7 @@ const SelectAsset = ({
           Max
         </button>
         <input
-          className="ml-3 text-2xl font-semibold text-right bg-transparent w-36 sm:w-auto focus:outline-none"
+          className="ml-3 text-2xl font-semibold text-right bg-transparent w-36 md:w-64 focus:outline-none"
           placeholder="0.00"
           onChange={(e) => onChangeFromAmounts(e.target.value)}
           value={fromAmounts === 0 ? "" : fromAmounts}
