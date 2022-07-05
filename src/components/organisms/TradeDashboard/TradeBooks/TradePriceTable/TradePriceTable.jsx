@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
 import useTheme from "components/hooks/useTheme";
-import { marketInfoSelector } from "lib/store/features/api/apiSlice";
+import { marketInfoSelector, settingsSelector } from "lib/store/features/api/apiSlice";
 import { numStringToSymbol } from "lib/utils";
 import Text from "components/atoms/Text/Text";
 
@@ -11,11 +11,11 @@ const Table = styled.table`
   flex: auto;
   overflow: auto;
   padding: 0px;
-  // height: 175px;
+  height: ${({ isLeft }) => isLeft ? '' : '242px'};
   flex-direction: column;
 
   &:not(.no-space) {
-    justify-content: space-between;
+    justify-content: ${({ isLeft }) => isLeft ? 'space-between' : 'start'};
   }
 
   &:first-type-of {
@@ -103,6 +103,7 @@ const Divider = styled.div`
 const TradePriceTable = (props) => {
   const { theme } = useTheme();
   const marketInfo = useSelector(marketInfoSelector);
+  const settings = useSelector(settingsSelector);
   const ref = useRef(null);
   const [isUpdateScroll, setUpdateScroll] = useState(false);
   const isMobile = window.innerWidth < 500
@@ -128,7 +129,7 @@ const TradePriceTable = (props) => {
   else onClickRow = () => null;
 
   return (
-    <Table ref={ref} className={props.adClass}>
+    <Table ref={ref} className={props.adClass} isLeft={settings.stackOrderbook}>
       {props.head && (
         <thead>
           <tr>
