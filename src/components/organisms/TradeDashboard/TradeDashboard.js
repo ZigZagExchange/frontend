@@ -110,7 +110,7 @@ export function TradeDashboard() {
 
   useEffect(()=>{
     if(_.isEmpty(marketSummary)) return
-    document.title = `${marketSummary.price} | ${marketSummary.market??'--'} | ZigZag`;
+    document.title = `${marketSummary.price} | ${marketSummary.market??'--'} | ZigZag Exchange`;
   }, [marketSummary])
 
   useEffect(() => {
