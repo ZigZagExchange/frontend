@@ -14,7 +14,8 @@ const SwapContianer = ({
   onChangeFromToken,
   onChangeFromAmounts,
   fromAmounts,
-  estimatedValue,
+  estimatedValueFrom,
+  estimatedValueTo,
   onSwitchTokenBtn,
   basePrice,
   toToken,
@@ -59,7 +60,7 @@ const SwapContianer = ({
         />
       </div>
       <p className="mt-1 text-sm font-normal text-right text-slate-400 ">
-        Estimated value: ~ ${formatUSD(estimatedValue)}
+        Estimated value: ~ ${formatUSD(estimatedValueFrom)}
       </p>
       <div className="relative h-px mx-2 my-5 dark:bg-foreground-400 bg-primary-500">
         <button
@@ -93,7 +94,7 @@ const SwapContianer = ({
         />
       </div>
       <p className="mt-1 text-sm font-normal text-right text-slate-400 ">
-        Estimated value: ~ ${formatUSD(estimatedValue)}
+        Estimated value: ~ ${formatUSD(estimatedValueTo)}
       </p>
     </div>
   );

@@ -59,7 +59,8 @@ export default function SwapPage() {
 
   const [orderButtonDisabled, setOrderButtonDisabled] = useState(false);
 
-  const estimatedValue = sellAmounts * coinEstimator(sellToken?.name) || 0;
+  const estimatedValueSell = sellAmounts * coinEstimator(sellToken?.name) || 0;
+  const estimatedValueBuy = buyAmounts * coinEstimator(buyToken?.name) || 0;
 
   const zkBalances = useMemo(
     () => (balanceData[network] ? balanceData[network] : {}),
@@ -469,7 +470,8 @@ export default function SwapPage() {
               onChangeFromToken={onChangeSellToken}
               onChangeFromAmounts={onChangeSellAmounts}
               fromAmounts={sellAmounts}
-              estimatedValue={estimatedValue}
+              estimatedValueFrom={estimatedValueSell}
+              estimatedValueTo={estimatedValueBuy}
               onSwitchTokenBtn={onSwitchTokenBtn}
               basePrice={basePrice}
               toToken={buyToken}

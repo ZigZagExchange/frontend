@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import classNames from "classnames";
 import { formatUSD, formatPrice, shortenAddress } from "lib/utils";
 import { RadioGroup } from "@headlessui/react";
 import { QuestionHelper } from "components";
 import { x } from "@xstyled/styled-components";
+import { settingsSelector } from "lib/store/features/api/apiSlice";
 
 const TransactionSettings = ({
   user,
@@ -27,6 +29,7 @@ const TransactionSettings = ({
   formErr,
   fastWithdrawDisabled,
 }) => {
+  const settings = useSelector(settingsSelector);
   return (
     <div className="p-2 mt-3 border rounded-lg sm:p-4 dark:border-foreground-400 border-primary-500">
       <p className="text-base font-work">Transaction Settings</p>
@@ -47,7 +50,7 @@ const TransactionSettings = ({
       </div>
       {user.address && (
         <div className="py-2 mt-2 font-sans text-sm tracking-wider text-center border rounded-lg dark:border-foreground-400 border-primary-500 text-slate-400 ">
-          {shortenAddress(user.address, 10)}
+          {settings.hideAddress ? "*****...*****" : shortenAddress(user.address, 10)}
         </div>
       )}
       {user.address && user.id && !isSwapAmountEmpty && (

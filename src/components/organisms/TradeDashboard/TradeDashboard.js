@@ -29,6 +29,7 @@ import {
   networkQueryParam,
 } from "../../pages/ListPairPage/SuccessModal";
 import TradesTable from "./TradeBooks/TradesTable";
+import { HighSlippageModal } from "components/molecules/HighSlippageModal";
 
 const TradeContainer = styled.div`
   color: #aeaebf;
@@ -54,6 +55,7 @@ const TradeGrid = styled.article`
   gap: 0px;
 
   @media screen and (max-width: 991px) {
+    height: auto;
     grid-template-rows: ${({ isLeft }) =>
       isLeft
         ? "56px 410px 459px 508px 362px"
@@ -212,6 +214,8 @@ export function TradeDashboard() {
           user={user}
         />
         {/* <TradeFooter /> */}
+
+        <HighSlippageModal />
       </TradeGrid>
     </TradeContainer>
   );

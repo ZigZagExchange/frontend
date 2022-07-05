@@ -12,6 +12,19 @@ const DropdownWrapper = styled.div`
         position: static;
     }
 
+    &.menu-dropdown {
+        padding-top: 3px;
+        button > div {
+            text-transform: uppercase;
+            font-size: 12px !important;
+            line-height: 14px !important;
+            color: ${({ theme }) => `${theme.colors.foregroundMediumEmphasis} !important`};
+        }
+        svg path {
+            fill: ${({ theme }) => `${theme.colors.foregroundMediumEmphasis} !important`};
+        }
+    }
+
     &:hover {
         .button-title {
             color: ${({ theme }) => `${theme.colors.primaryHighEmphasis} !important`};
@@ -29,7 +42,7 @@ const DropdownWrapper = styled.div`
 export const Wrapper = styled.div`
     position: absolute;
     // min-width: ${({ width }) => `${width}px`};
-    width: 100%;
+    width: ${({ width }) => width === 0 ? '100%' : `${width}px`};
     background-color: ${({ theme }) => theme.colors.backgroundMediumEmphasis};
     border: 1px solid ${({ theme }) => theme.colors.foreground400};
     box-shadow: 0px 8px 16px 0px #0101011A;
@@ -79,6 +92,12 @@ const DropdownListContainer = styled.div`
         padding: 8px 10px;
         align-items: center;
     }
+
+    &.menu-dropdown {
+        display: block;
+        width: 100%;
+        padding: 8px 20px;
+    }
 `
 
 const IconButton = styled(baseIcon)`
@@ -92,16 +111,20 @@ const IconButton = styled(baseIcon)`
         margin-left: 0px !important;
     }
 
-    &:not(.network-dropdown) {
+    &:not(.network-dropdown):not(.menu-dropdown) {
         border: 1px solid ${({ theme }) => theme.colors.foreground400};
     }
 
     &.network-dropdown path {
         fill: ${(p) => p.theme.colors.foregroundHighEmphasis};
     }
+
+    &.menu-dropdown button svg path {
+        fill: ${(p) => p.theme.colors.foregroundMediumEmphasis};
+    }
 `
 
-const Dropdown = ({ width, item, context, leftIcon, rightIcon, transparent, clickFunction, isMobile = false, adClass = ""}) => {
+const Dropdown = ({ width = 0, item, context, leftIcon, rightIcon, transparent, clickFunction, isMobile = false, adClass = "" }) => {
     const [isOpened, setIsOpened] = useState(false)
     const wrapperRef = useRef(null)
 
@@ -113,9 +136,11 @@ const Dropdown = ({ width, item, context, leftIcon, rightIcon, transparent, clic
 
     const handleClick = (url, text, value) => {
         if (url !== '#') {
-            window.location.href = url
+            window.open(url, "_blank");
         } else {
-            clickFunction(text, value)
+            if(value) {
+                clickFunction(text, value)
+            }
             toggle()
         }
     }
