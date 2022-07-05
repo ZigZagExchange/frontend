@@ -878,10 +878,13 @@ export default class API extends Emitter {
 
   updatePendingFills = (userFills) => {
     const fillRequestIds = [];
-    Object.keys(userFills).forEach(fillId => {
-      if (!fillId) return;
+    Object.keys(userFills).forEach(fillIdString => {
+      if (!fillIdString) return;
+      const fillStatus = userFills[fillIdString][6];
 
-      const fillStatus = userFills[fillId][6];
+      const fillId = Number(fillIdString);
+      if (!fillId || Number.isNaN(fillId) || !Number.isFinite(fillId)) return;
+
       if (['b', 'm', 'pm'].includes(fillStatus)) {
         // _pendingFills is used to only request on the 2nd time
         const index = this._pendingFills.indexOf(fillId);
@@ -895,7 +898,7 @@ export default class API extends Emitter {
     })
     // request status update
     if (fillRequestIds.length > 0) {
-      this.send("fillreceiptreq", [this.apiProvider.network, Number(fillRequestIds)])
+      this.send("fillreceiptreq", [this.apiProvider.network, fillRequestIds])
     }
   }
 }
