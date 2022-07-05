@@ -69,6 +69,8 @@ export default function SwapPage() {
 
   useEffect(() => {
     setLoading(true);
+    setSellTokenList(api.getCurrencies());
+    setGetPairs(api.getPairs());
     const timer = setInterval(() => {
       setSellTokenList(api.getCurrencies());
       setGetPairs(api.getPairs());
@@ -88,6 +90,7 @@ export default function SwapPage() {
   }, [user.address, zkBalances]);
 
   useEffect(() => {
+    setSellToken('USDC')
     dispatch(setCurrentMarket("ZZ-USDC"));
   }, []);
 
