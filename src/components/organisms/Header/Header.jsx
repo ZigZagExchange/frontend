@@ -50,7 +50,7 @@ const networkLists = [
   {
     text: "Arbitrum (soon)",
     value: null,
-    url: "",
+    url: "#",
     selectedIcon: <CheckIcon />,
     image: arbitrumLogo,
   },
@@ -439,20 +439,16 @@ export const Header = (props) => {
       )}
       {show && isMobile ? (
         <SideMenuWrapper>
-          {user.id && user.address ? (
-            <Dropdown
-              adClass="network-dropdown"
-              isMobile={true}
-              style={{ justifySelf: "center" }}
-              width={242}
-              item={networkItems}
-              context={networkName}
-              clickFunction={changeNetwork}
-              leftIcon={true}
-            />
-          ) : (
-            <></>
-          )}
+          <Dropdown
+            adClass="network-dropdown"
+            isMobile={true}
+            style={{ justifySelf: "center" }}
+            width={242}
+            item={networkItems}
+            context={networkName}
+            clickFunction={changeNetwork}
+            leftIcon={true}
+          />
           <TabMenu row activeIndex={index} onItemClick={handleClick}>
             <Tab>TRADE</Tab>
             {hasBridge && <Tab>CONVERT</Tab>}
