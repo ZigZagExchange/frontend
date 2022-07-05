@@ -68,13 +68,14 @@ const SlippageWarningModal = ({
                     <AiOutlineWarning size={50} color="#FCC958" />
                   </div>
                   <p className="mt-3 text-xl font-semibold text-center font-work">
-                    This transaction has high slippage
+                    This transaction has high slippage!
                   </p>
                   <p className="mt-3 text-sm text-center">
-                    At the current pool depth, this trade will result in{" "}
+                    With your current bridge options, <br></br>this transaction
+                    will result in
                   </p>
                   <p className="text-xl font-bold text-center font-work text-[#FCC958] mt-1">
-                    {slippage && slippage.toPrecision(4)}% price slippage.
+                    {slippage && slippage.toPrecision(4)}% slippage.
                   </p>
                   <p className="mt-3 text-sm text-center">
                     Type{" "}

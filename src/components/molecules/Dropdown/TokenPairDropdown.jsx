@@ -515,7 +515,7 @@ const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, upda
                     >
                         <td>
                             <PairWrapper>
-                                <span onClick={(e) => { favouritePair(d); }}>
+                                <span onClick={(e) => { e.stopPropagation(); favouritePair(d); }}>
                                     {isFavourited ? <ActivatedStarIcon /> : <StarIcon />}
                                 </span>
                                 <Text font="primaryExtraSmall" color="foregroundHighEmphasis">{pair.replace("-", "/")}</Text>
