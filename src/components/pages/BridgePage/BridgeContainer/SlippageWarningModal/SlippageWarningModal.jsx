@@ -6,7 +6,12 @@ import { AiOutlineWarning } from "react-icons/ai";
 import useTheme from "components/hooks/useTheme";
 import { Fragment } from "react";
 
-const SlippageWarningModal = ({ isOpen, closeModal, confirmModal }) => {
+const SlippageWarningModal = ({
+  isOpen,
+  closeModal,
+  confirmModal,
+  slippage,
+}) => {
   const { isDark } = useTheme();
   const [value, setValue] = useState("");
   const onCloseModal = () => {
@@ -69,7 +74,7 @@ const SlippageWarningModal = ({ isOpen, closeModal, confirmModal }) => {
                     At the current pool depth, this trade will result in{" "}
                   </p>
                   <p className="text-xl font-bold text-center font-work text-[#FCC958] mt-1">
-                    11% price slippage.
+                    {slippage && slippage.toPrecision(4)}% price slippage.
                   </p>
                   <p className="mt-3 text-sm text-center">
                     Type{" "}

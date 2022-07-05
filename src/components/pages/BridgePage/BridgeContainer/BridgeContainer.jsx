@@ -40,6 +40,7 @@ const BridgeContainer = () => {
   const [tokenLoading, setTokenLoading] = useState(false);
   const [fromAmounts, setFromAmounts] = useState();
   const [isOpen, setIsOpen] = useState(false);
+  const [slippage, setSlippage] = useState();
 
   const user = useSelector(userSelector);
   const balanceData = useSelector(balancesSelector);
@@ -550,6 +551,8 @@ const BridgeContainer = () => {
         if (L2FeeToken === swapDetails.currency) fee += L2FeeAmount;
         if (swapDetails.currency === "ETH") fee += L1FeeAmount;
         if (fee >= swapDetails.amount * 0.1) {
+          const p = (fee / swapDetails.amount) * 100;
+          setSlippage(p);
           setIsOpen(true);
         } else {
           deferredXfer = api.transferToBridge(
@@ -744,6 +747,7 @@ const BridgeContainer = () => {
             isOpen={isOpen}
             closeModal={onCloseWarningModal}
             confirmModal={onConfirmModal}
+            slippage={slippage}
           />
           <SwitchNetwork
             fromNetworkOptions={NETWORKS.map((item) => item.from)}
