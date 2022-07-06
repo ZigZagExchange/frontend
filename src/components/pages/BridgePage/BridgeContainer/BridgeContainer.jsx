@@ -104,9 +104,11 @@ const BridgeContainer = () => {
   };
 
   useEffect(() => {
-
-    setTokenLoading(true);
     setSellTokenList(api.getCurrencies());
+  }, [])
+  
+  useEffect(() => {
+    setTokenLoading(true);
     const timer = setInterval(() => {
       setSellTokenList(api.getCurrencies());
     }, 500);
