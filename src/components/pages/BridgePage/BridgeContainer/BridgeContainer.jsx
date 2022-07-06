@@ -247,7 +247,7 @@ const BridgeContainer = () => {
 
   useEffect(() => {
     calculateFees();
-  }, [withdrawSpeed, swapDetails.amount, swapDetails.currency, fromAmounts, fromNetwork, toNetwork]);
+  }, [withdrawSpeed, swapDetails.amount, swapDetails.currency, fromAmounts]);
 
   const getMax = (swapCurrency, feeCurrency) => {
     let max = 0;
