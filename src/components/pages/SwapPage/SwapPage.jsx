@@ -127,6 +127,9 @@ export default function SwapPage() {
     } else {
       sub();
     }
+    
+    setSellTokenList(api.getCurrencies());
+    setGetPairs(api.getPairs());
 
     return () => {
       if (api.ws && api.ws.readyState !== 0) {
