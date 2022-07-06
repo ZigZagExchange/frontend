@@ -92,12 +92,12 @@ export default function SwapPage() {
     setBalances(zkBalances);
   }, [user.address, zkBalances]);
 
-  /*
+  
   useEffect(() => {
-    dispatch(setCurrentMarket("ZZ-USDC"));
+    // dispatch(setCurrentMarket("ZZ-USDC"));
     document.title = "ZigZag Convert";
   }, []);
-  */
+  
 
   useEffect(() => {
     if (sellToken && buyToken) {
