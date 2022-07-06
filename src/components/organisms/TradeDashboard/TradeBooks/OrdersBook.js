@@ -63,6 +63,7 @@ const OrderFooterWrapper = styled.div`
   button {
     height: auto;
   }
+  padding-bottom: ${({ isStack }) => isStack ? '6px' : '0'};
 `;
 
 const OrderFooterRight = styled.div`
@@ -275,7 +276,7 @@ export default function OrdersBook(props) {
                 ""
               )}
               <Divider />
-              <OrderFooterWrapper>
+              <OrderFooterWrapper isStack={settings.stackOrderbook}>
                 {/* <Dropdown
                   adClass="side-dropdown"
                   transparent={true}
@@ -324,7 +325,7 @@ export default function OrdersBook(props) {
                   marketInfo={marketInfo}
                   fixedPoint={fixedPoint}
                 />
-                <OrderFooterWrapper>
+                <OrderFooterWrapper isStack={settings.stackOrderbook}>
                   {/* <Dropdown
                     adClass="side-dropdown"
                     transparent={true}

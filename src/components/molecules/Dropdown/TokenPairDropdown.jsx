@@ -630,7 +630,6 @@ const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, upda
                             icon="search"
                             value={searchValue}
                             onChange={updateSearchValue}
-                            autoFocus
                         />
                     </DropdownHeader>
                     <Divider />
