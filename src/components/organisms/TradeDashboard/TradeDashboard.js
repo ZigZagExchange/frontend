@@ -24,7 +24,8 @@ import {
   setCurrentMarket,
   setLayout,
   resetData,
-  layoutSelector,
+  settingsSelector,
+  setUISettings,
 } from "lib/store/features/api/apiSlice";
 import { userSelector } from "lib/store/features/auth/authSlice";
 import api from "lib/api";
@@ -100,7 +101,7 @@ export function TradeDashboard() {
   const currentMarket = useSelector(currentMarketSelector);
   const userOrders = useSelector(userOrdersSelector);
   const userFills = useSelector(userFillsSelector);
-  const layouts = useSelector(layoutSelector);
+  const settings = useSelector(settingsSelector);
   const [fixedPoint, setFixedPoint] = useState(2);
   const [side, setSide] = useState("all");
   const dispatch = useDispatch();
@@ -194,12 +195,14 @@ export function TradeDashboard() {
         currentMarket={currentMarket}
       />
       <GridLayoutRow
-        rowHeight={270}
-        layouts={layouts}
+        rowHeight={283}
+        layouts={settings.layouts}
         autoSize={false}
         onChange={(_, layout) => {
-          dispatch(setLayout(layout));
+          dispatch(setUISettings({ key: "layouts", value: layout }));
         }}
+        margin={settings.editable ? [10, 10] : [0, 0]}
+        isDraggable={settings.editable}
       >
         <div key="a">
           <TradeSidebar

@@ -9,6 +9,7 @@ import {
   settingsSelector,
   resetUISettings,
   resetTradeLayout,
+  setUISettings,
 } from "lib/store/features/api/apiSlice";
 
 const SettingModalWrapper = styled(GenericModal)`
@@ -76,6 +77,10 @@ const SettingsModal = ({ onDismiss }) => {
     dispatch(resetTradeLayout());
   };
 
+  const editLayout = () => {
+    dispatch(setUISettings({ key: "editable", value: !settings.editable }));
+  };
+
   return (
     <SettingModalWrapper isOpened onClose={onDismiss}>
       <ModalHeader>
@@ -83,7 +88,7 @@ const SettingsModal = ({ onDismiss }) => {
           Settings
         </Text>
         <ActionsWrapper>
-          <ActionWrapper>
+          <ActionWrapper onClick={editLayout}>
             <EditIcon />
             <Text
               font="primaryMediumBody"

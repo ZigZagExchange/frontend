@@ -18,6 +18,8 @@ const initialUISettings = {
   hideBalance: false,
   hideGuidePopup: false,
   disableTradeIDCard: false,
+  layouts: initialLayouts,
+  editable: false,
 };
 
 export const apiSlice = createSlice({
@@ -25,7 +27,6 @@ export const apiSlice = createSlice({
   initialState: {
     network: 1,
     userId: null,
-    layout: initialLayouts,
     currentMarket: "ETH-USDC",
     marketFills: {},
     bridgeReceipts: [],
@@ -555,7 +556,7 @@ export const apiSlice = createSlice({
       state.arweaveAllocation = payload;
     },
     setLayout(state, { payload }) {
-      state.layout = payload;
+      state.settings.layouts = payload;
     },
     setConnecting(state, { payload }) {
       state.isConnecting = payload;
@@ -567,7 +568,7 @@ export const apiSlice = createSlice({
       state.settings = initialUISettings;
     },
     resetTradeLayout(state) {
-      state.layout = initialLayouts;
+      state.settings.layouts = initialLayouts;
     },
   },
 });

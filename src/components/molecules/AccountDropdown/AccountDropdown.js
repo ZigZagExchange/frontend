@@ -38,7 +38,7 @@ const DropdownDisplay = styled.div`
   pointer-events: none;
   display: flex;
   flex-direction: column;
-  
+
   @media screen and (max-width: 991px) {
     position: fixed;
     margin-top: 0;
@@ -238,7 +238,7 @@ const DropdownExplorer = styled.div`
   &:hover {
     background: #4d76af;
   }
-  
+
   &:hover > a {
     color: #fff;
   }
@@ -260,9 +260,9 @@ const SignOutButton = styled.div`
   }
 
   &:active {
-  background: #c44;
-  color: #fff;
-}
+    background: #c44;
+    color: #fff;
+  }
 `;
 
 const LoaderContainer = styled.div`
@@ -315,11 +315,11 @@ export const AccountDropdown = () => {
 
   const changeLayout = (l) => {
     //local state
-    dispatch({ type: 'api/setLayout', payload: l });
+    dispatch({ type: "api/setLayout", payload: l });
     setLayout(l);
 
     setSelectedLayout(l);
-  }
+  };
 
   const [selectedLayer, setSelectedLayer] = useState(2);
   const coinEstimator = useCoinEstimator();
@@ -327,7 +327,9 @@ export const AccountDropdown = () => {
 
   const wallet =
     selectedLayer === 1 ? balanceData.wallet : balanceData[network];
-  const explorer = user.address ? api.getExplorer(user.address, selectedLayer) : null;
+  const explorer = user.address
+    ? api.getExplorer(user.address, selectedLayer)
+    : null;
 
   useEffect(() => {
     const hideDisplay = () => setShow(false);
@@ -391,7 +393,6 @@ export const AccountDropdown = () => {
           <h4>Wallet</h4>
         </span>
         <AiOutlineCaretDown />
-
       </DropdownButton>
       <DropdownDisplay>
         <DropdownHeader>
@@ -448,9 +449,17 @@ export const AccountDropdown = () => {
           )}
         </DropdownContent>
         <DropdownFooter>
-
-          <LayoutButton onClick={() => { setShowLayout(!showLayout); setShow(!show); }} tabIndex="0">
-            <IoMdGrid style={{ position: "relative", marginTop: 1, marginRight: 3 }} /> Layouts
+          <LayoutButton
+            onClick={() => {
+              setShowLayout(!showLayout);
+              setShow(!show);
+            }}
+            tabIndex="0"
+          >
+            <IoMdGrid
+              style={{ position: "relative", marginTop: 1, marginRight: 3 }}
+            />{" "}
+            Layouts
           </LayoutButton>
 
           <Modal
@@ -470,7 +479,10 @@ export const AccountDropdown = () => {
                 </Tooltip>
               </LayoutItem>
               <LayoutItem onClick={() => changeLayout(2)}>
-                <Tooltip placement={"bottom"} label={"Chart Focused RTL Layout"}>
+                <Tooltip
+                  placement={"bottom"}
+                  label={"Chart Focused RTL Layout"}
+                >
                   <img src={FourthLayoutImage} alt="Chart Focused RTL" />
                 </Tooltip>
               </LayoutItem>
@@ -483,10 +495,9 @@ export const AccountDropdown = () => {
           </Modal>
 
           <DropdownExplorer>
-            <a target="_blank"
-              rel="noreferrer"
-              href={explorer}>
-              <IoMdOpen style={{ position: "relative", top: -2 }} /> {selectedLayer === 1 ? 'Etherscan' : `zkScan`}
+            <a target="_blank" rel="noreferrer" href={explorer}>
+              <IoMdOpen style={{ position: "relative", top: -2 }} />{" "}
+              {selectedLayer === 1 ? "Etherscan" : `zkScan`}
             </a>
           </DropdownExplorer>
 
