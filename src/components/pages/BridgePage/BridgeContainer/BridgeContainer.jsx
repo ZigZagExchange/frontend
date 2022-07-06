@@ -222,14 +222,6 @@ const BridgeContainer = () => {
     }
   }, [user.address]);
 
-  useEffect(() => {
-    calculateFees();
-
-    if (withdrawSpeed === "normal") {
-      setL1Fee(null);
-    }
-  }, [withdrawSpeed]);
-
   useEffect(async () => {
     if (
       fromNetwork.id === "zksync" &&
@@ -255,7 +247,7 @@ const BridgeContainer = () => {
 
   useEffect(() => {
     calculateFees();
-  }, [swapDetails.amount, swapDetails.currency, fromAmounts]);
+  }, [withdrawSpeed, swapDetails.amount, swapDetails.currency, fromAmounts]);
 
   const getMax = (swapCurrency, feeCurrency) => {
     let max = 0;
