@@ -103,7 +103,7 @@ const SwapContianer = ({
           />
         )}
         <input
-          className="ml-3 text-2xl font-semibold text-right bg-transparent focus:outline-none w-36 md:w-auto"
+          className="ml-3 text-2xl font-semibold text-right bg-transparent focus:outline-none w-36 md:w-64"
           placeholder="0.00"
           value={toAmounts}
           onChange={onChangeToAmounts}

@@ -92,12 +92,10 @@ export default function SwapPage() {
     setBalances(zkBalances);
   }, [user.address, zkBalances]);
 
-  /*
   useEffect(() => {
     dispatch(setCurrentMarket("ZZ-USDC"));
     document.title = "ZigZag Convert";
   }, []);
-  */
 
   useEffect(() => {
     if (sellToken && buyToken) {
@@ -214,14 +212,14 @@ export default function SwapPage() {
         };
       });
       const f = p.find((item) => item.name === currentMarket.split("-")[1]);
-      const t = p.find((item) => item.name === currentMarket.split("-")[0]);
+      // const t = p.find((item) => item.name === currentMarket.split("-")[0]);
       const s = p.sort((a, b) => {
         return (
           parseFloat(b.price.substring(1)) - parseFloat(a.price.substring(1))
         );
       });
       setSellToken(f);
-      setBuyToken(t);
+      // setBuyToken(t);
       return s;
     } else {
       return [];
@@ -268,7 +266,7 @@ export default function SwapPage() {
         setBuyToken(d);
       }
     } else {
-      setBuyToken(filtered.find((item) => item.name === "ETH"));
+      setBuyToken(filtered.find((item) => item.name === "ZZ"));
     }
     filtered = filtered.filter(
       (value, index, self) =>
@@ -490,8 +488,6 @@ export default function SwapPage() {
       setSlippageValue(amount);
     }
   };
-
-  console.log(isNaN(buyAmounts), Number.isSafeInteger(parseFloat(buyAmounts)));
 
   return (
     <DefaultTemplate>
