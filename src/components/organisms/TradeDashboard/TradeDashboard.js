@@ -224,7 +224,23 @@ export function TradeDashboard() {
           />
         </div>
         <div key="b">
+        {settings.stackOrderbook ? (
+          <>
+            {/* TradePriceTable, TradePriceHeadSecond */}
+            <OrdersBook
+              currentMarket={currentMarket}
+              changeFixedPoint={changeFixedPoint}
+              changeSide={changeSide}
+            />
+            <TradesBook
+              currentMarket={currentMarket}
+              fixedPoint={fixedPoint}
+              side={side}
+            />
+          </>
+        ) : (
           <TradesTable />
+        )}
         </div>
         <div key="c">
           <TradeChartArea />
