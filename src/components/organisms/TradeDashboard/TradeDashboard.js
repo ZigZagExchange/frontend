@@ -26,6 +26,7 @@ import {
   resetData,
   settingsSelector,
   setUISettings,
+  marketSummarySelector,
 } from "lib/store/features/api/apiSlice";
 import { userSelector } from "lib/store/features/auth/authSlice";
 import api from "lib/api";
@@ -36,6 +37,8 @@ import {
   networkQueryParam,
 } from "../../pages/ListPairPage/SuccessModal";
 import TradesTable from "./TradeBooks/TradesTable";
+import { HighSlippageModal } from "components/molecules/HighSlippageModal";
+import _ from "lodash";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -47,7 +50,8 @@ const TradeContainer = styled.div`
 
 const TradeGrid = styled.article`
   display: grid;
-  grid-template-rows: 56px 2fr 1fr;
+  grid-template-rows: ${({ isLeft }) =>
+    isLeft ? "56px 2fr 1fr" : "56px 613px 1fr"};
   grid-template-columns: ${({ isLeft }) =>
     isLeft ? "300px 253.5px 253.5px 1fr" : "300px 507px 1fr"};
   grid-template-areas: ${({ isLeft }) =>
@@ -63,6 +67,7 @@ const TradeGrid = styled.article`
   gap: 0px;
 
   @media screen and (max-width: 991px) {
+    height: auto;
     grid-template-rows: ${({ isLeft }) =>
       isLeft ? "56px 410px 459px 508px 362px" : "56px 410px 459px 519px 362px"};
     grid-template-columns: ${({ isLeft }) => (isLeft ? "1fr 1fr" : "1fr")};
@@ -102,6 +107,7 @@ export function TradeDashboard() {
   const userOrders = useSelector(userOrdersSelector);
   const userFills = useSelector(userFillsSelector);
   const settings = useSelector(settingsSelector);
+  const marketSummary = useSelector(marketSummarySelector);
   const [fixedPoint, setFixedPoint] = useState(2);
   const [side, setSide] = useState("all");
   const dispatch = useDispatch();
@@ -112,6 +118,11 @@ export function TradeDashboard() {
   const updateMarketChain = (market) => {
     dispatch(setCurrentMarket(market));
   };
+
+  useEffect(()=>{
+    if(_.isEmpty(marketSummary)) return
+    document.title = `${marketSummary.price} | ${marketSummary.market??'--'} | ZigZag Exchange`;
+  }, [marketSummary])
 
   useEffect(() => {
     const urlParams = new URLSearchParams(search);
@@ -151,7 +162,7 @@ export function TradeDashboard() {
     }
     const sub = () => {
       dispatch(resetData());
-      api.subscribeToMarket(currentMarket);
+      api.subscribeToMarket(currentMarket, settings.showNightPriceChange);
     };
 
     if (api.ws && api.ws.readyState === 0) {
@@ -167,7 +178,7 @@ export function TradeDashboard() {
         api.off("open", sub);
       }
     };
-  }, [network, currentMarket, api.ws]);
+  }, [network, currentMarket, api.ws, settings.showNightPriceChange]);
 
   const changeFixedPoint = (point) => {
     setFixedPoint(point);
@@ -226,6 +237,7 @@ export function TradeDashboard() {
           />
         </div>
       </GridLayoutRow>
+      <HighSlippageModal />
     </TradeContainer>
   );
 }

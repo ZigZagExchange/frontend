@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import useTheme from "components/hooks/useTheme";
 import { useSelector } from "react-redux";
 import { userSelector } from "lib/store/features/auth/authSlice";
@@ -29,6 +29,10 @@ export default function BridgePage() {
   const [popup, setpopup] = useState("walletconnected");
   const user = useSelector(userSelector);
   const settings = useSelector(settingsSelector);
+
+  useEffect(()=>{
+    document.title = "ZigZag Bridge";
+  },[])
 
   return (
     <DefaultTemplate>

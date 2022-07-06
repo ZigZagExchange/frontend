@@ -80,7 +80,7 @@ const FillCard = ({ fill, closeToast }) => {
 
   return (
     <div ref={ref} className={classNames({ dark: isDark })}>
-      <div className="dark:bg-[#2B2E4A] relative bg-[#ddf1f7] border dark:border-foreground-400 border-slate-300 shadow-lg rounded-lg p-4">
+      <div className="dark:bg-[#2B2E4A] relative bg-[#ddf1f7] border dark:border-foreground-400 border-slate-300 shadow-lg rounded-lg p-4 pr-2">
         <div className="flex justify-between pb-3 border-b dark:border-foreground-500 border-slate-300">
           <div className="flex items-center gap-3 text-lg font-semibold dark:text-foreground-900 text-background-900 font-work">
             <img src={logo} alt="logo" className="w-6" />
@@ -106,12 +106,12 @@ const FillCard = ({ fill, closeToast }) => {
           <p className="font-normal font-work dark:text-foreground-900 text-background-900 secret-div">
             Use the Trade ID to identify old trades.
           </p>
-          <div className="flex items-start gap-6 mt-3">
+          <div className="flex items-start gap-4 mt-3">
             {/* <img src={QR} alt="QR" className="w-36" /> */}
             <div className="p-3 rounded-lg bg-foreground-900">
               <QRCode
                 id="qrCodeEl"
-                size={120}
+                size={90}
                 value={"https://info.zigzag.exchange"}
               />
             </div>
