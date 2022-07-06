@@ -18,7 +18,9 @@ import { formatUSD } from "lib/utils";
 import SwitchNetwork from "./SwitchNetwork";
 import SelectAsset from "./SelectAsset";
 import TransactionSettings from "./TransactionSettings";
+import SlippageWarningModal from "./SlippageWarningModal";
 import { Button, ConnectWalletButton } from "components/molecules/Button";
+
 import {
   NETWORKS,
   ZKSYNC_ETHEREUM_FAST_BRIDGE,
@@ -37,6 +39,8 @@ const BridgeContainer = () => {
   const [loading, setLoading] = useState(false);
   const [tokenLoading, setTokenLoading] = useState(false);
   const [fromAmounts, setFromAmounts] = useState();
+  const [isOpen, setIsOpen] = useState(false);
+  const [slippage, setSlippage] = useState();
 
   const user = useSelector(userSelector);
   const balanceData = useSelector(balancesSelector);
@@ -517,6 +521,7 @@ const BridgeContainer = () => {
     e.preventDefault();
     let deferredXfer;
     setLoading(true);
+
     if (fromNetwork.id === "polygon" && toNetwork.id === "zksync") {
       setPolygonLoading(true);
       deferredXfer = api.transferPolygonWeth(
@@ -542,12 +547,21 @@ const BridgeContainer = () => {
       );
     } else if (fromNetwork.id === "zksync" && toNetwork.id === "ethereum") {
       if (isFastWithdraw()) {
-        deferredXfer = api.transferToBridge(
-          `${swapDetails.amount}`,
-          swapDetails.currency,
-          ZKSYNC_ETHEREUM_FAST_BRIDGE.address,
-          user.address
-        );
+        let fee = ZigZagFeeAmount;
+        if (L2FeeToken === swapDetails.currency) fee += L2FeeAmount;
+        if (swapDetails.currency === "ETH") fee += L1FeeAmount;
+        if (fee >= swapDetails.amount * 0.1) {
+          const p = (fee / swapDetails.amount) * 100;
+          setSlippage(p);
+          setIsOpen(true);
+        } else {
+          deferredXfer = api.transferToBridge(
+            `${swapDetails.amount}`,
+            swapDetails.currency,
+            ZKSYNC_ETHEREUM_FAST_BRIDGE.address,
+            user.address
+          );
+        }
       } else {
         deferredXfer = api.withdrawL2(
           `${swapDetails.amount}`,
@@ -558,25 +572,26 @@ const BridgeContainer = () => {
       setFormErr("Wrong from/to combination");
       return false;
     }
-
-    deferredXfer
-      .then(() => {
-        setTimeout(() => {
-          api.getAccountState();
-          setFromAmounts(0);
-          api.getWalletBalances();
-        }, 1000);
-      })
-      .catch((e) => {
-        console.error("error sending transaction::", e);
-        setTimeout(() => api.getAccountState(), 1000);
-      })
-      .finally(() => {
-        setPolygonLoading(false);
-        setLoading(false);
-        setSwapDetails({ amount: "" });
-        // setFromAmounts(0);
-      });
+    if (deferredXfer) {
+      deferredXfer
+        .then(() => {
+          setTimeout(() => {
+            api.getAccountState();
+            setFromAmounts(0);
+            api.getWalletBalances();
+          }, 1000);
+        })
+        .catch((e) => {
+          console.error("error sending transaction::", e);
+          setTimeout(() => api.getAccountState(), 1000);
+        })
+        .finally(() => {
+          setPolygonLoading(false);
+          setLoading(false);
+          setSwapDetails({ amount: "" });
+          // setFromAmounts(0);
+        });
+    }
   };
 
   const onChangeSellToken = (option) => {
@@ -685,6 +700,40 @@ const BridgeContainer = () => {
     setSwapDetails(sDetails);
   };
 
+  const onCloseWarningModal = () => {
+    setIsOpen(false);
+    setLoading(false);
+  };
+
+  const onConfirmModal = () => {
+    setIsOpen(false);
+    let deferredXfer;
+    deferredXfer = api.transferToBridge(
+      `${swapDetails.amount}`,
+      swapDetails.currency,
+      ZKSYNC_ETHEREUM_FAST_BRIDGE.address,
+      user.address
+    );
+    deferredXfer
+      .then(() => {
+        setTimeout(() => {
+          api.getAccountState();
+          setFromAmounts(0);
+          api.getWalletBalances();
+        }, 1000);
+      })
+      .catch((e) => {
+        console.error("error sending transaction::", e);
+        setTimeout(() => api.getAccountState(), 1000);
+      })
+      .finally(() => {
+        setPolygonLoading(false);
+        setLoading(false);
+        setSwapDetails({ amount: "" });
+        // setFromAmounts(0);
+      });
+  };
+
   return (
     <>
       {tokenLoading && (
@@ -694,6 +743,12 @@ const BridgeContainer = () => {
       )}
       {!tokenLoading && (
         <div>
+          <SlippageWarningModal
+            isOpen={isOpen}
+            closeModal={onCloseWarningModal}
+            confirmModal={onConfirmModal}
+            slippage={slippage}
+          />
           <SwitchNetwork
             fromNetworkOptions={NETWORKS.map((item) => item.from)}
             onChangeFromNetwork={onSelectFromNetwork}

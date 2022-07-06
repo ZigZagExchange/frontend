@@ -157,7 +157,7 @@ const Dropdown = ({ width = 0, item, context, leftIcon, rightIcon, transparent, 
                             <DropdownListContainer className={`${adClass} ${iconSelected ? "active" : ""}`} key={items.text} leftIcon={leftIcon} onClick={() => handleClick(url, text, value)}>
                                 {/* {leftIcon && isValidElement(menuIcon) && <IconButton className={adClass} variant="secondary" startIcon={cloneElement(menuIcon)}></IconButton>} */}
                                 <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis" className={!iconSelected ? "selected-icon" : ""}>
-                                    {items.image != "" ? <img src={items.image} style={{width: 14, height: 14, borderRadius: "50%"}} /> : null}
+                                    {(items.image != "" && items.image) ? <img src={items.image} style={{width: 14, height: 14, borderRadius: "50%"}} /> : null}
                                     {text}
                                 </Text>
                                 {/* {rightIcon && isValidElement(menuIcon) && <IconButton className={adClass} variant="secondary" endIcon={cloneElement(menuIcon)}></IconButton>} */}
