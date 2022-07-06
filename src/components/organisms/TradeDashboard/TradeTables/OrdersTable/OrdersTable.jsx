@@ -62,9 +62,9 @@ export default function OrdersTable(props) {
   const [tokenSorted, setTokenSorted] = useState(false);
   const [balanceSorted, setBalanceSorted] = useState(false);
   const [sideItems, setSideItems] = useState([
-    { text: "All", url: "#", iconSelected: true },
-    { text: "Buy", url: "#" },
-    { text: "Sell", url: "#" },
+    { text: "All", url: "#", iconSelected: true, value: "All" },
+    { text: "Buy", url: "#", value: "Buy" },
+    { text: "Sell", url: "#", value: "Sell" },
   ]);
   const isMobile = window.innerWidth < 1064;
 
