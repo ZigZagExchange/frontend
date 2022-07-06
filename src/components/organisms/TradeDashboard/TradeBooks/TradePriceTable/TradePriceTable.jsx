@@ -172,8 +172,12 @@ const TradePriceTable = (props) => {
           const breakpoint = Math.round((total_step / total_total) * 100);
           let rowStyle;
           if (props.useGradient) {
+            let dir
+            if((d.side === "b" && !settings.stackOrderbook) || (d.side !== "b" && settings.stackOrderbook))
+              dir = "to left"
+            else dir = "to right"
             rowStyle = {
-              background: `linear-gradient(to right, ${color}, ${color} ${breakpoint}%, ${theme.colors.backgroundHighEmphasis} 0%)`,
+              background: `linear-gradient(${dir}, ${color}, ${color} ${breakpoint}%, ${theme.colors.backgroundHighEmphasis} 0%)`,
             };
           } else {
             rowStyle = {};

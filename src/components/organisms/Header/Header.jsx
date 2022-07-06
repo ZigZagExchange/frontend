@@ -454,12 +454,12 @@ export const Header = (props) => {
             {hasBridge && <Tab>CONVERT</Tab>}
             {hasBridge && <Tab>BRIDGE</Tab>}
             <Tab>LIST PAIR</Tab>
-            {hasBridge && (
+            {/* {hasBridge && (
               <Tab>
                 DOCS
                 <ExternalLinkIcon size={12} />
               </Tab>
-            )}
+            )} */}
             {/* {hasBridge && <Tab>DSL</Tab>} */}
           </TabMenu>
           <HorizontalDivider />

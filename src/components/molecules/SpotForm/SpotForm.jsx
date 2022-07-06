@@ -705,7 +705,7 @@ class SpotForm extends React.Component {
         <FormHeader>
           <InfoWrapper>
             <Text font="primaryTiny" color="foregroundMediumEmphasis">
-              Buy Fee
+              Network fee
             </Text>
             <QuestionHelper text={this.showLabel()} />
           </InfoWrapper>
@@ -731,7 +731,7 @@ class SpotForm extends React.Component {
         <FormHeader>
           <InfoWrapper>
             <Text font="primaryTiny" color="foregroundMediumEmphasis">
-              Sell Fee
+              Network fee
             </Text>
             <QuestionHelper text={this.showLabel()} />
           </InfoWrapper>

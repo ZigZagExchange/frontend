@@ -10,7 +10,7 @@ const IconButton = styled(baseIcon)`
 	height: 32px;
 	max-width: ${({ width }) => width}px;
 	width: 100%;
-	justify-content: space-between;
+		justify-content: ${({transparent}) => transparent ? 'flex-start' : 'space-between'};
 `
 
 const CustomText = styled(Text)`
