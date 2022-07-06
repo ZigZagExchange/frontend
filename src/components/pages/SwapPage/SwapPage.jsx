@@ -215,7 +215,8 @@ export default function SwapPage() {
       // const t = p.find((item) => item.name === currentMarket.split("-")[0]);
       const s = p.sort((a, b) => {
         return (
-          parseFloat(b.price.substring(1)) - parseFloat(a.price.substring(1))
+          parseFloat(b.price.substring(1).replace(",", "")) -
+          parseFloat(a.price.substring(1).replace(",", ""))
         );
       });
       setSellToken(f);
@@ -274,7 +275,8 @@ export default function SwapPage() {
     );
     const s = filtered.sort((a, b) => {
       return (
-        parseFloat(b.price.substring(1)) - parseFloat(a.price.substring(1))
+        parseFloat(b.price.substring(1).replace(",", "")) -
+        parseFloat(a.price.substring(1).replace(",", ""))
       );
     });
     return s;
