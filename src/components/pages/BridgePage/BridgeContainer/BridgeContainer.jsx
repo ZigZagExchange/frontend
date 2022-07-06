@@ -124,9 +124,10 @@ const BridgeContainer = () => {
 
   useEffect(async () => {
     if (!user.address) return;
+    setSellTokenList(api.getCurrencies());
     setBalances(_getBalances(fromNetwork.id));
     setAltBalances(_getBalances(toNetwork.id));
-  }, [toNetwork, user.address, walletBalances, zkBalances, polygonBalances]);
+  }, [network, toNetwork, user.address, walletBalances, zkBalances, polygonBalances]);
 
   const [withdrawSpeed, setWithdrawSpeed] = useState("fast");
   const isFastWithdraw = () => {
