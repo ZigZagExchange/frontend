@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { default as WidthProvider } from "./ReactGridLayout/ReactGridProvider";
+import GridLayoutCell from "./ReactGridLayout/ReactGridCell";
+import GridLayoutRow from "./ReactGridLayout/ReactGridRow";
+import { Responsive } from "react-grid-layout";
 import styled from "@xstyled/styled-components";
 import TradeSidebar from "./TradeSidebar/TradeSidebar";
 import TradeMarketSelector from "./TradeMarketSelector/TradeMarketSelector";
@@ -9,6 +13,9 @@ import TradeChartArea from "./TradeChartArea/TradeChartArea";
 import OrdersBook from "./TradeBooks/OrdersBook";
 import TradesBook from "./TradeBooks/TradesBook";
 import "react-toastify/dist/ReactToastify.css";
+import "react-grid-layout/css/styles.css";
+import "react-resizable/css/styles.css";
+import "./ReactGridLayout/custom-grid-layout.css";
 import { toast } from "react-toastify";
 import {
   networkSelector,
@@ -21,6 +28,7 @@ import {
   settingsSelector,
 } from "lib/store/features/api/apiSlice";
 import { userSelector } from "lib/store/features/auth/authSlice";
+import { getLayout } from "lib/helpers/storage/layouts";
 import api from "lib/api";
 import { useLocation, useHistory } from "react-router-dom";
 import {
@@ -29,6 +37,9 @@ import {
   networkQueryParam,
 } from "../../pages/ListPairPage/SuccessModal";
 import TradesTable from "./TradeBooks/TradesTable";
+import { setLayout } from "lib/helpers/storage/layouts";
+
+const ResponsiveGridLayout = WidthProvider(Responsive);
 
 const TradeContainer = styled.div`
   color: #aeaebf;
@@ -55,9 +66,7 @@ const TradeGrid = styled.article`
 
   @media screen and (max-width: 991px) {
     grid-template-rows: ${({ isLeft }) =>
-      isLeft
-        ? "56px 410px 459px 508px 362px"
-        : "56px 410px 459px 519px 362px"};
+      isLeft ? "56px 410px 459px 508px 362px" : "56px 410px 459px 519px 362px"};
     grid-template-columns: ${({ isLeft }) => (isLeft ? "1fr 1fr" : "1fr")};
     grid-template-areas: ${({ isLeft }) =>
       isLeft
@@ -84,16 +93,21 @@ const TradeGrid = styled.article`
   }
 `;
 
+const TradeGridLayout = styled(ResponsiveGridLayout)`
+  height: calc(100vh - 56px) !important;
+`;
+
 export function TradeDashboard() {
   const user = useSelector(userSelector);
   const network = useSelector(networkSelector);
   const currentMarket = useSelector(currentMarketSelector);
   const userOrders = useSelector(userOrdersSelector);
   const userFills = useSelector(userFillsSelector);
-  const layout = useSelector(layoutSelector);
+  const layouts = getLayout();
   const settings = useSelector(settingsSelector);
   const [fixedPoint, setFixedPoint] = useState(2);
   const [side, setSide] = useState("all");
+  const [firstLoading, setFirstLoading] = useState(true);
   const dispatch = useDispatch();
 
   const { search } = useLocation();
@@ -172,47 +186,48 @@ export function TradeDashboard() {
     activeOrderStatuses.includes(order[9])
   ).length;
 
+  const StyledGridLayoutRow = styled(GridLayoutRow)`
+    .react-grid-item {
+      background: ${({ theme }) => theme.colors.backgroundMediumEmphasis};
+    }
+  `;
+
   return (
     <TradeContainer>
-      <TradeGrid layout={layout} isLeft={settings.stackOrderbook}>
-        <TradeMarketSelector
-          updateMarketChain={updateMarketChain}
-          currentMarket={currentMarket}
-        />
-        {/* TradePriceBtcTable, Spotbox */}
-        <TradeSidebar
-          updateMarketChain={updateMarketChain}
-          currentMarket={currentMarket}
-          user={user}
-          activeOrderCount={activeUserOrders}
-        />
-        {settings.stackOrderbook ? (
-          <>
-            {/* TradePriceTable, TradePriceHeadSecond */}
-            <OrdersBook
-              currentMarket={currentMarket}
-              changeFixedPoint={changeFixedPoint}
-              changeSide={changeSide}
-            />
-            <TradesBook
-              currentMarket={currentMarket}
-              fixedPoint={fixedPoint}
-              side={side}
-            />
-          </>
-        ) : (
+      <TradeMarketSelector
+        updateMarketChain={updateMarketChain}
+        currentMarket={currentMarket}
+      />
+      <GridLayoutRow
+        rowHeight={270}
+        layouts={layouts}
+        autoSize={false}
+        onChange={(_, layout) => {
+          setLayout(layout);
+        }}
+      >
+        <div key="a">
+          <TradeSidebar
+            updateMarketChain={updateMarketChain}
+            currentMarket={currentMarket}
+            user={user}
+            activeOrderCount={activeUserOrders}
+          />
+        </div>
+        <div key="b">
           <TradesTable />
-        )}
-        {/* TradeChartArea */}
-        <TradeChartArea />
-        {/* OrdersTable */}
-        <TradeTables
-          userFills={userFills}
-          userOrders={userOrders}
-          user={user}
-        />
-        {/* <TradeFooter /> */}
-      </TradeGrid>
+        </div>
+        <div key="c">
+          <TradeChartArea />
+        </div>
+        <div key="d">
+          <TradeTables
+            userFills={userFills}
+            userOrders={userOrders}
+            user={user}
+          />
+        </div>
+      </GridLayoutRow>
     </TradeContainer>
   );
 }

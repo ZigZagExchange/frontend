@@ -1,0 +1,11 @@
+.react-grid-item > div {
+  height: 100%;
+}
+
+.react-grid-item > aside {
+  height: 100%;
+}
+
+.react-grid-item > section {
+  height: 100%;
+}
