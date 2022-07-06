@@ -8,6 +8,7 @@ import { RestartIcon, EditIcon } from "components/atoms/Svg";
 import {
   settingsSelector,
   resetUISettings,
+  resetTradeLayout,
 } from "lib/store/features/api/apiSlice";
 
 const SettingModalWrapper = styled(GenericModal)`
@@ -71,13 +72,17 @@ const SettingsModal = ({ onDismiss }) => {
     dispatch(resetUISettings());
   };
 
+  const resetLayout = () => {
+    dispatch(resetTradeLayout());
+  };
+
   return (
     <SettingModalWrapper isOpened onClose={onDismiss}>
       <ModalHeader>
         <Text font="primaryHeading6" color="foregroundHighEmphasis">
           Settings
         </Text>
-        {/* <ActionsWrapper>
+        <ActionsWrapper>
           <ActionWrapper>
             <EditIcon />
             <Text
@@ -88,7 +93,7 @@ const SettingsModal = ({ onDismiss }) => {
               Edit Layout
             </Text>
           </ActionWrapper>
-          <ActionWrapper>
+          <ActionWrapper onClick={resetLayout}>
             <RestartIcon />
             <Text
               font="primaryMediumBody"
@@ -98,7 +103,7 @@ const SettingsModal = ({ onDismiss }) => {
               Reset Layout
             </Text>
           </ActionWrapper>
-        </ActionsWrapper> */}
+        </ActionsWrapper>
       </ModalHeader>
       <Divider />
       <ModalBody>

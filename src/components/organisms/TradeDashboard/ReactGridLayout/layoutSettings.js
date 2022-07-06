@@ -3,7 +3,7 @@ export const initialLayouts = {
     {
       w: 6,
       h: 2,
-      x: 24,
+      x: 0,
       y: 0,
       i: "a",
       moved: false,
@@ -24,7 +24,7 @@ export const initialLayouts = {
       w: 24,
       h: 2,
       x: 16,
-      y: 2,
+      y: 0,
       i: "c",
       moved: false,
       static: false,

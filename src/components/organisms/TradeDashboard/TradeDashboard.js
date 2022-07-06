@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { default as WidthProvider } from "./ReactGridLayout/ReactGridProvider";
-import GridLayoutCell from "./ReactGridLayout/ReactGridCell";
 import GridLayoutRow from "./ReactGridLayout/ReactGridRow";
 import { Responsive } from "react-grid-layout";
 import styled from "@xstyled/styled-components";
@@ -23,12 +22,11 @@ import {
   userFillsSelector,
   currentMarketSelector,
   setCurrentMarket,
+  setLayout,
   resetData,
   layoutSelector,
-  settingsSelector,
 } from "lib/store/features/api/apiSlice";
 import { userSelector } from "lib/store/features/auth/authSlice";
-import { getLayout } from "lib/helpers/storage/layouts";
 import api from "lib/api";
 import { useLocation, useHistory } from "react-router-dom";
 import {
@@ -37,7 +35,6 @@ import {
   networkQueryParam,
 } from "../../pages/ListPairPage/SuccessModal";
 import TradesTable from "./TradeBooks/TradesTable";
-import { setLayout } from "lib/helpers/storage/layouts";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -103,11 +100,9 @@ export function TradeDashboard() {
   const currentMarket = useSelector(currentMarketSelector);
   const userOrders = useSelector(userOrdersSelector);
   const userFills = useSelector(userFillsSelector);
-  const layouts = getLayout();
-  const settings = useSelector(settingsSelector);
+  const layouts = useSelector(layoutSelector);
   const [fixedPoint, setFixedPoint] = useState(2);
   const [side, setSide] = useState("all");
-  const [firstLoading, setFirstLoading] = useState(true);
   const dispatch = useDispatch();
 
   const { search } = useLocation();
@@ -203,7 +198,7 @@ export function TradeDashboard() {
         layouts={layouts}
         autoSize={false}
         onChange={(_, layout) => {
-          setLayout(layout);
+          dispatch(setLayout(layout));
         }}
       >
         <div key="a">

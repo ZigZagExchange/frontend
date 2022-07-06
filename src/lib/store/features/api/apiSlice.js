@@ -2,8 +2,8 @@ import { createSlice, createAction } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 import { formatPrice } from "lib/utils";
 import api from "lib/api";
-import { getLayout } from "lib/helpers/storage/layouts";
 import FillCard from "components/organisms/TradeDashboard/TradeTables/OrdersTable/FillCard";
+import { initialLayouts } from "components/organisms/TradeDashboard/ReactGridLayout/layoutSettings";
 
 const makeScope = (state) => `${state.network}-${state.userId}`;
 
@@ -25,7 +25,7 @@ export const apiSlice = createSlice({
   initialState: {
     network: 1,
     userId: null,
-    layout: getLayout(),
+    layout: initialLayouts,
     currentMarket: "ETH-USDC",
     marketFills: {},
     bridgeReceipts: [],
@@ -566,6 +566,9 @@ export const apiSlice = createSlice({
     resetUISettings(state) {
       state.settings = initialUISettings;
     },
+    resetTradeLayout(state) {
+      state.layout = initialLayouts;
+    },
   },
 });
 
@@ -583,6 +586,8 @@ export const {
   setConnecting,
   setUISettings,
   resetUISettings,
+  resetTradeLayout,
+  setLayout,
 } = apiSlice.actions;
 
 export const layoutSelector = (state) => state.api.layout;

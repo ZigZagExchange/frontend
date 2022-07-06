@@ -67,6 +67,7 @@ const GridLayoutRow = (props) => {
               xs: 480,
               xxs: 0,
             }}
+            measureBeforeMount={true}
             cols={{ lg: 40, md: 10, sm: 8, xs: 4, xxs: 2 }}
             layouts={props.layouts}
             onLayoutChange={props.onChange}
