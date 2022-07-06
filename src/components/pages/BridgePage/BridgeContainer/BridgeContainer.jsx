@@ -285,7 +285,9 @@ const BridgeContainer = () => {
     return max;
   };
 
-  const validateInput = (inputValue, swapCurrency) => {
+  useEffect(() => {
+    const inputValue = parseFloat(swapDetails.amount) || 0;
+    const swapCurrency = swapDetails.currency;
     if (balances.length === 0) return false;
     const getCurrencyBalance = (cur) =>
       balances[cur] && swapCurrencyInfo?.decimals
@@ -307,7 +309,7 @@ const BridgeContainer = () => {
       } else if (bridgeAmount > max) {
         error = "Insufficient balance for fees";
       } else if (isFastWithdraw()) {
-        if (swapDetails.currency in fastWithdrawCurrencyMaxes) {
+        if (swapCurrency in fastWithdrawCurrencyMaxes) {
           const maxAmount = fastWithdrawCurrencyMaxes[swapCurrency];
           if (bridgeAmount > maxAmount) {
             error = `Max ${swapCurrency} liquidity for fast withdraw: ${maxAmount.toPrecision(
@@ -349,36 +351,26 @@ const BridgeContainer = () => {
 
     if (error) {
       setFormErr(error);
-      return false;
+      return;
     }
-    return true;
-  };
-
-  const validateFees = (inputValue, bridgeFee, feeCurrency) => {
-    const feeCurrencyInfo = api.getCurrencyInfo(feeCurrency);
+    
+    const feeCurrencyInfo = api.getCurrencyInfo(L2FeeToken);
     if (balances.length === 0) return false;
     const feeTokenBalance = parseFloat(
-      balances[feeCurrency] &&
-        balances[feeCurrency].value / 10 ** feeCurrencyInfo.decimals
+      balances[L2FeeToken] &&
+        balances[L2FeeToken].value / 10 ** feeCurrencyInfo.decimals
     );
 
-    if (inputValue > 0 && bridgeFee > feeTokenBalance) {
-      setFormErr("Not enough balance to pay for fees");
-      return false;
+    if (inputValue > 0 && L2FeeAmount > feeTokenBalance) {
+      error = "Not enough balance to pay for fees";
     }
-    return true;
-  };
 
-  const setL2Fee = (details, bridgeFee, feeToken) => {
-    setL2FeeAmount(bridgeFee);
-    setL2FeeToken(feeToken);
-    const input = parseFloat(details.amount) || 0;
-    const isInputValid = validateInput(input, details.currency);
-    const isFeesValid = validateFees(input, bridgeFee, feeToken);
-    if (isFeesValid && isInputValid) {
-      setFormErr("");
+    if (error) {
+      setFormErr(error);
+    } else {
+      setFormErr("")
     }
-  };
+  }, [swapDetails, ZigZagFeeAmount, userOrders, activationFee, L1FeeAmount, L2FeeAmount, L2FeeToken]);
 
   const setSwapDetails = async (values) => {
     const details = {
