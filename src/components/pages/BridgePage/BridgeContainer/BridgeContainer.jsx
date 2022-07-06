@@ -410,7 +410,8 @@ const BridgeContainer = () => {
       const gasFee = await api.getPolygonFee();
       if (gasFee) {
         setL1Fee((35000 * gasFee.fast.maxFee) / 10 ** 9);
-        setL2Fee(swapDetails, null, null);
+        setL2FeeAmount(null);
+        setL2FeeToken(null);
         setZigZagFeeToken("ETH");
         setZigZagFee(0.003);
       }
@@ -419,7 +420,8 @@ const BridgeContainer = () => {
     else if (fromNetwork.id === "zksync" && toNetwork.id === "polygon") {
       let res = await api.transferL2GasFee(swapDetails.currency);
       setL1Fee(null);
-      setL2Fee(swapDetails, res.amount, res.feeToken); // ZigZag fee
+      setL2FeeAmount(res.amount); // ZigZag fee
+      setL2FeeToken(res.feeToken);
       setZigZagFeeToken(res.feeToken);
       setZigZagFee(0.003);
     }
@@ -430,7 +432,8 @@ const BridgeContainer = () => {
         let maxFee = gasFee.maxFeePerGas / 10 ** 9;
         // For deposit, ethereum gaslimit is 90k, median is 63k
         setL1Fee((70000 * maxFee) / 10 ** 9);
-        setL2Fee(swapDetails, null, null);
+        setL2FeeAmount(null);
+        setL2FeeToken(null);
         setZigZagFeeToken(null);
         setZigZagFee(null);
       }
@@ -444,13 +447,15 @@ const BridgeContainer = () => {
             api.transferL2GasFee(swapDetails.currency),
           ]);
           setL1Fee(L1res);
-          setL2Fee(swapDetails, L2res.amount, L2res.feeToken);
+          setL2FeeAmount(L2res.amount);
+          setL2FeeToken(L2res.feeToken);
           setZigZagFeeToken("ETH");
           setZigZagFee(L1res * 3);
         } else {
           let res = await api.withdrawL2GasFee(swapDetails.currency);
           setL1Fee(null);
-          setL2Fee(swapDetails, res.amount, res.feeToken);
+          setL2FeeAmount(res.amount);
+          setL2FeeToken(res.feeToken);
           setZigZagFeeToken(null);
           setZigZagFee(null);
         }
@@ -461,7 +466,8 @@ const BridgeContainer = () => {
         `Bad op ==> from: ${fromNetwork.id}, to: ${toNetwork.id}, type: ${transfer.type}`
       );
       setL2FeeToken(null);
-      setL2Fee(swapDetails, null, null);
+      setL2FeeAmount(null);
+      setL2FeeToken(null);
       setZigZagFeeToken(null);
       setZigZagFee(null);
     }
