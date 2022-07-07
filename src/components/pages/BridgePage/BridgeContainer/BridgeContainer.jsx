@@ -382,19 +382,6 @@ const BridgeContainer = () => {
   };
 
   const calculateFees = async () => {
-    const input = parseFloat(swapDetails.amount) || 0;
-    if (
-      input > 0 &&
-      input < 0.0001 &&
-      (fromNetwork.id === "polygon" || toNetwork.id === "polygon")
-    ) {
-      setFormErr("Insufficient amount");
-      return;
-    } else if (swapDetails.amount.includes("0.000") && input === 0) {
-      setFormErr("");
-      return;
-    }
-
     setGasFetching(true);
 
     // polygon -> zkSync
