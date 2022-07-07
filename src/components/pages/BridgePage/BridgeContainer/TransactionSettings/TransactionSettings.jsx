@@ -127,7 +127,7 @@ const TransactionSettings = ({
               {ZigZagFee && (
                 <div className="flex items-center justify-between mt-3">
                   <p className="font-sans text-sm ">Bridge fee:</p>
-                  <p className="font-sans text-sm ">{`~${Number(ZigZagFee).toFixed(6)} ${ZigZagFeeToken}`}</p>
+                  <p className="font-sans text-sm ">{`~${formatPrice(ZigZagFee)} ${ZigZagFeeToken}`}</p>
                 </div>
               )}
               {isFastWithdraw && L1Fee && toNetwork.id === "ethereum" && (
@@ -142,7 +142,7 @@ const TransactionSettings = ({
               {L2Fee && (
                 <div className="flex items-center justify-between mt-3">
                   <p className="font-sans text-sm ">zkSync L2 gas fee:</p>
-                  <p className="font-sans text-sm ">{`~${L2Fee} ${L2FeeToken}`}</p>
+                  <p className="font-sans text-sm ">{`~${formatPrice(L2Fee)} ${L2FeeToken}`}</p>
                 </div>
               )}
               {!L2Fee && <div>Loading...</div>}
@@ -168,7 +168,7 @@ const TransactionSettings = ({
               {ZigZagFee && (
                 <div className="flex items-center justify-between mt-3">
                   <p className="font-sans text-sm ">Bridge fee:</p>
-                  <p className="font-sans text-sm ">{`~${ZigZagFee} ${ZigZagFeeToken}`}</p>
+                  <p className="font-sans text-sm ">{`~${formatPrice(ZigZagFee)} ${ZigZagFeeToken}`}</p>
                 </div>
               )}
               {L1Fee && fromNetwork.id === "ethereum" && (
