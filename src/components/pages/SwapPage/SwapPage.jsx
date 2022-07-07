@@ -93,7 +93,10 @@ export default function SwapPage() {
   }, [user.address, zkBalances]);
 
   useEffect(() => {
-    // dispatch(setCurrentMarket("ZZ-USDC"));
+    setSellToken('USDC')
+    dispatch(setCurrentMarket("ZZ-USDC"));
+    setSellTokenList(api.getCurrencies());
+    setGetPairs(api.getPairs());
     document.title = "ZigZag Convert";
   }, []);
   
@@ -130,6 +133,9 @@ export default function SwapPage() {
     } else {
       sub();
     }
+    
+    setSellTokenList(api.getCurrencies());
+    setGetPairs(api.getPairs());
 
     return () => {
       if (api.ws && api.ws.readyState !== 0) {
