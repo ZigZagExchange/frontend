@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { BigNumber } from "ethers";
 import isString from "lodash/isString";
 import get from "lodash/get";
-import { float } from "@xstyled/system";
 
 export const getThemeValue = (path, fallback) => (theme) =>
   get(theme, path, fallback);
@@ -13,6 +12,12 @@ export function formatUSD(floatNum) {
     .split(".");
   num[0] = parseInt(num[0]).toLocaleString();
   return num.join(".");
+}
+
+export function addComma(floatNum) {
+  const parts = floatNum.toString().split(".");
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return parts.join(".");
 }
 
 export function formatToken(floatNum, token = "USDC") {
