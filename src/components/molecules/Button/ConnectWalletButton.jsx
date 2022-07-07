@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { networkSelector, isConnectingSelector } from "../../../lib/store/features/api/apiSlice";
+import {
+  networkSelector,
+  isConnectingSelector,
+} from "../../../lib/store/features/api/apiSlice";
 import Button from "./Button";
 import api from "../../../lib/api";
 import { useHistory, useLocation } from "react-router-dom";
@@ -18,23 +21,30 @@ const ConnectWalletButton = (props) => {
     }
   }, [props.isLoading]);
 
-  const connect = async () => {
+  const connect = async (event) => {
+    event.preventDefault();
     try {
-      api.emit("connecting", true)
+      api.emit("connecting", true);
       // setConnecting(true);
       const state = await api.signIn(network);
-      const walletBalance = formatAmount(state.committed.balances['ETH'], { decimals: 18 });
-      const activationFee = await api.apiProvider.changePubKeyFee('ETH');
+      const walletBalance = formatAmount(state.committed.balances["ETH"], {
+        decimals: 18,
+      });
+      const activationFee = await api.apiProvider.changePubKeyFee("ETH");
 
-      if (!state.id && (!/^\/bridge(\/.*)?/.test(location.pathname)) && (isNaN(walletBalance) || walletBalance < activationFee)) {
+      if (
+        !state.id &&
+        !/^\/bridge(\/.*)?/.test(location.pathname) &&
+        (isNaN(walletBalance) || walletBalance < activationFee)
+      ) {
         history.push("/bridge");
       }
       // setConnecting(false);
-      api.emit("connecting", false)
+      api.emit("connecting", false);
     } catch (e) {
       console.error(e);
       // setConnecting(false);
-      api.emit("connecting", false)
+      api.emit("connecting", false);
     }
   };
 

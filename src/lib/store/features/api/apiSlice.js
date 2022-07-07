@@ -40,6 +40,17 @@ export const apiSlice = createSlice({
     arweaveAllocation: 0,
     isConnecting: false,
     settings: initialUISettings,
+    highSlippageModal: {
+      open: false,
+      confirmed: "",
+      delta: 0,
+      type: "sell",
+      marketInfo: " ",
+      xToken: 0,
+      yToken: 0,
+      userPrice: 0,
+      pairPrice: 0,
+    },
   },
   reducers: {
     _error(state, { payload }) {
@@ -560,6 +571,29 @@ export const apiSlice = createSlice({
     setConnecting(state, { payload }) {
       state.isConnecting = payload;
     },
+    setHighSlippageModal(state, { payload }) {
+      state.highSlippageModal = {
+        open: payload.open ? payload.open : false,
+        confirmed: payload.confirmed ? payload.confirmed : false,
+        delta: payload.delta ? payload.delta : state.highSlippageModal.delta,
+        type: payload.type ? payload.type : state.highSlippageModal.type,
+        marketInfo: payload.marketInfo
+          ? payload.marketInfo
+          : state.highSlippageModal.marketInfo,
+        xToken: payload.xToken
+          ? payload.xToken
+          : state.highSlippageModal.xToken,
+        yToken: payload.yToken
+          ? payload.yToken
+          : state.highSlippageModal.yToken,
+        userPrice: payload.userPrice
+          ? payload.userPrice
+          : state.highSlippageModal.userPrice,
+        pairPrice: payload.pairPrice
+          ? payload.pairPrice
+          : state.highSlippageModal.pairPrice,
+      };
+    },
     setUISettings(state, { payload }) {
       state.settings[payload.key] = payload.value;
     },
@@ -581,6 +615,7 @@ export const {
   clearLastPrices,
   setArweaveAllocation,
   setConnecting,
+  setHighSlippageModal,
   setUISettings,
   resetUISettings,
 } = apiSlice.actions;
@@ -600,6 +635,7 @@ export const marketInfoSelector = (state) => state.api.marketinfo;
 export const arweaveAllocationSelector = (state) => state.api.arweaveAllocation;
 export const isConnectingSelector = (state) => state.api.isConnecting;
 export const settingsSelector = (state) => state.api.settings;
+export const highSlippageModalSelector = (state) => state.api.highSlippageModal;
 export const balancesSelector = (state) =>
   state.api.balances[makeScope(state.api)] || {};
 
