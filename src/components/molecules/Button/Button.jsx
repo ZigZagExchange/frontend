@@ -15,7 +15,7 @@ const Button = (props) => {
       disabled={isDisabled}
       {...rest}
     >
-      {isLoading && <LoadingSpinner size={16} style={{ paddingRight: '8px' }} />}
+      {isLoading ? <LoadingSpinner size={16} style={{ paddingRight: '8px' }} /> :
       <>
         {isValidElement(startIcon) &&
           cloneElement(startIcon, {
@@ -26,7 +26,7 @@ const Button = (props) => {
           cloneElement(endIcon, {
             style: { marginLeft: "8px" },
           })}
-      </>
+      </>}
     </StyledButton>
   );
 };

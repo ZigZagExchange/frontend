@@ -127,7 +127,7 @@ const TransactionSettings = ({
               {ZigZagFee && (
                 <div className="flex items-center justify-between mt-3">
                   <p className="font-sans text-sm ">Bridge fee:</p>
-                  <p className="font-sans text-sm ">{`~${ZigZagFee} ${ZigZagFeeToken}`}</p>
+                  <p className="font-sans text-sm ">{`~${Number(ZigZagFee).toFixed(6)} ${ZigZagFeeToken}`}</p>
                 </div>
               )}
               {isFastWithdraw && L1Fee && toNetwork.id === "ethereum" && (
