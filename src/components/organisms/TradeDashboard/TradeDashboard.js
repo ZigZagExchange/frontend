@@ -221,7 +221,7 @@ export function TradeDashboard() {
                 onChange={(_, layout) => {
                     dispatch(setUISettings({ key: "layouts", value: layout }));
                 }}
-                margin={settings.editable ? [10, 10] : [0, 0]}
+                margin={[0, 0]}
                 isDraggable={settings.editable}
                 isResizable={settings.editable}
                 draggableHandle=".grid-item__title"
