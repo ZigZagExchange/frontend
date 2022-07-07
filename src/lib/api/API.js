@@ -434,6 +434,7 @@ export default class API extends Emitter {
 
   transferPolygonWeth = async (amount, walletAddress) => {
     let networkSwitched = false;
+    this.emit("bridge_connecting", true);
     try {
       const polygonChainId = this.getPolygonChainId(this.apiProvider.network);
       await window.ethereum.request({
@@ -491,8 +492,10 @@ export default class API extends Emitter {
       this.emit("bridgeReceipt", receipt);
 
       await this.signIn(this.apiProvider.network);
+      this.emit("bridge_connecting", false);
     } catch (e) {
       if (networkSwitched) await this.signIn(this.apiProvider.network);
+      this.emit("bridge_connecting", false);
       throw e;
     }
   };
