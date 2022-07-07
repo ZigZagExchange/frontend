@@ -108,6 +108,10 @@ const BridgeContainer = () => {
   };
 
   useEffect(() => {
+    setSellTokenList(api.getCurrencies());
+  }, [])
+  
+  useEffect(() => {
     setTokenLoading(true);
     const timer = setInterval(() => {
       setSellTokenList(api.getCurrencies());
@@ -124,9 +128,10 @@ const BridgeContainer = () => {
 
   useEffect(async () => {
     if (!user.address) return;
+    setSellTokenList(api.getCurrencies());
     setBalances(_getBalances(fromNetwork.id));
     setAltBalances(_getBalances(toNetwork.id));
-  }, [toNetwork, user.address, walletBalances, zkBalances, polygonBalances]);
+  }, [network, toNetwork, user.address, walletBalances, zkBalances, polygonBalances]);
 
   const [withdrawSpeed, setWithdrawSpeed] = useState("fast");
   const isFastWithdraw = () => {
@@ -832,7 +837,7 @@ const BridgeContainer = () => {
                   }
                   onClick={doTransfer}
                 >
-                  Exchange
+                  transfer
                 </Button>
               )}
             </>

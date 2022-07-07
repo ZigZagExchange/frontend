@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import styled from "styled-components";
 import useTheme from "components/hooks/useTheme";
 import { marketInfoSelector, settingsSelector } from "lib/store/features/api/apiSlice";
-import { numStringToSymbol } from "lib/utils";
+import { numStringToSymbol, addComma } from "lib/utils";
 import Text from "components/atoms/Text/Text";
 
 const Table = styled.table`
@@ -172,8 +172,12 @@ const TradePriceTable = (props) => {
           const breakpoint = Math.round((total_step / total_total) * 100);
           let rowStyle;
           if (props.useGradient) {
+            let dir
+            if((d.side === "b" && !settings.stackOrderbook) || (d.side !== "b" && settings.stackOrderbook))
+              dir = "to left"
+            else dir = "to right"
             rowStyle = {
-              background: `linear-gradient(to right, ${color}, ${color} ${breakpoint}%, ${theme.colors.backgroundHighEmphasis} 0%)`,
+              background: `linear-gradient(${dir}, ${color}, ${color} ${breakpoint}%, ${theme.colors.backgroundHighEmphasis} 0%)`,
             };
           } else {
             rowStyle = {};
@@ -218,7 +222,8 @@ const TradePriceTable = (props) => {
                   color="foregroundHighEmphasis"
                   textAlign="right"
                 >
-                  {numStringToSymbol(total, 2)}
+                  {/* {numStringToSymbol(total, 2)} */}
+                  {addComma(total)}
                 </Text>
               </td>}
             </tr>
