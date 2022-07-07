@@ -17,7 +17,9 @@ import apiReducer, {
   clearLastPrices,
   setArweaveAllocation,
   setCurrentMarket,
-  setConnecting
+  setConnecting,
+  setBridgeConnecting,
+  setUISettings
 } from "lib/store/features/api/apiSlice";
 import autoMergeLevel2 from "redux-persist/lib/stateReconciler/autoMergeLevel2";
 import api from "lib/api";
@@ -32,7 +34,7 @@ const persistConfig = {
 
 const apiPersistConfig = {
   key: "api",
-  whitelist: ["userId", "currentMarket", "bridgeReceipts", "network"],
+  whitelist: ["userId", "currentMarket", "bridgeReceipts", "network", "settings"],
   storage,
 };
 
@@ -103,6 +105,14 @@ api.on("message", (operation, args) => {
 
 api.on("connecting", (flag) => {
   store.dispatch(setConnecting(flag))
+})
+
+api.on("bridge_connecting", (flag) => {
+  store.dispatch(setBridgeConnecting(flag))
+})
+
+api.on("settings", (payload) => {
+  store.dispatch(setUISettings(payload))
 })
 
 export default store;

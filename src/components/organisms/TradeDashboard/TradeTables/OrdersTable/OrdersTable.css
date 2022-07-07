@@ -221,6 +221,14 @@ img.loading-gif {
   margin-bottom: 30px;
 }
 
+.text-green {
+  color: #74DE9F;
+}
+
+.text-red {
+  color: #E83681;
+}
+
 @media screen and (max-width: 697px) {
   .ft_tabs {
     flex-wrap: wrap;
