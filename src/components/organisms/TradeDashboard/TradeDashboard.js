@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { default as WidthProvider } from "./ReactGridLayout/ReactGridProvider";
 import GridLayoutRow from "./ReactGridLayout/ReactGridRow";
+import GridLayoutCell from "./ReactGridLayout/ReactGridCell";
 import { Responsive } from "react-grid-layout";
 import styled from "@xstyled/styled-components";
+import MenuIcon from "@mui/icons-material/Menu";
 import TradeSidebar from "./TradeSidebar/TradeSidebar";
 import TradeMarketSelector from "./TradeMarketSelector/TradeMarketSelector";
 import TradeTables from "./TradeTables/TradeTables";
@@ -214,40 +216,51 @@ export function TradeDashboard() {
         }}
         margin={settings.editable ? [10, 10] : [0, 0]}
         isDraggable={settings.editable}
+        draggableHandle=".grid-item__title"
         editable={settings.editable}
       >
         <div key={settings.stackOrderbook ? "a" : "b"}>
-          <TradeSidebar
-            updateMarketChain={updateMarketChain}
-            currentMarket={currentMarket}
-            user={user}
-            activeOrderCount={activeUserOrders}
-          />
+          <GridLayoutCell editable={settings.editable}>
+            <TradeSidebar
+              updateMarketChain={updateMarketChain}
+              currentMarket={currentMarket}
+              user={user}
+              activeOrderCount={activeUserOrders}
+            />
+          </GridLayoutCell>
         </div>
         {/* TradePriceTable, TradePriceHeadSecond */}
         <div key={settings.stackOrderbook ? "g" : "e"}>
-          <OrdersBook
-            currentMarket={currentMarket}
-            changeFixedPoint={changeFixedPoint}
-            changeSide={changeSide}
-          />
+          <GridLayoutCell editable={settings.editable}>
+            <OrdersBook
+              currentMarket={currentMarket}
+              changeFixedPoint={changeFixedPoint}
+              changeSide={changeSide}
+            />
+          </GridLayoutCell>
         </div>
         <div key={settings.stackOrderbook ? "h" : "f"}>
-          <TradesBook
-            currentMarket={currentMarket}
-            fixedPoint={fixedPoint}
-            side={side}
-          />
+          <GridLayoutCell editable={settings.editable}>
+            <TradesBook
+              currentMarket={currentMarket}
+              fixedPoint={fixedPoint}
+              side={side}
+            />
+          </GridLayoutCell>
         </div>
         <div key="c">
-          <TradeChartArea />
+          <GridLayoutCell editable={settings.editable}>
+            <TradeChartArea />
+          </GridLayoutCell>
         </div>
         <div key="d">
-          <TradeTables
-            userFills={userFills}
-            userOrders={userOrders}
-            user={user}
-          />
+          <GridLayoutCell editable={settings.editable}>
+            <TradeTables
+              userFills={userFills}
+              userOrders={userOrders}
+              user={user}
+            />
+          </GridLayoutCell>
         </div>
       </GridLayoutRow>
       <HighSlippageModal />

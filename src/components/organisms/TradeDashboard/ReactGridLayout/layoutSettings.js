@@ -1,7 +1,7 @@
 export const initialLayouts = {
   xl: [
     {
-      w: 6.5,
+      w: 7,
       h: 2,
       x: 0,
       y: 0,
@@ -11,7 +11,7 @@ export const initialLayouts = {
       isBounded: true,
     },
     {
-      w: 6.5,
+      w: 7,
       h: 2,
       x: 0,
       y: 0,
@@ -21,9 +21,9 @@ export const initialLayouts = {
       isBounded: true,
     },
     {
-      w: 23.5,
+      w: 23,
       h: 2,
-      x: 16.5,
+      x: 17,
       y: 0,
       i: "c",
       moved: false,
@@ -31,10 +31,10 @@ export const initialLayouts = {
       isBounded: true,
     },
     {
-      w: 33.5,
+      w: 33,
       h: 1,
-      x: 6.5,
-      y: 4,
+      x: 7,
+      y: 2,
       i: "d",
       moved: false,
       static: false,
@@ -43,26 +43,26 @@ export const initialLayouts = {
     {
       w: 10,
       h: 1,
-      x: 6.5,
+      x: 7,
       y: 0,
       i: "e",
     },
     {
       w: 10,
       h: 1,
-      x: 6.5,
-      y: 0,
+      x: 7,
+      y: 1,
       i: "f",
     },
     {
-      w: 5.5,
+      w: 5,
       h: 2,
-      x: 6.5,
+      x: 7,
       y: 0,
       i: "g",
     },
     {
-      w: 5.5,
+      w: 5,
       h: 2,
       x: 12,
       y: 0,
