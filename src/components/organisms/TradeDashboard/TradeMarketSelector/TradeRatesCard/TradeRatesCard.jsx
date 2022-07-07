@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
-import { formatPrice } from "lib/utils";
+import { formatPrice, addComma } from "lib/utils";
 import { SettingsIcon } from "components/atoms/Svg";
 import Button from "components/molecules/Button/Button";
 import Text from "components/atoms/Text/Text";
@@ -78,7 +78,7 @@ const TradeRatesCard = ({
                   : "dangerHighEmphasis"
               }
             >
-              {marketSummary.price ? marketSummary.price : "--"}
+              {marketSummary.price ? addComma(marketSummary.price) : "--"}
             </Text>
             <Text
               font="primaryTiny"
@@ -86,7 +86,7 @@ const TradeRatesCard = ({
             >
               $ {
                 (marketInfo?.baseAsset?.usdPrice)
-                  ? marketInfo.baseAsset.usdPrice
+                  ? addComma(marketInfo.baseAsset.usdPrice)
                   : "--"
               }
             </Text>
@@ -140,7 +140,7 @@ const TradeRatesCard = ({
                   font="primaryMediumSmallSemiBold"
                   color="foregroundHighEmphasis"
                 >
-                  {marketSummary["24hi"] ?? "--"}
+                  {marketSummary && marketSummary["24hi"] ? addComma(marketSummary["24hi"]): "--"}
                 </Text>
               </RatesCard>
               <Divider />
@@ -160,7 +160,7 @@ const TradeRatesCard = ({
                   font="primaryMediumSmallSemiBold"
                   color="foregroundHighEmphasis"
                 >
-                  {marketSummary["24lo"] ?? "--"}
+                  {marketSummary && marketSummary["24lo"] ? addComma(marketSummary["24lo"]): "--"}
                 </Text>
               </RatesCard>
               <Divider />
@@ -180,7 +180,7 @@ const TradeRatesCard = ({
                   font="primaryMediumSmallSemiBold"
                   color="foregroundHighEmphasis"
                 >
-                  {marketSummary.baseVolume ?? "--"}
+                  {marketSummary && marketSummary.baseVolume ? addComma(marketSummary.baseVolume): "--"}
                 </Text>
               </RatesCard>
               <Divider />
@@ -200,7 +200,7 @@ const TradeRatesCard = ({
                   font="primaryMediumSmallSemiBold"
                   color="foregroundHighEmphasis"
                 >
-                  {marketSummary.quoteVolume ?? "--"}
+                  {marketSummary && marketSummary.quoteVolume ? addComma(marketSummary.quoteVolume): "--"}
                 </Text>
               </RatesCard>
             </>

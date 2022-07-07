@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import styled from 'styled-components'
 import { ExpandableButton } from '../ExpandableButton'
-import { HideMenuOnOutsideClicked } from "lib/utils";
+import { HideMenuOnOutsideClicked, addComma } from "lib/utils";
 import Text from "components/atoms/Text/Text";
 import { StarIcon, ActivatedStarIcon, SortUpIcon, SortDownIcon, SortUpFilledIcon, SortDownFilledIcon } from "components/atoms/Svg";
 import InputField from "components/atoms/InputField/InputField";
@@ -518,7 +518,7 @@ const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, upda
                             </PairWrapper>
                         </td>
                         <td style={{paddingLeft: '30px'}}>
-                            <Text font="tableContent" color={increaseObj.increase === false ? 'dangerHighEmphasis' : 'successHighEmphasis'} align="right">{d.td2}</Text>
+                            <Text font="tableContent" color={increaseObj.increase === false ? 'dangerHighEmphasis' : 'successHighEmphasis'} align="right">{addComma(d.td2)}</Text>
                         </td>
                         <td>
                             <Text font="tableContent" color='foregroundHighEmphasis' align="right">{d.usdVolume.toLocaleString("en-US", {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Text>
