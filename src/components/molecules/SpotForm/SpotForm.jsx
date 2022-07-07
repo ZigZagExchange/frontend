@@ -358,6 +358,9 @@ class SpotForm extends React.Component {
       baseAmount = 0;
       baseAmountMsg = formatPrice(quoteAmount / price);
 
+      const bidPrice = this.getFirstBid();
+      const delta = ((price - bidPrice) / bidPrice) * 100;
+
       if (isNaN(quoteBalance)) {
         this.props.setHighSlippageModal({ open: true, delta: delta });
         return;
@@ -372,9 +375,6 @@ class SpotForm extends React.Component {
         this.props.setHighSlippageModal({ open: true, delta: delta });
         return;
       }
-
-      const bidPrice = this.getFirstBid();
-      const delta = ((price - bidPrice) / bidPrice) * 100;
 
       if (
         delta > 10 &&
@@ -705,7 +705,7 @@ class SpotForm extends React.Component {
         <FormHeader>
           <InfoWrapper>
             <Text font="primaryTiny" color="foregroundMediumEmphasis">
-              Buy Fee
+              Network fee
             </Text>
             <QuestionHelper text={this.showLabel()} />
           </InfoWrapper>
@@ -731,7 +731,7 @@ class SpotForm extends React.Component {
         <FormHeader>
           <InfoWrapper>
             <Text font="primaryTiny" color="foregroundMediumEmphasis">
-              Sell Fee
+              Network fee
             </Text>
             <QuestionHelper text={this.showLabel()} />
           </InfoWrapper>

@@ -69,7 +69,7 @@ const TransactionSettings = ({
       </div>
       <div className="flex justify-between mt-4">
         <p className="flex items-center gap-2 text-base font-light ">
-          Estimated gas fee:
+          Estimated gas fee
         </p>
         <div className="flex items-center gap-2 text-base ">
           {transactionType === "buy" && (

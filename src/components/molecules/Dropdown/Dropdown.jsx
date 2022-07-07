@@ -87,9 +87,10 @@ const DropdownListContainer = styled.div`
     }
 
     &.network-dropdown {
-        display: block;
+        display: flex;
         width: 100%;
-        padding: 8px 20px;
+        padding: 8px 10px;
+        align-items: center;
     }
 
     &.menu-dropdown {
@@ -137,7 +138,9 @@ const Dropdown = ({ width = 0, item, context, leftIcon, rightIcon, transparent, 
         if (url !== '#') {
             window.open(url, "_blank");
         } else {
-            clickFunction(text, value)
+            if(value) {
+                clickFunction(text, value)
+            }
             toggle()
         }
     }
@@ -153,7 +156,10 @@ const Dropdown = ({ width = 0, item, context, leftIcon, rightIcon, transparent, 
                         return (
                             <DropdownListContainer className={`${adClass} ${iconSelected ? "active" : ""}`} key={items.text} leftIcon={leftIcon} onClick={() => handleClick(url, text, value)}>
                                 {/* {leftIcon && isValidElement(menuIcon) && <IconButton className={adClass} variant="secondary" startIcon={cloneElement(menuIcon)}></IconButton>} */}
-                                <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis" className={!iconSelected ? "selected-icon" : ""}>{text}</Text>
+                                <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis" className={!iconSelected ? "selected-icon" : ""}>
+                                    {(items.image != "" && items.image) ? <img src={items.image} style={{width: 14, height: 14, borderRadius: "50%"}} /> : null}
+                                    {text}
+                                </Text>
                                 {/* {rightIcon && isValidElement(menuIcon) && <IconButton className={adClass} variant="secondary" endIcon={cloneElement(menuIcon)}></IconButton>} */}
                             </DropdownListContainer>
                         )

@@ -3,7 +3,7 @@ import styled from "styled-components";
 // css
 import "./TradeRecentTable.css";
 import useTheme from "components/hooks/useTheme";
-import { numStringToSymbol } from "lib/utils";
+import { numStringToSymbol, addComma } from "lib/utils";
 import Text from "components/atoms/Text/Text";
 
 const Table = styled.table`
@@ -13,6 +13,8 @@ const Table = styled.table`
   height: 200px;
   padding: 0px;
   flex-direction: column;
+  scrollbar-color: ${({ theme }) => theme.colors.foreground400} rgba(0,0,0,0.1);
+  scrollbar-width: thin !important;
 
   tbody {
     width: 100%;
@@ -174,7 +176,8 @@ const TradeRecentTable = (props) => {
                             : "dangerHighEmphasis"
                         }
                       >
-                        {numStringToSymbol(price, 2)}
+                        {/* {numStringToSymbol(price, 2)} */}
+                        {addComma(price)}
                       </Text>
                     </td>
                     <td>
@@ -183,7 +186,8 @@ const TradeRecentTable = (props) => {
                         color="foregroundHighEmphasis"
                         textAlign="right"
                       >
-                        {numStringToSymbol(amount, 2)}
+                        {/* {numStringToSymbol(amount, 2)} */}
+                        {addComma(price)}
                       </Text>
                     </td>
                     <td>

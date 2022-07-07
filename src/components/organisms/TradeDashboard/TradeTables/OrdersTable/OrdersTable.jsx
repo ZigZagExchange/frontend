@@ -14,7 +14,7 @@ import {
   settingsSelector,
 } from "lib/store/features/api/apiSlice";
 import api from "lib/api";
-import { formatDate, formatDateTime, formatToken } from "lib/utils";
+import { formatDate, formatDateTime, formatToken, addComma } from "lib/utils";
 import { Tab } from "components/molecules/TabMenu";
 import Text from "components/atoms/Text/Text";
 
@@ -62,9 +62,9 @@ export default function OrdersTable(props) {
   const [tokenSorted, setTokenSorted] = useState(false);
   const [balanceSorted, setBalanceSorted] = useState(false);
   const [sideItems, setSideItems] = useState([
-    { text: "All", url: "#", iconSelected: true },
-    { text: "Buy", url: "#" },
-    { text: "Sell", url: "#" },
+    { text: "All", url: "#", iconSelected: true, value: "All" },
+    { text: "Buy", url: "#", value: "Buy" },
+    { text: "Sell", url: "#", value: "Sell" },
   ]);
   const isMobile = window.innerWidth < 1064;
 
@@ -437,7 +437,7 @@ export default function OrdersTable(props) {
                         color="foregroundHighEmphasis"
                         textAlign="right"
                       >
-                        {price.toPrecision(6) / 1}
+                        {addComma(price.toPrecision(6) / 1)}
                       </Text>
                     </td>
                   </tr>
@@ -752,7 +752,7 @@ export default function OrdersTable(props) {
                       font="primaryExtraSmallSemiBold"
                       color="foregroundHighEmphasis"
                     >
-                      {price.toPrecision(6) / 1}
+                      {addComma(price.toPrecision(6) / 1)}
                     </Text>
                   </td>
                   <td data-label="Quantity">
