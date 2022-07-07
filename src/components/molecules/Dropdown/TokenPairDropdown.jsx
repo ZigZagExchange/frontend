@@ -93,13 +93,13 @@ const TableContent = styled.div`
   
       ::-webkit-scrollbar-track {
           border-radius: 0px;
-          background: hsla(0, 0%, 100%, 0.15);
+          background: hsla(0, 0%, 50%, 0.15);
           height: 23px;
       }
   
       ::-webkit-scrollbar-thumb {
           border-radius: 0px;
-          background: hsla(0, 0%, 100%, 0.4);
+          background: hsla(0, 0%, 50%, 0.4);
       }
   
       ::-webkit-scrollbar-thumb:window-inactive {
