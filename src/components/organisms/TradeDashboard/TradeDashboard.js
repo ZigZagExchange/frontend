@@ -48,6 +48,11 @@ const TradeContainer = styled.div`
     color: #aeaebf;
     height: calc(100vh - 56px);
     background: ${(p) => p.theme.colors.backgroundHighEmphasis};
+
+    .react-resizable-handle::after {
+        border-color: ${({ theme }) =>
+            `${theme.colors.primaryHighEmphasis} !important`};
+    }
 `;
 
 const TradeGrid = styled.article`
@@ -195,27 +200,14 @@ export function TradeDashboard() {
         activeOrderStatuses.includes(order[9])
     ).length;
 
-    const StyledGridLayoutRow = styled(GridLayoutRow)`
-        .react-grid-item {
-            padding: ${({ editable }) => editable && "10px"};
-            background: ${({ editable, theme }) =>
-                editable && theme.colors.backgroundMediumEmphasis};
-        }
-
-        .react-resizable-handle::after {
-            border-color: ${({ theme }) =>
-                `${theme.colors.primaryHighEmphasis} !important`};
-        }
-    `;
-
     return (
         <TradeContainer>
             <TradeMarketSelector
                 updateMarketChain={updateMarketChain}
                 currentMarket={currentMarket}
             />
-            <StyledGridLayoutRow
-                rowHeight={283}
+            <GridLayoutRow
+                rowHeight={(window.innerHeight - 112) / 30}
                 layouts={settings.layouts}
                 autoSize={false}
                 onChange={(_, layout) => {
@@ -270,7 +262,7 @@ export function TradeDashboard() {
                         />
                     </GridLayoutCell>
                 </div>
-            </StyledGridLayoutRow>
+            </GridLayoutRow>
             <HighSlippageModal />
         </TradeContainer>
     );
