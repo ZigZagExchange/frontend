@@ -207,7 +207,7 @@ const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, upda
     const [categorySelected, setCategorySelected] = useState(0)
     const [pairsByCategory, setPairsByCategory] = useState([])
     const [favourites, setFavourites] = useState(fetchFavourites())
-    const [volumeSorted, setVolumeSorted] = useState(false)
+    const [volumeSorted, setVolumeSorted] = useState(true)
     const [volumeDirection, setVolumeDirection] = useState(false)
     const [pairSorted, setPairSorted] = useState(false)
     const [pairDirection, setPairDirection] = useState(false)
@@ -515,7 +515,7 @@ const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, upda
                     >
                         <td>
                             <PairWrapper>
-                                <span onClick={(e) => { favouritePair(d); }}>
+                                <span onClick={(e) => { e.stopPropagation(); favouritePair(d); }}>
                                     {isFavourited ? <ActivatedStarIcon /> : <StarIcon />}
                                 </span>
                                 <Text font="primaryExtraSmall" color="foregroundHighEmphasis">{pair.replace("-", "/")}</Text>
@@ -630,6 +630,7 @@ const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, upda
                             icon="search"
                             value={searchValue}
                             onChange={updateSearchValue}
+                            autoFocus
                         />
                     </DropdownHeader>
                     <Divider />

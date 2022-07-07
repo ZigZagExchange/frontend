@@ -44,7 +44,7 @@ const TradePriceHeadSecond = (props) => {
   return (
     <Wrapper isIncrease={isIncrease}>
       <div>
-        <Text font="primaryTitleDisplay" color={isIncrease ? "successHighEmphasis" : "dangerHighEmphasis"}>{parseFloat(formatPrice(lastPrice)).toFixed(props.fixedPoint)}</Text>
+        <Text font="primaryTitleDisplay" color={isIncrease ? "successHighEmphasis" : "dangerHighEmphasis"}>{parseFloat(formatPrice(lastPrice))}</Text>
         {isIncrease ? <ArrowUpIcon /> : <ArrowDownIcon />} 
       </div>
       <Text font="primaryMediumSmallSemiBold" color="foregroundMediumEmphasis">

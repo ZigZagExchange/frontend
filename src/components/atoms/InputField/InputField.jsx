@@ -14,9 +14,10 @@ const InputFieldWrapper = styled.div`
 `
 
 const InputWrapper = styled.div`
-    display: flex;
-    flex-direction: row;
+  display: flex;
+  flex-direction: row;
 	position: relative;
+  align-items: center;
 	width: 100%;
 `
 
@@ -27,9 +28,6 @@ const LabelWrapper = styled.div`
 const IconWrapper = styled.div`
 	position: absolute;
 	left: 10.67px;
-	height: 100%;
-	display: grid;
-	align-items: center;
 `
 
 const Input = styled.input`
