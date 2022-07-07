@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
 import styled from "styled-components";
 import { toast } from "react-toastify";
+import { connect } from "react-redux";
 import api from "lib/api";
 import { RangeSlider, QuestionHelper } from "components";
 import { formatPrice, formatToken } from "lib/utils";
@@ -10,9 +11,10 @@ import InputField from "components/atoms/InputField/InputField";
 import Text from "components/atoms/Text/Text";
 import { IconButton as BaseIcon } from "../IconButton";
 import { InfoIcon, MinusIcon, PlusIcon } from "components/atoms/Svg";
+import { setHighSlippageModal } from "lib/store/features/api/apiSlice";
 
 const rx_live = /^\d*(?:[.,]\d*)?$/;
-export class SpotForm extends React.Component {
+class SpotForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -273,6 +275,13 @@ export class SpotForm extends React.Component {
       return;
     }
 
+    this.props.setHighSlippageModal({
+      xToken: baseAmount,
+      yToken: baseAmount * price,
+      userPrice: price,
+      pairPrice: this.props.lastPrice,
+    });
+
     if (this.props.activeOrderCount > 0 && api.isZksyncChain()) {
       toast.error("Only one active order permitted at a time", {
         toastId: "Only one active order permitted at a time",
@@ -296,6 +305,7 @@ export class SpotForm extends React.Component {
       baseAmount = baseAmount ? baseAmount : quoteAmount / price;
       quoteAmount = 0;
       baseAmountMsg = formatPrice(baseAmount);
+      this.props.setHighSlippageModal({ type: "sell" });
 
       if (isNaN(baseBalance)) {
         toast.error(`No ${marketInfo.baseAsset.symbol} balance`, {
@@ -327,16 +337,8 @@ export class SpotForm extends React.Component {
         this.props.orderType === "limit" &&
         !this.props.settings.disableSlippageWarning
       ) {
-        toast.error(
-          `You are selling ${delta.toFixed(
-            2
-          )}% under the current market price. You will lose money when signing this transaction!`,
-          {
-            toastId: `You are selling ${delta.toFixed(
-              2
-            )}% under the current market price. You will lose money when signing this transaction!`,
-          }
-        );
+        this.props.setHighSlippageModal({ open: true, delta: delta });
+        return;
       }
 
       if (
@@ -345,63 +347,42 @@ export class SpotForm extends React.Component {
       ) {
         price *= 0.9985;
         if (delta > 2) {
-          toast.error(
-            `You are selling ${delta.toFixed(
-              2
-            )}% under the current market price. You could lose money when signing this transaction!`,
-            {
-              toastId: `You are selling ${delta.toFixed(
-                2
-              )}% under the current market price. You could lose money when signing this transaction!`,
-            }
-          );
+          this.props.setHighSlippageModal({ open: true, delta: delta });
+          return;
         }
       }
     } else if (this.props.side === "b") {
+      this.props.setHighSlippageModal({ type: "buy" });
+
       quoteAmount = quoteAmount ? quoteAmount : baseAmount * price;
       baseAmount = 0;
       baseAmountMsg = formatPrice(quoteAmount / price);
 
+      const bidPrice = this.getFirstBid();
+      const delta = ((price - bidPrice) / bidPrice) * 100;
+
       if (isNaN(quoteBalance)) {
-        toast.error(`No ${marketInfo.quoteAsset.symbol} balance`, {
-          toastId: `No ${marketInfo.quoteAsset.symbol} balance`,
-        });
+        this.props.setHighSlippageModal({ open: true, delta: delta });
         return;
       }
 
       if (quoteAmount && quoteAmount + marketInfo.quoteFee > quoteBalance) {
-        toast.error(`Total exceeds ${marketInfo.quoteAsset.symbol} balance`, {
-          toastId: `Total exceeds ${marketInfo.quoteAsset.symbol} balance`,
-        });
+        this.props.setHighSlippageModal({ open: true, delta: delta });
         return;
       }
 
       if (quoteAmount && quoteAmount < marketInfo.quoteFee) {
-        toast.error(
-          `Minimum order size is ${marketInfo.quoteFee.toPrecision(5)} ${
-            marketInfo.quoteAsset.symbol
-          }`
-        );
+        this.props.setHighSlippageModal({ open: true, delta: delta });
         return;
       }
 
-      const bidPrice = this.getFirstBid();
-      const delta = ((price - bidPrice) / bidPrice) * 100;
       if (
         delta > 10 &&
         this.props.orderType === "limit" &&
         !this.props.settings.disableSlippageWarning
       ) {
-        toast.error(
-          `You are buying ${delta.toFixed(
-            2
-          )}% above the current market price. You will lose money when signing this transaction!`,
-          {
-            toastId: `You are buying ${delta.toFixed(
-              2
-            )}% above the current market price. You will lose money when signing this transaction!`,
-          }
-        );
+        this.props.setHighSlippageModal({ open: true, delta: delta });
+        return;
       }
 
       if (
@@ -410,19 +391,24 @@ export class SpotForm extends React.Component {
       ) {
         price *= 1.0015;
         if (delta > 2) {
-          toast.error(
-            `You are buying ${delta.toFixed(
-              2
-            )}% above the current market price. You could lose money when signing this transaction!`,
-            {
-              toastId: `You are buying ${delta.toFixed(
-                2
-              )}% above the current market price. You could lose money when signing this transaction!`,
-            }
-          );
+          this.props.setHighSlippageModal({ open: true, delta: delta });
+          return;
         }
       }
     }
+
+    this.handleOrder();
+  }
+
+  async handleOrder() {
+    let baseAmountMsg;
+    let baseAmount = this.state.baseAmount;
+    let quoteAmount = this.state.quoteAmount;
+    let price = this.state.price;
+    const marketInfo = this.props.marketInfo;
+    baseAmount = baseAmount ? baseAmount : quoteAmount / price;
+    quoteAmount = 0;
+    baseAmountMsg = formatPrice(baseAmount);
 
     const renderGuidContent = () => {
       return (
@@ -435,7 +421,7 @@ export class SpotForm extends React.Component {
             {["USDC", "USDT", "DAI", "FRAX"].includes(
               marketInfo.quoteAsset.symbol
             )
-              ? price.toFixed(2)
+              ? parseFloat(price).toFixed(2)
               : formatPrice(price)}{" "}
             {marketInfo.quoteAsset.symbol}
           </p>
@@ -625,9 +611,19 @@ export class SpotForm extends React.Component {
     this.setState(newstate);
   }
 
+  componentDidMount() {
+    this.props.setHighSlippageModal({ marketInfo: this.props.currentMarket });
+  }
+
   componentDidUpdate(prevProps, prevState) {
     // Prevents bug where price volatility can cause buy amount to be too large
     // by refreshing a maxed out buy amount to match the new price
+
+    if (this.props.confirmed) {
+      this.handleOrder();
+      this.props.setHighSlippageModal({ confirmed: false });
+    }
+
     if (
       this.props.lastPrice !== prevProps.lastPrice &&
       this.state.maxSizeSelected
@@ -695,7 +691,8 @@ export class SpotForm extends React.Component {
         color="foregroundMediumEmphasis"
         textAlign="right"
       >
-        {formatToken(baseBalance, marketInfo && marketInfo.baseAsset?.symbol)} {marketInfo && marketInfo.baseAsset?.symbol}
+        {formatToken(baseBalance, marketInfo && marketInfo.baseAsset?.symbol)}{" "}
+        {marketInfo && marketInfo.baseAsset?.symbol}
       </Text>
     );
 
@@ -708,7 +705,7 @@ export class SpotForm extends React.Component {
         <FormHeader>
           <InfoWrapper>
             <Text font="primaryTiny" color="foregroundMediumEmphasis">
-              Buy Fee
+              Network fee
             </Text>
             <QuestionHelper text={this.showLabel()} />
           </InfoWrapper>
@@ -718,7 +715,10 @@ export class SpotForm extends React.Component {
           >
             {marketInfo &&
               marketInfo.quoteFee &&
-              formatToken(Number(marketInfo.quoteFee), marketInfo && marketInfo.quoteAsset.symbol)}{" "}
+              formatToken(
+                Number(marketInfo.quoteFee),
+                marketInfo && marketInfo.quoteAsset.symbol
+              )}{" "}
             {marketInfo && marketInfo.quoteAsset.symbol}
           </Text>
         </FormHeader>
@@ -731,7 +731,7 @@ export class SpotForm extends React.Component {
         <FormHeader>
           <InfoWrapper>
             <Text font="primaryTiny" color="foregroundMediumEmphasis">
-              Sell Fee
+              Network fee
             </Text>
             <QuestionHelper text={this.showLabel()} />
           </InfoWrapper>
@@ -741,7 +741,10 @@ export class SpotForm extends React.Component {
           >
             {marketInfo &&
               marketInfo.baseFee &&
-              formatToken(Number(marketInfo.baseFee), marketInfo && marketInfo.baseAsset.symbol)}{" "}
+              formatToken(
+                Number(marketInfo.baseFee),
+                marketInfo && marketInfo.baseAsset.symbol
+              )}{" "}
             {marketInfo && marketInfo.baseAsset.symbol}
           </Text>
         </FormHeader>
@@ -857,6 +860,14 @@ export class SpotForm extends React.Component {
     );
   }
 }
+
+const mapStateToProps = (state) => {
+  return {
+    confirmed: state.api.highSlippageModal?.confirmed,
+  };
+};
+
+export default connect(mapStateToProps, { setHighSlippageModal })(SpotForm);
 
 const StyledForm = styled.form`
   display: grid;
