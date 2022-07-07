@@ -80,7 +80,7 @@ const TradeRatesCard = ({
           {_.indexOf(favourites, currentMarket) !== -1 &&
             <Box style={{ cursor: 'pointer' }} position="relative" onMouseEnter={() => { setOpen(true) }} onMouseLeave={() => { setOpen(false) }}>
               <ActivatedStarIcon />
-              {isOpen && <Box position='absolute' left="-50px" top="calc(100% + 5px)" width="140px" borderRadius={'5px'} overflow="hidden" display='flex' flexDirection="column" zIndex={1000}>
+              {isOpen && <Box position='absolute' left="-50px" top="calc(100% + 1px)" width="140px" borderRadius={'5px'} overflow="hidden" display='flex' flexDirection="column" zIndex={1000}>
                 <Box
                   px="15px"
                   py="7px"
@@ -101,6 +101,10 @@ const TradeRatesCard = ({
                     borderBottom={index !== favourites.length - 1 ? `1px solid ${isDark ? darkColors.foreground400 : lightColors.foreground400}` : ''}
                     bgcolor={isDark ? darkColors.backgroundLowEmphasis : lightColors.backgroundLowEmphasis}
                     color={isDark ? darkColors.foregroundHighEmphasis : lightColors.foregroundHighEmphasis}
+                    onClick={() => {
+                      updateMarketChain(item);
+                      setOpen(false)
+                    }}
                   >{item}</Box>
                 })}
               </Box>}
