@@ -187,7 +187,7 @@ const TradeRecentTable = (props) => {
                         textAlign="right"
                       >
                         {/* {numStringToSymbol(amount, 2)} */}
-                        {addComma(price)}
+                        {addComma(amount)}
                       </Text>
                     </td>
                     <td>
