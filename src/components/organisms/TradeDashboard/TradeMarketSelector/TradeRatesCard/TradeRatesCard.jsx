@@ -1,113 +1,234 @@
 import React from "react";
+import styled from "styled-components";
 import { formatPrice } from "lib/utils";
+import { SettingsIcon } from "components/atoms/Svg";
+import Button from "components/molecules/Button/Button";
+import Text from "components/atoms/Text/Text";
 // css
 import api from "lib/api";
 import "./TradeRatesCard.css";
+import SettingsModal from "./SettingsModal";
+import { TokenPairDropdown } from "components/molecules/Dropdown";
+import useModal from "components/hooks/useModal";
+import useTheme from "components/hooks/useTheme";
 
-class TradeRatesCard extends React.Component {
-  constructor(props) {
-    super(props);
-    this.props = props;
+const TradeRatesCard = ({
+  updateMarketChain,
+  marketSummary,
+  rowData,
+  currentMarket,
+  marketInfo,
+}) => {
+  const { isDark } = useTheme()
+  const handleOnModalClose = () => {
+    onSettingsModalClose();
+  };
 
-    this.state = {
-      marketInfo: null,
-    };
-  }
+  const [onSettingsModal, onSettingsModalClose] = useModal(
+    <SettingsModal onDismiss={() => handleOnModalClose()} />
+  );
 
-  componentDidUpdate() {
-    if (
-      this.props.marketInfo &&
-      this.props.marketInfo !== this.state.marketInfo
-    ) {
-      var marketInfo = this.props.marketInfo;
+  const handleSettings = () => {
+    onSettingsModal();
+  };
 
-      //add ticker name
-      var state = {
-        marketInfo: marketInfo,
-      };
+  const isMobile = window.innerWidth < 800;
+  const percentChange = (
+    (marketSummary.priceChange / marketSummary.price) *
+    100
+  ).toFixed(2);
 
-      this.setState(state);
-    }
-  }
-
-  componentDidMount() {
-    //get token name
-  }
-
-  render() {
-    var marketInfo = this.state.marketInfo;
-
-    let marketDisplay = "--/--";
-    if (this.state.marketInfo) {
-      marketInfo = this.state.marketInfo;
-      marketDisplay = <div>{marketInfo.baseAsset.symbol}/{marketInfo.quoteAsset.symbol}</div>;
-    }
-    const percentChange = (
-      (this.props.marketSummary.priceChange / this.props.marketSummary.price) *
-      100
-    ).toFixed(2);
-
-    if (!this.state.marketInfo) {
-      return null
-    }
-
-    return (
-      <>
-        <div className="tl_rates">
-          <div className="rates_box rb_text_1">
-            <div>
-              <img src={api.getCurrencyLogo(this.state.marketInfo?.baseAsset.symbol)} alt={this.state.marketInfo?.baseAsset.symbol} className="rates_box_symbol" />
-              <div>
-                <strong>{marketDisplay}</strong>
-                <p>
-                  {marketInfo?.baseAsset && marketInfo.baseAsset.name}{" "}
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="rates_box rb_text_2">
-            <h1>{this.props.marketSummary.price}</h1>
-            <p>$ {
-              (this.props.marketInfo?.baseAsset?.usdPrice)
-                ? this.props.marketInfo.baseAsset.usdPrice
-                : "--"
-            }</p>
-          </div>
-          <div
-            className={
-              this.props.marketSummary.priceChange < 0
-                ? "rates_box rb_text_3_down_value hide_sm"
-                : "rates_box rb_text_3_up_value hide_sm"
-            }
-          >
-            <h2>24h Change</h2>
-            <p>
+  return (
+    <Wrapper>
+      <LeftWrapper>
+        <MarketSelector>
+          <TokenPairDropdown
+            width={isMobile ? 83 : 223}
+            transparent
+            rowData={rowData}
+            updateMarketChain={updateMarketChain}
+            currentMarket={currentMarket}
+            marketInfo={marketInfo}
+          />
+        </MarketSelector>
+        <RatesCardsWrapper>
+          <RatesCard>
+            <Text
+              font="primaryExtraSmallSemiBold"
+              color="foregroundLowEmphasis"
+            >
+              Price
+            </Text>
+            <Text
+              font="primaryMediumSmallSemiBold"
+              color="foregroundHighEmphasis"
+            >
+              {marketSummary.price ? marketSummary.price : "--"}
+            </Text>
+          </RatesCard>
+          {/* <RatesCard>
+            <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis">24h Change</Text>
+            <Text font="primaryMediumSmallSemiBold" color="foregroundHighEmphasis">
               {this.props.marketSummary.priceChange &&
                 formatPrice(this.props.marketSummary.priceChange / 1)
               }{" "}
               {percentChange !== 'NaN' && `${percentChange}%`}
-            </p>
-          </div>
-          <div className="rates_box rb_text_4 hide_md">
-            <h2>24h High</h2>
-            <p>{this.props.marketSummary["24hi"]}</p>
-          </div>
-          <div className="rates_box rb_text_4 hide_md">
-            <h2>24h Low</h2>
-            <p>{this.props.marketSummary["24lo"]}</p>
-          </div>
-          <div className="rates_box rb_text_4 hide_sm">
-            <h2>24h Volume({marketInfo && marketInfo.baseAsset.symbol})</h2>
-            <p>{this.props.marketSummary.baseVolume}</p>
-          </div>
-          <div className="rates_box rb_text_4 hide_sm">
-            <h2>24h Volume({marketInfo && marketInfo.quoteAsset.symbol})</h2>
-            <p>{this.props.marketSummary.quoteVolume}</p>
-          </div>
-        </div>
-      </>
-    );
-  }
-}
+            </Text>
+          </RatesCard> */}
+          {isMobile ? (
+            <></>
+          ) : (
+            <>
+              <Divider />
+              <RatesCard>
+                <Text
+                  font="primaryExtraSmallSemiBold"
+                  color="foregroundLowEmphasis"
+                >
+                  24h Change
+                </Text>
+                <Text
+                  font="primaryMediumSmallSemiBold"
+                  color={
+                    percentChange === "NaN"
+                      ? "black"
+                      : parseFloat(marketSummary["priceChange"]) >= 0
+                      ? "successHighEmphasis"
+                      : "dangerHighEmphasis"
+                  }
+                >
+                  {marketSummary.priceChange &&
+                    formatPrice(marketSummary.priceChange / 1)}{" "}
+                  {percentChange !== "NaN" ? `(${percentChange}%)` : "--"}
+                </Text>
+              </RatesCard>
+              <Divider />
+              <RatesCard>
+                <Text
+                  font="primaryExtraSmallSemiBold"
+                  color="foregroundLowEmphasis"
+                >
+                  24h High
+                </Text>
+                <Text
+                  font="primaryMediumSmallSemiBold"
+                  color="foregroundHighEmphasis"
+                >
+                  {marketSummary["24hi"] ?? "--"}
+                </Text>
+              </RatesCard>
+              <Divider />
+              <RatesCard>
+                <Text
+                  font="primaryExtraSmallSemiBold"
+                  color="foregroundLowEmphasis"
+                >
+                  24h Low
+                </Text>
+                <Text
+                  font="primaryMediumSmallSemiBold"
+                  color="foregroundHighEmphasis"
+                >
+                  {marketSummary["24lo"] ?? "--"}
+                </Text>
+              </RatesCard>
+              <Divider />
+              <RatesCard>
+                <Text
+                  font="primaryExtraSmallSemiBold"
+                  color="foregroundLowEmphasis"
+                >
+                  24h Volume({marketInfo && marketInfo.baseAsset.symbol})
+                </Text>
+                <Text
+                  font="primaryMediumSmallSemiBold"
+                  color="foregroundHighEmphasis"
+                >
+                  {marketSummary.baseVolume ?? "--"}
+                </Text>
+              </RatesCard>
+              <Divider />
+              <RatesCard>
+                <Text
+                  font="primaryExtraSmallSemiBold"
+                  color="foregroundLowEmphasis"
+                >
+                  24h Volume({marketInfo && marketInfo.quoteAsset.symbol})
+                </Text>
+                <Text
+                  font="primaryMediumSmallSemiBold"
+                  color="foregroundHighEmphasis"
+                >
+                  {marketSummary.quoteVolume ?? "--"}
+                </Text>
+              </RatesCard>
+            </>
+          )}
+        </RatesCardsWrapper>
+      </LeftWrapper>
+      {isMobile ? (
+        <SettingsIcon
+          style={{ marginRight: "20px" }}
+          onClick={handleSettings}
+        />
+      ) : (
+        <Button
+          endIcon={<SettingsIcon />}
+          variant="outlined"
+          scale="imd"
+          mr="20px"
+          onClick={handleSettings}
+        >
+          Settings
+        </Button>
+      )}
+    </Wrapper>
+  );
+};
 
 export default TradeRatesCard;
+
+const Wrapper = styled.div`
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+`;
+const LeftWrapper = styled.div`
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+`;
+
+const RatesCardsWrapper = styled.div`
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  gap: 20px;
+  padding-left: 20px;
+`;
+
+const MarketSelector = styled.div`
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  gap: 10px;
+  background-color: ${({ theme }) => theme.colors.backgroundLowEmphasis};
+  padding: 0px 24px;
+  height: 56px;
+`;
+
+const RatesCard = styled.div`
+  display: grid;
+  grid-auto-flow: row;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+`;
+
+const Divider = styled.div`
+  width: 1px;
+  height: 32px;
+  background-color: ${({theme, isDark}) => isDark === "false" ? theme.colors.backgroundMediumEmphasis : theme.colors.foreground400};
+`;

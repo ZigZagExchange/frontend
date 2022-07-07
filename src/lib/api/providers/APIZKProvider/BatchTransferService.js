@@ -1,6 +1,4 @@
-
 class BatchTransferService {
-
   #syncProvider = null;
   #syncWallet = null;
   #builder = null;
@@ -17,19 +15,19 @@ class BatchTransferService {
   #submit = async (feeToken) => {
     const batch = await this.#builder.build(feeToken);
     return await this.#syncProvider.submitTxsBatch(batch.txs, batch.signature);
-  }
+  };
 
   sendWithdraw = async (withdraw = {}, feeToken) => {
     this.#setNewBuilder();
     this.#builder.addWithdraw(withdraw);
-    return await this.#submit(feeToken)
-  }
+    return await this.#submit(feeToken);
+  };
 
   sendTransfer = async (transfer = {}, feeToken) => {
-    this.#setNewBuilder()
+    this.#setNewBuilder();
     this.#builder.addTransfer(transfer);
-    return await this.#submit(feeToken)
-  }
+    return await this.#submit(feeToken);
+  };
 }
 
-export default BatchTransferService
+export default BatchTransferService;

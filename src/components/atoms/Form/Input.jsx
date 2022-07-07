@@ -2,6 +2,16 @@ import React, { useEffect } from "react";
 import { useField } from "formik";
 import { x } from "@xstyled/styled-components";
 import { composeValidators, required, requiredError } from "./validation";
+import styled from "styled-components";
+
+const Wrapper = styled.div`
+  input[type=number]::-webkit-inner-spin-button, 
+  input[type=number]::-webkit-outer-spin-button { 
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none; 
+  }
+`
 
 const Input = ({
   name,
@@ -12,6 +22,7 @@ const Input = ({
   value,
   onChange,
   hideValidation,
+  styles,
   children,
   rightOfLabel,
   ...rest
@@ -47,7 +58,7 @@ const Input = ({
           {label}
         </Label>
       )}
-      <x.div>
+      <Wrapper className={styles}>
         <Component
           {...field}
           {...rest}
@@ -62,7 +73,7 @@ const Input = ({
           value={field.value}
           children={children}
         />
-      </x.div>
+      </Wrapper>
       {isError && !hideValidation && <ErrorMessage error={meta.error} />}
     </FieldSet>
   );
@@ -95,11 +106,12 @@ const Label = ({
     <x.label
       for={name}
       mb={1}
-      fontSize={{xs: 'xs', md: '14px'}}
+      fontSize={{ xs: 'xs', md: '14px' }}
       color={"blue-gray-500"}
       display={"flex"}
       justifyContent={rightOfLabel ? "space-between" : "inherit"}
       alignItems={"center"}
+      className="custom-form-label"
     >
       <x.div>
         {isRequired && (
@@ -108,7 +120,7 @@ const Label = ({
             display={"inline-block"}
             mr={0.5}
           >
-            *
+            {/* * */}
           </x.span>
         )}
         {children}

@@ -43,6 +43,7 @@ export default class APIArbitrumProvider extends APIProvider {
       this.api.rollupProvider
     );
     const balanceList = await erc20Contract.balances([this.accountState.address], tokenList);
+    const exchangeAddress = this.getExchangeAddress();
 
     // generate object
     for(let i = 0; i < tokens.length; i++) {
@@ -51,7 +52,7 @@ export default class APIArbitrumProvider extends APIProvider {
       
       const allowanceBN = (tokens[i] === 'ETH') 
         ? ethers.constants.MaxUint256
-        : await this.allowance(currencyInfo.address); // TODO replace
+        : await this.getAllowance(currencyInfo.address, exchangeAddress); // TODO replace
       const valueReadable = (balanceBN && currencyInfo)
         ? ethers.utils.formatUnits(balanceBN.toString(), currencyInfo.decimals)
         : 0 
@@ -70,10 +71,11 @@ export default class APIArbitrumProvider extends APIProvider {
     return balances;
   };
 
-  // TODO replace
-  allowance = async (tokenAddress) => {
-    const exchangeAddress = this.getExchangeAddress();
-    if (!this.accountState.address || !exchangeAddress) return 0;
+  getAllowance = async (
+    tokenAddress,
+    contractAddress
+  ) => {
+    if (!this.accountState.address || !contractAddress) return 0;
 
     const erc20Contract = new ethers.Contract(
       tokenAddress,
@@ -83,7 +85,7 @@ export default class APIArbitrumProvider extends APIProvider {
 
     const allowance = await erc20Contract.allowance(
       this.accountState.address,
-      exchangeAddress
+      contractAddress
     );
 
     return ethers.BigNumber.from(allowance);
@@ -256,8 +258,7 @@ export default class APIArbitrumProvider extends APIProvider {
       wethContractABI,
       signer
     );
-
-    await wethContract.deposit(amountBN);
+    await wethContract.deposit({ value: amountBN });
 
     // update account balance
     await this.api.getBalances();
@@ -281,6 +282,24 @@ export default class APIArbitrumProvider extends APIProvider {
     await this.api.getBalances();
     return true;
   };
+
+  getWrapFees = async () => {
+    let feeData = {
+      'gasPrice': ethers.BigNumber.from(2_500_000_000) // 2.5 GWEI
+    };
+    try {
+      feeData = await this.api.rollupProvider.getFeeData()
+    } catch (e) {
+      console.log(`No fee data, error: ${e.message}`)
+    }
+    const feeResult = ethers.utils.formatEther (
+      (feeData.gasPrice).mul(450_000)
+    ).toString();
+    return {
+      'wrap': feeResult,
+      'unwrap': feeResult,
+    };
+  }
 
   getExchangeAddress = () => {
     const marketInfoArray = Object.values(this.api.marketInfo);

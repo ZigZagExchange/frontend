@@ -182,7 +182,6 @@ const CurrencyListItem = styled.li`
 
 const DropdownContent = styled.div`
   flex: 1 1 auto;
-  overflow-y: auto;
 `;
 
 const DropdownFooter = styled.div`
@@ -258,48 +257,47 @@ const SignOutButton = styled.div`
 
   &:hover {
     background: #b66;
-    color: #fff;
   }
 
   &:active {
-    background: #c44;
-    color: #fff;
-  }
+  background: #c44;
+  color: #fff;
+}
 `;
 
 const LoaderContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100px;
+display: flex;
+align - items: center;
+justify - content: center;
+height: 100px;
 `;
 
 const LayoutItem = styled.div`
-  display: flex;
-  width: 100%;
-  justify-content: center;
-  align-items: center;
-  font-size: 15px;
-  filter: invert(52%) sepia(5%) saturate(958%) hue-rotate(167deg) brightness(97%) contrast(82%);
-  padding: 10px;
+display: flex;
+width: 100 %;
+justify - content: center;
+align - items: center;
+font - size: 15px;
+filter: invert(52 %) sepia(5 %) saturate(958 %) hue - rotate(167deg) brightness(97 %) contrast(82 %);
+padding: 10px;
   & img {
-    height: 150px;
-    width: auto;
-    user-drag: none;
-    -webkit-user-drag: none;
-    user-select: none;
-    -moz-user-select: none;
-    -webkit-user-select: none;
-    -ms-user-select: none;
-  }
+  height: 150px;
+  width: auto;
+  user - drag: none;
+  -webkit - user - drag: none;
+  user - select: none;
+  -moz - user - select: none;
+  -webkit - user - select: none;
+  -ms - user - select: none;
+}
 `;
 
 const LayoutList = styled.div`
-  display: grid;
-  grid-template-columns: 50% 50%;
-  ${LayoutItem}:nth-child(${(props) => props.layout + 1}) {
-    filter: invert(84%) sepia(18%) saturate(211%) hue-rotate(186deg) brightness(107%) contrast(106%);
-  }
+display: grid;
+grid - template - columns: 50 % 50 %;
+  ${LayoutItem}: nth - child(${(props) => props.layout + 1}) {
+  filter: invert(84 %) sepia(18 %) saturate(211 %) hue - rotate(186deg) brightness(107 %) contrast(106 %);
+}
 `;
 
 export const AccountDropdown = () => {
@@ -313,26 +311,25 @@ export const AccountDropdown = () => {
   //UI layouts
   const layout = useSelector(layoutSelector);
   const [showLayout, setShowLayout] = useState(false);
-  const [selectedLayout, setSelectedLayout ] = useState(layout);
-  
+  const [selectedLayout, setSelectedLayout] = useState(layout);
+
   const changeLayout = (l) => {
     //local state
-    dispatch({type: 'api/setLayout', payload: l});
+    dispatch({ type: 'api/setLayout', payload: l });
     setLayout(l);
 
     setSelectedLayout(l);
   }
-  
+
   const [selectedLayer, setSelectedLayer] = useState(2);
   const coinEstimator = useCoinEstimator();
-  const { profile } = user;
+  const { profile, address } = user;
 
   const wallet =
     selectedLayer === 1 ? balanceData.wallet : balanceData[network];
-  const explorer = user.address ? api.getExplorerAccountLink(network, user.address) : null;
+  const explorer = address ? api.getExplorerAccountLink(network, address) : null;
   const networkName = selectedLayer === 1 ? 'Etherscan' : api.getNetworkDisplayName(network);
-  
-  
+
   useEffect(() => {
     const hideDisplay = () => setShow(false);
     document.addEventListener("click", hideDisplay, false);
@@ -389,13 +386,13 @@ export const AccountDropdown = () => {
       tabIndex="0"
     >
       <DropdownButton onClick={() => setShow(!show)} tabIndex="0">
-        <AvatarImg src={profile.image}/>
+        <AvatarImg src={profile.image} />
         <span>
           {profile.name}
           <h4>Wallet</h4>
         </span>
         <AiOutlineCaretDown />
-        
+
       </DropdownButton>
       <DropdownDisplay>
         <DropdownHeader>
@@ -460,42 +457,42 @@ export const AccountDropdown = () => {
           </LayoutButton>
 
           <Modal
-          title="Select a Layout"
-          show={showLayout}
-          onClose={() => setShowLayout(!showLayout)}
+            title="Select a Layout"
+            show={showLayout}
+            onClose={() => setShowLayout(!showLayout)}
           >
             <LayoutList layout={selectedLayout}>
               <LayoutItem onClick={() => changeLayout(0)}>
                 <Tooltip placement={"bottom"} label={"Default Layout"}>
-                  <img src={FirstLayoutImage} alt="Default"/>
+                  <img src={FirstLayoutImage} alt="Default" />
                 </Tooltip>
               </LayoutItem>
               <LayoutItem onClick={() => changeLayout(1)}>
                 <Tooltip placement={"bottom"} label={"Chart Focused Layout"}>
-                  <img src={ThirdLayoutImage} alt="Chart Focused"/>
+                  <img src={ThirdLayoutImage} alt="Chart Focused" />
                 </Tooltip>
               </LayoutItem>
               <LayoutItem onClick={() => changeLayout(2)}>
                 <Tooltip placement={"bottom"} label={"Chart Focused RTL Layout"}>
-                  <img src={FourthLayoutImage} alt="Chart Focused RTL"/>
+                  <img src={FourthLayoutImage} alt="Chart Focused RTL" />
                 </Tooltip>
               </LayoutItem>
               <LayoutItem onClick={() => changeLayout(3)}>
                 <Tooltip placement={"bottom"} label={"Default RTL Layout"}>
-                  <img src={SecondLayoutImage} alt="Default RTL"/>
+                  <img src={SecondLayoutImage} alt="Default RTL" />
                 </Tooltip>
               </LayoutItem>
             </LayoutList>
           </Modal>
-          
+
           <DropdownExplorer>
             <a target="_blank"
               rel="noreferrer"
               href={explorer}>
                 <IoMdOpen style={{ position: "relative", top: -2 }} /> {networkName} 
             </a>
-          </DropdownExplorer> 
-          
+          </DropdownExplorer>
+
           <SignOutButton onClick={() => api.signOut()}>
             <IoMdLogOut style={{ position: "relative", top: -1 }} /> Disconnect
           </SignOutButton>

@@ -9,8 +9,9 @@ import BatchTransferService from "./BatchTransferService";
 import {
   ZKSYNC_POLYGON_BRIDGE,
   ZKSYNC_ETHEREUM_FAST_BRIDGE,
-  ETH_ZKSYNC_BRIDGE
-} from "components/pages/BridgePage/Bridge/constants";
+  ETH_ZKSYNC_BRIDGE,
+} from "components/pages/BridgePage/constants";
+import _ from "lodash";
 import { formatAmount } from "lib/utils";
 
 export default class APIZKProvider extends APIProvider {
@@ -27,7 +28,7 @@ export default class APIZKProvider extends APIProvider {
   _tokenInfo = {};
   eligibleFastWithdrawTokens = ["ETH", "FRAX", "UST"];
   fastWithdrawContractAddress = ZKSYNC_ETHEREUM_FAST_BRIDGE.address;
-  
+
   handleBridgeReceipt = (_receipt, amount, token, type, target, walletAddress) => {
     let receipt = {
       date: +new Date(),
@@ -53,21 +54,20 @@ export default class APIZKProvider extends APIProvider {
     return receipt;
   };
 
-  changePubKeyFee = async ( currency = "USDC" ) => {
-    const { data } = await axios.post(this.getZkSyncBaseUrl(this.network) + "/fee",
+  changePubKeyFee = async (currency = "USDC") => {
+    const { data } = await axios.post(
+      this.getZkSyncBaseUrl(this.network) + "/fee",
       {
         txType: { ChangePubKey: "ECDSA" },
         address: "0x5364ff0cecb1d44efd9e4c7e4fe16bf5774530e3",
         tokenLike: currency,
       },
-      { headers: { "Content-Type": "application/json", }, }
+      { headers: { "Content-Type": "application/json" } }
     );
     // somehow the fee is ~50% too low
-    if ( currency === "USDC" )
-      return ((data.result.totalFee / 10 ** 6) * 2);
-    else 
-      return ((data.result.totalFee / 10 ** 18) * 2);
-  }
+    if (currency === "USDC") return (data.result.totalFee / 10 ** 6) * 2;
+    else return (data.result.totalFee / 10 ** 18) * 2;
+  };
 
   changePubKey = async () => {
     try {
@@ -90,7 +90,7 @@ export default class APIZKProvider extends APIProvider {
         }
       );
     }
-    
+
     let feeToken = "ETH";
     const accountState = await this.syncWallet.getAccountState();
     const balances = accountState.committed.balances;
@@ -114,14 +114,15 @@ export default class APIZKProvider extends APIProvider {
         const tokenInfo = await this.getTokenInfo(token);
         if (tokenInfo.enabledForFees) {
           const priceInfo = await this.tokenPrice(token);
-          const usdValue = priceInfo.price * balances[token] / 10 ** tokenInfo.decimals;
+          const usdValue =
+            (priceInfo.price * balances[token]) / 10 ** tokenInfo.decimals;
           if (usdValue > maxValue) {
             maxValue = usdValue;
             feeToken = token;
           }
         }
-      })
-      await Promise.all(result)
+      });
+      await Promise.all(result);
     }
 
     const signingKey = await this.syncWallet.setSigningKey({
@@ -135,17 +136,15 @@ export default class APIZKProvider extends APIProvider {
   };
 
   checkAccountActivated = async () => {
-    const [
-      accountState,
-      signingKeySet,
-      correspondigKeySet
-    ] = await Promise.all([
-      this.getAccountState(),
-      this.syncWallet.isSigningKeySet(),
-      this.syncWallet.isCorrespondingSigningKeySet()
-    ]);
-    return (accountState.id && signingKeySet && correspondigKeySet);
-  }
+    const [accountState, signingKeySet, correspondigKeySet] = await Promise.all(
+      [
+        this.getAccountState(),
+        this.syncWallet.isSigningKeySet(),
+        this.syncWallet.isCorrespondingSigningKeySet(),
+      ]
+    );
+    return accountState.id && signingKeySet && correspondigKeySet;
+  };
 
   submitOrder = async (
     market,
@@ -160,10 +159,11 @@ export default class APIZKProvider extends APIProvider {
       toast.error(
         "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
         {
-          autoClose: 60000
+          autoClose: 60000,
         },
         {
-          toastId: "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
+          toastId:
+            "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
         }
       );
       return;
@@ -210,10 +210,10 @@ export default class APIZKProvider extends APIProvider {
         tokenRatio[marketInfo.baseAsset.id] = baseAmount;
         tokenRatio[marketInfo.quoteAsset.id] = sellQuantityWithFee;
       }
-      sellQuantityBN = ethers.utils.parseUnits (
+      sellQuantityBN = ethers.utils.parseUnits(
         sellQuantityWithFee,
         marketInfo.quoteAsset.decimals
-      )
+      );
     } else {
       // baseAmount is first choice for sell
       if (baseAmount) {
@@ -237,10 +237,10 @@ export default class APIZKProvider extends APIProvider {
         tokenRatio[marketInfo.baseAsset.id] = sellQuantityWithFee;
         tokenRatio[marketInfo.quoteAsset.id] = quoteAmount;
       }
-      sellQuantityBN = ethers.utils.parseUnits (
+      sellQuantityBN = ethers.utils.parseUnits(
         sellQuantityWithFee,
         marketInfo.baseAsset.decimals
-      )
+      );
     }
 
     const now_unix = (Date.now() / 1000) | 0;
@@ -261,12 +261,12 @@ export default class APIZKProvider extends APIProvider {
       ratio: zksync.utils.tokenRatio(tokenRatio),
       validUntil,
     });
-    
+
     if (order.ethereumSignature && !order.ethSignature) {
       order.ethSignature = order.ethereumSignature;
       delete order.ethereumSignature;
     }
-    
+
     this.api.send("submitorder2", [this.network, market, order]);
 
     return order;
@@ -315,7 +315,16 @@ export default class APIZKProvider extends APIProvider {
 
       this.api.emit(
         "bridgeReceipt",
-        this.handleBridgeReceipt(transfer, amountDecimals, token, ETH_ZKSYNC_BRIDGE.ethTozkSync, "ethereum", this.network===1000 ? `https://rinkeby.zksync.io/explorer/accounts/${address}`:`https://zkscan.io/explorer/accounts/${address}`)
+        this.handleBridgeReceipt(
+          transfer,
+          amountDecimals,
+          token,
+          ETH_ZKSYNC_BRIDGE.ethTozkSync,
+          "ethereum",
+          this.network === 1000
+            ? `https://rinkeby.zksync.io/explorer/accounts/${address}`
+            : `https://zkscan.io/explorer/accounts/${address}`
+        )
       );
       return transfer;
     } catch (err) {
@@ -373,20 +382,28 @@ export default class APIZKProvider extends APIProvider {
       onSameFeeToken,
       onDiffFeeToken
     );
-    
+
     this.api.emit(
       "bridgeReceipt",
-      this.handleBridgeReceipt(transfer, amountTransferred, token, "withdraw", "zksync")
+      this.handleBridgeReceipt(
+        transfer,
+        amountTransferred,
+        token,
+        "withdraw",
+        "zksync"
+      )
     );
     return transfer;
   };
 
   transferToBridge = async (amountDecimals, token, address, userAddress) => {
     if (
-      (ZKSYNC_POLYGON_BRIDGE.address === address && !ZKSYNC_POLYGON_BRIDGE.eligibleTokensZkSync.includes(token)) ||
-      (ZKSYNC_ETHEREUM_FAST_BRIDGE.address === address && !ZKSYNC_ETHEREUM_FAST_BRIDGE.eligibleTokensZkSync.includes(token))
+      (ZKSYNC_POLYGON_BRIDGE.address === address &&
+        !ZKSYNC_POLYGON_BRIDGE.eligibleTokensZkSync.includes(token)) ||
+      (ZKSYNC_ETHEREUM_FAST_BRIDGE.address === address &&
+        !ZKSYNC_ETHEREUM_FAST_BRIDGE.eligibleTokensZkSync.includes(token))
     ) {
-      throw Error("Token not supported for fast withdraw")
+      throw Error("Token not supported for fast withdraw");
     }
 
     const onSameFeeToken = async (amount) => {
@@ -420,7 +437,6 @@ export default class APIZKProvider extends APIProvider {
     );
 
     if (ZKSYNC_POLYGON_BRIDGE.address === address) {
-
       this.api.emit(
         "bridgeReceipt",
         this.handleBridgeReceipt(
@@ -429,7 +445,9 @@ export default class APIZKProvider extends APIProvider {
           token,
           ZKSYNC_POLYGON_BRIDGE.zkSyncToPolygon,
           "zksync",
-          this.network === 1000 ? `https://mumbai.polygonscan.com/address/${userAddress}#tokentxns`:`https://polygonscan.com/address/${userAddress}#tokentxns`
+          this.network === 1000
+            ? `https://mumbai.polygonscan.com/address/${userAddress}#tokentxns`
+            : `https://polygonscan.com/address/${userAddress}#tokentxns`
         )
       );
     } else if (ZKSYNC_ETHEREUM_FAST_BRIDGE.address === address) {
@@ -515,7 +533,7 @@ export default class APIZKProvider extends APIProvider {
       const feeData = await this.api.rollupProvider.getFeeData();
       let bridgeFee = feeData.maxFeePerGas
         .add(feeData.maxPriorityFeePerGas)
-        .mul(21000)
+        .mul(21000);
 
       if (token === "ETH") {
         return getNumberFormatted(bridgeFee);
@@ -538,7 +556,7 @@ export default class APIZKProvider extends APIProvider {
   signIn = async () => {
     try {
       this.syncProvider = await zksync.getDefaultProvider(
-        this.api.getNetworkName(this.network)
+        this.network === 1 ? 'mainnet' : 'rinkeby'
       );
     } catch (e) {
       toast.error("Zksync is down. Try again later");
@@ -547,7 +565,10 @@ export default class APIZKProvider extends APIProvider {
 
     try {
       if (this.api.isArgent) {
-        this.syncWallet = await zksync.RemoteWallet.fromEthSigner(this.api.rollupProvider, this.syncProvider);
+        this.syncWallet = await zksync.RemoteWallet.fromEthSigner(
+          this.api.ethersProvider,
+          this.syncProvider
+        );
       } else {
         this.ethWallet = this.api.rollupProvider.getSigner();
         const { seed, ethSignatureType } = await this.getSeed(this.ethWallet);
@@ -570,35 +591,34 @@ export default class APIZKProvider extends APIProvider {
       this.syncWallet
     );
 
-    const [
-      accountState,
-      accountActivated
-    ] = await Promise.all([
+    const [accountState, accountActivated] = await Promise.all([
       this.api.getAccountState(),
-      this.checkAccountActivated()
+      this.checkAccountActivated(),
     ]);
     if (!accountState.id) {
-      const walletBalance = formatAmount(accountState.committed.balances['ETH'], { decimals: 18 });
-      const activationFee = await this.changePubKeyFee('ETH');
+      const walletBalance = formatAmount(
+        accountState.committed.balances["ETH"],
+        { decimals: 18 }
+      );
+      const activationFee = await this.changePubKeyFee("ETH");
 
-      if(isNaN(walletBalance) || walletBalance < activationFee) {
-        toast.error(
-          "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
-          {
-            autoClose: 60000
-          }
-        );
-      }
-      else {
-        toast.error(
-          "Your zkSync account is not activated. Please activate your zkSync wallet.",
-          {
-            autoClose: false
-          }
-        );
+      if (isNaN(walletBalance) || walletBalance < activationFee) {
+        // toast.error(
+        //   "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
+        //   {
+        //     autoClose: 60000,
+        //   }
+        // );
+      } else {
+        // toast.error(
+        //   "Your zkSync account is not activated. Please activate your zkSync wallet.",
+        //   {
+        //     autoClose: false,
+        //   }
+        // );
       }
     } else {
-      if(!accountActivated) {
+      if (!accountActivated) {
         await this.changePubKey();
       }
     }
@@ -758,6 +778,51 @@ export default class APIZKProvider extends APIProvider {
       case 1: return 'mainnet';
       case 1000: return 'rinkeby';
       default: throw Error("Chain ID not understood");
-    };
+    }
+  };
+
+  tokenPrice = async (tokenLike, chainId = 1) => {
+    try {
+      const res = await axios.get(
+        this.getZkSyncBaseUrl(chainId) + `/tokens/${tokenLike}/priceIn/usd`
+      );
+      return res.data.result;
+    } catch (e) {
+      console.error("Could not get token price", e);
+    }
+  };
+
+  cacheMarketInfoFromNetwork = async (pairs) => {
+    if (pairs.length === 0) return;
+    if (!this.network) return;
+    const pairText = pairs.join(",");
+    const url =
+      this.network === 1
+        ? `https://zigzag-markets.herokuapp.com/markets?id=${pairText}&chainid=${this.network}`
+        : `https://secret-thicket-93345.herokuapp.com/api/v1/marketinfos?chain_id=${this.network}&market=${pairText}`;
+    const marketInfoArray = await fetch(url).then((r) => r.json());
+    // if (!(marketInfoArray instanceof Array)) return;
+    _.forEach(marketInfoArray, (info) => (this.marketInfo[info.alias] = info));
+    // marketInfoArray.forEach((info) => (this.marketInfo[info.alias] = info));
+    return;
+  };
+
+  getPairs = () => {
+    return Object.keys(this.lastPrices);
+  };
+
+  getCurrencyInfo(currency) {
+    const pairs = this.getPairs();
+    for (let i = 0; i < pairs.length; i++) {
+      const pair = pairs[i];
+      const baseCurrency = pair.split("-")[0];
+      const quoteCurrency = pair.split("-")[1];
+      if (baseCurrency === currency && this.marketInfo[pair]) {
+        return this.marketInfo[pair].baseAsset;
+      } else if (quoteCurrency === currency && this.marketInfo[pair]) {
+        return this.marketInfo[pair].quoteAsset;
+      }
+    }
+    return null;
   }
 }

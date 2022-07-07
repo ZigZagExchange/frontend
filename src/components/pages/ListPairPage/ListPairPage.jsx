@@ -1,25 +1,61 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { userSelector } from "lib/store/features/auth/authSlice";
-import api from "lib/api";
-import { DefaultTemplate } from "components";
 import { RiErrorWarningLine } from "react-icons/all";
-import "bootstrap";
-import ConnectWalletButton from "../../atoms/ConnectWalletButton/ConnectWalletButton";
-import Pane from "../../atoms/Pane/Pane";
-import AllocationModal from "./AllocationModal";
+import { userSelector } from "lib/store/features/auth/authSlice";
+import { arweaveAllocationSelector, networkSelector } from "lib/store/features/api/apiSlice";
+import api from "lib/api";
 import { x } from "@xstyled/styled-components";
-import Submit, { Button } from "../../atoms/Form/Submit";
+import styled from "styled-components";
+import "bootstrap";
+
+import { DefaultTemplate } from "components";
+import Text from "../../atoms/Text/Text";
+import AllocationModal from "./AllocationModal";
+import { Button, ConnectWalletButton } from "components/molecules/Button";
 import { jsonify } from "../../../lib/helpers/strings";
-import { Dev } from "../../../lib/helpers/env";
 import SuccessModal from "./SuccessModal";
-import {arweaveAllocationSelector, networkSelector} from "lib/store/features/api/apiSlice";
-import {HiExternalLink} from "react-icons/hi";
-import ExternalLink from "./ExternalLink";
+import { HiExternalLink } from "react-icons/hi";
 import ListPairForm from "./ListPairForm";
-import {sleep} from "../../../lib/utils";
+import { sleep } from "../../../lib/utils";
+import TradeFooter from "components/organisms/TradeDashboard/TradeFooter/TradeFooter";
 
 export const TRADING_VIEW_CHART_KEY = "tradingViewChart";
+
+const ListPage = styled.div`
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-height: calc(100vh - 113px);
+  padding: 0 2rem;
+  // background-color: ${(p) => p.theme.colors.bridgeBackground};
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  flex-direction: column;
+
+  .bg_btn {
+    height: 29px;
+    font-size: 12px;
+  }
+`;
+
+const ListContainer = styled.div`
+  width: 100%;
+  max-width: 470px;
+  margin: 0 auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+
+  svg {
+    display: inline;
+  }
+
+  @media screen and (max-width: 480px) {
+    padding: 0 10px;
+  }
+`
 
 export default function ListPairPage() {
   const user = useSelector(userSelector);
@@ -115,28 +151,23 @@ export default function ListPairPage() {
 
   return (
     <DefaultTemplate>
-      <x.div
-        p={{xs: '2'}}
-        backgroundColor={"blue-400"}
-        w={"full"}
-        h={"full"}
-        style={{ minHeight: "calc(100vh - 48px)" }}
-        color={"white"}
-        display={"flex"}
-        alignItems={"center"}
-        justifyContent={"center"}
-      >
-        <Pane size={'sm'} variant={"light"} maxWidth={"500px"} margin={"auto"}>
-          <x.div display={"flex"} justifyContent={"space-between"} mb={4}>
-            <x.div fontSize={{xs: 'lg', md: '2xl'}} mb={2}>
+      <ListPage>
+        <ListContainer>
+          <x.div mb={4}>
+            <p className="mb-5 mt-10 text-3xl font-semibold font-work ">
               List New Pair
-            </x.div>
-            <x.div fontSize={{xs: 'xs', md: '12px'}} color={"blue-gray-400"} textAlign={"center"}>
-              <x.div>No Internal ID?</x.div>
+            </p>
+
+            <x.div fontSize={{ xs: 'xs', md: '14px' }} lineHeight={1} color={"blue-gray-400"}>
+              <x.div marginBottom="4px">No Internal ID?</x.div>
               <x.div>
-                <ExternalLink href={"https://zkscan.io/explorer/tokens"}>
-                  List your token on zkSync <HiExternalLink />
-                </ExternalLink>
+                <x.a
+                  target={"_blank"}
+                  color={{ _: "foregroundHighEmphasis", hover: "foregroundLowEmphasis" }}
+                  href={"https://zkscan.io/explorer/tokens"}>
+                  List your token on zkSync
+                  <HiExternalLink size="14px" style={{ marginLeft: "6px", marginBottom: "2px" }} />
+                </x.a>
               </x.div>
             </x.div>
           </x.div>
@@ -159,7 +190,7 @@ export default function ListPairPage() {
               </x.div>
             )}
 
-            <Dev>
+            {/* <Dev>
               <x.div
                 fontSize={12}
                 color={"blue-gray-500"}
@@ -168,23 +199,23 @@ export default function ListPairPage() {
               >
                 arweave allocation: {arweaveAllocationKB} kB
               </x.div>
-            </Dev>
+            </Dev> */}
 
             {(() => {
               if (!isUserLoggedIn) {
-                return <ConnectWalletButton />;
+                return <ConnectWalletButton width="100%" />;
               } else {
                 if (isUserConnectedToMainnet) {
                   return (
-                    <Submit block mt={5}>
+                    <Button width="100%">
                       {!isArweaveAllocationSufficient && hasAttemptedSubmit
                         ? "PURCHASE ALLOCATION"
-                        : "LIST"}
-                    </Submit>
+                        : "SUBMIT"}
+                    </Button>
                   );
                 } else {
                   return (
-                    <Button block isDisabled>
+                    <Button width="100%" variant="outlined" disabled>
                       Please connect to Mainnet
                     </Button>
                   );
@@ -192,8 +223,9 @@ export default function ListPairPage() {
               }
             })()}
           </ListPairForm>
-        </Pane>
-      </x.div>
+        </ListContainer>
+      </ListPage>
+
       <AllocationModal
         onClose={() => setIsAllocationModalOpen(false)}
         show={isAllocationModalOpen}
@@ -215,6 +247,7 @@ export default function ListPairPage() {
           setTxId(null);
         }}
       />
+      {/* <TradeFooter /> */}
     </DefaultTemplate>
   );
 }

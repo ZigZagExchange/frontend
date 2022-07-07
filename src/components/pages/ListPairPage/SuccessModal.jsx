@@ -7,29 +7,10 @@ import styled from "@xstyled/styled-components";
 import axios from "axios";
 import Loader from "react-loader-spinner";
 import ExternalLink from "./ExternalLink";
+import api from "lib/api";
 
 export const marketQueryParam = "market";
 export const networkQueryParam = "network";
-export const mainnetChainName = "zksync";
-export const rinkebyChainName = "zksync-rinkeby";
-export const getMarketChainFromId = (chainId) => {
-  if (chainId === 1) {
-    return mainnetChainName;
-  } else if (chainId === 1000) {
-    return rinkebyChainName;
-  } else {
-    return null;
-  }
-};
-export const getChainIdFromMarketChain = (chainName) => {
-  if (chainName === mainnetChainName) {
-    return 1;
-  } else if (chainName === rinkebyChainName) {
-    return 1000;
-  } else {
-    return null;
-  }
-};
 
 const StyledLink = styled(Link)`
   color: blue-gray-400;
@@ -58,7 +39,7 @@ const SuccessModal = ({ txid, show, onClose }) => {
           setQuoteAsset(data.quoteAsset.symbol);
 
           const chainId = Number(data.zigzagChainId);
-          setPairNetwork(getMarketChainFromId(chainId));
+          setPairNetwork(api.getNetworkName(chainId));
         })
         .catch((err) => console.error(err));
     }
@@ -104,7 +85,7 @@ const SuccessModal = ({ txid, show, onClose }) => {
         mb={6}
         fontSize={14}
       >
-        <ExternalLink href={viewMarketURL}>View your market</ExternalLink>
+        <ExternalLink href={"trade.zigzag.exchange"}>View your market</ExternalLink>
         <StyledLink
           to={{
             pathname: "/",
