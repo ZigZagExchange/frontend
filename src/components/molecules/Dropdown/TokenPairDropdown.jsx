@@ -201,7 +201,7 @@ const DropdownContent = styled.div`
   overflow-y: auto;
 `;
 
-const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, updateMarketChain, rowData }) => {
+const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, updateMarketChain, rowData, onFavourited }) => {
     // const [foundPairs, setFoundPairs] = useState([])
     const [pairs, setPairs] = useState([])
     const [categorySelected, setCategorySelected] = useState(0)
@@ -386,6 +386,7 @@ const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, upda
         }
 
         setFavourites(favourites)
+        onFavourited(favourites)
     }
 
     const togglePairSorting = () => {

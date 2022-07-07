@@ -12,6 +12,13 @@ import { TokenPairDropdown } from "components/molecules/Dropdown";
 import useModal from "components/hooks/useModal";
 import useTheme from "components/hooks/useTheme";
 import { settingsSelector } from "lib/store/features/api/apiSlice";
+import {
+  fetchFavourites,
+} from "lib/helpers/storage/favourites";
+import { ActivatedStarIcon } from "components/atoms/Svg";
+import { Box } from "@material-ui/core";
+import _ from "lodash";
+import { darkColors, lightColors } from "lib/theme/colors";
 
 const TradeRatesCard = ({
   updateMarketChain,
@@ -24,16 +31,18 @@ const TradeRatesCard = ({
 
   const [lastPrice, setLastPrice] = useState(0);
   const [isIncrease, setIncrease] = useState(true);
+  const [favourites, setFavourites] = useState(fetchFavourites())
+  const [isOpen, setOpen] = useState(false);
 
   const settings = useSelector(settingsSelector);
 
-  useEffect(()=>{
-    if(marketSummary.price > lastPrice)
+  useEffect(() => {
+    if (marketSummary.price > lastPrice)
       setIncrease(true)
-    else if(marketSummary.price < lastPrice)
+    else if (marketSummary.price < lastPrice)
       setIncrease(false)
     setLastPrice(marketSummary.price)
-  },[marketSummary.price])
+  }, [marketSummary.price])
 
   const handleOnModalClose = () => {
     onSettingsModalClose();
@@ -64,9 +73,39 @@ const TradeRatesCard = ({
             updateMarketChain={updateMarketChain}
             currentMarket={currentMarket}
             marketInfo={marketInfo}
+            onFavourited={(items) => { setFavourites(items);}}
           />
         </MarketSelector>
         <RatesCardsWrapper>
+          {_.indexOf(favourites, currentMarket) !== -1 &&
+            <Box style={{ cursor: 'pointer' }} position="relative" onMouseEnter={() => { setOpen(true) }} onMouseLeave={() => { setOpen(false) }}>
+              <ActivatedStarIcon />
+              {isOpen && <Box position='absolute' left="-50px" top="calc(100% + 5px)" width="140px" borderRadius={'5px'} overflow="hidden" display='flex' flexDirection="column" zIndex={1000}>
+                <Box
+                  px="15px"
+                  py="7px"
+                  boxSizing="boder-box"
+                  fontSize={16}
+                  fontWeight="bold"
+                  borderBottom={`1px solid ${isDark ? darkColors.foreground400 : lightColors.foreground400}`}
+                  bgcolor={isDark ? darkColors.backgroundLowEmphasis : lightColors.backgroundLowEmphasis}
+                  color={isDark ? darkColors.foregroundHighEmphasis : lightColors.foregroundHighEmphasis}
+                >Favorites</Box>
+                {_.map(favourites, (item, index) => {
+                  return <Box
+                    px="15px"
+                    py="7px"
+                    key={index}
+                    boxSizing="boder-box"
+                    fontSize={14}
+                    borderBottom={index !== favourites.length - 1 ? `1px solid ${isDark ? darkColors.foreground400 : lightColors.foreground400}` : ''}
+                    bgcolor={isDark ? darkColors.backgroundLowEmphasis : lightColors.backgroundLowEmphasis}
+                    color={isDark ? darkColors.foregroundHighEmphasis : lightColors.foregroundHighEmphasis}
+                  >{item}</Box>
+                })}
+              </Box>}
+            </Box>
+          }
           <RatesCard>
             <Text
               font="primaryHeading6"
@@ -74,8 +113,8 @@ const TradeRatesCard = ({
                 percentChange === "NaN"
                   ? "black"
                   : isIncrease
-                  ? "successHighEmphasis"
-                  : "dangerHighEmphasis"
+                    ? "successHighEmphasis"
+                    : "dangerHighEmphasis"
               }
             >
               {marketSummary.price ? marketSummary.price : "--"}
@@ -101,12 +140,12 @@ const TradeRatesCard = ({
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                <>
-                  {settings.showNightPriceChange 
-                    ? "UTC Change"
-                    : "24h Change"
-                  }
-                </>
+                  <>
+                    {settings.showNightPriceChange
+                      ? "UTC Change"
+                      : "24h Change"
+                    }
+                  </>
                 </Text>
                 <Text
                   font="primaryMediumSmallSemiBold"
@@ -114,8 +153,8 @@ const TradeRatesCard = ({
                     percentChange === "NaN"
                       ? "black"
                       : parseFloat(marketSummary["priceChange"]) >= 0
-                      ? "successHighEmphasis"
-                      : "dangerHighEmphasis"
+                        ? "successHighEmphasis"
+                        : "dangerHighEmphasis"
                   }
                 >
                   {marketSummary.priceChange &&
@@ -129,12 +168,12 @@ const TradeRatesCard = ({
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                <>
-                  {settings.showNightPriceChange 
-                    ? "UTC High"
-                    : "24h High"
-                  }
-                </>
+                  <>
+                    {settings.showNightPriceChange
+                      ? "UTC High"
+                      : "24h High"
+                    }
+                  </>
                 </Text>
                 <Text
                   font="primaryMediumSmallSemiBold"
@@ -149,12 +188,12 @@ const TradeRatesCard = ({
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                <>
-                  {settings.showNightPriceChange 
-                    ? "UTC Low"
-                    : "24h Low"
-                  }
-                </>
+                  <>
+                    {settings.showNightPriceChange
+                      ? "UTC Low"
+                      : "24h Low"
+                    }
+                  </>
                 </Text>
                 <Text
                   font="primaryMediumSmallSemiBold"
@@ -169,12 +208,12 @@ const TradeRatesCard = ({
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                <>
-                  {settings.showNightPriceChange 
-                    ? `UTC Volume(${marketInfo && marketInfo.baseAsset.symbol})`
-                    : `24h Volume(${marketInfo && marketInfo.baseAsset.symbol})`
-                  }
-                </>
+                  <>
+                    {settings.showNightPriceChange
+                      ? `UTC Volume(${marketInfo && marketInfo.baseAsset.symbol})`
+                      : `24h Volume(${marketInfo && marketInfo.baseAsset.symbol})`
+                    }
+                  </>
                 </Text>
                 <Text
                   font="primaryMediumSmallSemiBold"
@@ -189,12 +228,12 @@ const TradeRatesCard = ({
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                <>
-                  {settings.showNightPriceChange 
-                    ? `UTC Volume(${marketInfo && marketInfo.quoteAsset.symbol})`
-                    : `24h Volume(${marketInfo && marketInfo.quoteAsset.symbol})`
-                  }
-                </>
+                  <>
+                    {settings.showNightPriceChange
+                      ? `UTC Volume(${marketInfo && marketInfo.quoteAsset.symbol})`
+                      : `24h Volume(${marketInfo && marketInfo.quoteAsset.symbol})`
+                    }
+                  </>
                 </Text>
                 <Text
                   font="primaryMediumSmallSemiBold"
@@ -271,5 +310,5 @@ const RatesCard = styled.div`
 const Divider = styled.div`
   width: 1px;
   height: 32px;
-  background-color: ${({theme, isDark}) => isDark === "false" ? theme.colors.backgroundMediumEmphasis : theme.colors.foreground400};
+  background-color: ${({ theme, isDark }) => isDark === "false" ? theme.colors.backgroundMediumEmphasis : theme.colors.foreground400};
 `;
