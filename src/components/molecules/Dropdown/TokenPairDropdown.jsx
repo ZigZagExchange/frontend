@@ -84,27 +84,22 @@ const TableContent = styled.div`
       height: 342px;
       overflow: overlay;
 
-      ::-webkit-scrollbar {
-          width: 5px;
-          height: 5px;
-          position: relative;
-          z-index: 20;
-      }
-  
-      ::-webkit-scrollbar-track {
-          border-radius: 0px;
-          background: hsla(0, 0%, 100%, 0.15);
-          height: 23px;
-      }
-  
-      ::-webkit-scrollbar-thumb {
-          border-radius: 0px;
-          background: hsla(0, 0%, 100%, 0.4);
-      }
-  
-      ::-webkit-scrollbar-thumb:window-inactive {
-          background: #fff;
-      }
+    ::-webkit-scrollbar {
+        width: 5px;
+        position: relative;
+        z-index: 20;
+    }
+
+    ::-webkit-scrollbar-track {
+        border-radius: 4px;
+        background: transparent;
+        height: 23px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        border-radius: 4px;
+        background: ${({ theme }) => theme.colors.foreground400};
+    }
   }
 
   thead, tbody tr {
