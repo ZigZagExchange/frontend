@@ -18,6 +18,7 @@ import apiReducer, {
   setArweaveAllocation,
   setCurrentMarket,
   setConnecting,
+  setBridgeConnecting,
   setUISettings
 } from "lib/store/features/api/apiSlice";
 import autoMergeLevel2 from "redux-persist/lib/stateReconciler/autoMergeLevel2";
@@ -104,6 +105,10 @@ api.on("message", (operation, args) => {
 
 api.on("connecting", (flag) => {
   store.dispatch(setConnecting(flag))
+})
+
+api.on("bridge_connecting", (flag) => {
+  store.dispatch(setBridgeConnecting(flag))
 })
 
 api.on("settings", (payload) => {

@@ -39,6 +39,7 @@ export const apiSlice = createSlice({
     orders: {},
     arweaveAllocation: 0,
     isConnecting: false,
+    isBridgeConnecting: false,
     settings: initialUISettings,
     highSlippageModal: {
       open: false,
@@ -571,6 +572,9 @@ export const apiSlice = createSlice({
     setConnecting(state, { payload }) {
       state.isConnecting = payload;
     },
+    setBridgeConnecting(state, {payload}) {
+      state.isBridgeConnecting = payload;
+    },
     setHighSlippageModal(state, { payload }) {
       state.highSlippageModal = {
         open: payload.open ? payload.open : false,
@@ -615,6 +619,7 @@ export const {
   clearLastPrices,
   setArweaveAllocation,
   setConnecting,
+  setBridgeConnecting,
   setHighSlippageModal,
   setUISettings,
   resetUISettings,
@@ -634,6 +639,7 @@ export const bridgeReceiptsSelector = (state) => state.api.bridgeReceipts;
 export const marketInfoSelector = (state) => state.api.marketinfo;
 export const arweaveAllocationSelector = (state) => state.api.arweaveAllocation;
 export const isConnectingSelector = (state) => state.api.isConnecting;
+export const isBridgeConnectingSelector = (state) => state.api.isBridgeConnecting;
 export const settingsSelector = (state) => state.api.settings;
 export const highSlippageModalSelector = (state) => state.api.highSlippageModal;
 export const balancesSelector = (state) =>
