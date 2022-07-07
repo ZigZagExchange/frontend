@@ -17,7 +17,7 @@ const StyledTradeSidebar = styled.aside`
   grid-area: sidebar;
   position: relative;
   //   height: fit-content;
-  border: 1px solid ${({ theme }) => theme.colors.foreground300};
+  // border: 1px solid ${({ theme }) => theme.colors.foreground300};
   background: ${({ theme }) => theme.colors.backgroundMediumEmphasis};
   overflow-y: auto;
 
@@ -65,7 +65,7 @@ export default function TradeSidebar(props) {
       ) : (
         <InfoWrapper>
           <Text font="primarySmall" color="foregroundHighEmphasis">
-              Have a question? Need live support?
+            Have a question? Need live support?
           </Text>
           <Button
             width="150px"

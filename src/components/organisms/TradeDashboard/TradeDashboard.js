@@ -36,6 +36,7 @@ import {
   networkQueryParam,
 } from "../../pages/ListPairPage/SuccessModal";
 import TradesTable from "./TradeBooks/TradesTable";
+import { initialLayouts } from "components/organisms/TradeDashboard/ReactGridLayout/layoutSettings";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -89,10 +90,6 @@ const TradeGrid = styled.article`
   > main {
     background: ${(p) => p.theme.colors.zzDarkest};
   }
-`;
-
-const TradeGridLayout = styled(ResponsiveGridLayout)`
-  height: calc(100vh - 56px) !important;
 `;
 
 export function TradeDashboard() {
@@ -184,7 +181,9 @@ export function TradeDashboard() {
 
   const StyledGridLayoutRow = styled(GridLayoutRow)`
     .react-grid-item {
-      background: ${({ theme }) => theme.colors.backgroundMediumEmphasis};
+      padding: ${({ editable }) => editable && "10px"};
+      background: ${({ editable, theme }) =>
+        editable && theme.colors.backgroundMediumEmphasis};
     }
   `;
 
@@ -203,8 +202,9 @@ export function TradeDashboard() {
         }}
         margin={settings.editable ? [10, 10] : [0, 0]}
         isDraggable={settings.editable}
+        editable={settings.editable}
       >
-        <div key="a">
+        <div key={settings.stackOrderbook ? "a" : "b"}>
           <TradeSidebar
             updateMarketChain={updateMarketChain}
             currentMarket={currentMarket}
@@ -212,8 +212,20 @@ export function TradeDashboard() {
             activeOrderCount={activeUserOrders}
           />
         </div>
-        <div key="b">
-          <TradesTable />
+        {/* TradePriceTable, TradePriceHeadSecond */}
+        <div key={settings.stackOrderbook ? "g" : "e"}>
+          <OrdersBook
+            currentMarket={currentMarket}
+            changeFixedPoint={changeFixedPoint}
+            changeSide={changeSide}
+          />
+        </div>
+        <div key={settings.stackOrderbook ? "h" : "f"}>
+          <TradesBook
+            currentMarket={currentMarket}
+            fixedPoint={fixedPoint}
+            side={side}
+          />
         </div>
         <div key="c">
           <TradeChartArea />

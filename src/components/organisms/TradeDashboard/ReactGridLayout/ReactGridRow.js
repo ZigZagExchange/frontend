@@ -52,23 +52,22 @@ const GridLayoutRow = (props) => {
     <Row type="flex" justify="space-around" align="middle">
       <Col
         id="react-grid-layout-wrap"
+        xl={props.xl}
         lg={props.lg}
         md={props.md}
-        sm={props.sm}
-        xs={props.xs}
+        xxs={props.xxs}
       >
         <div>
           <ResponsiveGridLayout
             className="layout"
             breakpoints={{
-              lg: 1024,
-              md: 996,
-              sm: 768,
-              xs: 480,
+              xl: 1599,
+              lg: 1199,
+              md: 991,
               xxs: 0,
             }}
             measureBeforeMount={true}
-            cols={{ lg: 40, md: 10, sm: 8, xs: 4, xxs: 2 }}
+            cols={{ xl: 40, lg: 40, md: 40, xxs: 2 }}
             layouts={props.layouts}
             onLayoutChange={props.onChange}
             {...props}

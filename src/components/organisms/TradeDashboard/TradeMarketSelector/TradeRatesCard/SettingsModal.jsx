@@ -95,7 +95,7 @@ const SettingsModal = ({ onDismiss }) => {
               color="foregroundHighEmphasis"
               style={{ cursor: "pointer" }}
             >
-              Edit Layout
+              {settings.editable ? "Fix Layout" : "Edit Layout"}
             </Text>
           </ActionWrapper>
           <ActionWrapper onClick={resetLayout}>
@@ -204,7 +204,10 @@ const SettingsModal = ({ onDismiss }) => {
           <Toggle
             isChecked={settings.stackOrderbook}
             scale="md"
-            onChange={toggle}
+            onChange={() => {
+              toggle();
+              dispatch(resetTradeLayout());
+            }}
             settingKey="stackOrderbook"
           />
           <Text font="primarySmall" color="foregroundHighEmphasis">
