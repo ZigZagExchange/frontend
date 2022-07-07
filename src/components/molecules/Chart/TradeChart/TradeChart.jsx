@@ -4,8 +4,10 @@ import "./TradeChart.css";
 import { useSelector } from "react-redux";
 import { marketInfoSelector } from "../../../../lib/store/features/api/apiSlice";
 import { TRADING_VIEW_CHART_KEY } from "../../../pages/ListPairPage/ListPairPage";
+import useTheme from "components/hooks/useTheme";
 
 export const TradeChart = () => {
+  const { isDark } = useTheme()
   const marketInfo = useSelector(marketInfoSelector);
 
   let symbol = "";
@@ -23,7 +25,7 @@ export const TradeChart = () => {
   return (
     <TradingViewWidget
       symbol={symbol}
-      theme={Themes.DARK}
+      theme={isDark ? Themes.DARK : Themes.LIGHT}
       save_image={false}
       hide_top_toolbar={false}
       container_id="tradingview_7f572"
