@@ -223,6 +223,7 @@ export function TradeDashboard() {
                 }}
                 margin={settings.editable ? [10, 10] : [0, 0]}
                 isDraggable={settings.editable}
+                isResizable={settings.editable}
                 draggableHandle=".grid-item__title"
                 editable={settings.editable}
             >
