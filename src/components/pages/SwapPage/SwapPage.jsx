@@ -93,10 +93,10 @@ export default function SwapPage() {
   }, [user.address, zkBalances]);
 
   useEffect(() => {
-    dispatch(setCurrentMarket("ZZ-USDC"));
+    // dispatch(setCurrentMarket("ZZ-USDC"));
     document.title = "ZigZag Convert";
   }, []);
-
+  
   useEffect(() => {
     if (sellToken && buyToken) {
       const p_name = sellToken.name + "-" + buyToken.name;
