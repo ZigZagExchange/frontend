@@ -518,7 +518,16 @@ export default class API extends Emitter {
   };
 
   cancelOrder = async (orderId) => {
-    await this.send("cancelorder", [this.apiProvider.network, orderId]);
+    const token = localStorage.getItem(orderId);
+    // token is used to cancel the order - otherwiese the user is asked to sign a msg
+    if (token) {
+      await this.send("cancelorder3", [this.apiProvider.network, orderId, token]);
+    } else {
+      const message = `cancelorder2:${this.apiProvider.network}:${orderId}`
+      const signedMessage = await this.apiProvider.signMessage(message);
+      await this.send("cancelorder2", [this.apiProvider.network, orderId, signedMessage]);
+    }
+    
     return true;
   };
 
@@ -589,9 +598,30 @@ export default class API extends Emitter {
     }
   };
 
-  cancelAllOrders = async () => {
+  cancelAllOrders = async (orderIds) => {
     const { id: userId } = await this.getAccountState();
-    await this.send("cancelall", [this.apiProvider.network, userId]);
+    const tokenArray = [];
+    orderIds.forEach(id => {
+      tokenArray.push(localStorage.getItem(id));
+    })
+    if (orderIds.length === tokenArray.length) {
+      await this.send("cancelall3", [this.apiProvider.network, userId, tokenArray]);
+    } else {
+      const validUntil = (Date.now() / 1000) + 10;
+      const message = `cancelall2:${this.apiProvider.network}:${validUntil}`
+      const signedMessage = await this.apiProvider.signMessage(message);
+      await this.send("cancelall2", [this.apiProvider.network, userId, validUntil, signedMessage]);
+    }
+
+    return true;
+  };
+
+  cancelAllOrdersAllChains = async () => {
+    const validUntil = (Date.now() / 1000) + 10;
+    const message = `cancelall2:0:${validUntil}`
+    const signedMessage = await this.apiProvider.signMessage(message);
+    const { id: userId } = await this.getAccountState();
+    await this.send("cancelall2", [0, userId, signedMessage]);
     return true;
   };
 
