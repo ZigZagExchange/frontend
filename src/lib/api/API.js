@@ -522,11 +522,7 @@ export default class API extends Emitter {
     const token = localStorage.getItem(orderId);
     // token is used to cancel the order - otherwiese the user is asked to sign a msg
     if (token) {
-      try {
-        await this.send("cancelorder3", [this.apiProvider.network, orderId, token]);
-      } finally {
-        toast.dismiss(toastMsg);
-      }
+      await this.send("cancelorder3", [this.apiProvider.network, orderId, token]);
     } else {
       const toastMsg = toast.info('Sing the message to approve canceling the order...', {
         toastId: "Sing the message to approve canceling the order...'",
