@@ -5,7 +5,6 @@ import useTheme from "components/hooks/useTheme";
 import api from "lib/api";
 import { DefaultTemplate } from "components";
 import { ExternalLinkIcon, InfoIcon } from "components/atoms/Svg";
-import NetworkSelection from "components/organisms/NetworkSelection";
 import WrapContianer from "./WrapContainer";
 
 import classNames from "classnames";

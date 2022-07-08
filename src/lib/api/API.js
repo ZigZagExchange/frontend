@@ -67,7 +67,8 @@ export default class API extends Emitter {
 
       this.setAPIProvider(chainMap[window.ethereum.chainId] || 1);
     } else {
-      this.setAPIProvider(this.networks.mainnet[0]);
+      console.log(this.networks);
+      this.setAPIProvider(this.networks.zksync[0]);
     }
   }
 
