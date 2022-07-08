@@ -518,9 +518,16 @@ export default class API extends Emitter {
   };
 
   cancelOrder = async (orderId) => {
-    const message = `cancelorder2:${this.apiProvider.network}:${orderId}`
-    const signedMessage = await this.apiProvider.signMessage(message);
-    await this.send("cancelorder2", [this.apiProvider.network, orderId, signedMessage]);
+    const token = localStorage.getItem(orderId);
+    // token is used to cancel the order - otherwiese the user is asked to sign a msg
+    if (token) {
+      await this.send("cancelorder3", [this.apiProvider.network, orderId, token]);
+    } else {
+      const message = `cancelorder2:${this.apiProvider.network}:${orderId}`
+      const signedMessage = await this.apiProvider.signMessage(message);
+      await this.send("cancelorder2", [this.apiProvider.network, orderId, signedMessage]);
+    }
+
     return true;
   };
 
@@ -591,12 +598,21 @@ export default class API extends Emitter {
     }
   };
 
-  cancelAllOrders = async () => {
-    const validUntil = (Date.now() / 1000) + 10;
-    const message = `cancelall2:${this.apiProvider.network}:${validUntil}`
-    const signedMessage = await this.apiProvider.signMessage(message);
-    const { id: userId } = await this.getAccountState();
-    await this.send("cancelall2", [this.apiProvider.network, userId, signedMessage]);
+  cancelAllOrders = async (orderIds) => {
+    const tokenArray = [];
+    orderIds.forEach(id => {
+      tokenArray.push(localStorage.getItem(id));
+    })
+    if (orderIds.length === tokenArray.length) {
+      await this.send("cancelall3", [this.apiProvider.network, userId, signedMessage]);
+    } else {
+      const validUntil = (Date.now() / 1000) + 10;
+      const message = `cancelall2:${this.apiProvider.network}:${validUntil}`
+      const signedMessage = await this.apiProvider.signMessage(message);
+      const { id: userId } = await this.getAccountState();
+      await this.send("cancelall2", [this.apiProvider.network, userId, validUntil, signedMessage]);
+    }
+    
     return true;
   };
 

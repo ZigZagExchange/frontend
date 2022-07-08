@@ -387,6 +387,11 @@ export const apiSlice = createSlice({
       const orderId = payload[1];
       state.userOrders[orderId] = payload;
     },
+    _userorderack(state, { payload }) {
+      const orderId = payload[1].toString();
+      const token = payload[12].toString();
+      localStorage.setItem(orderId, token);
+    },
     setBalances(state, { payload }) {
       const scope = makeScope(state);
       state.balances[scope] = state.balances[scope] || {};

@@ -121,6 +121,10 @@ export default function OrdersTable(props) {
       )
       .sort((a, b) => b[1] - a[1]);
   };
+  
+  const getUserOrderIds = () => {
+    return getUserOrders().map(o => o[0]);
+  }
 
   const isOpenStatus = (orders) => {
     return orders.findIndex((order) => order[9] === "o") !== -1;
@@ -1587,7 +1591,7 @@ export default function OrdersTable(props) {
                 variant="outlined"
                 width="100px"
                 scale="md"
-                onClick={api.cancelAllOrders}
+                onClick={api.cancelAllOrders(getUserOrderIds())}
               >
                 Cancel All
               </StyledButton>
