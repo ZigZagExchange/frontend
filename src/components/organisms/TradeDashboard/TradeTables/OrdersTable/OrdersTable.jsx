@@ -56,6 +56,7 @@ export default function OrdersTable(props) {
   const coinEstimator = useCoinEstimator();
   const [tab, setTabIndex] = useState(0);
   const [selectedSide, setSelectedSide] = useState("All");
+  const [selectedTradeType, setSelectedTradeType] = useState("All");
   const [tokenDirection, setTokenDirection] = useState(false);
   const [balanceDirection, setBalanceDirection] = useState(false);
   const [walletList, setWalletList] = useState([]);
@@ -65,6 +66,11 @@ export default function OrdersTable(props) {
     { text: "All", url: "#", iconSelected: true, value: "All" },
     { text: "Buy", url: "#", value: "Buy" },
     { text: "Sell", url: "#", value: "Sell" },
+  ]);
+  const [tradeTypeItems, setTradeTypeItems] = useState([
+    { text: "All", url: "#", iconSelected: true, value: "All" },
+    { text: "Maker", url: "#", value: "Maker" },
+    { text: "Taker", url: "#", value: "Taker" },
   ]);
   const isMobile = window.innerWidth < 1064;
 
@@ -109,6 +115,14 @@ export default function OrdersTable(props) {
           i[6] === "f" &&
           (selectedSide === "All" || i[3] === selectedSide.toLowerCase()[0])
       )
+      .filter(
+        (i) =>
+        (
+          selectedTradeType === "All" ||
+          (selectedTradeType === 'Taker' && i[8].toLowerCase() === (`${props?.user?.id}`).toLowerCase()) ||
+          (selectedTradeType === 'Maker' && i[9].toLowerCase() === (`${props?.user?.id}`).toLowerCase())
+        )
+      )
       .sort((a, b) => b[1] - a[1]);
   };
 
@@ -143,6 +157,25 @@ export default function OrdersTable(props) {
     }, []);
     setSelectedSide(newSide);
     setSideItems(newItems);
+  };
+
+  const changeTradeType = (newType) => {
+    const newItems = tradeTypeItems.reduce((acc, item) => {
+      if (item.text === newType) {
+        acc.push({
+          ...item,
+          iconSelected: true,
+        });
+      } else {
+        acc.push({
+          ...item,
+          iconSelected: false,
+        });
+      }
+      return acc;
+    }, []);
+    setSelectedTradeType(newType);
+    setTradeTypeItems(newItems);
   };
 
   const sortByNotional = (cur1, cur2) => {
@@ -834,6 +867,7 @@ export default function OrdersTable(props) {
             const sidetext = side === "b" ? "buy" : "sell";
             const sideclassname =
               side === "b" ? "successHighEmphasis" : "dangerHighEmphasis";
+            const tradeTypeText = fill[8].toLowerCase() === (`${props?.user?.id}`).toLowerCase() ? "Taker" : "Maker";
             const txhash = fill[7];
             const feeamount = Number(fill[10]);
             const feetoken = fill[11];
@@ -938,6 +972,11 @@ export default function OrdersTable(props) {
                             color={sideclassname}
                           >
                             {sidetext}
+                          </Text>
+                          <Text
+                            font="primaryExtraSmallSemiBold"
+                          >
+                            {tradeTypeText}
                           </Text>
                         </div>
                         <Text
@@ -1107,6 +1146,20 @@ export default function OrdersTable(props) {
                 />
               </HeaderWrapper>
             </th>
+            <th scope="col">
+              <HeaderWrapper style={{ position: "relative" }}>
+                {/* <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis" onClick>Side</Text> */}
+                <Dropdown
+                  adClass="side-dropdown size-wide"
+                  transparent={true}
+                  width={162}
+                  item={tradeTypeItems}
+                  context="Type"
+                  leftIcon={false}
+                  clickFunction={changeTradeType}
+                />
+              </HeaderWrapper>
+            </th>
             <th>
               <HeaderWrapper>
                 <Text
@@ -1194,6 +1247,7 @@ export default function OrdersTable(props) {
             const sidetext = side === "b" ? "buy" : "sell";
             const sideclassname =
               side === "b" ? "successHighEmphasis" : "dangerHighEmphasis";
+            const tradeTypeText = fill[8].toLowerCase() === (`${props?.user?.id}`).toLowerCase() ? "Taker" : "Maker";
             const txhash = fill[7];
             const feeamount = Number(fill[10]);
             const feetoken = fill[11];
@@ -1301,6 +1355,11 @@ export default function OrdersTable(props) {
                 <td data-label="Side">
                   <Text font="primaryExtraSmallSemiBold" color={sideclassname}>
                     {sidetext}
+                  </Text>
+                </td>
+                <td data-label="Trade">
+                  <Text font="primaryExtraSmallSemiBold">
+                    {tradeTypeText}
                   </Text>
                 </td>
                 <td data-label="Quantity">
@@ -1414,8 +1473,8 @@ export default function OrdersTable(props) {
                   {settings.hideBalance
                     ? "****.****"
                     : formatToken(
-                        token.valueReadable * coinEstimator(token.token)
-                      )}
+                      token.valueReadable * coinEstimator(token.token)
+                    )}
                 </Text>
               </td>
             </tr>
