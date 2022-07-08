@@ -241,7 +241,7 @@ const ListPairForm = ({
               borderRadius={8}
               {...model(baseFee, setBaseFee)}
               label={baseSymbol ?
-                <x.span fontSize={{ xs: 'xs', md: '14px' }}>`${baseSymbol} Swap Fee`</x.span> :
+                <x.span fontSize={{ xs: 'xs', md: '14px' }}>{baseSymbol} Swap Fee</x.span> :
                 <x.span fontSize={{ xs: 'xs', md: '14px' }}>Base Swap Fee</x.span>}
               validate={[required, min(0)]}
               rightOfLabel={
@@ -259,7 +259,7 @@ const ListPairForm = ({
               borderRadius={8}
               name={"quoteFee"}
               {...model(quoteFee, setQuoteFee)}
-              label={quoteSymbol ? <x.span fontSize={{ xs: 'xs', md: '14px' }}>`${quoteSymbol} Swap Fee`</x.span> :
+              label={quoteSymbol ? <x.span fontSize={{ xs: 'xs', md: '14px' }}>{quoteSymbol} Swap Fee</x.span> :
                 <x.span fontSize={{ xs: 'xs', md: '14px' }}>Quote Swap Fee</x.span>}
               validate={[required, min(0)]}
               rightOfLabel={
