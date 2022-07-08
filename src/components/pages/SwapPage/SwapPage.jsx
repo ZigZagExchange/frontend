@@ -93,8 +93,25 @@ export default function SwapPage() {
   }, [user.address, zkBalances]);
 
   useEffect(() => {
-    setSellToken("USDC");
-    dispatch(setCurrentMarket("ZZ-USDC"));
+    // this could later be replaced by a better logic to pick a good pair
+    switch(network) {
+      case 1:
+        setSellToken("USDC");
+        dispatch(setCurrentMarket("ZZ-USDC"));
+        break;
+      case 1000:
+        setSellToken("USDC");
+        dispatch(setCurrentMarket("ETH-USDC"));
+        break;
+      case 42161:
+        setSellToken("USDC");
+        dispatch(setCurrentMarket("WETH-USDC"));
+        break;
+      default:
+        setSellToken("USDC");
+        dispatch(setCurrentMarket("ZZ-USDC"));
+    }
+
     setSellTokenList(api.getCurrencies());
     setGetPairs(api.getPairs());
     document.title = "ZigZag Convert";
