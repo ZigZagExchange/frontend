@@ -3,10 +3,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import useTheme from "components/hooks/useTheme";
 import api from "lib/api";
-import { Link } from "react-router-dom";
+
 import { DefaultTemplate } from "components";
-import { ExternalLinkIcon, InfoIcon } from "components/atoms/Svg";
-import NetworkSelection from "components/organisms/NetworkSelection";
 import SwapContianer from "./SwapContainer";
 
 import classNames from "classnames";
@@ -25,9 +23,9 @@ import {
   setCurrentMarket,
   resetData,
   settingsSelector,
-  userOrdersSelector
+  userOrdersSelector,
 } from "lib/store/features/api/apiSlice";
-import { formatPrice } from "lib/utils";
+import { formatPrice, formatUSD } from "lib/utils";
 import { LoadingSpinner } from "components/atoms/LoadingSpinner";
 
 export default function SwapPage() {
@@ -52,7 +50,7 @@ export default function SwapPage() {
   const [buyToken, setBuyToken] = useState();
   const [basePrice, setBasePrice] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [slippageValue, setSlippageValue] = useState("2.00");
+  const [slippageValue, setSlippageValue] = useState("1.00");
 
   const [sellAmounts, setSellAmounts] = useState();
   const [buyAmounts, setBuyAmounts] = useState();
@@ -61,12 +59,18 @@ export default function SwapPage() {
 
   const [orderButtonDisabled, setOrderButtonDisabled] = useState(false);
 
-  const estimatedValue = sellAmounts * coinEstimator(sellToken?.name) || 0;
+  const estimatedValueSell = sellAmounts * coinEstimator(sellToken?.name) || 0;
+  const estimatedValueBuy = buyAmounts * coinEstimator(buyToken?.name) || 0;
 
   const zkBalances = useMemo(
     () => (balanceData[network] ? balanceData[network] : {}),
     [balanceData, network]
   );
+
+  useEffect(() => {
+    setSellTokenList([]);
+    setGetPairs([]);
+  }, [network]);
 
   useEffect(() => {
     setLoading(true);
@@ -81,7 +85,7 @@ export default function SwapPage() {
     return () => {
       clearInterval(timer);
     };
-  }, [sellTokenList]);
+  }, [sellTokenList, network, currentMarket]);
 
   useEffect(async () => {
     if (!user.address) return;
@@ -89,7 +93,11 @@ export default function SwapPage() {
   }, [user.address, zkBalances]);
 
   useEffect(() => {
+    setSellToken("USDC");
     dispatch(setCurrentMarket("ZZ-USDC"));
+    setSellTokenList(api.getCurrencies());
+    setGetPairs(api.getPairs());
+    document.title = "ZigZag Convert";
   }, []);
 
   useEffect(() => {
@@ -117,7 +125,7 @@ export default function SwapPage() {
   useEffect(() => {
     const sub = () => {
       dispatch(resetData());
-      api.subscribeToMarket(currentMarket);
+      api.subscribeToMarket(currentMarket, settings.showNightPriceChange);
     };
 
     if (api.ws && api.ws.readyState === 0) {
@@ -134,6 +142,11 @@ export default function SwapPage() {
       }
     };
   }, [network, currentMarket, api.ws]);
+
+  // useEffect(() => {
+  //   setSellTokenList(api.getCurrencies());
+  //   setGetPairs(api.getPairs());
+  // }, [network]);
 
   const currentPrice = () => {
     var ladderPrice = getLadderPrice();
@@ -191,12 +204,32 @@ export default function SwapPage() {
   const fromTokenOptions = useMemo(() => {
     if (sellTokenList.length > 0) {
       const p = sellTokenList.map((item, index) => {
-        return { id: index, name: item };
+        const price = balances[item]?.valueReadable
+          ? `$ ${formatUSD(
+              coinEstimator(item) * balances[item]?.valueReadable
+            )}`
+          : "";
+
+        return {
+          id: index,
+          name: item,
+          balance: balances[item]?.valueReadable
+            ? balances[item]?.valueReadable
+            : "0.00000",
+          price: price !== "" ? `${price}` : "$ 0.00",
+        };
       });
       const f = p.find((item) => item.name === currentMarket.split("-")[1]);
       // const t = p.find((item) => item.name === currentMarket.split("-")[0]);
+      const s = p.sort((a, b) => {
+        return (
+          parseFloat(b.price.substring(1).replace(",", "")) -
+          parseFloat(a.price.substring(1).replace(",", ""))
+        );
+      });
       setSellToken(f);
-      return p;
+      // setBuyToken(t);
+      return s;
     } else {
       return [];
     }
@@ -219,7 +252,20 @@ export default function SwapPage() {
         return el != null;
       })
       .map((item, index) => {
-        return { id: index, name: item };
+        const price = balances[item]?.valueReadable
+          ? `$ ${formatUSD(
+              coinEstimator(item) * balances[item]?.valueReadable
+            )}`
+          : "";
+
+        return {
+          id: index,
+          name: item,
+          balance: balances[item]?.valueReadable
+            ? balances[item]?.valueReadable
+            : "0.00000",
+          price: price !== "" ? `${price}` : "$ 0.00",
+        };
       });
     if (buyToken) {
       const d = filtered.find((item) => item.name === buyToken.name);
@@ -235,7 +281,13 @@ export default function SwapPage() {
       (value, index, self) =>
         index === self.findIndex((t) => t.name === value.name)
     );
-    return filtered;
+    const s = filtered.sort((a, b) => {
+      return (
+        parseFloat(b.price.substring(1).replace(",", "")) -
+        parseFloat(a.price.substring(1).replace(",", ""))
+      );
+    });
+    return s;
   }, [sellToken, pairs]);
 
   const onChangeSellToken = (option) => {
@@ -250,6 +302,7 @@ export default function SwapPage() {
     const p = fromTokenOptions.find((item) => item.name === buyToken.name);
     setSellToken(p);
     setBuyToken(sellToken);
+    setSellAmounts(buyAmounts);
   };
 
   const onChangeSellAmounts = (event) => {
@@ -268,16 +321,16 @@ export default function SwapPage() {
 
   const onClickExchange = async () => {
     const userOrderArray = Object.values(userOrders);
-    if(userOrderArray.length > 0) {
-      const openOrders = userOrderArray.filter((o) => ['o', 'b', 'm'].includes(o[9]));
-      if(
-        [1, 1000].includes(network) &&
-        openOrders.length > 0
-      ) {
-        toast.warn(
-          'zkSync 1.0 allows one open order at a time. Please cancel your limit order or wait for it to be filled before converting. Otherwise your limit order will fail.',
+    if (userOrderArray.length > 0) {
+      const openOrders = userOrderArray.filter((o) =>
+        ["o", "b", "m"].includes(o[9])
+      );
+      if ([1, 1000].includes(network) && openOrders.length > 0) {
+        toast.error(
+          "zkSync 1.0 allows one open order at a time. Please cancel your limit order or wait for it to be filled before converting. Otherwise your limit order will fail.",
           {
-            toastId: 'zkSync 1.0 allows one open order at a time. Please cancel your limit order or wait for it to be filled before converting. Otherwise your limit order will fail.',
+            toastId:
+              "zkSync 1.0 allows one open order at a time. Please cancel your limit order or wait for it to be filled before converting. Otherwise your limit order will fail.",
             autoClose: 20000,
           }
         );
@@ -433,6 +486,7 @@ export default function SwapPage() {
     if (balance && fees) {
       const s_amounts = balance - fees;
       setSellAmounts(s_amounts);
+      setBuyAmounts(basePrice * s_amounts);
     }
   };
 
@@ -471,17 +525,14 @@ export default function SwapPage() {
               onChangeFromToken={onChangeSellToken}
               onChangeFromAmounts={onChangeSellAmounts}
               fromAmounts={sellAmounts}
-              estimatedValue={estimatedValue}
+              estimatedValueFrom={estimatedValueSell}
+              estimatedValueTo={estimatedValueBuy}
               onSwitchTokenBtn={onSwitchTokenBtn}
               basePrice={basePrice}
               toToken={buyToken}
               toTokenOptions={buyTokenOptions}
               onChangeToToken={onChangeBuyToken}
-              toAmounts={
-                isNaN(buyAmounts) || Number.isSafeInteger(buyAmounts)
-                  ? ""
-                  : buyAmounts
-              }
+              toAmounts={isNaN(buyAmounts) ? "" : buyAmounts}
               onClickMax={onClickMax}
               onChangeToAmounts={onChangeBuyAmounts}
             />

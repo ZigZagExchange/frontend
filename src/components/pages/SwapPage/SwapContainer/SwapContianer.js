@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import TokenDropDownModal from "components/organisms/TokenDropdownModal";
 import { formatUSD, formatPrice } from "lib/utils";
@@ -14,7 +14,8 @@ const SwapContianer = ({
   onChangeFromToken,
   onChangeFromAmounts,
   fromAmounts,
-  estimatedValue,
+  estimatedValueFrom,
+  estimatedValueTo,
   onSwitchTokenBtn,
   basePrice,
   toToken,
@@ -24,6 +25,11 @@ const SwapContianer = ({
   onChangeToAmounts,
   onClickMax,
 }) => {
+  const [switchType, setSwitchType] = useState(false);
+
+  const onChangeAmounts = () => {
+    setSwitchType(!switchType);
+  };
   return (
     <div className="p-4 mt-5 border rounded-lg dark:border-foreground-400 border-primary-500">
       <div className="flex items-center justify-between">
@@ -42,7 +48,7 @@ const SwapContianer = ({
             tickers={fromTokenOptions}
             onSelectedOption={onChangeFromToken}
             selectedOption={fromToken}
-            label={"Select a token to Swap"}
+            label={"Select a token to Convert"}
           />
         )}
         <button
@@ -59,7 +65,7 @@ const SwapContianer = ({
         />
       </div>
       <p className="mt-1 text-sm font-normal text-right text-slate-400 ">
-        Estimated value: ~ ${formatUSD(estimatedValue)}
+        Estimated value: ~ ${formatUSD(estimatedValueFrom)}
       </p>
       <div className="relative h-px mx-2 my-5 dark:bg-foreground-400 bg-primary-500">
         <button
@@ -72,8 +78,19 @@ const SwapContianer = ({
       <div className="flex items-center justify-between">
         <p className="text-lg font-work">To</p>
         <p className="flex items-center text-sm font-normal ">
-          1 {fromToken?.name} = {formatPrice(basePrice)} {toToken?.name}
-          <SwitchHorizontalIcon className="w-4" />
+          {!switchType
+            ? `1 ${fromToken?.name} = ${formatPrice(basePrice)} ${
+                toToken?.name
+              }`
+            : `1 ${toToken?.name} = ${formatPrice(1 / basePrice)} ${
+                fromToken?.name
+              }`}
+          <button
+            onClick={onChangeAmounts}
+            className="transition-all duration-300 ease-in-out hover:opacity-70 hover:rotate-180"
+          >
+            <SwitchHorizontalIcon className="w-4" />
+          </button>
         </p>
       </div>
       <div className="flex items-center justify-between px-3 py-2 mt-3 rounded-lg dark:bg-foreground-200 bg-primary-300 hover:ring-1 hover:ring-offset-0 hover:dark:ring-foreground-500 hover:ring-primary-600">
@@ -82,18 +99,18 @@ const SwapContianer = ({
             tickers={toTokenOptions}
             onSelectedOption={onChangeToToken}
             selectedOption={toToken}
-            label={"Select a token to Swap"}
+            label={"Select a token to Convert"}
           />
         )}
         <input
-          className="ml-3 text-2xl font-semibold text-right bg-transparent focus:outline-none w-36 md:w-auto"
+          className="ml-3 text-2xl font-semibold text-right bg-transparent focus:outline-none w-36 md:w-64"
           placeholder="0.00"
           value={toAmounts}
           onChange={onChangeToAmounts}
         />
       </div>
       <p className="mt-1 text-sm font-normal text-right text-slate-400 ">
-        Estimated value: ~ ${formatUSD(estimatedValue)}
+        Estimated value: ~ ${formatUSD(estimatedValueTo)}
       </p>
     </div>
   );

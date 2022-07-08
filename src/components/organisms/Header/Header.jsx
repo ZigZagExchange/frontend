@@ -12,6 +12,8 @@ import {
 } from "lib/store/features/api/apiSlice";
 import api from "lib/api";
 import logo from "assets/images/logo.png";
+import zksyncLogo from "assets/images/networks/zksync-network.svg";
+import arbitrumLogo from "assets/images/networks/arbitrum-network.svg";
 import { TabMenu, Tab } from "components/molecules/TabMenu";
 import { Dropdown, AccountDropdown } from "components/molecules/Dropdown";
 import { ConnectWalletButton } from "components/molecules/Button";
@@ -23,11 +25,8 @@ import {
   DeleteIcon,
   MenuIcon,
 } from "components/atoms/Svg";
-import { toNumber } from "lodash";
 import ToggleTheme from "components/molecules/Toggle/ToggleTheme";
 import useTheme from "components/hooks/useTheme";
-import { formatAmount } from "../../../lib/utils";
-import { SwapVerticalCircleSharp } from "@material-ui/icons";
 
 const langList = [
   { text: "EN", url: "#" },
@@ -35,12 +34,25 @@ const langList = [
 ];
 
 const networkLists = [
-  { text: "zkSync - Mainnet", value: 1, url: "#", selectedIcon: <CheckIcon /> },
+  { text: "zkSync - Mainnet",
+    value: 1,
+    url: "#",
+    selectedIcon: <CheckIcon />,
+    image: zksyncLogo,
+  },
   {
     text: "zkSync - Rinkeby",
     value: 1000,
     url: "#",
     selectedIcon: <CheckIcon />,
+    image: zksyncLogo,
+  },
+  {
+    text: "Arbitrum (soon)",
+    value: null,
+    url: "#",
+    selectedIcon: <CheckIcon />,
+    image: arbitrumLogo,
   },
   {
     text: "Arbitrum - Mainnet",
@@ -53,6 +65,19 @@ const networkLists = [
 const accountLists = [
   { text: "0x83AD...83H4", url: "#", icon: <DeleteIcon /> },
   { text: "0x12BV...b89G", url: "#", icon: <DeleteIcon /> },
+];
+
+const supportLists = [
+  { text: "Live Support", url: "https://discord.com/invite/zigzag" },
+  { text: "FAQ", url: "https://info.zigzag.exchange/" },
+  { text: "Docs", url: "https://docs.zigzag.exchange/" },
+  { text: "GitHub", url: "https://github.com/ZigZagExchange/" },
+  { text: "Uptime Status", url: "https://status.zigzag.exchange/" },
+];
+
+const communityLists = [
+  { text: "Governance", url: "https://forum.zigzaglabs.io/t/zigzag-exchange" },
+  { text: "Blog", url: "https://blog.zigzag.exchange/" },
 ];
 
 const HeaderWrapper = styled.div`
@@ -293,9 +318,6 @@ export const Header = (props) => {
         history.push("/list-pair");
         break;
       case 4:
-        window.open("https://docs.zigzag.exchange/", "_blank");
-        break;
-      case 5:
         setIndex(newIndex);
         localStorage.setItem("tab_index", newIndex);
         history.push("/dsl");
@@ -360,6 +382,23 @@ export const Header = (props) => {
             </TabMenu>
           </NavWrapper>
           <ActionsWrapper>
+            <VerticalDivider />
+            <Dropdown
+              adClass="menu-dropdown"
+              width={200}
+              item={supportLists}
+              context={'Support'}
+              leftIcon={true}
+              transparent
+            />
+            <Dropdown
+              adClass="menu-dropdown"
+              width={162}
+              item={communityLists}
+              context={'Community'}
+              leftIcon={true}
+              transparent
+            />
             <SocialWrapper>
               <SocialLink
                 target="_blank"
@@ -415,20 +454,16 @@ export const Header = (props) => {
       )}
       {show && isMobile ? (
         <SideMenuWrapper>
-          {user.id && user.address ? (
-            <Dropdown
-              adClass="network-dropdown"
-              isMobile={true}
-              style={{ justifySelf: "center" }}
-              width={242}
-              item={networkItems}
-              context={networkName}
-              clickFunction={changeNetwork}
-              leftIcon={true}
-            />
-          ) : (
-            <></>
-          )}
+          <Dropdown
+            adClass="network-dropdown"
+            isMobile={true}
+            style={{ justifySelf: "center" }}
+            width={242}
+            item={networkItems}
+            context={networkName}
+            clickFunction={changeNetwork}
+            leftIcon={true}
+          />
           <TabMenu row activeIndex={index} onItemClick={handleClick}>
             <Tab>TRADE</Tab>
             <Tab>CONVERT</Tab>
@@ -456,6 +491,22 @@ export const Header = (props) => {
             <ToggleTheme isDark={isDark} toggleTheme={toggleTheme} />
           </ActionSideMenuWrapper>
           <HorizontalDivider />
+          <Dropdown
+            adClass="menu-dropdown"
+            width={200}
+            item={supportLists}
+            context={'Support'}
+            leftIcon={true}
+            transparent
+          />
+          <Dropdown
+            adClass="menu-dropdown"
+            width={162}
+            item={communityLists}
+            context={'Community'}
+            leftIcon={true}
+            transparent
+          />
           <SocialWrapper style={{ justifySelf: "center" }}>
             <SocialLink
               target="_blank"

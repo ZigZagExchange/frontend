@@ -25,7 +25,7 @@ const SelectWrapper = styled.div`
   &::before {
     content: "";
     font-size: 1rem;
-    top: 32px;
+    top: 38px;
     right: 14px;
     position: absolute;
     border: solid ${({theme}) => theme.colors.foregroundHighEmphasis};
@@ -69,9 +69,10 @@ const SelectInput = ({
         h={"full"}
       >
         {items.map((item) => (
-          <x.option color={"black"} value={item.id}>
-            {item.name}
-          </x.option>
+          <div data_id={item.id} data_name={item.name}/>
+          // <x.option color={"black"} maxWidth={"100px"} value={item.id}>
+          //   {item.name}
+          // </x.option>
         ))}
       </InputField>
     </SelectWrapper>

@@ -7,7 +7,10 @@ const StyledTradeTables = styled.section`
   grid-area: tables;
   background-color: ${({ theme }) => theme.colors.backgroundMediumEmphasis};
   overflow: hidden;
-  // min-height: 260px;
+
+  @media screen and (max-width: 991px) {
+    height: 300px;
+  }
 `;
 
 export default function TradeTables(props) {

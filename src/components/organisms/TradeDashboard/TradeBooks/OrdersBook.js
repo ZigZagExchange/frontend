@@ -65,6 +65,7 @@ const OrderFooterWrapper = styled.div`
   button {
     height: auto;
   }
+  padding-bottom: ${({ isStack }) => isStack ? '6px' : '0'};
 `;
 
 const OrderFooterRight = styled.div`
@@ -231,6 +232,7 @@ export default function OrdersBook(props) {
                 <>
                   <TradePriceHeadSecond
                     lastPrice={marketSummary.price}
+                    marketSummary={marketSummary}
                     marketInfo={marketInfo}
                     fixedPoint={fixedPoint}
                   />
@@ -253,6 +255,7 @@ export default function OrdersBook(props) {
                 <>
                   <TradePriceHeadSecond
                     lastPrice={marketSummary.price}
+                    marketSummary={marketSummary}
                     marketInfo={marketInfo}
                     fixedPoint={fixedPoint}
                   />
@@ -283,6 +286,7 @@ export default function OrdersBook(props) {
                   <Divider />
                   <TradePriceHeadSecond
                     lastPrice={marketSummary.price}
+                    marketSummary={marketSummary}
                     marketInfo={marketInfo}
                     fixedPoint={fixedPoint}
                   />
@@ -298,7 +302,7 @@ export default function OrdersBook(props) {
                 ""
               )}
               <Divider />
-              <OrderFooterWrapper>
+              <OrderFooterWrapper isStack={settings.stackOrderbook}>
                 {/* <Dropdown
                   adClass="side-dropdown"
                   transparent={true}
@@ -343,11 +347,12 @@ export default function OrdersBook(props) {
               <HeaderWrapper>
                 <TradePriceHeadSecond
                   lastPrice={marketSummary.price}
+                  marketSummary={marketSummary}
                   marketInfo={marketInfo}
                   fixedPoint={fixedPoint}
                 />
-                <OrderFooterWrapper>
-                  <Dropdown
+                <OrderFooterWrapper isStack={settings.stackOrderbook}>
+                  {/* <Dropdown
                     adClass="side-dropdown"
                     transparent={true}
                     width={162}
@@ -355,7 +360,7 @@ export default function OrdersBook(props) {
                     context={`${fixedPoint} decimal`}
                     leftIcon={false}
                     clickFunction={changeFixedPoint}
-                  />
+                  /> */}
 
                   <OrderFooterRight>
                     <OrderButtonWrapper
@@ -393,7 +398,7 @@ export default function OrdersBook(props) {
                       adClass="no-space"
                       priceTableData={askBins}
                       currentMarket={props.currentMarket}
-                      scrollToBottom={true}
+                      scrollToBottom={false}
                       fixedPoint={fixedPoint}
                     />
                   </>
@@ -418,18 +423,17 @@ export default function OrdersBook(props) {
                   <>
                     <TradePriceTable
                       head
-                      className="trade_table_asks sell-side"
                       useGradient={!settings.disableOrderBookFlash}
-                      priceTableData={askBins}
                       currentMarket={props.currentMarket}
-                      scrollToBottom={true}
+                      priceTableData={bidBins}
                       fixedPoint={fixedPoint}
                     />
                     <TradePriceTable
                       head
+                      className="trade_table_asks sell-side"
                       useGradient={!settings.disableOrderBookFlash}
+                      priceTableData={askBins}
                       currentMarket={props.currentMarket}
-                      priceTableData={bidBins}
                       fixedPoint={fixedPoint}
                     />
                   </>

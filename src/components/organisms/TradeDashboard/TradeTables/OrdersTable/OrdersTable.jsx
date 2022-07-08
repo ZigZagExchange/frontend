@@ -1,19 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
+
 import "./OrdersTable.css";
 import { useCoinEstimator } from "components";
 import styled from "styled-components";
 import loadingGif from "assets/icons/loading.svg";
+
+import FillCard from "./FillCard";
 import {
   balancesSelector,
   networkSelector,
   settingsSelector,
 } from "lib/store/features/api/apiSlice";
 import api from "lib/api";
-import { formatDate, formatDateTime, formatToken } from "lib/utils";
+import { formatDate, formatDateTime, formatToken, addComma } from "lib/utils";
 import { Tab } from "components/molecules/TabMenu";
 import Text from "components/atoms/Text/Text";
+
 import {
   SortUpIcon,
   SortDownIcon,
@@ -58,9 +62,9 @@ export default function OrdersTable(props) {
   const [tokenSorted, setTokenSorted] = useState(false);
   const [balanceSorted, setBalanceSorted] = useState(false);
   const [sideItems, setSideItems] = useState([
-    { text: "All", url: "#", iconSelected: true },
-    { text: "Buy", url: "#" },
-    { text: "Sell", url: "#" },
+    { text: "All", url: "#", iconSelected: true, value: "All" },
+    { text: "Buy", url: "#", value: "Buy" },
+    { text: "Sell", url: "#", value: "Sell" },
   ]);
   const isMobile = window.innerWidth < 1064;
 
@@ -245,6 +249,20 @@ export default function OrdersTable(props) {
     }
   };
 
+  const onClickTradeId = (fill) => {
+    toast.warning(
+      ({ closeToast }) => <FillCard closeToast={closeToast} fill={fill} />,
+      {
+        className: "fillToastCard",
+        bodyClassName: "!p-0",
+        closeOnClick: false,
+        autoClose: false,
+        icon: false,
+        closeButton: false,
+      }
+    );
+  };
+
   const renderOrderTable = (orders) => {
     return isMobile ? (
       <table>
@@ -419,7 +437,7 @@ export default function OrdersTable(props) {
                         color="foregroundHighEmphasis"
                         textAlign="right"
                       >
-                        {price.toPrecision(6) / 1}
+                        {addComma(price.toPrecision(6) / 1)}
                       </Text>
                     </td>
                   </tr>
@@ -480,7 +498,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Market
+                  Time
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -493,7 +511,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Price
+                  Market
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -512,6 +530,19 @@ export default function OrdersTable(props) {
                   leftIcon={false}
                   clickFunction={changeSide}
                 />
+              </HeaderWrapper>
+            </th>
+            <th scope="col">
+              <HeaderWrapper>
+                <Text
+                  font="primaryExtraSmallSemiBold"
+                  color="foregroundLowEmphasis"
+                >
+                  Price
+                </Text>
+                {/* <SortIconWrapper>
+                    <SortUpIcon /><SortDownIcon />
+                  </SortIconWrapper> */}
               </HeaderWrapper>
             </th>
             <th scope="col">
@@ -546,7 +577,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Time
+                  Expiry
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -685,6 +716,14 @@ export default function OrdersTable(props) {
             return (
               <>
                 <tr key={orderId}>
+                  <td data-label="Time">
+                    <Text
+                      font="primaryExtraSmallSemiBold"
+                      color="foregroundHighEmphasis"
+                    >
+                      {time}
+                    </Text>
+                  </td>
                   <td data-label="Market">
                     <Text
                       font="primaryExtraSmallSemiBold"
@@ -693,20 +732,20 @@ export default function OrdersTable(props) {
                       {market}
                     </Text>
                   </td>
-                  <td data-label="Price">
-                    <Text
-                      font="primaryExtraSmallSemiBold"
-                      color="foregroundHighEmphasis"
-                    >
-                      {price.toPrecision(6) / 1}
-                    </Text>
-                  </td>
                   <td data-label="Side">
                     <Text
                       font="primaryExtraSmallSemiBold"
                       color={sideclassname}
                     >
                       {side}
+                    </Text>
+                  </td>
+                  <td data-label="Price">
+                    <Text
+                      font="primaryExtraSmallSemiBold"
+                      color="foregroundHighEmphasis"
+                    >
+                      {addComma(price.toPrecision(6) / 1)}
                     </Text>
                   </td>
                   <td data-label="Quantity">
@@ -725,12 +764,12 @@ export default function OrdersTable(props) {
                       {remaining.toPrecision(6) / 1} {baseCurrency}
                     </Text>
                   </td>
-                  <td data-label="Time">
+                  <td data-label="Expiry">
                     <Text
                       font="primaryExtraSmallSemiBold"
                       color="foregroundHighEmphasis"
                     >
-                      {time}
+                      {expiryText}
                     </Text>
                   </td>
                   <td data-label="Order Status">
@@ -955,9 +994,28 @@ export default function OrdersTable(props) {
                           color="foregroundHighEmphasis"
                           textAlign="right"
                         >
-                          {baseQuantity.toPrecision(6) / 1}{" "}
-                          {baseCurrency}
+                          {baseQuantity.toPrecision(6) / 1} {baseCurrency}
                         </Text>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <Text
+                          font="primaryExtraSmallSemiBold"
+                          color="foregroundLowEmphasis"
+                        >
+                          Trade ID
+                        </Text>
+                      </td>
+                      <td>
+                        <ActionWrapper
+                          font="primaryExtraSmallSemiBold"
+                          color="primaryHighEmphasis"
+                          textAlign="right"
+                          onClick={() => onClickTradeId(fill)}
+                        >
+                          #{fillid}
+                        </ActionWrapper>
                       </td>
                     </tr>
                     <tr>
@@ -999,7 +1057,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Market
+                  Time
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -1012,7 +1070,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Price
+                  Market
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -1052,7 +1110,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Fee
+                  Price
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -1065,7 +1123,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Time
+                  Fee
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -1080,10 +1138,6 @@ export default function OrdersTable(props) {
                 >
                   Order Status
                 </Text>
-                <SortIconWrapper>
-                  <SortUpIcon />
-                  <SortDownIcon />
-                </SortIconWrapper>
               </HeaderWrapper>
             </th>
             <th>
@@ -1212,20 +1266,20 @@ export default function OrdersTable(props) {
             const marketInfo = api.marketInfo[market];
             return (
               <tr key={fillid}>
+                <td data-label="Time">
+                  <Text
+                    font="primaryExtraSmallSemiBold"
+                    color="foregroundHighEmphasis"
+                  >
+                    {time}
+                  </Text>
+                </td>
                 <td data-label="Market">
                   <Text
                     font="primaryExtraSmallSemiBold"
                     color="foregroundHighEmphasis"
                   >
                     {market}
-                  </Text>
-                </td>
-                <td data-label="Price">
-                  <Text
-                    font="primaryExtraSmallSemiBold"
-                    color="foregroundHighEmphasis"
-                  >
-                    {price.toPrecision(6) / 1}
                   </Text>
                 </td>
                 <td data-label="Side">
@@ -1238,8 +1292,15 @@ export default function OrdersTable(props) {
                     font="primaryExtraSmallSemiBold"
                     color="foregroundHighEmphasis"
                   >
-                    {baseQuantity.toPrecision(6) / 1}{" "}
-                    {baseCurrency}
+                    {baseQuantity.toPrecision(6) / 1} {baseCurrency}
+                  </Text>
+                </td>
+                <td data-label="Price">
+                  <Text
+                    font="primaryExtraSmallSemiBold"
+                    color="foregroundHighEmphasis"
+                  >
+                    {price.toPrecision(6) / 1}
                   </Text>
                 </td>
                 <td data-label="Fee">
@@ -1250,26 +1311,18 @@ export default function OrdersTable(props) {
                     {feeText}
                   </Text>
                 </td>
-                <td data-label="Time">
-                  <Text
-                    font="primaryExtraSmallSemiBold"
-                    color="foregroundHighEmphasis"
-                  >
-                    {time}
-                  </Text>
-                </td>
                 <td data-label="Order Status">
                   <Text font="primaryExtraSmallSemiBold" color={statusClass}>
                     {statusText}
                   </Text>
                 </td>
                 <td data-label="TradeID">
-                  <Text
-                    font="primaryExtraSmallSemiBold"
-                    color="foregroundHighEmphasis"
+                  <button
+                    className="text-xs font-semibold text-primary-900 hover:underline hover:underline-offset-1 font-work"
+                    onClick={() => onClickTradeId(fill)}
                   >
-                    &nbsp;
-                  </Text>
+                    #{fillid}
+                  </button>
                 </td>
                 <td data-label="Action">
                   {txhash ? (

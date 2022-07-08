@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
 import useTheme from "components/hooks/useTheme";
-import { marketInfoSelector } from "lib/store/features/api/apiSlice";
-import { numStringToSymbol } from "lib/utils";
+import { marketInfoSelector, settingsSelector } from "lib/store/features/api/apiSlice";
+import { numStringToSymbol, addComma } from "lib/utils";
 import Text from "components/atoms/Text/Text";
 
 const Table = styled.table`
@@ -11,11 +11,13 @@ const Table = styled.table`
   flex: auto;
   overflow: auto;
   padding: 0px;
-  // height: 175px;
+  height: ${({ isLeft }) => isLeft ? '' : '242px'};
   flex-direction: column;
-
+  scrollbar-color: ${({ theme }) => theme.colors.foreground400} rgba(0,0,0,0.1);
+  scrollbar-width: thin !important;
+  
   &:not(.no-space) {
-    justify-content: space-between;
+    justify-content: ${({ isLeft }) => isLeft ? 'space-between' : 'start'};
   }
 
   &:first-type-of {
@@ -103,6 +105,7 @@ const Divider = styled.div`
 const TradePriceTable = (props) => {
   const { theme } = useTheme();
   const marketInfo = useSelector(marketInfoSelector);
+  const settings = useSelector(settingsSelector);
   const ref = useRef(null);
   const [isUpdateScroll, setUpdateScroll] = useState(false);
   const isMobile = window.innerWidth < 500
@@ -128,7 +131,7 @@ const TradePriceTable = (props) => {
   else onClickRow = () => null;
 
   return (
-    <Table ref={ref} className={props.adClass}>
+    <Table ref={ref} className={props.adClass} isLeft={settings.stackOrderbook}>
       {props.head && (
         <thead>
           <tr>
@@ -169,8 +172,12 @@ const TradePriceTable = (props) => {
           const breakpoint = Math.round((total_step / total_total) * 100);
           let rowStyle;
           if (props.useGradient) {
+            let dir
+            if((d.side === "b" && !settings.stackOrderbook) || (d.side !== "b" && settings.stackOrderbook))
+              dir = "to left"
+            else dir = "to right"
             rowStyle = {
-              background: `linear-gradient(to right, ${color}, ${color} ${breakpoint}%, ${theme.colors.backgroundHighEmphasis} 0%)`,
+              background: `linear-gradient(${dir}, ${color}, ${color} ${breakpoint}%, ${theme.colors.backgroundHighEmphasis} 0%)`,
             };
           } else {
             rowStyle = {};
@@ -215,7 +222,8 @@ const TradePriceTable = (props) => {
                   color="foregroundHighEmphasis"
                   textAlign="right"
                 >
-                  {numStringToSymbol(total, 2)}
+                  {/* {numStringToSymbol(total, 2)} */}
+                  {addComma(total)}
                 </Text>
               </td>}
             </tr>

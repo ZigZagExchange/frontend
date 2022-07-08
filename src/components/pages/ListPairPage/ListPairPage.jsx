@@ -134,6 +134,10 @@ export default function ListPairPage() {
     });
   };
 
+  useEffect(()=>{
+    document.title = "ZigZag List Pair";
+  },[])
+
   useEffect(() => {
     refreshUserArweaveAllocation();
     setHasAttemptedSubmit(false);

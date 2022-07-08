@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import styled from 'styled-components'
 import { ExpandableButton } from '../ExpandableButton'
-import { HideMenuOnOutsideClicked } from "lib/utils";
+import { HideMenuOnOutsideClicked, addComma } from "lib/utils";
 import Text from "components/atoms/Text/Text";
 import { StarIcon, ActivatedStarIcon, SortUpIcon, SortDownIcon, SortUpFilledIcon, SortDownFilledIcon } from "components/atoms/Svg";
 import InputField from "components/atoms/InputField/InputField";
@@ -84,27 +84,22 @@ const TableContent = styled.div`
       height: 342px;
       overflow: overlay;
 
-      ::-webkit-scrollbar {
-          width: 5px;
-          height: 5px;
-          position: relative;
-          z-index: 20;
-      }
-  
-      ::-webkit-scrollbar-track {
-          border-radius: 0px;
-          background: hsla(0, 0%, 100%, 0.15);
-          height: 23px;
-      }
-  
-      ::-webkit-scrollbar-thumb {
-          border-radius: 0px;
-          background: hsla(0, 0%, 100%, 0.4);
-      }
-  
-      ::-webkit-scrollbar-thumb:window-inactive {
-          background: #fff;
-      }
+    ::-webkit-scrollbar {
+        width: 5px;
+        position: relative;
+        z-index: 20;
+    }
+
+    ::-webkit-scrollbar-track {
+        border-radius: 4px;
+        background: transparent;
+        height: 23px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        border-radius: 4px;
+        background: ${({ theme }) => theme.colors.foreground400};
+    }
   }
 
   thead, tbody tr {
@@ -201,13 +196,13 @@ const DropdownContent = styled.div`
   overflow-y: auto;
 `;
 
-const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, updateMarketChain, rowData }) => {
+const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, updateMarketChain, rowData, onFavourited }) => {
     // const [foundPairs, setFoundPairs] = useState([])
     const [pairs, setPairs] = useState([])
     const [categorySelected, setCategorySelected] = useState(0)
     const [pairsByCategory, setPairsByCategory] = useState([])
     const [favourites, setFavourites] = useState(fetchFavourites())
-    const [volumeSorted, setVolumeSorted] = useState(false)
+    const [volumeSorted, setVolumeSorted] = useState(true)
     const [volumeDirection, setVolumeDirection] = useState(false)
     const [pairSorted, setPairSorted] = useState(false)
     const [pairDirection, setPairDirection] = useState(false)
@@ -386,6 +381,7 @@ const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, upda
         }
 
         setFavourites(favourites)
+        onFavourited(favourites)
     }
 
     const togglePairSorting = () => {
@@ -515,7 +511,7 @@ const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, upda
                     >
                         <td>
                             <PairWrapper>
-                                <span onClick={(e) => { favouritePair(d); }}>
+                                <span onClick={(e) => { e.stopPropagation(); favouritePair(d); }}>
                                     {isFavourited ? <ActivatedStarIcon /> : <StarIcon />}
                                 </span>
                                 <Text font="primaryExtraSmall" color="foregroundHighEmphasis">{pair.replace("-", "/")}</Text>
@@ -523,7 +519,7 @@ const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, upda
                             </PairWrapper>
                         </td>
                         <td style={{paddingLeft: '30px'}}>
-                            <Text font="tableContent" color={increaseObj.increase === false ? 'dangerHighEmphasis' : 'successHighEmphasis'} align="right">{d.td2}</Text>
+                            <Text font="tableContent" color={increaseObj.increase === false ? 'dangerHighEmphasis' : 'successHighEmphasis'} align="right">{addComma(d.td2)}</Text>
                         </td>
                         <td>
                             <Text font="tableContent" color='foregroundHighEmphasis' align="right">{d.usdVolume.toLocaleString("en-US", {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Text>
@@ -630,6 +626,7 @@ const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, upda
                             icon="search"
                             value={searchValue}
                             onChange={updateSearchValue}
+                            autoFocus
                         />
                     </DropdownHeader>
                     <Divider />

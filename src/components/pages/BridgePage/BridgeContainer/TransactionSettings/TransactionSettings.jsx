@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
+import { useSelector } from "react-redux";
 import classNames from "classnames";
-import { formatUSD, formatPrice, shortenAddress } from "lib/utils";
+import { formatPrice, shortenAddress } from "lib/utils";
 import { RadioGroup } from "@headlessui/react";
 import { QuestionHelper } from "components";
 import { x } from "@xstyled/styled-components";
+import { settingsSelector } from "lib/store/features/api/apiSlice";
 
 const TransactionSettings = ({
   user,
@@ -16,7 +18,6 @@ const TransactionSettings = ({
   ZigZagFee,
   swapDetails,
   isFastWithdraw,
-  balances,
   usdFee,
   onChangeSpeed,
   withdrawSpeed,
@@ -27,6 +28,7 @@ const TransactionSettings = ({
   formErr,
   fastWithdrawDisabled,
 }) => {
+  const settings = useSelector(settingsSelector);
   return (
     <div className="p-2 mt-3 border rounded-lg sm:p-4 dark:border-foreground-400 border-primary-500">
       <p className="text-base font-work">Transaction Settings</p>
@@ -47,7 +49,9 @@ const TransactionSettings = ({
       </div>
       {user.address && (
         <div className="py-2 mt-2 font-sans text-sm tracking-wider text-center border rounded-lg dark:border-foreground-400 border-primary-500 text-slate-400 ">
-          {shortenAddress(user.address, 10)}
+          {settings.hideAddress
+            ? "*****...*****"
+            : shortenAddress(user.address, 10)}
         </div>
       )}
       {user.address && user.id && !isSwapAmountEmpty && (
@@ -58,17 +62,21 @@ const TransactionSettings = ({
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <p className="font-sans text-sm ">Withdraw speed:</p>
-                    <QuestionHelper text={
-                      <x.div>
-                        <x.div mb={2}>
-                          Fast: receive ETH, UST and FRAX within seconds through ZigZag's Fast Withdrawal bridge.
+                    <QuestionHelper
+                      text={
+                        <x.div>
+                          <x.div mb={2}>
+                            Fast: receive ETH, UST and FRAX within seconds
+                            through ZigZag's Fast Withdrawal bridge.
+                          </x.div>
+                          <x.div mb={2}>
+                            Normal: use zkSync's bridge and receive funds after
+                            a few hours.
+                          </x.div>
                         </x.div>
-                        <x.div mb={2}>
-                          Normal: use zkSync's bridge and receive funds after a few hours.
-                        </x.div>
-                      </x.div>
-                    } placement="bottom">
-                    </QuestionHelper>
+                      }
+                      placement="bottom"
+                    ></QuestionHelper>
                   </div>
                   <RadioGroup
                     value={withdrawSpeed}
@@ -119,14 +127,12 @@ const TransactionSettings = ({
               {ZigZagFee && (
                 <div className="flex items-center justify-between mt-3">
                   <p className="font-sans text-sm ">Bridge fee:</p>
-                  <p className="font-sans text-sm ">{`~${ZigZagFee} ${ZigZagFeeToken}`}</p>
+                  <p className="font-sans text-sm ">{`~${formatPrice(ZigZagFee)} ${ZigZagFeeToken}`}</p>
                 </div>
               )}
               {isFastWithdraw && L1Fee && toNetwork.id === "ethereum" && (
                 <div className="flex items-center justify-between mt-3">
-                  <p className="font-sans text-sm ">
-                    Ethereum L1 gas:
-                  </p>
+                  <p className="font-sans text-sm ">Ethereum L1 gas:</p>
                   <p className="font-sans text-sm ">
                     {" "}
                     ~{formatPrice(L1Fee)} {swapDetails.currency}
@@ -136,11 +142,11 @@ const TransactionSettings = ({
               {L2Fee && (
                 <div className="flex items-center justify-between mt-3">
                   <p className="font-sans text-sm ">zkSync L2 gas fee:</p>
-                  <p className="font-sans text-sm ">{`~${L2Fee} ${L2FeeToken}`}</p>
+                  <p className="font-sans text-sm ">{`~${formatPrice(L2Fee)} ${L2FeeToken}`}</p>
                 </div>
               )}
               {!L2Fee && <div>Loading...</div>}
-              {!formErr && (swapDetails.amount - ZigZagFee) > 0 && (
+              {!formErr && swapDetails.amount - ZigZagFee > 0 && (
                 <div className="flex items-center justify-between mt-3">
                   <p className="font-sans text-sm ">You'll receive:</p>
                   <p className="font-sans text-sm ">
@@ -150,7 +156,8 @@ const TransactionSettings = ({
                       )} WETH on Polygon`}
                     {toNetwork.id === "ethereum" &&
                       ` ~${formatPrice(swapDetails.amount - ZigZagFee)} ${
-                        swapDetails.currency} on Ethereum L1`}
+                        swapDetails.currency
+                      } on Ethereum L1`}
                   </p>
                 </div>
               )}
@@ -161,7 +168,7 @@ const TransactionSettings = ({
               {ZigZagFee && (
                 <div className="flex items-center justify-between mt-3">
                   <p className="font-sans text-sm ">Bridge fee:</p>
-                  <p className="font-sans text-sm ">{`~${ZigZagFee} ${ZigZagFeeToken}`}</p>
+                  <p className="font-sans text-sm ">{`~${formatPrice(ZigZagFee)} ${ZigZagFeeToken}`}</p>
                 </div>
               )}
               {L1Fee && fromNetwork.id === "ethereum" && (
@@ -185,11 +192,11 @@ const TransactionSettings = ({
                       `~${formatPrice(L1Fee)} MATIC`}
                   </p>
                 </div>
-              )}              
+              )}
               {!L1Fee && !hasError && fromNetwork.id === "ethereum" && (
                 <div>Loading</div>
               )}
-              {!formErr && (swapDetails.amount - ZigZagFee) > 0 && (
+              {!formErr && swapDetails.amount - ZigZagFee > 0 && (
                 <div className="flex items-center justify-between mt-3">
                   <p className="font-sans text-sm ">You'll receive:</p>
                   <p className="font-sans text-sm ">
@@ -230,9 +237,10 @@ const TransactionSettings = ({
               </p>
               <p className="font-sans text-sm ">(~${usdFee})</p>
             </div>
-            <QuestionHelper text="The account activation fee is a one-time fee to register your account with zkSync."
-              placement="top">
-            </QuestionHelper>
+            <QuestionHelper
+              text="The account activation fee is a one-time fee to register your account with zkSync."
+              placement="top"
+            ></QuestionHelper>
           </div>
           <p className="font-sans text-sm ">
             {activationFee} {swapDetails.currency} (~${usdFee})

@@ -36,7 +36,7 @@ const GuidePopup = () => {
             Use this interface to easily bridge over funds between networks.
           </p>
           <p className="text-xl font-semibold mt-7 font-work">
-            Introduction Video
+            Introduction Video (soon!)
           </p>
           <div className="relative mt-2 rounded-lg">
             <video
@@ -58,7 +58,7 @@ const GuidePopup = () => {
           <p className="max-w-xs text-base">
             Visit our{" "}
             <a
-              href="/faq"
+              href="https://info.zigzag.exchange/#faq"
               target="_blank"
               className="text-primary-900 hover:underline"
             >
