@@ -48,7 +48,7 @@ const networkLists = [
     image: zksyncLogo,
   },
   {
-    text: "Arbitrum",
+    text: "Arbitrum (alpha)",
     value: 42161,
     url: "#",
     selectedIcon: <CheckIcon />,
