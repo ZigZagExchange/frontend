@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { connect } from "react-redux";
 import api from "lib/api";
 import { RangeSlider, QuestionHelper } from "components";
-import { formatPrice, formatToken } from "lib/utils";
+import { addComma, formatPrice, formatToken } from "lib/utils";
 import "./SpotForm.css";
 import { Button, ConnectWalletButton } from "components/molecules/Button";
 import InputField from "components/atoms/InputField/InputField";
@@ -680,7 +680,7 @@ class SpotForm extends React.Component {
         color="foregroundMediumEmphasis"
         textAlign="right"
       >
-        {formatToken(quoteBalance, marketInfo && marketInfo.quoteAsset?.symbol)}{" "}
+        {addComma(formatToken(quoteBalance, marketInfo && marketInfo.quoteAsset?.symbol))}{" "}
         {marketInfo && marketInfo.quoteAsset?.symbol}
       </Text>
     );
@@ -691,7 +691,7 @@ class SpotForm extends React.Component {
         color="foregroundMediumEmphasis"
         textAlign="right"
       >
-        {formatToken(baseBalance, marketInfo && marketInfo.baseAsset?.symbol)}{" "}
+        {addComma(formatToken(baseBalance, marketInfo && marketInfo.baseAsset?.symbol))}{" "}
         {marketInfo && marketInfo.baseAsset?.symbol}
       </Text>
     );

@@ -32,6 +32,7 @@ import {
 import TradesTable from "./TradeBooks/TradesTable";
 import { HighSlippageModal } from "components/molecules/HighSlippageModal";
 import _ from "lodash";
+import { addComma } from "lib/utils";
 
 const TradeContainer = styled.div`
   color: #aeaebf;
@@ -111,7 +112,7 @@ export function TradeDashboard() {
 
   useEffect(()=>{
     if(_.isEmpty(marketSummary)) return
-    document.title = `${marketSummary.price} | ${marketSummary.market??'--'} | ZigZag Exchange`;
+    document.title = `${addComma(marketSummary.price)} | ${marketSummary.market??'--'} | ZigZag Exchange`;
   }, [marketSummary])
 
   useEffect(() => {

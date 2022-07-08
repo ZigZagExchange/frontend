@@ -11,7 +11,7 @@ import {
   balancesSelector,
   settingsSelector,
 } from "lib/store/features/api/apiSlice";
-import { formatUSD, formatToken, HideMenuOnOutsideClicked } from "lib/utils";
+import { formatUSD, formatToken, HideMenuOnOutsideClicked, addComma } from "lib/utils";
 import { userSelector } from "lib/store/features/auth/authSlice";
 import api from "lib/api";
 import { IconButton as baseIcon } from "../IconButton";
@@ -293,7 +293,7 @@ const AccountDropdown = ({ notext, networkName }) => {
               <Text font="primaryHeading6" color="foregroundHighEmphasis">
                 {settings.hideBalance
                   ? "****.****"
-                  : "$ " + formatUSD(totalBalance)}
+                  : "$ " + addComma(formatUSD(totalBalance))}
               </Text>
             </div>
             <ToggleButton
