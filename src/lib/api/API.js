@@ -9,6 +9,7 @@ import { formatAmount } from "lib/utils";
 import erc20ContractABI from "lib/contracts/ERC20.json";
 import wethContractABI from "lib/contracts/WETH.json";
 import { MAX_ALLOWANCE } from "./constants";
+import { toast } from "react-toastify";
 import {
   ZKSYNC_POLYGON_BRIDGE,
   POLYGON_MUMBAI_WETH_ADDRESS,
@@ -523,9 +524,14 @@ export default class API extends Emitter {
     if (token) {
       await this.send("cancelorder3", [this.apiProvider.network, orderId, token]);
     } else {
+      const toastMsg = toast.info('Sing the message to approve canceling the order...', {
+        toastId: "Sing the message to approve canceling the order...'",
+      });
+
       const message = `cancelorder2:${this.apiProvider.network}:${orderId}`
       const signedMessage = await this.apiProvider.signMessage(message);
       await this.send("cancelorder2", [this.apiProvider.network, orderId, signedMessage]);
+      toast.dismiss(toastMsg);
     }
     
     return true;
@@ -607,21 +613,31 @@ export default class API extends Emitter {
     if (orderIds.length === tokenArray.length) {
       await this.send("cancelall3", [this.apiProvider.network, userId, tokenArray]);
     } else {
+      const toastMsg = toast.info('Sing the message to approve canceling the order...', {
+        toastId: "Sing the message to approve canceling the order...'",
+      });
       const validUntil = (Date.now() / 1000) + 10;
       const message = `cancelall2:${this.apiProvider.network}:${validUntil}`
       const signedMessage = await this.apiProvider.signMessage(message);
       await this.send("cancelall2", [this.apiProvider.network, userId, validUntil, signedMessage]);
+      toast.dismiss(toastMsg);
     }
 
     return true;
   };
 
   cancelAllOrdersAllChains = async () => {
+    const toastMsg = toast.info('Sing the message to approve canceling the order...', {
+      toastId: "Sing the message to approve canceling the order...'",
+    });
+
     const validUntil = (Date.now() / 1000) + 10;
     const message = `cancelall2:0:${validUntil}`
     const signedMessage = await this.apiProvider.signMessage(message);
     const { id: userId } = await this.getAccountState();
     await this.send("cancelall2", [0, userId, signedMessage]);
+
+    toast.dismiss(toastMsg);
     return true;
   };
 
