@@ -12,7 +12,7 @@ const Wrapper = styled.div`
 `;
 
 const ButtonMenu = ({
-  activeIndex = 0,
+  activeTab = 'TRADE',
   onItemClick,
   row,
   left,
@@ -21,13 +21,13 @@ const ButtonMenu = ({
 }) => {
   return (
     <Wrapper left={left} row={row} {...props}>
-      {Children.map(children, (child, index) => {
+      {Children.map(children, (child) => {
         if (!child) return
         return cloneElement(child, {
-          isActive: activeIndex === index,
+          isActive: activeTab === child.props.className,
           row,
           left,
-          onClick: onItemClick ? () => onItemClick(index) : undefined,
+          onClick: onItemClick ? () => onItemClick(child.props.className) : undefined,
         });
       })}
     </Wrapper>
