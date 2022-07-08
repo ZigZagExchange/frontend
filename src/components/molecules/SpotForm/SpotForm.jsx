@@ -362,17 +362,25 @@ class SpotForm extends React.Component {
       const delta = ((price - bidPrice) / bidPrice) * 100;
 
       if (isNaN(quoteBalance)) {
-        this.props.setHighSlippageModal({ open: true, delta: delta });
+        toast.error(`No ${marketInfo.quoteAsset.symbol} balance`, {
+          toastId: `No ${marketInfo.quoteAsset.symbol} balance`,
+        });
         return;
       }
 
       if (quoteAmount && quoteAmount + marketInfo.quoteFee > quoteBalance) {
-        this.props.setHighSlippageModal({ open: true, delta: delta });
+        toast.error(`Amount exceeds ${marketInfo.quoteAsset.symbol} balance`, {
+          toastId: `Amount exceeds ${marketInfo.quoteAsset.symbol} balance`,
+        });
         return;
       }
 
       if (quoteAmount && quoteAmount < marketInfo.quoteFee) {
-        this.props.setHighSlippageModal({ open: true, delta: delta });
+        toast.error(
+          `Minimum order size is ${marketInfo.quoteFee.toPrecision(5)} ${
+            marketInfo.quoteAsset.symbol
+          }`
+        );
         return;
       }
 
