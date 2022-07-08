@@ -4,6 +4,7 @@
 
 .zz-tooltip > .rc-tooltip-content > .rc-tooltip-inner {
   padding: 0 !important;
+  border-radius: 8px !important;
 }
 
 .rc-tooltip-placement-bottom > .rc-tooltip-content > .rc-tooltip-arrow {

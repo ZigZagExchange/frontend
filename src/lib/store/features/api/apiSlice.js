@@ -3,8 +3,22 @@ import { toast } from "react-toastify";
 import { formatPrice } from "lib/utils";
 import api from "lib/api";
 import { getLayout } from "lib/helpers/storage/layouts";
+import FillCard from "components/organisms/TradeDashboard/TradeTables/OrdersTable/FillCard";
 
 const makeScope = (state) => `${state.network}-${state.userId}`;
+
+const initialUISettings = {
+  showNightPriceChange: false,
+  showCancelOrders: false,
+  disableOrderNotification: false,
+  stackOrderbook: true,
+  disableSlippageWarning: false,
+  disabledisableOrderBookFlash: false,
+  hideAddress: false,
+  hideBalance: false,
+  hideGuidePopup: false,
+  disableTradeIDCard: false,
+};
 
 export const apiSlice = createSlice({
   name: "api",
@@ -25,21 +39,35 @@ export const apiSlice = createSlice({
     orders: {},
     arweaveAllocation: 0,
     isConnecting: false,
+    isBridgeConnecting: false,
+    settings: initialUISettings,
+    highSlippageModal: {
+      open: false,
+      confirmed: "",
+      delta: 0,
+      type: "sell",
+      marketInfo: " ",
+      xToken: 0,
+      yToken: 0,
+      userPrice: 0,
+      pairPrice: 0,
+    },
   },
   reducers: {
     _error(state, { payload }) {
       const op = payload[0];
       const errorMessage = payload[1];
       // we dont want to show some errors
-      if (errorMessage.includes('Order is no longer open')) {
+      if (errorMessage.includes("Order is no longer open")) {
         console.error(`Error at ${op}: ${errorMessage}`);
         return;
-      };
+      }
 
       const renderToastContent = () => {
         return (
           <>
-            An unknown error has occurred while processing '{op}' ({errorMessage}). Please{" "}
+            An unknown error has occurred while processing '{op}' (
+            {errorMessage}). Please{" "}
             <a
               href={"https://info.zigzag.exchange/#contact"}
               style={{
@@ -51,8 +79,8 @@ export const apiSlice = createSlice({
               rel="noreferrer"
             >
               contact us
-            </a>
-            {" "}or join the{" "}
+            </a>{" "}
+            or join the{" "}
             <a
               href={"https://discord.gg/zigzag"}
               style={{
@@ -64,18 +92,17 @@ export const apiSlice = createSlice({
               rel="noreferrer"
             >
               Discord
-            </a>
-            {" "}to report and solve this bug.
+            </a>{" "}
+            to report and solve this bug.
           </>
         );
       };
-      const toastContent = renderToastContent(op, errorMessage)
-      toast.error(toastContent,
-        { toastId: op,
-          closeOnClick: false,
-          autoClose: false,
-        },
-      );
+      const toastContent = renderToastContent(op, errorMessage);
+      toast.error(toastContent, {
+        toastId: op,
+        closeOnClick: false,
+        autoClose: false,
+      });
     },
     _marketinfo(state, { payload }) {
       if (payload[0].error) {
@@ -95,7 +122,7 @@ export const apiSlice = createSlice({
         }
         // for maker fills we need to flip the side and set fee to 0
         if (state.userId && fill[9] === state.userId.toString()) {
-          fill[3] = (fill[3] === "b") ? "s" : "b";
+          fill[3] = fill[3] === "b" ? "s" : "b";
           fill[10] = 0;
           state.userFills[fillid] = fill;
         }
@@ -103,6 +130,7 @@ export const apiSlice = createSlice({
     },
     _fillstatus(state, { payload }) {
       payload[0].forEach((update) => {
+        // console.log(update);
         const fillid = update[1];
         const newstatus = update[2];
         const timestamp = update[7];
@@ -126,22 +154,58 @@ export const apiSlice = createSlice({
           if (feeamount) state.userFills[fillid][10] = feeamount;
           if (feetoken) state.userFills[fillid][11] = feetoken;
 
-          if (newstatus === 'f') {
+          if (newstatus === "f") {
             const fillDetails = state.userFills[fillid];
+
             const baseCurrency = fillDetails[2].split("-")[0];
             const sideText = fillDetails[3] === "b" ? "buy" : "sell";
             const price = Number(fillDetails[4]);
             const baseQuantity = Number(fillDetails[5]);
-            toast.success(
-              `Your ${sideText} order for ${Number(baseQuantity.toPrecision(4))
-              } ${baseCurrency} was filled @ ${Number(formatPrice(price))
-              }!`,
-              {
-                toastId: `Your ${sideText} order for ${Number(baseQuantity.toPrecision(4))
-                  } ${baseCurrency} was filled @ ${Number(formatPrice(price))
-                  }!`,
+            let p = [];
+            for (var i = 0; i < 13; i++) {
+              if (i === 4) {
+                p.push(Number(fillDetails[i]));
+              } else {
+                p.push(fillDetails[i]);
               }
-            );
+            }
+            if (
+              !state.settings.disableOrderNotification &&
+              state.settings.disableTradeIDCard
+            ) {
+              toast.dismiss("Order placed.");
+              toast.success(
+                `Your ${sideText} order for ${Number(
+                  baseQuantity.toPrecision(4)
+                )} ${baseCurrency} was filled @ ${Number(formatPrice(price))}!`,
+                {
+                  toastId: `Your ${sideText} order for ${Number(
+                    baseQuantity.toPrecision(4)
+                  )} ${baseCurrency} was filled @ ${Number(
+                    formatPrice(price)
+                  )}!`,
+                }
+              );
+            }
+            if (
+              !state.settings.disableOrderNotification &&
+              !state.settings.disableTradeIDCard
+            ) {
+              toast.dismiss("Order placed.");
+              toast.warning(
+                ({ closeToast }) => (
+                  <FillCard closeToast={closeToast} fill={p} />
+                ),
+                {
+                  toastId: fillid,
+                  className: "fillToastCard",
+                  bodyClassName: "!p-0",
+                  closeOnClick: false,
+                  icon: false,
+                  closeButton: false,
+                }
+              );
+            }
           }
         }
       });
@@ -157,7 +221,7 @@ export const apiSlice = createSlice({
         }
         // for maker fills we need to flip the side and set fee to 0
         if (state.userId && fill[9] === state.userId.toString()) {
-          fill[3] = (fill[3] === "b") ? "s" : "b";
+          fill[3] = fill[3] === "b" ? "s" : "b";
           fill[10] = 0;
           state.userFills[fillid] = fill;
         }
@@ -263,13 +327,17 @@ export const apiSlice = createSlice({
               filledOrder[10] = txHash;
               const noFeeOrder = api.getOrderDetailsWithoutFee(filledOrder);
               toast.error(
-                `Your ${sideText} order for ${noFeeOrder.baseQuantity.toPrecision(4) / 1
-                } ${baseCurrency} @ ${noFeeOrder.price.toPrecision(4) / 1
+                `Your ${sideText} order for ${
+                  noFeeOrder.baseQuantity.toPrecision(4) / 1
+                } ${baseCurrency} @ ${
+                  noFeeOrder.price.toPrecision(4) / 1
                 } was rejected: ${error}`,
                 {
-                  toastId: `Your ${sideText} order for ${noFeeOrder.baseQuantity.toPrecision(4) / 1
-                    } ${baseCurrency} @ ${noFeeOrder.price.toPrecision(4) / 1
-                    } was rejected: ${error}`,
+                  toastId: `Your ${sideText} order for ${
+                    noFeeOrder.baseQuantity.toPrecision(4) / 1
+                  } ${baseCurrency} @ ${
+                    noFeeOrder.price.toPrecision(4) / 1
+                  } was rejected: ${error}`,
                 }
               );
               toast.info(
@@ -317,7 +385,7 @@ export const apiSlice = createSlice({
     },
     _orderreceipt(state, { payload }) {
       const orderId = payload[1];
-      state.userOrders[orderId] = payload;      
+      state.userOrders[orderId] = payload;
     },
     setBalances(state, { payload }) {
       const scope = makeScope(state);
@@ -354,18 +422,20 @@ export const apiSlice = createSlice({
 
       const renderBridgeLink = (text, link) => {
         return (
-          <a
-            href={link}
-            style={{
-              color: "white",
-              textDecoration: "underline",
-              fontWeight: "bold",
-            }}
-            target="_blank"
-            rel="noreferrer"
-          >
-            {text}
-          </a>
+          <p className="mt-2">
+            <a
+              href={link}
+              style={{
+                color: "white",
+                textDecoration: "underline",
+                fontWeight: "bold",
+              }}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {text}
+            </a>
+          </p>
         );
       };
 
@@ -378,14 +448,28 @@ export const apiSlice = createSlice({
           break;
         case "withdraw":
           successMsg = "withdrew";
-          targetMsg = "into your Ethereum wallet. Withdraws can take up to 7 hours to complete";
-          extraInfoLink = { text: "Bridge FAQ", link: "https://docs.zigzag.exchange/zksync/bridge-guide" };
+          targetMsg =
+            "into your Ethereum wallet. Withdraws can take up to 7 hours to complete";
+          extraInfoLink = {
+            text: "Bridge FAQ",
+            link: "https://docs.zigzag.exchange/zksync/bridge-guide",
+          };
           break;
         case "withdraw_fast":
           successMsg = "withdrew";
-          targetMsg = "into your Ethereum wallet. Fast withdrawals should be confirmed within a few minutes";
-          extraInfoLink = { text: "Fast Bridge FAQ", link: "https://docs.zigzag.exchange/zksync/fast-withdraw-bridge" };
-          ethWallet = {text: "Ethereum wallet", link: state.network === 1?`https://etherscan.io/address/${walletAddress}`:`https://rinkeby.etherscan.io/address/${walletAddress}`}
+          targetMsg =
+            "into your Ethereum wallet. Fast withdrawals should be confirmed within a few minutes";
+          extraInfoLink = {
+            text: "Fast Bridge FAQ",
+            link: "https://docs.zigzag.exchange/zksync/fast-withdraw-bridge",
+          };
+          ethWallet = {
+            text: "Ethereum wallet",
+            link:
+              state.network === 1
+                ? `https://etherscan.io/address/${walletAddress}`
+                : `https://rinkeby.etherscan.io/address/${walletAddress}`,
+          };
           break;
         case "zkSync_to_polygon":
           successMsg = "transferred";
@@ -407,71 +491,61 @@ export const apiSlice = createSlice({
 
       const renderToastContent = () => {
         return (
-          <>
-            Successfully {successMsg}{" "}
-            {amount} {token}{" "}
-            {targetMsg}
-            {type !== "zkSync_to_polygon" && type !== "eth_to_zksync" && type !== "polygon_to_zkSync" &&
-              <>
-              <br />
-              <br />
-              </>
-            }
-            <a
-              href={txUrl}
-              style={{
-                color: "white",
-                textDecoration: "underline",
-                fontWeight: "bold",
-              }}
-              target="_blank"
-              rel="noreferrer"
-            >
-              View transaction
-            </a>
-            {type === "withdraw_fast" ? <br /> : " • "}
-            {(type === "eth_to_zksync" || type === "zkSync_to_polygon" || type === "polygon_to_zkSync")&& 
-              <>
-                <br />
+          <div>
+            <p className="mb-2 text-xl font-semibold font-work">
+              Transaction Successful
+            </p>
+            Successfully {successMsg} {amount} {token} {targetMsg}
+            {type !== "zkSync_to_polygon" &&
+              type !== "eth_to_zksync" &&
+              type !== "polygon_to_zkSync" && (
+                <>
+                  <br />
+                  <br />
+                </>
+              )}
+            <p>
+              <a
+                href={txUrl}
+                className="text-base font-bold underline font-work underline-offset-2"
+                target="_blank"
+                rel="noreferrer"
+              >
+                View transaction
+              </a>
+            </p>
+            {type === "withdraw_fast" ? <br /> : ""}
+            {(type === "eth_to_zksync" ||
+              type === "zkSync_to_polygon" ||
+              type === "polygon_to_zkSync") && (
+              <div className="mt-3">
                 Confirm that your funds have arrived {targetMsg}
-                <a 
-                  href={walletAddress} 
-                  rel="noreferrer" 
-                  target="_blank"
-                  style={{
-                    color: "white",
-                    textDecoration: "underline",
-                    fontWeight: "bold",
-                  }}
-                > {type === "zkSync_to_polygon" ? 'Polygon wallet':' zkSync wallet'} </a>
-                {" • "}
-              </>
-            }
-            { 
-              extraInfoLink &&
-              renderBridgeLink(
-                extraInfoLink.text,
-                extraInfoLink.link
-              )
-            }
-            <br />
-            { ethWallet && 
-              renderBridgeLink(
-                ethWallet.text,
-                ethWallet.link
-              )
-            }
-          </>
+                <p>
+                  <a
+                    href={walletAddress}
+                    rel="noreferrer"
+                    target="_blank"
+                    className="text-base font-bold underline font-work underline-offset-2"
+                  >
+                    {type === "zkSync_to_polygon"
+                      ? "Polygon wallet"
+                      : " zkSync wallet"}{" "}
+                  </a>
+                </p>
+              </div>
+            )}
+            {extraInfoLink &&
+              renderBridgeLink(extraInfoLink.text, extraInfoLink.link)}
+            {ethWallet && renderBridgeLink(ethWallet.text, ethWallet.link)}
+          </div>
         );
       };
 
-      toast.success(
-        renderToastContent(),
-        {
-          closeOnClick: false,
-          autoClose: 15000,
-        },
-      );
+      toast.success(renderToastContent(), {
+        closeOnClick: false,
+        autoClose: 15000,
+        icon: false,
+      });
 
       state.bridgeReceipts.unshift(payload);
     },
@@ -492,12 +566,44 @@ export const apiSlice = createSlice({
     setArweaveAllocation(state, { payload }) {
       state.arweaveAllocation = payload;
     },
-    setLayout(state, { payload }){
+    setLayout(state, { payload }) {
       state.layout = payload;
     },
-    setConnecting(state,{payload}) {
-      state.isConnecting = payload
-    }
+    setConnecting(state, { payload }) {
+      state.isConnecting = payload;
+    },
+    setBridgeConnecting(state, {payload}) {
+      state.isBridgeConnecting = payload;
+    },
+    setHighSlippageModal(state, { payload }) {
+      state.highSlippageModal = {
+        open: payload.open ? payload.open : false,
+        confirmed: payload.confirmed ? payload.confirmed : false,
+        delta: payload.delta ? payload.delta : state.highSlippageModal.delta,
+        type: payload.type ? payload.type : state.highSlippageModal.type,
+        marketInfo: payload.marketInfo
+          ? payload.marketInfo
+          : state.highSlippageModal.marketInfo,
+        xToken: payload.xToken
+          ? payload.xToken
+          : state.highSlippageModal.xToken,
+        yToken: payload.yToken
+          ? payload.yToken
+          : state.highSlippageModal.yToken,
+        userPrice: payload.userPrice
+          ? payload.userPrice
+          : state.highSlippageModal.userPrice,
+        pairPrice: payload.pairPrice
+          ? payload.pairPrice
+          : state.highSlippageModal.pairPrice,
+      };
+    },
+    setUISettings(state, { payload }) {
+      state.settings[payload.key] = payload.value;
+    },
+    resetUISettings(state) {
+      state.settings = initialUISettings;
+    },
   },
 });
 
@@ -513,6 +619,10 @@ export const {
   clearLastPrices,
   setArweaveAllocation,
   setConnecting,
+  setBridgeConnecting,
+  setHighSlippageModal,
+  setUISettings,
+  resetUISettings,
 } = apiSlice.actions;
 
 export const layoutSelector = (state) => state.api.layout;
@@ -529,6 +639,9 @@ export const bridgeReceiptsSelector = (state) => state.api.bridgeReceipts;
 export const marketInfoSelector = (state) => state.api.marketinfo;
 export const arweaveAllocationSelector = (state) => state.api.arweaveAllocation;
 export const isConnectingSelector = (state) => state.api.isConnecting;
+export const isBridgeConnectingSelector = (state) => state.api.isBridgeConnecting;
+export const settingsSelector = (state) => state.api.settings;
+export const highSlippageModalSelector = (state) => state.api.highSlippageModal;
 export const balancesSelector = (state) =>
   state.api.balances[makeScope(state.api)] || {};
 

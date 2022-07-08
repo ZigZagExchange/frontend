@@ -1,27 +1,214 @@
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { useHistory, useLocation } from "react-router-dom";
-import { BiChevronDown } from "react-icons/bi";
-import { AiOutlineCaretDown } from "react-icons/ai";
-import { FaDiscord, FaTelegramPlane, FaTwitter } from "react-icons/fa";
-import { GoGlobe } from "react-icons/go";
-import { HiExternalLink } from "react-icons/hi";
-import React, { useState, useRef, useEffect } from "react";
-import { NavLink } from "react-router-dom";
-import { Button, Dropdown, AccountDropdown, Menu, MenuItem } from "components";
-import ConnectWalletButton from "../../atoms/ConnectWalletButton/ConnectWalletButton";
+import { useHistory } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import styled from "styled-components";
+import CheckIcon from "@mui/icons-material/Check";
+import { useLocation } from "react-router-dom";
 import { userSelector } from "lib/store/features/auth/authSlice";
-import { networkSelector, isConnectingSelector } from "lib/store/features/api/apiSlice";
+import {
+  networkSelector,
+  isConnectingSelector,
+} from "lib/store/features/api/apiSlice";
 import api from "lib/api";
 import logo from "assets/images/logo.png";
-import menu from "assets/icons/menu.png";
-import "./Header.css";
-import { Dev } from "../../../lib/helpers/env";
-import { formatAmount } from "../../../lib/utils";
+import zksyncLogo from "assets/images/networks/zksync-network.svg";
+import arbitrumLogo from "assets/images/networks/arbitrum-network.svg";
+import { TabMenu, Tab } from "components/molecules/TabMenu";
+import { Dropdown, AccountDropdown } from "components/molecules/Dropdown";
+import { ConnectWalletButton } from "components/molecules/Button";
+import {
+  DiscordIcon,
+  ExternalLinkIcon,
+  TelegramIcon,
+  TwitterIcon,
+  DeleteIcon,
+  MenuIcon,
+} from "components/atoms/Svg";
+import ToggleTheme from "components/molecules/Toggle/ToggleTheme";
+import useTheme from "components/hooks/useTheme";
+
+const langList = [
+  { text: "EN", url: "#" },
+  { text: "FR", url: "#" },
+];
+
+const networkLists = [
+  { text: "zkSync - Mainnet",
+    value: 1,
+    url: "#",
+    selectedIcon: <CheckIcon />,
+    image: zksyncLogo,
+  },
+  {
+    text: "zkSync - Rinkeby",
+    value: 1000,
+    url: "#",
+    selectedIcon: <CheckIcon />,
+    image: zksyncLogo,
+  },
+  {
+    text: "Arbitrum (soon)",
+    value: null,
+    url: "#",
+    selectedIcon: <CheckIcon />,
+    image: arbitrumLogo,
+  },
+];
+
+const accountLists = [
+  { text: "0x83AD...83H4", url: "#", icon: <DeleteIcon /> },
+  { text: "0x12BV...b89G", url: "#", icon: <DeleteIcon /> },
+];
+
+const supportLists = [
+  { text: "Live Support", url: "https://discord.com/invite/zigzag" },
+  { text: "FAQ", url: "https://info.zigzag.exchange/" },
+  { text: "Docs", url: "https://docs.zigzag.exchange/" },
+  { text: "GitHub", url: "https://github.com/ZigZagExchange/" },
+  { text: "Uptime Status", url: "https://status.zigzag.exchange/" },
+];
+
+const communityLists = [
+  { text: "Governance", url: "https://forum.zigzaglabs.io/t/zigzag-exchange" },
+  { text: "Blog", url: "https://blog.zigzag.exchange/" },
+];
+
+const HeaderWrapper = styled.div`
+  display: grid;
+  grid-auto-flow: column;
+  width: 100%;
+  height: 56px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.foreground400};
+  align-items: center;
+  background-color: ${({ theme }) => theme.colors.backgroundHighEmphasis};
+  position: fixed;
+  padding: 0px 20px;
+  z-index: 100;
+  box-shadow: ${({ isMobile }) =>
+    isMobile ? "0px 8px 16px 0px #0101011A" : ""};
+  ${({ isMobile }) => (isMobile ? "backdrop-filter: blur(8px);" : "")}
+
+  button {
+    &:hover {
+      // background-color: ${({ theme }) =>
+        `${theme.colors.foregroundHighEmphasis} !important`};
+
+      div {
+        color: ${({ theme }) =>
+          `${theme.colors.primaryHighEmphasis} !important`};
+
+        svg path {
+          fill: ${({ theme }) =>
+            `${theme.colors.primaryHighEmphasis} !important`};
+        }
+      }
+    }
+  }
+`;
+
+const LogoWrapper = styled.div``;
+
+const ButtonWrapper = styled.div`
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  justify-content: end;
+  gap: 19px;
+`;
+
+const MenuButtonWrapper = styled.div`
+  cursor: pointer;
+`;
+
+const NavWrapper = styled.div`
+  display: grid;
+  grid-template-columns: 32px 421px;
+  align-items: center;
+`;
+
+const ActionsWrapper = styled.div`
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  justify-items: center;
+`;
+
+const SocialWrapper = styled.div`
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  justify-items: center;
+  width: 120px;
+`;
+
+const LanguageWrapper = styled.div`
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  gap: 27px;
+`;
+
+const SocialLink = styled.a`
+  &:hover {
+    svg path {
+      fill: ${({ theme }) => `${theme.colors.primaryHighEmphasis} !important`};
+    }
+  }
+
+  svg path {
+    fill: ${({ theme }) => theme.colors.foregroundLowEmphasis};
+  }
+`;
+
+const StyledDropdown = styled(Dropdown)`
+  padding: 16px 0px 16px 16px;
+  width: auto;
+`;
+
+const VerticalDivider = styled.div`
+  width: 1px;
+  height: 32px;
+  background-color: ${({ theme }) => theme.colors.foreground400};
+`;
+
+const SideMenuWrapper = styled.div`
+  position: fixed;
+  width: 320px;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  background: ${({ theme }) => theme.colors.backgroundLowEmphasis};
+  z-index: 9999;
+  display: grid;
+  grid-auto-flow: row;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid ${({ theme }) => theme.colors.foreground400};
+  backdrop-filter: blur(8px);
+`;
+
+const HorizontalDivider = styled.div`
+  width: 229px;
+  height: 1px;
+  background: ${({ theme }) => theme.colors.foreground400};
+`;
+
+const ActionSideMenuWrapper = styled.div`
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  justify-content: space-between;
+  span {
+    font-family: WorkSans-SemiBold;
+    font-size: 12px;
+    line-height: 14px;
+    text-transform: uppercase;
+  }
+`;
 
 export const Header = (props) => {
   // state to open or close the sidebar in mobile
-  const mobileRef = useRef();
   const [show, setShow] = useState(false);
   const connecting = useSelector(isConnectingSelector);
   // const [connecting, setConnecting] = useState(false);
@@ -29,328 +216,311 @@ export const Header = (props) => {
   const network = useSelector(networkSelector);
   const hasBridge = api.isImplemented("depositL2");
   const history = useHistory();
+  const [index, setIndex] = useState(0);
+  const [language, setLanguage] = useState(langList[0].text);
+  const [account, setAccount] = useState(accountLists[0].text);
+  const [networkName, setNetworkName] = useState("");
+  const [networkItems, setNetWorkItems] = useState(networkLists);
+  const { isDark, toggleTheme } = useTheme();
   const location = useLocation();
+  useEffect(() => {
+    const netName = networkLists.filter((item, i) => {
+      return item.value === network;
+    });
+    setNetworkName(netName[0].text);
+  });
 
   useEffect(() => {
-    const detectOutside = e => {
-      if (show && mobileRef.current && !mobileRef.current.contains(e.target)) {
-        setShow(false)
-      }
-    }
-    document.addEventListener("touchmove", detectOutside)
-    return () => {
-      document.removeEventListener("touchmove", detectOutside)
-    }
-  }, [show])
+    let temp = networkItems.reduce((acc, item) => {
+      if (item.text === networkName) item["iconSelected"] = true;
+      else item["iconSelected"] = false;
+      acc.push(item);
+      return acc;
+    }, []);
 
-  useEffect(()=>{
-    api.emit("connecting", props.isLoading)
+    setNetWorkItems(temp);
+  }, [networkName]);
+
+  useEffect(() => {
+    api.emit("connecting", props.isLoading);
     // setConnecting(props.isLoading)
-  }, [props.isLoading])
+  }, [props.isLoading]);
 
+  useEffect(() => {
+    switch (location.pathname) {
+      case "/":
+        setIndex(0);
+        break;
+      case "/convert":
+        setIndex(1);
+        break;
+      case "/bridge":
+        setIndex(2);
+        break;
+      case "/list-pair":
+        setIndex(3);
+        break;
+      case "/dsl":
+        setIndex(5);
+        break;
 
-  const connect = async () => {
-    try {
-      api.emit("connecting", true)
-      // setConnecting(true);
-      const state = await api.signIn(network);
-      const walletBalance = formatAmount(state.committed.balances['ETH'], { decimals: 18 });
-      const activationFee = await api.apiProvider.changePubKeyFee('ETH');
-
-      if (!state.id && (!/^\/bridge(\/.*)?/.test(location.pathname)) && (isNaN(walletBalance) || walletBalance < activationFee)) {
-        history.push("/bridge");
-      }
-      // setConnecting(false);
-      api.emit("connecting", false)
-    } catch (e) {
-      console.error(e);
-      // setConnecting(false);
-      api.emit("connecting", false)
-    }
-  };
-
-  const handleMenu = ({ key }) => {
-    switch (key) {
-      case "signOut":
-        api.signOut();
-        return;
       default:
-        throw new Error("Invalid dropdown option");
+        setIndex(0);
+        break;
+    }
+  }, []);
+
+  const changeLanguage = (text) => {
+    setLanguage(text);
+  };
+
+  const changeAccount = (text) => {
+    alert(text);
+  };
+
+  const changeNetwork = (text, value) => {
+    setNetworkName(text);
+
+    api.setAPIProvider(value);
+    api.refreshNetwork().catch((err) => {
+      console.log(err);
+    });
+  };
+
+  const handleClick = (newIndex) => {
+    switch (newIndex) {
+      case 0:
+        history.push("/");
+        break;
+      case 1:
+        setIndex(newIndex);
+        localStorage.setItem("tab_index", newIndex);
+        history.push("/convert");
+        break;
+
+      case 2:
+        setIndex(newIndex);
+        localStorage.setItem("tab_index", newIndex);
+        history.push("bridge");
+        break;
+      case 3:
+        setIndex(newIndex);
+        localStorage.setItem("tab_index", newIndex);
+        history.push("/list-pair");
+        break;
+      case 4:
+        setIndex(newIndex);
+        localStorage.setItem("tab_index", newIndex);
+        history.push("/dsl");
+        break;
+      default:
+        break;
     }
   };
 
-  const dropdownMenu = (
-    <Menu onSelect={handleMenu}>
-      <MenuItem key="signOut">Disconnect</MenuItem>
-    </Menu>
-  );
+  const isMobile = window.innerWidth < 1034;
+
   return (
-    <>
-      <header>
-        <div className="mobile_header main_header mb_h">
-          <img src={logo} alt="logo" height="30" /> 
-          <div className="head_account_area">
-          {user.address ? (
-            <Dropdown overlay={dropdownMenu}>
-              <button className="address_button">
-                <span>
-                  {user.address.slice(0, 8)}···
-                  {user.address.slice(-4)}
-                  <h4>WALLET</h4>
-                </span>
-                <AiOutlineCaretDown />
-              </button>
-            </Dropdown>
-          ) : (
-            <ConnectWalletButton />
-          )}
-          </div>
-          {/* open sidebar function */}
-          <img
-            onClick={() => {
-              setShow(!show);
-            }}
-            src={menu}
-            alt="..."
-          />
-        </div>
-        {/* mobile sidebar */}
-          <div className={show ? "mb_header_container active mb_h" : "mb_header_container mb_h"} ref={mobileRef}>
-            <img src={logo} alt="logo" />
-            <div className="head_left">
-              <ul className="flex-column mt-4">
-                <li>
-                  <NavLink exact to="/" activeClassName="active_link">
-                    Trade
-                  </NavLink>
-                </li>
-                {hasBridge && (
-                  <li>
-                    <NavLink exact to="/bridge" activeClassName="active_link">
-                      Bridge
-                    </NavLink>
-                  </li>
-                )}
-                <li>
-                  <NavLink exact to="/list-pair" activeClassName="active_link">
-                    List Pair
-                  </NavLink>
-                </li>
-                {hasBridge && (
-                  <li>
-                    <a
-                      href="https://docs.zigzag.exchange/"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Docs <HiExternalLink />
-                    </a>
-                  </li>
-                )}
-                
-                <Dev>
-                  <li>
-                    <NavLink exact to="/pool" activeClassName="active_link">
-                      Pool
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink exact to="/dsl" activeClassName="active-link">
-                      DSL
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink exact to="/swap" activeClassName="active-link">
-                      Swap
-                    </NavLink>
-                  </li>
-                </Dev>
-              </ul>
-            </div>
-            <div className="head_right">
-              <div className="d-flex align-items-center justify-content-between">
-                {user.address ? (
-                  <Dropdown overlay={dropdownMenu}>
-                    <button className="address_button">
-                      {user.address.slice(0, 8)}···
-                      {user.address.slice(-4)}
-                    </button>
-                  </Dropdown>
-                ) : (
-                  <ConnectWalletButton />
-                )}
-              </div>
-              <div className="eu_text mt-3">
-                <GoGlobe className="eu_network" />
-                <select
-                  value={network.toString()}
-                  onChange={(e) => {
-                    api.setAPIProvider(parseInt(e.target.value));
-                    api.refreshNetwork().catch((err) => {
-                      console.log(err);
-                    });
-                  }}
-                >
-                  <option value="1">zkSync - Mainnet</option>
-                  <option value="1000">zkSync - Rinkeby</option>
-                </select>
-                <BiChevronDown className="eu_caret" />
-              </div>
-              <div className="head_left head_left_socials">
-                <ul>
-                  <li className="head_social_link">
-                    <a
-                      target="_blank"
-                      rel="noreferrer"
-                      href="https://discord.gg/zigzag"
-                    >
-                      <FaDiscord />
-                    </a>
-                  </li>
-                  <li className="head_social_link">
-                    <a
-                      target="_blank"
-                      rel="noreferrer"
-                      href="https://twitter.com/ZigZagExchange"
-                    >
-                      <FaTwitter />
-                    </a>
-                  </li>
-                  <li className="head_social_link">
-                    <a
-                      target="_blank"
-                      rel="noreferrer"
-                      href="https://t.me/zigzagexchange"
-                    >
-                      <FaTelegramPlane />
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        {/* desktop header */}
-        <div className="main_header head_wrapper_desktop dex_h">
-          <div className="head_left">
+    <HeaderWrapper isMobile={isMobile}>
+      {isMobile ? (
+        <>
+          <LogoWrapper>
             <Link to="/">
               <a href="/" rel="noreferrer">
-                <img src={logo} alt="logo" height="30" />
+                <img src={logo} alt="logo" height="32" />
               </a>
             </Link>
-            <ul>
-              <li>
-                <NavLink exact to="/" activeClassName="active_link">
-                  Trade
-                </NavLink>
-              </li>
-              {hasBridge && (
-                <li>
-                  <NavLink exact to="/bridge" activeClassName="active_link">
-                    Bridge
-                  </NavLink>
-                </li>
-              )}
-              <li>
-                <NavLink exact to="/list-pair" activeClassName="active_link">
-                  List Pair
-                </NavLink>
-              </li>
-              {hasBridge && (
-                <li>
-                  <a
-                    href="https://docs.zigzag.exchange/"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Docs <HiExternalLink />
-                  </a>
-                </li>
-              )}
-              <Dev>
-                <li>
-                  <NavLink exact to="/pool" activeClassName="active_link">
-                    Pool
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink exact to="/dsl" activeClassName="active_link">
-                    DSL
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink exact to="/swap" activeClassName="active-link">
-                    Swap
-                  </NavLink>
-                </li>
-              </Dev>
-            </ul>
-          </div>
-          <div className="head_right">
-            <div className="head_left head_left_socials">
-              <ul>
-                <li className="head_social_link">
-                  <a
-                    target="_blank"
-                    rel="noreferrer"
-                    href="https://discord.gg/zigzag"
-                  >
-                    <FaDiscord />
-                  </a>
-                </li>
-                <li className="head_social_link">
-                  <a
-                    target="_blank"
-                    rel="noreferrer"
-                    href="https://twitter.com/ZigZagExchange"
-                  >
-                    <FaTwitter />
-                  </a>
-                </li>
-                <li className="head_social_link">
-                  <a
-                    target="_blank"
-                    rel="noreferrer"
-                    href="https://t.me/zigzagexchange"
-                  >
-                    <FaTelegramPlane />
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <label htmlFor="networkSelector" className="eu_text">
-              <GoGlobe className="eu_network" />
-              <select
-                id="networkSelector"
-                value={network.toString()}
-                onChange={(e) => {
-                  api.setAPIProvider(parseInt(e.target.value));
-                  if(user.address){
-                    api.refreshNetwork().catch((err) => {
-                      console.log(err);
-                    });
-                  }
-                }}
+          </LogoWrapper>
+          <ButtonWrapper>
+            {user.address ? (
+              <>
+                <AccountDropdown networkName={networkName} />
+              </>
+            ) : (
+              <ConnectWalletButton />
+            )}
+            <MenuButtonWrapper>
+              <MenuIcon onClick={() => setShow(!show)} />
+            </MenuButtonWrapper>
+          </ButtonWrapper>
+        </>
+      ) : (
+        <>
+          <NavWrapper>
+            <Link to="/">
+              <a href="/" rel="noreferrer">
+                <img src={logo} alt="logo" height="32" />
+              </a>
+            </Link>
+            <TabMenu
+              activeIndex={index}
+              onItemClick={handleClick}
+              style={{ paddingTop: "20px" }}
+            >
+              <Tab>TRADE</Tab>
+              {hasBridge && <Tab>CONVERT</Tab>}
+              {hasBridge && <Tab>BRIDGE</Tab>}
+              <Tab>LIST PAIR</Tab>
+              {/* {hasBridge && <Tab>DSL</Tab>} */}
+
+              {/* {hasBridge && <Tab>Old BRIDGE</Tab>} */}
+            </TabMenu>
+          </NavWrapper>
+          <ActionsWrapper>
+            <VerticalDivider />
+            <Dropdown
+              adClass="menu-dropdown"
+              width={200}
+              item={supportLists}
+              context={'Support'}
+              leftIcon={true}
+              transparent
+            />
+            <Dropdown
+              adClass="menu-dropdown"
+              width={162}
+              item={communityLists}
+              context={'Community'}
+              leftIcon={true}
+              transparent
+            />
+            <SocialWrapper>
+              <SocialLink
+                target="_blank"
+                rel="noreferrer"
+                href="https://discord.gg/zigzag"
               >
-                <option value="1">zkSync - Mainnet</option>
-                <option value="1000">zkSync - Rinkeby</option>
-              </select>
-              <BiChevronDown className="eu_caret" />
-            </label>
-            <div className="head_account_area">
-              {user.address ? (
-                <AccountDropdown />
-              ) : (
-                <Button
-                  className="bg_btn zig_btn_sm"
-                  loading={connecting}
-                  text="CONNECT WALLET"
-                  onClick={connect}
-                />
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
-    </>
+                <DiscordIcon />
+              </SocialLink>
+              <SocialLink
+                target="_blank"
+                rel="noreferrer"
+                href="https://twitter.com/ZigZagExchange"
+              >
+                <TwitterIcon />
+              </SocialLink>
+              <SocialLink
+                target="_blank"
+                rel="noreferrer"
+                href="https://t.me/zigzagexchange"
+              >
+                <TelegramIcon />
+              </SocialLink>
+            </SocialWrapper>
+            <VerticalDivider />
+            <LanguageWrapper>
+              {/* <StyledDropdown
+                adClass="lang-dropdown"
+                transparent
+                item={langList}
+                context={language}
+                clickFunction={changeLanguage}
+              /> */}
+              <ToggleTheme isDark={isDark} toggleTheme={toggleTheme} />
+            </LanguageWrapper>
+            <VerticalDivider />
+
+            <Dropdown
+              adClass="network-dropdown"
+              width={162}
+              item={networkItems}
+              context={networkName}
+              clickFunction={changeNetwork}
+              leftIcon={true}
+            />
+
+            {user.address ? (
+              <AccountDropdown networkName={networkName} />
+            ) : (
+              <ConnectWalletButton />
+            )}
+          </ActionsWrapper>
+        </>
+      )}
+      {show && isMobile ? (
+        <SideMenuWrapper>
+          <Dropdown
+            adClass="network-dropdown"
+            isMobile={true}
+            style={{ justifySelf: "center" }}
+            width={242}
+            item={networkItems}
+            context={networkName}
+            clickFunction={changeNetwork}
+            leftIcon={true}
+          />
+          <TabMenu row activeIndex={index} onItemClick={handleClick}>
+            <Tab>TRADE</Tab>
+            {hasBridge && <Tab>CONVERT</Tab>}
+            {hasBridge && <Tab>BRIDGE</Tab>}
+            <Tab>LIST PAIR</Tab>
+            {/* {hasBridge && (
+              <Tab>
+                DOCS
+                <ExternalLinkIcon size={12} />
+              </Tab>
+            )} */}
+            {/* {hasBridge && <Tab>DSL</Tab>} */}
+          </TabMenu>
+          <HorizontalDivider />
+          {/* <ActionSideMenuWrapper>
+            <span>Language: </span>
+            <StyledDropdown
+              adClass="lang-dropdown"
+              transparent
+              item={langList}
+              context={language}
+              clickFunction={changeLanguage}
+            />
+          </ActionSideMenuWrapper> */}
+          <ActionSideMenuWrapper>
+            <span>Theme: </span>
+            <ToggleTheme isDark={isDark} toggleTheme={toggleTheme} />
+          </ActionSideMenuWrapper>
+          <HorizontalDivider />
+          <Dropdown
+            adClass="menu-dropdown"
+            width={200}
+            item={supportLists}
+            context={'Support'}
+            leftIcon={true}
+            transparent
+          />
+          <Dropdown
+            adClass="menu-dropdown"
+            width={162}
+            item={communityLists}
+            context={'Community'}
+            leftIcon={true}
+            transparent
+          />
+          <SocialWrapper style={{ justifySelf: "center" }}>
+            <SocialLink
+              target="_blank"
+              rel="noreferrer"
+              href="https://discord.gg/zigzag"
+            >
+              <DiscordIcon />
+            </SocialLink>
+            <SocialLink
+              target="_blank"
+              rel="noreferrer"
+              href="https://twitter.com/ZigZagExchange"
+            >
+              <TwitterIcon />
+            </SocialLink>
+            <SocialLink
+              target="_blank"
+              rel="noreferrer"
+              href="https://t.me/zigzagexchange"
+            >
+              <TelegramIcon />
+            </SocialLink>
+          </SocialWrapper>
+        </SideMenuWrapper>
+      ) : (
+        <></>
+      )}
+    </HeaderWrapper>
   );
 };

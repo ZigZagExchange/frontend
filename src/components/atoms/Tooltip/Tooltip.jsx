@@ -1,32 +1,27 @@
-import React from "react";
-import RCTooltip from "rc-tooltip";
-import Pane from "../Pane/Pane";
-import "rc-tooltip/assets/bootstrap.css";
-import "./Tooltip.css";
+import React, { useCallback, useState } from 'react'
+import styled from 'styled-components'
+import Popover from './Popover'
 
-const TooltipOverlay = ({ children }) => {
-  return (
-    <Pane
-      fontSize={12}
-      size={"xs"}
-      bg={"#0b0e15"}
-      display={"inline-block"}
-      color={"blue-gray-400"}
-    >
-      {children}
-    </Pane>
-  );
-};
+const TooltipContainer = styled.div`
+  width: fit-content;
+  padding: 0.6rem 1rem;
+  line-height: 150%;
+  font-weight: 400;
+`
 
-export const Tooltip = ({ placement, label, children }) => {
+export default function Tooltip({ text, ...rest }) {
+  return <Popover content={<TooltipContainer>{text}</TooltipContainer>} {...rest} />
+}
+
+export function MouseoverTooltip({ children, ...rest }) {
+  const [show, setShow] = useState(true)
+  const open = useCallback(() => setShow(true), [setShow])
+  const close = useCallback(() => setShow(false), [setShow])
   return (
-    <RCTooltip
-      trigger={["hover"]}
-      placement={placement}
-      overlay={<TooltipOverlay>{label}</TooltipOverlay>}
-      overlayClassName={"zz-tooltip"}
-    >
-      {children}
-    </RCTooltip>
-  );
-};
+    <Tooltip {...rest} show={show}>
+      <div onMouseEnter={open} onMouseLeave={close}>
+        {children}
+      </div>
+    </Tooltip>
+  )
+}

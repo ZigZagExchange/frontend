@@ -3,8 +3,10 @@
     flex: auto;
     overflow: auto;
     height: 200px;
-    padding: 0 20px;
+    padding: 0px;
     flex-direction: column;
+    scrollbar-color: hsla(0, 0%, 100%, 0.15) hsla(0, 0%, 100%, 0.4);
+    scrollbar-width: thin !important;
   }
   
   .trade_recent_table::-webkit-scrollbar {
