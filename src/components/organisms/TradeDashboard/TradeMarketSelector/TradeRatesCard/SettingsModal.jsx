@@ -23,8 +23,7 @@ const ModalHeader = styled.div`
 `;
 
 const ResetAllSettingsWrapper = styled.div`
-  display: grid;
-  grid-auto-flow: column;
+  display: inline-flex;
   gap: 7px;
   justify-content: end;
   svg path {
@@ -214,16 +213,21 @@ const SettingsModal = ({ onDismiss }) => {
             Stack orderbooks
           </Text>
         </ToggleWrapper>
-        <ResetAllSettingsWrapper onClick={resetSettings}>
-          <RestartIcon />
-          <Text
-            font="primaryMediumBody"
-            color="primaryHighEmphasis"
-            style={{ textDecoration: "underline", cursor: "pointer" }}
-            textAlign="right"
+        <ResetAllSettingsWrapper>
+          <button
+            className="flex float-right gap-2 hover:opacity-75"
+            onClick={resetSettings}
           >
-            Reset All Settings
-          </Text>
+            <RestartIcon />
+            <Text
+              font="primaryMediumBody"
+              color="primaryHighEmphasis"
+              style={{ textDecoration: "underline", cursor: "pointer" }}
+              textAlign="right"
+            >
+              Reset All Settings
+            </Text>
+          </button>
         </ResetAllSettingsWrapper>
       </ModalBody>
     </SettingModalWrapper>
