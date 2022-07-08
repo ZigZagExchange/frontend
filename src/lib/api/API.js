@@ -599,17 +599,17 @@ export default class API extends Emitter {
   };
 
   cancelAllOrders = async (orderIds) => {
+    const { id: userId } = await this.getAccountState();
     const tokenArray = [];
     orderIds.forEach(id => {
       tokenArray.push(localStorage.getItem(id));
     })
     if (orderIds.length === tokenArray.length) {
-      await this.send("cancelall3", [this.apiProvider.network, userId, signedMessage]);
+      await this.send("cancelall3", [this.apiProvider.network, userId, tokenArray]);
     } else {
       const validUntil = (Date.now() / 1000) + 10;
       const message = `cancelall2:${this.apiProvider.network}:${validUntil}`
       const signedMessage = await this.apiProvider.signMessage(message);
-      const { id: userId } = await this.getAccountState();
       await this.send("cancelall2", [this.apiProvider.network, userId, validUntil, signedMessage]);
     }
     
