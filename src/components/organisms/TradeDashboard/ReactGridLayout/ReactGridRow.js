@@ -27,17 +27,16 @@ const ResponsiveGridLayout = WidthProvider(Responsive);
   }
 };*/
 const triggerWindowResize = () => {
-  var evt = window.document.createEvent("UIEvents");
-  evt.initUIEvent("resize", true, false, window, 0);
-  setTimeout(() => window.dispatchEvent(evt), 100);
+    var evt = window.document.createEvent("UIEvents");
+    evt.initUIEvent("resize", true, false, window, 0);
+    setTimeout(() => window.dispatchEvent(evt), 100);
 };
 
 const GridLayoutRow = (props) => {
-  //const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-  console.log("props.layoutis", props.layouts);
+    //const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
-  useLayoutEffect(() => {
-    /*doWhenDocumentReadyStateIsComplete(() => {
+    useLayoutEffect(() => {
+        /*doWhenDocumentReadyStateIsComplete(() => {
       let wrap = document.querySelectorAll("#react-grid-layout-wrap");
       wrap &&
         setDimensions({
@@ -45,39 +44,39 @@ const GridLayoutRow = (props) => {
           height: wrap[0].offsetHeight
         });
     });*/
-    triggerWindowResize();
-  }, []);
+        triggerWindowResize();
+    }, []);
 
-  return (
-    <Row type="flex" justify="space-around" align="middle">
-      <Col
-        id="react-grid-layout-wrap"
-        xl={props.xl}
-        lg={props.lg}
-        md={props.md}
-        xxs={props.xxs}
-      >
-        <div>
-          <ResponsiveGridLayout
-            className="layout"
-            breakpoints={{
-              xl: 1599,
-              lg: 1199,
-              md: 991,
-              xxs: 0,
-            }}
-            measureBeforeMount={true}
-            cols={{ xl: 40, lg: 40, md: 40, xxs: 2 }}
-            layouts={props.layouts}
-            onLayoutChange={props.onChange}
-            {...props}
-          >
-            {props.children}
-          </ResponsiveGridLayout>
-        </div>
-      </Col>
-    </Row>
-  );
+    return (
+        <Row type="flex" justify="space-around" align="middle">
+            <Col
+                id="react-grid-layout-wrap"
+                xl={props.xl}
+                lg={props.lg}
+                md={props.md}
+                xxs={props.xxs}
+            >
+                <div>
+                    <ResponsiveGridLayout
+                        className="layout"
+                        breakpoints={{
+                            xl: 1599,
+                            lg: 1199,
+                            md: 991,
+                            xxs: 0,
+                        }}
+                        measureBeforeMount={true}
+                        cols={{ xl: 40, lg: 40, md: 40, xxs: 2 }}
+                        layouts={props.layouts}
+                        onLayoutChange={props.onChange}
+                        {...props}
+                    >
+                        {props.children}
+                    </ResponsiveGridLayout>
+                </div>
+            </Col>
+        </Row>
+    );
 };
 
 export default GridLayoutRow;

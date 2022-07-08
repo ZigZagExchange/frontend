@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { default as WidthProvider } from "./ReactGridLayout/ReactGridProvider";
 import GridLayoutRow from "./ReactGridLayout/ReactGridRow";
 import GridLayoutCell from "./ReactGridLayout/ReactGridCell";
-import { Responsive } from "react-grid-layout";
 import styled from "@xstyled/styled-components";
-import MenuIcon from "@mui/icons-material/Menu";
 import TradeSidebar from "./TradeSidebar/TradeSidebar";
 import TradeMarketSelector from "./TradeMarketSelector/TradeMarketSelector";
 import TradeTables from "./TradeTables/TradeTables";
@@ -24,7 +21,6 @@ import {
     userFillsSelector,
     currentMarketSelector,
     setCurrentMarket,
-    setLayout,
     resetData,
     settingsSelector,
     setUISettings,
@@ -38,70 +34,24 @@ import {
     marketQueryParam,
     networkQueryParam,
 } from "../../pages/ListPairPage/SuccessModal";
-import TradesTable from "./TradeBooks/TradesTable";
 import { HighSlippageModal } from "components/molecules/HighSlippageModal";
 import _ from "lodash";
-
-const ResponsiveGridLayout = WidthProvider(Responsive);
 
 const TradeContainer = styled.div`
     color: #aeaebf;
     height: calc(100vh - 56px);
     background: ${(p) => p.theme.colors.backgroundHighEmphasis};
 
-    .react-resizable-handle::after {
-        border-color: ${({ theme }) =>
-            `${theme.colors.primaryHighEmphasis} !important`};
-    }
-`;
-
-const TradeGrid = styled.article`
-    display: grid;
-    grid-template-rows: ${({ isLeft }) =>
-        isLeft ? "56px 2fr 1fr" : "56px 613px 1fr"};
-    grid-template-columns: ${({ isLeft }) =>
-        isLeft ? "300px 253.5px 253.5px 1fr" : "300px 507px 1fr"};
-    grid-template-areas: ${({ isLeft }) =>
-        isLeft
-            ? `"marketSelector marketSelector marketSelector marketSelector"
-  "sidebar orders trades chart"
-  "tables tables tables tables"`
-            : `"marketSelector marketSelector marketSelector"
-  "sidebar stack chart"
-  "tables tables tables"`};
-
-    height: calc(100vh - 56px);
-    gap: 0px;
-
-    @media screen and (max-width: 991px) {
-        height: auto;
-        grid-template-rows: ${({ isLeft }) =>
-            isLeft
-                ? "56px 410px 459px 508px 362px"
-                : "56px 410px 459px 519px 362px"};
-        grid-template-columns: ${({ isLeft }) => (isLeft ? "1fr 1fr" : "1fr")};
-        grid-template-areas: ${({ isLeft }) =>
-            isLeft
-                ? `"marketSelector marketSelector"
-      "chart chart"
-      "sidebar orders"
-      "trades trades"
-      "tables tables"
-      `
-                : `"marketSelector"
-      "chart"
-      "sidebar"
-      "stack"
-      "tables"
-      `};
-    }
-
-    > div,
-    > aside,
-    > header,
-    > section,
-    > main {
-        background: ${(p) => p.theme.colors.zzDarkest};
+    .react-resizable-handle {
+        &::after {
+            width: 10px !important;
+            height: 10px !important;
+            border-color: ${({ theme }) =>
+                `${theme.colors.primaryHighEmphasis} !important`};
+            border-right-width: 3px !important;
+            border-bottom-width: 3px !important;
+            cursor: nwse-resize;
+        }
     }
 `;
 
