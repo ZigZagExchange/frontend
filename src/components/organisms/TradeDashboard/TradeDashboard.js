@@ -168,6 +168,7 @@ export function TradeDashboard() {
                 isResizable={settings.editable}
                 draggableHandle=".grid-item__title"
                 editable={settings.editable}
+                useCSSTransforms={false}
             >
                 <div key={settings.stackOrderbook ? "a" : "b"}>
                     <GridLayoutCell editable={settings.editable}>
