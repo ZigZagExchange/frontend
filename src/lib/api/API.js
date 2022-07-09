@@ -270,22 +270,6 @@ export default class API extends Emitter {
     }
   }
 
-  _socketError = (e) => {
-    console.warn("Zigzag websocket connection failed");
-  }
-
-  getAccountState = async () => {
-    const accountState = { ...(await this.apiProvider.getAccountState()) }
-    accountState.profile = await this.getProfile(accountState.address)
-    this.emit('accountState', accountState)
-    return accountState
-  }
-
-  send = (op, args) => {
-    if (!this.ws) return;
-    return this.ws.send(JSON.stringify({ op, args }))
-  }
-
   refreshNetwork = async () => {
     if (!window.ethereum) return
     let ethereumChainId
