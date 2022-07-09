@@ -619,7 +619,7 @@ export default function OrdersTable(props) {
             const time = order[7] && formatDate(new Date(order[7] * 1000));
             let price = order[4];
             let baseQuantity = order[5];
-            let remaining = isNaN(Number(order[11])) ? order[5] : order[11];
+            let remaining = isNaN(Number(order[10])) ? order[5] : order[10];
             let orderStatus = order[9];
             const baseCurrency = order[2].split("-")[0];
             const side = order[3] === "b" ? "buy" : "sell";
@@ -666,14 +666,7 @@ export default function OrdersTable(props) {
                 break;
               case "pm":
                 statusText = (
-                  <span>
-                    partial match
-                    <img
-                      className="loading-gif"
-                      src={loadingGif}
-                      alt="Pending"
-                    />
-                  </span>
+                  <span>partial match</span>
                 );
                 statusClass = "warningHighEmphasis";
                 break;
@@ -785,7 +778,7 @@ export default function OrdersTable(props) {
                     </Text>
                   </td>
                   <td data-label="Action">
-                    {orderStatus === "o" ? (
+                    {["o", "pf", "pm"].includes(orderStatus) ? (
                       <ActionWrapper
                         font="primaryExtraSmallSemiBold"
                         color="primaryHighEmphasis"
@@ -807,18 +800,6 @@ export default function OrdersTable(props) {
   };
 
   const renderFillTable = (fills) => {
-    let baseExplorerUrl;
-    switch (api.apiProvider.network) {
-      case 1001:
-        baseExplorerUrl = "https://goerli.voyager.online/tx/";
-        break;
-      case 1000:
-        baseExplorerUrl = "https://rinkeby.zkscan.io/explorer/transactions/";
-        break;
-      case 1:
-      default:
-        baseExplorerUrl = "https://zkscan.io/explorer/transactions/";
-    }
     return isMobile ? (
       <table>
         <tbody>
@@ -965,7 +946,10 @@ export default function OrdersTable(props) {
                               color="primaryHighEmphasis"
                               textAlign="right"
                               onClick={() =>
-                                window.open(baseExplorerUrl + txhash, "_blank")
+                                window.open(
+                                  api.getExplorerTxLink(api.apiProvider.network, txhash),
+                                  "_blank"
+                                )
                               }
                             >
                               View Tx
@@ -1346,7 +1330,10 @@ export default function OrdersTable(props) {
                       font="primaryExtraSmallSemiBold"
                       color="primaryHighEmphasis"
                       onClick={() =>
-                        window.open(baseExplorerUrl + txhash, "_blank")
+                        window.open(
+                          api.getExplorerTxLink(api.apiProvider.network, txhash),
+                          "_blank"
+                        )
                       }
                     >
                       View Tx
@@ -1362,18 +1349,6 @@ export default function OrdersTable(props) {
       </table>
     );
   };
-
-  let explorerLink;
-  switch (api.apiProvider.network) {
-    case 1000:
-      explorerLink =
-        "https://rinkeby.zkscan.io/explorer/accounts/" + props.user.address;
-      break;
-    case 1:
-    default:
-      explorerLink =
-        "https://zkscan.io/explorer/accounts/" + props.user.address;
-  }
 
   let footerContent;
   switch (tab) {
@@ -1535,13 +1510,15 @@ export default function OrdersTable(props) {
               </thead>
               <tbody>{balancesContent}</tbody>
             </table>
-
             <ActionWrapper
               font="primaryExtraSmallSemiBold"
               color="primaryHighEmphasis"
               textAlign="center"
               className="view-account-button"
-              onClick={() => window.open(explorerLink, "_blank")}
+              onClick={() => window.open(
+                api.getExplorerAccountLink(api.apiProvider.network, props.user.address),
+                "_blank"
+              )}
             >
               View Account on Explorer
             </ActionWrapper>
@@ -1555,7 +1532,10 @@ export default function OrdersTable(props) {
               color="primaryHighEmphasis"
               textAlign="center"
               className="view-account-button"
-              onClick={() => window.open(explorerLink, "_blank")}
+              onClick={() => window.open(
+                api.getExplorerAccountLink(api.apiProvider.network, props.user.address),
+                "_blank"
+              )}
             >
               View Account on Explorer
             </ActionWrapper>

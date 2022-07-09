@@ -25,7 +25,6 @@ import { userSelector } from "lib/store/features/auth/authSlice";
 import api from "lib/api";
 import { useLocation, useHistory } from "react-router-dom";
 import {
-  getChainIdFromMarketChain,
   marketQueryParam,
   networkQueryParam,
 } from "../../pages/ListPairPage/SuccessModal";
@@ -118,7 +117,7 @@ export function TradeDashboard() {
     const urlParams = new URLSearchParams(search);
     const marketFromURL = urlParams.get(marketQueryParam);
     const networkFromURL = urlParams.get(networkQueryParam);
-    const chainid = getChainIdFromMarketChain(networkFromURL);
+    const chainid = api.getChainIdFromName(networkFromURL);
     if (marketFromURL && currentMarket !== marketFromURL) {
       updateMarketChain(marketFromURL);
     }
@@ -136,6 +135,8 @@ export function TradeDashboard() {
       networkText = "zksync";
     } else if (network === 1000) {
       networkText = "zksync-rinkeby";
+    } else if (network === 42161) {
+      networkText = "arbitrum";
     }
     history.push(`/?market=${currentMarket}&network=${networkText}`);
   }, [network, currentMarket]);

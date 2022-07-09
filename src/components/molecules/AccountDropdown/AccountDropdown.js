@@ -11,7 +11,7 @@ import {
   balancesSelector,
   layoutSelector,
 } from "lib/store/features/api/apiSlice";
-import { formatUSD } from "lib/utils";
+import { formatUSD, formatPrice} from "lib/utils";
 import api from "lib/api";
 import { setLayout } from "lib/helpers/storage/layouts";
 import { Modal, Tooltip } from "components";
@@ -323,11 +323,12 @@ export const AccountDropdown = () => {
 
   const [selectedLayer, setSelectedLayer] = useState(2);
   const coinEstimator = useCoinEstimator();
-  const { profile } = user;
+  const { profile, address } = user;
 
   const wallet =
     selectedLayer === 1 ? balanceData.wallet : balanceData[network];
-  const explorer = user.address ? api.getExplorer(user.address, selectedLayer) : null;
+  const explorer = address ? api.getExplorerAccountLink(network, address) : null;
+  const networkName = selectedLayer === 1 ? 'Etherscan' : api.getNetworkDisplayName(network);
 
   useEffect(() => {
     const hideDisplay = () => setShow(false);
@@ -432,7 +433,9 @@ export const AccountDropdown = () => {
                       />
                       <div>
                         <strong>
-                          {wallet[ticker].valueReadable} {ticker}
+                          {formatPrice(
+                            wallet[ticker].valueReadable
+                          )} {ticker}
                         </strong>
                         <small>
                           $
@@ -486,7 +489,7 @@ export const AccountDropdown = () => {
             <a target="_blank"
               rel="noreferrer"
               href={explorer}>
-              <IoMdOpen style={{ position: "relative", top: -2 }} /> {selectedLayer === 1 ? 'Etherscan' : `zkScan`}
+                <IoMdOpen style={{ position: "relative", top: -2 }} /> {networkName} 
             </a>
           </DropdownExplorer>
 

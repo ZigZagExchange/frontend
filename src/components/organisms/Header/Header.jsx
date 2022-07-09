@@ -48,8 +48,8 @@ const networkLists = [
     image: zksyncLogo,
   },
   {
-    text: "Arbitrum (soon)",
-    value: null,
+    text: "Arbitrum (alpha)",
+    value: 42161,
     url: "#",
     selectedIcon: <CheckIcon />,
     image: arbitrumLogo,
@@ -215,6 +215,7 @@ export const Header = (props) => {
   const user = useSelector(userSelector);
   const network = useSelector(networkSelector);
   const hasBridge = api.isImplemented("depositL2");
+  const isEVM = api.isEVMChain();
   const history = useHistory();
   const [index, setIndex] = useState(0);
   const [language, setLanguage] = useState(langList[0].text);
@@ -261,9 +262,11 @@ export const Header = (props) => {
         setIndex(3);
         break;
       case "/dsl":
+        setIndex(4);
+        break;
+      case "/wrap":
         setIndex(5);
         break;
-
       default:
         setIndex(0);
         break;
@@ -312,6 +315,11 @@ export const Header = (props) => {
         setIndex(newIndex);
         localStorage.setItem("tab_index", newIndex);
         history.push("/dsl");
+	break;
+      case 5:
+        setIndex(newIndex);
+        localStorage.setItem("tab_index", newIndex);
+        history.push("/wrap");
         break;
       default:
         break;
@@ -358,12 +366,14 @@ export const Header = (props) => {
               style={{ paddingTop: "20px" }}
             >
               <Tab>TRADE</Tab>
-              {hasBridge && <Tab>CONVERT</Tab>}
-              {hasBridge && <Tab>BRIDGE</Tab>}
-              <Tab>LIST PAIR</Tab>
-              {/* {hasBridge && <Tab>DSL</Tab>} */}
-
-              {/* {hasBridge && <Tab>Old BRIDGE</Tab>} */}
+              <Tab>CONVERT</Tab>
+              <Tab display={hasBridge}>BRIDGE</Tab>
+              <Tab display={!isEVM}>LIST PAIR</Tab>
+              <Tab display={false}>
+                DOCS
+                <ExternalLinkIcon size={12} />
+              </Tab>
+              <Tab display={isEVM}>WRAP</Tab>
             </TabMenu>
           </NavWrapper>
           <ActionsWrapper>
@@ -451,16 +461,14 @@ export const Header = (props) => {
           />
           <TabMenu row activeIndex={index} onItemClick={handleClick}>
             <Tab>TRADE</Tab>
-            {hasBridge && <Tab>CONVERT</Tab>}
+            <Tab>CONVERT</Tab>
             {hasBridge && <Tab>BRIDGE</Tab>}
             <Tab>LIST PAIR</Tab>
-            {/* {hasBridge && (
-              <Tab>
-                DOCS
-                <ExternalLinkIcon size={12} />
-              </Tab>
-            )} */}
-            {/* {hasBridge && <Tab>DSL</Tab>} */}
+            <Tab>
+              DOCS
+              <ExternalLinkIcon size={12} />
+            </Tab>
+              {isEVM && <Tab>WRAP</Tab>}
           </TabMenu>
           <HorizontalDivider />
           {/* <ActionSideMenuWrapper>
