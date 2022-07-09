@@ -78,7 +78,6 @@ export default class API extends Emitter {
 
   setAPIProvider = (network, networkChanged = true) => {
     const networkName = this.getNetworkName(network)
-    console.log(network, networkName);
 
     if (!networkName) {
       this.signOut()
@@ -273,31 +272,6 @@ export default class API extends Emitter {
 
   _socketError = (e) => {
     console.warn("Zigzag websocket connection failed");
-  }
-
-  start = () => {
-    if (this.ws) this.stop()
-    this.ws = new WebSocket(this.apiProvider.websocketUrl)
-    this.ws.addEventListener('open', this._socketOpen)
-    this.ws.addEventListener('close', this._socketClose)
-    this.ws.addEventListener('message', this._socketMsg)
-    this.ws.addEventListener('error', this._socketError)
-    this.emit('start')
-
-    // login after reconnect
-    const accountState = this.getAccountState();
-    if (accountState && accountState.id) {
-      this.send("login", [
-        this.apiProvider.network,
-        accountState.id && accountState.id.toString(),
-      ]);
-    }
-  }
-
-  stop = () => {
-    if (!this.ws) return
-    this.ws.close()
-    this.emit('stop')
   }
 
   getAccountState = async () => {
