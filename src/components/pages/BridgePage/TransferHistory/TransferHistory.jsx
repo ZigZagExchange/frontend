@@ -68,7 +68,7 @@ const TransferHistory = () => {
                     key={idx}
                   >
                     <div className="flex items-center gap-5 ">
-                      <p className="inline-block px-2 py-1 text-xs font-semibold border rounded-lg border-foreground-500">
+                      <p className="inline-block px-2 py-1 text-xs font-semibold border rounded-lg dark:border-foreground-400 border-primary-500">
                         {type}
                       </p>
                       <img

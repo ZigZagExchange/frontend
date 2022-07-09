@@ -30,9 +30,9 @@ export default function BridgePage() {
   const user = useSelector(userSelector);
   const settings = useSelector(settingsSelector);
 
-  useEffect(()=>{
+  useEffect(() => {
     document.title = "ZigZag Bridge";
-  },[])
+  }, []);
 
   return (
     <DefaultTemplate>
@@ -88,7 +88,7 @@ export default function BridgePage() {
                   })}
                 </Tab.List>
                 <Tab.Panels className="mt-2">
-                  <Tab.Panel>
+                  <Tab.Panel className="outline-none">
                     <BridgeContainer />
                   </Tab.Panel>
                   <Tab.Panel>
