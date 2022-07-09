@@ -14,8 +14,10 @@ import useTheme from "components/hooks/useTheme";
 import { settingsSelector } from "lib/store/features/api/apiSlice";
 import {
   fetchFavourites,
+  addFavourite,
+  removeFavourite,
 } from "lib/helpers/storage/favourites";
-import { ActivatedStarIcon } from "components/atoms/Svg";
+import { ActivatedStarIcon, StarIcon } from "components/atoms/Svg";
 import { Box } from "@material-ui/core";
 import _ from "lodash";
 import { darkColors, lightColors } from "lib/theme/colors";
@@ -62,6 +64,19 @@ const TradeRatesCard = ({
     100
   ).toFixed(2);
 
+  const favouritePair = (pair) => {
+    const isFavourited = fetchFavourites().includes(pair);
+
+    let favourites = [];
+    if (!isFavourited) {
+        favourites = addFavourite(pair);
+    } else {
+        favourites = removeFavourite(pair);
+    }
+
+    setFavourites(favourites)
+}
+
   return (
     <Wrapper>
       <LeftWrapper>
@@ -74,42 +89,43 @@ const TradeRatesCard = ({
             currentMarket={currentMarket}
             marketInfo={marketInfo}
             onFavourited={(items) => { setFavourites(items);}}
+            favourited={favourites}
           />
         </MarketSelector>
         <RatesCardsWrapper>
-          {_.indexOf(favourites, currentMarket) !== -1 &&
-            <Box style={{ cursor: 'pointer' }} position="relative" onMouseEnter={() => { setOpen(true) }} onMouseLeave={() => { setOpen(false) }}>
-              <ActivatedStarIcon />
-              {isOpen && <Box position='absolute' left="-50px" top="calc(100% + 1px)" width="140px" borderRadius={'5px'} overflow="hidden" display='flex' flexDirection="column" zIndex={1000}>
-                <Box
+          <Box style={{ cursor: 'pointer' }} position="relative" onMouseEnter={() => { setOpen(true) }} onMouseLeave={() => { setOpen(false) }}>
+            <Box display={'flex'} onClick={()=>favouritePair(currentMarket)}>
+            {_.indexOf(favourites, currentMarket) !== -1 ? <ActivatedStarIcon /> : <StarIcon />}
+            </Box>
+            {isOpen && <Box position='absolute' left="-50px" top="calc(100% - 2px)" width="140px" borderRadius={'5px'} overflow="hidden" display='flex' flexDirection="column" zIndex={1000}>
+              <Box
+                px="15px"
+                py="7px"
+                boxSizing="boder-box"
+                fontSize={16}
+                fontWeight="bold"
+                borderBottom={`1px solid ${isDark ? darkColors.foreground400 : lightColors.foreground400}`}
+                bgcolor={isDark ? darkColors.backgroundLowEmphasis : lightColors.backgroundLowEmphasis}
+                color={isDark ? darkColors.foregroundHighEmphasis : lightColors.foregroundHighEmphasis}
+              >Favorites</Box>
+              {_.map(favourites, (item, index) => {
+                return <FavItem
                   px="15px"
                   py="7px"
+                  key={index}
                   boxSizing="boder-box"
-                  fontSize={16}
-                  fontWeight="bold"
-                  borderBottom={`1px solid ${isDark ? darkColors.foreground400 : lightColors.foreground400}`}
+                  fontSize={14}
+                  borderBottom={index !== favourites.length - 1 ? `1px solid ${isDark ? darkColors.foreground400 : lightColors.foreground400}` : ''}
                   bgcolor={isDark ? darkColors.backgroundLowEmphasis : lightColors.backgroundLowEmphasis}
                   color={isDark ? darkColors.foregroundHighEmphasis : lightColors.foregroundHighEmphasis}
-                >Favorites</Box>
-                {_.map(favourites, (item, index) => {
-                  return <Box
-                    px="15px"
-                    py="7px"
-                    key={index}
-                    boxSizing="boder-box"
-                    fontSize={14}
-                    borderBottom={index !== favourites.length - 1 ? `1px solid ${isDark ? darkColors.foreground400 : lightColors.foreground400}` : ''}
-                    bgcolor={isDark ? darkColors.backgroundLowEmphasis : lightColors.backgroundLowEmphasis}
-                    color={isDark ? darkColors.foregroundHighEmphasis : lightColors.foregroundHighEmphasis}
-                    onClick={() => {
-                      updateMarketChain(item);
-                      setOpen(false)
-                    }}
-                  >{item}</Box>
-                })}
-              </Box>}
-            </Box>
-          }
+                  onClick={() => {
+                    updateMarketChain(item);
+                    setOpen(false)
+                  }}
+                >{item.replace('-', '/')}</FavItem>
+              })}
+            </Box>}
+          </Box>
           <RatesCard>
             <Text
               font="primaryHeading6"
@@ -316,3 +332,9 @@ const Divider = styled.div`
   height: 32px;
   background-color: ${({ theme, isDark }) => isDark === "false" ? theme.colors.backgroundMediumEmphasis : theme.colors.foreground400};
 `;
+
+const FavItem = styled(Box)`
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.backgroundHighEmphasis };
+  }
+`
