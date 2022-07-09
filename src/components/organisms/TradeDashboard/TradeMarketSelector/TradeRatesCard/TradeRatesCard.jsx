@@ -94,10 +94,10 @@ const TradeRatesCard = ({
         </MarketSelector>
         <RatesCardsWrapper>
           <Box style={{ cursor: 'pointer' }} position="relative" onMouseEnter={() => { setOpen(true) }} onMouseLeave={() => { setOpen(false) }}>
-            <Box p="10px" display={'flex'} onClick={()=>favouritePair(currentMarket)}>
+            <Box display={'flex'} onClick={()=>favouritePair(currentMarket)}>
             {_.indexOf(favourites, currentMarket) !== -1 ? <ActivatedStarIcon /> : <StarIcon />}
             </Box>
-            {isOpen && <Box position='absolute' left="-50px" top="calc(100% - 4px)" width="140px" borderRadius={'5px'} overflow="hidden" display='flex' flexDirection="column" zIndex={1000}>
+            {isOpen && <Box position='absolute' left="-50px" top="calc(100% - 2px)" width="140px" borderRadius={'5px'} overflow="hidden" display='flex' flexDirection="column" zIndex={1000}>
               <Box
                 px="15px"
                 py="7px"
