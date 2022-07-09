@@ -315,7 +315,8 @@ export const Header = (props) => {
         setIndex(newIndex);
         localStorage.setItem("tab_index", newIndex);
         history.push("/dsl");
-      case 6:
+	break;
+      case 5:
         setIndex(newIndex);
         localStorage.setItem("tab_index", newIndex);
         history.push("/wrap");
@@ -366,13 +367,13 @@ export const Header = (props) => {
             >
               <Tab>TRADE</Tab>
               <Tab>CONVERT</Tab>
-              {hasBridge && <Tab>BRIDGE</Tab>}
-              <Tab>LIST PAIR</Tab>
-              <Tab>
+              <Tab display={hasBridge}>BRIDGE</Tab>
+              <Tab display={!isEVM}>LIST PAIR</Tab>
+              <Tab display={false}>
                 DOCS
                 <ExternalLinkIcon size={12} />
               </Tab>
-              {isEVM && <Tab>WRAP</Tab>}
+              <Tab display={isEVM}>WRAP</Tab>
             </TabMenu>
           </NavWrapper>
           <ActionsWrapper>
