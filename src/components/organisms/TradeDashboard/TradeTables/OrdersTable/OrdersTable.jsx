@@ -273,7 +273,7 @@ export default function OrdersTable(props) {
             const time = order[7] && formatDateTime(new Date(order[7] * 1000));
             let price = order[4];
             let baseQuantity = order[5];
-            let remaining = isNaN(Number(order[11])) ? order[5] : order[11];
+            let remaining = Number(order[10]);
             const orderStatus = order[9];
             const baseCurrency = order[2].split("-")[0];
             const side = order[3] === "b" ? "buy" : "sell";
@@ -293,8 +293,8 @@ export default function OrdersTable(props) {
               expiryText = "--";
             }
 
-            const orderWithoutFee = api.getOrderDetailsWithoutFee(order);
             if (api.isZksyncChain()) {
+              const orderWithoutFee = api.getOrderDetailsWithoutFee(order);
               price = orderWithoutFee.price;
               baseQuantity = orderWithoutFee.baseQuantity;
               remaining = orderWithoutFee.remaining;
@@ -619,7 +619,7 @@ export default function OrdersTable(props) {
             const time = order[7] && formatDate(new Date(order[7] * 1000));
             let price = order[4];
             let baseQuantity = order[5];
-            let remaining = isNaN(Number(order[10])) ? order[5] : order[10];
+            let remaining = Number(order[10]);
             let orderStatus = order[9];
             const baseCurrency = order[2].split("-")[0];
             const side = order[3] === "b" ? "buy" : "sell";
@@ -644,8 +644,8 @@ export default function OrdersTable(props) {
               orderStatus = "e";
             }
 
-            const orderWithoutFee = api.getOrderDetailsWithoutFee(order);
             if (api.isZksyncChain()) {
+              const orderWithoutFee = api.getOrderDetailsWithoutFee(order);
               price = orderWithoutFee.price;
               baseQuantity = orderWithoutFee.baseQuantity;
               remaining = orderWithoutFee.remaining;
