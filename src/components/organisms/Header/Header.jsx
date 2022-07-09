@@ -210,16 +210,16 @@ const ActionSideMenuWrapper = styled.div`
 export const Header = (props) => {
   // state to open or close the sidebar in mobile
   const [show, setShow] = useState(false);
-  // const connecting = useSelector(isConnectingSelector);
+  const connecting = useSelector(isConnectingSelector);
   // const [connecting, setConnecting] = useState(false);
   const user = useSelector(userSelector);
   const network = useSelector(networkSelector);
   const hasBridge = api.isImplemented("depositL2");
   const isEVM = api.isEVMChain();
   const history = useHistory();
-  const [activeTab, setTab] = useState('TRADE');
+  const [index, setIndex] = useState(0);
   const [language, setLanguage] = useState(langList[0].text);
-  // const [account, setAccount] = useState(accountLists[0].text);
+  const [account, setAccount] = useState(accountLists[0].text);
   const [networkName, setNetworkName] = useState("");
   const [networkItems, setNetWorkItems] = useState(networkLists);
   const { isDark, toggleTheme } = useTheme();
@@ -250,25 +250,25 @@ export const Header = (props) => {
   useEffect(() => {
     switch (location.pathname) {
       case "/":
-        setTab('TRADE');
+        setIndex(0);
         break;
       case "/convert":
-        setTab('CONVERT');
+        setIndex(1);
         break;
       case "/bridge":
-        setTab('BRIDGE');
+        setIndex(2);
         break;
       case "/list-pair":
-        setTab('LIST PAIR');
+        setIndex(3);
         break;
       case "/dsl":
-        setTab('DSL');
+        setIndex(5);
         break;
       case "/wrap":
-        setTab('WRAP');
+        setIndex(6);
         break;
       default:
-        setTab('TRADE');
+        setIndex(0);
         break;
     }
   }, []);
@@ -290,35 +290,34 @@ export const Header = (props) => {
     });
   };
 
-  const handleClick = (newTab) => {
-    console.log(`newTab ==> ${newTab}`)
-    console.log(newTab)
-    switch (newTab) {
-      case 'TRADE':
+  const handleClick = (newIndex) => {
+    switch (newIndex) {
+      case 0:
         history.push("/");
         break;
-      case "CONVERT":
-        setTab(newTab);
-        localStorage.setItem("tab_index", newTab);
+      case 1:
+        setIndex(newIndex);
+        localStorage.setItem("tab_index", newIndex);
         history.push("/convert");
         break;
-      case 'BRIDGE':
-        setTab(newTab);
-        localStorage.setItem("tab_index", newTab);
+
+      case 2:
+        setIndex(newIndex);
+        localStorage.setItem("tab_index", newIndex);
         history.push("bridge");
         break;
-      case 'LIST PAIR':
-        setTab(newTab);
-        localStorage.setItem("tab_index", newTab);
+      case 3:
+        setIndex(newIndex);
+        localStorage.setItem("tab_index", newIndex);
         history.push("/list-pair");
         break;
-      case 'DSL':
-        setTab(newTab);
-        localStorage.setItem("tab_index", newTab);
+      case 4:
+        setIndex(newIndex);
+        localStorage.setItem("tab_index", newIndex);
         history.push("/dsl");
-      case 'WRAP':
-        setTab(newTab);
-        localStorage.setItem("tab_index", newTab);
+      case 6:
+        setIndex(newIndex);
+        localStorage.setItem("tab_index", newIndex);
         history.push("/wrap");
         break;
       default:
@@ -361,15 +360,19 @@ export const Header = (props) => {
               </a>
             </Link>
             <TabMenu
-              activeTab={activeTab}
+              activeIndex={index}
               onItemClick={handleClick}
               style={{ paddingTop: "20px" }}
             >
-              <Tab className="TRADE">TRADE</Tab>
-              <Tab className="CONVERT">CONVERT</Tab>
-              {hasBridge && <Tab className="BRIDGE">BRIDGE</Tab>}
-              {!isEVM && <Tab className="LIST PAIR">LIST PAIR</Tab>}
-              {isEVM && <Tab className="WRAP">WRAP</Tab>}
+              <Tab>TRADE</Tab>
+              <Tab>CONVERT</Tab>
+              {hasBridge && <Tab>BRIDGE</Tab>}
+              <Tab>LIST PAIR</Tab>
+              <Tab>
+                DOCS
+                <ExternalLinkIcon size={12} />
+              </Tab>
+              {isEVM && <Tab>WRAP</Tab>}
             </TabMenu>
           </NavWrapper>
           <ActionsWrapper>
@@ -455,12 +458,16 @@ export const Header = (props) => {
             clickFunction={changeNetwork}
             leftIcon={true}
           />
-          <TabMenu row activeTab={activeTab} onItemClick={handleClick}>
-            <Tab className="TRADE">TRADE</Tab>
-            <Tab className="CONVERT">CONVERT</Tab>
-            {hasBridge && <Tab className="BRIDGE">BRIDGE</Tab>}
-            <Tab className="LIST PAIR">LIST PAIR</Tab>
-            {isEVM && <Tab className="WRAP">WRAP</Tab>}
+          <TabMenu row activeIndex={index} onItemClick={handleClick}>
+            <Tab>TRADE</Tab>
+            <Tab>CONVERT</Tab>
+            {hasBridge && <Tab>BRIDGE</Tab>}
+            <Tab>LIST PAIR</Tab>
+            <Tab>
+              DOCS
+              <ExternalLinkIcon size={12} />
+            </Tab>
+              {isEVM && <Tab>WRAP</Tab>}
           </TabMenu>
           <HorizontalDivider />
           {/* <ActionSideMenuWrapper>
