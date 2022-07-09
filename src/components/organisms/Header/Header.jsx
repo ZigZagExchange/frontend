@@ -262,10 +262,10 @@ export const Header = (props) => {
         setIndex(3);
         break;
       case "/dsl":
-        setIndex(5);
+        setIndex(4);
         break;
       case "/wrap":
-        setIndex(6);
+        setIndex(5);
         break;
       default:
         setIndex(0);
