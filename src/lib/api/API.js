@@ -816,8 +816,8 @@ export default class API extends Emitter {
       product,
       side,
       price,
-      baseAmount,
-      quoteAmount,
+      Number(baseAmount),
+      Number(quoteAmount),
       orderType
     );
   };
