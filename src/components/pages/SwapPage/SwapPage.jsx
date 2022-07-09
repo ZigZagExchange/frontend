@@ -121,21 +121,30 @@ export default function SwapPage() {
     if (sellToken && buyToken) {
       const p_name = sellToken.name + "-" + buyToken.name;
       const r_p_name = buyToken.name + "-" + sellToken.name;
+      let c = false;
       Object.keys(pairPrices).forEach((pair) => {
         if (pair === p_name) {
+          console.log(p_name);
           setBasePrice(pairPrices[pair].price);
           const x = sellAmounts * pairPrices[pair].price;
           setBuyAmounts(x);
           setTtype("sell");
           dispatch(setCurrentMarket(p_name));
-        } else if (pair === r_p_name) {
-          setBasePrice(1 / pairPrices[pair].price);
-          const x = (sellAmounts * 1) / pairPrices[pair].price;
-          setBuyAmounts(x);
-          setTtype("buy");
-          dispatch(setCurrentMarket(r_p_name));
+          c = true;
         }
       });
+      if (c === false) {
+        Object.keys(pairPrices).forEach((pair) => {
+          if (pair === r_p_name) {
+            console.log(r_p_name);
+            setBasePrice(1 / pairPrices[pair].price);
+            const x = (sellAmounts * 1) / pairPrices[pair].price;
+            setBuyAmounts(x);
+            setTtype("buy");
+            dispatch(setCurrentMarket(r_p_name));
+          }
+        });
+      }
     }
   }, [sellToken, buyToken]);
 

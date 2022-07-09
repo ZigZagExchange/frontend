@@ -426,7 +426,6 @@ class SpotForm extends React.Component {
         this.props.orderType === "market" &&
         !this.props.settings.disableSlippageWarning
       ) {
-        price *= 0.9985;
         if (delta > 2) {
           this.props.setHighSlippageModal({ open: true, delta: delta });
           return;
@@ -486,7 +485,6 @@ class SpotForm extends React.Component {
         this.props.orderType === "market" &&
         !this.props.settings.disableSlippageWarning
       ) {
-        price *= 1.0015;
         if (delta > 2) {
           this.props.setHighSlippageModal({ open: true, delta: delta });
           return;
@@ -502,6 +500,11 @@ class SpotForm extends React.Component {
     let baseAmount = this.state.baseAmount;
     let quoteAmount = this.state.quoteAmount;
     let price = this.state.price;
+    if (this.props.orderType === "market") {
+      price *= this.props.side === "b"
+        ? 1.0015
+        : 0.9985
+    }
     const marketInfo = this.props.marketInfo;
     baseAmount = baseAmount ? baseAmount : quoteAmount / price;
     quoteAmount = 0;

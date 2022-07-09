@@ -98,7 +98,7 @@ const TransactionSettings = ({
                           </p>
                           <div
                             className={classNames(
-                              "inline-flex items-center justify-center w-5 h-5 mt-1 border border-white rounded-full",
+                              "inline-flex items-center justify-center w-5 h-5 mt-1 border dark:border-foreground-400 border-primary-500 rounded-full",
                               disabled ? "border-gray-600" : ""
                             )}
                           >
@@ -113,7 +113,7 @@ const TransactionSettings = ({
                       {({ checked }) => (
                         <div className="text-center cursor-pointer">
                           <p className="text-sm ">Normal</p>
-                          <div className="inline-flex items-center justify-center w-5 h-5 mt-1 border border-white rounded-full">
+                          <div className="inline-flex items-center justify-center w-5 h-5 mt-1 border rounded-full dark:border-foreground-400 border-primary-500">
                             {checked && (
                               <div className="w-3 h-3 rounded-full bg-gradient-to-tr from-primary-900 to-secondary-900"></div>
                             )}
@@ -127,7 +127,9 @@ const TransactionSettings = ({
               {ZigZagFee && (
                 <div className="flex items-center justify-between mt-3">
                   <p className="font-sans text-sm ">Bridge fee:</p>
-                  <p className="font-sans text-sm ">{`~${formatPrice(ZigZagFee)} ${ZigZagFeeToken}`}</p>
+                  <p className="font-sans text-sm ">{`~${formatPrice(
+                    ZigZagFee
+                  )} ${ZigZagFeeToken}`}</p>
                 </div>
               )}
               {isFastWithdraw && L1Fee && toNetwork.id === "ethereum" && (
@@ -142,7 +144,9 @@ const TransactionSettings = ({
               {L2Fee && (
                 <div className="flex items-center justify-between mt-3">
                   <p className="font-sans text-sm ">zkSync L2 gas fee:</p>
-                  <p className="font-sans text-sm ">{`~${formatPrice(L2Fee)} ${L2FeeToken}`}</p>
+                  <p className="font-sans text-sm ">{`~${formatPrice(
+                    L2Fee
+                  )} ${L2FeeToken}`}</p>
                 </div>
               )}
               {!L2Fee && <div>Loading...</div>}
@@ -168,7 +172,9 @@ const TransactionSettings = ({
               {ZigZagFee && (
                 <div className="flex items-center justify-between mt-3">
                   <p className="font-sans text-sm ">Bridge fee:</p>
-                  <p className="font-sans text-sm ">{`~${formatPrice(ZigZagFee)} ${ZigZagFeeToken}`}</p>
+                  <p className="font-sans text-sm ">{`~${formatPrice(
+                    ZigZagFee
+                  )} ${ZigZagFeeToken}`}</p>
                 </div>
               )}
               {L1Fee && fromNetwork.id === "ethereum" && (
