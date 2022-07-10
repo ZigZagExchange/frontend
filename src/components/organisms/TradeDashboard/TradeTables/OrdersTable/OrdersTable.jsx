@@ -273,7 +273,7 @@ export default function OrdersTable(props) {
             const time = order[7] && formatDateTime(new Date(order[7] * 1000));
             let price = order[4];
             let baseQuantity = order[5];
-            let remaining = Number(order[10]);
+            let remaining = order[10] === null ? baseQuantity : order[10];
             const orderStatus = order[9];
             const baseCurrency = order[2].split("-")[0];
             const side = order[3] === "b" ? "buy" : "sell";
@@ -619,7 +619,7 @@ export default function OrdersTable(props) {
             const time = order[7] && formatDate(new Date(order[7] * 1000));
             let price = order[4];
             let baseQuantity = order[5];
-            let remaining = Number(order[10]);
+            let remaining = order[10] === null ? baseQuantity : order[10];
             let orderStatus = order[9];
             const baseCurrency = order[2].split("-")[0];
             const side = order[3] === "b" ? "buy" : "sell";
