@@ -91,11 +91,8 @@ export default class APIArbitrumProvider extends APIProvider {
     return ethers.BigNumber.from(allowance);
   };
 
-  submitOrder = async (market, side, price, baseAmount, quoteAmount, orderType) => {
+  submitOrder = async (market, side, baseAmount, quoteAmount, orderType) => {
     const marketInfo = this.api.marketInfo[market];
-
-    if (!quoteAmount) quoteAmount = baseAmount * price;
-    if (!baseAmount) baseAmount = quoteAmount / price;
 
     let makerToken, takerToken, makerAmountBN, takerAmountBN, gasFee, makerVolumeFeeBN, takerVolumeFeeBN;
     if(side === 's') {

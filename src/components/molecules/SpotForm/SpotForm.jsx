@@ -388,7 +388,7 @@ class SpotForm extends React.Component {
         return;
       }
 
-      if (baseAmount && baseAmount + marketInfo.baseFee > baseBalance) {
+      if (baseAmount && baseAmount > baseBalance) {
         toast.error(`Amount exceeds ${marketInfo.baseAsset.symbol} balance`, {
           toastId: `Amount exceeds ${marketInfo.baseAsset.symbol} balance`,
         });
@@ -448,7 +448,7 @@ class SpotForm extends React.Component {
         return;
       }
 
-      if (quoteAmount && quoteAmount + marketInfo.quoteFee > quoteBalance) {
+      if (quoteAmount && quoteAmount > quoteBalance) {
         toast.error(`Amount exceeds ${marketInfo.quoteAsset.symbol} balance`, {
           toastId: `Amount exceeds ${marketInfo.quoteAsset.symbol} balance`,
         });
@@ -498,16 +498,9 @@ class SpotForm extends React.Component {
   async handleOrder() {
     let baseAmountMsg;
     let baseAmount = this.state.baseAmount;
-    let quoteAmount = this.state.quoteAmount;
+    let quoteAmount = this.state.quoteAmount || this.state.totalAmount;
     let price = this.state.price;
-    if (this.props.orderType === "market") {
-      price *= this.props.side === "b"
-        ? 1.0015
-        : 0.9985
-    }
     const marketInfo = this.props.marketInfo;
-    baseAmount = baseAmount ? baseAmount : quoteAmount / price;
-    quoteAmount = 0;
     baseAmountMsg = formatPrice(baseAmount);
 
     const renderGuidContent = () => {
@@ -542,14 +535,23 @@ class SpotForm extends React.Component {
         autoClose: false,
       });
     }
+    
+    // set slippages
+    quoteAmount = Number(quoteAmount);
+    baseAmount = Number(baseAmount);
+    if (this.props.side === 's') {
+        quoteAmount = quoteAmount * 0.9985;
+    }
+    else if (this.props.side === 'b') {
+        baseAmount = baseAmount * 0.9985;
+    }
 
     try {
       await api.submitOrder(
         this.props.currentMarket,
         this.props.side,
-        price,
-        baseAmount,
-        quoteAmount,
+        Number(baseAmount),
+        Number(quoteAmount),
         this.props.orderType
       );
 
@@ -639,12 +641,6 @@ class SpotForm extends React.Component {
     const newstate = { ...this.state };
     if (val === 100) {
       newstate.maxSizeSelected = true;
-      if (this.props.side === "b") {
-        val = 99.9;
-      }
-      if (this.props.side === "s") {
-        val = 99.9;
-      }
     } else {
       newstate.maxSizeSelected = false;
     }
@@ -652,7 +648,6 @@ class SpotForm extends React.Component {
       const baseBalance = this.getBaseBalance();
       const decimals = marketInfo.baseAsset.decimals;
       let displayAmount = (baseBalance * val) / 100;
-      displayAmount -= marketInfo.baseFee;
       displayAmount = parseFloat(displayAmount.toFixed(decimals));
       displayAmount =
         displayAmount > 9999
@@ -678,7 +673,6 @@ class SpotForm extends React.Component {
       const quoteDecimals = marketInfo.quoteAsset.decimals;
       const baseDecimals = marketInfo.baseAsset.decimals;
       let displayAmount = (quoteBalance * val) / 100;
-      displayAmount -= marketInfo.quoteFee;
       displayAmount = parseFloat(displayAmount.toFixed(quoteDecimals));
       displayAmount =
         displayAmount > 9999

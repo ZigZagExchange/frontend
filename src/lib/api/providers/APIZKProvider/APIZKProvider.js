@@ -149,11 +149,11 @@ export default class APIZKProvider extends APIProvider {
   submitOrder = async (
     market,
     side,
-    price,
     baseAmount,
     quoteAmount,
     orderType
   ) => {
+
     const accountActivated = await this.checkAccountActivated();
     if (!accountActivated) {
       toast.error(
@@ -174,75 +174,34 @@ export default class APIZKProvider extends APIProvider {
       throw new Error("Invalid side");
     }
 
-    quoteAmount = quoteAmount
-      ? parseFloat(quoteAmount).toFixed(marketInfo.quoteAsset.decimals)
-      : null;
-    baseAmount = baseAmount
-      ? parseFloat(baseAmount).toFixed(marketInfo.baseAsset.decimals)
-      : null;
+    // standardize amount formats
+    quoteAmount = parseFloat(quoteAmount).toFixed(marketInfo.quoteAsset.decimals);
+    baseAmount = parseFloat(baseAmount).toFixed(marketInfo.baseAsset.decimals);
 
-    let tokenBuy,
-      tokenSell,
-      sellQuantity,
-      sellQuantityWithFee,
-      tokenRatio = {},
-      sellQuantityBN;
+    // set token ratio
+    const tokenRatio = {}
+    tokenRatio[marketInfo.quoteAsset.id] = quoteAmount;
+    tokenRatio[marketInfo.baseAsset.id] = baseAmount;
+    
+    // calculate sell quantity and token ratios
+    let tokenBuy, tokenSell, sellQuantity;
     if (side === "b") {
-      // quoteAmount is first choice for buy
-      if (quoteAmount) {
-        sellQuantity = parseFloat(quoteAmount);
-        sellQuantityWithFee = (sellQuantity + marketInfo.quoteFee).toFixed(
-          marketInfo.quoteAsset.decimals
-        );
-        tokenSell = marketInfo.quoteAsset.id;
-        tokenBuy = marketInfo.baseAsset.id;
-        tokenRatio[marketInfo.baseAsset.id] = (quoteAmount / price).toFixed(
-          marketInfo.baseAsset.decimals
-        );
-        tokenRatio[marketInfo.quoteAsset.id] = sellQuantityWithFee;
-      } else {
-        sellQuantity = parseFloat(baseAmount * price);
-        sellQuantityWithFee = (sellQuantity + marketInfo.quoteFee).toFixed(
-          marketInfo.quoteAsset.decimals
-        );
-        tokenSell = marketInfo.quoteAsset.id;
-        tokenBuy = marketInfo.baseAsset.id;
-        tokenRatio[marketInfo.baseAsset.id] = baseAmount;
-        tokenRatio[marketInfo.quoteAsset.id] = sellQuantityWithFee;
-      }
-      sellQuantityBN = ethers.utils.parseUnits(
-        sellQuantityWithFee,
+      sellQuantity = ethers.utils.parseUnits(
+        quoteAmount,
         marketInfo.quoteAsset.decimals
       );
+      tokenSell = marketInfo.quoteAsset.id;
+      tokenBuy = marketInfo.baseAsset.id;
     } else {
-      // baseAmount is first choice for sell
-      if (baseAmount) {
-        sellQuantity = parseFloat(baseAmount);
-        sellQuantityWithFee = (sellQuantity + marketInfo.baseFee).toFixed(
-          marketInfo.baseAsset.decimals
-        );
-        tokenSell = marketInfo.baseAsset.id;
-        tokenBuy = marketInfo.quoteAsset.id;
-        tokenRatio[marketInfo.baseAsset.id] = sellQuantityWithFee;
-        tokenRatio[marketInfo.quoteAsset.id] = (baseAmount * price).toFixed(
-          marketInfo.quoteAsset.decimals
-        );
-      } else {
-        sellQuantity = parseFloat(quoteAmount / price);
-        sellQuantityWithFee = (sellQuantity + marketInfo.baseFee).toFixed(
-          marketInfo.baseAsset.decimals
-        );
-        tokenSell = marketInfo.baseAsset.id;
-        tokenBuy = marketInfo.quoteAsset.id;
-        tokenRatio[marketInfo.baseAsset.id] = sellQuantityWithFee;
-        tokenRatio[marketInfo.quoteAsset.id] = quoteAmount;
-      }
-      sellQuantityBN = ethers.utils.parseUnits(
-        sellQuantityWithFee,
+      sellQuantity = ethers.utils.parseUnits(
+        baseAmount,
         marketInfo.baseAsset.decimals
       );
+      tokenSell = marketInfo.baseAsset.id;
+      tokenBuy = marketInfo.quoteAsset.id;
     }
 
+    // calculate expiry
     const now_unix = (Date.now() / 1000) | 0;
     const two_minute_expiry = now_unix + 120;
     const one_week_expiry = now_unix + 7 * 24 * 3600;
@@ -252,8 +211,10 @@ export default class APIZKProvider extends APIProvider {
     } else {
       validUntil = two_minute_expiry;
     }
+    
+    // Generate order
     const packedSellQuantity =
-      zksync.utils.closestPackableTransactionAmount(sellQuantityBN);
+      zksync.utils.closestPackableTransactionAmount(sellQuantity);
     const order = await this.syncWallet.signOrder({
       tokenSell,
       tokenBuy,
