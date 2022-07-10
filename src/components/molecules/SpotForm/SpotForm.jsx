@@ -496,12 +496,11 @@ class SpotForm extends React.Component {
   }
 
   async handleOrder() {
-    let baseAmountMsg;
-    let baseAmount = this.state.baseAmount;
-    let quoteAmount = this.state.quoteAmount || this.state.totalAmount;
-    let price = this.state.price;
     const marketInfo = this.props.marketInfo;
-    baseAmountMsg = formatPrice(baseAmount);
+    let baseAmount = this.state.baseAmount;
+    let quoteAmount = this.state.totalAmount || this.state.quoteAmount;
+    let price = this.state.price;
+    const baseAmountMsg = formatPrice(baseAmount);
 
     const renderGuidContent = () => {
       return (
@@ -536,22 +535,27 @@ class SpotForm extends React.Component {
       });
     }
     
-    // set slippages
     quoteAmount = Number(quoteAmount);
     baseAmount = Number(baseAmount);
-    if (this.props.side === 's') {
-        quoteAmount = quoteAmount * 0.9985;
-    }
-    else if (this.props.side === 'b') {
-        baseAmount = baseAmount * 0.9985;
-    }
 
+    // set slippages
+    if (this.props.orderType === "market") {
+        if (this.props.side === 's') {
+            quoteAmount = quoteAmount * 0.9985;
+        }
+        else if (this.props.side === 'b') {
+            baseAmount = baseAmount * 0.9985;
+        }
+    }
+    
+
+    console.log(quoteAmount, baseAmount);
     try {
       await api.submitOrder(
         this.props.currentMarket,
         this.props.side,
-        Number(baseAmount),
-        Number(quoteAmount),
+        baseAmount,
+        quoteAmount,
         this.props.orderType
       );
 
