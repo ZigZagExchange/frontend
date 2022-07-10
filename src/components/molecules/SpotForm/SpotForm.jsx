@@ -547,7 +547,6 @@ class SpotForm extends React.Component {
     }
 
     try {
-      console.log(baseAmount, quoteAmount, price);
       await api.submitOrder(
         this.props.currentMarket,
         this.props.side,
