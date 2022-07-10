@@ -564,8 +564,7 @@ export default class API extends Emitter {
     return keys[keys.findIndex((key) => network === this.networks[key][0])];
   };
 
-  getChainName = (network) => {
-    const chainId = getChainIdFromName(network);
+  getChainName = (chainId) => {
     switch (chainId) {
       case 1: return 'mainnet';
       case 1000: return 'rinkeby';
