@@ -1,10 +1,9 @@
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import CheckIcon from "@mui/icons-material/Check";
-import { useLocation } from "react-router-dom";
 import { userSelector } from "lib/store/features/auth/authSlice";
 import {
   networkSelector,
@@ -281,18 +280,30 @@ export const Header = (props) => {
     alert(text);
   };
 
-  const changeNetwork = (text, value) => {
+  const changeNetwork = async (text, value) => {
     setNetworkName(text);
 
     api.setAPIProvider(value);
-    api.refreshNetwork().catch((err) => {
+    try {
+      await api.refreshNetwork()
+    } catch (err) {
       console.log(err);
-    });
+    }
+
+    console.log(api.isEVMChain())
+    console.log(location.pathname)
+    if (
+      /^\/wrap(\/.*)?/.test(location.pathname) && (!api.isEVMChain())
+    ) {
+      setIndex(0);
+      history.push("/");
+    }
   };
 
   const handleClick = (newIndex) => {
     switch (newIndex) {
       case 0:
+        setIndex(newIndex);
         history.push("/");
         break;
       case 1:
@@ -315,7 +326,7 @@ export const Header = (props) => {
         setIndex(newIndex);
         localStorage.setItem("tab_index", newIndex);
         history.push("/dsl");
-	break;
+	      break;
       case 5:
         setIndex(newIndex);
         localStorage.setItem("tab_index", newIndex);
