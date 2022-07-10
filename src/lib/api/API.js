@@ -814,7 +814,6 @@ export default class API extends Emitter {
     await this.apiProvider.submitOrder(
       product,
       side,
-      price,
       Number(baseAmount),
       Number(quoteAmount),
       orderType
