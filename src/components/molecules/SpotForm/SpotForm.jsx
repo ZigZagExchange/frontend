@@ -500,10 +500,10 @@ class SpotForm extends React.Component {
     let baseAmount = this.state.baseAmount;
     let quoteAmount = this.state.quoteAmount;
     let price = this.state.price;
-    if (api.apiProvider.evmCompatible) {
+    if (api.apiProvider.evmCompatible && this.props.orderType === "market") {
         price = this.getLadderPrice();
     }
-    if (this.props.orderType === "market") {
+    else if (api.apiProvider.zksyncCompatible && this.props.orderType === "market") {
       price *= this.props.side === "b"
         ? 1.0015
         : 0.9985
