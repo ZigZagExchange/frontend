@@ -291,7 +291,9 @@ export const Header = (props) => {
     }
 
     if (
-      /^\/wrap(\/.*)?/.test(location.pathname) && (!api.isEVMChain())
+      (/^\/wrap(\/.*)?/.test(location.pathname) && (!api.isEVMChain())) ||
+      (/^\/bridge(\/.*)?/.test(location.pathname) && (!api.isImplemented("depositL2"))) ||
+      (/^\/list-pair(\/.*)?/.test(location.pathname) && (!api.isEVMChain()))
     ) {
       setIndex(0);
       history.push("/");
