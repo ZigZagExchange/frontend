@@ -20,7 +20,6 @@ const FillCard = ({ fill, closeToast }) => {
   const side = fill[3];
   let feeText = "1 USDC";
   const marketInfo = api.marketInfo["ETH-USDC"];
-  console.log(feeamount);
   if (feeamount && feetoken) {
     feeamount = Number(feeamount);
     const displayFee =
