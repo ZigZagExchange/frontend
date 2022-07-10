@@ -77,9 +77,10 @@ export default class API extends Emitter {
   };
 
   setAPIProvider = (network, networkChanged = true) => {
-    const networkName = this.getNetworkName(network)
+    const chianName = this.getChainName(network)
 
-    if (!networkName) {
+    if (!chianName) {
+      console.error (`Can't get chainName for ${network}`);
       this.signOut()
       return
     }
@@ -99,13 +100,13 @@ export default class API extends Emitter {
 
     this.web3 = new Web3(
       window.ethereum || new Web3.providers.HttpProvider(
-        `https://${networkName}.infura.io/v3/${this.infuraId}`
+        `https://${chianName}.infura.io/v3/${this.infuraId}`
       )
     )
 
-    if (networkName === 'arbitrum') {
+    if (chianName === 'arbitrum') {
       this.web3Modal = new Web3Modal({
-        network: networkName,
+        network: chianName,
         cacheProvider: true,
         theme: "dark",
         providerOptions: {
@@ -119,7 +120,7 @@ export default class API extends Emitter {
       })
     } else {
       this.web3Modal = new Web3Modal({
-        network: networkName,
+        network: chianName,
         cacheProvider: true,
         theme: "dark",
         providerOptions: {
@@ -562,6 +563,15 @@ export default class API extends Emitter {
     const keys = Object.keys(this.networks);
     return keys[keys.findIndex((key) => network === this.networks[key][0])];
   };
+
+  getChainName = (chainId) => {
+    switch (chainId) {
+      case 1: return 'mainnet';
+      case 1000: return 'rinkeby';
+      case 42161: return 'arbitrum';
+      default: return null
+    }
+  }
 
   getChainIdFromName = (name) => {
     return this.networks?.[name]?.[1];
