@@ -500,6 +500,9 @@ class SpotForm extends React.Component {
     let baseAmount = this.state.baseAmount;
     let quoteAmount = this.state.quoteAmount;
     let price = this.state.price;
+    if (api.apiProvider.evmCompatible) {
+        price = this.getLadderPrice();
+    }
     if (this.props.orderType === "market") {
       price *= this.props.side === "b"
         ? 1.0015
@@ -544,6 +547,7 @@ class SpotForm extends React.Component {
     }
 
     try {
+      console.log(baseAmount, quoteAmount, price);
       await api.submitOrder(
         this.props.currentMarket,
         this.props.side,
