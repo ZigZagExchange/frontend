@@ -4,19 +4,18 @@ import { toast } from "react-toastify";
 import useTheme from "components/hooks/useTheme";
 import api from "lib/api";
 import { DefaultTemplate } from "components";
-import { ExternalLinkIcon, InfoIcon } from "components/atoms/Svg";
 import WrapContianer from "./WrapContainer";
 
 import classNames from "classnames";
 import TransactionSettings from "./TransationSettings";
 import { Button } from "components/molecules/Button";
+import { LoadingSpinner } from "components/atoms/LoadingSpinner";
 
 import { useCoinEstimator } from "components";
 import { userSelector } from "lib/store/features/auth/authSlice";
 import {
   networkSelector,
   balancesSelector,
-  settingsSelector,
 } from "lib/store/features/api/apiSlice";
 
 export default function WrapPage() {
@@ -25,7 +24,6 @@ export default function WrapPage() {
   const { isDark } = useTheme();
 
   const user = useSelector(userSelector);
-  const settings = useSelector(settingsSelector);
   const balanceData = useSelector(balancesSelector);
   const network = useSelector(networkSelector);
 
@@ -35,10 +33,11 @@ export default function WrapPage() {
   const [sellToken, setSellToken] = useState('ETH');
   const [buyToken, setBuyToken] = useState('WETH');
   const [fee, setFee] = useState({
-    'wrap': 0.0005,
-    'unwrap': 0.0005
+    'wrap': 0,
+    'unwrap': 0
   });
   const [orderButtonDisabled, setOrderButtonDisabled] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const estimatedValueSell = amount * coinEstimator(sellToken) || 0;
   const estimatedValueBuy = amount * coinEstimator(buyToken) || 0;
@@ -48,16 +47,25 @@ export default function WrapPage() {
     [balanceData, network]
   );
 
-  const updateFee = async () => {
-    const fees = await api.getWrapFees();
-    setFee(fees);
-  }
-
-  useEffect(async () => {
-    await new Promise(r => setTimeout(r, 2500)); // wait for provider to be ready
-    updateFee(); // update now
-    setInterval(updateFee, 30000); // keep fees updated
-  }, [])
+  useEffect(() => {
+    setLoading(true);
+    const timer = setInterval(() => {
+      console.log('updateFEe')
+      if (!api.isEVMChain()) return;
+      if (!api.rollupProvider) return;      
+      api.getWrapFees()
+        .then(fees => setFee(fees))
+        .catch(err => console.error(`Failed to get fee: ${err}`));
+    }, 500);
+    console.log(fee)
+    if (fee.wrap > 0 && fee.unwrap > 0) {
+      clearInterval(timer);
+      setLoading(false);
+    }
+    return () => {
+      clearInterval(timer);
+    };
+  }, [fee, network]);
 
   useEffect(async () => {
     if (!user.address) return;
@@ -209,10 +217,21 @@ export default function WrapPage() {
             toToken={buyToken}
             onClickMax={onClickMax}
           />
-          <TransactionSettings
-            transactionType={tType}
-            fee={fee}
-          />
+          {!loading && (
+            <TransactionSettings
+              transactionType={tType}
+              fee={fee}
+            />
+          )}
+          {loading && (
+            <div
+              className={classNames("flex justify-center align-center mt-4", {
+                dark: isDark,
+              })}
+            >
+              <LoadingSpinner />
+            </div>
+          )}
           <Button
             isLoading={false}
             className="w-full py-3 my-3 uppercase"
