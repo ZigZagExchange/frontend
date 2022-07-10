@@ -15,12 +15,14 @@ const FillCard = ({ fill, closeToast }) => {
   const tradeId = fill[1];
   const market = fill[2];
   const fillstatus = fill[6];
-  const feeamount = fill[10];
+  let feeamount = fill[10];
   const feetoken = fill[11];
   const side = fill[3];
   let feeText = "1 USDC";
   const marketInfo = api.marketInfo["ETH-USDC"];
+  console.log(feeamount);
   if (feeamount && feetoken) {
+    feeamount = Number(feeamount);
     const displayFee =
       feeamount > 9999 ? feeamount.toFixed(0) : feeamount.toPrecision(4);
     feeText = feeamount !== 0 ? `${displayFee} ${feetoken}` : "--";
