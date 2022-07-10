@@ -57,8 +57,10 @@ export default function WrapPage() {
         .then(fees => setFee(fees))
         .catch(err => console.error(`Failed to get fee: ${err}`));
     }, 500);
-    console.log(fee)
-    if (fee.wrap > 0 && fee.unwrap > 0) {
+    if (
+      (fee.wrap > 0 && fee.unwrap > 0) ||
+      !api.isEVMChain()
+    ) {
       clearInterval(timer);
       setLoading(false);
     }

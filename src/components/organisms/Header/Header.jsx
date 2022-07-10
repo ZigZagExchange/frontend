@@ -290,8 +290,6 @@ export const Header = (props) => {
       console.log(err);
     }
 
-    console.log(api.isEVMChain())
-    console.log(location.pathname)
     if (
       /^\/wrap(\/.*)?/.test(location.pathname) && (!api.isEVMChain())
     ) {
