@@ -1421,22 +1421,24 @@ export default function OrdersTable(props) {
       if (props.user.committed) {
         const tokenBalanceInOrder = {};
         const userOrders = getUserOrders();
-        Object.keys(userOrders).forEach(orderId => {
-          const order = userOrders[orderId];
-          let sellToken, amount;
-          if (order[3] === 's') {
-            sellToken = order[2].split('-')[0];
-            amount = order[10];
-          } else {
-            sellToken = order[2].split('-')[1];
-            amount = order[4] * order[10];
-          }
-          if (sellToken in tokenBalanceInOrder) {
-            tokenBalanceInOrder[sellToken] += amount;
-          } else {
-            tokenBalanceInOrder[sellToken] = amount;
-          }
-        });
+        if (this.props.userOrders) {
+          Object.keys(userOrders).forEach(orderId => {
+            const order = userOrders[orderId];
+            let sellToken, amount;
+            if (order[3] === 's') {
+              sellToken = order[2].split('-')[0];
+              amount = order[10];
+            } else {
+              sellToken = order[2].split('-')[1];
+              amount = order[4] * order[10];
+            }
+            if (sellToken in tokenBalanceInOrder) {
+              tokenBalanceInOrder[sellToken] += amount;
+            } else {
+              tokenBalanceInOrder[sellToken] = amount;
+            }
+          });
+        }
 
         const balancesContent = walletList.map((token) => {
           return (

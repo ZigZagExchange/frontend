@@ -175,6 +175,8 @@ class SpotForm extends React.Component {
     if (!marketInfo) return 0;
     if (!this.props.balances?.[marketInfo.zigzagChainId]?.[marketInfo.baseAsset.symbol]?.valueReadable) return 0;
     let totalBalance = this.props.balances[marketInfo.zigzagChainId][marketInfo.baseAsset.symbol].valueReadable
+    if (!this.props.userOrders) return totalBalance;
+
     Object.keys(this.props.userOrders).forEach(orderId => {
       const order = this.props.userOrders[orderId];
       const sellToken = (order[3] === 's')
@@ -193,6 +195,8 @@ class SpotForm extends React.Component {
     if (!marketInfo) return 0;
     if (!this.props.balances?.[marketInfo.zigzagChainId]?.[marketInfo.quoteAsset.symbol]?.valueReadable) return 0;
     let totalBalance = this.props.balances[marketInfo.zigzagChainId][marketInfo.quoteAsset.symbol].valueReadable
+    if (!this.props.userOrders) return totalBalance;
+    
     Object.keys(this.props.userOrders).forEach(orderId => {
       const order = this.props.userOrders[orderId];
       const sellToken = order[3] === 's'
