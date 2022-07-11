@@ -1,16 +1,16 @@
-import React, { useRef } from "react";
+import React from "react";
 import styled from "styled-components";
 import { toast } from "react-toastify";
 import { connect } from "react-redux";
 import api from "lib/api";
 import { RangeSlider, QuestionHelper } from "components";
-import { formatPrice, formatToken } from "lib/utils";
+import { formatPrice, formatToken, addComma} from "lib/utils";
 import "./SpotForm.css";
 import { Button, ConnectWalletButton } from "components/molecules/Button";
 import InputField from "components/atoms/InputField/InputField";
 import Text from "components/atoms/Text/Text";
 import { IconButton as BaseIcon } from "../IconButton";
-import { InfoIcon, MinusIcon, PlusIcon } from "components/atoms/Svg";
+import { MinusIcon, PlusIcon } from "components/atoms/Svg";
 import { setHighSlippageModal } from "lib/store/features/api/apiSlice";
 
 const rx_live = /^\d*(?:[.,]\d*)?$/;
@@ -149,7 +149,6 @@ class SpotForm extends React.Component {
       newState.baseAmount = newState.quoteAmount * price;
     }
     
-
     const newAmount = Number(this.state.quoteAmount) + quoteBalance * 0.02;
     newState.quoteAmount = newAmount > quoteBalance ? quoteBalance : newAmount;
     newState.baseAmount = newState.quoteAmount / this.currentPrice();
@@ -172,18 +171,36 @@ class SpotForm extends React.Component {
     const marketInfo = this.props.marketInfo;
     if (!marketInfo) return 0;
     if (!this.props.balances?.[marketInfo.zigzagChainId]?.[marketInfo.baseAsset.symbol]?.valueReadable) return 0;
-    return (
-      this.props.balances[marketInfo.zigzagChainId][marketInfo.baseAsset.symbol].valueReadable
-    );
+    let totalBalance = this.props.balances[marketInfo.zigzagChainId][marketInfo.baseAsset.symbol].valueReadable
+    Object.keys(this.props.userOrders).forEach(orderId => {
+      const order = this.props.userOrders[orderId];
+      const sellToken = (order[3] === 's')
+        ? order[2].split('-')[0]
+        : order[2].split('-')[1]
+      if (sellToken === marketInfo.baseAsset.symbol) {
+        totalBalance -= order[10]; // remove remaining order size
+      }
+    });   
+    
+    return totalBalance;
   }
 
   getQuoteBalance() {
     const marketInfo = this.props.marketInfo;
     if (!marketInfo) return 0;
     if (!this.props.balances?.[marketInfo.zigzagChainId]?.[marketInfo.quoteAsset.symbol]?.valueReadable) return 0;
-    return (
-      this.props.balances[marketInfo.zigzagChainId][marketInfo.quoteAsset.symbol].valueReadable
-    );
+    let totalBalance = this.props.balances[marketInfo.zigzagChainId][marketInfo.quoteAsset.symbol].valueReadable
+    Object.keys(this.props.userOrders).forEach(orderId => {
+      const order = this.props.userOrders[orderId];
+      const sellToken = order[3] === 's'
+        ? order[2].split('-')[0]
+        : order[2].split('-')[1]
+      if (sellToken === marketInfo.quoteAsset.symbol) {
+        totalBalance -= order[4] * order[10]; // remove remaining order size
+      }
+    });
+
+    return totalBalance;
   }
 
   getBaseAllowance() {
@@ -527,12 +544,12 @@ class SpotForm extends React.Component {
             {this.props.side === "s" ? "Sell" : "Buy"} Order pending
           </p>
           <p style={{ fontSize: "14px", lineHeight: "24px" }}>
-            {formatPrice(baseAmount)} {marketInfo.baseAsset.symbol} @{" "}
-            {["USDC", "USDT", "DAI", "FRAX"].includes(
+            {addComma(formatPrice(baseAmount))} {marketInfo.baseAsset.symbol} @{" "}
+            {addComma(["USDC", "USDT", "DAI", "FRAX"].includes(
               marketInfo.quoteAsset.symbol
             )
               ? parseFloat(price).toFixed(2)
-              : formatPrice(price)}{" "}
+              : formatPrice(price))}{" "}
             {marketInfo.quoteAsset.symbol}
           </p>
           <p style={{ fontSize: "14px", lineHeight: "24px" }}>
@@ -857,11 +874,11 @@ class SpotForm extends React.Component {
             placeholder={`Price (${
               marketInfo && marketInfo.quoteAsset?.symbol
             })`}
-            value={formatPrice(
+            value={addComma(formatPrice(
               this.state.userHasEditedPrice
                 ? this.state.price
                 : this.currentPrice()
-            )}
+            ))}
             onChange={this.updatePrice.bind(this)}
             disabled={this.props.orderType === "market"}
           />
@@ -883,7 +900,7 @@ class SpotForm extends React.Component {
             placeholder={`Amount (${
               marketInfo && marketInfo.baseAsset?.symbol
             })`}
-            value={formatPrice(this.state.baseAmount)}
+            value={addComma(formatPrice(this.state.baseAmount))}
             onChange={this.updateBaseAmount.bind(this)}
           />
           <IconButton
@@ -910,7 +927,7 @@ class SpotForm extends React.Component {
             placeholder={`Total (${
               marketInfo && marketInfo.quoteAsset?.symbol
             })`}
-            value={formatPrice(this.state.quoteAmount)}
+            value={addComma(formatPrice(this.state.quoteAmount))}
             onChange={this.updateQuoteAmount.bind(this)}
           />
           <IconButton

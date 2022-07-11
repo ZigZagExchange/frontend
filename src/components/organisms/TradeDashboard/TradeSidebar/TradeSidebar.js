@@ -10,8 +10,9 @@ import {
   marketInfoSelector,
   balancesSelector,
   allOrdersSelector,
+  userOrdersSelector,
 } from "lib/store/features/api/apiSlice";
-import { Button, ConnectWalletButton } from "components/molecules/Button";
+import { Button } from "components/molecules/Button";
 
 const StyledTradeSidebar = styled.aside`
   // display: grid;
@@ -56,6 +57,7 @@ const InfoWrapper = styled.div`
 
 export default function TradeSidebar(props) {
   const allOrders = useSelector(allOrdersSelector);
+  const userOrders = useSelector(userOrdersSelector);
   const balances = useSelector(balancesSelector);
   const marketInfo = useSelector(marketInfoSelector);
   const marketSummary = useSelector(marketSummarySelector);
@@ -101,6 +103,7 @@ export default function TradeSidebar(props) {
         marketInfo={marketInfo}
         balances={balances}
         allOrders={allOrders}
+        userOrders={userOrders}
       />
     </StyledTradeSidebar>
   );
