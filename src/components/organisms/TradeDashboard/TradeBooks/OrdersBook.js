@@ -165,7 +165,7 @@ export default function OrdersBook(props) {
       const order = allOrders[orderid];
       const side = order[3];
       const price = order[4];
-      const remaining = isNaN(Number(order[10])) ? order[5] : order[10];
+      const remaining = order[10] === null ? order[5] : order[10];
       const remainingQuote = remaining * price;
       const orderStatus = order[9];
 
