@@ -11,7 +11,10 @@ import SettingsModal from "./SettingsModal";
 import { TokenPairDropdown } from "components/molecules/Dropdown";
 import useModal from "components/hooks/useModal";
 import useTheme from "components/hooks/useTheme";
-import { settingsSelector,setUISettings } from "lib/store/features/api/apiSlice";
+import {
+    settingsSelector,
+    setUISettings,
+} from "lib/store/features/api/apiSlice";
 import { fetchFavourites } from "lib/helpers/storage/favourites";
 import { ActivatedStarIcon } from "components/atoms/Svg";
 import { Box } from "@material-ui/core";
@@ -55,10 +58,11 @@ const TradeRatesCard = ({
     };
 
     const toggleLayout = () => {
-      dispatch(setUISettings({ key: "editable", value: !settings.editable }));
+        dispatch(setUISettings({ key: "editable", value: !settings.editable }));
     };
 
     const isMobile = window.innerWidth < 800;
+    const isOverflow = window.innerWidth < 1210;
     const percentChange = (
         (marketSummary.priceChange / marketSummary.price) *
         100
@@ -330,11 +334,25 @@ const TradeRatesCard = ({
                     )}
                 </RatesCardsWrapper>
             </LeftWrapper>
-            {isMobile ? (
-                <SettingsIcon
-                    style={{ marginRight: "20px" }}
-                    onClick={handleSettings}
-                />
+            {isOverflow ? (
+                <div style={{ marginRight: "20px", display: "flex" }}>
+                    {settings.editable ? (
+                        <LockIcon
+                            style={{ marginRight: "20px" }}
+                            onClick={toggleLayout}
+                        ></LockIcon>
+                    ) : (
+                        <LockOpenIcon
+                            style={{ marginRight: "20px" }}
+                            onClick={toggleLayout}
+                        ></LockOpenIcon>
+                    )}
+
+                    <SettingsIcon
+                        style={{ marginRight: "20px" }}
+                        onClick={handleSettings}
+                    />
+                </div>
             ) : (
                 <div style={{ marginRight: "20px" }}>
                     <Button
@@ -347,7 +365,9 @@ const TradeRatesCard = ({
                         style={{ marginRight: "10px" }}
                         onClick={toggleLayout}
                     >
-                        {settings.editable? "Lock Interface":"Edit Interface"}
+                        {settings.editable
+                            ? "Lock Interface"
+                            : "Edit Interface"}
                     </Button>
 
                     <Button
