@@ -566,7 +566,7 @@ export default class APIZKProvider extends APIProvider {
     try {
       if (this.api.isArgent) {
         this.syncWallet = await zksync.RemoteWallet.fromEthSigner(
-          this.api.ethersProvider,
+          this.api.rollupProvider,
           this.syncProvider
         );
       } else {

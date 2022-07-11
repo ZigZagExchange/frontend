@@ -351,8 +351,6 @@ export default class API extends Emitter {
     if (!this._signInProgress) {
       this._signInProgress = Promise.resolve()
         .then(async () => {
-          const apiProvider = this.apiProvider;
-
           if (network) {
             this.apiProvider = this.getAPIProvider(network);
           }
@@ -366,7 +364,7 @@ export default class API extends Emitter {
           );
 
           this.mainnetProvider = new ethers.providers.InfuraProvider(
-            'mainnet',
+            this.getChainNameL1(network),
             this.infuraId
           )
 
@@ -440,26 +438,35 @@ export default class API extends Emitter {
   };
 
   getPolygonUrl(network) {
-    if (network === 1000) {
-      return `https://polygon-mumbai.infura.io/v3/${this.infuraId}`;
-    } else {
-      return `https://polygon-mainnet.infura.io/v3/${this.infuraId}`;
+    switch(network) {
+      case 1: case 42161:
+        return `https://polygon-mainnet.infura.io/v3/${this.infuraId}`;
+      case 1000: 
+        return `https://polygon-mumbai.infura.io/v3/${this.infuraId}`;
+      default:
+        throw new Error(`getPolygonUrl network: ${network} not understood.`);
     }
   }
 
   getPolygonChainId(network) {
-    if (network === 1000) {
+    switch(network) {
+      case 1: case 42161:
+        return "0x89";
+      case 1000: 
       return "0x13881";
-    } else {
-      return "0x89";
+      default:
+        throw new Error(`getPolygonChainId network: ${network} not understood.`);
     }
   }
 
   getPolygonWethContract(network) {
-    if (network === 1000) {
+    switch(network) {
+      case 1: case 42161:
+        return POLYGON_MAINNET_WETH_ADDRESS;
+      case 1000: 
       return POLYGON_MUMBAI_WETH_ADDRESS;
-    } else if (network === 1) {
-      return POLYGON_MAINNET_WETH_ADDRESS;
+      default:
+        throw new Error(`getPolygonWethContract network: ${network} not understood.`);
     }
   }
 
@@ -470,7 +477,6 @@ export default class API extends Emitter {
       this.apiProvider.network
     );
     if (!this.polygonProvider) return 0;
-    // Arbitrum doesn't return a Polygon WETH address. Maybe it should return the same one as zksync mainnet
     if (!polygonEthAddress) return 0;
 
     const ethContract = new ethers.Contract(
@@ -503,11 +509,6 @@ export default class API extends Emitter {
       const polygonProvider = new ethers.providers.Web3Provider(
         window.web3.currentProvider
       );
-      // const currentNetwork = await polygonProvider.getNetwork(); // This is not correct on the brave browser.
-
-      // if ("0x"+currentNetwork.chainId.toString(16) !== polygonChainId)
-      //   throw new Error("Must approve network change");
-      // const signer = polygonProvider.getSigner();
 
       networkSwitched = true;
 
@@ -573,6 +574,14 @@ export default class API extends Emitter {
     }
   }
 
+  getChainNameL1 = (chainId) => {
+    switch (chainId) {
+      case 1: case 42161: return 'mainnet';
+      case 1000: return 'rinkeby';
+      default: return null
+    }
+  }
+
   getChainIdFromName = (name) => {
     return this.networks?.[name]?.[1];
   };
@@ -613,13 +622,6 @@ export default class API extends Emitter {
   getPolygonFee = async () => {
     const res = await axios.get("https://gasstation-mainnet.matic.network/v2");
     return res.data;
-  };
-
-  getEthereumFee = async () => {
-    if (this.ethersProvider) {
-      const feeData = await this.ethersProvider.getFeeData();
-      return feeData;
-    }
   };
 
   getEthereumFee = async () => {
