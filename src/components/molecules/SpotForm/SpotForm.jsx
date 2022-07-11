@@ -27,6 +27,11 @@ class SpotForm extends React.Component {
       maxSizeSelected: false,
     };
   }
+  componentWillReceiveProps = (nextProps) => {
+    if (nextProps.orderType !== this.props.orderType) {
+      this.setState({userHasEditedPrice: false})
+    }
+  }
 
   isInvalidNumber(val) {
     if (Number.isNaN(val) || Number(val) === 0) return true;
