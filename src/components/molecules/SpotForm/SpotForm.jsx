@@ -96,11 +96,11 @@ class SpotForm extends React.Component {
     // set baseAmount
     const newBaseAmount = Number(this.state.baseAmount) + baseBalance * 0.02;
     newState.baseAmount = newBaseAmount > baseBalance ? baseBalance : newBaseAmount;
-    
+
     if (this.props.side === 'b') {
       // for buy order we cant exceed the quoteBalance
-    let quoteBalance = this.getQuoteBalance();
-    quoteBalance = this.getQuoteFee(quoteBalance);
+      let quoteBalance = this.getQuoteBalance();
+      quoteBalance -= this.getQuoteFee(quoteBalance);
       const newQuoteAmount = newState.baseAmount * price;
       if (newQuoteAmount > quoteBalance) {
         newState.baseAmount = quoteBalance / price;
@@ -140,7 +140,8 @@ class SpotForm extends React.Component {
 
     if (this.props.side === 's') {
       // for sell order we cant exceed the baseBalance
-      const baseBalance = this.getBaseBalance() - this.props.marketInfo.baseAmount;
+      let baseBalance = this.getBaseBalance();
+      baseBalance -= this.getBaseFee(baseBalance);
       const newBaseAmount = newState.quoteAmount * price;
       if (newBaseAmount > baseBalance) {
         newState.quoteAmount = baseBalance / price;
@@ -196,7 +197,7 @@ class SpotForm extends React.Component {
     if (!this.props.balances?.[marketInfo.zigzagChainId]?.[marketInfo.quoteAsset.symbol]?.valueReadable) return 0;
     let totalBalance = this.props.balances[marketInfo.zigzagChainId][marketInfo.quoteAsset.symbol].valueReadable
     if (!this.props.userOrders) return totalBalance;
-    
+
     Object.keys(this.props.userOrders).forEach(orderId => {
       const order = this.props.userOrders[orderId];
       const sellToken = order[3] === 's'
