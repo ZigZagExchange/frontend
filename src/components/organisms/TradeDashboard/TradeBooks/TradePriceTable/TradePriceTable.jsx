@@ -136,7 +136,7 @@ const TradePriceTable = (props) => {
         <thead>
           <tr>
             <th>
-              <Text font="tableHeader" color="foregroundLowEmphasis">
+              <Text font="tableHeader" color="foregroundLowEmphasis" textAlign="center">
                 Price
               </Text>
             </th>
