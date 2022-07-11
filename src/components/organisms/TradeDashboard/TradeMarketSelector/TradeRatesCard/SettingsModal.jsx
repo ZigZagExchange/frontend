@@ -78,6 +78,7 @@ const SettingsModal = ({ onDismiss }) => {
 
     const editLayout = () => {
         dispatch(setUISettings({ key: "editable", value: !settings.editable }));
+        onDismiss();
     };
 
     return (
@@ -96,7 +97,7 @@ const SettingsModal = ({ onDismiss }) => {
                         >
                             {settings.editable
                                 ? "Lock Layout"
-                                : " Unlock & Customise Layout"}
+                                : "Unlock & Customise Layout"}
                         </Text>
                     </ActionWrapper>
                     <ActionWrapper onClick={resetLayout}>
