@@ -93,32 +93,58 @@ export default function SwapPage() {
   }, [user.address, zkBalances]);
 
   useEffect(() => {
-    setSellToken('USDC')
-    dispatch(setCurrentMarket("ZZ-USDC"));
+    // this could later be replaced by a better logic to pick a good pair
+    switch(network) {
+      case 1:
+        setSellToken("USDC");
+        dispatch(setCurrentMarket("ZZ-USDC"));
+        break;
+      case 1000:
+        setSellToken("USDC");
+        dispatch(setCurrentMarket("ETH-USDC"));
+        break;
+      case 42161:
+        setSellToken("USDC");
+        dispatch(setCurrentMarket("WETH-USDC"));
+        break;
+      default:
+        setSellToken("USDC");
+        dispatch(setCurrentMarket("ZZ-USDC"));
+    }
+
     setSellTokenList(api.getCurrencies());
     setGetPairs(api.getPairs());
     document.title = "ZigZag Convert";
   }, []);
-  
+
   useEffect(() => {
     if (sellToken && buyToken) {
       const p_name = sellToken.name + "-" + buyToken.name;
       const r_p_name = buyToken.name + "-" + sellToken.name;
+      let c = false;
       Object.keys(pairPrices).forEach((pair) => {
         if (pair === p_name) {
+          console.log(p_name);
           setBasePrice(pairPrices[pair].price);
           const x = sellAmounts * pairPrices[pair].price;
           setBuyAmounts(x);
           setTtype("sell");
           dispatch(setCurrentMarket(p_name));
-        } else if (pair === r_p_name) {
-          setBasePrice(1 / pairPrices[pair].price);
-          const x = (sellAmounts * 1) / pairPrices[pair].price;
-          setBuyAmounts(x);
-          setTtype("buy");
-          dispatch(setCurrentMarket(r_p_name));
+          c = true;
         }
       });
+      if (c === false) {
+        Object.keys(pairPrices).forEach((pair) => {
+          if (pair === r_p_name) {
+            console.log(r_p_name);
+            setBasePrice(1 / pairPrices[pair].price);
+            const x = (sellAmounts * 1) / pairPrices[pair].price;
+            setBuyAmounts(x);
+            setTtype("buy");
+            dispatch(setCurrentMarket(r_p_name));
+          }
+        });
+      }
     }
   }, [sellToken, buyToken]);
 
@@ -133,9 +159,6 @@ export default function SwapPage() {
     } else {
       sub();
     }
-    
-    setSellTokenList(api.getCurrencies());
-    setGetPairs(api.getPairs());
 
     return () => {
       if (api.ws && api.ws.readyState !== 0) {
@@ -145,6 +168,11 @@ export default function SwapPage() {
       }
     };
   }, [network, currentMarket, api.ws]);
+
+  // useEffect(() => {
+  //   setSellTokenList(api.getCurrencies());
+  //   setGetPairs(api.getPairs());
+  // }, [network]);
 
   const currentPrice = () => {
     var ladderPrice = getLadderPrice();
