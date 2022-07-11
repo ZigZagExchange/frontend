@@ -375,7 +375,7 @@ export default class API extends Emitter {
 
           let accountState;
           try {
-            accountState = await apiProvider.signIn(...args);
+            accountState = await this.apiProvider.signIn(...args);
           } catch (err) {
             await this.signOut();
             throw err;
