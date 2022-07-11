@@ -342,10 +342,7 @@ const TradeRatesCard = ({
                             onClick={toggleLayout}
                         ></LockIcon>
                     ) : (
-                        <LockOpenIcon
-                            style={{ marginRight: "20px" }}
-                            onClick={toggleLayout}
-                        ></LockOpenIcon>
+                        ""
                     )}
 
                     <SettingsIcon
@@ -355,20 +352,20 @@ const TradeRatesCard = ({
                 </div>
             ) : (
                 <div style={{ marginRight: "20px" }}>
-                    <Button
-                        endIcon={
-                            settings.editable ? <LockIcon /> : <LockOpenIcon />
-                        }
-                        variant="outlined"
-                        scale="imd"
-                        mr="20px"
-                        style={{ marginRight: "10px" }}
-                        onClick={toggleLayout}
-                    >
-                        {settings.editable
-                            ? "Lock Interface"
-                            : "Edit Interface"}
-                    </Button>
+                    {settings.editable ? (
+                        <Button
+                            endIcon={<LockOpenIcon />}
+                            variant="outlined"
+                            scale="imd"
+                            mr="20px"
+                            style={{ marginRight: "10px" }}
+                            onClick={toggleLayout}
+                        >
+                            Lock Interface
+                        </Button>
+                    ) : (
+                        ""
+                    )}
 
                     <Button
                         endIcon={<SettingsIcon />}
