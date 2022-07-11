@@ -192,7 +192,7 @@ const AccountDropdown = ({ notext, networkName }) => {
     toggle();
   };
 
-  const popoutzkScan = () => {
+  const openWallet = () => {
     if (user.address) {
       if (selectedLayer === 1) {
         if (networkName.includes("Rinkeby")) {
@@ -200,18 +200,28 @@ const AccountDropdown = ({ notext, networkName }) => {
             `https://rinkeby.etherscan.io/address/${user.address}`,
             "_blank"
           );
-        } else {
+        }
+        else {
           window.open(`https://etherscan.io/address/${user.address}`, "_blank");
         }
       } else {
-        if (networkName.includes("Rinkeby")) {
+        if(networkName.includes("zkSync")) {
+          if (networkName.includes("Rinkeby")) {
+            window.open(
+              `https://rinkeby.zkscan.io/explorer/accounts/${user.address}`,
+              "_blank"
+            );
+          } 
+          else {
+            window.open(
+              `https://zkscan.io/explorer/accounts/${user.address}`,
+              "_blank"
+            );
+          }
+        }
+        else if(networkName.includes("Arbitrum")) {
           window.open(
-            `https://rinkeby.zkscan.io/explorer/accounts/${user.address}`,
-            "_blank"
-          );
-        } else {
-          window.open(
-            `https://zkscan.io/explorer/accounts/${user.address}`,
+            `https://arbiscan.io/address/${user.address}`,
             "_blank"
           );
         }
@@ -363,7 +373,7 @@ const AccountDropdown = ({ notext, networkName }) => {
             <Button
               variant="outlined"
               scale="imd"
-              onClick={popoutzkScan}
+              onClick={openWallet}
               className="mr-[1rem]"
             >
               <Text
@@ -372,7 +382,7 @@ const AccountDropdown = ({ notext, networkName }) => {
                 textAlign="center"
               >
                 <ExternalLinkIcon size={10} />
-                {selectedLayer === 1 ? "Etherscan" : `zkScan`}
+                {selectedLayer === 1 ? "Etherscan" : networkName.includes("zkSync") ? "zkScan" : "Arbiscan"}
               </Text>
             </Button>
             <Button variant="outlined" scale="imd" onClick={disconnect}>
