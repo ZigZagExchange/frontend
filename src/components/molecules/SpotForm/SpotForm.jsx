@@ -89,7 +89,8 @@ class SpotForm extends React.Component {
   increaseBaseAmount(e) {
     e.preventDefault();
     const newState = { ...this.state };
-    const baseBalance = this.getBaseBalance();
+    let baseBalance = this.getBaseBalance();
+    baseBalance -= this.getBaseFee(baseBalance);
     const price = this.currentPrice();
 
     // set baseAmount
@@ -98,7 +99,8 @@ class SpotForm extends React.Component {
     
     if (this.props.side === 'b') {
       // for buy order we cant exceed the quoteBalance
-      const quoteBalance = this.getQuoteBalance();
+    let quoteBalance = this.getQuoteBalance();
+    quoteBalance = this.getQuoteFee(quoteBalance);
       const newQuoteAmount = newState.baseAmount * price;
       if (newQuoteAmount > quoteBalance) {
         newState.baseAmount = quoteBalance / price;
@@ -119,7 +121,7 @@ class SpotForm extends React.Component {
     const newState = { ...this.state };
     const baseBalance = this.getBaseBalance();
     const newAmount = Number(this.state.baseAmount) - baseBalance * 0.02;
-    newState.baseAmount = newAmount < 0 ? 0 : newAmount;
+    newState.baseAmount = newAmount < this.getBaseFee(baseBalance) ? 0 : newAmount;
     newState.quoteAmount = newState.baseAmount * this.currentPrice();
     newState.orderButtonDisabled = this.isInvalidNumber(newState.quoteAmount);
     this.setState(newState);
@@ -128,7 +130,8 @@ class SpotForm extends React.Component {
   increaseQuoteAmount(e) {
     e.preventDefault();
     const newState = { ...this.state };
-    const quoteBalance = this.getQuoteBalance();
+    let quoteBalance = this.getQuoteBalance();
+    quoteBalance -= this.getQuoteFee(quoteBalance);
     const price = this.currentPrice();
 
     // set quoteAmount
@@ -137,7 +140,7 @@ class SpotForm extends React.Component {
 
     if (this.props.side === 's') {
       // for sell order we cant exceed the baseBalance
-      const baseBalance = this.getBaseBalance();
+      const baseBalance = this.getBaseBalance() - this.props.marketInfo.baseAmount;
       const newBaseAmount = newState.quoteAmount * price;
       if (newBaseAmount > baseBalance) {
         newState.quoteAmount = baseBalance / price;
@@ -161,7 +164,7 @@ class SpotForm extends React.Component {
     const newState = { ...this.state };
     const quoteBalance = this.getQuoteBalance();
     const newAmount = Number(this.state.quoteAmount) - quoteBalance * 0.02;
-    newState.quoteAmount = newAmount < 0 ? 0 : newAmount;
+    newState.quoteAmount = newAmount < this.getQuoteFee(quoteBalance) ? 0 : newAmount;
     newState.baseAmount = newState.quoteAmount / this.currentPrice();
     newState.orderButtonDisabled = this.isInvalidNumber(newState.quoteAmount);
     this.setState(newState);
@@ -219,6 +222,22 @@ class SpotForm extends React.Component {
     return (
       this.props.balances[marketInfo.zigzagChainId][marketInfo.quoteAsset.symbol].allowanceReadable
     );
+  }
+
+  getBaseFee(amount) {
+    let fee = this.props.marketInfo.baseFee;
+    fee += (this.props.marketInfo.makerVolumeFee && amount)
+      ? amount * this.props.marketInfo.makerVolumeFee
+      : 0;
+    return fee;
+  }
+
+  getQuoteFee(amount) {
+    let fee = this.props.marketInfo.quoteFee;
+    fee += (this.props.marketInfo.makerVolumeFee && amount)
+      ? amount * this.props.marketInfo.makerVolumeFee
+      : 0;
+    return fee;
   }
 
   /*
@@ -408,9 +427,12 @@ class SpotForm extends React.Component {
     baseBalance = parseFloat(baseBalance);
     quoteBalance = parseFloat(quoteBalance);
     if (this.props.side === "s") {
-      baseAmount = baseAmount ? baseAmount : quoteAmount / price;
-      quoteAmount = 0;
       this.props.setHighSlippageModal({ type: "sell" });
+
+      baseAmount = baseAmount ? baseAmount : quoteAmount / price;
+      const fee = this.getBaseFee(baseAmount);
+      const askPrice = this.getFirstAsk();
+      const delta = ((askPrice - price) / askPrice) * 100;
 
       if (isNaN(baseBalance)) {
         toast.error(`No ${marketInfo.baseAsset.symbol} balance`, {
@@ -419,16 +441,16 @@ class SpotForm extends React.Component {
         return;
       }
 
-      if (baseAmount && baseAmount + marketInfo.baseFee > baseBalance) {
+      if (baseAmount && baseAmount + fee > baseBalance) {
         toast.error(`Amount exceeds ${marketInfo.baseAsset.symbol} balance`, {
           toastId: `Amount exceeds ${marketInfo.baseAsset.symbol} balance`,
         });
         return;
       }
 
-      if (baseAmount && baseAmount < marketInfo.baseFee) {
+      if (baseAmount && baseAmount < fee) {
         toast.error(
-          `Minimum order size is ${marketInfo.baseFee.toPrecision(5)} ${
+          `Minimum order size is ${fee.toPrecision(5)} ${
             marketInfo.baseAsset.symbol
           }`
         );
@@ -442,8 +464,6 @@ class SpotForm extends React.Component {
         return;
       }
 
-      const askPrice = this.getFirstAsk();
-      const delta = ((askPrice - price) / askPrice) * 100;
       if (
         delta > 10 &&
         this.props.orderType === "limit" &&
@@ -466,8 +486,7 @@ class SpotForm extends React.Component {
       this.props.setHighSlippageModal({ type: "buy" });
 
       quoteAmount = quoteAmount ? quoteAmount : baseAmount * price;
-      baseAmount = 0;
-
+      const fee = this.getQuoteFee(quoteAmount);
       const bidPrice = this.getFirstBid();
       const delta = ((price - bidPrice) / bidPrice) * 100;
 
@@ -478,18 +497,18 @@ class SpotForm extends React.Component {
         return;
       }
 
-      if (quoteAmount && quoteAmount + marketInfo.quoteFee > quoteBalance) {
+      if (quoteAmount && quoteAmount + fee > quoteBalance) {
         toast.error(`Amount exceeds ${marketInfo.quoteAsset.symbol} balance`, {
           toastId: `Amount exceeds ${marketInfo.quoteAsset.symbol} balance`,
         });
         return;
       }
 
-      if (quoteAmount && quoteAmount < marketInfo.quoteFee) {
+      if (quoteAmount && quoteAmount < fee) {
         toast.error(
-          `Minimum order size is ${marketInfo.quoteFee.toPrecision(5)
+          `Minimum order size is ${fee.toPrecision(5)
           } ${marketInfo.quoteAsset.symbol}`, {
-            toastId: `Minimum order size is ${marketInfo.quoteFee.toPrecision(5)
+            toastId: `Minimum order size is ${fee.toPrecision(5)
             } ${marketInfo.quoteAsset.symbol}`,
           });
         return;
@@ -603,11 +622,13 @@ class SpotForm extends React.Component {
     const marketInfo = this.props.marketInfo;
 
     if (this.props.side === "s") {
-      const baseBalance = this.getBaseBalance() - marketInfo.baseFee;
+      let baseBalance = this.getBaseBalance() 
+      baseBalance -= this.getBaseFee(baseBalance);
       const baseAmount = this.state.baseAmount || 0;
       return Math.round((baseAmount / baseBalance) * 100);
     } else if (this.props.side === "b") {
-      const quoteBalance = this.getQuoteBalance() - marketInfo.quoteFee;
+      let quoteBalance = this.getQuoteBalance();
+      quoteBalance -= this.getQuoteFee(quoteBalance);
       const quoteAmount = this.state.quoteAmount || 0;
       return Math.round((quoteAmount / quoteBalance) * 100);
     }
@@ -661,9 +682,8 @@ class SpotForm extends React.Component {
     if (this.props.side === "s") {
       const baseBalance = this.getBaseBalance();
       let amount = (baseBalance * val) / 100;
-      amount -= marketInfo.baseFee;
       amount = amount;
-      if (amount < marketInfo.baseFee) {
+      if (amount < this.getBaseFee(amount)) {
         newstate.baseAmount = 0;
         newstate.quoteAmount = 0;
       } else {
@@ -673,8 +693,7 @@ class SpotForm extends React.Component {
     } else if (this.props.side === "b") {
       const quoteBalance = this.getQuoteBalance();
       let amount = (quoteBalance * val) / 100;
-      amount -= marketInfo.quoteFee;
-      if (amount < marketInfo.quoteFee) {
+      if (amount < this.getQuoteFee(amount)) {
         newstate.quoteAmount = 0;
         newstate.baseAmount = 0;
       } else {
@@ -818,9 +837,8 @@ class SpotForm extends React.Component {
             color="foregroundMediumEmphasis"
           >
             {marketInfo &&
-              marketInfo.quoteFee &&
               formatToken(
-                Number(marketInfo.quoteFee),
+                Number(this.getQuoteFee(quoteAmount)),
                 marketInfo && marketInfo.quoteAsset.symbol
               )}{" "}
             {marketInfo && marketInfo.quoteAsset.symbol}
@@ -848,9 +866,8 @@ class SpotForm extends React.Component {
             color="foregroundMediumEmphasis"
           >
             {marketInfo &&
-              marketInfo.baseFee &&
               formatToken(
-                Number(marketInfo.baseFee),
+                Number(this.getBaseFee(baseAmount)),
                 marketInfo && marketInfo.baseAsset.symbol
               )}{" "}
             {marketInfo && marketInfo.baseAsset.symbol}
