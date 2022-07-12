@@ -137,7 +137,7 @@ const TradeRatesCard = ({
                     : "dangerHighEmphasis"
               }
             >
-              {marketSummary.price ? addComma(marketSummary.price) : "--"}
+              {marketSummary.price ? addComma(formatPrice(marketSummary.price)) : "--"}
             </Text>
             <Text
               font="primaryTiny"
@@ -199,7 +199,7 @@ const TradeRatesCard = ({
                   font="primaryMediumSmallSemiBold"
                   color="foregroundHighEmphasis"
                 >
-                  {marketSummary && marketSummary["24hi"] ? addComma(marketSummary["24hi"]): "--"}
+                  {marketSummary && marketSummary["24hi"] ? addComma(formatPrice(marketSummary["24hi"])): "--"}
                 </Text>
               </RatesCard>
               <Divider />
@@ -219,7 +219,7 @@ const TradeRatesCard = ({
                   font="primaryMediumSmallSemiBold"
                   color="foregroundHighEmphasis"
                 >
-                  {marketSummary && marketSummary["24lo"] ? addComma(marketSummary["24lo"]): "--"}
+                  {marketSummary && marketSummary["24lo"] ? addComma(formatPrice(marketSummary["24lo"])): "--"}
                 </Text>
               </RatesCard>
               <Divider />
@@ -239,7 +239,7 @@ const TradeRatesCard = ({
                   font="primaryMediumSmallSemiBold"
                   color="foregroundHighEmphasis"
                 >
-                  {marketSummary && marketSummary.baseVolume ? addComma(marketSummary.baseVolume): "--"}
+                  {marketSummary && marketSummary.baseVolume ? addComma(formatPrice(marketSummary.baseVolume)): "--"}
                 </Text>
               </RatesCard>
               <Divider />
@@ -259,7 +259,7 @@ const TradeRatesCard = ({
                   font="primaryMediumSmallSemiBold"
                   color="foregroundHighEmphasis"
                 >
-                  {marketSummary && marketSummary.quoteVolume ? addComma(marketSummary.quoteVolume): "--"}
+                  {marketSummary && marketSummary.quoteVolume ? addComma(formatPrice(marketSummary.quoteVolume)): "--"}
                 </Text>
               </RatesCard>
             </>
