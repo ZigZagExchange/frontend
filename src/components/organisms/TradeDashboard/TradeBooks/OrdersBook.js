@@ -16,6 +16,7 @@ import {
     SideSellButton,
     SideBuyButton,
 } from "./OrdersFooter/SideButtons";
+import api from "lib/api";
 
 const StyledTradeBooks = styled.section`
     display: flex;

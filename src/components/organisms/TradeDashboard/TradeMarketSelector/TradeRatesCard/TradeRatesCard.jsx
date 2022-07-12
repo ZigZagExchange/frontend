@@ -430,3 +430,9 @@ const Divider = styled.div`
             ? theme.colors.backgroundMediumEmphasis
             : theme.colors.foreground400};
 `;
+
+const FavItem = styled(Box)`
+    &:hover {
+        background-color: ${({ theme }) => theme.colors.backgroundHighEmphasis};
+    }
+`;

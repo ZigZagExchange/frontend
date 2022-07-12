@@ -25,7 +25,7 @@ import {
   settingsSelector,
   userOrdersSelector,
 } from "lib/store/features/api/apiSlice";
-import { formatPrice, formatUSD } from "lib/utils";
+import { formatPrice, formatUSD, formatToken } from "lib/utils";
 import { LoadingSpinner } from "components/atoms/LoadingSpinner";
 
 export default function SwapPage() {
@@ -88,22 +88,41 @@ export default function SwapPage() {
   }, [sellTokenList, network, currentMarket]);
 
   useEffect(async () => {
-    if (!user.address) return;
-    setBalances(zkBalances);
+    if (user.address !== undefined) {
+      setBalances(zkBalances);
+    }
   }, [user.address, zkBalances]);
 
-  useEffect(() => {
-    setSellToken("USDC");
-    dispatch(setCurrentMarket("ZZ-USDC"));
-    setSellTokenList(api.getCurrencies());
-    setGetPairs(api.getPairs());
-    document.title = "ZigZag Convert";
-  }, []);
+  // useEffect(() => {
+  //   // this could later be replaced by a better logic to pick a good pair
+  //   switch (network) {
+  //     case 1:
+  //       setSellToken({ id: 0, name: "USDC" });
+  //       dispatch(setCurrentMarket("ZZ-USDC"));
+  //       break;
+  //     case 1000:
+  //       setSellToken({ id: 0, name: "USDC" });
+  //       dispatch(setCurrentMarket("ETH-USDC"));
+  //       break;
+  //     case 42161:
+  //       setSellToken({ id: 0, name: "USDC" });
+  //       dispatch(setCurrentMarket("WETH-USDC"));
+  //       break;
+  //     default:
+  //       setSellToken({ id: 0, name: "USDC" });
+  //       dispatch(setCurrentMarket("ZZ-USDC"));
+  //   }
+
+  //   setSellTokenList(api.getCurrencies());
+  //   setGetPairs(api.getPairs());
+  //   document.title = "ZigZag Convert";
+  // }, []);
 
   useEffect(() => {
     if (sellToken && buyToken) {
       const p_name = sellToken.name + "-" + buyToken.name;
       const r_p_name = buyToken.name + "-" + sellToken.name;
+      let c = false;
       Object.keys(pairPrices).forEach((pair) => {
         if (pair === p_name) {
           setBasePrice(pairPrices[pair].price);
@@ -111,18 +130,32 @@ export default function SwapPage() {
           setBuyAmounts(x);
           setTtype("sell");
           dispatch(setCurrentMarket(p_name));
-        } else if (pair === r_p_name) {
-          setBasePrice(1 / pairPrices[pair].price);
-          const x = (sellAmounts * 1) / pairPrices[pair].price;
-          setBuyAmounts(x);
-          setTtype("buy");
-          dispatch(setCurrentMarket(r_p_name));
+          c = true;
         }
       });
+      if (c === false) {
+        Object.keys(pairPrices).forEach((pair) => {
+          if (pair === r_p_name) {
+            setBasePrice(1 / pairPrices[pair].price);
+            const x = (sellAmounts * 1) / pairPrices[pair].price;
+            setBuyAmounts(x);
+            setTtype("buy");
+            dispatch(setCurrentMarket(r_p_name));
+          }
+        });
+      }
     }
   }, [sellToken, buyToken]);
 
   useEffect(() => {
+    if (user.address && !user.id) {
+      toast.error(
+        "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
+        {
+          autoClose: 60000,
+        }
+      );
+    }
     const sub = () => {
       dispatch(resetData());
       api.subscribeToMarket(currentMarket, settings.showNightPriceChange);
@@ -141,12 +174,7 @@ export default function SwapPage() {
         api.off("open", sub);
       }
     };
-  }, [network, currentMarket, api.ws]);
-
-  // useEffect(() => {
-  //   setSellTokenList(api.getCurrencies());
-  //   setGetPairs(api.getPairs());
-  // }, [network]);
+  }, [network, currentMarket, api.ws, settings.showNightPriceChange]);
 
   const currentPrice = () => {
     var ladderPrice = getLadderPrice();
@@ -209,31 +237,31 @@ export default function SwapPage() {
               coinEstimator(item) * balances[item]?.valueReadable
             )}`
           : "";
-
         return {
           id: index,
           name: item,
           balance: balances[item]?.valueReadable
-            ? balances[item]?.valueReadable
-            : "0.00000",
+            ? formatToken(balances[item]?.valueReadable, item)
+            : "0.0000000",
           price: price !== "" ? `${price}` : "$ 0.00",
         };
       });
-      const f = p.find((item) => item.name === currentMarket.split("-")[1]);
-      // const t = p.find((item) => item.name === currentMarket.split("-")[0]);
       const s = p.sort((a, b) => {
         return (
           parseFloat(b.price.substring(1).replace(",", "")) -
           parseFloat(a.price.substring(1).replace(",", ""))
         );
       });
-      setSellToken(f);
-      // setBuyToken(t);
+      if (!sellToken) {
+        const f = s.find((item) => item.name === currentMarket.split("-")[1]);
+        setSellToken(f);
+      }
+
       return s;
     } else {
       return [];
     }
-  }, [sellTokenList]);
+  }, [sellTokenList, balances]);
 
   const buyTokenOptions = useMemo(() => {
     const p = pairs.map((item) => {
@@ -262,8 +290,8 @@ export default function SwapPage() {
           id: index,
           name: item,
           balance: balances[item]?.valueReadable
-            ? balances[item]?.valueReadable
-            : "0.00000",
+            ? formatToken(balances[item]?.valueReadable, item)
+            : "0.0000000",
           price: price !== "" ? `${price}` : "$ 0.00",
         };
       });
@@ -275,7 +303,10 @@ export default function SwapPage() {
         setBuyToken(d);
       }
     } else {
-      setBuyToken(filtered.find((item) => item.name === "ZZ"));
+      const b = filtered.find(
+        (item) => item.name === currentMarket.split("-")[0]
+      );
+      setBuyToken(b);
     }
     filtered = filtered.filter(
       (value, index, self) =>
@@ -288,7 +319,7 @@ export default function SwapPage() {
       );
     });
     return s;
-  }, [sellToken, pairs]);
+  }, [sellToken, pairs, balances]);
 
   const onChangeSellToken = (option) => {
     setSellToken(option);

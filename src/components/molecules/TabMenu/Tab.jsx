@@ -22,9 +22,9 @@ const StyledText = styled(Text)`
   }
 `
 
-const Tab = ({ isActive = false, row = false, left = false, onClick, children }) => {
+const Tab = ({ isActive = false, row = false, left = false, onClick, children, display = true }) => {
   return (
-    <StyledTab onClick={onClick}>
+    <StyledTab onClick={onClick} display={display}>
       <StyledText isActive={isActive} left={left} row={row} font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis">
         {children}
       </StyledText>

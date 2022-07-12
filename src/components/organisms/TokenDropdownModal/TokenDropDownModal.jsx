@@ -51,7 +51,7 @@ const TokenDropDownModal = ({
         <button
           type="button"
           onClick={openModal}
-          className="flex items-center p-2 text-sm font-medium rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 hover:dark:bg-foreground-400 hover:bg-primary-400"
+          className="flex items-center p-2 text-sm font-medium rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 hover:dark:bg-foreground-400 hover:bg-primary-400 "
         >
           {
             <img

@@ -96,7 +96,9 @@ api.on("signOut", (accountState) => {
 api.on("providerChange", (network) => {
   store.dispatch(clearLastPrices());
   store.dispatch(setNetwork(network));
-  store.dispatch(setCurrentMarket('ETH-USDC'));
+  // EVM networks can't trade ETH so the default is WETH
+  if (network === 42161) store.dispatch(setCurrentMarket('WETH-USDC'));
+  else store.dispatch(setCurrentMarket('ETH-USDC'));
 });
 
 api.on("message", (operation, args) => {

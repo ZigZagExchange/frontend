@@ -196,7 +196,7 @@ const DropdownContent = styled.div`
   overflow-y: auto;
 `;
 
-const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, updateMarketChain, rowData, onFavourited }) => {
+const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, updateMarketChain, rowData, onFavourited, favourited }) => {
     // const [foundPairs, setFoundPairs] = useState([])
     const [pairs, setPairs] = useState([])
     const [categorySelected, setCategorySelected] = useState(0)
@@ -217,6 +217,11 @@ const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, upda
     const [_marketInfo, setMarketInfo] = useState(null);
     const [_rowData, setRowData] = useState([]);
     const [isIncrease, setIsIncrease] = useState([]);
+
+    useEffect(()=>{
+        if(favourited)
+            setFavourites(favourited);
+    },[favourited])
 
     HideMenuOnOutsideClicked(wrapperRef, setIsOpened)
 

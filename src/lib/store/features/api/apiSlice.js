@@ -115,15 +115,24 @@ export const apiSlice = createSlice({
     _fills(state, { payload }) {
       payload[0].forEach((fill) => {
         const fillid = fill[1];
-        if (fill[2] === state.currentMarket && fill[0] === state.network) {
+        // taker and maker user ids have to be matched lowercase because addresses
+        // sometimes come back in camelcase checksum format
+        const takerUserId = fill[8] && fill[8].toLowerCase();
+        const makerUserId = fill[9] && fill[9].toLowerCase();
+        if (
+          ['f', 'pf'].includes(fill[6]) &&
+          fill[2] === state.currentMarket &&
+          fill[0] === state.network
+        ) {
           state.marketFills[fillid] = fill;
         }
-        if (state.userId && fill[8] === state.userId.toString()) {
+        if (state.userId && takerUserId === state.userId.toString().toLowerCase()) {
+
           state.userFills[fillid] = fill;
         }
         // for maker fills we need to flip the side and set fee to 0
-        if (state.userId && fill[9] === state.userId.toString()) {
-          fill[3] = fill[3] === "b" ? "s" : "b";
+        if (state.userId && makerUserId === state.userId.toString().toLowerCase()) {
+          fill[3] = (fill[3] === "b") ? "s" : "b";
           fill[10] = 0;
           state.userFills[fillid] = fill;
         }
@@ -176,18 +185,18 @@ export const apiSlice = createSlice({
             ) {
               toast.dismiss("Order placed.");
               toast.success(
-                `Your ${sideText} order for ${Number(
-                  baseQuantity.toPrecision(4)
-                )} ${baseCurrency} was filled @ ${Number(formatPrice(price))}!`,
-                {
-                  toastId: `Your ${sideText} order for ${Number(
-                    baseQuantity.toPrecision(4)
-                  )} ${baseCurrency} was filled @ ${Number(
-                    formatPrice(price)
-                  )}!`,
-                }
-              );
+                `Your ${sideText} order #${fillid} for ${Number(baseQuantity.toPrecision(4))
+                } ${baseCurrency} was filled @ ${Number(formatPrice(price))
+                }!`, {
+                toastId:
+                  `Your ${sideText} order #${fillid} for ${Number(baseQuantity.toPrecision(4))
+                  } ${baseCurrency} was filled @ ${Number(formatPrice(price))
+                  }!`,
+              });
             }
+
+            // update the balances of the user account
+            api.getBalances();
             if (
               !state.settings.disableOrderNotification &&
               !state.settings.disableTradeIDCard
@@ -213,16 +222,19 @@ export const apiSlice = createSlice({
     },
     _fillreceipt(state, { payload }) {
       payload[0].forEach((fill) => {
+        if (!fill) return;
+        const takerUserId = fill[8] && fill[8].toLowerCase();
+        const makerUserId = fill[9] && fill[9].toLowerCase();
         const fillid = fill[1];
         if (fill[2] === state.currentMarket && fill[0] === state.network) {
           state.marketFills[fillid] = fill;
         }
-        if (state.userId && fill[8] === state.userId.toString()) {
+        if (state.userId && takerUserId === state.userId.toString().toLowerCase()) {
           state.userFills[fillid] = fill;
         }
         // for maker fills we need to flip the side and set fee to 0
-        if (state.userId && fill[9] === state.userId.toString()) {
-          fill[3] = fill[3] === "b" ? "s" : "b";
+        if (state.userId && makerUserId === state.userId.toString().toLowerCase()) {
+          fill[3] = (fill[3] === "b") ? "s" : "b";
           fill[10] = 0;
           state.userFills[fillid] = fill;
         }
@@ -272,7 +284,7 @@ export const apiSlice = createSlice({
     _orderstatus(state, { payload }) {
       (payload[0] || []).forEach(async (update) => {
         let filledOrder;
-        const [, orderId, newStatus, txHash] = update;
+        const [, orderId, newStatus, txHash, remaining] = update;
         switch (newStatus) {
           case "c":
             delete state.orders[orderId];
@@ -280,42 +292,42 @@ export const apiSlice = createSlice({
               state.userOrders[orderId][9] = "c";
             }
             break;
-          case "pm":
-            const remaining = update[4];
+          case "pm": case "pf":
             if (state.orders[orderId]) {
-              state.orders[orderId][11] = remaining;
+              state.orders[orderId][10] = remaining;
             }
             if (state.userOrders[orderId]) {
-              state.userOrders[orderId][11] = remaining;
+              state.userOrders[orderId][10] = remaining;
             }
             break;
           case "m":
             const matchedOrder = state.orders[orderId];
             if (!matchedOrder) return;
             matchedOrder[9] = "m";
+            matchedOrder[10] = 0;
+            const takerUserId = matchedOrder[8] && matchedOrder[8].toLowerCase();
+            const makerUserId = matchedOrder[9] && matchedOrder[9].toLowerCase();
+            const orderUserId = state.userId && state.userId.toString().toLowerCase();
             delete state.orders[orderId];
             if (
               matchedOrder &&
-              state.userId &&
-              matchedOrder[8] === state.userId.toString()
+              (takerUserId === orderUserId || makerUserId === orderUserId)
             ) {
-              if (!state.userOrders[matchedOrder[1]]) {
-                state.userOrders[matchedOrder[1]] = matchedOrder;
-              }
+              state.userOrders[matchedOrder[1]] = matchedOrder;
             }
             break;
           case "f":
             filledOrder = state.userOrders[orderId];
             if (filledOrder) {
               filledOrder[9] = "f";
-              filledOrder[10] = txHash;
+              filledOrder[11] = txHash;
             }
             break;
           case "b":
             filledOrder = state.userOrders[orderId];
             if (filledOrder) {
               filledOrder[9] = "b";
-              filledOrder[10] = txHash;
+              filledOrder[11] = txHash;
             }
             break;
           case "r":
@@ -325,20 +337,16 @@ export const apiSlice = createSlice({
               const error = update[4];
               const baseCurrency = filledOrder[2].split("-")[0];
               filledOrder[9] = "r";
-              filledOrder[10] = txHash;
+              filledOrder[11] = txHash;
               const noFeeOrder = api.getOrderDetailsWithoutFee(filledOrder);
               toast.error(
-                `Your ${sideText} order for ${
-                  noFeeOrder.baseQuantity.toPrecision(4) / 1
-                } ${baseCurrency} @ ${
-                  noFeeOrder.price.toPrecision(4) / 1
+                `Your ${sideText} order for ${noFeeOrder.baseQuantity.toPrecision(4) / 1
+                } ${baseCurrency} @ ${noFeeOrder.price.toPrecision(4) / 1
                 } was rejected: ${error}`,
                 {
-                  toastId: `Your ${sideText} order for ${
-                    noFeeOrder.baseQuantity.toPrecision(4) / 1
-                  } ${baseCurrency} @ ${
-                    noFeeOrder.price.toPrecision(4) / 1
-                  } was rejected: ${error}`,
+                  toastId: `Your ${sideText} order for ${noFeeOrder.baseQuantity.toPrecision(4) / 1
+                    } ${baseCurrency} @ ${noFeeOrder.price.toPrecision(4) / 1
+                    } was rejected: ${error}`,
                 }
               );
               toast.info(

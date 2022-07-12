@@ -109,8 +109,8 @@ const BridgeContainer = () => {
 
   useEffect(() => {
     setSellTokenList(api.getCurrencies());
-  }, [])
-  
+  }, []);
+
   useEffect(() => {
     setTokenLoading(true);
     const timer = setInterval(() => {
@@ -131,7 +131,14 @@ const BridgeContainer = () => {
     setSellTokenList(api.getCurrencies());
     setBalances(_getBalances(fromNetwork.id));
     setAltBalances(_getBalances(toNetwork.id));
-  }, [network, toNetwork, user.address, walletBalances, zkBalances, polygonBalances]);
+  }, [
+    network,
+    toNetwork,
+    user.address,
+    walletBalances,
+    zkBalances,
+    polygonBalances,
+  ]);
 
   const [withdrawSpeed, setWithdrawSpeed] = useState("fast");
   const isFastWithdraw = () => {
@@ -357,7 +364,7 @@ const BridgeContainer = () => {
       setFormErr(error);
       return;
     }
-    
+
     const feeCurrencyInfo = api.getCurrencyInfo(L2FeeToken);
     if (balances.length === 0) return false;
     const feeTokenBalance = parseFloat(
@@ -372,9 +379,17 @@ const BridgeContainer = () => {
     if (error) {
       setFormErr(error);
     } else {
-      setFormErr("")
+      setFormErr("");
     }
-  }, [swapDetails, ZigZagFeeAmount, userOrders, activationFee, L1FeeAmount, L2FeeAmount, L2FeeToken]);
+  }, [
+    swapDetails,
+    ZigZagFeeAmount,
+    userOrders,
+    activationFee,
+    L1FeeAmount,
+    L2FeeAmount,
+    L2FeeToken,
+  ]);
 
   const setSwapDetails = async (values) => {
     const details = {

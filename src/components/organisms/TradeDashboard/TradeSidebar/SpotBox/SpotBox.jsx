@@ -18,6 +18,8 @@ const SpotBox = ({
   activeOrderCount,
   liquidity,
   marketSummary,
+  allOrders,
+  balances
 }) => {
   const [selectedLayer, setSelectedLayer] = useState(1);
   const [index, setIndex] = useState(1);
@@ -43,6 +45,8 @@ const SpotBox = ({
       marketInfo={marketInfo}
       marketSummary={marketSummary}
       settings={settings}
+      allOrders={allOrders}
+      balances={balances}
     />
   );
 
@@ -58,6 +62,8 @@ const SpotBox = ({
       marketInfo={marketInfo}
       marketSummary={marketSummary}
       settings={settings}
+      allOrders={allOrders}
+      balances={balances}
     />
   );
 
