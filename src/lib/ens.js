@@ -8,9 +8,7 @@ const CONTRACT_ABI = [
     type: "constructor",
   },
   {
-    inputs: [
-      { internalType: "address[]", name: "addresses", type: "address[]" },
-    ],
+    inputs: [{ internalType: "address[]", name: "addresses", type: "address[]" }],
     name: "getNames",
     outputs: [{ internalType: "string[]", name: "r", type: "string[]" }],
     stateMutability: "view",
@@ -26,10 +24,7 @@ function getContract() {
       )
     );
 
-    contract = new web3.eth.Contract(
-      CONTRACT_ABI,
-      "0x3671aE578E63FdF66ad4F3E12CC0c0d71Ac7510C"
-    );
+    contract = new web3.eth.Contract(CONTRACT_ABI, "0x3671aE578E63FdF66ad4F3E12CC0c0d71Ac7510C");
   }
 
   return contract;

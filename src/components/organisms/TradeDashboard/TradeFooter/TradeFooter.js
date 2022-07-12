@@ -4,10 +4,10 @@ import { DiscordIcon, TelegramIcon, TwitterIcon } from "components/atoms/Svg";
 import Text from "components/atoms/Text/Text";
 
 const StyledTradeFooter = styled.footer`
-  display: ${({ isMobile }) => isMobile ? 'grid' : 'flex'};
+  display: ${({ isMobile }) => (isMobile ? "grid" : "flex")};
   align-items: center;
   padding: 0 20px;
-  justify-content: ${({ isMobile }) => isMobile ? 'center' : 'space-between'};
+  justify-content: ${({ isMobile }) => (isMobile ? "center" : "space-between")};
   grid-area: footer;
   background: ${({ theme }) => theme.colors.backgroundDisabled};
   border-top: 1px solid ${({ theme }) => theme.colors.foreground400};
@@ -21,20 +21,20 @@ const SocialWrapper = styled.div`
   align-items: center;
   justify-items: center;
   width: 120px;
-`
+`;
 
 const SocialLink = styled.a`
   svg path {
-    transition: fill .25s;
+    transition: fill 0.25s;
     fill: ${({ theme }) => theme.colors.foregroundLowEmphasis};
   }
-  
+
   &:hover {
     svg path {
       fill: ${({ theme }) => theme.colors.primaryHighEmphasis};
     }
   }
-`
+`;
 
 const StyledLinkBox = styled.div`
   display: flex;
@@ -43,35 +43,31 @@ const StyledLinkBox = styled.div`
 `;
 
 export default function TradeFooter() {
-  const isMobile = window.innerWidth < 430
+  const isMobile = window.innerWidth < 430;
   return (
     <StyledTradeFooter isMobile={isMobile}>
-      <Text font="primaryMediumBody" color="foregroundLowEmphasis" textAlign={isMobile ? 'center' : 'left'}>ZigZag Exchange © 2022</Text>
+      <Text
+        font="primaryMediumBody"
+        color="foregroundLowEmphasis"
+        textAlign={isMobile ? "center" : "left"}
+      >
+        ZigZag Exchange © 2022
+      </Text>
       <StyledLinkBox>
         <SocialWrapper>
-          <SocialLink
-            target="_blank"
-            rel="noreferrer"
-            href="https://discord.gg/zigzag"
-          >
+          <SocialLink target="_blank" rel="noreferrer" href="https://discord.gg/zigzag">
             <DiscordIcon />
           </SocialLink>
-          <SocialLink
-            target="_blank"
-            rel="noreferrer"
-            href="https://twitter.com/ZigZagExchange"
-          >
+          <SocialLink target="_blank" rel="noreferrer" href="https://twitter.com/ZigZagExchange">
             <TwitterIcon />
           </SocialLink>
-          <SocialLink
-            target="_blank"
-            rel="noreferrer"
-            href="https://t.me/zigzagexchange"
-          >
+          <SocialLink target="_blank" rel="noreferrer" href="https://t.me/zigzagexchange">
             <TelegramIcon />
           </SocialLink>
         </SocialWrapper>
-        <Text font="primaryMediumBody" color="foregroundLowEmphasis">Powered By zkSync</Text>
+        <Text font="primaryMediumBody" color="foregroundLowEmphasis">
+          Powered By zkSync
+        </Text>
       </StyledLinkBox>
     </StyledTradeFooter>
   );

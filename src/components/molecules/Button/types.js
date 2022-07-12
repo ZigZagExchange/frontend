@@ -1,5 +1,5 @@
 export const scales = {
-	LG: "lg",
+  LG: "lg",
   IMD: "imd",
   MD: "md",
   SM: "sm",

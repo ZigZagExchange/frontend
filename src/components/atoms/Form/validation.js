@@ -1,16 +1,12 @@
 export const max = (maxValue, customErrorString) => (formValue) => {
-  const error = customErrorString
-    ? customErrorString
-    : `Max value: ${maxValue}`;
+  const error = customErrorString ? customErrorString : `Max value: ${maxValue}`;
   if (Number(formValue) > Number(maxValue)) {
     return error;
   }
 };
 
 export const min = (minValue, customErrorString) => (formValue) => {
-  const error = customErrorString
-    ? customErrorString
-    : `Min value: ${minValue}`;
+  const error = customErrorString ? customErrorString : `Min value: ${minValue}`;
   if (Number(formValue) < Number(minValue)) {
     return error;
   }
@@ -23,7 +19,7 @@ export const required = (formValue) => {
   }
 };
 
-export const forceValidation = (showThrow, errorMessage) => (formValue) => {
+export const forceValidation = (showThrow, errorMessage) => () => {
   if (showThrow) {
     return errorMessage;
   }
@@ -32,7 +28,4 @@ export const forceValidation = (showThrow, errorMessage) => (formValue) => {
 export const composeValidators =
   (...validators) =>
   (value) =>
-    validators.reduce(
-      (error, validator) => error || validator(value),
-      undefined
-    );
+    validators.reduce((error, validator) => error || validator(value), undefined);

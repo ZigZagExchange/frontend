@@ -4,7 +4,7 @@ import styled from "@xstyled/styled-components";
 import TradePriceTable from "./TradePriceTable/TradePriceTable";
 import TradePriceHeadSecond from "./TradePriceHeadSecond/TradePriceHeadSecond";
 import Text from "components/atoms/Text/Text";
-import { Dropdown } from "components/molecules/Dropdown";
+
 import {
   liquiditySelector,
   marketSummarySelector,
@@ -12,11 +12,7 @@ import {
   settingsSelector,
   allOrdersSelector,
 } from "lib/store/features/api/apiSlice";
-import {
-  SideAllButton,
-  SideSellButton,
-  SideBuyButton,
-} from "./OrdersFooter/SideButtons";
+import { SideAllButton, SideSellButton, SideBuyButton } from "./OrdersFooter/SideButtons";
 import api from "lib/api";
 
 const StyledTradeBooks = styled.section`
@@ -24,7 +20,7 @@ const StyledTradeBooks = styled.section`
   grid-area: orders;
   flex-direction: row;
   justify-content: space-between;
-  padding: ${({ isLeft }) => isLeft ? '21px 10px 12px 20px' : '21px 10px 0px 10px'};
+  padding: ${({ isLeft }) => (isLeft ? "21px 10px 12px 20px" : "21px 10px 0px 10px")};
   border-top: 1px solid ${({ theme }) => theme.colors.foreground400};
   border-bottom: 1px solid ${({ theme }) => theme.colors.foreground400};
   overflow: hidden;
@@ -65,7 +61,7 @@ const OrderFooterWrapper = styled.div`
   button {
     height: auto;
   }
-  padding-bottom: ${({ isStack }) => isStack ? '6px' : '0'};
+  padding-bottom: ${({ isStack }) => (isStack ? "6px" : "0")};
 `;
 
 const OrderFooterRight = styled.div`
@@ -74,8 +70,7 @@ const OrderFooterRight = styled.div`
 
   img {
     margin-left: 5px;
-    // border: 1px solid ${({ theme }) =>
-      theme.colors.foregroundMediumEmphasis};
+    // border: 1px solid ${({ theme }) => theme.colors.foregroundMediumEmphasis};
     cursor: pointer;
   }
 `;
@@ -107,7 +102,7 @@ export default function OrdersBook(props) {
   const liquidity = useSelector(liquiditySelector);
   const settings = useSelector(settingsSelector);
   const allOrders = useSelector(allOrdersSelector);
-  const [fixedPoint, setFixedPoint] = useState(2);
+  const [fixedPoint] = useState(2);
   const [side, setSide] = useState("all");
   const [fixedPointItems, setFixedPointItems] = useState(fixedPoints);
 
@@ -118,13 +113,6 @@ export default function OrdersBook(props) {
     });
     setFixedPointItems(newFixedPoints);
   }, [fixedPoint]);
-
-  const changeFixedPoint = (text, value) => {
-    setFixedPoint(parseInt(value));
-    if (props.changeFixedPoint) {
-      props.changeFixedPoint(parseInt(value));
-    }
-  };
 
   const changeSide = (type) => {
     setSide(type);
@@ -192,10 +180,7 @@ export default function OrdersBook(props) {
     const lastAskIndex = askBins.length - 1;
     if (i === 0) {
       askBins.push(orderbookAsks[i]);
-    } else if (
-      orderbookAsks[i].td1.toPrecision(6) ===
-      askBins[lastAskIndex].td1.toPrecision(6)
-    ) {
+    } else if (orderbookAsks[i].td1.toPrecision(6) === askBins[lastAskIndex].td1.toPrecision(6)) {
       askBins[lastAskIndex].td2 += orderbookAsks[i].td2;
       askBins[lastAskIndex].td3 += orderbookAsks[i].td3;
     } else {
@@ -208,10 +193,7 @@ export default function OrdersBook(props) {
     const lastBidIndex = bidBins.length - 1;
     if (i === "0") {
       bidBins.push(orderbookBids[i]);
-    } else if (
-      orderbookBids[i].td1.toPrecision(6) ===
-      bidBins[lastBidIndex].td1.toPrecision(6)
-    ) {
+    } else if (orderbookBids[i].td1.toPrecision(6) === bidBins[lastBidIndex].td1.toPrecision(6)) {
       bidBins[lastBidIndex].td2 += orderbookBids[i].td2;
       bidBins[lastBidIndex].td3 += orderbookBids[i].td3;
     } else {

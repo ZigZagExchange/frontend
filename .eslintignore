@@ -1,0 +1,5 @@
+build/*.js
+scripts/*.js
+config/*.js
+config/jest/**.js
+tailwind.config.js

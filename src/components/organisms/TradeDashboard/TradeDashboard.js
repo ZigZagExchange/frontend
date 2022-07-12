@@ -24,10 +24,7 @@ import {
 import { userSelector } from "lib/store/features/auth/authSlice";
 import api from "lib/api";
 import { useLocation, useHistory } from "react-router-dom";
-import {
-  marketQueryParam,
-  networkQueryParam,
-} from "../../pages/ListPairPage/SuccessModal";
+import { marketQueryParam, networkQueryParam } from "../../pages/ListPairPage/SuccessModal";
 import TradesTable from "./TradeBooks/TradesTable";
 import { HighSlippageModal } from "components/molecules/HighSlippageModal";
 import _ from "lodash";
@@ -41,8 +38,7 @@ const TradeContainer = styled.div`
 
 const TradeGrid = styled.article`
   display: grid;
-  grid-template-rows: ${({ isLeft }) =>
-    isLeft ? "56px 2fr 1fr" : "56px 613px 1fr"};
+  grid-template-rows: ${({ isLeft }) => (isLeft ? "56px 2fr 1fr" : "56px 613px 1fr")};
   grid-template-columns: ${({ isLeft }) =>
     isLeft ? "300px 253.5px 253.5px 1fr" : "300px 507px 1fr"};
   grid-template-areas: ${({ isLeft }) =>
@@ -60,9 +56,7 @@ const TradeGrid = styled.article`
   @media screen and (max-width: 991px) {
     height: auto;
     grid-template-rows: ${({ isLeft }) =>
-      isLeft
-        ? "56px 410px 459px 508px 1fr"
-        : "56px 410px 459px 519px 1fr"};
+      isLeft ? "56px 410px 459px 508px 1fr" : "56px 410px 459px 519px 1fr"};
     grid-template-columns: ${({ isLeft }) => (isLeft ? "1fr 1fr" : "1fr")};
     grid-template-areas: ${({ isLeft }) =>
       isLeft
@@ -109,10 +103,12 @@ export function TradeDashboard() {
     dispatch(setCurrentMarket(market));
   };
 
-  useEffect(()=>{
-    if(_.isEmpty(marketSummary)) return
-    document.title = `${addComma(formatPrice(marketSummary.price))} | ${marketSummary.market??'--'} | ZigZag Exchange`;
-  }, [marketSummary])
+  useEffect(() => {
+    if (_.isEmpty(marketSummary)) return;
+    document.title = `${addComma(formatPrice(marketSummary.price))} | ${
+      marketSummary.market ?? "--"
+    } | ZigZag Exchange`;
+  }, [marketSummary]);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(search);
@@ -188,10 +184,7 @@ export function TradeDashboard() {
   return (
     <TradeContainer>
       <TradeGrid layout={layout} isLeft={settings.stackOrderbook}>
-        <TradeMarketSelector
-          updateMarketChain={updateMarketChain}
-          currentMarket={currentMarket}
-        />
+        <TradeMarketSelector updateMarketChain={updateMarketChain} currentMarket={currentMarket} />
         {/* TradePriceBtcTable, Spotbox */}
         <TradeSidebar
           updateMarketChain={updateMarketChain}
@@ -207,11 +200,7 @@ export function TradeDashboard() {
               changeFixedPoint={changeFixedPoint}
               changeSide={changeSide}
             />
-            <TradesBook
-              currentMarket={currentMarket}
-              fixedPoint={fixedPoint}
-              side={side}
-            />
+            <TradesBook currentMarket={currentMarket} fixedPoint={fixedPoint} side={side} />
           </>
         ) : (
           <TradesTable />
@@ -219,11 +208,7 @@ export function TradeDashboard() {
         {/* TradeChartArea */}
         <TradeChartArea />
         {/* OrdersTable */}
-        <TradeTables
-          userFills={userFills}
-          userOrders={userOrders}
-          user={user}
-        />
+        <TradeTables userFills={userFills} userOrders={userOrders} user={user} />
         {/* <TradeFooter /> */}
 
         <HighSlippageModal />

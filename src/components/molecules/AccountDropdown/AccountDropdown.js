@@ -6,12 +6,8 @@ import styled, { css } from "@xstyled/styled-components";
 import { useCoinEstimator } from "components";
 import Loader from "react-loader-spinner";
 import { userSelector } from "lib/store/features/auth/authSlice";
-import {
-  networkSelector,
-  balancesSelector,
-  layoutSelector,
-} from "lib/store/features/api/apiSlice";
-import { formatUSD, formatPrice} from "lib/utils";
+import { networkSelector, balancesSelector, layoutSelector } from "lib/store/features/api/apiSlice";
+import { formatUSD, formatPrice } from "lib/utils";
 import api from "lib/api";
 import { setLayout } from "lib/helpers/storage/layouts";
 import { Modal, Tooltip } from "components";
@@ -38,7 +34,7 @@ const DropdownDisplay = styled.div`
   pointer-events: none;
   display: flex;
   flex-direction: column;
-  
+
   @media screen and (max-width: 991px) {
     position: fixed;
     margin-top: 0;
@@ -238,7 +234,7 @@ const DropdownExplorer = styled.div`
   &:hover {
     background: #4d76af;
   }
-  
+
   &:hover > a {
     color: #fff;
   }
@@ -260,9 +256,9 @@ const SignOutButton = styled.div`
   }
 
   &:active {
-  background: #c44;
-  color: #fff;
-}
+    background: #c44;
+    color: #fff;
+  }
 `;
 
 const LoaderContainer = styled.div`
@@ -315,20 +311,19 @@ export const AccountDropdown = () => {
 
   const changeLayout = (l) => {
     //local state
-    dispatch({ type: 'api/setLayout', payload: l });
+    dispatch({ type: "api/setLayout", payload: l });
     setLayout(l);
 
     setSelectedLayout(l);
-  }
+  };
 
   const [selectedLayer, setSelectedLayer] = useState(2);
   const coinEstimator = useCoinEstimator();
   const { profile, address } = user;
 
-  const wallet =
-    selectedLayer === 1 ? balanceData.wallet : balanceData[network];
+  const wallet = selectedLayer === 1 ? balanceData.wallet : balanceData[network];
   const explorer = address ? api.getExplorerAccountLink(network, address) : null;
-  const networkName = selectedLayer === 1 ? 'Etherscan' : api.getNetworkDisplayName(network);
+  const networkName = selectedLayer === 1 ? "Etherscan" : api.getNetworkDisplayName(network);
 
   useEffect(() => {
     const hideDisplay = () => setShow(false);
@@ -392,22 +387,15 @@ export const AccountDropdown = () => {
           <h4>Wallet</h4>
         </span>
         <AiOutlineCaretDown />
-
       </DropdownButton>
       <DropdownDisplay>
         <DropdownHeader>
           <h3>Your Wallet</h3>
           <WalletToggle>
-            <WalletToggleItem
-              onClick={() => setSelectedLayer(1)}
-              show={selectedLayer === 1}
-            >
+            <WalletToggleItem onClick={() => setSelectedLayer(1)} show={selectedLayer === 1}>
               L1
             </WalletToggleItem>
-            <WalletToggleItem
-              onClick={() => setSelectedLayer(2)}
-              show={selectedLayer === 2}
-            >
+            <WalletToggleItem onClick={() => setSelectedLayer(2)} show={selectedLayer === 2}>
               L2
             </WalletToggleItem>
           </WalletToggle>
@@ -433,15 +421,10 @@ export const AccountDropdown = () => {
                       />
                       <div>
                         <strong>
-                          {formatPrice(
-                            wallet[ticker].valueReadable
-                          )} {ticker}
+                          {formatPrice(wallet[ticker].valueReadable)} {ticker}
                         </strong>
                         <small>
-                          $
-                          {formatUSD(
-                            coinEstimator(ticker) * wallet[ticker].valueReadable
-                          )}
+                          ${formatUSD(coinEstimator(ticker) * wallet[ticker].valueReadable)}
                         </small>
                       </div>
                     </CurrencyListItem>
@@ -451,8 +434,13 @@ export const AccountDropdown = () => {
           )}
         </DropdownContent>
         <DropdownFooter>
-
-          <LayoutButton onClick={() => { setShowLayout(!showLayout); setShow(!show); }} tabIndex="0">
+          <LayoutButton
+            onClick={() => {
+              setShowLayout(!showLayout);
+              setShow(!show);
+            }}
+            tabIndex="0"
+          >
             <IoMdGrid style={{ position: "relative", marginTop: 1, marginRight: 3 }} /> Layouts
           </LayoutButton>
 
@@ -486,10 +474,8 @@ export const AccountDropdown = () => {
           </Modal>
 
           <DropdownExplorer>
-            <a target="_blank"
-              rel="noreferrer"
-              href={explorer}>
-                <IoMdOpen style={{ position: "relative", top: -2 }} /> {networkName} 
+            <a target="_blank" rel="noreferrer" href={explorer}>
+              <IoMdOpen style={{ position: "relative", top: -2 }} /> {networkName}
             </a>
           </DropdownExplorer>
 
