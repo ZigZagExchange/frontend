@@ -96,7 +96,7 @@ export const LaptopWrapper = styled.div`
     overflow: auto;
 
     ::-webkit-scrollbar {
-      width: 5px;
+      width: 10px;
       position: relative;
       z-index: 20;
     }
