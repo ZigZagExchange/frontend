@@ -11,7 +11,7 @@ const Table = styled.table`
   flex: auto;
   overflow: auto;
   padding: 0px;
-  height: ${({ isLeft }) => isLeft ? '' : '242px'};
+  height: 242px;
   flex-direction: column;
   scrollbar-color: ${({ theme }) => theme.colors.foreground400} rgba(0,0,0,0.1);
   scrollbar-width: thin !important;
@@ -136,7 +136,7 @@ const TradePriceTable = (props) => {
         <thead>
           <tr>
             <th>
-              <Text font="tableHeader" color="foregroundLowEmphasis" textAlign="center">
+              <Text font="tableHeader" color="foregroundLowEmphasis">
                 Price
               </Text>
             </th>
