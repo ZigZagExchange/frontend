@@ -825,11 +825,6 @@ class SpotForm extends React.Component {
     return (
       <>
       <StyledForm isMobile={isMobile}>
-        <FormHeader>
-          <Text font="primaryTiny" color="foregroundMediumEmphasis">
-            Price
-          </Text>
-        </FormHeader>
         <InputBox>
         {this.props.orderType !== "market" && <IconButton
             variant="secondary"
