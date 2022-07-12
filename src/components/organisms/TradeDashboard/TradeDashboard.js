@@ -22,6 +22,7 @@ import {
     currentMarketSelector,
     setCurrentMarket,
     resetData,
+    layoutSelector,
     settingsSelector,
     setUISettings,
     marketSummarySelector,
@@ -30,7 +31,6 @@ import { userSelector } from "lib/store/features/auth/authSlice";
 import api from "lib/api";
 import { useLocation, useHistory } from "react-router-dom";
 import {
-    getChainIdFromMarketChain,
     marketQueryParam,
     networkQueryParam,
 } from "../../pages/ListPairPage/SuccessModal";
@@ -124,68 +124,20 @@ export function TradeDashboard() {
       api.subscribeToMarket(currentMarket, settings.showNightPriceChange);
     };
 
-    useEffect(() => {
-        if (_.isEmpty(marketSummary)) return;
-        document.title = `${marketSummary.price} | ${
-            marketSummary.market ?? "--"
-        } | ZigZag Exchange`;
-    }, [marketSummary]);
+    if (api.ws && api.ws.readyState === 0) {
+      api.on("open", sub);
+    } else {
+      sub();
+    }
 
-    useEffect(() => {
-        const urlParams = new URLSearchParams(search);
-        const marketFromURL = urlParams.get(marketQueryParam);
-        const networkFromURL = urlParams.get(networkQueryParam);
-        const chainid = getChainIdFromMarketChain(networkFromURL);
-        if (marketFromURL && currentMarket !== marketFromURL) {
-            updateMarketChain(marketFromURL);
-        }
-        if (chainid && network !== chainid) {
-            api.setAPIProvider(chainid);
-            api.signOut();
-        }
-        api.getWalletBalances();
-    }, []);
-
-    // Update URL when market or network update
-    useEffect(() => {
-        let networkText;
-        if (network === 1) {
-            networkText = "zksync";
-        } else if (network === 1000) {
-            networkText = "zksync-rinkeby";
-        }
-        history.push(`/?market=${currentMarket}&network=${networkText}`);
-    }, [network, currentMarket]);
-
-    useEffect(() => {
-        if (user.address && !user.id) {
-            history.push("/bridge");
-            toast.error(
-                "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
-                {
-                    autoClose: 60000,
-                }
-            );
-        }
-        const sub = () => {
-            dispatch(resetData());
-            api.subscribeToMarket(currentMarket, settings.showNightPriceChange);
-        };
-
-        if (api.ws && api.ws.readyState === 0) {
-            api.on("open", sub);
-        } else {
-            sub();
-        }
-
-        return () => {
-            if (api.ws && api.ws.readyState !== 0) {
-                api.unsubscribeToMarket(currentMarket);
-            } else {
-                api.off("open", sub);
-            }
-        };
-    }, [network, currentMarket, api.ws, settings.showNightPriceChange]);
+    return () => {
+      if (api.ws && api.ws.readyState !== 0) {
+        api.unsubscribeToMarket(currentMarket);
+      } else {
+        api.off("open", sub);
+      }
+    };
+  }, [network, currentMarket, api.ws, settings.showNightPriceChange]);
 
     const changeFixedPoint = (point) => {
         setFixedPoint(point);

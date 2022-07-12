@@ -372,12 +372,6 @@ const Divider = styled.div`
 `;
 
 const FavItem = styled(Box)`
-    &:hover {
-        background-color: ${({ theme }) => theme.colors.backgroundHighEmphasis};
-    }
-`;
-
-const FavItem = styled(Box)`
   &:hover {
     background-color: ${({ theme }) => theme.colors.backgroundHighEmphasis };
   }
