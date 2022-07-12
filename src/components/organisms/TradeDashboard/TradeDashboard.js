@@ -57,22 +57,71 @@ const TradeContainer = styled.div`
 `;
 
 export function TradeDashboard() {
-    const user = useSelector(userSelector);
-    const network = useSelector(networkSelector);
-    const currentMarket = useSelector(currentMarketSelector);
-    const userOrders = useSelector(userOrdersSelector);
-    const userFills = useSelector(userFillsSelector);
-    const settings = useSelector(settingsSelector);
-    const marketSummary = useSelector(marketSummarySelector);
-    const [fixedPoint, setFixedPoint] = useState(2);
-    const [side, setSide] = useState("all");
-    const dispatch = useDispatch();
+  const user = useSelector(userSelector);
+  const network = useSelector(networkSelector);
+  const currentMarket = useSelector(currentMarketSelector);
+  const userOrders = useSelector(userOrdersSelector);
+  const userFills = useSelector(userFillsSelector);
+  const layout = useSelector(layoutSelector);
+  const settings = useSelector(settingsSelector);
+  const marketSummary = useSelector(marketSummarySelector);
+  const [fixedPoint, setFixedPoint] = useState(2);
+  const [side, setSide] = useState("all");
+  const dispatch = useDispatch();
 
-    const { search } = useLocation();
-    const history = useHistory();
+  const { search } = useLocation();
+  const history = useHistory();
 
-    const updateMarketChain = (market) => {
-        dispatch(setCurrentMarket(market));
+  const updateMarketChain = (market) => {
+    dispatch(setCurrentMarket(market));
+  };
+
+  useEffect(()=>{
+    if(_.isEmpty(marketSummary)) return
+    document.title = `${addComma(formatPrice(marketSummary.price))} | ${marketSummary.market??'--'} | ZigZag Exchange`;
+  }, [marketSummary])
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(search);
+    const marketFromURL = urlParams.get(marketQueryParam);
+    const networkFromURL = urlParams.get(networkQueryParam);
+    const chainid = api.getChainIdFromName(networkFromURL);
+    if (marketFromURL && currentMarket !== marketFromURL) {
+      updateMarketChain(marketFromURL);
+    }
+    if (chainid && network !== chainid) {
+      api.setAPIProvider(chainid);
+      api.signOut();
+    }
+    api.getWalletBalances();
+  }, []);
+
+  // Update URL when market or network update
+  useEffect(() => {
+    let networkText;
+    if (network === 1) {
+      networkText = "zksync";
+    } else if (network === 1000) {
+      networkText = "zksync-rinkeby";
+    } else if (network === 42161) {
+      networkText = "arbitrum";
+    }
+    history.push(`/?market=${currentMarket}&network=${networkText}`);
+  }, [network, currentMarket]);
+
+  useEffect(() => {
+    if (user.address && !user.id) {
+      history.push("/bridge");
+      toast.error(
+        "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
+        {
+          autoClose: 60000,
+        }
+      );
+    }
+    const sub = () => {
+      dispatch(resetData());
+      api.subscribeToMarket(currentMarket, settings.showNightPriceChange);
     };
 
     useEffect(() => {

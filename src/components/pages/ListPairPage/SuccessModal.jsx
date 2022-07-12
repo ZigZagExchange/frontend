@@ -11,26 +11,6 @@ import api from "lib/api";
 
 export const marketQueryParam = "market";
 export const networkQueryParam = "network";
-export const mainnetChainName = "zksync";
-export const rinkebyChainName = "zksync-rinkeby";
-export const getMarketChainFromId = (chainId) => {
-  if (chainId === 1) {
-    return mainnetChainName;
-  } else if (chainId === 1000) {
-    return rinkebyChainName;
-  } else {
-    return null;
-  }
-};
-export const getChainIdFromMarketChain = (chainName) => {
-  if (chainName === mainnetChainName) {
-    return 1;
-  } else if (chainName === rinkebyChainName) {
-    return 1000;
-  } else {
-    return null;
-  }
-};
 
 const StyledLink = styled(Link)`
   color: blue-gray-400;
