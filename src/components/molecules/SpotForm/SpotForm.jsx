@@ -200,6 +200,24 @@ class SpotForm extends React.Component {
         );
     }
 
+    getBaseAllowance() {
+      const marketInfo = this.props.marketInfo;
+      if (!marketInfo) return 0;
+      if (!this.props.balances?.[marketInfo.zigzagChainId]?.[marketInfo.baseAsset.symbol]?.allowanceReadable) return 0;
+      return (
+        this.props.balances[marketInfo.zigzagChainId][marketInfo.baseAsset.symbol].allowanceReadable
+      );
+    }
+  
+    getQuoteAllowance() {
+      const marketInfo = this.props.marketInfo;
+      if (!marketInfo) return 0;
+      if (!this.props.balances?.[marketInfo.zigzagChainId]?.[marketInfo.quoteAsset.symbol]?.allowanceReadable) return 0;
+      return (
+        this.props.balances[marketInfo.zigzagChainId][marketInfo.quoteAsset.symbol].allowanceReadable
+      );
+    }
+
     /*
      * zkSync does not allow partial fills, so the ladder price is the first
      * liquidity that can fill the order size.
@@ -318,13 +336,17 @@ class SpotForm extends React.Component {
             });
             return;
         }
-        let baseBalance, quoteBalance;
+        let baseBalance, quoteBalance, baseAllowance, quoteAllowance;
         if (this.props.user.id) {
             baseBalance = this.getBaseBalance();
             quoteBalance = this.getQuoteBalance();
+            baseAllowance = this.getBaseAllowance();
+            quoteAllowance = this.getQuoteAllowance();
         } else {
             baseBalance = 0;
             quoteBalance = 0;
+            baseAllowance = 0;
+            quoteAllowance = 0;
         }
 
         const marketInfo = this.props.marketInfo;
@@ -361,6 +383,13 @@ class SpotForm extends React.Component {
                     )} ${marketInfo.baseAsset.symbol}`
                 );
                 return;
+            }
+
+            if (baseAmount && baseAmount > baseAllowance) {
+              toast.error(`Amount exceeds ${marketInfo.baseAsset.symbol} allowance`, {
+                toastId: `Amount exceeds ${marketInfo.baseAsset.symbol} allowance`,
+              });
+              return;
             }
 
             const askPrice = this.getFirstAsk();
@@ -413,6 +442,13 @@ class SpotForm extends React.Component {
             if (quoteAmount && quoteAmount < marketInfo.quoteFee) {
                 this.props.setHighSlippageModal({ open: true, delta: delta });
                 return;
+            }
+
+            if (quoteAmount && quoteAmount > quoteAllowance) {
+              toast.error(`Total exceeds ${marketInfo.quoteAsset.symbol} allowance`, {
+                toastId: `Total exceeds ${marketInfo.quoteAsset.symbol} allowance`,
+              });
+              return;
             }
 
             if (
@@ -694,33 +730,53 @@ class SpotForm extends React.Component {
         }
     }
 
-    showLabel() {
-        return (
-            <div>
-                <p>
-                    zkSync's network swap fees are dynamic and sit around ~$0.10
-                </p>
-                <p>covered by the market maker, but paid by the trader</p>
-            </div>
-        );
+    showLabel() {    
+        if(api.getNetworkName() === 'arbitrum') {
+           return (
+             <div>
+               <p>Arbitrum's network swap fees are dynamic and sit around ~$1</p>
+               <p>covered by the ZigZag operator, but paid by the taker</p>
+             </div>
+           );
+         } else {
+           return (
+             <div>
+               <p>zkSync's network swap fees are dynamic and sit around ~$0.10</p>
+               <p>covered by the market maker, but paid by the trader</p>
+             </div>
+           );
+         }
     }
 
     render() {
-        // const ethInput = useRef(null);
-        // const usdInput = useRef(null);
         const isMobile = window.innerWidth < 430;
         const marketInfo = this.props.marketInfo;
+        let baseAmount, quoteAmount;
+        if (typeof this.state.baseAmount === "string") {
+          baseAmount = parseFloat(this.state.baseAmount.replace(",", "."));
+        } else {
+          baseAmount = this.state.baseAmount;
+        }
+        if (typeof this.state.quoteAmount === "string") {
+          quoteAmount = parseFloat(this.state.quoteAmount.replace(",", "."));
+        } else {
+          quoteAmount = this.state.quoteAmount;
+        }
 
         let price = this.currentPrice();
         if (price === 0) price = "";
 
-        let baseBalance, quoteBalance;
+        let baseBalance, quoteBalance, baseAllowance, quoteAllowance;
         if (this.props.user.id) {
             baseBalance = this.getBaseBalance();
             quoteBalance = this.getQuoteBalance();
+            baseAllowance = this.getBaseAllowance();
+            quoteAllowance = this.getQuoteAllowance();
         } else {
-            baseBalance = "-";
-            quoteBalance = "-";
+            baseBalance = 0;
+            quoteBalance = 0;
+            baseAllowance = 0;
+            quoteAllowance = 0;
         }
         if (isNaN(baseBalance)) {
             baseBalance = 0;
@@ -757,11 +813,15 @@ class SpotForm extends React.Component {
             </Text>
         );
 
-        let buttonText, feeAmount, buttonType;
+        let buttonText, feeAmount, buttonType, approveNeeded = false;
         if (this.props.side === "b") {
             buttonType = "BUY";
-            buttonText =
-                buttonType + " " + (marketInfo && marketInfo.baseAsset?.symbol);
+            if (quoteAmount > quoteAllowance)  {
+              buttonText = `Approve ${(marketInfo && marketInfo.quoteAsset?.symbol)}`;
+              approveNeeded = true;
+            } else {
+              buttonText = `BUY ${(marketInfo && marketInfo.baseAsset?.symbol)}`;
+            }
             feeAmount = (
                 <FormHeader>
                     <InfoWrapper>
@@ -789,8 +849,12 @@ class SpotForm extends React.Component {
             );
         } else if (this.props.side === "s") {
             buttonType = "SELL";
-            buttonText =
-                buttonType + " " + (marketInfo && marketInfo.baseAsset?.symbol);
+            if (baseAmount > baseAllowance)  {
+              buttonText = `Approve ${marketInfo && marketInfo.baseAsset?.symbol}`;
+              approveNeeded = true;
+            } else {
+              buttonText = `SELL ${marketInfo && marketInfo.baseAsset?.symbol}`;
+            }
             feeAmount = (
                 <FormHeader>
                     <InfoWrapper>
@@ -925,7 +989,7 @@ class SpotForm extends React.Component {
                                 width="100%"
                                 scale="imd"
                                 disabled={this.state.orderButtonDisabled}
-                                onClick={this.buySellHandler.bind(this)}
+                                onClick={approveNeeded ? this.approveHandler.bind(this) : this.buySellHandler.bind(this)}
                             >
                                 {buttonText}
                             </Button>
