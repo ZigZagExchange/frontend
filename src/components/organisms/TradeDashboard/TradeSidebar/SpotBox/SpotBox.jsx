@@ -6,9 +6,8 @@ import "./SpotBox.css";
 import { SpotForm } from "components";
 import { ToggleButton } from "components/molecules/Toggle";
 import { IconButton as baseIcon } from "components/molecules/IconButton";
-import { CalculatorIcon } from "components/atoms/Svg";
 import { TabMenu, Tab } from "components/molecules/TabMenu";
-import { settingsSelector } from "lib/store/features/api/apiSlice";
+import { settingsSelector, networkSelector } from "lib/store/features/api/apiSlice";
 
 const SpotBox = ({
   marketInfo,
@@ -28,6 +27,7 @@ const SpotBox = ({
 
   const toggleClick = (num) => setSelectedLayer(num);
   const settings = useSelector(settingsSelector);
+  const network = useSelector(networkSelector);
   const handleTabClick = (newIndex) => {
     setIndex(newIndex);
     if (newIndex === 0) updateOrderType("limit");
@@ -49,6 +49,7 @@ const SpotBox = ({
       allOrders={allOrders}
       userOrders={userOrders}
       balances={balances}
+      network={network}
     />
   );
 
@@ -66,6 +67,7 @@ const SpotBox = ({
       settings={settings}
       allOrders={allOrders}
       balances={balances}
+      network={network}
     />
   );
 
