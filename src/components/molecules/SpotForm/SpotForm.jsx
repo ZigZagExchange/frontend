@@ -852,10 +852,12 @@ class SpotForm extends React.Component {
             }-${
               marketInfo && marketInfo.baseAsset?.symbol
             })`}
-            value={this.currentPrice() > 0
-              ? addComma(formatPrice(this.currentPrice()))
-              : ""
-            }
+            value={this.currentPrice() !== ""
+            ? ['.',',','0'].includes(this.currentPrice().toString().at(-1)) 
+              ? this.currentPrice()
+              : addComma(formatPrice(this.currentPrice()))
+            : ""
+          }
             onChange={this.updatePrice.bind(this)}
             disabled={this.props.orderType === "market"}
           />
@@ -878,9 +880,9 @@ class SpotForm extends React.Component {
               marketInfo && marketInfo.baseAsset?.symbol
             })`}
             value={this.state.baseAmount !== ""
-              ? ['.',',','0'].includes(this.state.baseAmount[-1]) 
-                ? addComma(formatPrice(this.state.baseAmount)) 
-                : this.state.baseAmount
+              ? ['.',',','0'].includes(this.state.baseAmount.toString().at(-1)) 
+                ? this.state.baseAmount 
+                : addComma(formatPrice(this.state.baseAmount))
               : ""
             }
             onChange={this.updateBaseAmount.bind(this)}
@@ -909,11 +911,10 @@ class SpotForm extends React.Component {
             placeholder={`Total (${
               marketInfo && marketInfo.quoteAsset?.symbol
             })`}
-            value=
-            {this.state.quoteAmount !== ""
-              ? ['.',',','0'].includes(this.state.quoteAmount[-1]) 
-                ? addComma(formatPrice(this.state.quoteAmount)) 
-                : this.state.quoteAmount
+            value={this.state.quoteAmount !== ""
+              ? ['.',',','0'].includes(this.state.quoteAmount.toString().at(-1)) 
+                ? this.state.quoteAmount
+                : addComma(formatPrice(this.state.quoteAmount)) 
               : ""
             }
             onChange={this.updateQuoteAmount.bind(this)}
