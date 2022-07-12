@@ -739,7 +739,7 @@ class SpotForm extends React.Component {
       quoteBalance = 0;
     }
 
-    const balance1Html = (
+    const quoteBalanceHtml = (
       <Text
         font="primaryExtraSmallSemiBold"
         color="foregroundMediumEmphasis"
@@ -750,7 +750,7 @@ class SpotForm extends React.Component {
       </Text>
     );
 
-    const balance2Html = (
+    const baseBalanceHtml = (
       <Text
         font="primaryExtraSmallSemiBold"
         color="foregroundMediumEmphasis"
@@ -825,6 +825,11 @@ class SpotForm extends React.Component {
     return (
       <>
       <StyledForm isMobile={isMobile}>
+        <FormHeader>
+          <Text font="primaryTiny" color="foregroundMediumEmphasis">
+            Price
+          </Text>
+        </FormHeader>
         <InputBox>
         {this.props.orderType !== "market" && <IconButton
             variant="secondary"
@@ -884,7 +889,7 @@ class SpotForm extends React.Component {
           <Text font="primaryTiny" color="foregroundMediumEmphasis">
             Available balance
           </Text>
-          {balance2Html}
+          {baseBalanceHtml}
         </FormHeader>
         <InputBox>
           <IconButton
@@ -916,7 +921,7 @@ class SpotForm extends React.Component {
           <Text font="primaryTiny" color="foregroundMediumEmphasis">
             Available balance
           </Text>
-          {balance1Html}
+          {quoteBalanceHtml}
         </FormHeader>
         <RangeWrapper>
           <RangeSlider
