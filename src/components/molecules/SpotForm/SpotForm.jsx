@@ -18,18 +18,11 @@ class SpotForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      userHasEditedPrice: false,
       price: props.lastPrice,
       baseAmount: "",
       quoteAmount: "",
-      orderButtonDisabled: true,
       maxSizeSelected: false,
     };
-  }
-  componentWillReceiveProps = (nextProps) => {
-    if (nextProps.orderType !== this.props.orderType) {
-      this.setState({userHasEditedPrice: false})
-    }
   }
 
   isInvalidNumber(val) {
@@ -42,9 +35,7 @@ class SpotForm extends React.Component {
     newState.price = rx_live.test(e.target.value)
       ? e.target.value
       : this.state.price;
-    newState.userHasEditedPrice = true;
     newState.quoteAmount = newState.baseAmount * newState.price;
-    newState.orderButtonDisabled = this.isInvalidNumber(newState.quoteAmount);
     this.setState(newState);
   }
 
@@ -54,7 +45,6 @@ class SpotForm extends React.Component {
       ? e.target.value
       : this.state.baseAmount;
     newState.quoteAmount = newState.baseAmount * this.currentPrice();
-    newState.orderButtonDisabled = this.isInvalidNumber(newState.quoteAmount);
     this.setState(newState);
   }
 
@@ -64,7 +54,6 @@ class SpotForm extends React.Component {
       ? e.target.value
       : this.state.quoteAmount;      
     newState.baseAmount = newState.quoteAmount / this.currentPrice();
-    newState.orderButtonDisabled = this.isInvalidNumber(newState.quoteAmount);
     this.setState(newState);
   }
 
@@ -72,7 +61,6 @@ class SpotForm extends React.Component {
     e.preventDefault();
     const newState = { ...this.state };
     newState.price = this.state.price * 1.001;
-    newState.userHasEditedPrice = true;
     newState.quoteAmount = this.currentPrice() * newState.baseAmount;
     this.setState(newState);
   }
@@ -81,7 +69,6 @@ class SpotForm extends React.Component {
     e.preventDefault();
     const newState = { ...this.state };
     newState.price = this.state.price * 0.999;
-    newState.userHasEditedPrice = true;
     newState.quoteAmount = this.currentPrice() * newState.baseAmount;
     this.setState(newState);
   }
@@ -92,15 +79,29 @@ class SpotForm extends React.Component {
     let baseBalance = this.getBaseBalance();
     baseBalance -= this.getBaseFee(baseBalance);
     const price = this.currentPrice();
+    if (baseBalance < 0) {
+      newState.baseAmount = 0;
+      newState.quoteAmount = 0;
+      this.setState(newState);
+      return;
+    }
 
     // set baseAmount
     const newBaseAmount = Number(this.state.baseAmount) + baseBalance * 0.02;
     newState.baseAmount = newBaseAmount > baseBalance ? baseBalance : newBaseAmount;
-
+    console.log(`newBaseAmount ==> ${newBaseAmount}`)
+    console.log(`newState.baseAmount ==> ${newState.baseAmount}`)
     if (this.props.side === 'b') {
       // for buy order we cant exceed the quoteBalance
       let quoteBalance = this.getQuoteBalance();
       quoteBalance -= this.getQuoteFee(quoteBalance);
+      if (quoteBalance < 0) {
+        newState.baseAmount = 0;
+        newState.quoteAmount = 0;
+        this.setState(newState);
+        return;
+      }
+
       const newQuoteAmount = newState.baseAmount * price;
       if (newQuoteAmount > quoteBalance) {
         newState.baseAmount = quoteBalance / price;
@@ -112,7 +113,6 @@ class SpotForm extends React.Component {
       newState.quoteAmount = newState.baseAmount * price;
     }
 
-    newState.orderButtonDisabled = this.isInvalidNumber(newState.quoteAmount);
     this.setState(newState);
   }
 
@@ -123,7 +123,6 @@ class SpotForm extends React.Component {
     const newAmount = Number(this.state.baseAmount) - baseBalance * 0.02;
     newState.baseAmount = newAmount < this.getBaseFee(baseBalance) ? 0 : newAmount;
     newState.quoteAmount = newState.baseAmount * this.currentPrice();
-    newState.orderButtonDisabled = this.isInvalidNumber(newState.quoteAmount);
     this.setState(newState);
   }
 
@@ -133,6 +132,12 @@ class SpotForm extends React.Component {
     let quoteBalance = this.getQuoteBalance();
     quoteBalance -= this.getQuoteFee(quoteBalance);
     const price = this.currentPrice();
+    if (quoteBalance < 0) {
+      newState.baseAmount = 0;
+      newState.quoteAmount = 0;
+      this.setState(newState);
+      return;
+    }
 
     // set quoteAmount
     const newQuoteAmount = Number(this.state.quoteAmount) + quoteBalance * 0.02;
@@ -142,6 +147,13 @@ class SpotForm extends React.Component {
       // for sell order we cant exceed the baseBalance
       let baseBalance = this.getBaseBalance();
       baseBalance -= this.getBaseFee(baseBalance);
+      if (baseBalance < 0) {
+        newState.baseAmount = 0;
+        newState.quoteAmount = 0;
+        this.setState(newState);
+        return;
+      }
+
       const newBaseAmount = newState.quoteAmount * price;
       if (newBaseAmount > baseBalance) {
         newState.quoteAmount = baseBalance / price;
@@ -156,7 +168,6 @@ class SpotForm extends React.Component {
     const newAmount = Number(this.state.quoteAmount) + quoteBalance * 0.02;
     newState.quoteAmount = newAmount > quoteBalance ? quoteBalance : newAmount;
     newState.baseAmount = newState.quoteAmount / this.currentPrice();
-    newState.orderButtonDisabled = this.isInvalidNumber(newState.quoteAmount);
     this.setState(newState);
   }
 
@@ -167,7 +178,6 @@ class SpotForm extends React.Component {
     const newAmount = Number(this.state.quoteAmount) - quoteBalance * 0.02;
     newState.quoteAmount = newAmount < this.getQuoteFee(quoteBalance) ? 0 : newAmount;
     newState.baseAmount = newState.quoteAmount / this.currentPrice();
-    newState.orderButtonDisabled = this.isInvalidNumber(newState.quoteAmount);
     this.setState(newState);
   }
 
@@ -339,7 +349,6 @@ class SpotForm extends React.Component {
       : marketInfo.quoteAsset.symbol;    
 
     let newstate = { ...this.state };
-    newstate.orderButtonDisabled = true;
     this.setState(newstate);
     let orderApproveToast = toast.info(
       "Approve pending. Sign or Cancel to continue...", {
@@ -359,7 +368,6 @@ class SpotForm extends React.Component {
 
     toast.dismiss(orderApproveToast);
     newstate = { ...this.state };
-    newstate.orderButtonDisabled = false;
     this.setState(newstate);
   }
 
@@ -584,7 +592,6 @@ class SpotForm extends React.Component {
     };
 
     let newstate = { ...this.state };
-    newstate.orderButtonDisabled = true;
     this.setState(newstate);
     let orderPendingToast;
     if (!this.props.settings.disableOrderNotification) {
@@ -618,7 +625,6 @@ class SpotForm extends React.Component {
     }
 
     newstate = { ...this.state };
-    newstate.orderButtonDisabled = false;
     this.setState(newstate);
   }
 
@@ -712,7 +718,6 @@ class SpotForm extends React.Component {
 
     if (isNaN(newstate.baseAmount)) newstate.baseAmount = 0;
     if (isNaN(newstate.quoteAmount)) newstate.quoteAmount = 0;
-    newstate.orderButtonDisabled = this.isInvalidNumber(newstate.quoteAmount);
     this.setState(newstate);
   }
 
@@ -986,7 +991,11 @@ class SpotForm extends React.Component {
                 variant={buttonType.toLowerCase()}
                 width="100%"
                 scale="imd"
-                disabled={this.state.orderButtonDisabled}
+                disabled={
+                  this.isInvalidNumber(this.state.quoteAmount) ||
+                  this.isInvalidNumber(this.state.baseAmount) ||
+                  this.isInvalidNumber(this.state.price)
+                }
                 onClick={approveNeeded ? this.approveHandler.bind(this) : this.buySellHandler.bind(this)}
               >
                 {buttonText}
