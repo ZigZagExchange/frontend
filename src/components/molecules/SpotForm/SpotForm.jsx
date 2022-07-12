@@ -406,7 +406,6 @@ class SpotForm extends React.Component {
 
       baseAmount = baseAmount ? baseAmount : quoteAmount / price;
       const fee = this.getBaseFee(baseAmount);
-      const delta = ((this.props.lastPrice - price) / this.props.lastPrice) * 100;
 
       if (isNaN(baseBalance)) {
         toast.error(`No ${marketInfo.baseAsset.symbol} balance`, {
@@ -440,7 +439,6 @@ class SpotForm extends React.Component {
     } else if (this.props.side === "b") {
       quoteAmount = quoteAmount ? quoteAmount : baseAmount * price;
       const fee = this.getQuoteFee(quoteAmount);
-      const delta = ((price - this.props.lastPrice) / this.props.lastPrice) * 100;
 
       if (isNaN(quoteBalance)) {
         toast.error(`No ${marketInfo.quoteAsset.symbol} balance`, {
@@ -491,9 +489,9 @@ class SpotForm extends React.Component {
 
     let price = quoteAmount / baseAmount;
 
-    const delta = (Math.abs(price - this.props.lastPrice) / this.props.lastPrice) * 100;
-    console.log(`delta ==> ${delta}`)
-    console.log(`this.props.orderType ==> ${this.props.orderType}`)
+    const delta = (this.props.side === 'b')
+      ? ((price - this.props.lastPrice) / this.props.lastPrice) * 100
+      : ((this.props.lastPrice - price) / this.props.lastPrice) * 100;
     if (
       (delta > 10 && this.props.orderType === "limit" && !this.props.settings.disableSlippageWarning) ||
       (delta > 2.5 && this.props.orderType === "market" && !this.props.settings.disableSlippageWarning)
@@ -606,7 +604,7 @@ class SpotForm extends React.Component {
     if (!this.props.user.id) return false;
 
     const newstate = { ...this.state };
-    if (val === 100) {
+    if (val > 99.9) {
       newstate.maxSizeSelected = true;
     } else {
       newstate.maxSizeSelected = false;
@@ -621,7 +619,7 @@ class SpotForm extends React.Component {
         newstate.quoteAmount = "";
       } else {
         newstate.baseAmount = amount;
-        newstate.quoteAmount = amount * this.state.price;
+        newstate.quoteAmount = amount * this.currentPrice();
       }
     } else if (this.props.side === "b") {
       let quoteBalance = this.getQuoteBalance();
@@ -633,7 +631,7 @@ class SpotForm extends React.Component {
         newstate.baseAmount = "";
       } else {
         newstate.quoteAmount = amount;
-        newstate.baseAmount = amount / this.state.price;
+        newstate.baseAmount = amount / this.currentPrice();
       }
     }
 
@@ -654,11 +652,27 @@ class SpotForm extends React.Component {
     }
 
     if (
-      this.props.lastPrice !== prevProps.lastPrice &&
-      this.state.maxSizeSelected
+      (
+        this.props.lastPrice !== prevProps.lastPrice ||
+        this.props.balances !== prevProps.balances
+      ) && this.state.maxSizeSelected
     ) {
       this.rangeSliderHandler(null, 100);
     }
+
+    if (this.props.orderType !== prevProps.orderType) {
+      const newState = { ...this.state };
+      if (this.props.side === 'b') {
+        // for buy quoteAmount should be fixed
+        newState.baseAmount = newState.quoteAmount / this.currentPrice();
+        newState.baseAmount = newState.baseAmount === 0 ? "" : newState.baseAmount;
+      } else {
+        // for sell baseAmount should be fixed
+        newState.quoteAmount = this.currentPrice() * newState.baseAmount;
+        newState.quoteAmount = newState.quoteAmount === 0 ? "" : newState.quoteAmount;
+      }
+      this.setState(newState);
+    }    
 
     if (this.props.currentMarket !== prevProps.currentMarket) {
       this.setState((state) => ({
@@ -919,7 +933,7 @@ class SpotForm extends React.Component {
                 disabled={
                   this.isInvalidNumber(this.state.quoteAmount) ||
                   this.isInvalidNumber(this.state.baseAmount) ||
-                  this.isInvalidNumber(this.state.price)
+                  this.isInvalidNumber(this.currentPrice())
                 }
                 onClick={approveNeeded ? this.approveHandler.bind(this) : this.buySellHandler.bind(this)}
               >

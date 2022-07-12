@@ -1421,9 +1421,10 @@ export default function OrdersTable(props) {
       if (props.user.committed) {
         const tokenBalanceInOrder = {};
         const userOrders = getUserOrders();
-        if (this.props.userOrders) {
+        if (userOrders) {
           Object.keys(userOrders).forEach(orderId => {
             const order = userOrders[orderId];
+            if (order) return;
             let sellToken, amount;
             if (order[3] === 's') {
               sellToken = order[2].split('-')[0];
