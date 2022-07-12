@@ -186,9 +186,9 @@ const AccountDropdown = ({ notext, networkName }) => {
     selectedLayer === 1 ? balanceData.wallet : balanceData[network];
 
   useEffect(()=>{
-    const explorerLink = user.address ? api.getExplorerAccountLink(network, user.address) : null;
+    const explorerLink = user.address ? api.getExplorerAccountLink(network, user.address, selectedLayer) : null;
     setExplorer(explorerLink)
-  }, [network, user.address])
+  }, [network, user.address, selectedLayer])
 
   const toggle = () => {
     setIsOpened(!isOpened);
