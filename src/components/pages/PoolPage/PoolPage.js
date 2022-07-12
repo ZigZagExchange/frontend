@@ -9,10 +9,7 @@ import "./PoolPage.style.css";
 
 export default function BridgePage() {
   const network = useSelector(networkSelector);
-  const isPoolCompatible = useMemo(
-    () => network && api.isImplemented("depositL2"),
-    [network]
-  );
+  const isPoolCompatible = useMemo(() => network && api.isImplemented("depositL2"), [network]);
 
   return (
     <DefaultTemplate>

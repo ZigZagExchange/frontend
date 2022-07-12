@@ -1,28 +1,21 @@
-import React, { useState } from "react";
+import React from "react";
 import { useSelector } from "react-redux";
 import { Listbox as ListBoxSelect, Transition } from "@headlessui/react";
 import { CheckIcon, SelectorIcon } from "@heroicons/react/solid";
 import { networkSelector } from "lib/store/features/api/apiSlice";
 const NetworkDropdown = ({ options, setSelectedItem, selectedItem }) => {
-  // const [selectedItem, setSelectedItem] = useState(options[0]);
   const network = useSelector(networkSelector);
 
   return (
     <ListBoxSelect value={selectedItem} onChange={setSelectedItem}>
       <ListBoxSelect.Button className="relative w-full py-2 pl-3 pr-10 text-sm text-left rounded-lg hover:bg-primary-400 dark:bg-foreground-200 bg-primary-300 hover:dark:bg-foreground-100">
         <div className="flex items-start gap-2">
-          <img
-            src={selectedItem.icon}
-            alt="icon"
-            className="rounded-full w-9 h-9"
-          />
+          <img src={selectedItem.icon} alt="icon" className="rounded-full w-9 h-9" />
           <div>
             <p className="text-xs font-bold tracking-wider md:text-base font-work ">
               {selectedItem.name}
             </p>
-            <p className="text-xs tracking-wider ">
-              {network === 1 ? "Mainnet" : "Testnet"}
-            </p>
+            <p className="text-xs tracking-wider ">{network === 1 ? "Mainnet" : "Testnet"}</p>
           </div>
         </div>
         <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
@@ -50,11 +43,7 @@ const NetworkDropdown = ({ options, setSelectedItem, selectedItem }) => {
             >
               {({ selected }) => (
                 <>
-                  <span
-                    className={`block truncate ${
-                      selected ? "font-medium" : "font-normal"
-                    }`}
-                  >
+                  <span className={`block truncate ${selected ? "font-medium" : "font-normal"}`}>
                     {item.name}
                   </span>
                   {selected ? (

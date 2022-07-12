@@ -42,13 +42,15 @@
     "date-fns": "^2.27.0",
     "dotenv": "8.2.0",
     "dotenv-expand": "5.1.0",
-    "eslint": "^7.11.0",
+    "eslint": "^8.19.0",
+    "eslint-config-prettier": "^8.5.0",
     "eslint-config-react-app": "^6.0.0",
     "eslint-plugin-flowtype": "^5.2.0",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-jest": "^24.1.0",
     "eslint-plugin-jsx-a11y": "^6.3.1",
-    "eslint-plugin-react": "^7.21.5",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-react": "^7.30.1",
     "eslint-plugin-react-hooks": "^4.2.0",
     "eslint-plugin-testing-library": "^3.9.2",
     "eslint-webpack-plugin": "^2.5.2",
@@ -64,6 +66,7 @@
     "jest-circus": "26.6.0",
     "jest-resolve": "26.6.0",
     "jest-watch-typeahead": "0.6.1",
+    "lint-staged": "^13.0.3",
     "lodash": "^4.17.21",
     "match-sorter": "^6.3.1",
     "mini-css-extract-plugin": "0.11.3",
@@ -133,7 +136,9 @@
     "build:local": "node scripts/build.js",
     "build:prod": "env-cmd -f .env.prod node scripts/build.js",
     "test": "node scripts/test.js",
-    "format": "prettier --write src/"
+    "format": "prettier --write src/",
+    "prepare": "husky install",
+    "lint": "eslint --fix ."
   },
   "eslintConfig": {
     "extends": [
@@ -164,6 +169,7 @@
     "@babel/plugin-proposal-private-methods": "^7.16.11",
     "babel-plugin-styled-components": "^2.0.2",
     "env-cmd": "^10.1.0",
+    "husky": "^8.0.0",
     "prettier": "2.4.1",
     "source-map-explorer": "^2.5.2"
   },
@@ -230,6 +236,12 @@
           "loose": true
         }
       ]
+    ]
+  },
+  "lint-staged": {
+    "**/*.{js,jsx}": [
+      "npm run lint",
+      "npm run format"
     ]
   }
 }

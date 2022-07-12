@@ -26,8 +26,7 @@ export default class APIStarknetProvider extends APIProvider {
     const baseCurrency = product.split("-")[0];
     const quoteCurrency = product.split("-")[1];
     const sellCurrency = side === "s" ? baseCurrency : quoteCurrency;
-    const tokenAddress =
-      this.api.currencies[sellCurrency].chain[this.network].contractAddress;
+    const tokenAddress = this.api.currencies[sellCurrency].chain[this.network].contractAddress;
     const decimals = this.api.currencies[sellCurrency].decimals;
     const allowancesToast = toast.info("Checking and setting allowances", {
       autoClose: false,
@@ -54,24 +53,11 @@ export default class APIStarknetProvider extends APIProvider {
       baseAmount = quoteAmount / price;
     }
     const expiration = Date.now() + 86400;
-    const orderhash = this._createOrderHash(
-      product,
-      side,
-      price,
-      amount,
-      expiration
-    );
-    const keypair = starknet.ec.ec.keyFromPrivate(
-      localStorage.getItem("starknet:privkey"),
-      "hex"
-    );
+    const orderhash = this._createOrderHash(product, side, price, baseAmount, expiration);
+    const keypair = starknet.ec.ec.keyFromPrivate(localStorage.getItem("starknet:privkey"), "hex");
     const sig = starknet.ec.sign(keypair, orderhash.hash);
 
-    const starknetOrder = [
-      ...orderhash.order,
-      sig.r.toString(),
-      sig.s.toString(),
-    ];
+    const starknetOrder = [...orderhash.order, sig.r.toString(), sig.s.toString()];
     this.api.send("submitorder", [this.network, starknetOrder]);
   };
 
@@ -80,10 +66,7 @@ export default class APIStarknetProvider extends APIProvider {
     let keypair;
 
     if (localStorage.getItem("starknet:privkey")) {
-      keypair = starknet.ec.ec.keyFromPrivate(
-        localStorage.getItem("starknet:privkey"),
-        "hex"
-      );
+      keypair = starknet.ec.ec.keyFromPrivate(localStorage.getItem("starknet:privkey"), "hex");
     } else {
       keypair = starknet.ec.genKeyPair();
       localStorage.setItem("starknet:privkey", keypair.getPrivate("hex"));
@@ -97,14 +80,13 @@ export default class APIStarknetProvider extends APIProvider {
         "First time using Zigzag Starknet. Deploying account contract...",
         {
           autoClose: false,
-          toastId:
-            "First time using Zigzag Starknet. Deploying account contract...",
+          toastId: "First time using Zigzag Starknet. Deploying account contract...",
         }
       );
-      const deployContractResponse =
-        await starknet.defaultProvider.deployContract(starknetAccountContract, [
-          starkkeyint.toString(),
-        ]);
+      const deployContractResponse = await starknet.defaultProvider.deployContract(
+        starknetAccountContract,
+        [starkkeyint.toString()]
+      );
       toast.dismiss(deployContractToast);
       userWalletContractAddress = deployContractResponse.address;
       toast.success("Account contract deployed");
@@ -112,9 +94,7 @@ export default class APIStarknetProvider extends APIProvider {
     }
 
     // Check account initialized
-    const initialized = await this._checkAccountInitialized(
-      userWalletContractAddress
-    );
+    const initialized = await this._checkAccountInitialized(userWalletContractAddress);
     if (!initialized) {
       await this._initializeAccount(userWalletContractAddress);
     }
@@ -170,8 +150,7 @@ export default class APIStarknetProvider extends APIProvider {
     try {
       await starknet.defaultProvider.callContract({
         contract_address: userWalletContractAddress,
-        entry_point_selector:
-          starknet.stark.getSelectorFromName("assert_initialized"),
+        entry_point_selector: starknet.stark.getSelectorFromName("assert_initialized"),
         calldata: [],
       });
       return true;
@@ -196,8 +175,7 @@ export default class APIStarknetProvider extends APIProvider {
     const balances = {};
     for (let currency in this.api.currencies) {
       if (this.api.currencies[currency].chain[this.network]) {
-        const contractAddress =
-          this.api.currencies[currency].chain[this.network].contractAddress;
+        const contractAddress = this.api.currencies[currency].chain[this.network].contractAddress;
         if (contractAddress) {
           let balance = await this._getBalance(contractAddress, userAddress);
           balances[currency] = balance;
@@ -233,13 +211,8 @@ export default class APIStarknetProvider extends APIProvider {
     const allowances = {};
     for (let currency in this.api.currencies) {
       if (this.api.currencies[currency].chain[this.network]) {
-        const contractAddress =
-          this.api.currencies[currency].chain[this.network].contractAddress;
-        let allowance = await this._getTokenAllowance(
-          contractAddress,
-          userAddress,
-          spender
-        );
+        const contractAddress = this.api.currencies[currency].chain[this.network].contractAddress;
+        let allowance = await this._getTokenAllowance(contractAddress, userAddress, spender);
         allowances[currency] = allowance;
       }
     }
@@ -259,16 +232,9 @@ export default class APIStarknetProvider extends APIProvider {
   };
 
   _setTokenApproval = async (tokenAddress, userAddress, spender, amount) => {
-    const keypair = starknet.ec.ec.keyFromPrivate(
-      localStorage.getItem("starknet:privkey"),
-      "hex"
-    );
+    const keypair = starknet.ec.ec.keyFromPrivate(localStorage.getItem("starknet:privkey"), "hex");
     const spenderInt = bigInt(spender.slice(2), 16);
-    const localSigner = new starknet.Signer(
-      starknet.defaultProvider,
-      userAddress,
-      keypair
-    );
+    const localSigner = new starknet.Signer(starknet.defaultProvider, userAddress, keypair);
     return localSigner.addTransaction({
       type: "INVOKE_FUNCTION",
       contract_address: tokenAddress,
@@ -280,27 +246,18 @@ export default class APIStarknetProvider extends APIProvider {
   _createOrderHash = (product, side, price, amount, expiration) => {
     const baseCurrency = product.split("-")[0];
     const quoteCurrency = product.split("-")[1];
-    const baseAsset =
-      this.api.currencies[baseCurrency].chain[this.network].contractAddress;
-    const quoteAsset =
-      this.api.currencies[quoteCurrency].chain[this.network].contractAddress;
+    const baseAsset = this.api.currencies[baseCurrency].chain[this.network].contractAddress;
+    const quoteAsset = this.api.currencies[quoteCurrency].chain[this.network].contractAddress;
     const decimalDifference =
-      this.api.currencies[baseCurrency].decimals -
-      this.api.currencies[quoteCurrency].decimals;
+      this.api.currencies[baseCurrency].decimals - this.api.currencies[quoteCurrency].decimals;
     let priceNumerator, priceDenominator;
     if (product === "ETH-USDT" || product === "ETH-USDC") {
       priceNumerator = "1";
       priceDenominator = ((1 / price) * 10 ** decimalDifference).toFixed(0);
     }
     const sideInt = side === "b" ? 0 : 1;
-    const baseQuantityInt = (
-      amount *
-      10 ** this.api.currencies[baseCurrency].decimals
-    ).toFixed(0);
-    let orderhash = starknet.hash.pedersen([
-      this.network,
-      this._accountState.address,
-    ]);
+    const baseQuantityInt = (amount * 10 ** this.api.currencies[baseCurrency].decimals).toFixed(0);
+    let orderhash = starknet.hash.pedersen([this.network, this._accountState.address]);
     orderhash = starknet.hash.pedersen([orderhash, baseAsset]);
     orderhash = starknet.hash.pedersen([orderhash, quoteAsset]);
     orderhash = starknet.hash.pedersen([orderhash, sideInt]);

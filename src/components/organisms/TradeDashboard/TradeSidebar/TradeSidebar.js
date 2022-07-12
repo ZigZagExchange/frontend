@@ -11,7 +11,7 @@ import {
   balancesSelector,
   allOrdersSelector,
 } from "lib/store/features/api/apiSlice";
-import { Button, ConnectWalletButton } from "components/molecules/Button";
+import { Button } from "components/molecules/Button";
 
 const StyledTradeSidebar = styled.aside`
   // display: grid;
@@ -22,7 +22,7 @@ const StyledTradeSidebar = styled.aside`
   border: 1px solid ${({ theme }) => theme.colors.foreground300};
   background: ${({ theme }) => theme.colors.backgroundMediumEmphasis};
   overflow-y: auto;
-  scrollbar-color: ${({ theme }) => theme.colors.foreground400} rgba(0,0,0,0.1);
+  scrollbar-color: ${({ theme }) => theme.colors.foreground400} rgba(0, 0, 0, 0.1);
   scrollbar-width: thin !important;
 
   ::-webkit-scrollbar {
@@ -71,7 +71,7 @@ export default function TradeSidebar(props) {
       ) : (
         <InfoWrapper>
           <Text font="primarySmall" color="foregroundHighEmphasis">
-              Have a question? Need live support?
+            Have a question? Need live support?
           </Text>
           <Button
             width="150px"
@@ -81,11 +81,7 @@ export default function TradeSidebar(props) {
             mr="8px"
             onClick={joinDiscord}
           >
-            <Text
-              font="primaryBoldDisplay"
-              color="foregroundHighEmphasis"
-              textAlign="center"
-            >
+            <Text font="primaryBoldDisplay" color="foregroundHighEmphasis" textAlign="center">
               JOIN DISCORD
             </Text>
           </Button>

@@ -16,11 +16,7 @@ const StyledTradeTables = styled.section`
 export default function TradeTables(props) {
   return (
     <StyledTradeTables>
-      <OrdersTable
-        userFills={props.userFills}
-        userOrders={props.userOrders}
-        user={props.user}
-      />
+      <OrdersTable userFills={props.userFills} userOrders={props.userOrders} user={props.user} />
     </StyledTradeTables>
   );
 }

@@ -19,7 +19,7 @@ import apiReducer, {
   setCurrentMarket,
   setConnecting,
   setBridgeConnecting,
-  setUISettings
+  setUISettings,
 } from "lib/store/features/api/apiSlice";
 import autoMergeLevel2 from "redux-persist/lib/stateReconciler/autoMergeLevel2";
 import api from "lib/api";
@@ -88,7 +88,7 @@ api.on("signIn", (accountState) => {
   store.dispatch(signIn(accountState));
 });
 
-api.on("signOut", (accountState) => {
+api.on("signOut", () => {
   store.dispatch(clearUserOrders());
   store.dispatch(signOut());
 });
@@ -97,8 +97,8 @@ api.on("providerChange", (network) => {
   store.dispatch(clearLastPrices());
   store.dispatch(setNetwork(network));
   // EVM networks can't trade ETH so the default is WETH
-  if (network === 42161) store.dispatch(setCurrentMarket('WETH-USDC'));
-  else store.dispatch(setCurrentMarket('ETH-USDC'));
+  if (network === 42161) store.dispatch(setCurrentMarket("WETH-USDC"));
+  else store.dispatch(setCurrentMarket("ETH-USDC"));
 });
 
 api.on("message", (operation, args) => {
@@ -106,15 +106,15 @@ api.on("message", (operation, args) => {
 });
 
 api.on("connecting", (flag) => {
-  store.dispatch(setConnecting(flag))
-})
+  store.dispatch(setConnecting(flag));
+});
 
 api.on("bridge_connecting", (flag) => {
-  store.dispatch(setBridgeConnecting(flag))
-})
+  store.dispatch(setBridgeConnecting(flag));
+});
 
 api.on("settings", (payload) => {
-  store.dispatch(setUISettings(payload))
-})
+  store.dispatch(setUISettings(payload));
+});
 
 export default store;

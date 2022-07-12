@@ -3,8 +3,7 @@ import { BigNumber } from "ethers";
 import isString from "lodash/isString";
 import get from "lodash/get";
 
-export const getThemeValue = (path, fallback) => (theme) =>
-  get(theme, path, fallback);
+export const getThemeValue = (path, fallback) => (theme) => get(theme, path, fallback);
 
 export function formatUSD(floatNum) {
   const num = parseFloat(floatNum || 0)
@@ -30,7 +29,9 @@ export function formatToken(floatNum, token = "USDC") {
     token === "FRAX"
   )
     isUSD = true;
-  return floatNum !== "" && isUSD ? parseFloat(floatNum).toFixed(2) : parseFloat(floatNum).toFixed(7);
+  return floatNum !== "" && isUSD
+    ? parseFloat(floatNum).toFixed(2)
+    : parseFloat(floatNum).toFixed(7);
 }
 
 export function formatAmount(amount, currency) {
@@ -77,8 +78,7 @@ export function toBaseUnit(value, decimals) {
 
   if (value === ".") {
     throw new Error(
-      `Invalid value ${value} cannot be converted to` +
-        ` base unit with ${decimals} decimals.`
+      `Invalid value ${value} cannot be converted to` + ` base unit with ${decimals} decimals.`
     );
   }
 

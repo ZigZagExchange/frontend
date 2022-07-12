@@ -105,17 +105,14 @@ export default class APIZKProvider extends APIProvider {
     } else if (balances.WBTC && balances.WBTC > 0.0003e8) {
       feeToken = "WBTC";
     } else {
-      toast.warn(
-        "Your token balances are very low. You might need to bridge in more funds first."
-      );
+      toast.warn("Your token balances are very low. You might need to bridge in more funds first.");
       let maxValue = 0;
       const tokens = Object.keys(balances);
       const result = tokens.map(async (token) => {
         const tokenInfo = await this.getTokenInfo(token);
         if (tokenInfo.enabledForFees) {
           const priceInfo = await this.tokenPrice(token);
-          const usdValue =
-            (priceInfo.price * balances[token]) / 10 ** tokenInfo.decimals;
+          const usdValue = (priceInfo.price * balances[token]) / 10 ** tokenInfo.decimals;
           if (usdValue > maxValue) {
             maxValue = usdValue;
             feeToken = token;
@@ -136,24 +133,15 @@ export default class APIZKProvider extends APIProvider {
   };
 
   checkAccountActivated = async () => {
-    const [accountState, signingKeySet, correspondigKeySet] = await Promise.all(
-      [
-        this.getAccountState(),
-        this.syncWallet.isSigningKeySet(),
-        this.syncWallet.isCorrespondingSigningKeySet(),
-      ]
-    );
+    const [accountState, signingKeySet, correspondigKeySet] = await Promise.all([
+      this.getAccountState(),
+      this.syncWallet.isSigningKeySet(),
+      this.syncWallet.isCorrespondingSigningKeySet(),
+    ]);
     return accountState.id && signingKeySet && correspondigKeySet;
   };
 
-  submitOrder = async (
-    market,
-    side,
-    price,
-    baseAmount,
-    quoteAmount,
-    orderType
-  ) => {
+  submitOrder = async (market, side, price, baseAmount, quoteAmount, orderType) => {
     const accountActivated = await this.checkAccountActivated();
     if (!accountActivated) {
       toast.error(
@@ -177,9 +165,7 @@ export default class APIZKProvider extends APIProvider {
     quoteAmount = quoteAmount
       ? parseFloat(quoteAmount).toFixed(marketInfo.quoteAsset.decimals)
       : null;
-    baseAmount = baseAmount
-      ? parseFloat(baseAmount).toFixed(marketInfo.baseAsset.decimals)
-      : null;
+    baseAmount = baseAmount ? parseFloat(baseAmount).toFixed(marketInfo.baseAsset.decimals) : null;
 
     let tokenBuy,
       tokenSell,
@@ -210,10 +196,7 @@ export default class APIZKProvider extends APIProvider {
         tokenRatio[marketInfo.baseAsset.id] = baseAmount;
         tokenRatio[marketInfo.quoteAsset.id] = sellQuantityWithFee;
       }
-      sellQuantityBN = ethers.utils.parseUnits(
-        sellQuantityWithFee,
-        marketInfo.quoteAsset.decimals
-      );
+      sellQuantityBN = ethers.utils.parseUnits(sellQuantityWithFee, marketInfo.quoteAsset.decimals);
     } else {
       // baseAmount is first choice for sell
       if (baseAmount) {
@@ -237,10 +220,7 @@ export default class APIZKProvider extends APIProvider {
         tokenRatio[marketInfo.baseAsset.id] = sellQuantityWithFee;
         tokenRatio[marketInfo.quoteAsset.id] = quoteAmount;
       }
-      sellQuantityBN = ethers.utils.parseUnits(
-        sellQuantityWithFee,
-        marketInfo.baseAsset.decimals
-      );
+      sellQuantityBN = ethers.utils.parseUnits(sellQuantityWithFee, marketInfo.baseAsset.decimals);
     }
 
     const now_unix = (Date.now() / 1000) | 0;
@@ -252,8 +232,7 @@ export default class APIZKProvider extends APIProvider {
     } else {
       validUntil = two_minute_expiry;
     }
-    const packedSellQuantity =
-      zksync.utils.closestPackableTransactionAmount(sellQuantityBN);
+    const packedSellQuantity = zksync.utils.closestPackableTransactionAmount(sellQuantityBN);
     const order = await this.syncWallet.signOrder({
       tokenSell,
       tokenBuy,
@@ -278,18 +257,13 @@ export default class APIZKProvider extends APIProvider {
 
     this.api.getCurrencies().forEach((ticker) => {
       const currencyInfo = this.api.getCurrencyInfo(ticker);
-      const balance =
-        account && account.committed
-          ? account.committed.balances[ticker] || 0
-          : 0;
+      const balance = account && account.committed ? account.committed.balances[ticker] || 0 : 0;
       if (!balance) return true;
       balances[ticker] = {
         value: balance,
-        valueReadable:
-          (balance && currencyInfo && balance / 10 ** currencyInfo.decimals) ||
-          0,
+        valueReadable: (balance && currencyInfo && balance / 10 ** currencyInfo.decimals) || 0,
         allowance: ethers.constants.MaxUint256,
-        allowanceReadable: 9007199254740991 // max save int
+        allowanceReadable: 9007199254740991, // max save int
       };
     });
 
@@ -332,12 +306,7 @@ export default class APIZKProvider extends APIProvider {
     }
   };
 
-  createWithdraw = async (
-    amountDecimals,
-    token,
-    onSameFeeToken,
-    onDiffFeeToken
-  ) => {
+  createWithdraw = async (amountDecimals, token, onSameFeeToken, onDiffFeeToken) => {
     let transfer;
 
     const currencyInfo = this.api.getCurrencyInfo(token);
@@ -385,13 +354,7 @@ export default class APIZKProvider extends APIProvider {
 
     this.api.emit(
       "bridgeReceipt",
-      this.handleBridgeReceipt(
-        transfer,
-        amountTransferred,
-        token,
-        "withdraw",
-        "zksync"
-      )
+      this.handleBridgeReceipt(transfer, amountTransferred, token, "withdraw", "zksync")
     );
     return transfer;
   };
@@ -501,11 +464,7 @@ export default class APIZKProvider extends APIProvider {
         feeToken
       );
     } else {
-      const fee = await this.syncProvider.getTransactionFee(
-        "Transfer",
-        address,
-        token
-      );
+      const fee = await this.syncProvider.getTransactionFee("Transfer", address, token);
       totalFee = fee.totalFee;
     }
 
@@ -531,19 +490,14 @@ export default class APIZKProvider extends APIProvider {
         throw Error("Token not eligible for fast withdraw");
       }
       const feeData = await this.api.rollupProvider.getFeeData();
-      let bridgeFee = feeData.maxFeePerGas
-        .add(feeData.maxPriorityFeePerGas)
-        .mul(21000);
+      let bridgeFee = feeData.maxFeePerGas.add(feeData.maxPriorityFeePerGas).mul(21000);
 
       if (token === "ETH") {
         return getNumberFormatted(bridgeFee);
       } else if (["FRAX", "UST"].includes(token)) {
         const priceInfo = await this.tokenPrice("ETH");
         const stableFee = (
-          ((bridgeFee.toString() / 1e18) *
-            priceInfo.price *
-            10 ** currencyInfo.decimals *
-            50000) /
+          ((bridgeFee.toString() / 1e18) * priceInfo.price * 10 ** currencyInfo.decimals * 50000) /
           21000
         ).toFixed(0);
         return getNumberFormatted(stableFee);
@@ -556,7 +510,7 @@ export default class APIZKProvider extends APIProvider {
   signIn = async () => {
     try {
       this.syncProvider = await zksync.getDefaultProvider(
-        this.network === 1 ? 'mainnet' : 'rinkeby'
+        this.network === 1 ? "mainnet" : "rinkeby"
       );
     } catch (e) {
       toast.error("Zksync is down. Try again later");
@@ -586,20 +540,14 @@ export default class APIZKProvider extends APIProvider {
       throw err;
     }
 
-    this.batchTransferService = new BatchTransferService(
-      this.syncProvider,
-      this.syncWallet
-    );
+    this.batchTransferService = new BatchTransferService(this.syncProvider, this.syncWallet);
 
     const [accountState, accountActivated] = await Promise.all([
       this.api.getAccountState(),
       this.checkAccountActivated(),
     ]);
     if (!accountState.id) {
-      const walletBalance = formatAmount(
-        accountState.committed.balances["ETH"],
-        { decimals: 18 }
-      );
+      const walletBalance = formatAmount(accountState.committed.balances["ETH"], { decimals: 18 });
       const activationFee = await this.changePubKeyFee("ETH");
 
       if (isNaN(walletBalance) || walletBalance < activationFee) {
@@ -628,9 +576,7 @@ export default class APIZKProvider extends APIProvider {
 
   getSeeds = () => {
     try {
-      return JSON.parse(
-        window.localStorage.getItem(APIZKProvider.SEEDS_STORAGE_KEY) || "{}"
-      );
+      return JSON.parse(window.localStorage.getItem(APIZKProvider.SEEDS_STORAGE_KEY) || "{}");
     } catch {
       return {};
     }
@@ -650,10 +596,7 @@ export default class APIZKProvider extends APIProvider {
         .toString()
         .split(",")
         .map((x) => +x);
-      window.localStorage.setItem(
-        APIZKProvider.SEEDS_STORAGE_KEY,
-        JSON.stringify(seeds)
-      );
+      window.localStorage.setItem(APIZKProvider.SEEDS_STORAGE_KEY, JSON.stringify(seeds));
     }
 
     seeds[seedKey].seed = Uint8Array.from(seeds[seedKey].seed);
@@ -666,16 +609,12 @@ export default class APIZKProvider extends APIProvider {
       const network = await ethSigner.provider.getNetwork();
       chainID = network.chainId;
     }
-    let message =
-      "Access zkSync account.\n\nOnly sign this message for a trusted client!";
+    let message = "Access zkSync account.\n\nOnly sign this message for a trusted client!";
     if (chainID !== 1) {
       message += `\nChain ID: ${chainID}.`;
     }
     const signedBytes = zksync.utils.getSignedBytesFromMessage(message, false);
-    const signature = await zksync.utils.signMessagePersonalAPI(
-      ethSigner,
-      signedBytes
-    );
+    const signature = await zksync.utils.signMessagePersonalAPI(ethSigner, signedBytes);
     const address = await ethSigner.getAddress();
     const ethSignatureType = await zksync.utils.getEthSignatureType(
       ethSigner.provider,
@@ -690,8 +629,7 @@ export default class APIZKProvider extends APIProvider {
   refreshArweaveAllocation = async (address) => {
     if (address) {
       const url =
-        "https://zigzag-arweave-bridge.herokuapp.com/allocation/zksync?address=" +
-        address;
+        "https://zigzag-arweave-bridge.herokuapp.com/allocation/zksync?address=" + address;
       try {
         const allocation = await fetch(url).then((r) => r.json());
         const bytes = Number(allocation.remaining_bytes);
@@ -709,10 +647,7 @@ export default class APIZKProvider extends APIProvider {
     const feeTokenDecimals = 6;
     const BYTES_PER_DOLLAR = 10 ** 6;
     const ARWEAVE_BRIDGE_ADDRESS = "0xCb7AcA0cdEa76c5bD5946714083c559E34627607";
-    const amount = (
-      (bytes / BYTES_PER_DOLLAR) *
-      10 ** feeTokenDecimals
-    ).toString();
+    const amount = ((bytes / BYTES_PER_DOLLAR) * 10 ** feeTokenDecimals).toString();
     return this.syncWallet.syncTransfer({
       to: ARWEAVE_BRIDGE_ADDRESS,
       token: feeToken,
@@ -753,15 +688,12 @@ export default class APIZKProvider extends APIProvider {
    * */
   getTokenInfo = async (tokenLike, _chainId = this.network) => {
     const chainId = _chainId.toString();
-    const returnFromCache =
-      this._tokenInfo[chainId] && this._tokenInfo[chainId][tokenLike];
+    const returnFromCache = this._tokenInfo[chainId] && this._tokenInfo[chainId][tokenLike];
     try {
       if (returnFromCache) {
         return this._tokenInfo[chainId][tokenLike];
       } else {
-        const res = await axios.get(
-          this.getZkSyncBaseUrl(chainId) + `/tokens/${tokenLike}`
-        );
+        const res = await axios.get(this.getZkSyncBaseUrl(chainId) + `/tokens/${tokenLike}`);
         this._tokenInfo[chainId] = {
           ...this._tokenInfo[chainId],
           [tokenLike]: res.data.result,
@@ -775,20 +707,12 @@ export default class APIZKProvider extends APIProvider {
 
   getChainName = (chainId) => {
     switch (Number(chainId)) {
-      case 1: return 'mainnet';
-      case 1000: return 'rinkeby';
-      default: throw Error("Chain ID not understood");
-    }
-  };
-
-  tokenPrice = async (tokenLike, chainId = 1) => {
-    try {
-      const res = await axios.get(
-        this.getZkSyncBaseUrl(chainId) + `/tokens/${tokenLike}/priceIn/usd`
-      );
-      return res.data.result;
-    } catch (e) {
-      console.error("Could not get token price", e);
+      case 1:
+        return "mainnet";
+      case 1000:
+        return "rinkeby";
+      default:
+        throw Error("Chain ID not understood");
     }
   };
 

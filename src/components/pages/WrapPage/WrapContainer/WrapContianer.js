@@ -1,10 +1,7 @@
 import React from "react";
 import api from "lib/api";
 import { formatUSD, formatPrice } from "lib/utils";
-import {
-  SwitchVerticalIcon,
-  SwitchHorizontalIcon,
-} from "@heroicons/react/solid";
+import { SwitchVerticalIcon, SwitchHorizontalIcon } from "@heroicons/react/solid";
 
 const WrapContianer = ({
   balances,
@@ -23,15 +20,13 @@ const WrapContianer = ({
         <p className="text-lg font-work">From</p>
         <p className="text-sm font-normal ">
           Available Balance:{" "}
-          {balances[fromToken]
-            ? Number(balances[fromToken].valueReadable).toPrecision(8)
-            : "0.00"}
+          {balances[fromToken] ? Number(balances[fromToken].valueReadable).toPrecision(8) : "0.00"}
           {` ${fromToken}`}
         </p>
       </div>
       <div className="flex items-center justify-between px-3 py-2 mt-3 rounded-lg dark:bg-foreground-200 bg-primary-300 hover:ring-1 hover:ring-offset-0 hover:dark:ring-foreground-500 hover:ring-primary-600">
         <img src={api.getCurrencyLogo(fromToken)} style={{ width: 25, height: 25 }} />
-        {fromToken && fromToken }
+        {fromToken && fromToken}
         <button
           className="bg-[#07071C] px-2 py-1 rounded-md text-sm font-semibold text-primary-900 ml-2.5 hover:bg-slate-800 "
           onClick={onClickMax}
@@ -64,7 +59,7 @@ const WrapContianer = ({
         </p>
       </div>
       <div className="flex items-center justify-between px-3 py-2 mt-3 rounded-lg dark:bg-foreground-200 bg-primary-300 hover:ring-1 hover:ring-offset-0 hover:dark:ring-foreground-500 hover:ring-primary-600">
-      <img src={api.getCurrencyLogo(toToken)} style={{ width: 25, height: 25 }} />
+        <img src={api.getCurrencyLogo(toToken)} style={{ width: 25, height: 25 }} />
         {toToken && toToken}
         <input
           className="ml-3 text-2xl font-semibold text-right bg-transparent focus:outline-none w-36 md:w-auto"

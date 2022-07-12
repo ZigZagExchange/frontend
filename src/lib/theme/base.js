@@ -113,15 +113,15 @@ const shadows = {
 };
 
 const fontWeights = {
-hairline: "100",
-thin: "200",
-light: "300",
-normal: "400",
-medium: "500",
-semibold: "600",
-bold: "700",
-extrabold: "800",
-black: "900",
+  hairline: "100",
+  thin: "200",
+  light: "300",
+  normal: "400",
+  medium: "500",
+  semibold: "600",
+  bold: "700",
+  extrabold: "800",
+  black: "900",
 };
 
 const fonts = {
@@ -233,7 +233,6 @@ const borders = {
   default: "1px solid transparent",
 };
 
-/* eslint import/no-anonymous-default-export: [2, {"allowObject": true}] */
 export default {
   fontSizes,
   screens,
@@ -251,5 +250,5 @@ export default {
   states,
   borderWidths,
   ringWidths,
-  borders
+  borders,
 };

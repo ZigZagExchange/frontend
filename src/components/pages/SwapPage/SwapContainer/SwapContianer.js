@@ -2,10 +2,7 @@ import React, { useState } from "react";
 
 import TokenDropDownModal from "components/organisms/TokenDropdownModal";
 import { formatUSD, formatPrice } from "lib/utils";
-import {
-  SwitchVerticalIcon,
-  SwitchHorizontalIcon,
-} from "@heroicons/react/solid";
+import { SwitchVerticalIcon, SwitchHorizontalIcon } from "@heroicons/react/solid";
 
 const SwapContianer = ({
   balances,
@@ -79,12 +76,8 @@ const SwapContianer = ({
         <p className="text-lg font-work">To</p>
         <p className="flex items-center text-sm font-normal ">
           {!switchType
-            ? `1 ${fromToken?.name} = ${formatPrice(basePrice)} ${
-                toToken?.name
-              }`
-            : `1 ${toToken?.name} = ${formatPrice(1 / basePrice)} ${
-                fromToken?.name
-              }`}
+            ? `1 ${fromToken?.name} = ${formatPrice(basePrice)} ${toToken?.name}`
+            : `1 ${toToken?.name} = ${formatPrice(1 / basePrice)} ${fromToken?.name}`}
           <button
             onClick={onChangeAmounts}
             className="transition-all duration-300 ease-in-out hover:opacity-70 hover:rotate-180"
