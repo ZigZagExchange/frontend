@@ -206,17 +206,21 @@ class SpotForm extends React.Component {
   }
 
   getBaseFee(amount) {
-    let fee = this.props.marketInfo.baseFee;
-    fee += (this.props.marketInfo.makerVolumeFee && amount)
-      ? amount * this.props.marketInfo.makerVolumeFee
+    const marketInfo = this.props.marketInfo;
+    if (!marketInfo) return 0;
+    let fee = marketInfo.baseFee;
+    fee += (marketInfo.makerVolumeFee && amount)
+      ? amount * marketInfo.makerVolumeFee
       : 0;
     return fee;
   }
 
   getQuoteFee(amount) {
-    let fee = this.props.marketInfo.quoteFee;
-    fee += (this.props.marketInfo.makerVolumeFee && amount)
-      ? amount * this.props.marketInfo.makerVolumeFee
+    const marketInfo = this.props.marketInfo;
+    if (!marketInfo) return 0;
+    let fee = marketInfo.quoteFee;
+    fee += (marketInfo.makerVolumeFee && amount)
+      ? amount * marketInfo.makerVolumeFee
       : 0;
     return fee;
   }
@@ -376,13 +380,6 @@ class SpotForm extends React.Component {
       return;
     }
 
-    this.props.setHighSlippageModal({
-      xToken: baseAmount,
-      yToken: baseAmount * price,
-      userPrice: price,
-      pairPrice: this.props.lastPrice,
-    });
-
     if (this.props.activeOrderCount > 0 && api.isZksyncChain()) {
       toast.error("Only one active order permitted at a time", {
         toastId: "Only one active order permitted at a time",
@@ -406,7 +403,6 @@ class SpotForm extends React.Component {
     baseBalance = parseFloat(baseBalance);
     quoteBalance = parseFloat(quoteBalance);
     if (this.props.side === "s") {
-      this.props.setHighSlippageModal({ type: "sell" });
 
       baseAmount = baseAmount ? baseAmount : quoteAmount / price;
       const fee = this.getBaseFee(baseAmount);
@@ -441,28 +437,7 @@ class SpotForm extends React.Component {
         });
         return;
       }
-
-      if (
-        delta > 10 &&
-        this.props.orderType === "limit" &&
-        !this.props.settings.disableSlippageWarning
-      ) {
-        this.props.setHighSlippageModal({ open: true, delta: delta });
-        return;
-      }
-
-      if (
-        this.props.orderType === "market" &&
-        !this.props.settings.disableSlippageWarning
-      ) {
-        if (delta > 2) {
-          this.props.setHighSlippageModal({ open: true, delta: delta });
-          return;
-        }
-      }
     } else if (this.props.side === "b") {
-      this.props.setHighSlippageModal({ type: "buy" });
-
       quoteAmount = quoteAmount ? quoteAmount : baseAmount * price;
       const fee = this.getQuoteFee(quoteAmount);
       const delta = ((price - this.props.lastPrice) / this.props.lastPrice) * 100;
@@ -497,25 +472,6 @@ class SpotForm extends React.Component {
         });
         return;
       }
-
-      if (
-        delta > 10 &&
-        this.props.orderType === "limit" &&
-        !this.props.settings.disableSlippageWarning
-      ) {
-        this.props.setHighSlippageModal({ open: true, delta: delta });
-        return;
-      }
-
-      if (
-        this.props.orderType === "market" &&
-        !this.props.settings.disableSlippageWarning
-      ) {
-        if (delta > 2) {
-          this.props.setHighSlippageModal({ open: true, delta: delta });
-          return;
-        }
-      }
     }
 
     this.handleOrder();
@@ -523,6 +479,7 @@ class SpotForm extends React.Component {
 
   async handleOrder() {
     const marketInfo = this.props.marketInfo;
+    if(!marketInfo) return;
     let baseAmount = this.state.baseAmount;
     let quoteAmount = this.state.quoteAmount;
     baseAmount = (this.props.side === 'b' && this.props.orderType === "market")
@@ -533,6 +490,26 @@ class SpotForm extends React.Component {
       : quoteAmount;
 
     let price = quoteAmount / baseAmount;
+
+    const delta = (Math.abs(price - this.props.lastPrice) / this.props.lastPrice) * 100;
+    console.log(`delta ==> ${delta}`)
+    console.log(`this.props.orderType ==> ${this.props.orderType}`)
+    if (
+      (delta > 10 && this.props.orderType === "limit" && !this.props.settings.disableSlippageWarning) ||
+      (delta > 2.5 && this.props.orderType === "market" && !this.props.settings.disableSlippageWarning)
+    ) {
+      this.props.setHighSlippageModal({
+        xToken: baseAmount,
+        yToken: quoteAmount,
+        userPrice: price,
+        pairPrice: this.props.lastPrice,
+        type: this.props.side === 'b' ? 'buy' : 'sell',
+        open: true,
+        delta: delta 
+      });
+      return;
+    }
+
     const renderGuidContent = () => {
       return (
         <div>
@@ -593,9 +570,7 @@ class SpotForm extends React.Component {
   }
 
   amountPercentOfMax() {
-    if (!this.props.user.id || !this.props.marketInfo) return 0;
-    const marketInfo = this.props.marketInfo;
-
+    if (!this.props.user.id) return 0;
     if (this.props.side === "s") {
       let baseBalance = this.getBaseBalance() 
       baseBalance -= this.getBaseFee(baseBalance);
@@ -642,8 +617,8 @@ class SpotForm extends React.Component {
       const fee = this.getBaseFee(amount);
       amount -= fee;
       if (amount < fee) {
-        newstate.baseAmount = 0;
-        newstate.quoteAmount = 0;
+        newstate.baseAmount = "";
+        newstate.quoteAmount = "";
       } else {
         newstate.baseAmount = amount;
         newstate.quoteAmount = amount * this.state.price;
@@ -654,16 +629,14 @@ class SpotForm extends React.Component {
       const fee = this.getQuoteFee(amount);
       amount -= fee;
       if (amount < fee) {
-        newstate.quoteAmount = 0;
-        newstate.baseAmount = 0;
+        newstate.quoteAmount = "";
+        newstate.baseAmount = "";
       } else {
         newstate.quoteAmount = amount;
         newstate.baseAmount = amount / this.state.price;
       }
     }
 
-    if (isNaN(newstate.baseAmount)) newstate.baseAmount = 0;
-    if (isNaN(newstate.quoteAmount)) newstate.quoteAmount = 0;
     this.setState(newstate);
   }
 
