@@ -61,7 +61,14 @@ class SpotForm extends React.Component {
     e.preventDefault();
     const newState = { ...this.state };
     newState.price = this.state.price * 1.001;
-    newState.quoteAmount = this.currentPrice() * newState.baseAmount;
+    if (this.props.side === 'b') {
+      // for buy quoteAmount should be fixed
+      newState.baseAmount = newState.quoteAmount / this.currentPrice();
+    } else {
+      // for sell baseAmount should be fixed
+      newState.quoteAmount = this.currentPrice() * newState.baseAmount;
+    }
+    
     this.setState(newState);
   }
 
@@ -73,24 +80,11 @@ class SpotForm extends React.Component {
     this.setState(newState);
   }
 
-  increaseBaseAmount(e) {
+  increaseAmount(e) {
     e.preventDefault();
     const newState = { ...this.state };
-    let baseBalance = this.getBaseBalance();
-    baseBalance -= this.getBaseFee(baseBalance);
     const price = this.currentPrice();
-    if (baseBalance < 0) {
-      newState.baseAmount = 0;
-      newState.quoteAmount = 0;
-      this.setState(newState);
-      return;
-    }
 
-    // set baseAmount
-    const newBaseAmount = Number(this.state.baseAmount) + baseBalance * 0.02;
-    newState.baseAmount = newBaseAmount > baseBalance ? baseBalance : newBaseAmount;
-    console.log(`newBaseAmount ==> ${newBaseAmount}`)
-    console.log(`newState.baseAmount ==> ${newState.baseAmount}`)
     if (this.props.side === 'b') {
       // for buy order we cant exceed the quoteBalance
       let quoteBalance = this.getQuoteBalance();
@@ -98,86 +92,43 @@ class SpotForm extends React.Component {
       if (quoteBalance < 0) {
         newState.baseAmount = 0;
         newState.quoteAmount = 0;
-        this.setState(newState);
-        return;
-      }
-
-      const newQuoteAmount = newState.baseAmount * price;
-      if (newQuoteAmount > quoteBalance) {
-        newState.baseAmount = quoteBalance / price;
-        newState.quoteAmount = quoteBalance;
       } else {
-        newState.quoteAmount = newQuoteAmount;
+        const newQuoteAmount = Number(this.state.quoteAmount) + quoteBalance * 0.02;
+        newState.quoteAmount = newQuoteAmount > quoteBalance ? quoteBalance : newQuoteAmount;
+        newState.baseAmount = newState.quoteAmount / price;
       }
     } else {
-      newState.quoteAmount = newState.baseAmount * price;
-    }
-
-    this.setState(newState);
-  }
-
-  decreaseBaseAmount(e) {
-    e.preventDefault();
-    const newState = { ...this.state };
-    const baseBalance = this.getBaseBalance();
-    const newAmount = Number(this.state.baseAmount) - baseBalance * 0.02;
-    newState.baseAmount = newAmount < this.getBaseFee(baseBalance) ? 0 : newAmount;
-    newState.quoteAmount = newState.baseAmount * this.currentPrice();
-    this.setState(newState);
-  }
-
-  increaseQuoteAmount(e) {
-    e.preventDefault();
-    const newState = { ...this.state };
-    let quoteBalance = this.getQuoteBalance();
-    quoteBalance -= this.getQuoteFee(quoteBalance);
-    const price = this.currentPrice();
-    if (quoteBalance < 0) {
-      newState.baseAmount = 0;
-      newState.quoteAmount = 0;
-      this.setState(newState);
-      return;
-    }
-
-    // set quoteAmount
-    const newQuoteAmount = Number(this.state.quoteAmount) + quoteBalance * 0.02;
-    newState.quoteAmount = newQuoteAmount > quoteBalance ? quoteBalance : newQuoteAmount;
-
-    if (this.props.side === 's') {
       // for sell order we cant exceed the baseBalance
       let baseBalance = this.getBaseBalance();
       baseBalance -= this.getBaseFee(baseBalance);
       if (baseBalance < 0) {
         newState.baseAmount = 0;
         newState.quoteAmount = 0;
-        this.setState(newState);
-        return;
-      }
-
-      const newBaseAmount = newState.quoteAmount * price;
-      if (newBaseAmount > baseBalance) {
-        newState.quoteAmount = baseBalance / price;
-        newState.baseAmount = baseBalance;
       } else {
-        newState.baseAmount = newBaseAmount;
+        const newBaseAmount = Number(this.state.baseAmount) + baseBalance * 0.02;
+        newState.baseAmount = newBaseAmount > baseBalance ? baseBalance : newBaseAmount;
+        newState.quoteAmount = newState.baseAmount * price;
       }
-    } else {
-      newState.baseAmount = newState.quoteAmount * price;
     }
-    
-    const newAmount = Number(this.state.quoteAmount) + quoteBalance * 0.02;
-    newState.quoteAmount = newAmount > quoteBalance ? quoteBalance : newAmount;
-    newState.baseAmount = newState.quoteAmount / this.currentPrice();
+
     this.setState(newState);
   }
 
-  decreaseQuoteAmount(e) {
+  decreaseAmount(e) {
     e.preventDefault();
     const newState = { ...this.state };
-    const quoteBalance = this.getQuoteBalance();
-    const newAmount = Number(this.state.quoteAmount) - quoteBalance * 0.02;
-    newState.quoteAmount = newAmount < this.getQuoteFee(quoteBalance) ? 0 : newAmount;
-    newState.baseAmount = newState.quoteAmount / this.currentPrice();
+    if (this.props.side === 'b') {
+      const quoteBalance = this.getQuoteBalance();
+      const newAmount = Number(this.state.quoteAmount) - quoteBalance * 0.02;
+      newState.quoteAmount = newAmount < this.getQuoteFee(quoteBalance) ? 0 : newAmount;
+      newState.baseAmount = newState.quoteAmount / this.currentPrice();
+    } else {
+      const baseBalance = this.getBaseBalance();
+      const newAmount = Number(this.state.baseAmount) - baseBalance * 0.02;
+      newState.baseAmount = newAmount < this.getBaseFee(baseBalance) ? 0 : newAmount;
+      newState.quoteAmount = newState.baseAmount * this.currentPrice();
+    }
+
     this.setState(newState);
   }
 
@@ -908,7 +859,7 @@ class SpotForm extends React.Component {
             })`}
             value={this.currentPrice() > 0
               ? addComma(formatPrice(this.currentPrice()))
-              : null
+              : ""
             }
             onChange={this.updatePrice.bind(this)}
             disabled={this.props.orderType === "market"}
@@ -923,7 +874,7 @@ class SpotForm extends React.Component {
           <IconButton
             variant="secondary"
             startIcon={<MinusIcon />}
-            onClick={this.decreaseBaseAmount.bind(this)}
+            onClick={this.decreaseAmount.bind(this)}
           ></IconButton>
           <InputField
             type="text"
@@ -931,16 +882,16 @@ class SpotForm extends React.Component {
             placeholder={`Amount (${
               marketInfo && marketInfo.baseAsset?.symbol
             })`}
-            value={this.state.baseAmount > 0 
+            value={Number(this.state.baseAmount) > 0
               ? addComma(formatPrice(this.state.baseAmount))
-              : null
+              : ""
             }
             onChange={this.updateBaseAmount.bind(this)}
           />
           <IconButton
             variant="secondary"
             startIcon={<PlusIcon />}
-            onClick={this.increaseBaseAmount.bind(this)}
+            onClick={this.increaseAmount.bind(this)}
           ></IconButton>
         </InputBox>
         <FormHeader>
@@ -953,7 +904,7 @@ class SpotForm extends React.Component {
           <IconButton
             variant="secondary"
             startIcon={<MinusIcon />}
-            onClick={this.decreaseQuoteAmount.bind(this)}
+            onClick={this.decreaseAmount.bind(this)}
           ></IconButton>
           <InputField
             type="text"
@@ -961,16 +912,16 @@ class SpotForm extends React.Component {
             placeholder={`Total (${
               marketInfo && marketInfo.quoteAsset?.symbol
             })`}
-            value={this.state.quoteAmount > 0 
+            value={Number(this.state.quoteAmount) > 0
               ? addComma(formatPrice(this.state.quoteAmount))
-              : null
+              : ""
             }
             onChange={this.updateQuoteAmount.bind(this)}
           />
           <IconButton
             variant="secondary"
             startIcon={<PlusIcon />}
-            onClick={this.increaseQuoteAmount.bind(this)}
+            onClick={this.increaseAmount.bind(this)}
           ></IconButton>
         </InputBox>
         <FormHeader>
