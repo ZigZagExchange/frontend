@@ -898,12 +898,13 @@ class SpotForm extends React.Component {
             pattern="\d+(?:[.,]\d+)?"
             placeholder={`Price (${
               marketInfo && marketInfo.quoteAsset?.symbol
+            }-${
+              marketInfo && marketInfo.baseAsset?.symbol
             })`}
-            value={addComma(formatPrice(
-              this.state.userHasEditedPrice
-                ? this.state.price
-                : this.currentPrice()
-            ))}
+            value={this.currentPrice() > 0
+              ? addComma(formatPrice(this.currentPrice()))
+              : null
+            }
             onChange={this.updatePrice.bind(this)}
             disabled={this.props.orderType === "market"}
           />
@@ -925,7 +926,10 @@ class SpotForm extends React.Component {
             placeholder={`Amount (${
               marketInfo && marketInfo.baseAsset?.symbol
             })`}
-            value={addComma(formatPrice(this.state.baseAmount))}
+            value={this.state.baseAmount > 0 
+              ? addComma(formatPrice(this.state.baseAmount))
+              : null
+            }
             onChange={this.updateBaseAmount.bind(this)}
           />
           <IconButton
@@ -952,7 +956,10 @@ class SpotForm extends React.Component {
             placeholder={`Total (${
               marketInfo && marketInfo.quoteAsset?.symbol
             })`}
-            value={addComma(formatPrice(this.state.quoteAmount))}
+            value={this.state.quoteAmount > 0 
+              ? addComma(formatPrice(this.state.quoteAmount))
+              : null
+            }
             onChange={this.updateQuoteAmount.bind(this)}
           />
           <IconButton
