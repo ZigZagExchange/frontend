@@ -685,10 +685,11 @@ class SpotForm extends React.Component {
       newstate.maxSizeSelected = false;
     }
     if (this.props.side === "s") {
-      const baseBalance = this.getBaseBalance();
+      let baseBalance = this.getBaseBalance();
       let amount = (baseBalance * val) / 100;
-      amount = amount;
-      if (amount < this.getBaseFee(amount)) {
+      const fee = this.getBaseFee(amount);
+      amount -= fee;
+      if (amount < fee) {
         newstate.baseAmount = 0;
         newstate.quoteAmount = 0;
       } else {
@@ -696,9 +697,11 @@ class SpotForm extends React.Component {
         newstate.quoteAmount = amount * this.state.price;
       }
     } else if (this.props.side === "b") {
-      const quoteBalance = this.getQuoteBalance();
+      let quoteBalance = this.getQuoteBalance();
       let amount = (quoteBalance * val) / 100;
-      if (amount < this.getQuoteFee(amount)) {
+      const fee = this.getQuoteFee(amount);
+      amount -= fee;
+      if (amount < fee) {
         newstate.quoteAmount = 0;
         newstate.baseAmount = 0;
       } else {
