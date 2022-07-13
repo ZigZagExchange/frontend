@@ -57,87 +57,89 @@ const TradeContainer = styled.div`
 `;
 
 export function TradeDashboard() {
-  const user = useSelector(userSelector);
-  const network = useSelector(networkSelector);
-  const currentMarket = useSelector(currentMarketSelector);
-  const userOrders = useSelector(userOrdersSelector);
-  const userFills = useSelector(userFillsSelector);
-  const layout = useSelector(layoutSelector);
-  const settings = useSelector(settingsSelector);
-  const marketSummary = useSelector(marketSummarySelector);
-  const [fixedPoint, setFixedPoint] = useState(2);
-  const [side, setSide] = useState("all");
-  const dispatch = useDispatch();
+    const user = useSelector(userSelector);
+    const network = useSelector(networkSelector);
+    const currentMarket = useSelector(currentMarketSelector);
+    const userOrders = useSelector(userOrdersSelector);
+    const userFills = useSelector(userFillsSelector);
+    const layout = useSelector(layoutSelector);
+    const settings = useSelector(settingsSelector);
+    const marketSummary = useSelector(marketSummarySelector);
+    const [fixedPoint, setFixedPoint] = useState(2);
+    const [side, setSide] = useState("all");
+    const dispatch = useDispatch();
 
-  const { search } = useLocation();
-  const history = useHistory();
+    const { search } = useLocation();
+    const history = useHistory();
 
-  const updateMarketChain = (market) => {
-    dispatch(setCurrentMarket(market));
-  };
+    const updateMarketChain = (market) => {
+        dispatch(setCurrentMarket(market));
+    };
 
-  useEffect(()=>{
-    if(_.isEmpty(marketSummary)) return
-    document.title = `${addComma(formatPrice(marketSummary.price))} | ${marketSummary.market??'--'} | ZigZag Exchange`;
-  }, [marketSummary])
+    useEffect(() => {
+        if (_.isEmpty(marketSummary)) return;
+        document.title = `${addComma(formatPrice(marketSummary.price))} | ${
+            marketSummary.market ?? "--"
+        } | ZigZag Exchange`;
+    }, [marketSummary]);
 
-  useEffect(() => {
-    const urlParams = new URLSearchParams(search);
-    const marketFromURL = urlParams.get(marketQueryParam);
-    const networkFromURL = urlParams.get(networkQueryParam);
-    const chainid = api.getChainIdFromName(networkFromURL);
-    if (marketFromURL && currentMarket !== marketFromURL) {
-      updateMarketChain(marketFromURL);
-    }
-    if (chainid && network !== chainid) {
-      api.setAPIProvider(chainid);
-      api.signOut();
-    }
-    api.getWalletBalances();
-  }, []);
-
-  // Update URL when market or network update
-  useEffect(() => {
-    let networkText;
-    if (network === 1) {
-      networkText = "zksync";
-    } else if (network === 1000) {
-      networkText = "zksync-rinkeby";
-    } else if (network === 42161) {
-      networkText = "arbitrum";
-    }
-    history.push(`/?market=${currentMarket}&network=${networkText}`);
-  }, [network, currentMarket]);
-
-  useEffect(() => {
-    if (user.address && !user.id) {
-      history.push("/bridge");
-      toast.error(
-        "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
-        {
-          autoClose: 60000,
+    useEffect(() => {
+        const urlParams = new URLSearchParams(search);
+        const marketFromURL = urlParams.get(marketQueryParam);
+        const networkFromURL = urlParams.get(networkQueryParam);
+        const chainid = api.getChainIdFromName(networkFromURL);
+        if (marketFromURL && currentMarket !== marketFromURL) {
+            updateMarketChain(marketFromURL);
         }
-      );
-    }
-    const sub = () => {
-      dispatch(resetData());
-      api.subscribeToMarket(currentMarket, settings.showNightPriceChange);
-    };
+        if (chainid && network !== chainid) {
+            api.setAPIProvider(chainid);
+            api.signOut();
+        }
+        api.getWalletBalances();
+    }, []);
 
-    if (api.ws && api.ws.readyState === 0) {
-      api.on("open", sub);
-    } else {
-      sub();
-    }
+    // Update URL when market or network update
+    useEffect(() => {
+        let networkText;
+        if (network === 1) {
+            networkText = "zksync";
+        } else if (network === 1000) {
+            networkText = "zksync-rinkeby";
+        } else if (network === 42161) {
+            networkText = "arbitrum";
+        }
+        history.push(`/?market=${currentMarket}&network=${networkText}`);
+    }, [network, currentMarket]);
 
-    return () => {
-      if (api.ws && api.ws.readyState !== 0) {
-        api.unsubscribeToMarket(currentMarket);
-      } else {
-        api.off("open", sub);
-      }
-    };
-  }, [network, currentMarket, api.ws, settings.showNightPriceChange]);
+    useEffect(() => {
+        if (user.address && !user.id) {
+            history.push("/bridge");
+            toast.error(
+                "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
+                {
+                    autoClose: 60000,
+                }
+            );
+        }
+        const sub = () => {
+            dispatch(resetData());
+            api.subscribeToMarket(currentMarket, settings.showNightPriceChange);
+        };
+
+        if (api.ws && api.ws.readyState === 0) {
+            api.on("open", sub);
+        } else {
+            sub();
+        }
+
+        return () => {
+            if (api.ws && api.ws.readyState !== 0) {
+                api.unsubscribeToMarket(currentMarket);
+            } else {
+                api.off("open", sub);
+            }
+        };
+    }, [network, currentMarket, api.ws, settings.showNightPriceChange]);
 
     const changeFixedPoint = (point) => {
         setFixedPoint(point);
@@ -172,7 +174,7 @@ export function TradeDashboard() {
                 editable={settings.editable}
                 useCSSTransforms={false}
             >
-                <div key={settings.stackOrderbook ? "a" : "b"}>
+                <div key="a">
                     <GridLayoutCell editable={settings.editable}>
                         <TradeSidebar
                             updateMarketChain={updateMarketChain}
@@ -183,7 +185,7 @@ export function TradeDashboard() {
                     </GridLayoutCell>
                 </div>
                 {/* TradePriceTable, TradePriceHeadSecond */}
-                <div key={settings.stackOrderbook ? "g" : "e"}>
+                <div key="g">
                     <GridLayoutCell editable={settings.editable}>
                         <OrdersBook
                             currentMarket={currentMarket}
@@ -192,7 +194,7 @@ export function TradeDashboard() {
                         />
                     </GridLayoutCell>
                 </div>
-                <div key={settings.stackOrderbook ? "h" : "f"}>
+                <div key="h">
                     <GridLayoutCell editable={settings.editable}>
                         <TradesBook
                             currentMarket={currentMarket}

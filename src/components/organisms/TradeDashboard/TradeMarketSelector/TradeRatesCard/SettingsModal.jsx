@@ -10,6 +10,7 @@ import {
     resetUISettings,
     resetTradeLayout,
     setUISettings,
+    setLayout,
 } from "lib/store/features/api/apiSlice";
 
 const SettingModalWrapper = styled(GenericModal)`
@@ -67,6 +68,84 @@ const SettingsModal = ({ onDismiss }) => {
     const [checked, setChecked] = useState(false);
     const toggle = () => setChecked(!checked);
     const dispatch = useDispatch();
+    const breakpoints = { xl: 1599, lg: 1199, md: 991, xxs: 0 };
+    console.log("settings", settings.layouts["xxs"]);
+
+    const isInvolve = (max, min, value) => {
+        return value <= breakpoints[max] && value >= breakpoints[min];
+    };
+
+    const onChangeStackOrderBook = () => {
+        let newLayouts = { ...settings.layouts };
+        let width = window.innerWidth;
+        let currentPoint =
+            width > 1599
+                ? "xl"
+                : isInvolve("xl", "lg", width)
+                ? "lg"
+                : isInvolve("lg", "md", width)
+                ? "md"
+                : "xxs";
+
+        let sidebarIndex = newLayouts[currentPoint].findIndex(
+            (item) => item.i === "a"
+        );
+
+        let leftIndex = newLayouts[currentPoint].findIndex(
+            (item) => item.i === "g"
+        );
+        let rightIndex = newLayouts[currentPoint].findIndex(
+            (item) => item.i === "h"
+        );
+        let left = { ...newLayouts[currentPoint][leftIndex] },
+            right = { ...newLayouts[currentPoint][rightIndex] },
+            sidebar = { ...newLayouts[currentPoint][sidebarIndex] };
+        if (settings.stackOrderbook) {
+            left = {
+                ...left,
+                w: currentPoint === "xxs" ? 40 : left.w * 2,
+                h: currentPoint === "xxs" ? 10 : left.h / 2,
+            };
+            right = {
+                ...right,
+                w: currentPoint === "xxs" ? 40 : right.w * 2,
+                h: currentPoint === "xxs" ? 10 : left.h / 2,
+                x: left.x,
+            };
+            sidebar = {
+                ...sidebar,
+                w: currentPoint === "xxs" ? 40 : sidebar.w * 2,
+                h: currentPoint === "xxs" ? 10 : sidebar.h / 2,
+            };
+        } else {
+            left = {
+                ...left,
+                w: currentPoint === "xxs" ? 20 : left.w / 2,
+                h: currentPoint === "xxs" ? 20 : left.h * 2,
+                x: 20,
+            };
+            right = {
+                ...right,
+                w: currentPoint === "xxs" ? 40 : right.w / 2,
+                h: currentPoint === "xxs" ? 20 : left.h * 2,
+                x: left.x + left.w,
+            };
+            sidebar = {
+                ...sidebar,
+                w: currentPoint === "xxs" ? 20 : sidebar.w / 2,
+                h: currentPoint === "xxs" ? 20 : sidebar.h * 2,
+            };
+        }
+        let newArray = [...newLayouts[currentPoint]];
+        newArray.splice(leftIndex, 1, left);
+        newArray.splice(rightIndex, 1, right);
+        if (currentPoint === "xxs") {
+            newArray.splice(sidebarIndex, 1, sidebar);
+        }
+        newLayouts = { ...newLayouts, [currentPoint]: newArray };
+
+        dispatch(setUISettings({ key: "layouts", value: newLayouts }));
+    };
 
     const resetSettings = () => {
         dispatch(resetUISettings());
@@ -210,7 +289,7 @@ const SettingsModal = ({ onDismiss }) => {
                         scale="md"
                         onChange={() => {
                             toggle();
-                            dispatch(resetTradeLayout());
+                            onChangeStackOrderBook();
                         }}
                         settingKey="stackOrderbook"
                     />
