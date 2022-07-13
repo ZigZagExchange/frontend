@@ -42,6 +42,7 @@ export const apiSlice = createSlice({
     isConnecting: false,
     isBridgeConnecting: false,
     settings: initialUISettings,
+    slippageValue: "1.00",
     highSlippageModal: {
       open: false,
       confirmed: "",
@@ -120,19 +121,24 @@ export const apiSlice = createSlice({
         const takerUserId = fill[8] && fill[8].toLowerCase();
         const makerUserId = fill[9] && fill[9].toLowerCase();
         if (
-          ['f', 'pf'].includes(fill[6]) &&
+          ["f", "pf"].includes(fill[6]) &&
           fill[2] === state.currentMarket &&
           fill[0] === state.network
         ) {
           state.marketFills[fillid] = fill;
         }
-        if (state.userId && takerUserId === state.userId.toString().toLowerCase()) {
-
+        if (
+          state.userId &&
+          takerUserId === state.userId.toString().toLowerCase()
+        ) {
           state.userFills[fillid] = fill;
         }
         // for maker fills we need to flip the side and set fee to 0
-        if (state.userId && makerUserId === state.userId.toString().toLowerCase()) {
-          fill[3] = (fill[3] === "b") ? "s" : "b";
+        if (
+          state.userId &&
+          makerUserId === state.userId.toString().toLowerCase()
+        ) {
+          fill[3] = fill[3] === "b" ? "s" : "b";
           fill[10] = 0;
           state.userFills[fillid] = fill;
         }
@@ -185,14 +191,17 @@ export const apiSlice = createSlice({
             ) {
               toast.dismiss("Order placed.");
               toast.success(
-                `Your ${sideText} order #${fillid} for ${Number(baseQuantity.toPrecision(4))
-                } ${baseCurrency} was filled @ ${Number(formatPrice(price))
-                }!`, {
-                toastId:
-                  `Your ${sideText} order #${fillid} for ${Number(baseQuantity.toPrecision(4))
-                  } ${baseCurrency} was filled @ ${Number(formatPrice(price))
-                  }!`,
-              });
+                `Your ${sideText} order #${fillid} for ${Number(
+                  baseQuantity.toPrecision(4)
+                )} ${baseCurrency} was filled @ ${Number(formatPrice(price))}!`,
+                {
+                  toastId: `Your ${sideText} order #${fillid} for ${Number(
+                    baseQuantity.toPrecision(4)
+                  )} ${baseCurrency} was filled @ ${Number(
+                    formatPrice(price)
+                  )}!`,
+                }
+              );
             }
 
             // update the balances of the user account
@@ -229,12 +238,18 @@ export const apiSlice = createSlice({
         if (fill[2] === state.currentMarket && fill[0] === state.network) {
           state.marketFills[fillid] = fill;
         }
-        if (state.userId && takerUserId === state.userId.toString().toLowerCase()) {
+        if (
+          state.userId &&
+          takerUserId === state.userId.toString().toLowerCase()
+        ) {
           state.userFills[fillid] = fill;
         }
         // for maker fills we need to flip the side and set fee to 0
-        if (state.userId && makerUserId === state.userId.toString().toLowerCase()) {
-          fill[3] = (fill[3] === "b") ? "s" : "b";
+        if (
+          state.userId &&
+          makerUserId === state.userId.toString().toLowerCase()
+        ) {
+          fill[3] = fill[3] === "b" ? "s" : "b";
           fill[10] = 0;
           state.userFills[fillid] = fill;
         }
@@ -292,7 +307,8 @@ export const apiSlice = createSlice({
               state.userOrders[orderId][9] = "c";
             }
             break;
-          case "pm": case "pf":
+          case "pm":
+          case "pf":
             if (state.orders[orderId]) {
               state.orders[orderId][10] = remaining;
             }
@@ -305,9 +321,12 @@ export const apiSlice = createSlice({
             if (!matchedOrder) return;
             matchedOrder[9] = "m";
             matchedOrder[10] = 0;
-            const takerUserId = matchedOrder[8] && matchedOrder[8].toLowerCase();
-            const makerUserId = matchedOrder[9] && matchedOrder[9].toLowerCase();
-            const orderUserId = state.userId && state.userId.toString().toLowerCase();
+            const takerUserId =
+              matchedOrder[8] && matchedOrder[8].toLowerCase();
+            const makerUserId =
+              matchedOrder[9] && matchedOrder[9].toLowerCase();
+            const orderUserId =
+              state.userId && state.userId.toString().toLowerCase();
             delete state.orders[orderId];
             if (
               matchedOrder &&
@@ -340,13 +359,17 @@ export const apiSlice = createSlice({
               filledOrder[11] = txHash;
               const noFeeOrder = api.getOrderDetailsWithoutFee(filledOrder);
               toast.error(
-                `Your ${sideText} order for ${noFeeOrder.baseQuantity.toPrecision(4) / 1
-                } ${baseCurrency} @ ${noFeeOrder.price.toPrecision(4) / 1
+                `Your ${sideText} order for ${
+                  noFeeOrder.baseQuantity.toPrecision(4) / 1
+                } ${baseCurrency} @ ${
+                  noFeeOrder.price.toPrecision(4) / 1
                 } was rejected: ${error}`,
                 {
-                  toastId: `Your ${sideText} order for ${noFeeOrder.baseQuantity.toPrecision(4) / 1
-                    } ${baseCurrency} @ ${noFeeOrder.price.toPrecision(4) / 1
-                    } was rejected: ${error}`,
+                  toastId: `Your ${sideText} order for ${
+                    noFeeOrder.baseQuantity.toPrecision(4) / 1
+                  } ${baseCurrency} @ ${
+                    noFeeOrder.price.toPrecision(4) / 1
+                  } was rejected: ${error}`,
                 }
               );
               toast.info(
@@ -581,7 +604,7 @@ export const apiSlice = createSlice({
     setConnecting(state, { payload }) {
       state.isConnecting = payload;
     },
-    setBridgeConnecting(state, {payload}) {
+    setBridgeConnecting(state, { payload }) {
       state.isBridgeConnecting = payload;
     },
     setHighSlippageModal(state, { payload }) {
@@ -616,6 +639,9 @@ export const apiSlice = createSlice({
     resetTradeLayout(state) {
       state.settings.layouts = initialLayouts;
     },
+    setSlippageValue(state, { payload }) {
+      state.slippageValue = payload.value;
+    },
   },
 });
 
@@ -637,6 +663,7 @@ export const {
   resetUISettings,
   resetTradeLayout,
   setLayout,
+  setSlippageValue,
 } = apiSlice.actions;
 
 export const layoutSelector = (state) => state.api.layout;
@@ -653,12 +680,14 @@ export const bridgeReceiptsSelector = (state) => state.api.bridgeReceipts;
 export const marketInfoSelector = (state) => state.api.marketinfo;
 export const arweaveAllocationSelector = (state) => state.api.arweaveAllocation;
 export const isConnectingSelector = (state) => state.api.isConnecting;
-export const isBridgeConnectingSelector = (state) => state.api.isBridgeConnecting;
+export const isBridgeConnectingSelector = (state) =>
+  state.api.isBridgeConnecting;
 export const settingsSelector = (state) => state.api.settings;
 export const highSlippageModalSelector = (state) => state.api.highSlippageModal;
 export const balancesSelector = (state) =>
   state.api.balances[makeScope(state.api)] || {};
 
 export const handleMessage = createAction("api/handleMessage");
+export const slippageValueSelector = (state) => state.api.slippageValue;
 
 export default apiSlice.reducer;

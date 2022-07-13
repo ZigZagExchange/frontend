@@ -381,16 +381,20 @@ export default class API extends Emitter {
             throw err;
           }
 
+          try {
+            accountState.profile = await this.getProfile(accountState.address)
+          } catch (e) {
+            accountState.profile = {};
+          }           
+
+          this.emit("signIn", accountState);
+
           if (accountState && accountState.id) {
             this.send("login", [
               network,
               accountState.id && accountState.id.toString(),
             ]);
           }
-
-          accountState.profile = await this.getProfile(accountState.address)
-
-          this.emit("signIn", accountState);
 
           // fetch blances
           await this.getBalances();

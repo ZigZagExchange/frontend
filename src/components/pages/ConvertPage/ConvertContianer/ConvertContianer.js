@@ -7,7 +7,7 @@ import {
   SwitchHorizontalIcon,
 } from "@heroicons/react/solid";
 
-const SwapContianer = ({
+const ConvertContianer = ({
   balances,
   fromToken,
   fromTokenOptions,
@@ -116,4 +116,4 @@ const SwapContianer = ({
   );
 };
 
-export default SwapContianer;
+export default ConvertContianer;
