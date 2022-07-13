@@ -13,7 +13,6 @@ import { IconButton as BaseIcon } from "../IconButton";
 import { MinusIcon, PlusIcon } from "components/atoms/Svg";
 import { setHighSlippageModal } from "lib/store/features/api/apiSlice";
 
-const rx_live = /^\d*(?:[.,]\d*)?$/;
 class SpotForm extends React.Component {
   constructor(props) {
     super(props);
@@ -22,7 +21,8 @@ class SpotForm extends React.Component {
       baseAmount: "",
       quoteAmount: "",
       maxSizeSelected: false,
-      exchangePercent: 0,
+      baseChanged: false,
+      quoteChanged: false,
     };
   }
 
@@ -31,33 +31,57 @@ class SpotForm extends React.Component {
     else return false;
   }
 
+  getExchangePercentage(baseAmount, quoteAmount) {
+    let result;
+    if (this.props.side === 's') {
+      const baseBalance = this.getBaseBalance();
+      const baseFee = this.getBaseFee();
+      result = ((baseAmount + baseFee) / baseBalance) * 100;
+    } else {
+      const quoteBalance = this.getQuoteBalance();
+      const quoteFee = this.getQuoteFee();
+      result = ((quoteAmount + quoteFee) / quoteBalance) * 100;
+    }
+    if (Number.isNaN(result) || result <= 0) {
+      return 0;
+    } else if (!Number.isFinite(result) || result >= 100) {
+      return 100;
+    }
+    return result.toFixed(0);
+  }
+
   updatePrice(e) {
     const newState = { ...this.state };
-    newState.price = rx_live.test(e.target.value)
-      ? e.target.value
-      : this.state.price;
-    newState.quoteAmount = newState.baseAmount * newState.price;
-    newState.quoteAmount = newState.quoteAmount === 0 ? "" : newState.quoteAmount;
+    newState.price = e.target.value.replace(',','.').replace(/[^0-9.]/g, "");
+    if (this.props.side === 'b') {
+      // for buy quoteAmount should be fixed
+      newState.baseAmount = newState.quoteAmount / newState.price;
+      newState.baseAmount = newState.baseAmount === 0 ? "" : newState.baseAmount;
+    } else {
+      // for sell baseAmount should be fixed
+      newState.quoteAmount = newState.price * newState.baseAmount;
+      newState.quoteAmount = newState.quoteAmount === 0 ? "" : newState.quoteAmount;
+    }
     this.setState(newState);
   }
 
   updateBaseAmount(e) {
     const newState = { ...this.state };
-    newState.baseAmount = rx_live.test(e.target.value)
-      ? e.target.value
-      : this.state.baseAmount;
+    newState.baseAmount = e.target.value.replace(',','.').replace(/[^0-9.]/g, "");
     newState.quoteAmount = newState.baseAmount * this.currentPrice();
     newState.quoteAmount = newState.quoteAmount === 0 ? "" : newState.quoteAmount;
+    newState.baseChanged = true;
+    newState.quoteChanged = false;
     this.setState(newState);
   }
 
   updateQuoteAmount(e) {
     const newState = { ...this.state };
-    newState.quoteAmount = rx_live.test(e.target.value)
-      ? e.target.value
-      : this.state.quoteAmount;      
+    newState.quoteAmount = e.target.value.replace(',','.').replace(/[^0-9.]/g, "");
     newState.baseAmount = newState.quoteAmount / this.currentPrice();
     newState.baseAmount = newState.baseAmount === 0 ? "" : newState.baseAmount;
+    newState.baseChanged = false;
+    newState.quoteChanged = true;
     this.setState(newState);
   }
 
@@ -67,14 +91,15 @@ class SpotForm extends React.Component {
     newState.price = this.state.price * 1.001;
     if (this.props.side === 'b') {
       // for buy quoteAmount should be fixed
-      newState.baseAmount = newState.quoteAmount / this.currentPrice();
+      newState.baseAmount = newState.quoteAmount / newState.price;
       newState.baseAmount = newState.baseAmount === 0 ? "" : newState.baseAmount;
     } else {
       // for sell baseAmount should be fixed
-      newState.quoteAmount = this.currentPrice() * newState.baseAmount;
+      newState.quoteAmount = newState.price * newState.baseAmount;
       newState.quoteAmount = newState.quoteAmount === 0 ? "" : newState.quoteAmount;
     }
-    
+    newState.baseChanged = false;
+    newState.quoteChanged = false;
     this.setState(newState);
   }
 
@@ -82,7 +107,17 @@ class SpotForm extends React.Component {
     e.preventDefault();
     const newState = { ...this.state };
     newState.price = this.state.price * 0.999;
-    newState.quoteAmount = this.currentPrice() * newState.baseAmount;
+    if (this.props.side === 'b') {
+      // for buy quoteAmount should be fixed
+      newState.baseAmount = newState.quoteAmount / newState.price;
+      newState.baseAmount = newState.baseAmount === 0 ? "" : newState.baseAmount;
+    } else {
+      // for sell baseAmount should be fixed
+      newState.quoteAmount = newState.price * newState.baseAmount;
+      newState.quoteAmount = newState.quoteAmount === 0 ? "" : newState.quoteAmount;
+    }
+    newState.baseChanged = false;
+    newState.quoteChanged = false;
     this.setState(newState);
   }
 
@@ -117,6 +152,8 @@ class SpotForm extends React.Component {
       }
     }
 
+    newState.quoteChanged = false;
+    newState.baseChanged = false;
     this.setState(newState);
   }
 
@@ -145,6 +182,8 @@ class SpotForm extends React.Component {
       }
     }
 
+    newState.quoteChanged = false;
+    newState.baseChanged = false;
     this.setState(newState);
   }
 
@@ -481,13 +520,6 @@ class SpotForm extends React.Component {
     if(!marketInfo) return;
     let baseAmount = this.state.baseAmount;
     let quoteAmount = this.state.quoteAmount;
-    baseAmount = (this.props.side === 'b' && this.props.orderType === "market")
-      ? baseAmount * (1 - 0.0015) // add marging
-      : baseAmount;
-    quoteAmount = (this.props.side === 's' && this.props.orderType === "market")
-      ? quoteAmount * (1 - 0.0015) // add marging
-      : quoteAmount;
-
     let price = quoteAmount / baseAmount;
 
     const delta = (this.props.side === 'b')
@@ -516,7 +548,7 @@ class SpotForm extends React.Component {
             {this.props.side === "s" ? "Sell" : "Buy"} Order pending
           </p>
           <p style={{ fontSize: "14px", lineHeight: "24px" }}>
-            {addComma(formatPrice(baseAmount))} {marketInfo.baseAsset.symbol} @{" "}
+            {addComma(formatToken(baseAmount))} {marketInfo.baseAsset.symbol} @{" "}
             {addComma(["USDC", "USDT", "DAI", "FRAX"].includes(
               marketInfo.quoteAsset.symbol
             )
@@ -590,11 +622,17 @@ class SpotForm extends React.Component {
     if (this.props.orderType === "limit" && this.state.price) {
       return this.state.price;
     } else {
+      let price;
       if (api.isZksyncChain()) {
-        return this.getLadderPriceZkSync_v1();
+        price = this.getLadderPriceZkSync_v1();
       } else {
-        return this.getLadderPrice();
+        price = this.getLadderPrice();
       }
+      price *= (this.props.side === 'b')
+        ? 1 + 0.0015
+        : 1 - 0.0015
+  
+      return price;
     }
   }
 
@@ -635,8 +673,6 @@ class SpotForm extends React.Component {
         newstate.baseAmount = amount / this.currentPrice();
       }
     }
-
-    newstate.exchangePercent = val;
     this.setState(newstate);
   }
 
@@ -869,8 +905,8 @@ class SpotForm extends React.Component {
               marketInfo && marketInfo.baseAsset?.symbol
             })`}
             value={this.state.baseAmount !== ""
-              ? ['.',',','0'].includes(this.state.baseAmount.toString().at(-1)) 
-                ? this.state.baseAmount 
+              ? this.state.baseChanged
+                ? this.state.baseAmount
                 : addComma(formatPrice(this.state.baseAmount))
               : ""
             }
@@ -882,15 +918,6 @@ class SpotForm extends React.Component {
             onClick={this.increaseAmount.bind(this)}
           ></IconButton>
         </InputBox>
-        <RangeWrapper>
-          <RangeSlider
-            value={this.amountPercentOfMax()}
-            onChange={this.rangeSliderHandler.bind(this)}
-          />
-          <span className="current_progress">
-            {this.state.exchangePercent}%
-          </span>
-        </RangeWrapper>
         <FormHeader>
           <Text font="primaryTiny" color="foregroundMediumEmphasis">
             Available balance
@@ -910,9 +937,9 @@ class SpotForm extends React.Component {
               marketInfo && marketInfo.quoteAsset?.symbol
             })`}
             value={this.state.quoteAmount !== ""
-              ? ['.',',','0'].includes(this.state.quoteAmount.toString().at(-1)) 
+              ? this.state.quoteChanged
                 ? this.state.quoteAmount
-                : addComma(formatPrice(this.state.quoteAmount)) 
+                : addComma(formatPrice(this.state.quoteAmount))
               : ""
             }
             onChange={this.updateQuoteAmount.bind(this)}
@@ -934,6 +961,9 @@ class SpotForm extends React.Component {
             value={this.amountPercentOfMax()}
             onChange={this.rangeSliderHandler.bind(this)}
           />
+          <span className="current_progress">
+            {this.getExchangePercentage(this.state.baseAmount, this.state.quoteAmount)}%
+          </span>
         </RangeWrapper>
           {this.props.user.id ? (
             <div className="">
@@ -944,7 +974,9 @@ class SpotForm extends React.Component {
                 disabled={
                   this.isInvalidNumber(this.state.quoteAmount) ||
                   this.isInvalidNumber(this.state.baseAmount) ||
-                  this.isInvalidNumber(this.currentPrice())
+                  this.isInvalidNumber(this.currentPrice()) ||
+                  (this.state.quoteAmount > this.getQuoteBalance() && this.props.side === 'b') ||
+                  (this.state.baseAmount > this.getBaseBalance() && this.props.side === 's')
                 }
                 onClick={approveNeeded ? this.approveHandler.bind(this) : this.buySellHandler.bind(this)}
               >
