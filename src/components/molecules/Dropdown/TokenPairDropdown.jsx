@@ -23,7 +23,9 @@ const ButtonWrapper = styled.div`
   gap: 8px;
   width: 130px;
   img {
-    height: 1.6rem;
+    height: 24px;
+    width: auto;
+    max-width: unset;
   }
 `
 
