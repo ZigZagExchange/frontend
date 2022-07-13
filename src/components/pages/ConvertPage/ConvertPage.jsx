@@ -5,7 +5,7 @@ import useTheme from "components/hooks/useTheme";
 import api from "lib/api";
 
 import { DefaultTemplate } from "components";
-import SwapContianer from "./SwapContainer";
+import ConvertContianer from "./ConvertContianer";
 
 import classNames from "classnames";
 import TransactionSettings from "./TransationSettings";
@@ -13,6 +13,7 @@ import { Button } from "components/molecules/Button";
 
 import { useCoinEstimator } from "components";
 import { userSelector } from "lib/store/features/auth/authSlice";
+import { setSlippageValue } from "lib/store/features/api/apiSlice";
 import {
   networkSelector,
   balancesSelector,
@@ -24,11 +25,12 @@ import {
   resetData,
   settingsSelector,
   userOrdersSelector,
+  slippageValueSelector,
 } from "lib/store/features/api/apiSlice";
 import { formatPrice, formatUSD, formatToken } from "lib/utils";
 import { LoadingSpinner } from "components/atoms/LoadingSpinner";
 
-export default function SwapPage() {
+const ConvertPage = () => {
   const coinEstimator = useCoinEstimator();
   const userOrders = useSelector(userOrdersSelector);
 
@@ -44,13 +46,15 @@ export default function SwapPage() {
   const currentMarket = useSelector(currentMarketSelector);
   const network = useSelector(networkSelector);
   const marketInfo = useSelector(marketInfoSelector);
+  const slippageValue = useSelector(slippageValueSelector);
+
   const [pairs, setGetPairs] = useState([]);
   const [sellTokenList, setSellTokenList] = useState([]);
   const [sellToken, setSellToken] = useState();
   const [buyToken, setBuyToken] = useState();
   const [basePrice, setBasePrice] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [slippageValue, setSlippageValue] = useState("1.00");
+  // const [slippageValue, setSlippageValue] = useState(slippage);
 
   const [sellAmounts, setSellAmounts] = useState();
   const [buyAmounts, setBuyAmounts] = useState();
@@ -545,6 +549,8 @@ export default function SwapPage() {
       );
     }
 
+    console.log(slippageValue, 1 + slippageValue / 100);
+
     try {
       await api.submitOrder(
         currentMarket,
@@ -582,9 +588,9 @@ export default function SwapPage() {
   const onChangeSlippageValue = (value) => {
     let amount = value.replace(/[^1-9.]/g, ""); //^[1-9][0-9]?$|^100$
     if (parseFloat(amount) < 1 || parseFloat(amount) > 10) {
-      setSlippageValue("1.00");
+      dispatch(setSlippageValue({ value: "1.00" }));
     } else {
-      setSlippageValue(amount);
+      dispatch(setSlippageValue({ value: amount }));
     }
   };
 
@@ -605,7 +611,7 @@ export default function SwapPage() {
             <p className="mt-10 text-3xl font-semibold font-work ">
               ZigZag Convert
             </p>
-            <SwapContianer
+            <ConvertContianer
               setTransactionType={(type) => setTtype(type)}
               transactionType={tType}
               balances={balances}
@@ -653,4 +659,6 @@ export default function SwapPage() {
       )}
     </DefaultTemplate>
   );
-}
+};
+
+export default ConvertPage;
