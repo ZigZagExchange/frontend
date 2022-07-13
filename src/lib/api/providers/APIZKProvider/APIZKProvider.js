@@ -283,7 +283,6 @@ export default class APIZKProvider extends APIProvider {
         account && account.committed
           ? account.committed.balances[ticker] || 0
           : 0;
-      if (!balance) return true;
       balances[ticker] = {
         value: balance,
         valueReadable:
