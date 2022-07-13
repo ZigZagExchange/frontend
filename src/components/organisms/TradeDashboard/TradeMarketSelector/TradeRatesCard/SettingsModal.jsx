@@ -71,7 +71,7 @@ const SettingsModal = ({ onDismiss }) => {
     const breakpoints = ["xl", "lg", "md", "xxs"];
 
     const onChangeStackOrderBook = () => {
-        if (settings.layoutsCustomized) {
+        if (!settings.layoutsCustomized) {
             let newLayouts = { ...settings.layouts };
             breakpoints.forEach((currentPoint) => {
                 let sidebarIndex = newLayouts[currentPoint].findIndex(

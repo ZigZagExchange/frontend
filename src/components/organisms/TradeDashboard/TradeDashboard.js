@@ -166,6 +166,8 @@ export function TradeDashboard() {
                 autoSize={false}
                 onChange={(_, layout) => {
                     dispatch(setUISettings({ key: "layouts", value: layout }));
+                }}
+                onDragStart={() => {
                     dispatch(
                         setUISettings({ key: "layoutsCustomized", value: true })
                     );

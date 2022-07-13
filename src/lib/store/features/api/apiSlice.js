@@ -661,11 +661,10 @@ export const apiSlice = createSlice({
         },
         resetUISettings(state) {
             state.settings = initialUISettings;
-            state.layoutsCustomized = false;
         },
         resetTradeLayout(state) {
             state.settings.layouts = initialLayouts;
-            state.layoutsCustomized = false;
+            state.settings.layoutsCustomized = false;
         },
         setSlippageValue(state, { payload }) {
             state.slippageValue = payload.value;
