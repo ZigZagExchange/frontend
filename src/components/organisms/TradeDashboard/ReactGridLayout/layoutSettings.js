@@ -199,7 +199,7 @@ export const initialLayouts = {
             w: 40,
             h: 15,
             x: 0,
-            y: 40,
+            y: 60,
             i: "d",
         },
         {
@@ -218,7 +218,7 @@ export const initialLayouts = {
         },
         {
             w: 20,
-            h: 10,
+            h: 20,
             x: 20,
             y: 20,
             i: "g",
