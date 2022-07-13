@@ -1,108 +1,378 @@
-import React from "react";
-import { useSelector } from "react-redux";
-import styled from "@xstyled/styled-components";
-import SpotBox from "./SpotBox/SpotBox";
+import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import styled from "styled-components";
+import { formatPrice, addComma } from "lib/utils";
+import { SettingsIcon } from "components/atoms/Svg";
+import Button from "components/molecules/Button/Button";
 import Text from "components/atoms/Text/Text";
-import { DiscordIcon } from "components/atoms/Svg";
+// css
+import "./TradeRatesCard.css";
+import SettingsModal from "./SettingsModal";
+import { TokenPairDropdown } from "components/molecules/Dropdown";
+import useModal from "components/hooks/useModal";
+import useTheme from "components/hooks/useTheme";
 import {
-    liquiditySelector,
-    marketSummarySelector,
-    marketInfoSelector,
-    balancesSelector,
-    allOrdersSelector,
+    settingsSelector,
+    setUISettings,
 } from "lib/store/features/api/apiSlice";
-import { Button, ConnectWalletButton } from "components/molecules/Button";
+import {
+  fetchFavourites,
+  addFavourite,
+  removeFavourite,
+} from "lib/helpers/storage/favourites";
+import { ActivatedStarIcon, StarIcon } from "components/atoms/Svg";
+import { Box } from "@material-ui/core";
+import LockOpenIcon from "@mui/icons-material/LockOpen";
+import LockIcon from "@mui/icons-material/Lock";
+import _ from "lodash";
+import { darkColors, lightColors } from "lib/theme/colors";
 
-const StyledTradeSidebar = styled.aside`
-    // display: grid;
-    grid-auto-flow: row;
-    grid-area: sidebar;
-    position: relative;
-    //   height: fit-content;
-    border: 1px solid ${({ theme }) => theme.colors.foreground300};
-    background: ${({ theme }) => theme.colors.backgroundMediumEmphasis};
-    overflow-y: auto;
-    scrollbar-color: ${({ theme }) => theme.colors.foreground400}
-        rgba(0, 0, 0, 0.1);
-    scrollbar-width: thin !important;
+const TradeRatesCard = ({
+    updateMarketChain,
+    marketSummary,
+    rowData,
+    currentMarket,
+    marketInfo,
+}) => {
+    const { isDark } = useTheme();
+    const [lastPrice, setLastPrice] = useState(0);
+    const [isIncrease, setIncrease] = useState(true);
+    const [favourites, setFavourites] = useState(fetchFavourites());
+    const [isOpen, setOpen] = useState(false);
+    const dispatch = useDispatch();
 
-    ::-webkit-scrollbar {
-        width: 5px;
-        position: relative;
-        z-index: 20;
+    const settings = useSelector(settingsSelector);
+
+    useEffect(() => {
+        if (marketSummary.price > lastPrice) setIncrease(true);
+        else if (marketSummary.price < lastPrice) setIncrease(false);
+        setLastPrice(marketSummary.price);
+    }, [marketSummary.price]);
+
+    const handleOnModalClose = () => {
+        onSettingsModalClose();
+    };
+
+    const [onSettingsModal, onSettingsModalClose] = useModal(
+        <SettingsModal onDismiss={() => handleOnModalClose()} />
+    );
+
+    const handleSettings = () => {
+        onSettingsModal();
+    };
+
+    const toggleLayout = () => {
+        dispatch(setUISettings({ key: "editable", value: !settings.editable }));
+    };
+
+    const isMobile = window.innerWidth < 800;
+    const isOverflow = window.innerWidth < 1210;
+    const percentChange = (
+        (marketSummary.priceChange / marketSummary.price) *
+        100
+    ).toFixed(2);
+
+  const favouritePair = (pair) => {
+    const isFavourited = fetchFavourites().includes(pair);
+
+    let favourites = [];
+    if (!isFavourited) {
+        favourites = addFavourite(pair);
+    } else {
+        favourites = removeFavourite(pair);
     }
 
-    //   ::-webkit-scrollbar-track {
-    //     border-radius: 4px;
-    //     background: transparent;
-    //     height: 23px;
-    //   }
+    setFavourites(favourites)
+}
 
-    ::-webkit-scrollbar-thumb {
-        border-radius: 4px;
-        background: ${({ theme }) => theme.colors.foreground400};
-    }
+  return (
+    <Wrapper>
+      <LeftWrapper>
+        <MarketSelector>
+          <TokenPairDropdown
+            width={isMobile ? 83 : 223}
+            transparent
+            rowData={rowData}
+            updateMarketChain={updateMarketChain}
+            currentMarket={currentMarket}
+            marketInfo={marketInfo}
+            onFavourited={(items) => { setFavourites(items);}}
+            favourited={favourites}
+          />
+        </MarketSelector>
+        <RatesCardsWrapper>
+          <Box style={{ cursor: 'pointer' }} position="relative" onMouseEnter={() => { setOpen(true) }} onMouseLeave={() => { setOpen(false) }}>
+            <Box display={'flex'} onClick={()=>favouritePair(currentMarket)}>
+            {_.indexOf(favourites, currentMarket) !== -1 ? <ActivatedStarIcon /> : <StarIcon />}
+            </Box>
+            {isOpen && <Box position='absolute' left="-50px" top="calc(100% - 2px)" width="140px" borderRadius={'5px'} overflow="hidden" display='flex' flexDirection="column" zIndex={1000}>
+              <Box
+                px="15px"
+                py="7px"
+                boxSizing="boder-box"
+                fontSize={16}
+                fontWeight="bold"
+                borderBottom={`1px solid ${isDark ? darkColors.foreground400 : lightColors.foreground400}`}
+                bgcolor={isDark ? darkColors.backgroundLowEmphasis : lightColors.backgroundLowEmphasis}
+                color={isDark ? darkColors.foregroundHighEmphasis : lightColors.foregroundHighEmphasis}
+              >Favorites</Box>
+              {_.map(favourites, (item, index) => {
+                return <FavItem
+                  px="15px"
+                  py="7px"
+                  key={index}
+                  boxSizing="boder-box"
+                  fontSize={14}
+                  borderBottom={index !== favourites.length - 1 ? `1px solid ${isDark ? darkColors.foreground400 : lightColors.foreground400}` : ''}
+                  bgcolor={isDark ? darkColors.backgroundLowEmphasis : lightColors.backgroundLowEmphasis}
+                  color={isDark ? darkColors.foregroundHighEmphasis : lightColors.foregroundHighEmphasis}
+                  onClick={() => {
+                    updateMarketChain(item);
+                    setOpen(false)
+                  }}
+                >{item.replace('-', '/')}</FavItem>
+              })}
+            </Box>}
+          </Box>
+          <RatesCard>
+            <Text
+              font="primaryHeading6"
+              color={
+                percentChange === "NaN"
+                  ? "black"
+                  : isIncrease
+                    ? "successHighEmphasis"
+                    : "dangerHighEmphasis"
+              }
+            >
+              {marketSummary.price ? addComma(formatPrice(marketSummary.price)) : "--"}
+            </Text>
+            <Text
+              font="primaryTiny"
+              color="foregroundHighEmphasis"
+            >
+              $ {
+                (marketInfo?.baseAsset?.usdPrice)
+                  ? addComma(marketInfo.baseAsset.usdPrice)
+                  : "--"
+              }
+            </Text>
+          </RatesCard>
+          {isMobile ? (
+            <></>
+          ) : (
+            <>
+              <Divider />
+              <RatesCard>
+                <Text
+                  font="primaryExtraSmallSemiBold"
+                  color="foregroundLowEmphasis"
+                >
+                  <>
+                    {settings.showNightPriceChange
+                      ? "UTC Change"
+                      : "24h Change"
+                    }
+                  </>
+                </Text>
+                <Text
+                  font="primaryMediumSmallSemiBold"
+                  color={
+                    percentChange === "NaN"
+                      ? "black"
+                      : parseFloat(marketSummary["priceChange"]) >= 0
+                        ? "successHighEmphasis"
+                        : "dangerHighEmphasis"
+                  }
+                >
+                  {marketSummary.priceChange &&
+                    formatPrice(marketSummary.priceChange / 1)}{" | "}
+                  {percentChange !== "NaN" ? `${percentChange}%` : "--"}
+                </Text>
+              </RatesCard>
+              <Divider />
+              <RatesCard>
+                <Text
+                  font="primaryExtraSmallSemiBold"
+                  color="foregroundLowEmphasis"
+                >
+                  <>
+                    {settings.showNightPriceChange
+                      ? "UTC High"
+                      : "24h High"
+                    }
+                  </>
+                </Text>
+                <Text
+                  font="primaryMediumSmallSemiBold"
+                  color="foregroundHighEmphasis"
+                >
+                  {marketSummary && marketSummary["24hi"] ? addComma(formatPrice(marketSummary["24hi"])): "--"}
+                </Text>
+              </RatesCard>
+              <Divider />
+              <RatesCard>
+                <Text
+                  font="primaryExtraSmallSemiBold"
+                  color="foregroundLowEmphasis"
+                >
+                  <>
+                    {settings.showNightPriceChange
+                      ? "UTC Low"
+                      : "24h Low"
+                    }
+                  </>
+                </Text>
+                <Text
+                  font="primaryMediumSmallSemiBold"
+                  color="foregroundHighEmphasis"
+                >
+                  {marketSummary && marketSummary["24lo"] ? addComma(formatPrice(marketSummary["24lo"])): "--"}
+                </Text>
+              </RatesCard>
+              <Divider />
+              <RatesCard>
+                <Text
+                  font="primaryExtraSmallSemiBold"
+                  color="foregroundLowEmphasis"
+                >
+                  <>
+                    {settings.showNightPriceChange
+                      ? `UTC Volume(${marketInfo && marketInfo.baseAsset.symbol})`
+                      : `24h Volume(${marketInfo && marketInfo.baseAsset.symbol})`
+                    }
+                  </>
+                </Text>
+                <Text
+                  font="primaryMediumSmallSemiBold"
+                  color="foregroundHighEmphasis"
+                >
+                  {marketSummary && marketSummary.baseVolume ? addComma(formatPrice(marketSummary.baseVolume)): "--"}
+                </Text>
+              </RatesCard>
+              <Divider />
+              <RatesCard>
+                <Text
+                  font="primaryExtraSmallSemiBold"
+                  color="foregroundLowEmphasis"
+                >
+                  <>
+                    {settings.showNightPriceChange
+                      ? `UTC Volume(${marketInfo && marketInfo.quoteAsset.symbol})`
+                      : `24h Volume(${marketInfo && marketInfo.quoteAsset.symbol})`
+                    }
+                  </>
+                </Text>
+                <Text
+                  font="primaryMediumSmallSemiBold"
+                  color="foregroundHighEmphasis"
+                >
+                  {marketSummary && marketSummary.quoteVolume ? addComma(formatPrice(marketSummary.quoteVolume)): "--"}
+                </Text>
+              </RatesCard>
+            </>
+          )}
+        </RatesCardsWrapper>
+      </LeftWrapper>
+      {isOverflow ? (
+          <div style={{ marginRight: "20px", display: "flex" }}>
+              {settings.editable ? (
+                  <LockIcon
+                      style={{ marginRight: "20px" }}
+                      onClick={toggleLayout}
+                  ></LockIcon>
+              ) : (
+                  ""
+              )}
+
+              <SettingsIcon
+                  style={{ marginRight: "20px" }}
+                  onClick={handleSettings}
+              />
+          </div>
+      ) : (
+          <div style={{ marginRight: "20px" }}>
+              {settings.editable ? (
+                  <Button
+                      endIcon={<LockOpenIcon />}
+                      variant="outlined"
+                      scale="imd"
+                      mr="20px"
+                      style={{ marginRight: "10px" }}
+                      onClick={toggleLayout}
+                  >
+                      Lock Interface
+                  </Button>
+              ) : (
+                  ""
+              )}
+
+              <Button
+                  endIcon={<SettingsIcon />}
+                  variant="outlined"
+                  scale="imd"
+                  onClick={handleSettings}
+              >
+                  Settings
+              </Button>
+          </div>
+      )}
+    </Wrapper>
+  );
+};
+
+export default TradeRatesCard;
+
+const Wrapper = styled.div`
+    display: grid;
+    grid-auto-flow: column;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+`;
+const LeftWrapper = styled.div`
+    display: grid;
+    grid-auto-flow: column;
+    align-items: center;
 `;
 
-const InfoWrapper = styled.div`
-    display: flex;
-    flex-direction: column;
+const RatesCardsWrapper = styled.div`
+    display: grid;
+    grid-auto-flow: column;
+    align-items: center;
+    gap: 20px;
+    padding-left: 20px;
+`;
+
+const MarketSelector = styled.div`
+    display: grid;
+    grid-auto-flow: column;
+    align-items: center;
+    gap: 10px;
+    background-color: ${({ theme }) => theme.colors.backgroundLowEmphasis};
+    padding: 0px 24px;
+    height: 56px;
+`;
+
+const RatesCard = styled.div`
+    display: grid;
+    grid-auto-flow: row;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    height: 98px;
-    background-color: ${({ theme }) => theme.colors.backgroundMediumEmphasis};
-    border-bottom: 1px solid ${({ theme }) => theme.colors.foreground400};
+    gap: 2px;
 `;
 
-export default function TradeSidebar(props) {
-    const allOrders = useSelector(allOrdersSelector);
-    const balances = useSelector(balancesSelector);
-    const marketInfo = useSelector(marketInfoSelector);
-    const marketSummary = useSelector(marketSummarySelector);
-    const liquidity = useSelector(liquiditySelector);
-    const isMobile = window.innerWidth < 992;
-    const joinDiscord = () => {
-        window.open("https://discord.gg/zigzag", "_blank");
-    };
-    return (
-        <StyledTradeSidebar>
-            {isMobile ? (
-                <></>
-            ) : (
-                <InfoWrapper>
-                    <Text font="primarySmall" color="foregroundHighEmphasis">
-                        Have a question? Need live support?
-                    </Text>
-                    <Button
-                        width="150px"
-                        startIcon={<DiscordIcon />}
-                        variant="outlined"
-                        scale="imd"
-                        mr="8px"
-                        onClick={joinDiscord}
-                    >
-                        <Text
-                            font="primaryBoldDisplay"
-                            color="foregroundHighEmphasis"
-                            textAlign="center"
-                        >
-                            JOIN DISCORD
-                        </Text>
-                    </Button>
-                </InfoWrapper>
-            )}
-            <SpotBox
-                lastPrice={marketSummary.price}
-                user={props.user}
-                activeOrderCount={props.activeOrderCount}
-                liquidity={liquidity}
-                currentMarket={props.currentMarket}
-                marketSummary={marketSummary}
-                marketInfo={marketInfo}
-                balances={balances}
-                allOrders={allOrders}
-            />
-        </StyledTradeSidebar>
-    );
-}
+const Divider = styled.div`
+    width: 1px;
+    height: 32px;
+    background-color: ${({ theme, isDark }) =>
+        isDark === "false"
+            ? theme.colors.backgroundMediumEmphasis
+            : theme.colors.foreground400};
+`;
+
+const FavItem = styled(Box)`
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.backgroundHighEmphasis };
+  }
+`

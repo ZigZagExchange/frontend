@@ -58,7 +58,6 @@ export default function SwapPage() {
   const [balances, setBalances] = useState([]);
 
   const [orderButtonDisabled, setOrderButtonDisabled] = useState(false);
-  const [errorMsg, setError] = useState("");
 
   const estimatedValueSell = sellAmounts * coinEstimator(sellToken?.name) || 0;
   const estimatedValueBuy = buyAmounts * coinEstimator(buyToken?.name) || 0;
@@ -146,7 +145,6 @@ export default function SwapPage() {
         });
       }
     }
-    isValid();
   }, [sellToken, buyToken]);
 
   useEffect(() => {
@@ -177,15 +175,6 @@ export default function SwapPage() {
       }
     };
   }, [network, currentMarket, api.ws, settings.showNightPriceChange]);
-
-  useEffect(()=>{
-    isValid();
-  }, [sellAmounts, buyAmounts])
-
-  // useEffect(() => {
-  //   setSellTokenList(api.getCurrencies());
-  //   setGetPairs(api.getPairs());
-  // }, [network]);
 
   const currentPrice = () => {
     var ladderPrice = getLadderPrice();
@@ -361,71 +350,6 @@ export default function SwapPage() {
     setSellAmounts(x.toPrecision(6));
   };
 
-  const isValid = () => {
-    let baseAmount, quoteAmount;
-    if(!sellAmounts || !buyAmounts) {
-      setError("")
-      return;
-    }
-    if (typeof sellAmounts === "string") {
-      baseAmount = parseFloat(sellAmounts.replace(",", "."));
-    } else {
-      baseAmount = sellAmounts;
-    }
-    if (typeof buyAmounts === "string") {
-      quoteAmount = parseFloat(buyAmounts.replace(",", "."));
-    } else {
-      quoteAmount = buyAmounts;
-    }
-    quoteAmount = isNaN(quoteAmount) ? 0 : quoteAmount;
-    baseAmount = isNaN(baseAmount) ? 0 : baseAmount;
-    if (!baseAmount && !quoteAmount) {
-      setError("No amount available")
-      return;
-    }
-
-    let price = currentPrice();
-    if (!price) {
-      setError("No price available")
-      return;
-    }
-
-    if (price < 0) {
-      setError(`Price (${price}) can't be below 0`)
-      return;
-    }
-    const baseBalance = balances[sellToken?.name]?.valueReadable;
-
-    if (tType === "sell") {
-      if (baseAmount && baseAmount + marketInfo.baseFee > baseBalance) {
-        setError(`Amount exceeds ${marketInfo.baseAsset.symbol} balance`)
-        return;
-      }
-
-      if (
-        (baseAmount && baseAmount < marketInfo.baseFee) ||
-        baseBalance === undefined
-      ) {
-        setError(`Minimum order size is ${marketInfo.baseFee.toPrecision(5)}`)
-        return;
-      }
-    } else {
-      if (baseAmount && baseAmount + marketInfo.quoteFee > baseBalance) {
-        setError(`Amount exceeds ${marketInfo.quoteAsset.symbol} balance`)
-        return;
-      }
-
-      if (
-        (baseAmount && baseAmount < marketInfo.quoteFee) ||
-        baseBalance === undefined
-      ) {
-        setError(`Minimum order size is ${marketInfo.quoteFee.toPrecision(5)}`)
-        return;
-      }
-    }
-    ;
-  }
-
   const onClickExchange = async () => {
     const userOrderArray = Object.values(userOrders);
     if (userOrderArray.length > 0) {
@@ -458,18 +382,24 @@ export default function SwapPage() {
     quoteAmount = isNaN(quoteAmount) ? 0 : quoteAmount;
     baseAmount = isNaN(baseAmount) ? 0 : baseAmount;
     if (!baseAmount && !quoteAmount) {
-      setError("No amount available")
+      toast.error("No amount available", {
+        toastId: "No amount available",
+      });
       return;
     }
 
     let price = currentPrice();
     if (!price) {
-      setError("No price available")
+      toast.error("No price available", {
+        toastId: "No price available",
+      });
       return;
     }
 
     if (price < 0) {
-      setError(`Price (${price}) can't be below 0`)
+      toast.error(`Price (${price}) can't be below 0`, {
+        toastId: `Price (${price}) can't be below 0`,
+      });
       return;
     }
 
@@ -508,7 +438,9 @@ export default function SwapPage() {
 
     if (tType === "sell") {
       if (baseAmount && baseAmount + marketInfo.baseFee > baseBalance) {
-        setError(`Amount exceeds ${marketInfo.baseAsset.symbol} balance`)
+        toast.error(`Amount exceeds ${marketInfo.baseAsset.symbol} balance`, {
+          toastId: `Amount exceeds ${marketInfo.baseAsset.symbol} balance`,
+        });
         return;
       }
 
@@ -516,12 +448,18 @@ export default function SwapPage() {
         (baseAmount && baseAmount < marketInfo.baseFee) ||
         baseBalance === undefined
       ) {
-        setError(`Minimum order size is ${marketInfo.baseFee.toPrecision(5)}`)
+        toast.error(
+          `Minimum order size is ${marketInfo.baseFee.toPrecision(5)} ${
+            marketInfo.baseAsset.symbol
+          }`
+        );
         return;
       }
     } else {
       if (baseAmount && baseAmount + marketInfo.quoteFee > baseBalance) {
-        setError(`Amount exceeds ${marketInfo.quoteAsset.symbol} balance`)
+        toast.error(`Amount exceeds ${marketInfo.quoteAsset.symbol} balance`, {
+          toastId: `Amount exceeds ${marketInfo.quoteAsset.symbol} balance`,
+        });
         return;
       }
 
@@ -529,7 +467,11 @@ export default function SwapPage() {
         (baseAmount && baseAmount < marketInfo.quoteFee) ||
         baseBalance === undefined
       ) {
-        setError(`Minimum order size is ${marketInfo.quoteFee.toPrecision(5)}`)
+        toast.error(
+          `Minimum order size is ${marketInfo.quoteFee.toPrecision(5)} ${
+            marketInfo.quoteAsset.symbol
+          }`
+        );
         return;
       }
     }
@@ -630,7 +572,7 @@ export default function SwapPage() {
               onSetSlippageValue={onChangeSlippageValue}
               slippageValue={slippageValue}
             />
-            {!errorMsg && <Button
+            <Button
               isLoading={false}
               className="w-full py-3 my-3 uppercase"
               scale="imd"
@@ -638,16 +580,7 @@ export default function SwapPage() {
               disabled={orderButtonDisabled || !user.address}
             >
               Convert
-            </Button>}
-            {errorMsg && <Button
-              isLoading={false}
-              className="w-full py-3 my-3 uppercase"
-              variant="sell"
-              scale="imd"
-              disabled
-            >
-              {errorMsg}
-            </Button>}
+            </Button>
           </div>
         </div>
       )}

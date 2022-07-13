@@ -26,15 +26,6 @@ import {
 } from "components/atoms/Svg";
 import ToggleTheme from "components/molecules/Toggle/ToggleTheme";
 import useTheme from "components/hooks/useTheme";
-import {
-  MdOutlineArticle,
-  MdOutlineQuiz,
-  MdSignalCellularAlt,
-  MdAccountBalance,
-  MdCreate,
-  MdOutlineContactMail,
-} from "react-icons/md";
-import { FaDiscord, FaGithub } from "react-icons/fa";
 
 const langList = [
   { text: "EN", url: "#" },
@@ -42,8 +33,7 @@ const langList = [
 ];
 
 const networkLists = [
-  {
-    text: "zkSync - Mainnet",
+  { text: "zkSync - Mainnet",
     value: 1,
     url: "#",
     selectedIcon: <CheckIcon />,
@@ -71,49 +61,16 @@ const accountLists = [
 ];
 
 const supportLists = [
-  {
-    text: "Live Support",
-    url: "https://discord.com/invite/zigzag",
-    icon: <FaDiscord size={14} />,
-  },
-  {
-    text: "FAQ",
-    url: "https://info.zigzag.exchange/",
-    icon: <MdOutlineQuiz size={14} />,
-  },
-  {
-    text: "Docs",
-    url: "https://docs.zigzag.exchange/",
-    icon: <MdOutlineArticle size={14} />,
-  },
-  {
-    text: "GitHub",
-    url: "https://github.com/ZigZagExchange/",
-    icon: <FaGithub size={14} />,
-  },
-  {
-    text: "Uptime Status",
-    url: "https://status.zigzag.exchange/",
-    icon: <MdSignalCellularAlt size={14} />,
-  },
-  {
-    text: "Contact",
-    url: "https://info.zigzag.exchange/#contact",
-    icon: <MdOutlineContactMail size={14} />,
-  },
+  { text: "Live Support", url: "https://discord.com/invite/zigzag" },
+  { text: "FAQ", url: "https://info.zigzag.exchange/" },
+  { text: "Docs", url: "https://docs.zigzag.exchange/" },
+  { text: "GitHub", url: "https://github.com/ZigZagExchange/" },
+  { text: "Uptime Status", url: "https://status.zigzag.exchange/" },
 ];
 
 const communityLists = [
-  {
-    text: "Governance",
-    url: "https://forum.zigzaglabs.io/t/zigzag-exchange",
-    icon: <MdAccountBalance size={14} />,
-  },
-  {
-    text: "Blog",
-    url: "https://blog.zigzag.exchange/",
-    icon: <MdCreate size={14} />,
-  },
+  { text: "Governance", url: "https://forum.zigzaglabs.io/t/zigzag-exchange" },
+  { text: "Blog", url: "https://blog.zigzag.exchange/" },
 ];
 
 const HeaderWrapper = styled.div`
@@ -328,16 +285,15 @@ export const Header = (props) => {
 
     api.setAPIProvider(value);
     try {
-      await api.refreshNetwork();
+      await api.refreshNetwork()
     } catch (err) {
       console.log(err);
     }
 
     if (
-      (/^\/wrap(\/.*)?/.test(location.pathname) && !api.isEVMChain()) ||
-      (/^\/bridge(\/.*)?/.test(location.pathname) &&
-        !api.isImplemented("depositL2")) ||
-      (/^\/list-pair(\/.*)?/.test(location.pathname) && api.isEVMChain())
+      (/^\/wrap(\/.*)?/.test(location.pathname) && (!api.isEVMChain())) ||
+      (/^\/bridge(\/.*)?/.test(location.pathname) && (!api.isImplemented("depositL2"))) ||
+      (/^\/list-pair(\/.*)?/.test(location.pathname) && (api.isEVMChain()))
     ) {
       setIndex(0);
       history.push("/");
@@ -370,7 +326,7 @@ export const Header = (props) => {
         setIndex(newIndex);
         localStorage.setItem("tab_index", newIndex);
         history.push("/dsl");
-        break;
+	      break;
       case 5:
         setIndex(newIndex);
         localStorage.setItem("tab_index", newIndex);
@@ -437,7 +393,7 @@ export const Header = (props) => {
               adClass="menu-dropdown"
               width={200}
               item={supportLists}
-              context={"Support"}
+              context={'Support'}
               leftIcon={true}
               transparent
             />
@@ -445,7 +401,7 @@ export const Header = (props) => {
               adClass="menu-dropdown"
               width={162}
               item={communityLists}
-              context={"Community"}
+              context={'Community'}
               leftIcon={true}
               transparent
             />
@@ -523,7 +479,7 @@ export const Header = (props) => {
               DOCS
               <ExternalLinkIcon size={12} />
             </Tab>
-            {isEVM && <Tab>WRAP</Tab>}
+              {isEVM && <Tab>WRAP</Tab>}
           </TabMenu>
           <HorizontalDivider />
           {/* <ActionSideMenuWrapper>
@@ -545,7 +501,7 @@ export const Header = (props) => {
             adClass="menu-dropdown"
             width={200}
             item={supportLists}
-            context={"Support"}
+            context={'Support'}
             leftIcon={true}
             transparent
           />
@@ -553,7 +509,7 @@ export const Header = (props) => {
             adClass="menu-dropdown"
             width={162}
             item={communityLists}
-            context={"Community"}
+            context={'Community'}
             leftIcon={true}
             transparent
           />
