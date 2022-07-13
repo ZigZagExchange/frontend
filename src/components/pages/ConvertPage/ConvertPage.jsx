@@ -128,7 +128,6 @@ const ConvertPage = () => {
       const p_name = sellToken.name + "-" + buyToken.name;
       const r_p_name = buyToken.name + "-" + sellToken.name;
       let c = false;
-      console.log("123123");
       Object.keys(pairPrices).forEach((pair) => {
         if (pair === p_name) {
           setBasePrice(pairPrices[pair].price);
@@ -136,7 +135,6 @@ const ConvertPage = () => {
           const price = getLadderPrice() * (1 - slippageValue / 100);
           const x = sellAmounts * price;
           setBuyAmounts(x.toPrecision(6));
-          console.log(x.toPrecision(6));
           dispatch(setCurrentMarket(p_name));
           c = true;
         }
@@ -149,7 +147,6 @@ const ConvertPage = () => {
             const price = getLadderPrice() * (1 + slippageValue / 100);
             const x = sellAmounts * price;
             setBuyAmounts(x.toPrecision(6));
-            console.log(x.toPrecision(6));
             dispatch(setCurrentMarket(r_p_name));
           }
         });
@@ -365,7 +362,6 @@ const ConvertPage = () => {
         : getLadderPrice() * (1 - slippageValue / 100);
     const x = amount * price;
     setBuyAmounts(x.toPrecision(6));
-    console.log(x.toPrecision(6));
   };
 
   const onChangeBuyAmounts = (event) => {
@@ -377,7 +373,6 @@ const ConvertPage = () => {
         : getLadderPrice() * (1 - slippageValue / 100);
     const x = amount / price;
     setSellAmounts(x.toPrecision(6));
-    console.log(x.toPrecision(6));
   };
 
   const isValid = () => {
