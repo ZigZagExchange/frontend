@@ -90,12 +90,12 @@ const SettingsModal = ({ onDismiss }) => {
                 left = {
                     ...left,
                     w: currentPoint === "xxs" ? 40 : left.w * 2,
-                    h: currentPoint === "xxs" ? 10 : left.h / 2,
+                    // h: currentPoint === "xxs" ? 10 : left.h / 2,
                 };
                 right = {
                     ...right,
                     w: currentPoint === "xxs" ? 40 : right.w * 2,
-                    h: currentPoint === "xxs" ? 10 : right.h / 2,
+                    // h: currentPoint === "xxs" ? 10 : right.h / 2,
                     // x: left.x,
                 };
                 sidebar = {
@@ -106,19 +106,19 @@ const SettingsModal = ({ onDismiss }) => {
                 left = {
                     ...left,
                     w: currentPoint === "xxs" ? 20 : left.w / 2,
-                    h: currentPoint === "xxs" ? 20 : left.h * 2,
+                    // h: currentPoint === "xxs" ? 20 : left.h * 2,
                     x: currentPoint === "xxs" ? 20 : left.x,
                 };
                 right = {
                     ...right,
                     w: currentPoint === "xxs" ? 40 : right.w / 2,
-                    h: currentPoint === "xxs" ? 20 : right.h * 2,
+                    // h: currentPoint === "xxs" ? 20 : right.h * 2,
                     // x: left.x + left.w,
                 };
                 sidebar = {
                     ...sidebar,
                     w: currentPoint === "xxs" ? 20 : sidebar.w / 2,
-                    h: currentPoint === "xxs" ? 20 : sidebar.h * 2,
+                    // h: currentPoint === "xxs" ? 20 : sidebar.h * 2,
                 };
             }
             let newArray = [...newLayouts[currentPoint]];
