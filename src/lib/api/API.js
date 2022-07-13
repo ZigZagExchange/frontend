@@ -77,9 +77,9 @@ export default class API extends Emitter {
   };
 
   setAPIProvider = (network, networkChanged = true) => {
-    const chianName = this.getChainName(network)
+    const chainName = this.getChainName(network)
 
-    if (!chianName) {
+    if (!chainName) {
       console.error (`Can't get chainName for ${network}`);
       this.signOut()
       return
@@ -100,13 +100,13 @@ export default class API extends Emitter {
 
     this.web3 = new Web3(
       window.ethereum || new Web3.providers.HttpProvider(
-        `https://${chianName}.infura.io/v3/${this.infuraId}`
+        `https://${chainName}.infura.io/v3/${this.infuraId}`
       )
     )
 
-    if (chianName === 'arbitrum') {
+    if (chainName === 'arbitrum') {
       this.web3Modal = new Web3Modal({
-        network: chianName,
+        network: chainName,
         cacheProvider: true,
         theme: "dark",
         providerOptions: {
@@ -120,7 +120,7 @@ export default class API extends Emitter {
       })
     } else {
       this.web3Modal = new Web3Modal({
-        network: chianName,
+        network: chainName,
         cacheProvider: true,
         theme: "dark",
         providerOptions: {
