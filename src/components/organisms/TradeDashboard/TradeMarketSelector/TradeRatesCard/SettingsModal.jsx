@@ -69,23 +69,9 @@ const SettingsModal = ({ onDismiss }) => {
     const toggle = () => setChecked(!checked);
     const dispatch = useDispatch();
     const breakpoints = ["xl", "lg", "md", "xxs"];
-    // console.log("settings", settings.layouts["xxs"]);
-
-    // const isInvolve = (max, min, value) => {
-    //     return value <= breakpoints[max] && value >= breakpoints[min];
-    // };
 
     const onChangeStackOrderBook = () => {
         let newLayouts = { ...settings.layouts };
-        // let width = window.innerWidth;
-        // let currentPoint =
-        //     width > 1599
-        //         ? "xl"
-        //         : isInvolve("xl", "lg", width)
-        //         ? "lg"
-        //         : isInvolve("lg", "md", width)
-        //         ? "md"
-        //         : "xxs";
         breakpoints.forEach((currentPoint) => {
             let sidebarIndex = newLayouts[currentPoint].findIndex(
                 (item) => item.i === "a"
@@ -110,7 +96,7 @@ const SettingsModal = ({ onDismiss }) => {
                     ...right,
                     w: currentPoint === "xxs" ? 40 : right.w * 2,
                     h: currentPoint === "xxs" ? 10 : right.h / 2,
-                    x: left.x,
+                    // x: left.x,
                 };
                 sidebar = {
                     ...sidebar,
@@ -127,7 +113,7 @@ const SettingsModal = ({ onDismiss }) => {
                     ...right,
                     w: currentPoint === "xxs" ? 40 : right.w / 2,
                     h: currentPoint === "xxs" ? 20 : right.h * 2,
-                    x: left.x + left.w,
+                    // x: left.x + left.w,
                 };
                 sidebar = {
                     ...sidebar,
