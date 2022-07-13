@@ -26,7 +26,7 @@ export const apiSlice = createSlice({
     network: 1,
     userId: null,
     layout: getLayout() || 0,
-    currentMarket: "ETH-USDC",
+    currentMarket: api.apiProvider.defaultMarket,
     marketFills: {},
     bridgeReceipts: [],
     lastPrices: {},
