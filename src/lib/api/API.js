@@ -381,16 +381,20 @@ export default class API extends Emitter {
             throw err;
           }
 
+          try {
+            accountState.profile = await this.getProfile(accountState.address)
+          } catch (e) {
+            accountState.profile = {};
+          }           
+
+          this.emit("signIn", accountState);
+
           if (accountState && accountState.id) {
             this.send("login", [
               network,
               accountState.id && accountState.id.toString(),
             ]);
           }
-
-          accountState.profile = await this.getProfile(accountState.address)
-
-          this.emit("signIn", accountState);
 
           // fetch blances
           await this.getBalances();
@@ -1077,12 +1081,22 @@ export default class API extends Emitter {
     }
   }
 
-  getExplorerAccountLink = (chainId, address) => {
-    switch (Number(chainId)) {
-      case 1: return 'https://zkscan.io/explorer/accounts/' + address;
-      case 1000: return 'https://rinkeby.zkscan.io/explorer/accounts/' + address;
-      case 42161: return 'https://arbiscan.io/address/' + address;
-      default: throw Error("Chain ID not understood");
+  getExplorerAccountLink = (chainId, address, layer = 1) => {
+    if(layer === 1){
+      switch (Number(chainId)) {
+        case 1: return 'https://etherscan.io/address/' + address;
+        case 1000: return 'https://rinkeby.etherscan.io/address/' + address;
+        case 42161: return 'https://etherscan.io/address/' + address;
+        default: throw Error("Chain ID not understood");
+      }
+    }
+    else{
+      switch (Number(chainId)) {
+        case 1: return 'https://zkscan.io/explorer/accounts/' + address;
+        case 1000: return 'https://rinkeby.zkscan.io/explorer/accounts/' + address;
+        case 42161: return 'https://arbiscan.io/address/' + address;
+        default: throw Error("Chain ID not understood");
+      }
     }
   };
 }

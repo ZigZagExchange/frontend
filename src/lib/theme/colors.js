@@ -54,7 +54,7 @@ export const lightColors = {
   ...baseColors,
   successHighEmphasis: '#2ed170',
   backgroundHighEmphasis: '#ddf1f7',
-  backgroundMediumEmphasis: '#ddf1f7',
+  backgroundMediumEmphasis: '#f6fbfd',
   backgroundLowEmphasis: '#ecf8fa',
   backgroundDisabled: '#FFFFFF52',
   background500: '#FFFFFF52',

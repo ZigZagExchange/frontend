@@ -25,6 +25,7 @@ class SpotForm extends React.Component {
       quoteAmount: "",
       orderButtonDisabled: true,
       maxSizeSelected: false,
+      exchangePercent: 0,
     };
   }
   componentWillReceiveProps = (nextProps) => {
@@ -715,6 +716,7 @@ class SpotForm extends React.Component {
     if (isNaN(newstate.totalAmount)) newstate.totalAmount = 0;
     if (isNaN(newstate.quoteAmount)) newstate.quoteAmount = 0;
     newstate.orderButtonDisabled = this.isInvalidNumber(newstate.totalAmount);
+    newstate.exchangePercent = val;
     this.setState(newstate);
   }
 
@@ -945,6 +947,9 @@ class SpotForm extends React.Component {
             value={this.amountPercentOfMax()}
             onChange={this.rangeSliderHandler.bind(this)}
           />
+          <span className="current_progress">
+            {this.state.exchangePercent}%
+          </span>
         </RangeWrapper>
         <FormHeader>
           <Text font="primaryTiny" color="foregroundMediumEmphasis">
@@ -1063,28 +1068,33 @@ const InputBox = styled.div`
 `;
 
 const RangeWrapper = styled.div`
+  position: relative;
   width: 98%;
   padding-left: 10px;
-
+  .current_progress {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+  }
   .custom_range {
     &::before {
-      border: 2px solid ${({ theme }) => theme.colors.foregroundLowEmphasis} !important;
-      background-color: ${({ theme }) =>
-        theme.colors.backgroundMediumEmphasis} !important;
+        border: 2px solid
+            ${({ theme }) => theme.colors.foregroundLowEmphasis} !important;
+        background-color: ${({ theme }) =>
+            theme.colors.backgroundMediumEmphasis} !important;
     }
-
     &::before {
-      width: 10px !important;
-      height: 10px !important;
+        width: 10px !important;
+        height: 10px !important;
     }
   }
-
   .MuiSlider-rail {
     top: 50%;
     height: 6px;
     transform: translateY(-50%);
     background-color: ${({ theme }) =>
-      theme.colors.foregroundLowEmphasis} !important;
+        theme.colors.foregroundLowEmphasis} !important;
   }
 
   .MuiSlider-track {
