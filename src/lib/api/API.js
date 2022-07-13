@@ -411,11 +411,11 @@ export default class API extends Emitter {
     return this._signInProgress;
   };
 
-  signOut = async () => {
+  signOut = async (clearCatch = false) => {
     if (!this.apiProvider) {
       return;
-    } else if (this.web3Modal) {
-      await this.web3Modal.clearCachedProvider();
+    } else if (this.web3Modal && clearCatch) {
+      this.web3Modal.clearCachedProvider();
     }
 
     if (isMobile) window.localStorage.clear();
