@@ -166,6 +166,9 @@ export function TradeDashboard() {
                 autoSize={false}
                 onChange={(_, layout) => {
                     dispatch(setUISettings({ key: "layouts", value: layout }));
+                    dispatch(
+                        setUISettings({ key: "layoutsCustomized", value: true })
+                    );
                 }}
                 margin={[0, 0]}
                 isDraggable={settings.editable}
