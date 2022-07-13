@@ -13,6 +13,7 @@ import {
   userOrdersSelector,
 } from "lib/store/features/api/apiSlice";
 import { Button } from "components/molecules/Button";
+import useTheme from "components/hooks/useTheme";
 
 const StyledTradeSidebar = styled.aside`
   // display: grid;
@@ -21,7 +22,7 @@ const StyledTradeSidebar = styled.aside`
   position: relative;
   //   height: fit-content;
   border: 1px solid ${({ theme }) => theme.colors.foreground300};
-  background: ${({ theme }) => theme.colors.backgroundMediumEmphasis};
+  background: ${({ theme, isDark }) => isDark ? theme.colors.backgroundMediumEmphasis : theme.colors.backgroundHighEmphasis};
   overflow-y: auto;
   scrollbar-color: ${({ theme }) => theme.colors.foreground400} rgba(0,0,0,0.1);
   scrollbar-width: thin !important;
@@ -51,7 +52,7 @@ const InfoWrapper = styled.div`
   justify-content: center;
   gap: 8px;
   height: 98px;
-  background-color: ${({ theme }) => theme.colors.backgroundMediumEmphasis};
+  background-color: ${({ theme, isDark }) => isDark ? theme.colors.backgroundMediumEmphasis : theme.colors.backgroundHighEmphasis};
   border-bottom: 1px solid ${({ theme }) => theme.colors.foreground400};
 `;
 
@@ -62,16 +63,17 @@ export default function TradeSidebar(props) {
   const marketInfo = useSelector(marketInfoSelector);
   const marketSummary = useSelector(marketSummarySelector);
   const liquidity = useSelector(liquiditySelector);
+  const { isDark } = useTheme()
   const isMobile = window.innerWidth < 992;
   const joinDiscord = () => {
     window.open("https://discord.gg/zigzag", "_blank");
   };
   return (
-    <StyledTradeSidebar>
+    <StyledTradeSidebar isDark={isDark}>
       {isMobile ? (
         <></>
       ) : (
-        <InfoWrapper>
+        <InfoWrapper isDark={isDark}>
           <Text font="primarySmall" color="foregroundHighEmphasis">
               Have a question? Need live support?
           </Text>

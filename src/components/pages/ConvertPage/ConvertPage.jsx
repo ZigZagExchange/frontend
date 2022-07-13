@@ -5,7 +5,7 @@ import useTheme from "components/hooks/useTheme";
 import api from "lib/api";
 
 import { DefaultTemplate } from "components";
-import SwapContianer from "./SwapContainer";
+import ConvertContianer from "./ConvertContianer";
 
 import classNames from "classnames";
 import TransactionSettings from "./TransationSettings";
@@ -13,6 +13,7 @@ import { Button } from "components/molecules/Button";
 
 import { useCoinEstimator } from "components";
 import { userSelector } from "lib/store/features/auth/authSlice";
+import { setSlippageValue } from "lib/store/features/api/apiSlice";
 import {
   networkSelector,
   balancesSelector,
@@ -24,11 +25,12 @@ import {
   resetData,
   settingsSelector,
   userOrdersSelector,
+  slippageValueSelector,
 } from "lib/store/features/api/apiSlice";
-import { formatPrice, formatUSD } from "lib/utils";
+import { formatPrice, formatUSD, formatToken } from "lib/utils";
 import { LoadingSpinner } from "components/atoms/LoadingSpinner";
 
-export default function SwapPage() {
+const ConvertPage = () => {
   const coinEstimator = useCoinEstimator();
   const userOrders = useSelector(userOrdersSelector);
 
@@ -44,13 +46,15 @@ export default function SwapPage() {
   const currentMarket = useSelector(currentMarketSelector);
   const network = useSelector(networkSelector);
   const marketInfo = useSelector(marketInfoSelector);
+  const slippageValue = useSelector(slippageValueSelector);
+
   const [pairs, setGetPairs] = useState([]);
   const [sellTokenList, setSellTokenList] = useState([]);
   const [sellToken, setSellToken] = useState();
   const [buyToken, setBuyToken] = useState();
   const [basePrice, setBasePrice] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [slippageValue, setSlippageValue] = useState("1.00");
+  // const [slippageValue, setSlippageValue] = useState(slippage);
 
   const [sellAmounts, setSellAmounts] = useState();
   const [buyAmounts, setBuyAmounts] = useState();
@@ -58,6 +62,7 @@ export default function SwapPage() {
   const [balances, setBalances] = useState([]);
 
   const [orderButtonDisabled, setOrderButtonDisabled] = useState(false);
+  const [errorMsg, setError] = useState("");
 
   const estimatedValueSell = sellAmounts * coinEstimator(sellToken?.name) || 0;
   const estimatedValueBuy = buyAmounts * coinEstimator(buyToken?.name) || 0;
@@ -88,34 +93,35 @@ export default function SwapPage() {
   }, [sellTokenList, network, currentMarket]);
 
   useEffect(async () => {
-    if (!user.address) return;
-    setBalances(zkBalances);
+    if (user.address !== undefined) {
+      setBalances(zkBalances);
+    }
   }, [user.address, zkBalances]);
 
-  useEffect(() => {
-    // this could later be replaced by a better logic to pick a good pair
-    switch(network) {
-      case 1:
-        setSellToken("USDC");
-        dispatch(setCurrentMarket("ZZ-USDC"));
-        break;
-      case 1000:
-        setSellToken("USDC");
-        dispatch(setCurrentMarket("ETH-USDC"));
-        break;
-      case 42161:
-        setSellToken("USDC");
-        dispatch(setCurrentMarket("WETH-USDC"));
-        break;
-      default:
-        setSellToken("USDC");
-        dispatch(setCurrentMarket("ZZ-USDC"));
-    }
+  // useEffect(() => {
+  //   // this could later be replaced by a better logic to pick a good pair
+  //   switch (network) {
+  //     case 1:
+  //       setSellToken({ id: 0, name: "USDC" });
+  //       dispatch(setCurrentMarket("ZZ-USDC"));
+  //       break;
+  //     case 1000:
+  //       setSellToken({ id: 0, name: "USDC" });
+  //       dispatch(setCurrentMarket("ETH-USDC"));
+  //       break;
+  //     case 42161:
+  //       setSellToken({ id: 0, name: "USDC" });
+  //       dispatch(setCurrentMarket("WETH-USDC"));
+  //       break;
+  //     default:
+  //       setSellToken({ id: 0, name: "USDC" });
+  //       dispatch(setCurrentMarket("ZZ-USDC"));
+  //   }
 
-    setSellTokenList(api.getCurrencies());
-    setGetPairs(api.getPairs());
-    document.title = "ZigZag Convert";
-  }, []);
+  //   setSellTokenList(api.getCurrencies());
+  //   setGetPairs(api.getPairs());
+  //   document.title = "ZigZag Convert";
+  // }, []);
 
   useEffect(() => {
     if (sellToken && buyToken) {
@@ -124,7 +130,6 @@ export default function SwapPage() {
       let c = false;
       Object.keys(pairPrices).forEach((pair) => {
         if (pair === p_name) {
-          console.log(p_name);
           setBasePrice(pairPrices[pair].price);
           const x = sellAmounts * pairPrices[pair].price;
           setBuyAmounts(x);
@@ -136,7 +141,6 @@ export default function SwapPage() {
       if (c === false) {
         Object.keys(pairPrices).forEach((pair) => {
           if (pair === r_p_name) {
-            console.log(r_p_name);
             setBasePrice(1 / pairPrices[pair].price);
             const x = (sellAmounts * 1) / pairPrices[pair].price;
             setBuyAmounts(x);
@@ -146,9 +150,18 @@ export default function SwapPage() {
         });
       }
     }
+    isValid();
   }, [sellToken, buyToken]);
 
   useEffect(() => {
+    if (user.address && !user.id) {
+      toast.error(
+        "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
+        {
+          autoClose: 60000,
+        }
+      );
+    }
     const sub = () => {
       dispatch(resetData());
       api.subscribeToMarket(currentMarket, settings.showNightPriceChange);
@@ -167,7 +180,11 @@ export default function SwapPage() {
         api.off("open", sub);
       }
     };
-  }, [network, currentMarket, api.ws]);
+  }, [network, currentMarket, api.ws, settings.showNightPriceChange]);
+
+  useEffect(()=>{
+    isValid();
+  }, [sellAmounts, buyAmounts])
 
   // useEffect(() => {
   //   setSellTokenList(api.getCurrencies());
@@ -235,31 +252,31 @@ export default function SwapPage() {
               coinEstimator(item) * balances[item]?.valueReadable
             )}`
           : "";
-
         return {
           id: index,
           name: item,
           balance: balances[item]?.valueReadable
-            ? balances[item]?.valueReadable
-            : "0.00000",
+            ? formatToken(balances[item]?.valueReadable, item)
+            : "0.0000000",
           price: price !== "" ? `${price}` : "$ 0.00",
         };
       });
-      const f = p.find((item) => item.name === currentMarket.split("-")[1]);
-      // const t = p.find((item) => item.name === currentMarket.split("-")[0]);
       const s = p.sort((a, b) => {
         return (
           parseFloat(b.price.substring(1).replace(",", "")) -
           parseFloat(a.price.substring(1).replace(",", ""))
         );
       });
-      setSellToken(f);
-      // setBuyToken(t);
+      if (!sellToken) {
+        const f = s.find((item) => item.name === currentMarket.split("-")[1]);
+        setSellToken(f);
+      }
+
       return s;
     } else {
       return [];
     }
-  }, [sellTokenList]);
+  }, [sellTokenList, balances]);
 
   const buyTokenOptions = useMemo(() => {
     const p = pairs.map((item) => {
@@ -288,8 +305,8 @@ export default function SwapPage() {
           id: index,
           name: item,
           balance: balances[item]?.valueReadable
-            ? balances[item]?.valueReadable
-            : "0.00000",
+            ? formatToken(balances[item]?.valueReadable, item)
+            : "0.0000000",
           price: price !== "" ? `${price}` : "$ 0.00",
         };
       });
@@ -301,7 +318,10 @@ export default function SwapPage() {
         setBuyToken(d);
       }
     } else {
-      setBuyToken(filtered.find((item) => item.name === "ZZ"));
+      const b = filtered.find(
+        (item) => item.name === currentMarket.split("-")[0]
+      );
+      setBuyToken(b);
     }
     filtered = filtered.filter(
       (value, index, self) =>
@@ -314,7 +334,7 @@ export default function SwapPage() {
       );
     });
     return s;
-  }, [sellToken, pairs]);
+  }, [sellToken, pairs, balances]);
 
   const onChangeSellToken = (option) => {
     setSellToken(option);
@@ -344,6 +364,71 @@ export default function SwapPage() {
     const x = amount / basePrice;
     setSellAmounts(x.toPrecision(6));
   };
+
+  const isValid = () => {
+    let baseAmount, quoteAmount;
+    if(!sellAmounts || !buyAmounts) {
+      setError("")
+      return;
+    }
+    if (typeof sellAmounts === "string") {
+      baseAmount = parseFloat(sellAmounts.replace(",", "."));
+    } else {
+      baseAmount = sellAmounts;
+    }
+    if (typeof buyAmounts === "string") {
+      quoteAmount = parseFloat(buyAmounts.replace(",", "."));
+    } else {
+      quoteAmount = buyAmounts;
+    }
+    quoteAmount = isNaN(quoteAmount) ? 0 : quoteAmount;
+    baseAmount = isNaN(baseAmount) ? 0 : baseAmount;
+    if (!baseAmount && !quoteAmount) {
+      setError("No amount available")
+      return;
+    }
+
+    let price = currentPrice();
+    if (!price) {
+      setError("No price available")
+      return;
+    }
+
+    if (price < 0) {
+      setError(`Price (${price}) can't be below 0`)
+      return;
+    }
+    const baseBalance = balances[sellToken?.name]?.valueReadable;
+
+    if (tType === "sell") {
+      if (baseAmount && baseAmount + marketInfo.baseFee > baseBalance) {
+        setError(`Amount exceeds ${marketInfo.baseAsset.symbol} balance`)
+        return;
+      }
+
+      if (
+        (baseAmount && baseAmount < marketInfo.baseFee) ||
+        baseBalance === undefined
+      ) {
+        setError(`Minimum order size is ${marketInfo.baseFee.toPrecision(5)}`)
+        return;
+      }
+    } else {
+      if (baseAmount && baseAmount + marketInfo.quoteFee > baseBalance) {
+        setError(`Amount exceeds ${marketInfo.quoteAsset.symbol} balance`)
+        return;
+      }
+
+      if (
+        (baseAmount && baseAmount < marketInfo.quoteFee) ||
+        baseBalance === undefined
+      ) {
+        setError(`Minimum order size is ${marketInfo.quoteFee.toPrecision(5)}`)
+        return;
+      }
+    }
+    ;
+  }
 
   const onClickExchange = async () => {
     const userOrderArray = Object.values(userOrders);
@@ -377,24 +462,18 @@ export default function SwapPage() {
     quoteAmount = isNaN(quoteAmount) ? 0 : quoteAmount;
     baseAmount = isNaN(baseAmount) ? 0 : baseAmount;
     if (!baseAmount && !quoteAmount) {
-      toast.error("No amount available", {
-        toastId: "No amount available",
-      });
+      setError("No amount available")
       return;
     }
 
     let price = currentPrice();
     if (!price) {
-      toast.error("No price available", {
-        toastId: "No price available",
-      });
+      setError("No price available")
       return;
     }
 
     if (price < 0) {
-      toast.error(`Price (${price}) can't be below 0`, {
-        toastId: `Price (${price}) can't be below 0`,
-      });
+      setError(`Price (${price}) can't be below 0`)
       return;
     }
 
@@ -433,9 +512,7 @@ export default function SwapPage() {
 
     if (tType === "sell") {
       if (baseAmount && baseAmount + marketInfo.baseFee > baseBalance) {
-        toast.error(`Amount exceeds ${marketInfo.baseAsset.symbol} balance`, {
-          toastId: `Amount exceeds ${marketInfo.baseAsset.symbol} balance`,
-        });
+        setError(`Amount exceeds ${marketInfo.baseAsset.symbol} balance`)
         return;
       }
 
@@ -443,18 +520,12 @@ export default function SwapPage() {
         (baseAmount && baseAmount < marketInfo.baseFee) ||
         baseBalance === undefined
       ) {
-        toast.error(
-          `Minimum order size is ${marketInfo.baseFee.toPrecision(5)} ${
-            marketInfo.baseAsset.symbol
-          }`
-        );
+        setError(`Minimum order size is ${marketInfo.baseFee.toPrecision(5)}`)
         return;
       }
     } else {
       if (baseAmount && baseAmount + marketInfo.quoteFee > baseBalance) {
-        toast.error(`Amount exceeds ${marketInfo.quoteAsset.symbol} balance`, {
-          toastId: `Amount exceeds ${marketInfo.quoteAsset.symbol} balance`,
-        });
+        setError(`Amount exceeds ${marketInfo.quoteAsset.symbol} balance`)
         return;
       }
 
@@ -462,11 +533,7 @@ export default function SwapPage() {
         (baseAmount && baseAmount < marketInfo.quoteFee) ||
         baseBalance === undefined
       ) {
-        toast.error(
-          `Minimum order size is ${marketInfo.quoteFee.toPrecision(5)} ${
-            marketInfo.quoteAsset.symbol
-          }`
-        );
+        setError(`Minimum order size is ${marketInfo.quoteFee.toPrecision(5)}`)
         return;
       }
     }
@@ -481,6 +548,8 @@ export default function SwapPage() {
         }
       );
     }
+
+    console.log(slippageValue, 1 + slippageValue / 100);
 
     try {
       await api.submitOrder(
@@ -519,9 +588,9 @@ export default function SwapPage() {
   const onChangeSlippageValue = (value) => {
     let amount = value.replace(/[^1-9.]/g, ""); //^[1-9][0-9]?$|^100$
     if (parseFloat(amount) < 1 || parseFloat(amount) > 10) {
-      setSlippageValue("1.00");
+      dispatch(setSlippageValue({ value: "1.00" }));
     } else {
-      setSlippageValue(amount);
+      dispatch(setSlippageValue({ value: amount }));
     }
   };
 
@@ -542,7 +611,7 @@ export default function SwapPage() {
             <p className="mt-10 text-3xl font-semibold font-work ">
               ZigZag Convert
             </p>
-            <SwapContianer
+            <ConvertContianer
               setTransactionType={(type) => setTtype(type)}
               transactionType={tType}
               balances={balances}
@@ -567,7 +636,7 @@ export default function SwapPage() {
               onSetSlippageValue={onChangeSlippageValue}
               slippageValue={slippageValue}
             />
-            <Button
+            {!errorMsg && <Button
               isLoading={false}
               className="w-full py-3 my-3 uppercase"
               scale="imd"
@@ -575,10 +644,21 @@ export default function SwapPage() {
               disabled={orderButtonDisabled || !user.address}
             >
               Convert
-            </Button>
+            </Button>}
+            {errorMsg && <Button
+              isLoading={false}
+              className="w-full py-3 my-3 uppercase"
+              variant="sell"
+              scale="imd"
+              disabled
+            >
+              {errorMsg}
+            </Button>}
           </div>
         </div>
       )}
     </DefaultTemplate>
   );
-}
+};
+
+export default ConvertPage;

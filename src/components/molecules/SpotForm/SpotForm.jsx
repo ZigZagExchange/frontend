@@ -22,6 +22,7 @@ class SpotForm extends React.Component {
       baseAmount: "",
       quoteAmount: "",
       maxSizeSelected: false,
+      exchangePercent: 0,
     };
   }
 
@@ -635,6 +636,7 @@ class SpotForm extends React.Component {
       }
     }
 
+    newstate.exchangePercent = val;
     this.setState(newstate);
   }
 
@@ -880,6 +882,15 @@ class SpotForm extends React.Component {
             onClick={this.increaseAmount.bind(this)}
           ></IconButton>
         </InputBox>
+        <RangeWrapper>
+          <RangeSlider
+            value={this.amountPercentOfMax()}
+            onChange={this.rangeSliderHandler.bind(this)}
+          />
+          <span className="current_progress">
+            {this.state.exchangePercent}%
+          </span>
+        </RangeWrapper>
         <FormHeader>
           <Text font="primaryTiny" color="foregroundMediumEmphasis">
             Available balance
@@ -1022,28 +1033,33 @@ const InputBox = styled.div`
 `;
 
 const RangeWrapper = styled.div`
+  position: relative;
   width: 98%;
   padding-left: 10px;
-
+  .current_progress {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+  }
   .custom_range {
     &::before {
-      border: 2px solid ${({ theme }) => theme.colors.foregroundLowEmphasis} !important;
-      background-color: ${({ theme }) =>
-        theme.colors.backgroundMediumEmphasis} !important;
+        border: 2px solid
+            ${({ theme }) => theme.colors.foregroundLowEmphasis} !important;
+        background-color: ${({ theme }) =>
+            theme.colors.backgroundMediumEmphasis} !important;
     }
-
     &::before {
-      width: 10px !important;
-      height: 10px !important;
+        width: 10px !important;
+        height: 10px !important;
     }
   }
-
   .MuiSlider-rail {
     top: 50%;
     height: 6px;
     transform: translateY(-50%);
     background-color: ${({ theme }) =>
-      theme.colors.foregroundLowEmphasis} !important;
+        theme.colors.foregroundLowEmphasis} !important;
   }
 
   .MuiSlider-track {
