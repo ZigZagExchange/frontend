@@ -6,11 +6,11 @@ import TradePriceHeadSecond from "./TradePriceHeadSecond/TradePriceHeadSecond";
 import Text from "components/atoms/Text/Text";
 import { Dropdown } from "components/molecules/Dropdown";
 import {
-  liquiditySelector,
-  marketSummarySelector,
-  marketInfoSelector,
-  settingsSelector,
-  allOrdersSelector,
+    liquiditySelector,
+    marketSummarySelector,
+    marketInfoSelector,
+    settingsSelector,
+    allOrdersSelector,
 } from "lib/store/features/api/apiSlice";
 import {
     SideAllButton,
@@ -104,14 +104,14 @@ const fixedPoints = [
 ];
 
 export default function OrdersBook(props) {
-  const marketInfo = useSelector(marketInfoSelector);
-  const marketSummary = useSelector(marketSummarySelector);
-  const liquidity = useSelector(liquiditySelector);
-  const settings = useSelector(settingsSelector);
-  const allOrders = useSelector(allOrdersSelector);
-  const [fixedPoint, setFixedPoint] = useState(2);
-  const [side, setSide] = useState("all");
-  const [fixedPointItems, setFixedPointItems] = useState(fixedPoints);
+    const marketInfo = useSelector(marketInfoSelector);
+    const marketSummary = useSelector(marketSummarySelector);
+    const liquidity = useSelector(liquiditySelector);
+    const settings = useSelector(settingsSelector);
+    const allOrders = useSelector(allOrdersSelector);
+    const [fixedPoint, setFixedPoint] = useState(2);
+    const [side, setSide] = useState("all");
+    const [fixedPointItems, setFixedPointItems] = useState(fixedPoints);
 
     useEffect(() => {
         let newFixedPoints = [...fixedPointItems];
@@ -138,54 +138,57 @@ export default function OrdersBook(props) {
     const orderbookBids = [];
     const orderbookAsks = [];
 
-  if (api.isZksyncChain()) {
-    liquidity.forEach((liq) => {
-      const side = liq[0];
-      const price = liq[1];
-      const quantity = liq[2];
-      if (side === "b") {
-        orderbookBids.push({
-          td1: price,
-          td2: quantity,
-          td3: price * quantity,
-          side: "b",
+    if (api.isZksyncChain()) {
+        liquidity.forEach((liq) => {
+            const side = liq[0];
+            const price = liq[1];
+            const quantity = liq[2];
+            if (side === "b") {
+                orderbookBids.push({
+                    td1: price,
+                    td2: quantity,
+                    td3: price * quantity,
+                    side: "b",
+                });
+            }
+            if (side === "s") {
+                orderbookAsks.push({
+                    td1: price,
+                    td2: quantity,
+                    td3: price * quantity,
+                    side: "s",
+                });
+            }
         });
-      }
-      if (side === "s") {
-        orderbookAsks.push({
-          td1: price,
-          td2: quantity,
-          td3: price * quantity,
-          side: "s",
-        });
-      }
-    });
-  }
-
-  if (api.isEVMChain()) {
-    for (let orderid in allOrders) {
-      const order = allOrders[orderid];
-      const side = order[3];
-      const price = order[4];
-      const remaining = order[10] === null ? order[5] : order[10];
-      const remainingQuote = remaining * price;
-      const orderStatus = order[9];
-
-      const orderRow = {
-        td1: price,
-        td2: remaining,
-        td3: remainingQuote,
-        side,
-        order: order,
-      };
-
-      if (side === "b" && ["o", "pm", "pf"].includes(orderStatus)) {
-        orderbookBids.push(orderRow);
-      } else if (side === "s" && ["o", "pm", "pf"].includes(orderStatus)) {
-        orderbookAsks.push(orderRow);
-      }
     }
-  }
+
+    if (api.isEVMChain()) {
+        for (let orderid in allOrders) {
+            const order = allOrders[orderid];
+            const side = order[3];
+            const price = order[4];
+            const remaining = order[10] === null ? order[5] : order[10];
+            const remainingQuote = remaining * price;
+            const orderStatus = order[9];
+
+            const orderRow = {
+                td1: price,
+                td2: remaining,
+                td3: remainingQuote,
+                side,
+                order: order,
+            };
+
+            if (side === "b" && ["o", "pm", "pf"].includes(orderStatus)) {
+                orderbookBids.push(orderRow);
+            } else if (
+                side === "s" &&
+                ["o", "pm", "pf"].includes(orderStatus)
+            ) {
+                orderbookAsks.push(orderRow);
+            }
+        }
+    }
 
     orderbookAsks.sort((a, b) => b.td1 - a.td1);
     orderbookBids.sort((a, b) => b.td1 - a.td1);
@@ -205,21 +208,26 @@ export default function OrdersBook(props) {
         }
     }
 
-  let bidBins = [];
-  for (let i in orderbookBids) {
-    const lastBidIndex = bidBins.length - 1;
-    if (i === "0") {
-      bidBins.push(orderbookBids[i]);
-    } else if (
-      orderbookBids[i].td1.toPrecision(6) ===
-      bidBins[lastBidIndex].td1.toPrecision(6)
-    ) {
-      bidBins[lastBidIndex].td2 += orderbookBids[i].td2;
-      bidBins[lastBidIndex].td3 += orderbookBids[i].td3;
-    } else {
-      bidBins.push(orderbookBids[i]);
+    let bidBins = [];
+    for (let i in orderbookBids) {
+        const lastBidIndex = bidBins.length - 1;
+        if (i === "0") {
+            bidBins.push(orderbookBids[i]);
+        } else if (
+            orderbookBids[i].td1.toPrecision(6) ===
+            bidBins[lastBidIndex].td1.toPrecision(6)
+        ) {
+            bidBins[lastBidIndex].td2 += orderbookBids[i].td2;
+            bidBins[lastBidIndex].td3 += orderbookBids[i].td3;
+        } else {
+            bidBins.push(orderbookBids[i]);
+        }
     }
-  }
+
+    let binsLength =
+        askBins.length > bidBins.length ? bidBins.length : askBins.length;
+    askBins = askBins.slice(0, binsLength);
+    bidBins = bidBins.slice(0, binsLength);
 
     return (
         <>
