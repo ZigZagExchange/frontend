@@ -128,12 +128,15 @@ const ConvertPage = () => {
       const p_name = sellToken.name + "-" + buyToken.name;
       const r_p_name = buyToken.name + "-" + sellToken.name;
       let c = false;
+      console.log("123123");
       Object.keys(pairPrices).forEach((pair) => {
         if (pair === p_name) {
           setBasePrice(pairPrices[pair].price);
-          const x = sellAmounts * pairPrices[pair].price;
-          setBuyAmounts(x);
           setTtype("sell");
+          const price = getLadderPrice() * (1 - slippageValue / 100);
+          const x = sellAmounts * price;
+          setBuyAmounts(x.toPrecision(6));
+          console.log(x.toPrecision(6));
           dispatch(setCurrentMarket(p_name));
           c = true;
         }
@@ -142,9 +145,11 @@ const ConvertPage = () => {
         Object.keys(pairPrices).forEach((pair) => {
           if (pair === r_p_name) {
             setBasePrice(1 / pairPrices[pair].price);
-            const x = (sellAmounts * 1) / pairPrices[pair].price;
-            setBuyAmounts(x);
             setTtype("buy");
+            const price = getLadderPrice() * (1 + slippageValue / 100);
+            const x = sellAmounts * price;
+            setBuyAmounts(x.toPrecision(6));
+            console.log(x.toPrecision(6));
             dispatch(setCurrentMarket(r_p_name));
           }
         });
@@ -182,9 +187,9 @@ const ConvertPage = () => {
     };
   }, [network, currentMarket, api.ws, settings.showNightPriceChange]);
 
-  useEffect(()=>{
+  useEffect(() => {
     isValid();
-  }, [sellAmounts, buyAmounts])
+  }, [sellAmounts, buyAmounts]);
 
   // useEffect(() => {
   //   setSellTokenList(api.getCurrencies());
@@ -354,21 +359,31 @@ const ConvertPage = () => {
   const onChangeSellAmounts = (event) => {
     const amount = event.target.value.replace(/[^0-9.]/g, "");
     setSellAmounts(amount);
-    const x = amount * basePrice;
+    const price =
+      tType === "buy"
+        ? getLadderPrice() * (1 + slippageValue / 100)
+        : getLadderPrice() * (1 - slippageValue / 100);
+    const x = amount * price;
     setBuyAmounts(x.toPrecision(6));
+    console.log(x.toPrecision(6));
   };
 
   const onChangeBuyAmounts = (event) => {
     const amount = event.target.value.replace(/[^0-9.]/g, "");
     setBuyAmounts(amount);
-    const x = amount / basePrice;
+    const price =
+      tType === "buy"
+        ? getLadderPrice() * (1 + slippageValue / 100)
+        : getLadderPrice() * (1 - slippageValue / 100);
+    const x = amount / price;
     setSellAmounts(x.toPrecision(6));
+    console.log(x.toPrecision(6));
   };
 
   const isValid = () => {
     let baseAmount, quoteAmount;
-    if(!sellAmounts || !buyAmounts) {
-      setError("")
+    if (!sellAmounts || !buyAmounts) {
+      setError("");
       return;
     }
     if (typeof sellAmounts === "string") {
@@ -384,25 +399,25 @@ const ConvertPage = () => {
     quoteAmount = isNaN(quoteAmount) ? 0 : quoteAmount;
     baseAmount = isNaN(baseAmount) ? 0 : baseAmount;
     if (!baseAmount && !quoteAmount) {
-      setError("No amount available")
+      setError("No amount available");
       return;
     }
 
     let price = currentPrice();
     if (!price) {
-      setError("No price available")
+      setError("No price available");
       return;
     }
 
     if (price < 0) {
-      setError(`Price (${price}) can't be below 0`)
+      setError(`Price (${price}) can't be below 0`);
       return;
     }
     const baseBalance = balances[sellToken?.name]?.valueReadable;
 
     if (tType === "sell") {
       if (baseAmount && baseAmount + marketInfo.baseFee > baseBalance) {
-        setError(`Amount exceeds ${marketInfo.baseAsset.symbol} balance`)
+        setError(`Amount exceeds ${marketInfo.baseAsset.symbol} balance`);
         return;
       }
 
@@ -410,12 +425,12 @@ const ConvertPage = () => {
         (baseAmount && baseAmount < marketInfo.baseFee) ||
         baseBalance === undefined
       ) {
-        setError(`Minimum order size is ${marketInfo.baseFee.toPrecision(5)}`)
+        setError(`Minimum order size is ${marketInfo.baseFee.toPrecision(5)}`);
         return;
       }
     } else {
       if (baseAmount && baseAmount + marketInfo.quoteFee > baseBalance) {
-        setError(`Amount exceeds ${marketInfo.quoteAsset.symbol} balance`)
+        setError(`Amount exceeds ${marketInfo.quoteAsset.symbol} balance`);
         return;
       }
 
@@ -423,12 +438,11 @@ const ConvertPage = () => {
         (baseAmount && baseAmount < marketInfo.quoteFee) ||
         baseBalance === undefined
       ) {
-        setError(`Minimum order size is ${marketInfo.quoteFee.toPrecision(5)}`)
+        setError(`Minimum order size is ${marketInfo.quoteFee.toPrecision(5)}`);
         return;
       }
     }
-    ;
-  }
+  };
 
   const onClickExchange = async () => {
     const userOrderArray = Object.values(userOrders);
@@ -462,18 +476,18 @@ const ConvertPage = () => {
     quoteAmount = isNaN(quoteAmount) ? 0 : quoteAmount;
     baseAmount = isNaN(baseAmount) ? 0 : baseAmount;
     if (!baseAmount && !quoteAmount) {
-      setError("No amount available")
+      setError("No amount available");
       return;
     }
 
     let price = currentPrice();
     if (!price) {
-      setError("No price available")
+      setError("No price available");
       return;
     }
 
     if (price < 0) {
-      setError(`Price (${price}) can't be below 0`)
+      setError(`Price (${price}) can't be below 0`);
       return;
     }
 
@@ -512,7 +526,7 @@ const ConvertPage = () => {
 
     if (tType === "sell") {
       if (baseAmount && baseAmount + marketInfo.baseFee > baseBalance) {
-        setError(`Amount exceeds ${marketInfo.baseAsset.symbol} balance`)
+        setError(`Amount exceeds ${marketInfo.baseAsset.symbol} balance`);
         return;
       }
 
@@ -520,12 +534,12 @@ const ConvertPage = () => {
         (baseAmount && baseAmount < marketInfo.baseFee) ||
         baseBalance === undefined
       ) {
-        setError(`Minimum order size is ${marketInfo.baseFee.toPrecision(5)}`)
+        setError(`Minimum order size is ${marketInfo.baseFee.toPrecision(5)}`);
         return;
       }
     } else {
       if (baseAmount && baseAmount + marketInfo.quoteFee > baseBalance) {
-        setError(`Amount exceeds ${marketInfo.quoteAsset.symbol} balance`)
+        setError(`Amount exceeds ${marketInfo.quoteAsset.symbol} balance`);
         return;
       }
 
@@ -533,7 +547,7 @@ const ConvertPage = () => {
         (baseAmount && baseAmount < marketInfo.quoteFee) ||
         baseBalance === undefined
       ) {
-        setError(`Minimum order size is ${marketInfo.quoteFee.toPrecision(5)}`)
+        setError(`Minimum order size is ${marketInfo.quoteFee.toPrecision(5)}`);
         return;
       }
     }
@@ -548,8 +562,6 @@ const ConvertPage = () => {
         }
       );
     }
-
-    console.log(slippageValue, 1 + slippageValue / 100);
 
     try {
       await api.submitOrder(
@@ -636,24 +648,28 @@ const ConvertPage = () => {
               onSetSlippageValue={onChangeSlippageValue}
               slippageValue={slippageValue}
             />
-            {!errorMsg && <Button
-              isLoading={false}
-              className="w-full py-3 my-3 uppercase"
-              scale="imd"
-              onClick={onClickExchange}
-              disabled={orderButtonDisabled || !user.address}
-            >
-              Convert
-            </Button>}
-            {errorMsg && <Button
-              isLoading={false}
-              className="w-full py-3 my-3 uppercase"
-              variant="sell"
-              scale="imd"
-              disabled
-            >
-              {errorMsg}
-            </Button>}
+            {!errorMsg && (
+              <Button
+                isLoading={false}
+                className="w-full py-3 my-3 uppercase"
+                scale="imd"
+                onClick={onClickExchange}
+                disabled={orderButtonDisabled || !user.address}
+              >
+                Convert
+              </Button>
+            )}
+            {errorMsg && (
+              <Button
+                isLoading={false}
+                className="w-full py-3 my-3 uppercase"
+                variant="sell"
+                scale="imd"
+                disabled
+              >
+                {errorMsg}
+              </Button>
+            )}
           </div>
         </div>
       )}
