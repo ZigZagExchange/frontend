@@ -385,6 +385,7 @@ class SpotForm extends React.Component {
   }
 
   async approveHandler(e) {
+    e.preventDefault();
     const marketInfo = this.props.marketInfo;
     const token = (this.props.side === "s")
       ? marketInfo.baseAsset.symbol
