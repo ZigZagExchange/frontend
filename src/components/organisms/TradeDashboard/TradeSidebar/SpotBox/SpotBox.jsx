@@ -7,7 +7,10 @@ import { SpotForm } from "components";
 import { ToggleButton } from "components/molecules/Toggle";
 import { IconButton as baseIcon } from "components/molecules/IconButton";
 import { TabMenu, Tab } from "components/molecules/TabMenu";
-import { settingsSelector, networkSelector } from "lib/store/features/api/apiSlice";
+import {
+  settingsSelector,
+  networkSelector,
+} from "lib/store/features/api/apiSlice";
 import useTheme from "components/hooks/useTheme";
 
 const SpotBox = ({
@@ -20,13 +23,13 @@ const SpotBox = ({
   marketSummary,
   allOrders,
   userOrders,
-  balances
+  balances,
 }) => {
   const [selectedLayer, setSelectedLayer] = useState(1);
   const [index, setIndex] = useState(1);
   const [orderType, updateOrderType] = useState("market");
 
-  const { isDark } = useTheme()
+  const { isDark } = useTheme();
 
   const toggleClick = (num) => setSelectedLayer(num);
   const settings = useSelector(settingsSelector);
@@ -105,7 +108,10 @@ export default SpotBox;
 const Wrapper = styled.div`
   // display: grid;
   grid-auto-flow: row;
-  background-color: ${({ theme, isDark }) => isDark ? theme.colors.backgroundMediumEmphasis : theme.colors.backgroundHighEmphasis};
+  background-color: ${({ theme, isDark }) =>
+    isDark
+      ? theme.colors.backgroundMediumEmphasis
+      : theme.colors.backgroundHighEmphasis};
   height: ${({ isMobile }) => (isMobile ? "457px" : "428px")};
 `;
 

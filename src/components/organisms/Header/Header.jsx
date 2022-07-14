@@ -33,7 +33,8 @@ const langList = [
 ];
 
 const networkLists = [
-  { text: "zkSync - Mainnet",
+  {
+    text: "zkSync - Mainnet",
     value: 1,
     url: "#",
     selectedIcon: <CheckIcon />,
@@ -285,15 +286,16 @@ export const Header = (props) => {
 
     api.setAPIProvider(value);
     try {
-      await api.refreshNetwork()
+      await api.refreshNetwork();
     } catch (err) {
       console.log(err);
     }
 
     if (
-      (/^\/wrap(\/.*)?/.test(location.pathname) && (!api.isEVMChain())) ||
-      (/^\/bridge(\/.*)?/.test(location.pathname) && (!api.isImplemented("depositL2"))) ||
-      (/^\/list-pair(\/.*)?/.test(location.pathname) && (api.isEVMChain()))
+      (/^\/wrap(\/.*)?/.test(location.pathname) && !api.isEVMChain()) ||
+      (/^\/bridge(\/.*)?/.test(location.pathname) &&
+        !api.isImplemented("depositL2")) ||
+      (/^\/list-pair(\/.*)?/.test(location.pathname) && api.isEVMChain())
     ) {
       setIndex(0);
       history.push("/");
@@ -326,7 +328,7 @@ export const Header = (props) => {
         setIndex(newIndex);
         localStorage.setItem("tab_index", newIndex);
         history.push("/dsl");
-	      break;
+        break;
       case 5:
         setIndex(newIndex);
         localStorage.setItem("tab_index", newIndex);
@@ -393,7 +395,7 @@ export const Header = (props) => {
               adClass="menu-dropdown"
               width={200}
               item={supportLists}
-              context={'Support'}
+              context={"Support"}
               leftIcon={true}
               transparent
             />
@@ -401,7 +403,7 @@ export const Header = (props) => {
               adClass="menu-dropdown"
               width={162}
               item={communityLists}
-              context={'Community'}
+              context={"Community"}
               leftIcon={true}
               transparent
             />
@@ -479,7 +481,7 @@ export const Header = (props) => {
               DOCS
               <ExternalLinkIcon size={12} />
             </Tab>
-              {isEVM && <Tab>WRAP</Tab>}
+            {isEVM && <Tab>WRAP</Tab>}
           </TabMenu>
           <HorizontalDivider />
           {/* <ActionSideMenuWrapper>
@@ -501,7 +503,7 @@ export const Header = (props) => {
             adClass="menu-dropdown"
             width={200}
             item={supportLists}
-            context={'Support'}
+            context={"Support"}
             leftIcon={true}
             transparent
           />
@@ -509,7 +511,7 @@ export const Header = (props) => {
             adClass="menu-dropdown"
             width={162}
             item={communityLists}
-            context={'Community'}
+            context={"Community"}
             leftIcon={true}
             transparent
           />
