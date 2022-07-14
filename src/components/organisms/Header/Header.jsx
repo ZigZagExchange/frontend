@@ -372,9 +372,7 @@ export const Header = (props) => {
         history.push("/dsl");
         break;
       case 5:
-        setIndex(newIndex);
-        localStorage.setItem("tab_index", newIndex);
-        history.push("/wrap");
+        window.open("https://app.uniswap.org/#/swap?inputCurrency=ETH&outputCurrency=0x82af49447d8a07e3bd95bd0d56f35241523fbab1&chain=arbitrum", '_blank');
         break;
       default:
         break;
@@ -428,7 +426,10 @@ export const Header = (props) => {
                 DOCS
                 <ExternalLinkIcon size={12} />
               </Tab>
-              <Tab display={isEVM}>WRAP</Tab>
+              <Tab display={isEVM}>
+                WRAP
+                <ExternalLinkIcon size={12} />
+              </Tab>
             </TabMenu>
           </NavWrapper>
           <ActionsWrapper>
