@@ -54,7 +54,7 @@ class SpotForm extends React.Component {
   updatePrice(e) {
     const newState = { ...this.state };
     newState.price = e.target.value.replace(',','.').replace(/[^0-9.]/g, "");
-    if (this.props.side === 'b') {
+    if (this.props.quoteChanged) {
       // for buy quoteAmount should be fixed
       const fee = this.getQuoteFee(newState.quoteAmount);
       newState.baseAmount = (newState.quoteAmount - fee) / newState.price;
@@ -76,12 +76,15 @@ class SpotForm extends React.Component {
 
   updateBaseAmount(e) {
     const newState = { ...this.state };
-    newState.baseAmount = e.target.value.replace(',','.').replace(/[^0-9.]/g, "");
-    const fee = this.getBaseFee(newState.baseAmount);
-    newState.quoteAmount = this.currentPrice() * (newState.baseAmount - fee);
-    if (newState.quoteAmount <= 0) {
-      newState.quoteAmount = ""
-      newState.baseAmount = ""
+    if ((/^0\.?0*$/).test(newState.baseAmount) || Number.isNaN(newState.baseAmount)) {
+      newState.quoteAmount = "";
+    } else {
+      const fee = this.getBaseFee(newState.baseAmount);
+      newState.quoteAmount = this.currentPrice() * (newState.baseAmount - fee);
+      if (newState.quoteAmount < 0) {
+        newState.quoteAmount = "";
+        newState.baseAmount = "";
+      }
     }
     newState.baseChanged = true;
     newState.quoteChanged = false;
@@ -91,12 +94,16 @@ class SpotForm extends React.Component {
   updateQuoteAmount(e) {
     const newState = { ...this.state };
     newState.quoteAmount = e.target.value.replace(',','.').replace(/[^0-9.]/g, "");
-    const fee = this.getQuoteFee(newState.quoteAmount);
-    newState.baseAmount = (newState.quoteAmount - fee) / this.currentPrice();
-    if (newState.baseAmount <= 0) {
-      newState.quoteAmount = ""
-      newState.baseAmount = ""
-    }
+    if ((/^0\.?0*$/).test(newState.quoteAmount) || Number.isNaN(newState.quoteAmount)) {
+      newState.baseAmount = "";
+    } else {
+      const fee = this.getQuoteFee(newState.quoteAmount);
+      newState.baseAmount = (newState.quoteAmount - fee) / this.currentPrice();
+      if (newState.baseAmount < 0) {
+        newState.quoteAmount = "";
+        newState.baseAmount = "";
+      }
+    }    
     newState.baseChanged = false;
     newState.quoteChanged = true;
     this.setState(newState);
@@ -106,7 +113,7 @@ class SpotForm extends React.Component {
     e.preventDefault();
     const newState = { ...this.state };
     newState.price = this.state.price * 1.001;
-    if (this.props.side === 'b') {
+    if (this.props.quoteChanged) {
       // for buy quoteAmount should be fixed
       const fee = this.getQuoteFee(newState.quoteAmount);
       newState.baseAmount = (newState.quoteAmount - fee) / newState.price;
@@ -132,7 +139,7 @@ class SpotForm extends React.Component {
     e.preventDefault();
     const newState = { ...this.state };
     newState.price = this.state.price * 0.999;
-    if (this.props.side === 'b') {
+    if (this.props.quoteChanged) {
       // for buy quoteAmount should be fixed
       const fee = this.getQuoteFee(newState.quoteAmount);
       newState.baseAmount = (newState.quoteAmount - fee) / newState.price;
@@ -709,12 +716,28 @@ class SpotForm extends React.Component {
       this.props.marketInfo && prevProps.marketInfo && this.props.marketInfo !== prevProps.marketInfo
     ) {
       const newState = { ...this.state };
-      if (this.props.side === 's') {
+      if (this.props.side === 's' && !Number.isNaN(newState.baseAmount)) {
         // follow fee for sell order
-        newState.baseAmount += this.props.marketInfo.baseFee - prevProps.marketInfo.baseFee;
-      } else {
+        const newBaseAmount = newState.baseAmount + this.props.marketInfo.baseFee - prevProps.marketInfo.baseFee;
+        if (newBaseAmount <= 0) {
+          newState.baseAmount= "";
+          newState.quoteAmount= "";
+          newState.baseChanged= false;
+          newState.quoteChanged= false;
+        } else {
+          newState.baseAmount = newBaseAmount;
+        }
+      } else if (this.props.side === 'b' && !Number.isNaN(this.props.quoteChanged)) {
         // follow fee for buy order
-        newState.quoteAmount += this.props.marketInfo.quoteFee - prevProps.marketInfo.quoteFee;
+        const newQuoteAmount = newState.quoteAmount + this.props.marketInfo.quoteFee - prevProps.marketInfo.quoteFee;
+        if (newQuoteAmount <= 0) {
+          newState.baseAmount= "";
+          newState.quoteAmount= "";
+          newState.baseChanged= false;
+          newState.quoteChanged= false;
+        } else {
+          newState.quoteAmount = newQuoteAmount;
+        }
       }
       this.setState(newState);
     }
@@ -734,12 +757,13 @@ class SpotForm extends React.Component {
     }    
 
     if (this.props.currentMarket !== prevProps.currentMarket) {
-      this.setState((state) => ({
-        ...state,
-        price: "",
-        baseAmount: "",
-        quoteAmount: "",
-      }));
+      const newState = { ...this.state };
+      newState.price= "";
+      newState.baseAmount= "";
+      newState.quoteAmount= "";
+      newState.baseChanged= false;
+      newState.quoteChanged= false;
+      this.setState(newState);
     }
   }
 

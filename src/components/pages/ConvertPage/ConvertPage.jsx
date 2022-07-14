@@ -622,7 +622,8 @@ const ConvertPage = () => {
     setError("")
   }
 
-  const onClickExchange = async () => {
+  const onClickExchange = async (e) => {
+    e.preventDefault();
     if (errorMsg) return;
 
     const sellAmountParsed = (typeof sellAmounts === "string")
@@ -703,7 +704,8 @@ const ConvertPage = () => {
     }
   };
 
-  const approveHandler = async () => {
+  const approveHandler = async (e) => {
+    e.preventDefault();
     const token = (tType === "sell")
       ? marketInfo.baseAsset.symbol
       : marketInfo.quoteAsset.symbol;    
