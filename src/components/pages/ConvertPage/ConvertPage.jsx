@@ -356,24 +356,21 @@ const ConvertPage = () => {
   const onChangeSellAmounts = (event) => {
     const amount = event.target.value.replace(/[^0-9.]/g, "");
     setSellAmounts(amount);
-    const price =
+    const x =
       tType === "buy"
-        ? getLadderPrice() * (1 + slippageValue / 100)
-        : getLadderPrice() * (1 - slippageValue / 100);
-    const x = amount / price;
-    console.log(tType, getLadderPrice());
+        ? (amount / getLadderPrice()) * (1 + slippageValue / 100)
+        : amount * getLadderPrice() * (1 - slippageValue / 100);
+
     setBuyAmounts(x.toPrecision(6));
   };
 
   const onChangeBuyAmounts = (event) => {
     const amount = event.target.value.replace(/[^0-9.]/g, "");
     setBuyAmounts(amount);
-    const price =
+    const x =
       tType === "buy"
-        ? getLadderPrice() * (1 + slippageValue / 100)
-        : getLadderPrice() * (1 - slippageValue / 100);
-    const x = amount * price;
-    console.log(3);
+        ? amount * getLadderPrice() * (1 + slippageValue / 100)
+        : (amount / getLadderPrice()) * (1 - slippageValue / 100);
     setSellAmounts(x.toPrecision(6));
   };
 
