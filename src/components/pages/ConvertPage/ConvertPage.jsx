@@ -133,7 +133,7 @@ const ConvertPage = () => {
           setBasePrice(pairPrices[pair].price);
           setTtype("sell");
           const price = getLadderPrice() * (1 - slippageValue / 100);
-          const x = sellAmounts * price;
+          const x = sellAmounts / price;
           setBuyAmounts(x.toPrecision(6));
           dispatch(setCurrentMarket(p_name));
           c = true;
@@ -145,7 +145,7 @@ const ConvertPage = () => {
             setBasePrice(1 / pairPrices[pair].price);
             setTtype("buy");
             const price = getLadderPrice() * (1 + slippageValue / 100);
-            const x = sellAmounts * price;
+            const x = sellAmounts / price;
             setBuyAmounts(x.toPrecision(6));
             dispatch(setCurrentMarket(r_p_name));
           }
