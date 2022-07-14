@@ -643,8 +643,8 @@ export default function OrdersTable(props) {
                   </SortIconWrapper> */}
               </HeaderWrapper>
             </th>
-            <th className="w-36">
-              {isOpenStatus(getUserOrders()) && settings.showCancelOrders ? (
+            {!settings.showCancelOrders && (
+              <th className="w-36">
                 <StyledButton
                   variant="outlined"
                   width="100px"
@@ -653,10 +653,8 @@ export default function OrdersTable(props) {
                 >
                   Cancel All
                 </StyledButton>
-              ) : (
-                ""
-              )}
-            </th>
+              </th>
+            )}
           </tr>
         </thead>
         <tbody>
@@ -835,7 +833,7 @@ export default function OrdersTable(props) {
                       ""
                     )}
                   </td>
-                  <td className="w-36"></td>
+                  {!settings.showCancelOrders && <td className="w-36"></td>}
                 </tr>
               </>
             );
@@ -1514,7 +1512,6 @@ export default function OrdersTable(props) {
             </tr>
           );
         });
-        console.log(balancesContent);
         footerContent = (
           <div style={{ textAlign: "center", marginTop: "8px" }}>
             <table>
