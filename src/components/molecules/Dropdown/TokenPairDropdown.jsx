@@ -490,6 +490,7 @@ const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, upda
         const shown_pairs = pairs
             .map((pair) => [pair, _rowData.find((row) => row.td1 === pair)])
             .sort(([_, d], [__, d2]) => {
+		if (!d || !d2) return 0;
                 if (changeSorted) {
                     return changeDirection ? d.td3 - d2.td3 : d2.td3 - d.td3;
                 } else if (volumeSorted) {

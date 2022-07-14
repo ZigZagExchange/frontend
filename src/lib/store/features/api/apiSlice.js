@@ -10,7 +10,7 @@ const makeScope = (state) => `${state.network}-${state.userId}`;
 const initialUISettings = {
   showNightPriceChange: false,
   showCancelOrders: false,
-  disableOrderNotification: false,
+  disableOrderNotification: true,
   stackOrderbook: true,
   disableSlippageWarning: false,
   disabledisableOrderBookFlash: false,
@@ -26,7 +26,7 @@ export const apiSlice = createSlice({
     network: 1,
     userId: null,
     layout: getLayout() || 0,
-    currentMarket: "ETH-USDC",
+    currentMarket: api.apiProvider.defaultMarket,
     marketFills: {},
     bridgeReceipts: [],
     lastPrices: {},
