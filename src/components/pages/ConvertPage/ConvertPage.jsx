@@ -9,7 +9,7 @@ import ConvertContianer from "./ConvertContianer";
 
 import classNames from "classnames";
 import TransactionSettings from "./TransationSettings";
-import { Button } from "components/molecules/Button";
+import { Button, ConnectWalletButton } from "components/molecules/Button";
 
 import { useCoinEstimator } from "components";
 import { userSelector } from "lib/store/features/auth/authSlice";
@@ -26,8 +26,9 @@ import {
   settingsSelector,
   userOrdersSelector,
   slippageValueSelector,
+  allOrdersSelector
 } from "lib/store/features/api/apiSlice";
-import { formatPrice, formatUSD, formatToken } from "lib/utils";
+import { formatPrice, formatUSD, formatToken, addComma } from "lib/utils";
 import { LoadingSpinner } from "components/atoms/LoadingSpinner";
 
 const ConvertPage = () => {
@@ -43,6 +44,7 @@ const ConvertPage = () => {
   const balanceData = useSelector(balancesSelector);
   const pairPrices = useSelector(lastPricesSelector);
   const liquidity = useSelector(liquiditySelector);
+  const allOrders = useSelector(allOrdersSelector);
   const currentMarket = useSelector(currentMarketSelector);
   const network = useSelector(networkSelector);
   const marketInfo = useSelector(marketInfoSelector);
@@ -52,17 +54,19 @@ const ConvertPage = () => {
   const [sellTokenList, setSellTokenList] = useState([]);
   const [sellToken, setSellToken] = useState();
   const [buyToken, setBuyToken] = useState();
-  const [basePrice, setBasePrice] = useState(0);
   const [loading, setLoading] = useState(false);
-  // const [slippageValue, setSlippageValue] = useState(slippage);
 
   const [sellAmounts, setSellAmounts] = useState();
   const [buyAmounts, setBuyAmounts] = useState();
 
   const [balances, setBalances] = useState([]);
+  const [currentPrice, setCurrentPrice] = useState(1);
 
   const [orderButtonDisabled, setOrderButtonDisabled] = useState(false);
   const [errorMsg, setError] = useState("");
+  const [approveNeeded, setApproveNeeded] = useState(false);
+  const [changedBuyAmount, setChangedBuyAmount] = useState(false);
+  const [changedSellAmount, setChangedSellAmount] = useState(false);
 
   const estimatedValueSell = sellAmounts * coinEstimator(sellToken?.name) || 0;
   const estimatedValueBuy = buyAmounts * coinEstimator(buyToken?.name) || 0;
@@ -82,7 +86,7 @@ const ConvertPage = () => {
     const timer = setInterval(() => {
       setSellTokenList(api.getCurrencies());
       setGetPairs(api.getPairs());
-    }, 500);
+    }, 50);
     if (sellTokenList.length > 0) {
       clearInterval(timer);
       setLoading(false);
@@ -98,41 +102,28 @@ const ConvertPage = () => {
     }
   }, [user.address, zkBalances]);
 
-  // useEffect(() => {
-  //   // this could later be replaced by a better logic to pick a good pair
-  //   switch (network) {
-  //     case 1:
-  //       setSellToken({ id: 0, name: "USDC" });
-  //       dispatch(setCurrentMarket("ZZ-USDC"));
-  //       break;
-  //     case 1000:
-  //       setSellToken({ id: 0, name: "USDC" });
-  //       dispatch(setCurrentMarket("ETH-USDC"));
-  //       break;
-  //     case 42161:
-  //       setSellToken({ id: 0, name: "USDC" });
-  //       dispatch(setCurrentMarket("WETH-USDC"));
-  //       break;
-  //     default:
-  //       setSellToken({ id: 0, name: "USDC" });
-  //       dispatch(setCurrentMarket("ZZ-USDC"));
-  //   }
-
-  //   setSellTokenList(api.getCurrencies());
-  //   setGetPairs(api.getPairs());
-  //   document.title = "ZigZag Convert";
-  // }, []);
+  useEffect(() => {
+   document.title = "ZigZag Convert";
+  }, []);
 
   useEffect(() => {
     if (sellToken && buyToken) {
+      // check if the current market can fill the trades
+      if (currentMarket === `${sellToken}-${buyToken}`) {
+        setTtype('sell')
+        return;
+      }
+      if (currentMarket === `${buyToken}-${sellToken}`) {
+        setTtype('buy')
+        return;
+      }
+
+      // get a new pair
       const p_name = sellToken.name + "-" + buyToken.name;
       const r_p_name = buyToken.name + "-" + sellToken.name;
       let c = false;
       Object.keys(pairPrices).forEach((pair) => {
         if (pair === p_name) {
-          setBasePrice(pairPrices[pair].price);
-          const x = sellAmounts * pairPrices[pair].price;
-          setBuyAmounts(x);
           setTtype("sell");
           dispatch(setCurrentMarket(p_name));
           c = true;
@@ -141,10 +132,7 @@ const ConvertPage = () => {
       if (c === false) {
         Object.keys(pairPrices).forEach((pair) => {
           if (pair === r_p_name) {
-            setBasePrice(1 / pairPrices[pair].price);
-            const x = (sellAmounts * 1) / pairPrices[pair].price;
-            setBuyAmounts(x);
-            setTtype("buy");
+            setTtype("buy"); 
             dispatch(setCurrentMarket(r_p_name));
           }
         });
@@ -154,7 +142,7 @@ const ConvertPage = () => {
   }, [sellToken, buyToken]);
 
   useEffect(() => {
-    if (user.address && !user.id) {
+    if (!api.checkAccountActivated()) {
       toast.error(
         "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
         {
@@ -184,65 +172,198 @@ const ConvertPage = () => {
 
   useEffect(()=>{
     isValid();
-  }, [sellAmounts, buyAmounts])
+  }, [sellAmounts, buyAmounts, userOrders]);
+  
+  useEffect(() => {
+    let price;
+    if (api.isZksyncChain()) {
+      price = getLadderPriceZkSync_v1();
+    } else {
+      price = getLadderPrice();
+    }
+    price *= (tType === 'buy')
+      ? 1 + slippageValue / 100
+      : 1 - slippageValue / 100
 
-  // useEffect(() => {
-  //   setSellTokenList(api.getCurrencies());
-  //   setGetPairs(api.getPairs());
-  // }, [network]);
+    setCurrentPrice(price)
+  }, [liquidity, allOrders, slippageValue]);
 
-  const currentPrice = () => {
-    var ladderPrice = getLadderPrice();
-    return ladderPrice;
-  };
+  useEffect(() => {
+    if (changedBuyAmount) {      
+      const newSellAmount = (tType === 'sell')
+        ? buyAmounts / currentPrice
+        : buyAmounts * currentPrice;
+      setBuyAmounts(newSellAmount);
+    }
 
-  const getFirstAsk = () => {
+    if (changedSellAmount) {
+      const newBuyAmount = (tType === 'sell')
+        ? sellAmounts * currentPrice
+        : sellAmounts / currentPrice;
+      setBuyAmounts(newBuyAmount);
+    }    
+  }, [currentPrice]);
+
+  const getBaseBalance = () => {
     if (!marketInfo) return 0;
-    const asks = liquidity.filter((l) => l[0] === "s").map((l) => l[1]);
-    return formatPrice(Math.min(...asks));
-  };
+    if (!balances?.[marketInfo.baseAsset.symbol]?.valueReadable) return 0;
+    let totalBalance = balances[marketInfo.baseAsset.symbol].valueReadable
+    if (!userOrders) return totalBalance;
 
-  const getFirstBid = () => {
-    if (!marketInfo) return 0;
-    const bids = liquidity.filter((l) => l[0] === "b").map((l) => l[1]);
-    return formatPrice(Math.max(...bids));
-  };
+    Object.keys(userOrders).forEach(orderId => {
+      const order = userOrders[orderId];
+      const sellToken = (order[3] === 's')
+        ? order[2].split('-')[0]
+        : order[2].split('-')[1]
+      if (sellToken === marketInfo.baseAsset.symbol) {
+        totalBalance -= order[10]; // remove remaining order size
+      }
+    });   
+    
+    return Number(totalBalance);
+  }
 
-  const getLadderPrice = () => {
+  const getQuoteBalance = () =>  {
     if (!marketInfo) return 0;
-    const side = tType === "buy" ? "b" : "s";
-    let baseAmount = sellAmounts;
+    if (!balances?.[marketInfo.quoteAsset.symbol]?.valueReadable) return 0;
+    let totalBalance = balances[marketInfo.quoteAsset.symbol].valueReadable
+    if (!userOrders) return totalBalance;
+
+    Object.keys(userOrders).forEach(orderId => {
+      const order = userOrders[orderId];
+      const sellToken = order[3] === 's'
+        ? order[2].split('-')[0]
+        : order[2].split('-')[1]
+      if (sellToken === marketInfo.quoteAsset.symbol) {
+        totalBalance -= order[4] * order[10]; // remove remaining order size
+      }
+    });
+
+    return Number(totalBalance);
+  }
+  
+  const getBaseAllowance = () => {
+    if (!marketInfo) return 0;
+    if (!balances?.[marketInfo.baseAsset.symbol]?.allowanceReadable) return 0;
+    return (Number(
+      balances[marketInfo.baseAsset.symbol].allowanceReadable
+    ));
+  }
+
+  const getQuoteAllowance = () => {
+    if (!marketInfo) return 0;
+    if (!balances?.[marketInfo.quoteAsset.symbol]?.allowanceReadable) return 0;
+    return (Number(
+      balances[marketInfo.quoteAsset.symbol].allowanceReadable
+    ));
+  }
+
+  const getBaseFee = (amount) => {
+    if (!marketInfo) return 0;
+    let fee = marketInfo.baseFee;
+    fee += (marketInfo.makerVolumeFee && amount)
+      ? amount * marketInfo.makerVolumeFee
+      : 0;
+    return fee;
+  }
+
+  const getQuoteFee = (amount) => {
+    if (!marketInfo) return 0;
+    let fee = marketInfo.quoteFee;
+    fee += (marketInfo.makerVolumeFee && amount)
+      ? amount * marketInfo.makerVolumeFee
+      : 0;
+    return fee;
+  }
+    
+  /*
+  * zkSync does not allow partial fills, so the ladder price is the first
+  * liquidity that can fill the order size.
+  */
+  const getLadderPriceZkSync_v1 = () => {
+    let baseAmount = (tType === 'sell')
+      ? sellAmounts
+      : buyAmounts
+
     if (!baseAmount) baseAmount = 0;
 
-    let price,
-      unfilled = baseAmount;
-    if (side === "b") {
+    let price;
+    if (tType === "buy") {
       const asks = liquidity.filter((l) => l[0] === "s");
       asks.sort((a, b) => a[1] - b[1]);
+
       for (let i = 0; i < asks.length; i++) {
-        if (asks[i][2] >= unfilled || i === asks.length - 1) {
+        if (asks[i][2] >= baseAmount || i === asks.length - 1) {
           price = asks[i][1];
           break;
-        } else {
-          unfilled -= asks[i][2];
         }
       }
-    } else if (side === "s") {
+    } else if (tType === "sell") {
       const bids = liquidity.filter((l) => l[0] === "b");
-
       bids.sort((a, b) => b[1] - a[1]);
+
       for (let i = 0; i < bids.length; i++) {
-        if (bids[i][2] >= unfilled || i === bids.length - 1) {
+        if (bids[i][2] >= baseAmount || i === bids.length - 1) {
           price = bids[i][1];
           break;
-        } else {
-          unfilled -= bids[i][2];
         }
       }
     }
     if (!price) return 0;
-    return formatPrice(price);
-  };
+    return price;
+  }
+
+  const getLadderPrice = () => {
+    const orderbookAsks = [];
+    const orderbookBids = [];
+    let baseAmount = (tType === 'sell')
+      ? sellAmounts
+      : buyAmounts
+    if (!baseAmount) baseAmount = 0;
+
+    for (let orderid in allOrders) {
+      const order = allOrders[orderid];
+      const side = order[3];
+      const price = order[4];
+      const remaining = isNaN(Number(order[10])) ? order[5] : order[10];
+      const orderStatus = order[9];
+
+      const orderEntry = [
+        price,
+        remaining
+      ];
+
+      if (side === "b" && ["o", "pm", "pf"].includes(orderStatus)) {
+        orderbookBids.push(orderEntry);
+      } else if (side === "s" && ["o", "pm", "pf"].includes(orderStatus)) {
+        orderbookAsks.push(orderEntry);
+      }
+    }
+
+    let price;
+    let unfilled = baseAmount;
+    if (tType === "buy" && orderbookAsks) {
+      for (let i = orderbookAsks.length - 1; i >= 0; i--) {
+        if (orderbookAsks[i][1] >= unfilled || i === 0) {
+          price = orderbookAsks[i][0];
+          break;
+        } else {
+          unfilled -= orderbookAsks[i][1];
+        }
+      }
+    } else if (tType === "sell" && orderbookBids) {
+      for (let i = orderbookBids.length - 1; i >= 0; i--) {
+        if (orderbookBids[i][1] >= unfilled ||  i === 0) {
+          price = orderbookBids[i][0];
+          break;
+        } else {
+          unfilled -= orderbookBids[i][1];
+        }
+      }
+    }
+    if (!price) return 0;
+    return price;
+  }
 
   const fromTokenOptions = useMemo(() => {
     if (sellTokenList.length > 0) {
@@ -337,10 +458,18 @@ const ConvertPage = () => {
   }, [sellToken, pairs, balances]);
 
   const onChangeSellToken = (option) => {
+    setSellAmounts("")
+    setBuyAmounts("")
+    setChangedBuyAmount(false);
+    setChangedSellAmount(false);
     setSellToken(option);
   };
 
   const onChangeBuyToken = (option) => {
+    setSellAmounts("")
+    setBuyAmounts("")
+    setChangedBuyAmount(false);
+    setChangedSellAmount(false);
     setBuyToken(option);
   };
 
@@ -348,126 +477,92 @@ const ConvertPage = () => {
     const p = fromTokenOptions.find((item) => item.name === buyToken.name);
     setSellToken(p);
     setBuyToken(sellToken);
-    setSellAmounts(buyAmounts);
+    setTtype(!tType)
+    const newSellAmount = (tType === 'sell')
+      ? sellAmounts * currentPrice
+      : sellAmounts / currentPrice
+    setSellAmounts(isNaN(newSellAmount) ? "" : newSellAmount);
+    setBuyAmounts(isNaN(sellAmounts) ? "" : sellAmounts);
+    setChangedBuyAmount(false);
+    setChangedSellAmount(false);
   };
 
   const onChangeSellAmounts = (event) => {
-    const amount = event.target.value.replace(/[^0-9.]/g, "");
+    const amount = event.target.value.replace(',','.').replace(/[^0-9.]/g, "");
     setSellAmounts(amount);
-    const x = amount * basePrice;
-    setBuyAmounts(x.toPrecision(6));
+    const newBuyAmount = (tType === "buy")
+      ? amount / currentPrice
+      : amount * currentPrice;
+    setBuyAmounts(newBuyAmount);
+    setChangedBuyAmount(false);
+    setChangedSellAmount(true);
   };
 
   const onChangeBuyAmounts = (event) => {
-    const amount = event.target.value.replace(/[^0-9.]/g, "");
+    const amount = event.target.value.replace(',','.').replace(/[^0-9.]/g, "");
     setBuyAmounts(amount);
-    const x = amount / basePrice;
-    setSellAmounts(x.toPrecision(6));
+    const newSellAmount = (tType === "buy")
+      ? amount * currentPrice
+      : amount / currentPrice;
+    setSellAmounts(newSellAmount);
+    setChangedBuyAmount(true);
+    setChangedSellAmount(false);
   };
 
   const isValid = () => {
-    let baseAmount, quoteAmount;
-    if(!sellAmounts || !buyAmounts) {
-      setError("")
-      return;
-    }
-    if (typeof sellAmounts === "string") {
-      baseAmount = parseFloat(sellAmounts.replace(",", "."));
-    } else {
-      baseAmount = sellAmounts;
-    }
-    if (typeof buyAmounts === "string") {
-      quoteAmount = parseFloat(buyAmounts.replace(",", "."));
-    } else {
-      quoteAmount = buyAmounts;
-    }
-    quoteAmount = isNaN(quoteAmount) ? 0 : quoteAmount;
-    baseAmount = isNaN(baseAmount) ? 0 : baseAmount;
-    if (!baseAmount && !quoteAmount) {
-      setError("No amount available")
-      return;
-    }
-
-    let price = currentPrice();
-    if (!price) {
-      setError("No price available")
-      return;
-    }
-
-    if (price < 0) {
-      setError(`Price (${price}) can't be below 0`)
-      return;
-    }
-    const baseBalance = balances[sellToken?.name]?.valueReadable;
-
-    if (tType === "sell") {
-      if (baseAmount && baseAmount + marketInfo.baseFee > baseBalance) {
-        setError(`Amount exceeds ${marketInfo.baseAsset.symbol} balance`)
-        return;
-      }
-
-      if (
-        (baseAmount && baseAmount < marketInfo.baseFee) ||
-        baseBalance === undefined
-      ) {
-        setError(`Minimum order size is ${marketInfo.baseFee.toPrecision(5)}`)
-        return;
-      }
-    } else {
-      if (baseAmount && baseAmount + marketInfo.quoteFee > baseBalance) {
-        setError(`Amount exceeds ${marketInfo.quoteAsset.symbol} balance`)
-        return;
-      }
-
-      if (
-        (baseAmount && baseAmount < marketInfo.quoteFee) ||
-        baseBalance === undefined
-      ) {
-        setError(`Minimum order size is ${marketInfo.quoteFee.toPrecision(5)}`)
-        return;
-      }
-    }
-    ;
-  }
-
-  const onClickExchange = async () => {
     const userOrderArray = Object.values(userOrders);
     if (userOrderArray.length > 0) {
       const openOrders = userOrderArray.filter((o) =>
         ["o", "b", "m"].includes(o[9])
       );
-      if ([1, 1000].includes(network) && openOrders.length > 0) {
-        toast.error(
-          "zkSync 1.0 allows one open order at a time. Please cancel your limit order or wait for it to be filled before converting. Otherwise your limit order will fail.",
-          {
-            toastId:
-              "zkSync 1.0 allows one open order at a time. Please cancel your limit order or wait for it to be filled before converting. Otherwise your limit order will fail.",
-            autoClose: 20000,
-          }
-        );
+      if (api.isZksyncChain() && openOrders.length > 0) {
+        setError("Only one open order allowed")
         return;
       }
     }
-    let baseAmount, quoteAmount;
-    if (typeof sellAmounts === "string") {
-      baseAmount = parseFloat(sellAmounts.replace(",", "."));
-    } else {
-      baseAmount = sellAmounts;
+
+    // no error in this case needed
+    if(!sellAmounts) {
+      return;
     }
-    if (typeof buyAmounts === "string") {
-      quoteAmount = parseFloat(buyAmounts.replace(",", "."));
-    } else {
-      quoteAmount = buyAmounts;
+    if(!buyAmounts) {
+      setError("Missing buy amount")
+      return;
     }
-    quoteAmount = isNaN(quoteAmount) ? 0 : quoteAmount;
-    baseAmount = isNaN(baseAmount) ? 0 : baseAmount;
-    if (!baseAmount && !quoteAmount) {
+
+    const [baseToken, quoteToken] = currentMarket.split('-');
+    if (baseToken !== buyToken?.name && quoteToken !== buyToken?.name) {
+      setError("Buy token not it current market.")
+      return;
+    }
+    if (baseToken !== sellToken?.name && quoteToken !== sellToken?.name) {
+      setError("Sell token not it current market.")
+      return;
+    }
+
+    const sellAmountParsed = (typeof sellAmounts === "string")
+      ? parseFloat(sellAmounts.replace(",", "."))
+      : sellAmounts;
+    const buyAmountParsed = (typeof buyAmounts === "string")
+      ? parseFloat(buyAmounts.replace(",", "."))
+      : buyAmounts;
+    let baseAmount = baseToken === buyToken?.name
+      ? buyAmountParsed
+      : sellAmountParsed;
+    let quoteAmount = quoteToken === sellToken?.name
+      ? sellAmountParsed
+      : buyAmountParsed;
+
+    if (!baseAmount || !quoteAmount) {
       setError("No amount available")
       return;
     }
 
-    let price = currentPrice();
-    if (!price) {
+    const price = tType === 'buy'
+      ? quoteAmount + getQuoteFee(quoteAmount) / baseAmount
+      : quoteAmount / baseAmount + getBaseFee(baseAmount);
+    const targetPrice = currentPrice;
+    if (!targetPrice || !price) {
       setError("No price available")
       return;
     }
@@ -477,89 +572,115 @@ const ConvertPage = () => {
       return;
     }
 
-    if (tType === "buy") {
-      const bidPrice = getFirstBid();
-      const delta = ((price - bidPrice) / bidPrice) * 100;
-      if (delta > 2 && !settings.disableSlippageWarning) {
-        toast.error(
-          `You are buying ${delta.toFixed(
-            2
-          )}% above the current market price. You could lose money when signing this transaction!`,
-          {
-            toastId: `You are buying ${delta.toFixed(
-              2
-            )}% above the current market price. You could lose money when signing this transaction!`,
-          }
-        );
-      }
-    } else {
-      const askPrice = getFirstAsk();
-      const delta = ((askPrice - price) / askPrice) * 100;
-      if (delta > 2 && !settings.disableSlippageWarning) {
-        toast.error(
-          `You are selling ${delta.toFixed(
-            2
-          )}% under the current market price. You could lose money when signing this transaction!`,
-          {
-            toastId: `You are selling ${delta.toFixed(
-              2
-            )}% under the current market price. You could lose money when signing this transaction!`,
-          }
-        );
-      }
-    }
-    const baseBalance = balances[sellToken?.name]?.valueReadable;
-
     if (tType === "sell") {
-      if (baseAmount && baseAmount + marketInfo.baseFee > baseBalance) {
+      const baseBalance = getBaseBalance();
+      const fee = getBaseFee(baseAmount);
+      if (!baseBalance || baseAmount + fee > baseBalance) {
         setError(`Amount exceeds ${marketInfo.baseAsset.symbol} balance`)
         return;
       }
 
-      if (
-        (baseAmount && baseAmount < marketInfo.baseFee) ||
-        baseBalance === undefined
-      ) {
-        setError(`Minimum order size is ${marketInfo.baseFee.toPrecision(5)}`)
+      if (baseAmount < fee) {
+        setError(`Minimum order size is ${fee.toPrecision(5)}`)
         return;
       }
+
+      if (api.isEVMChain()) {
+        const allowance = getBaseAllowance();
+        if (baseAmount + fee < allowance) {
+          setApproveNeeded(true)
+          setError(`Amount exceeds ${marketInfo.baseAsset.symbol} allowance`)
+          return;
+        } else {
+          setApproveNeeded(false)
+        }
+      }
     } else {
-      if (baseAmount && baseAmount + marketInfo.quoteFee > baseBalance) {
+      const quoteBalance = getQuoteBalance();
+      const fee = getQuoteFee(quoteAmount);
+      if (!quoteBalance || quoteAmount + fee > quoteBalance) {
         setError(`Amount exceeds ${marketInfo.quoteAsset.symbol} balance`)
         return;
       }
 
-      if (
-        (baseAmount && baseAmount < marketInfo.quoteFee) ||
-        baseBalance === undefined
-      ) {
-        setError(`Minimum order size is ${marketInfo.quoteFee.toPrecision(5)}`)
+      if (quoteAmount < fee) {
+        setError(`Minimum order size is ${fee.toPrecision(5)}`)
         return;
       }
-    }
-
-    let orderPendingToast;
-    setOrderButtonDisabled(true);
-    if (api.isZksyncChain()) {
-      orderPendingToast = toast.info(
-        "Order pending. Sign or Cancel to continue...",
-        {
-          toastId: "Order pending. Sign or Cancel to continue...",
+      
+      if (api.isEVMChain()) {
+        const allowance = getQuoteAllowance();
+        if (quoteAmount + fee < allowance) {
+          setApproveNeeded(true)
+          setError(`Amount exceeds ${marketInfo.quoteAsset.symbol} allowance`)
+          return;
+        } else {
+          setApproveNeeded(false)
         }
-      );
+      }
     }
+    setError("")
+  }
 
-    console.log(slippageValue, 1 + slippageValue / 100);
+  const onClickExchange = async () => {
+    if (errorMsg) return;
+
+    const sellAmountParsed = (typeof sellAmounts === "string")
+      ? parseFloat(sellAmounts.replace(",", "."))
+      : sellAmounts;
+    const buyAmountParsed = (typeof buyAmounts === "string")
+      ? parseFloat(buyAmounts.replace(",", "."))
+      : buyAmounts;
+    const [baseToken, quoteToken] = currentMarket.split('-');
+    let baseAmount = baseToken === buyToken?.name
+      ? buyAmountParsed
+      : sellAmountParsed;
+    let quoteAmount = quoteToken === sellToken?.name
+      ? sellAmountParsed
+      : buyAmountParsed;
+
+    const price = quoteAmount / baseAmount;
+    baseAmount = tType === 'buy' ? baseAmount : baseAmount + getBaseFee(baseAmount);
+    quoteAmount = tType === 'buy' ? quoteAmount + getQuoteFee(quoteAmount) : quoteAmount;
+
+    const renderGuidContent = () => {
+      return (
+        <div>
+          <p style={{ fontSize: "14px", lineHeight: "24px" }}>
+            {tType === "sell" ? "Sell" : "Buy"} Order pending
+          </p>
+          <p style={{ fontSize: "14px", lineHeight: "24px" }}>
+            {addComma(formatPrice(baseAmount))} {marketInfo.baseAsset.symbol} @{" "}
+            {addComma(formatPrice(price))}{" "}
+            {marketInfo.quoteAsset.symbol}
+          </p>
+          <p style={{ fontSize: "14px", lineHeight: "24px" }}>
+            Transaction fee: {tType === 'sell' 
+              ? `${addComma(formatPrice(getBaseFee(baseAmount)))} ${marketInfo.baseAsset.symbol}`
+              : `${addComma(formatPrice(getQuoteFee(quoteAmount)))} ${marketInfo.quoteAsset.symbol}`
+            }
+          </p>
+          <p style={{ fontSize: "14px", lineHeight: "24px" }}>
+            Sign or Cancel to continue...
+          </p>
+        </div>
+      );
+    };
+    
+    let orderPendingToast;
+    if (!settings.disableOrderNotification) {
+      orderPendingToast = toast.info(renderGuidContent(), {
+        toastId: "Order pending",
+        autoClose: false,
+      });
+    }
 
     try {
       await api.submitOrder(
         currentMarket,
         tType === "buy" ? "b" : "s",
-        tType === "buy"
-          ? price * (1 + slippageValue / 100)
-          : price * (1 - slippageValue / 100),
-        tType === "sell" ? baseAmount : 0,
-        tType === "buy" ? baseAmount : 0,
+        baseAmount,
+        quoteAmount,
         "market"
       );
       setTimeout(() => {
@@ -567,27 +688,63 @@ const ConvertPage = () => {
       }, 8000);
     } catch (e) {
       console.log(e);
-      toast.error(e.message);
+      toast.error(
+        `Error submitting the order: ${e.message}`,
+        {
+          autoClose: 20000,
+          toastId: 'submitOrder',
+        },
+      );
       setOrderButtonDisabled(false);
     }
-    if (api.isZksyncChain()) {
+    
+    if (!settings.disableOrderNotification) {
       toast.dismiss(orderPendingToast);
     }
   };
 
+  const approveHandler = async () => {
+    const token = (tType === "sell")
+      ? marketInfo.baseAsset.symbol
+      : marketInfo.quoteAsset.symbol;    
+
+    let orderApproveToast = toast.info(
+      "Approve pending. Sign or Cancel to continue...", {
+      toastId: "Approve pending. Sign or Cancel to continue...",
+      autoClose: false,
+    });
+
+    try {
+      await api.approveExchangeContract(
+        token,
+        0 // amount = 0 ==> MAX_ALLOWANCE
+      );
+    } catch (e) {
+      console.log(e);
+      toast.error(e.message);
+    }
+
+    toast.dismiss(orderApproveToast);
+  }
+
   const onClickMax = () => {
     const balance = balances[sellToken?.name]?.valueReadable;
-    const fees = tType === "sell" ? marketInfo?.baseFee : marketInfo?.quoteFee;
+    const fees = tType === "sell" ? getBaseFee() : getQuoteFee();
     if (balance && fees) {
       const s_amounts = balance - fees;
       setSellAmounts(s_amounts);
-      setBuyAmounts(basePrice * s_amounts);
+      const newBuyAmount = (tType === 'sell')
+        ? s_amounts * currentPrice
+        : s_amounts / currentPrice
+      setBuyAmounts(newBuyAmount);
     }
+    setChangedBuyAmount(false);
+    setChangedSellAmount(false);
   };
 
   const onChangeSlippageValue = (value) => {
-    let amount = value.replace(/[^1-9.]/g, ""); //^[1-9][0-9]?$|^100$
-    if (parseFloat(amount) < 1 || parseFloat(amount) > 10) {
+    let amount = value.replace(',','.').replace(/[^0-9.]/g, ""); //^[1-9][0-9]?$|^100$
+    if (parseFloat(amount) < 0.1 || parseFloat(amount) > 25) {
       dispatch(setSlippageValue({ value: "1.00" }));
     } else {
       dispatch(setSlippageValue({ value: amount }));
@@ -623,7 +780,7 @@ const ConvertPage = () => {
               estimatedValueFrom={estimatedValueSell}
               estimatedValueTo={estimatedValueBuy}
               onSwitchTokenBtn={onSwitchTokenBtn}
-              basePrice={basePrice}
+              basePrice={currentPrice}
               toToken={buyToken}
               toTokenOptions={buyTokenOptions}
               onChangeToToken={onChangeBuyToken}
@@ -636,16 +793,16 @@ const ConvertPage = () => {
               onSetSlippageValue={onChangeSlippageValue}
               slippageValue={slippageValue}
             />
-            {!errorMsg && <Button
+            {!errorMsg && user.address && !approveNeeded && <Button
               isLoading={false}
               className="w-full py-3 my-3 uppercase"
               scale="imd"
               onClick={onClickExchange}
-              disabled={orderButtonDisabled || !user.address}
+              disabled={orderButtonDisabled}
             >
-              Convert
+              Convert {sellToken?.name}
             </Button>}
-            {errorMsg && <Button
+            {errorMsg && user.address && !approveNeeded && <Button
               isLoading={false}
               className="w-full py-3 my-3 uppercase"
               variant="sell"
@@ -654,6 +811,20 @@ const ConvertPage = () => {
             >
               {errorMsg}
             </Button>}
+            {user.address && approveNeeded && api.isEVMChain() && <Button
+              isLoading={false}
+              className="w-full py-3 my-3 uppercase"
+              variant="sell"
+              scale="imd"
+              onClick={approveHandler}
+            >
+              Approve {sellToken?.name}
+            </Button>}
+            {!user.address &&
+              <ConnectWalletButton
+                className="w-full py-3 my-3 uppercase"
+              />
+            }
           </div>
         </div>
       )}

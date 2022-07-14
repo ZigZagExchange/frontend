@@ -32,21 +32,22 @@ class SpotForm extends React.Component {
   }
 
   getExchangePercentage(baseAmount, quoteAmount) {
+    if (!this.props.user.id) return 0;
     let result;
     if (this.props.side === 's') {
       const baseBalance = this.getBaseBalance();
       const baseFee = this.getBaseFee();
-      result = ((baseAmount + baseFee) / baseBalance) * 100;
+      result = ((Number(baseAmount) + Number(baseFee)) / baseBalance) * 100;
     } else {
       const quoteBalance = this.getQuoteBalance();
       const quoteFee = this.getQuoteFee();
-      result = ((quoteAmount + quoteFee) / quoteBalance) * 100;
+      result = ((Number(quoteAmount) + Number(quoteFee)) / quoteBalance) * 100;
     }
     if (Number.isNaN(result) || result <= 0) {
       return 0;
     } else if (!Number.isFinite(result) || result >= 100) {
       return 100;
-    }
+    } 
     return result.toFixed(0);
   }
 
@@ -469,6 +470,8 @@ class SpotForm extends React.Component {
         return;
       }
 
+      console.log(`this.state.baseAmount ==> ${this.state.baseAmount}`)
+      console.log(`baseBalance ==> ${baseBalance}`)
       if (this.state.baseAmount > baseBalance) {
         toast.error(`Amount exceeds ${marketInfo.baseAsset.symbol} balance`, {
           toastId: `Amount exceeds ${marketInfo.baseAsset.symbol} balance`,
@@ -535,22 +538,22 @@ class SpotForm extends React.Component {
     let baseAmount = this.state.baseAmount;
     let quoteAmount = this.state.quoteAmount;
     // show msg with no fee
+    const fairPrice = this.currentPrice();
     let price = (this.props.side === 'b')
       ? (quoteAmount - this.getQuoteFee(quoteAmount)) / baseAmount
       : quoteAmount / (baseAmount - this.getBaseFee(baseAmount));
-
     const delta = (this.props.side === 'b')
-      ? ((price - this.props.lastPrice) / this.props.lastPrice) * 100
-      : ((this.props.lastPrice - price) / this.props.lastPrice) * 100;
+      ? ((price - fairPrice) / fairPrice) * 100
+      : ((fairPrice - price) / fairPrice) * 100;
     if (
       (delta > 10 && this.props.orderType === "limit" && !this.props.settings.disableSlippageWarning) ||
-      (delta > 2.5 && this.props.orderType === "market" && !this.props.settings.disableSlippageWarning)
+      (delta > 2 && this.props.orderType === "market" && !this.props.settings.disableSlippageWarning)
     ) {
       this.props.setHighSlippageModal({
         xToken: baseAmount,
         yToken: quoteAmount,
         userPrice: price,
-        pairPrice: this.props.lastPrice,
+        pairPrice: fairPrice,
         type: this.props.side === 'b' ? 'buy' : 'sell',
         open: true,
         delta: delta 
@@ -565,13 +568,15 @@ class SpotForm extends React.Component {
             {this.props.side === "s" ? "Sell" : "Buy"} Order pending
           </p>
           <p style={{ fontSize: "14px", lineHeight: "24px" }}>
-            {addComma(formatToken(baseAmount))} {marketInfo.baseAsset.symbol} @{" "}
-            {addComma(["USDC", "USDT", "DAI", "FRAX"].includes(
-              marketInfo.quoteAsset.symbol
-            )
-              ? parseFloat(price).toFixed(2)
-              : formatPrice(price))}{" "}
+            {addComma(formatPrice(baseAmount))} {marketInfo.baseAsset.symbol} @{" "}
+            {addComma(formatPrice(price))}{" "}
             {marketInfo.quoteAsset.symbol}
+          </p>
+          <p style={{ fontSize: "14px", lineHeight: "24px" }}>
+            Transaction fee: {this.props.side === 's' 
+              ? `${addComma(formatPrice(marketInfo.baseFee))} ${marketInfo.baseAsset.symbol}`
+              : `${addComma(formatPrice(marketInfo.quoteFee))} ${marketInfo.quoteAsset.symbol}`
+            }
           </p>
           <p style={{ fontSize: "14px", lineHeight: "24px" }}>
             Sign or Cancel to continue...
@@ -594,10 +599,9 @@ class SpotForm extends React.Component {
       await api.submitOrder(
         this.props.currentMarket,
         this.props.side,
-        price,
         baseAmount,
         quoteAmount,
-        this.props.orderType
+        this.props.orderType,
       );
 
       if (!this.props.settings.disableOrderNotification) {
@@ -606,8 +610,14 @@ class SpotForm extends React.Component {
         });
       }
     } catch (e) {
-      toast.error(e.message);
-      console.error(e);
+      console.log(e);
+      toast.error(
+        `Error submitting the order: ${e.message}`,
+        {
+          autoClose: 20000,
+          toastId: 'submitOrder',
+        },
+      );
     }
 
     if (!this.props.settings.disableOrderNotification) {
@@ -616,21 +626,6 @@ class SpotForm extends React.Component {
 
     newstate = { ...this.state };
     this.setState(newstate);
-  }
-
-  amountPercentOfMax() {
-    if (!this.props.user.id) return 0;
-    if (this.props.side === "s") {
-      let baseBalance = this.getBaseBalance() 
-      baseBalance -= this.getBaseFee(baseBalance);
-      const baseAmount = this.state.baseAmount || 0;
-      return Math.round((baseAmount / baseBalance) * 100);
-    } else if (this.props.side === "b") {
-      let quoteBalance = this.getQuoteBalance();
-      quoteBalance -= this.getQuoteFee(quoteBalance);
-      const quoteAmount = this.state.quoteAmount || 0;
-      return Math.round((quoteAmount / quoteBalance) * 100);
-    }
   }
 
   currentPrice() {
@@ -990,7 +985,7 @@ class SpotForm extends React.Component {
         </FormHeader>
         <RangeWrapper>
           <RangeSlider
-            value={this.amountPercentOfMax()}
+            value={exchangePercentage}
             onChange={this.rangeSliderHandler.bind(this)}
           />
           <span className="current_progress">
