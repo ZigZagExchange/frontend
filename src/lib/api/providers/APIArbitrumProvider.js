@@ -111,8 +111,8 @@ export default class APIArbitrumProvider extends APIProvider {
         marketInfo.quoteAsset.decimals
       );
       takerAmountBN = takerAmountBN.mul(99999).div(100000);
-      gasFee = ethers.utils.parseUnits (
-        marketInfo.baseFee.toString(),
+      gasFee = ethers.utils.parseUnits(
+        parseFloat(marketInfo.baseFee).toFixed(marketInfo.baseAsset.decimals),
         marketInfo.baseAsset.decimals 
       )
       const makerFee = baseAmount * Number(marketInfo.makerVolumeFee)

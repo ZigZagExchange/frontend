@@ -607,6 +607,7 @@ class SpotForm extends React.Component {
       }
     } catch (e) {
       toast.error(e.message);
+      console.error(e);
     }
 
     if (!this.props.settings.disableOrderNotification) {
