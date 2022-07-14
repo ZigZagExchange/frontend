@@ -1,7 +1,6 @@
-import React, { useState, cloneElement, isValidElement, useRef } from "react";
+import React, { useState, useRef } from "react";
 import styled from "styled-components";
 import { ExpandableButton } from "../ExpandableButton";
-import { IconButton as baseIcon } from "../IconButton";
 import Text from "../../atoms/Text/Text";
 import { HideMenuOnOutsideClicked } from "lib/utils";
 import { Box } from '@mui/material';
@@ -94,30 +93,6 @@ const DropdownListContainer = styled.div`
     // display: block;
     width: 100%;
     padding: 8px 20px;
-  }
-`;
-
-const IconButton = styled(baseIcon)`
-  width: 24px;
-  height: 24px;
-  background: transparent;
-  border-radius: 9999px;
-  padding: 0px !important;
-  svg {
-    margin-right: 0px !important;
-    margin-left: 0px !important;
-  }
-
-  &:not(.network-dropdown):not(.menu-dropdown) {
-    border: 1px solid ${({ theme }) => theme.colors.foreground400};
-  }
-
-  &.network-dropdown path {
-    fill: ${(p) => p.theme.colors.foregroundHighEmphasis};
-  }
-
-  &.menu-dropdown button svg path {
-    fill: ${(p) => p.theme.colors.foregroundMediumEmphasis};
   }
 `;
 
@@ -214,7 +189,6 @@ const Dropdown = ({
                   ) : null}
                   {text}
                 </Text>
-                {/* {rightIcon && isValidElement(menuIcon) && <IconButton className={adClass} variant="secondary" endIcon={cloneElement(menuIcon)}></IconButton>} */}
               </DropdownListContainer>
             );
           })}

@@ -112,7 +112,7 @@ class SpotForm extends React.Component {
   increasePrice(e) {
     e.preventDefault();
     const newState = { ...this.state };
-    newState.price = this.state.price * 1.001;
+    newState.price = formatPrice(this.state.price * 1.001);
     if (this.props.quoteChanged) {
       // for buy quoteAmount should be fixed
       const fee = this.getQuoteFee(newState.quoteAmount);
@@ -138,7 +138,7 @@ class SpotForm extends React.Component {
   decreasePrice(e) {
     e.preventDefault();
     const newState = { ...this.state };
-    newState.price = this.state.price * 0.999;
+    newState.price = formatPrice(this.state.price * 0.999);
     if (this.props.quoteChanged) {
       // for buy quoteAmount should be fixed
       const fee = this.getQuoteFee(newState.quoteAmount);
@@ -719,7 +719,7 @@ class SpotForm extends React.Component {
       if (this.props.side === 's' && !Number.isNaN(newState.baseAmount)) {
         // follow fee for sell order
         const newBaseAmount = newState.baseAmount + this.props.marketInfo.baseFee - prevProps.marketInfo.baseFee;
-        if (newBaseAmount <= 0) {
+        if (newBaseAmount <= 0 || newState.quoteChanged === "") {
           newState.baseAmount= "";
           newState.quoteAmount= "";
           newState.baseChanged= false;
@@ -730,7 +730,7 @@ class SpotForm extends React.Component {
       } else if (this.props.side === 'b' && !Number.isNaN(this.props.quoteChanged)) {
         // follow fee for buy order
         const newQuoteAmount = newState.quoteAmount + this.props.marketInfo.quoteFee - prevProps.marketInfo.quoteFee;
-        if (newQuoteAmount <= 0) {
+        if (newQuoteAmount <= 0 || newState.baseAmount === "") {
           newState.baseAmount= "";
           newState.quoteAmount= "";
           newState.baseChanged= false;
@@ -906,10 +906,21 @@ class SpotForm extends React.Component {
     }
 
     const exchangePercentage = this.getExchangePercentage(
-      this.state.baseAmount,
-      this.state.quoteAmount
+      baseAmount,
+      quoteAmount
     );
     this.state.maxSizeSelected = (exchangePercentage === 100);
+    const showAmountPlusBox = (
+      !this.props.user.id ||
+      exchangePercentage >= 100 ||
+      (marketInfo && this.props.side === 's' && baseBalance < marketInfo.baseFee) ||
+      (marketInfo && this.props.side === 'b' && quoteBalance < marketInfo.quoteFee)
+    );
+    const showMinusBox = (
+      !this.props.user.id ||
+      this.state.baseAmount === "" ||
+      this.state.baseAmount <= 0
+    )
 
     return (
       <>
@@ -919,6 +930,8 @@ class SpotForm extends React.Component {
             variant="secondary"
             startIcon={<MinusIcon />}
             onClick={this.decreasePrice.bind(this)}
+            show={!this.props.user.id}
+            disabled={!this.props.user.id}
           ></IconButton>}
           <InputField
             type="text"
@@ -939,6 +952,8 @@ class SpotForm extends React.Component {
             variant="secondary"
             startIcon={<PlusIcon />}
             onClick={this.increasePrice.bind(this)}
+            show={!this.props.user.id}
+            disabled={!this.props.user.id}
           ></IconButton>}
         </InputBox>
         <InputBox>
@@ -946,6 +961,8 @@ class SpotForm extends React.Component {
             variant="secondary"
             startIcon={<MinusIcon />}
             onClick={this.decreaseAmount.bind(this)}
+            show={showMinusBox}
+            disabled={showMinusBox}
           ></IconButton>
           <InputField
             type="text"
@@ -965,6 +982,8 @@ class SpotForm extends React.Component {
             variant="secondary"
             startIcon={<PlusIcon />}
             onClick={this.increaseAmount.bind(this)}
+            show={showAmountPlusBox}
+            disabled={showAmountPlusBox}
           ></IconButton>
         </InputBox>
         <FormHeader>
@@ -978,6 +997,8 @@ class SpotForm extends React.Component {
             variant="secondary"
             startIcon={<MinusIcon />}
             onClick={this.decreaseAmount.bind(this)}
+            show={showMinusBox}
+            disabled={showMinusBox}
           ></IconButton>
           <InputField
             type="text"
@@ -997,6 +1018,8 @@ class SpotForm extends React.Component {
             variant="secondary"
             startIcon={<PlusIcon />}
             onClick={this.increaseAmount.bind(this)}
+            show={showAmountPlusBox}
+            disabled={showAmountPlusBox}
           ></IconButton>
         </InputBox>
         <FormHeader>
