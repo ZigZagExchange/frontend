@@ -470,8 +470,6 @@ class SpotForm extends React.Component {
         return;
       }
 
-      console.log(`this.state.baseAmount ==> ${this.state.baseAmount}`)
-      console.log(`baseBalance ==> ${baseBalance}`)
       if (this.state.baseAmount > baseBalance) {
         toast.error(`Amount exceeds ${marketInfo.baseAsset.symbol} balance`, {
           toastId: `Amount exceeds ${marketInfo.baseAsset.symbol} balance`,

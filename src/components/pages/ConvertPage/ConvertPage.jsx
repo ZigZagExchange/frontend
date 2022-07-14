@@ -732,11 +732,16 @@ const ConvertPage = () => {
     const fees = tType === "sell" ? getBaseFee() : getQuoteFee();
     if (balance && fees) {
       const s_amounts = balance - fees;
-      setSellAmounts(s_amounts);
-      const newBuyAmount = (tType === 'sell')
-        ? s_amounts * currentPrice
-        : s_amounts / currentPrice
-      setBuyAmounts(newBuyAmount);
+      if (s_amounts < 0) {
+        setSellAmounts("")
+        setBuyAmounts("");
+      } else {
+        setSellAmounts(s_amounts);
+        const newBuyAmount = (tType === 'sell')
+          ? s_amounts * currentPrice
+          : s_amounts / currentPrice
+        setBuyAmounts(newBuyAmount);
+      }      
     }
     setChangedBuyAmount(false);
     setChangedSellAmount(false);
