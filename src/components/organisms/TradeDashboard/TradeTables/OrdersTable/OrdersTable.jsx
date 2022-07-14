@@ -1490,7 +1490,6 @@ export default function OrdersTable(props) {
             </tr>
           );
         });
-        console.log(balancesContent)
         footerContent = (
           <div style={{ textAlign: "center", marginTop: "8px" }}>
             <table>

@@ -35,6 +35,7 @@ export default class API extends Emitter {
   isArgent = false
   marketInfo = {}
   lastPrices = {}
+  balances = {}
   _signInProgress = null
   _profiles = {}
   _pendingOrders = []
@@ -424,6 +425,7 @@ export default class API extends Emitter {
 
     this.marketInfo = {}
     this.lastPrices = {}
+    this.balances = {}
     this._profiles = {}
     this._pendingOrders = []
     this._pendingFills = []
@@ -781,6 +783,7 @@ export default class API extends Emitter {
 
   getBalances = async () => {
     const balances = await this.apiProvider.getBalances();
+    this.balances = balances;
     this.emit("balanceUpdate", this.apiProvider.network, balances);
     return balances;
   };
@@ -818,23 +821,60 @@ export default class API extends Emitter {
   };
 
   submitOrder = async (
-    product,
+    market,
     side,
-    price,
     baseAmount,
     quoteAmount,
     orderType
   ) => {
-    if (!quoteAmount && !baseAmount) {
+    if (!quoteAmount || !baseAmount) {
       throw new Error("Set base or quote amount");
     }
+    
+    const marketInfo = this.marketInfo[market];
+    let baseAmountBN = ethers.utils.parseUnits (
+      Number(baseAmount).toFixed(marketInfo.baseAsset.decimals),
+      marketInfo.baseAsset.decimals
+    );
+    let quoteAmountBN = ethers.utils.parseUnits (
+      Number(quoteAmount).toFixed(marketInfo.quoteAsset.decimals),
+      marketInfo.quoteAsset.decimals
+    );
+    
+    const [baseToken, quoteToken] = market.split('-');
+    if (side === 's') {
+      const delta = baseAmount / this.balances[baseToken].valueReadable;
+      
+      if (delta > 100.05) {
+        throw new Error(`Amount exceeds ${baseToken} balance.`)
+      }
+      if (delta > 99.95) {
+        baseAmountBN = this.balances[baseToken].value;
+      }
+    } else if (side === 'b'){
+      const delta = quoteAmount / this.balances[quoteToken].valueReadable;
+      if (delta > 100.05) {
+        throw new Error(`Amount exceeds ${quoteToken} balance.`)
+      }
+      if (delta > 99.95) {
+        quoteAmountBN = this.balances[quoteToken].value;
+      }
+    } else {      
+      throw new Error(`Bad side ${side}.`)
+    }
+
+    const expirationTimeSeconds = Math.floor(
+      (orderType === 'market')
+        ? Date.now() / 1000 + 60 * 2 // two minutes
+        : Date.now() / 1000 + 60 * 60 * 24 * 7 // one week
+    )
+
     await this.apiProvider.submitOrder(
-      product,
+      market,
       side,
-      price,
-      Number(baseAmount),
-      Number(quoteAmount),
-      orderType
+      baseAmountBN,
+      quoteAmountBN,
+      expirationTimeSeconds
     );
   };
 
@@ -867,6 +907,11 @@ export default class API extends Emitter {
 
   approveExchangeContract = async (token, amount) => {
     return this.apiProvider.approveExchangeContract(token, amount);
+  };
+
+  checkAccountActivated = async () => {
+    if (!this.apiProvider.isZksyncChain) return true;
+    return this.apiProvider.checkAccountActivated();
   }
 
   warpETH = async (amount) => {
