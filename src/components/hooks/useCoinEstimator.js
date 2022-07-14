@@ -68,6 +68,9 @@ export function useCoinEstimator() {
       prices[token] = sum / priceArray[token].length;
     });
 
+    if('ETH' in prices && !('WETH' in prices)) prices.WETH = prices.ETH;
+    if('WETH' in prices && !('ETH' in prices)) prices.ETH = prices.WETH;
+
     return (token) => {
       return parseFloat(prices && prices[token] ? prices[token] : 0).toFixed(2);
     };
