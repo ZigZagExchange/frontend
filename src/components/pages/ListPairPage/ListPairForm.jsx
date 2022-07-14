@@ -39,24 +39,21 @@ const ListPairContainer = styled.div`
     flex-direction: column;
     justify-content: space-between;
   }
-`
+`;
 
-const ListPairForm = ({
-  onSubmit,
-  children
-}) => {
-  const [baseAssetId, setBaseAssetId] = useState("")
-  const [quoteAssetId, setQuoteAssetId] = useState("")
-  const [baseFee, setBaseFee] = useState("")
-  const [quoteFee, setQuoteFee] = useState("")
-  const [basePrice, setBasePrice] = useState(null)
-  const [quotePrice, setQuotePrice] = useState(null)
-  const [baseSymbol, setBaseSymbol] = useState(null)
-  const [quoteSymbol, setQuoteSymbol] = useState(null)
-  const [isBaseAssetIdInvalid, setIsBaseAssetIdInvalid] = useState(false)
-  const [isQuoteAssetIdInvalid, setIsQuoteAssetIdInvalid] = useState(false)
-  const [showAdvancedSettings, setShowAdvancedSettings] = useState(false)
-  const [zigZagChainId, setZigZagChainId] = useState(1)
+const ListPairForm = ({ onSubmit, children }) => {
+  const [baseAssetId, setBaseAssetId] = useState("");
+  const [quoteAssetId, setQuoteAssetId] = useState("");
+  const [baseFee, setBaseFee] = useState("");
+  const [quoteFee, setQuoteFee] = useState("");
+  const [basePrice, setBasePrice] = useState(null);
+  const [quotePrice, setQuotePrice] = useState(null);
+  const [baseSymbol, setBaseSymbol] = useState(null);
+  const [quoteSymbol, setQuoteSymbol] = useState(null);
+  const [isBaseAssetIdInvalid, setIsBaseAssetIdInvalid] = useState(false);
+  const [isQuoteAssetIdInvalid, setIsQuoteAssetIdInvalid] = useState(false);
+  const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
+  const [zigZagChainId, setZigZagChainId] = useState(1);
   const { isDark } = useTheme();
   const isMobile = window.innerWidth < 500;
 
@@ -161,11 +158,15 @@ const ListPairForm = ({
         >
           <x.div>
             <NumberInput
-              className={`rounded-lg ${isDark ? 'bg-foreground-200 hover:ring-foreground-500' : 'bg-primary-300 hover:ring-primary-600'} hover:ring-1 hover:ring-offset-0`}
+              className={`rounded-lg ${
+                isDark
+                  ? "bg-foreground-200 hover:ring-foreground-500"
+                  : "bg-primary-300 hover:ring-primary-600"
+              } hover:ring-1 hover:ring-offset-0`}
               block
               {...model(baseAssetId, setBaseAssetId)}
               label={
-                <x.span fontSize={{ xs: 'xs', md: '14px' }} col>
+                <x.span fontSize={{ xs: "xs", md: "14px" }} col>
                   Base Asset{" "}
                   <x.a
                     color={{ _: "blue-gray-500", hover: "primaryHighEmphasis" }}
@@ -186,23 +187,32 @@ const ListPairForm = ({
               validate={[
                 required,
                 min(0),
-                forceValidation(isBaseAssetIdInvalid, "invalid asset on zksync"),
+                forceValidation(
+                  isBaseAssetIdInvalid,
+                  "invalid asset on zksync"
+                ),
               ]}
               rightOfLabel={
-                <QuestionHelper text="zkSync token ID of the first asset appearing in the pair
-                (BASE/QUOTE)" placement={"top"}>
-                </QuestionHelper>
+                <QuestionHelper
+                  text="zkSync token ID of the first asset appearing in the pair
+                (BASE/QUOTE)"
+                  placement={"top"}
+                ></QuestionHelper>
               }
             />
           </x.div>
 
           <x.div>
             <NumberInput
-              className={`rounded-lg ${isDark ? 'bg-foreground-200 hover:ring-foreground-500' : 'bg-primary-300 hover:ring-primary-600'} hover:ring-1 hover:ring-offset-0`}
+              className={`rounded-lg ${
+                isDark
+                  ? "bg-foreground-200 hover:ring-foreground-500"
+                  : "bg-primary-300 hover:ring-primary-600"
+              } hover:ring-1 hover:ring-offset-0`}
               block
               {...model(quoteAssetId, setQuoteAssetId)}
               label={
-                <x.span fontSize={{ xs: 'xs', md: '14px' }}>
+                <x.span fontSize={{ xs: "xs", md: "14px" }}>
                   Quote Asset{" "}
                   <x.a
                     color={{ _: "blue-gray-500", hover: "primaryHighEmphasis" }}
@@ -223,97 +233,154 @@ const ListPairForm = ({
               validate={[
                 required,
                 min(0),
-                forceValidation(isQuoteAssetIdInvalid, "invalid asset on zksync"),
+                forceValidation(
+                  isQuoteAssetIdInvalid,
+                  "invalid asset on zksync"
+                ),
               ]}
               rightOfLabel={
-                <QuestionHelper text="zkSync token ID of the second asset appearing in the pair
-                (BASE/QUOTE)" placement="top">
-                </QuestionHelper>
+                <QuestionHelper
+                  text="zkSync token ID of the second asset appearing in the pair
+                (BASE/QUOTE)"
+                  placement="top"
+                ></QuestionHelper>
               }
             />
           </x.div>
           <x.div>
             <NumberInput
-              className={`rounded-lg ${isDark ? 'bg-foreground-200 hover:ring-foreground-500' : 'bg-primary-300 hover:ring-primary-600'} hover:ring-1 hover:ring-offset-0`}
+              className={`rounded-lg ${
+                isDark
+                  ? "bg-foreground-200 hover:ring-foreground-500"
+                  : "bg-primary-300 hover:ring-primary-600"
+              } hover:ring-1 hover:ring-offset-0`}
               block
               name={"baseFee"}
               fontSize={14}
               borderRadius={8}
               {...model(baseFee, setBaseFee)}
-              label={baseSymbol ?
-                <x.span fontSize={{ xs: 'xs', md: '14px' }}>{baseSymbol} Swap Fee</x.span> :
-                <x.span fontSize={{ xs: 'xs', md: '14px' }}>Base Swap Fee</x.span>}
+              label={
+                baseSymbol ? (
+                  <x.span fontSize={{ xs: "xs", md: "14px" }}>
+                    {baseSymbol} Swap Fee
+                  </x.span>
+                ) : (
+                  <x.span fontSize={{ xs: "xs", md: "14px" }}>
+                    Base Swap Fee
+                  </x.span>
+                )
+              }
               validate={[required, min(0)]}
               rightOfLabel={
-                <QuestionHelper text="Swap fee collected by market makers" placement={isMobile ? "top" : "left"}>
-                </QuestionHelper>
+                <QuestionHelper
+                  text="Swap fee collected by market makers"
+                  placement={isMobile ? "top" : "left"}
+                ></QuestionHelper>
               }
             />
             {renderFeeHint(basePrice, baseFee, baseSymbol, setBaseFee)}
           </x.div>
           <x.div>
             <NumberInput
-              className={`rounded-lg ${isDark ? 'bg-foreground-200 hover:ring-foreground-500' : 'bg-primary-300 hover:ring-primary-600'} hover:ring-1 hover:ring-offset-0`}
+              className={`rounded-lg ${
+                isDark
+                  ? "bg-foreground-200 hover:ring-foreground-500"
+                  : "bg-primary-300 hover:ring-primary-600"
+              } hover:ring-1 hover:ring-offset-0`}
               block
               fontSize={14}
               borderRadius={8}
               name={"quoteFee"}
               {...model(quoteFee, setQuoteFee)}
-              label={quoteSymbol ? <x.span fontSize={{ xs: 'xs', md: '14px' }}>{quoteSymbol} Swap Fee</x.span> :
-                <x.span fontSize={{ xs: 'xs', md: '14px' }}>Quote Swap Fee</x.span>}
+              label={
+                quoteSymbol ? (
+                  <x.span fontSize={{ xs: "xs", md: "14px" }}>
+                    {quoteSymbol} Swap Fee
+                  </x.span>
+                ) : (
+                  <x.span fontSize={{ xs: "xs", md: "14px" }}>
+                    Quote Swap Fee
+                  </x.span>
+                )
+              }
               validate={[required, min(0)]}
               rightOfLabel={
-                <QuestionHelper text="Swap fee collected by market makers" placement={isMobile ? "top" : "right"}>
-                </QuestionHelper>
+                <QuestionHelper
+                  text="Swap fee collected by market makers"
+                  placement={isMobile ? "top" : "right"}
+                ></QuestionHelper>
               }
             />
             {renderFeeHint(quotePrice, quoteFee, quoteSymbol, setQuoteFee)}
           </x.div>
           <x.div>
             <NumberInput
-              className={`rounded-lg ${isDark ? 'bg-foreground-200 hover:ring-foreground-500' : 'bg-primary-300 hover:ring-primary-600'} hover:ring-1 hover:ring-offset-0`}
+              className={`rounded-lg ${
+                isDark
+                  ? "bg-foreground-200 hover:ring-foreground-500"
+                  : "bg-primary-300 hover:ring-primary-600"
+              } hover:ring-1 hover:ring-offset-0`}
               block
               fontSize={14}
               borderRadius={8}
               name={"pricePrecisionDecimals"}
-              label={<x.span fontSize={{ xs: 'xs', md: '14px' }}>Price Precision Decimals</x.span>}
+              label={
+                <x.span fontSize={{ xs: "xs", md: "14px" }}>
+                  Price Precision Decimals
+                </x.span>
+              }
               validate={[required, max(10), min(0)]}
               rightOfLabel={
-                <QuestionHelper text={
-                  <>
-                    <x.div>
-                      Number of decimal places in the price of the asset pair.
-                    </x.div>
+                <QuestionHelper
+                  text={
+                    <>
+                      <x.div>
+                        Number of decimal places in the price of the asset pair.
+                      </x.div>
 
-                    <x.div display={"grid"} gridTemplateColumns={2} mt={2} gap={0}>
-                      <x.div>ex: ETH/USDC has '2'</x.div>
-                      <x.div>($3250.61)</x.div>
-                      <x.div>ex: ETH/WBTC has '6'</x.div>
-                      <x.div>(0.075225)</x.div>
-                    </x.div>
-                  </>
-                } placement={isMobile ? "top" : "bottom"}>
-                </QuestionHelper>
+                      <x.div
+                        display={"grid"}
+                        gridTemplateColumns={2}
+                        mt={2}
+                        gap={0}
+                      >
+                        <x.div>ex: ETH/USDC has '2'</x.div>
+                        <x.div>($3250.61)</x.div>
+                        <x.div>ex: ETH/WBTC has '6'</x.div>
+                        <x.div>(0.075225)</x.div>
+                      </x.div>
+                    </>
+                  }
+                  placement={isMobile ? "top" : "bottom"}
+                ></QuestionHelper>
               }
             />
           </x.div>
           <x.div>
             <SelectInput
-              className={`rounded-lg ${isDark ? 'bg-foreground-200 hover:ring-foreground-500' : 'bg-primary-300 hover:ring-primary-600'} hover:ring-1 hover:ring-offset-0`}
+              className={`rounded-lg ${
+                isDark
+                  ? "bg-foreground-200 hover:ring-foreground-500"
+                  : "bg-primary-300 hover:ring-primary-600"
+              } hover:ring-1 hover:ring-offset-0`}
               fontSize={14}
               padding={5}
               borderRadius={8}
               {...model(zigZagChainId, setZigZagChainId)}
               name={"zigzagChainId"}
-              label={<x.span fontSize={{ xs: 'xs', md: '14px' }}>Network</x.span>}
+              label={
+                <x.span fontSize={{ xs: "xs", md: "14px" }}>Network</x.span>
+              }
               items={[
                 { name: "zkSync - Mainnet", id: 1 },
                 { name: "zkSync - Rinkeby", id: 1000 },
               ]}
               validate={required}
               rightOfLabel={
-                <QuestionHelper text="zkSync network on which the pair will be listed" placement={isMobile ? "top":"right"}>
-                </QuestionHelper>
+                <QuestionHelper
+                  text="zkSync network on which the pair will be listed"
+                  placement={isMobile ? "top" : "right"}
+                ></QuestionHelper>
               }
             />
           </x.div>
@@ -327,12 +394,13 @@ const ListPairForm = ({
           mb={21}
         />
 
-        <x.div
-          display={"flex"}
-          alignItems={"center"}
-          mb={21}
-        >
-          <Toggle scale="md" font="primarySmall" leftLabel="Advanced Settings" onChange={() => setShowAdvancedSettings(!showAdvancedSettings)} />
+        <x.div display={"flex"} alignItems={"center"} mb={21}>
+          <Toggle
+            scale="md"
+            font="primarySmall"
+            leftLabel="Advanced Settings"
+            onChange={() => setShowAdvancedSettings(!showAdvancedSettings)}
+          />
         </x.div>
         <x.div
           display={"grid"}
@@ -345,32 +413,42 @@ const ListPairForm = ({
           <x.div>
             {showAdvancedSettings && (
               <TextInput
-                className={`rounded-lg ${isDark ? 'bg-foreground-200 hover:ring-foreground-500' : 'bg-primary-300 hover:ring-primary-600'} hover:ring-1 hover:ring-offset-0`}
+                className={`rounded-lg ${
+                  isDark
+                    ? "bg-foreground-200 hover:ring-foreground-500"
+                    : "bg-primary-300 hover:ring-primary-600"
+                } hover:ring-1 hover:ring-offset-0`}
                 block
                 fontSize={14}
                 padding={5}
                 borderRadius={8}
                 name={TRADING_VIEW_CHART_KEY}
-                label={<x.span fontSize={{ xs: 'xs', md: '14px' }}>Default Chart Ticker</x.span>}
-                rightOfLabel={
-                  <QuestionHelper text={
-                    <div>
-                      <x.div>
-                        Default TradingView chart to be seen on the trade page
-                      </x.div>
-                      <x.div mt={2}>
-                        (ex: show COINBASE:BTCUSD for WBTC-USD)
-                      </x.div>
-                    </div>}>
-                  </QuestionHelper>
+                label={
+                  <x.span fontSize={{ xs: "xs", md: "14px" }}>
+                    Default Chart Ticker
+                  </x.span>
                 }
-              />)
-            }
+                rightOfLabel={
+                  <QuestionHelper
+                    text={
+                      <div>
+                        <x.div>
+                          Default TradingView chart to be seen on the trade page
+                        </x.div>
+                        <x.div mt={2}>
+                          (ex: show COINBASE:BTCUSD for WBTC-USD)
+                        </x.div>
+                      </div>
+                    }
+                  ></QuestionHelper>
+                }
+              />
+            )}
           </x.div>
         </x.div>
         {children}
       </Form>
-    </ListPairContainer >
+    </ListPairContainer>
   );
 };
 
@@ -384,7 +462,12 @@ const PairPreview = ({
   return (
     <>
       {(baseAssetId || quoteAssetId) && (
-        <x.div display={"flex"} fontSize={isMobile ? 24 : 35} justifyContent={"center"} my={4}>
+        <x.div
+          display={"flex"}
+          fontSize={isMobile ? 24 : 35}
+          justifyContent={"center"}
+          my={4}
+        >
           <x.span color={baseSymbol ? "blue-gray-400" : "blue-gray-800"}>
             {baseSymbol ? baseSymbol : "XXX"}
           </x.span>
@@ -419,32 +502,47 @@ const PairPreview = ({
 // };
 
 const getAmountForTargetNotional = (price) => {
-  const targetUSDFeeAmount = 1
-  return (targetUSDFeeAmount / price).toFixed(6)
-}
+  const targetUSDFeeAmount = 1;
+  return (targetUSDFeeAmount / price).toFixed(6);
+};
 
 const renderFeeHint = (assetPrice, assetFee, symbol, feeSetter) => {
   if (assetPrice) {
-    const notional = (Number(assetPrice) * Number(assetFee)).toFixed(2)
+    const notional = (Number(assetPrice) * Number(assetFee)).toFixed(2);
     if (notional > 0) {
-      return <x.div pl={2} fontSize={12} color={"blue-gray-500"} mt={1} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
-        <x.div style={{ wordBreak: "break-all" }}>
-          {assetFee} {symbol} = ${notional}
+      return (
+        <x.div
+          pl={2}
+          fontSize={12}
+          color={"blue-gray-500"}
+          mt={1}
+          display={"flex"}
+          alignItems={"center"}
+          justifyContent={"space-between"}
+        >
+          <x.div style={{ wordBreak: "break-all" }}>
+            {assetFee} {symbol} = ${notional}
+          </x.div>
+          {notional > 1 && (
+            <x.div>
+              <Button
+                ml={1}
+                variant={"secondary"}
+                size={"xs"}
+                onClick={() =>
+                  feeSetter(getAmountForTargetNotional(assetPrice))
+                }
+              >
+                set to $1
+              </Button>
+              <x.div />
+            </x.div>
+          )}
         </x.div>
-        {notional > 1 && <x.div>
-          <Button
-            ml={1}
-            variant={"secondary"}
-            size={"xs"}
-            onClick={() => feeSetter(getAmountForTargetNotional(assetPrice))}>
-            set to $1
-          </Button>
-          <x.div />
-        </x.div>}
-      </x.div>
+      );
     }
   }
-  return null
-}
+  return null;
+};
 
-export default ListPairForm
+export default ListPairForm;

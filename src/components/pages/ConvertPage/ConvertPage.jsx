@@ -138,7 +138,6 @@ const ConvertPage = () => {
         });
       }
     }
-    isValid();
   }, [sellToken, buyToken]);
 
   useEffect(() => {
@@ -568,7 +567,9 @@ const ConvertPage = () => {
     }
 
     if (price < 0) {
-      setError(`Price (${price}) can't be below 0`)
+      toast.error(`Price (${price}) can't be below 0`, {
+        toastId: `Price (${price}) can't be below 0`,
+      });
       return;
     }
 
