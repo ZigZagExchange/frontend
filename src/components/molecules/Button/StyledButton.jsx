@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { space, layout, variant } from "styled-system";
 import { scaleVariants, styleVariants } from "./theme";
 
+
 const StyledButton = styled.button`
   align-items: center;
   border: 1px;
@@ -16,14 +17,13 @@ const StyledButton = styled.button`
   outline: 0;
 
   ${variant({
-    prop: "scale",
-    variants: scaleVariants,
-  })}
+  prop: "scale",
+  variants: scaleVariants,
+})}
 
-  ${({ theme }) =>
-    variant({
-      variants: styleVariants(theme),
-    })}
+  ${({ theme }) => variant({
+  variants: styleVariants(theme),
+})}
 
   ${layout}
 
@@ -39,19 +39,17 @@ const StyledButton = styled.button`
 
   &:hover {
     svg path {
-      fill: ${({ show, theme }) =>
-        !show ? `${theme.colors.primaryHighEmphasis} !important` : ""}}
+      fill: ${({ show, theme }) => !show ? `${theme.colors.primaryHighEmphasis} !important` : ""
+  }}
 
   &:hover {
     div {
-      color: ${({ show, theme }) =>
-        !show ? `${theme.colors.primaryHighEmphasis} !important` : ""}}
+      color: ${({ show, theme }) => !show ? `${theme.colors.primaryHighEmphasis} !important` : ""
+  }}
 
   &:hover {
-    color: ${({ variant, theme }) =>
-      variant === "outlined"
-        ? `${theme.colors.primaryHighEmphasis} !important`
-        : ""}
+    color: ${({ variant, theme }) => variant === 'outlined' ? `${theme.colors.primaryHighEmphasis} !important` : ""
+  }
 `;
 
 export default StyledButton;

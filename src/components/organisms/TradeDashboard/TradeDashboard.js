@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import GridLayoutRow from "./ReactGridLayout/ReactGridRow";
-import GridLayoutCell from "./ReactGridLayout/ReactGridCell";
 import styled from "@xstyled/styled-components";
 import TradeSidebar from "./TradeSidebar/TradeSidebar";
 import TradeMarketSelector from "./TradeMarketSelector/TradeMarketSelector";
@@ -11,9 +9,6 @@ import TradeChartArea from "./TradeChartArea/TradeChartArea";
 import OrdersBook from "./TradeBooks/OrdersBook";
 import TradesBook from "./TradeBooks/TradesBook";
 import "react-toastify/dist/ReactToastify.css";
-import "react-grid-layout/css/styles.css";
-import "react-resizable/css/styles.css";
-import "./ReactGridLayout/custom-grid-layout.css";
 import { toast } from "react-toastify";
 import {
   networkSelector,
@@ -24,7 +19,6 @@ import {
   resetData,
   layoutSelector,
   settingsSelector,
-  setUISettings,
   marketSummarySelector,
 } from "lib/store/features/api/apiSlice";
 import { userSelector } from "lib/store/features/auth/authSlice";
@@ -34,6 +28,7 @@ import {
   marketQueryParam,
   networkQueryParam,
 } from "../../pages/ListPairPage/SuccessModal";
+import TradesTable from "./TradeBooks/TradesTable";
 import { HighSlippageModal } from "components/molecules/HighSlippageModal";
 import _ from "lodash";
 import { formatPrice, addComma } from "lib/utils";
@@ -42,17 +37,55 @@ const TradeContainer = styled.div`
   color: #aeaebf;
   height: calc(100vh - 56px);
   background: ${(p) => p.theme.colors.backgroundHighEmphasis};
+`;
 
-  .react-resizable-handle {
-    &::after {
-      width: 10px !important;
-      height: 10px !important;
-      border-color: ${({ theme }) =>
-        `${theme.colors.primaryHighEmphasis} !important`};
-      border-right-width: 3px !important;
-      border-bottom-width: 3px !important;
-      cursor: nwse-resize;
-    }
+const TradeGrid = styled.article`
+  display: grid;
+  grid-template-rows: ${({ isLeft }) =>
+    isLeft ? "56px 2fr 1fr" : "56px 613px 1fr"};
+  grid-template-columns: ${({ isLeft }) =>
+    isLeft ? "300px 253.5px 253.5px 1fr" : "300px 507px 1fr"};
+  grid-template-areas: ${({ isLeft }) =>
+    isLeft
+      ? `"marketSelector marketSelector marketSelector marketSelector"
+  "sidebar orders trades chart"
+  "tables tables tables tables"`
+      : `"marketSelector marketSelector marketSelector"
+  "sidebar stack chart"
+  "tables tables tables"`};
+
+  height: calc(100vh - 56px);
+  gap: 0px;
+
+  @media screen and (max-width: 991px) {
+    height: auto;
+    grid-template-rows: ${({ isLeft }) =>
+      isLeft
+        ? "56px 410px 459px 508px 1fr"
+        : "56px 410px 459px 519px 1fr"};
+    grid-template-columns: ${({ isLeft }) => (isLeft ? "1fr 1fr" : "1fr")};
+    grid-template-areas: ${({ isLeft }) =>
+      isLeft
+        ? `"marketSelector marketSelector"
+      "chart chart"
+      "sidebar orders"
+      "trades trades"
+      "tables tables"
+      `
+        : `"marketSelector"
+      "chart"
+      "sidebar"
+      "stack"
+      "tables"
+      `};
+  }
+
+  > div,
+  > aside,
+  > header,
+  > section,
+  > main {
+    background: ${(p) => p.theme.colors.zzDarkest};
   }
 `;
 
@@ -76,12 +109,10 @@ export function TradeDashboard() {
     dispatch(setCurrentMarket(market));
   };
 
-  useEffect(() => {
-    if (_.isEmpty(marketSummary)) return;
-    document.title = `${addComma(formatPrice(marketSummary.price))} | ${
-      marketSummary.market ?? "--"
-    } | ZigZag Exchange`;
-  }, [marketSummary]);
+  useEffect(()=>{
+    if(_.isEmpty(marketSummary)) return
+    document.title = `${addComma(formatPrice(marketSummary.price))} | ${marketSummary.market??'--'} | ZigZag Exchange`;
+  }, [marketSummary])
 
   useEffect(() => {
     const urlParams = new URLSearchParams(search);
@@ -156,72 +187,47 @@ export function TradeDashboard() {
 
   return (
     <TradeContainer>
-      <TradeMarketSelector
-        updateMarketChain={updateMarketChain}
-        currentMarket={currentMarket}
-      />
-      <GridLayoutRow
-        rowHeight={(window.innerHeight - 112) / 30}
-        layouts={settings.layouts}
-        autoSize={false}
-        onChange={(_, layout) => {
-          dispatch(setUISettings({ key: "layouts", value: layout }));
-        }}
-        onDragStart={() => {
-          dispatch(setUISettings({ key: "layoutsCustomized", value: true }));
-        }}
-        margin={[0, 0]}
-        isDraggable={settings.editable}
-        isResizable={settings.editable}
-        draggableHandle=".grid-item__title"
-        editable={settings.editable}
-        useCSSTransforms={false}
-      >
-        <div key="a">
-          <GridLayoutCell editable={settings.editable}>
-            <TradeSidebar
-              updateMarketChain={updateMarketChain}
-              currentMarket={currentMarket}
-              user={user}
-              activeOrderCount={activeUserOrders}
-            />
-          </GridLayoutCell>
-        </div>
-        {/* TradePriceTable, TradePriceHeadSecond */}
-        <div key="g">
-          <GridLayoutCell editable={settings.editable}>
+      <TradeGrid layout={layout} isLeft={settings.stackOrderbook}>
+        <TradeMarketSelector
+          updateMarketChain={updateMarketChain}
+          currentMarket={currentMarket}
+        />
+        {/* TradePriceBtcTable, Spotbox */}
+        <TradeSidebar
+          updateMarketChain={updateMarketChain}
+          currentMarket={currentMarket}
+          user={user}
+          activeOrderCount={activeUserOrders}
+        />
+        {settings.stackOrderbook ? (
+          <>
+            {/* TradePriceTable, TradePriceHeadSecond */}
             <OrdersBook
               currentMarket={currentMarket}
               changeFixedPoint={changeFixedPoint}
               changeSide={changeSide}
             />
-          </GridLayoutCell>
-        </div>
-        <div key="h">
-          <GridLayoutCell editable={settings.editable}>
             <TradesBook
               currentMarket={currentMarket}
               fixedPoint={fixedPoint}
               side={side}
             />
-          </GridLayoutCell>
-        </div>
-        <div key="c">
-          <GridLayoutCell editable={settings.editable}>
-            <TradeChartArea />
-          </GridLayoutCell>
-        </div>
-        <div key="d">
-          <GridLayoutCell editable={settings.editable}>
-            <TradeTables
-              userFills={userFills}
-              userOrders={userOrders}
-              user={user}
-            />
-          </GridLayoutCell>
-        </div>
-      </GridLayoutRow>
-      <HighSlippageModal />
+          </>
+        ) : (
+          <TradesTable />
+        )}
+        {/* TradeChartArea */}
+        <TradeChartArea />
+        {/* OrdersTable */}
+        <TradeTables
+          userFills={userFills}
+          userOrders={userOrders}
+          user={user}
+        />
+        {/* <TradeFooter /> */}
+
+        <HighSlippageModal />
+      </TradeGrid>
     </TradeContainer>
   );
 }

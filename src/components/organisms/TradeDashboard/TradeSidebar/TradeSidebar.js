@@ -22,10 +22,7 @@ const StyledTradeSidebar = styled.aside`
   position: relative;
   //   height: fit-content;
   border: 1px solid ${({ theme }) => theme.colors.foreground300};
-  background: ${({ theme, isDark }) =>
-    isDark
-      ? theme.colors.backgroundMediumEmphasis
-      : theme.colors.backgroundHighEmphasis};
+  background: ${({ theme, isDark }) => isDark ? theme.colors.backgroundMediumEmphasis : theme.colors.backgroundHighEmphasis};
   overflow-y: auto;
   scrollbar-color: ${({ theme }) => theme.colors.foreground400} rgba(0,0,0,0.1);
   scrollbar-width: thin !important;
@@ -33,30 +30,19 @@ const StyledTradeSidebar = styled.aside`
   ::-webkit-scrollbar {
     width: 5px;
     position: relative;
-    //   height: fit-content;
-    border: 1px solid ${({ theme }) => theme.colors.foreground300};
-    background: ${({ theme }) => theme.colors.backgroundMediumEmphasis};
-    overflow-y: auto;
-    scrollbar-color: ${({ theme }) => theme.colors.foreground400}
-        rgba(0, 0, 0, 0.1);
-    scrollbar-width: thin !important;
+    z-index: 20;
+  }
 
-    ::-webkit-scrollbar {
-        width: 5px;
-        position: relative;
-        z-index: 20;
-    }
+  //   ::-webkit-scrollbar-track {
+  //     border-radius: 4px;
+  //     background: transparent;
+  //     height: 23px;
+  //   }
 
-    //   ::-webkit-scrollbar-track {
-    //     border-radius: 4px;
-    //     background: transparent;
-    //     height: 23px;
-    //   }
-
-    ::-webkit-scrollbar-thumb {
-        border-radius: 4px;
-        background: ${({ theme }) => theme.colors.foreground400};
-    }
+  ::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background: ${({ theme }) => theme.colors.foreground400};
+  }
 `;
 
 const InfoWrapper = styled.div`
@@ -66,10 +52,7 @@ const InfoWrapper = styled.div`
   justify-content: center;
   gap: 8px;
   height: 98px;
-  background-color: ${({ theme, isDark }) =>
-    isDark
-      ? theme.colors.backgroundMediumEmphasis
-      : theme.colors.backgroundHighEmphasis};
+  background-color: ${({ theme, isDark }) => isDark ? theme.colors.backgroundMediumEmphasis : theme.colors.backgroundHighEmphasis};
   border-bottom: 1px solid ${({ theme }) => theme.colors.foreground400};
 `;
 
@@ -80,7 +63,7 @@ export default function TradeSidebar(props) {
   const marketInfo = useSelector(marketInfoSelector);
   const marketSummary = useSelector(marketSummarySelector);
   const liquidity = useSelector(liquiditySelector);
-  const { isDark } = useTheme();
+  const { isDark } = useTheme()
   const isMobile = window.innerWidth < 992;
   const joinDiscord = () => {
     window.open("https://discord.gg/zigzag", "_blank");
@@ -92,7 +75,7 @@ export default function TradeSidebar(props) {
       ) : (
         <InfoWrapper isDark={isDark}>
           <Text font="primarySmall" color="foregroundHighEmphasis">
-            Have a question? Need live support?
+              Have a question? Need live support?
           </Text>
           <Button
             width="150px"

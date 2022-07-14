@@ -155,6 +155,8 @@ const AccountDropdown = ({ notext, networkName }) => {
   const balanceData = useSelector(balancesSelector);
   const [totalBalance, setTotalBalance] = useState(0);
   const [selectedLayer, setSelectedLayer] = useState(2);
+  const [explorer, setExplorer] = useState(null);
+
   const coinEstimator = useCoinEstimator();
   const isMobile = window.innerWidth < 490;
   const wrapperRef = useRef(null);
@@ -163,6 +165,11 @@ const AccountDropdown = ({ notext, networkName }) => {
 
   const wallet =
     selectedLayer === 1 ? balanceData.wallet : balanceData[network];
+
+  useEffect(()=>{
+    const explorerLink = user.address ? api.getExplorerAccountLink(network, user.address, selectedLayer) : null;
+    setExplorer(explorerLink)
+  }, [network, user.address, selectedLayer])
 
   const toggle = () => {
     setIsOpened(!isOpened);
@@ -173,30 +180,9 @@ const AccountDropdown = ({ notext, networkName }) => {
     toggle();
   };
 
-  const popoutzkScan = () => {
-    if (user.address) {
-      if (selectedLayer === 1) {
-        if (networkName.includes("Rinkeby")) {
-          window.open(
-            `https://rinkeby.etherscan.io/address/${user.address}`,
-            "_blank"
-          );
-        } else {
-          window.open(`https://etherscan.io/address/${user.address}`, "_blank");
-        }
-      } else {
-        if (networkName.includes("Rinkeby")) {
-          window.open(
-            `https://rinkeby.zkscan.io/explorer/accounts/${user.address}`,
-            "_blank"
-          );
-        } else {
-          window.open(
-            `https://zkscan.io/explorer/accounts/${user.address}`,
-            "_blank"
-          );
-        }
-      }
+  const openWallet = () => {
+    if(explorer){
+      window.open( explorer, "_blank");
     }
   };
 
@@ -227,14 +213,6 @@ const AccountDropdown = ({ notext, networkName }) => {
     } else return 0;
   };
 
-  const clickItem = (text) => {
-    alert(text);
-  };
-
-  const accountData = [
-    { text: "0x83AD...83H4", url: "#", icon: <DeleteIcon /> },
-    { text: "0x12BV...b89G", url: "#", icon: <DeleteIcon /> },
-  ];
 
   useEffect(() => {
     if (wallet?.length === 0) return;
@@ -258,14 +236,6 @@ const AccountDropdown = ({ notext, networkName }) => {
       ></AccountButton>
       {isOpened && (
         <DropdownDisplay isMobile={isMobile}>
-          {/* <DropdownHeader>
-            <Dropdown width={242} item={accountData} rightIcon context="0x83AD...83H4" clickFunction={clickItem} />
-            <IconButtonWrapper>
-              <IconButton variant="secondary" startIcon={<PlusIcon />}></IconButton>
-              <IconButton variant="secondary" startIcon={<CompareArrowIcon />}></IconButton>
-            </IconButtonWrapper>
-          </DropdownHeader>
-          <Divider /> */}
           <DropdownHeader>
             <div>
               <Text font="primaryTiny" color="foregroundMediumEmphasis">
@@ -344,7 +314,7 @@ const AccountDropdown = ({ notext, networkName }) => {
             <Button
               variant="outlined"
               scale="imd"
-              onClick={popoutzkScan}
+              onClick={openWallet}
               className="mr-[1rem]"
             >
               <Text
@@ -353,7 +323,7 @@ const AccountDropdown = ({ notext, networkName }) => {
                 textAlign="center"
               >
                 <ExternalLinkIcon size={10} />
-                {selectedLayer === 1 ? "Etherscan" : `zkScan`}
+                {selectedLayer === 1 ? "Etherscan" : networkName.includes("zkSync") ? "zkScan" : "Arbiscan"}
               </Text>
             </Button>
             <Button variant="outlined" scale="imd" onClick={disconnect}>

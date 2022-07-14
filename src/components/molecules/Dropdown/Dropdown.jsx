@@ -3,9 +3,9 @@ import styled from "styled-components";
 import { ExpandableButton } from "../ExpandableButton";
 import Text from "../../atoms/Text/Text";
 import { HideMenuOnOutsideClicked } from "lib/utils";
-import { Box } from "@mui/material";
-import { useEffect } from "react";
-import _ from "lodash";
+import { Box } from '@mui/material';
+import { useEffect } from 'react';
+import _ from 'lodash';
 
 const DropdownWrapper = styled.div`
   position: relative;
@@ -23,20 +23,11 @@ const DropdownWrapper = styled.div`
       color: ${({ theme }) =>
         `${theme.colors.foregroundMediumEmphasis} !important`};
     }
-    svg path {
-      fill: ${({ theme }) =>
-        `${theme.colors.foregroundMediumEmphasis} !important`};
-    }
   }
 
   &:hover {
     .button-title {
       color: ${({ theme }) => `${theme.colors.primaryHighEmphasis} !important`};
-      // transition: color .25s;
-    }
-
-    svg path {
-      fill: ${({ theme }) => `${theme.colors.primaryHighEmphasis} !important`};
       // transition: color .25s;
     }
   }
@@ -70,7 +61,7 @@ export const Wrapper = styled.div`
 `;
 
 const DropdownListContainer = styled.div`
-  display: grid;
+  // display: grid;
   // grid-auto-flow: column;
   // height: 31px;
   align-items: center;
@@ -99,7 +90,7 @@ const DropdownListContainer = styled.div`
   }
 
   &.menu-dropdown {
-    display: block;
+    // display: block;
     width: 100%;
     padding: 8px 20px;
   }
@@ -122,9 +113,10 @@ const Dropdown = ({
 
   useEffect(() => {
     if (!context) return;
-    const index = _.findIndex(item, { text: context });
-    if (index !== -1) setIndex(index);
-  }, [context]);
+    const index = _.findIndex(item, { text: context })
+    if (index !== -1)
+      setIndex(index)
+  }, [context])
 
   HideMenuOnOutsideClicked(wrapperRef, setIsOpened);
 
@@ -151,18 +143,13 @@ const Dropdown = ({
         expanded={isOpened}
         onClick={toggle}
       >
-        <Box display="flex" justifyContent={"center"} alignItems="center">
-          {item[index]?.image && (
-            <img
-              src={item[index].image}
-              style={{
-                width: 14,
-                height: 14,
-                borderRadius: "50%",
-                marginRight: "10px",
-              }}
+        <Box display="flex" justifyContent={'center'} alignItems="center">
+          {item[index]?.image && 
+            <img 
+              src={item[index].image} 
+              style={{ width: 14, height: 14, borderRadius: "50%", marginRight: '10px' }} 
             />
-          )}
+          }
           {context}
         </Box>
       </ExpandableButton>

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Listbox as ListBoxSelect, Transition } from "@headlessui/react";
 import { CheckIcon, SelectorIcon } from "@heroicons/react/solid";
 
-const ListBox = ({ options, setSelectedItem, selectedItem }) => {
+const ListBox = ({options, setSelectedItem, selectedItem}) => {
   // const [selectedItem, setSelectedItem] = useState(options[0]);
 
   return (

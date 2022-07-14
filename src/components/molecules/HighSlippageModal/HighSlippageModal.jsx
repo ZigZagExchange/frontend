@@ -142,17 +142,13 @@ const FormDialog = () => {
             color="foregroundHighEmphasis"
             style={{ marginTop: "28px", display: "block", lineHeight: "25px" }}
           >
-            You are placing a {getCapitalize(highSlippageModal.type)} Order for
-            <br />
-            {highSlippageModal.xToken} {baseToken} @ {highSlippageModal.yToken}{" "}
-            {quoteToken}
-            <br />
-            which is {highSlippageModal.delta.toFixed(2)}% (
-            {highSlippageModal.userPrice} {quoteToken}){" "}
-            {highSlippageModal.type === "sell" ? "under" : "above"}
-            <br />
-            the current market price ({highSlippageModal.pairPrice} {quoteToken}
-            ).
+            You are placing a {getCapitalize(highSlippageModal.type)} Order for<br />
+            {highSlippageModal.xToken} {baseToken} @{" "}
+            {highSlippageModal.yToken} {quoteToken}<br />which is{" "}
+            {highSlippageModal.delta.toFixed(2)}% ({highSlippageModal.userPrice}{" "}
+            {quoteToken}){" "}
+            {highSlippageModal.type === "sell" ? "under" : "above"}<br />the current
+            market price ({highSlippageModal.pairPrice} {quoteToken}).
           </Text>
           <Text
             font="primaryHeading6"

@@ -21,30 +21,32 @@ const DSLWrapper = styled.div`
   align-items: center;
   background-color: ${(p) => p.theme.colors.backgroundHighEmphasis};
   color: white;
-`;
+`
 
 const DSLSpan = styled.span`
   font-size: 24px;
   margin-bottom: 3px;
   margin-top: 5px;
-`;
+`
 
 const DSLItemsWrapper = styled.div`
   display: grid;
   grid-auto-flow: row;
   gap: 6px;
-`;
+`
 
 const DSLItemTitle = styled.div`
   font-size: 18px;
-`;
+`
 
 const DSLPage = () => {
   return (
     <DefaultTemplate>
       <div style={{ minHeight: "calc(100vh - 56px)" }}>
         <DSLWrapper>
-          <DSLSpan>DSL</DSLSpan>
+          <DSLSpan>
+            DSL
+          </DSLSpan>
           <DSLItemsWrapper>
             <DSLItem title={"Text Demo"}>
               <TextDemo />

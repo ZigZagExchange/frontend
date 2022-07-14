@@ -1,7 +1,7 @@
-import React, { useCallback, useState } from "react";
-import styled from "styled-components";
-import { InfoIcon } from "../Svg";
-import Tooltip from "./Tooltip";
+import React, { useCallback, useState } from 'react'
+import styled from 'styled-components'
+import { InfoIcon } from '../Svg'
+import Tooltip from './Tooltip'
 
 const QuestionWrapper = styled.div`
   display: flex;
@@ -13,19 +13,16 @@ const QuestionWrapper = styled.div`
   outline: none;
   cursor: pointer;
   border-radius: 36px;
-`;
+`
 
 export default function QuestionHelper({ text, placement }) {
-  const [show, setShow] = useState(false);
+  const [show, setShow] = useState(false)
 
   return (
     <Tooltip text={text} show={show} placement={placement}>
-      <QuestionWrapper
-        onMouseEnter={() => setShow(true)}
-        onMouseLeave={() => setShow(false)}
-      >
-        <InfoIcon />
-      </QuestionWrapper>
+        <QuestionWrapper onMouseEnter={()=>setShow(true)} onMouseLeave={()=>setShow(false)}>
+            <InfoIcon />
+        </QuestionWrapper>
     </Tooltip>
-  );
+  )
 }

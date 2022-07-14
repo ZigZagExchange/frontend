@@ -2,6 +2,7 @@ import React from "react";
 import "./SearchBox.css";
 
 export default function SearchBox(props) {
+
   function handleChange(e) {
     props.searchPair(e.target.value);
   }

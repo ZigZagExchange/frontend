@@ -8,9 +8,6 @@ import { RestartIcon, EditIcon } from "components/atoms/Svg";
 import {
   settingsSelector,
   resetUISettings,
-  resetTradeLayout,
-  setUISettings,
-  setLayout,
 } from "lib/store/features/api/apiSlice";
 
 const SettingModalWrapper = styled(GenericModal)`
@@ -68,82 +65,9 @@ const SettingsModal = ({ onDismiss }) => {
   const [checked, setChecked] = useState(false);
   const toggle = () => setChecked(!checked);
   const dispatch = useDispatch();
-  const breakpoints = ["xl", "lg", "md", "xxs"];
-
-  const onChangeStackOrderBook = () => {
-    if (!settings.layoutsCustomized) {
-      let newLayouts = { ...settings.layouts };
-      breakpoints.forEach((currentPoint) => {
-        let sidebarIndex = newLayouts[currentPoint].findIndex(
-          (item) => item.i === "a"
-        );
-        let leftIndex = newLayouts[currentPoint].findIndex(
-          (item) => item.i === "g"
-        );
-        let rightIndex = newLayouts[currentPoint].findIndex(
-          (item) => item.i === "h"
-        );
-        let left = { ...newLayouts[currentPoint][leftIndex] },
-          right = { ...newLayouts[currentPoint][rightIndex] },
-          sidebar = { ...newLayouts[currentPoint][sidebarIndex] };
-        if (settings.stackOrderbook) {
-          left = {
-            ...left,
-            w: currentPoint === "xxs" ? 40 : left.w * 2,
-            h: currentPoint === "xxs" ? 10 : left.h / 2,
-          };
-          right = {
-            ...right,
-            w: currentPoint === "xxs" ? 40 : right.w * 2,
-            h: currentPoint === "xxs" ? 10 : right.h / 2,
-            x: left.x,
-          };
-          sidebar = {
-            ...sidebar,
-            w: currentPoint === "xxs" ? 40 : sidebar.w * 2,
-          };
-        } else {
-          left = {
-            ...left,
-            w: currentPoint === "xxs" ? 20 : left.w / 2,
-            h: currentPoint === "xxs" ? 20 : left.h * 2,
-            x: currentPoint === "xxs" ? 20 : left.x,
-          };
-          right = {
-            ...right,
-            w: currentPoint === "xxs" ? 40 : right.w / 2,
-            h: currentPoint === "xxs" ? 20 : right.h * 2,
-            x: left.x + left.w,
-          };
-          sidebar = {
-            ...sidebar,
-            w: currentPoint === "xxs" ? 20 : sidebar.w / 2,
-            h: currentPoint === "xxs" ? 20 : sidebar.h * 2,
-          };
-        }
-        let newArray = [...newLayouts[currentPoint]];
-        newArray.splice(leftIndex, 1, left);
-        newArray.splice(rightIndex, 1, right);
-        if (currentPoint === "xxs") {
-          newArray.splice(sidebarIndex, 1, sidebar);
-        }
-        newLayouts = { ...newLayouts, [currentPoint]: newArray };
-      });
-      dispatch(setUISettings({ key: "layouts", value: newLayouts }));
-    }
-  };
 
   const resetSettings = () => {
     dispatch(resetUISettings());
-  };
-
-  const resetLayout = () => {
-    dispatch(resetTradeLayout());
-  };
-
-  const editLayout = () => {
-    dispatch(setUISettings({ key: "editable", value: !settings.editable }));
-    onDismiss();
   };
 
   return (
@@ -152,18 +76,18 @@ const SettingsModal = ({ onDismiss }) => {
         <Text font="primaryHeading6" color="foregroundHighEmphasis">
           Settings
         </Text>
-        <ActionsWrapper>
-          <ActionWrapper onClick={editLayout}>
+        {/* <ActionsWrapper>
+          <ActionWrapper>
             <EditIcon />
             <Text
               font="primaryMediumBody"
               color="foregroundHighEmphasis"
               style={{ cursor: "pointer" }}
             >
-              {settings.editable ? "Lock Layout" : "Unlock & Customise Layout"}
+              Edit Layout
             </Text>
           </ActionWrapper>
-          <ActionWrapper onClick={resetLayout}>
+          <ActionWrapper>
             <RestartIcon />
             <Text
               font="primaryMediumBody"
@@ -173,7 +97,7 @@ const SettingsModal = ({ onDismiss }) => {
               Reset Layout
             </Text>
           </ActionWrapper>
-        </ActionsWrapper>
+        </ActionsWrapper> */}
       </ModalHeader>
       <Divider />
       <ModalBody>
@@ -269,10 +193,7 @@ const SettingsModal = ({ onDismiss }) => {
           <Toggle
             isChecked={settings.stackOrderbook}
             scale="md"
-            onChange={() => {
-              toggle();
-              onChangeStackOrderBook();
-            }}
+            onChange={toggle}
             settingKey="stackOrderbook"
           />
           <Text font="primarySmall" color="foregroundHighEmphasis">
@@ -288,10 +209,7 @@ const SettingsModal = ({ onDismiss }) => {
             <Text
               font="primaryMediumBody"
               color="primaryHighEmphasis"
-              style={{
-                textDecoration: "underline",
-                cursor: "pointer",
-              }}
+              style={{ textDecoration: "underline", cursor: "pointer" }}
               textAlign="right"
             >
               Reset All Settings

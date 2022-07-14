@@ -1,31 +1,34 @@
-import { ethers } from "ethers";
+import { ethers } from 'ethers';
 import APIProvider from "./APIProvider";
-import balanceBundleABI from "lib/contracts/BalanceBundle.json";
+import balanceBundleABI  from "lib/contracts/BalanceBundle.json";
 import erc20ContractABI from "lib/contracts/ERC20.json";
 import wethContractABI from "lib/contracts/WETH.json";
-import { balanceBundlerAddress } from "./../constants";
+import { 
+  balanceBundlerAddress
+} from "./../constants";
 
 export default class APIArbitrumProvider extends APIProvider {
+
   accountState = {};
   evmCompatible = true;
   zksyncCompatible = false;
   _tokenInfo = {};
-  defaultMarket = "WETH-USDC";
+  defaultMarket = "WETH-USDC"
 
   getAccountState = async () => {
     return this.accountState;
   };
 
   getBalances = async () => {
-    const balances = {};
+    const balances = {}
     if (!this.accountState.address) return balances;
 
-    // allways get ETH - generate token list
-    const tokens = ["ETH"].concat(this.api.getCurrencies());
-    const tokenInfoList = [{ decimals: 18 }];
+    // allways get ETH - generate token list     
+    const tokens = ['ETH'].concat(this.api.getCurrencies());
+    const tokenInfoList = [{ decimals: 18, }];
     const tokenList = [ethers.constants.AddressZero];
 
-    for (let i = 1; i < tokens.length; i++) {
+    for(let i = 1; i < tokens.length; i++) {
       const token = tokens[i];
       const tokenInfo = this.api.getCurrencyInfo(token);
       if (!tokenInfo || !tokenInfo.address) continue;
@@ -40,48 +43,39 @@ export default class APIArbitrumProvider extends APIProvider {
       balanceBundleABI,
       this.api.rollupProvider
     );
-    const balanceList = await erc20Contract.balances(
-      [this.accountState.address],
-      tokenList
-    );
+    const balanceList = await erc20Contract.balances([this.accountState.address], tokenList);
     const exchangeAddress = this.getExchangeAddress();
 
     // generate object
-    for (let i = 0; i < tokens.length; i++) {
+    for(let i = 0; i < tokens.length; i++) {
       const balanceBN = balanceList[i];
       const currencyInfo = tokenInfoList[i];
-
-      const allowanceBN =
-        tokens[i] === "ETH"
-          ? ethers.constants.MaxUint256
-          : await this.getAllowance(currencyInfo.address, exchangeAddress); // TODO replace
-      const valueReadable =
-        balanceBN && currencyInfo
-          ? ethers.utils.formatUnits(
-              balanceBN.toString(),
-              currencyInfo.decimals
-            )
-          : 0;
-      const allowanceReadable =
-        allowanceBN && currencyInfo
-          ? ethers.utils.formatUnits(
-              allowanceBN.toString(),
-              currencyInfo.decimals
-            )
-          : 0;
+      
+      const allowanceBN = (tokens[i] === 'ETH') 
+        ? ethers.constants.MaxUint256
+        : await this.getAllowance(currencyInfo.address, exchangeAddress); // TODO replace
+      const valueReadable = (balanceBN && currencyInfo)
+        ? ethers.utils.formatUnits(balanceBN.toString(), currencyInfo.decimals)
+        : 0 
+      const allowanceReadable = (allowanceBN && currencyInfo)
+        ? ethers.utils.formatUnits(allowanceBN.toString(), currencyInfo.decimals)
+        : 0 
 
       balances[tokens[i]] = {
         value: balanceBN.toString(),
         valueReadable,
         allowance: allowanceBN.toString(),
-        allowanceReadable,
-      };
+        allowanceReadable
+      }
     }
 
     return balances;
   };
 
-  getAllowance = async (tokenAddress, contractAddress) => {
+  getAllowance = async (
+    tokenAddress,
+    contractAddress
+  ) => {
     if (!this.accountState.address || !contractAddress) return 0;
 
     const erc20Contract = new ethers.Contract(
@@ -133,7 +127,7 @@ export default class APIArbitrumProvider extends APIProvider {
       makerToken: makerToken,
       takerToken: takerToken,
       feeRecipientAddress: marketInfo.feeAddress,
-      makerAssetAmount: makerAmountBN.toString(),
+      makerAssetAmount:  makerAmountBN.toString(),
       takerAssetAmount: takerAmountBN.toString(),
       makerVolumeFee: makerVolumeFeeBN.toString(),
       takerVolumeFee: takerVolumeFeeBN.toString(),
@@ -141,39 +135,39 @@ export default class APIArbitrumProvider extends APIProvider {
       expirationTimeSeconds: expirationTimeSeconds.toFixed(0),
       salt: (Math.random() * 123456789).toFixed(0),
     };
-
+    
     const domain = {
-      name: "ZigZag",
-      version: "3",
+      name: 'ZigZag',
+      version: '3',
       chainId: this.network,
     };
 
     const types = {
-      Order: [
-        { name: "makerAddress", type: "address" },
-        { name: "makerToken", type: "address" },
-        { name: "takerToken", type: "address" },
-        { name: "feeRecipientAddress", type: "address" },
-        { name: "makerAssetAmount", type: "uint256" },
-        { name: "takerAssetAmount", type: "uint256" },
-        { name: "makerVolumeFee", type: "uint256" },
-        { name: "takerVolumeFee", type: "uint256" },
-        { name: "gasFee", type: "uint256" },
-        { name: "expirationTimeSeconds", type: "uint256" },
-        { name: "salt", type: "uint256" },
-      ],
+      "Order": [
+        { "name": 'makerAddress', "type": 'address' },
+        { "name": 'makerToken', "type": 'address' },
+        { "name": 'takerToken', "type": 'address' },
+        { "name": 'feeRecipientAddress', "type": 'address' },
+        { "name": 'makerAssetAmount', "type": 'uint256' },
+        { "name": 'takerAssetAmount', "type": 'uint256' },
+        { "name": 'makerVolumeFee', "type": 'uint256' },
+        { "name": 'takerVolumeFee', "type": 'uint256' },
+        { "name": 'gasFee', "type": 'uint256' },
+        { "name": 'expirationTimeSeconds', "type": 'uint256' },
+        { "name": 'salt', "type": 'uint256' }
+      ]
     };
 
     const signer = await this.api.rollupProvider.getSigner();
     const signature = await signer._signTypedData(domain, types, Order);
 
-    Order.signature = signature;
+    Order.signature = signature;    
     this.api.send("submitorder3", [this.network, market, Order]);
-    return Order;
-  };
+    return Order;    
+  }
 
   signIn = async () => {
-    console.log("signing in to arbitrum");
+    console.log('signing in to arbitrum');
     const [account] = await this.api.web3.eth.getAccounts();
     const balances = await this.getBalances();
     this.accountState = {
@@ -185,21 +179,20 @@ export default class APIArbitrumProvider extends APIProvider {
     };
 
     return this.accountState;
-  };
+  }
 
   approveExchangeContract = async (token, amount) => {
     const exchangeAddress = this.getExchangeAddress();
     if (!exchangeAddress) throw new Error(`No exchange contract address`);
 
     const currencyInfo = this.api.getCurrencyInfo(token);
-    if (!currencyInfo.address)
-      throw new Error(`ERC20 address for ${token} not found`);
+    if (!currencyInfo.address) throw new Error(`ERC20 address for ${token} not found`);
 
     let amountBN;
-    if (!amount) {
+    if(!amount) {
       amountBN = ethers.constants.MaxUint256;
     } else {
-      amountBN = ethers.utils.parseUnits(
+      amountBN = ethers.utils.parseUnits (
         amount.toFixed(currencyInfo.decimals),
         currencyInfo.decimals
       );
@@ -212,7 +205,10 @@ export default class APIArbitrumProvider extends APIProvider {
       signer
     );
 
-    await erc20Contract.approve(exchangeAddress, amountBN);
+    await erc20Contract.approve(
+      exchangeAddress,
+      amountBN
+    );
 
     // update account balance
     await this.api.getBalances();
@@ -220,8 +216,8 @@ export default class APIArbitrumProvider extends APIProvider {
   };
 
   warpETH = async (amountBN) => {
-    const wethInfo = this.api.getCurrencyInfo("WETH");
-    if (!wethInfo) throw new Error("No WETH contract address");
+    const wethInfo = this.api.getCurrencyInfo('WETH');
+    if (!wethInfo) throw new Error('No WETH contract address')
 
     const signer = await this.api.rollupProvider.getSigner();
     const wethContract = new ethers.Contract(
@@ -237,8 +233,8 @@ export default class APIArbitrumProvider extends APIProvider {
   };
 
   unWarpETH = async (amountBN) => {
-    const wethInfo = this.api.getCurrencyInfo("WETH");
-    if (!wethInfo) throw new Error("No WETH contract address");
+    const wethInfo = this.api.getCurrencyInfo('WETH');
+    if (!wethInfo) throw new Error('No WETH contract address')
 
     const signer = await this.api.rollupProvider.getSigner();
     const wethContract = new ethers.Contract(
@@ -256,24 +252,24 @@ export default class APIArbitrumProvider extends APIProvider {
 
   getWrapFees = async () => {
     let feeData = {
-      gasPrice: ethers.BigNumber.from(2_500_000_000), // 2.5 GWEI
+      'gasPrice': ethers.BigNumber.from(2_500_000_000) // 2.5 GWEI
     };
     try {
-      feeData = await this.api.rollupProvider.getFeeData();
+      feeData = await this.api.rollupProvider.getFeeData()
     } catch (e) {
-      console.log(`No fee data, error: ${e.message}`);
+      console.log(`No fee data, error: ${e.message}`)
     }
-    const feeResult = ethers.utils
-      .formatEther(feeData.gasPrice.mul(450_000))
-      .toString();
+    const feeResult = ethers.utils.formatEther (
+      (feeData.gasPrice).mul(450_000)
+    ).toString();
     return {
-      wrap: feeResult,
-      unwrap: feeResult,
+      'wrap': feeResult,
+      'unwrap': feeResult,
     };
-  };
+  }
 
   getExchangeAddress = () => {
     const marketInfoArray = Object.values(this.api.marketInfo);
     return marketInfoArray[0].exchangeAddress;
-  };
+  }
 }

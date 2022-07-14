@@ -117,11 +117,11 @@ export default function OrdersTable(props) {
       )
       .filter(
         (i) =>
+        (
           selectedTradeType === "All" ||
-          (selectedTradeType === "Taker" &&
-            i[8].toLowerCase() === `${props?.user?.id}`.toLowerCase()) ||
-          (selectedTradeType === "Maker" &&
-            i[9].toLowerCase() === `${props?.user?.id}`.toLowerCase())
+          (selectedTradeType === 'Taker' && i[8].toLowerCase() === (`${props?.user?.id}`).toLowerCase()) ||
+          (selectedTradeType === 'Maker' && i[9].toLowerCase() === (`${props?.user?.id}`).toLowerCase())
+        )
       )
       .sort((a, b) => b[1] - a[1]);
   };
@@ -698,7 +698,9 @@ export default function OrdersTable(props) {
                 statusClass = "successHighEmphasis";
                 break;
               case "pm":
-                statusText = <span>partial match</span>;
+                statusText = (
+                  <span>partial match</span>
+                );
                 statusClass = "warningHighEmphasis";
                 break;
               case "m":
@@ -846,10 +848,7 @@ export default function OrdersTable(props) {
             const sidetext = side === "b" ? "buy" : "sell";
             const sideclassname =
               side === "b" ? "successHighEmphasis" : "dangerHighEmphasis";
-            const tradeTypeText =
-              fill[8].toLowerCase() === `${props?.user?.id}`.toLowerCase()
-                ? "Taker"
-                : "Maker";
+            const tradeTypeText = fill[8].toLowerCase() === (`${props?.user?.id}`).toLowerCase() ? "Taker" : "Maker";
             const txhash = fill[7];
             const feeamount = Number(fill[10]);
             const feetoken = fill[11];
@@ -955,7 +954,9 @@ export default function OrdersTable(props) {
                           >
                             {sidetext}
                           </Text>
-                          <Text font="primaryExtraSmallSemiBold">
+                          <Text
+                            font="primaryExtraSmallSemiBold"
+                          >
                             {tradeTypeText}
                           </Text>
                         </div>
@@ -985,10 +986,7 @@ export default function OrdersTable(props) {
                               textAlign="right"
                               onClick={() =>
                                 window.open(
-                                  api.getExplorerTxLink(
-                                    api.apiProvider.network,
-                                    txhash
-                                  ),
+                                  api.getExplorerTxLink(api.apiProvider.network, txhash),
                                   "_blank"
                                 )
                               }
@@ -1233,10 +1231,7 @@ export default function OrdersTable(props) {
             const sidetext = side === "b" ? "buy" : "sell";
             const sideclassname =
               side === "b" ? "successHighEmphasis" : "dangerHighEmphasis";
-            const tradeTypeText =
-              fill[8].toLowerCase() === `${props?.user?.id}`.toLowerCase()
-                ? "Taker"
-                : "Maker";
+            const tradeTypeText = fill[8].toLowerCase() === (`${props?.user?.id}`).toLowerCase() ? "Taker" : "Maker";
             const txhash = fill[7];
             const feeamount = Number(fill[10]);
             const feetoken = fill[11];
@@ -1347,7 +1342,9 @@ export default function OrdersTable(props) {
                   </Text>
                 </td>
                 <td data-label="Trade">
-                  <Text font="primaryExtraSmallSemiBold">{tradeTypeText}</Text>
+                  <Text font="primaryExtraSmallSemiBold">
+                    {tradeTypeText}
+                  </Text>
                 </td>
                 <td data-label="Quantity">
                   <Text
@@ -1393,10 +1390,7 @@ export default function OrdersTable(props) {
                       color="primaryHighEmphasis"
                       onClick={() =>
                         window.open(
-                          api.getExplorerTxLink(
-                            api.apiProvider.network,
-                            txhash
-                          ),
+                          api.getExplorerTxLink(api.apiProvider.network, txhash),
                           "_blank"
                         )
                       }
@@ -1428,15 +1422,15 @@ export default function OrdersTable(props) {
         const tokenBalanceInOrder = {};
         const userOrders = getUserOrders();
         if (userOrders) {
-          Object.keys(userOrders).forEach((orderId) => {
+          Object.keys(userOrders).forEach(orderId => {
             const order = userOrders[orderId];
             if (order) return;
             let sellToken, amount;
-            if (order[3] === "s") {
-              sellToken = order[2].split("-")[0];
+            if (order[3] === 's') {
+              sellToken = order[2].split('-')[0];
               amount = order[10];
             } else {
-              sellToken = order[2].split("-")[1];
+              sellToken = order[2].split('-')[1];
               amount = order[4] * order[10];
             }
             if (sellToken in tokenBalanceInOrder) {
@@ -1476,12 +1470,9 @@ export default function OrdersTable(props) {
                   {settings.hideBalance
                     ? "****.****"
                     : formatToken(
-                        token.valueReadable -
-                          (tokenBalanceInOrder[token]
-                            ? tokenBalanceInOrder[token]
-                            : 0),
-                        token.token
-                      )}
+                      token.valueReadable - (tokenBalanceInOrder[token] ? tokenBalanceInOrder[token] : 0),
+                      token.token
+                    )}
                 </Text>
               </td>
               <td data-label="Balance">
@@ -1492,8 +1483,8 @@ export default function OrdersTable(props) {
                   {settings.hideBalance
                     ? "****.****"
                     : formatToken(
-                        token.valueReadable * coinEstimator(token.token)
-                      )}
+                      token.valueReadable * coinEstimator(token.token)
+                    )}
                 </Text>
               </td>
             </tr>
@@ -1574,7 +1565,10 @@ export default function OrdersTable(props) {
                       )}
                     </HeaderWrapper>
                   </th>
-                  <th scope="col" style={{ cursor: "pointer" }}>
+                  <th
+                    scope="col"
+                    style={{ cursor: "pointer" }}
+                  >
                     <HeaderWrapper>
                       <Text
                         font="primaryExtraSmallSemiBold"
@@ -1628,15 +1622,10 @@ export default function OrdersTable(props) {
               color="primaryHighEmphasis"
               textAlign="center"
               className="view-account-button"
-              onClick={() =>
-                window.open(
-                  api.getExplorerAccountLink(
-                    api.apiProvider.network,
-                    props.user.address
-                  ),
-                  "_blank"
-                )
-              }
+              onClick={() => window.open(
+                api.getExplorerAccountLink(api.apiProvider.network, props.user.address),
+                "_blank"
+              )}
             >
               View Account on Explorer
             </ActionWrapper>
@@ -1650,15 +1639,10 @@ export default function OrdersTable(props) {
               color="primaryHighEmphasis"
               textAlign="center"
               className="view-account-button"
-              onClick={() =>
-                window.open(
-                  api.getExplorerAccountLink(
-                    api.apiProvider.network,
-                    props.user.address
-                  ),
-                  "_blank"
-                )
-              }
+              onClick={() => window.open(
+                api.getExplorerAccountLink(api.apiProvider.network, props.user.address),
+                "_blank"
+              )}
             >
               View Account on Explorer
             </ActionWrapper>

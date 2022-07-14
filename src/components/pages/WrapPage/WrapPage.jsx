@@ -30,11 +30,11 @@ export default function WrapPage() {
   const [tType, setTtype] = useState("wrap");
   const [amount, setAmount] = useState();
   const [balances, setBalances] = useState([]);
-  const [sellToken, setSellToken] = useState("ETH");
-  const [buyToken, setBuyToken] = useState("WETH");
+  const [sellToken, setSellToken] = useState('ETH');
+  const [buyToken, setBuyToken] = useState('WETH');
   const [fee, setFee] = useState({
-    wrap: 0,
-    unwrap: 0,
+    'wrap': 0,
+    'unwrap': 0
   });
   const [orderButtonDisabled, setOrderButtonDisabled] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -50,15 +50,17 @@ export default function WrapPage() {
   useEffect(() => {
     setLoading(true);
     const timer = setInterval(() => {
-      console.log("updateFEe");
+      console.log('updateFEe')
       if (!api.isEVMChain()) return;
-      if (!api.rollupProvider) return;
-      api
-        .getWrapFees()
-        .then((fees) => setFee(fees))
-        .catch((err) => console.error(`Failed to get fee: ${err}`));
+      if (!api.rollupProvider) return;      
+      api.getWrapFees()
+        .then(fees => setFee(fees))
+        .catch(err => console.error(`Failed to get fee: ${err}`));
     }, 500);
-    if ((fee.wrap > 0 && fee.unwrap > 0) || !api.isEVMChain()) {
+    if (
+      (fee.wrap > 0 && fee.unwrap > 0) ||
+      !api.isEVMChain()
+    ) {
       clearInterval(timer);
       setLoading(false);
     }
@@ -74,9 +76,9 @@ export default function WrapPage() {
 
   useEffect(() => {
     if (sellToken && buyToken) {
-      if (sellToken === "ETH" && buyToken === "WETH") {
+      if (sellToken === 'ETH' && buyToken === 'WETH') {
         setTtype("wrap");
-      } else if (sellToken === "WETH" && buyToken === "ETH") {
+      } else if (sellToken === 'WETH' && buyToken === 'ETH') {
         setTtype("unwrap");
       }
     }
@@ -122,7 +124,7 @@ export default function WrapPage() {
       return;
     }
 
-    if (sellToken === "ETH" && wrapAmount + fee > userBalance) {
+    if (sellToken==='ETH' && (wrapAmount + fee) > userBalance) {
       toast.error(`Remaining ETH balance too low to pay fees`, {
         toastId: `Remaining ETH balance too low to pay fees`,
       });
@@ -144,9 +146,9 @@ export default function WrapPage() {
       } else if (tType === "unwrap") {
         await api.unWarpETH(wrapAmount);
       } else {
-        console.error("Bad tType");
-        return;
-      }
+      console.error('Bad tType');
+      return;
+    }
       setTimeout(() => {
         setOrderButtonDisabled(false);
       }, 20000);
@@ -156,7 +158,7 @@ export default function WrapPage() {
       setOrderButtonDisabled(false);
     }
     await api.getBalances();
-    setAmount(0);
+    setAmount(0)
     toast.dismiss(orderPendingToast);
   };
 
@@ -165,28 +167,30 @@ export default function WrapPage() {
     let dust = 0;
     let fee = 0;
     // for unwrap we dont have to leave dust or care about fees
-    if (tType === "wrap") {
+    if (tType === 'wrap') {
       dust = 0.005;
       fee = fee[tType] ? fee[tType] : 0.0005;
     }
-
+    
     if (balance) {
       let s_amounts = balance - fee;
       if (s_amounts < 0) {
-        toast.warn("Can not set max amount, balance too low to pay gas fees.", {
-          toastId: "Can not set max amount, balance too low to pay gas fees.",
-        });
+        toast.warn(
+          "Can not set max amount, balance too low to pay gas fees.",
+          {
+            toastId: "Can not set max amount, balance too low to pay gas fees.",
+          }
+        );
         setAmount(0);
         return;
       }
 
-      s_amounts = balance - dust;
+      s_amounts = balance - dust
       if (s_amounts < 0) {
         toast.warn(
           "Can not set max amount, you should keep some ETH to pay for other transactions.",
           {
-            toastId:
-              "Can not set max amount, you should keep some ETH to pay for other transactions.",
+            toastId: "Can not set max amount, you should keep some ETH to pay for other transactions.",
           }
         );
         setAmount(0);
@@ -216,7 +220,10 @@ export default function WrapPage() {
             onClickMax={onClickMax}
           />
           {!loading && (
-            <TransactionSettings transactionType={tType} fee={fee} />
+            <TransactionSettings
+              transactionType={tType}
+              fee={fee}
+            />
           )}
           {loading && (
             <div
@@ -234,7 +241,7 @@ export default function WrapPage() {
             onClick={onClickExchange}
             disabled={orderButtonDisabled || !user.address}
           >
-            {tType === "wrap" ? "WRAP ETH" : "UNWRAP WETH"}
+            {tType === 'wrap' ? 'WRAP ETH' : 'UNWRAP WETH'}
           </Button>
         </div>
       </div>

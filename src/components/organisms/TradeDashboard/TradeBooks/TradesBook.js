@@ -11,7 +11,7 @@ const StyledTradeBooks = styled.section`
   grid-area: trades;
   flex-direction: row;
   justify-content: space-between;
-  padding: ${({ isLeft }) => (isLeft ? "21px 20px 12px 10px" : "10px")};
+  padding: ${({ isLeft }) => isLeft ? '21px 20px 12px 10px' : '10px'};
   border-top: 1px solid ${({ theme }) => theme.colors.foreground400};
   border-bottom: 1px solid ${({ theme }) => theme.colors.foreground400};
 `;
@@ -22,7 +22,7 @@ const TradesWrapper = styled.div`
   width: 100%;
   gap: 8px;
   padding-top: 10px;
-`;
+`
 
 export default function TradesBook(props) {
   const marketFills = useSelector(marketFillsSelector);
@@ -50,13 +50,7 @@ export default function TradesBook(props) {
       <StyledTradeBooks isStack={settings.stackOrderbook}>
         <TradesWrapper>
           {/* TradePriceTable*/}
-          <Text
-            style={{ paddingBottom: "5px" }}
-            font="primaryTitleDisplay"
-            color="foregroundHighEmphasis"
-          >
-            Market Trades
-          </Text>
+          <Text style={{paddingBottom: '5px'}} font="primaryTitleDisplay" color="foregroundHighEmphasis">Market Trades</Text>
           <TradeRecentTable
             head
             value="up_value"

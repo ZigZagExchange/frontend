@@ -142,6 +142,7 @@
   opacity: 1;
 }
 
+
 .footer_bottom {
   margin-top: 40px;
   width: 100%;
@@ -221,11 +222,11 @@ img.loading-gif {
 }
 
 .text-green {
-  color: #74de9f;
+  color: #74DE9F;
 }
 
 .text-red {
-  color: #e83681;
+  color: #E83681;
 }
 
 @media screen and (max-width: 697px) {

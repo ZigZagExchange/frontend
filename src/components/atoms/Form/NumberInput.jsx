@@ -11,7 +11,7 @@ const InputField = styled(Input)`
   }
   background: none;
   color: ${({ theme }) => theme.colors.foregroundHighEmphasis};
-`;
+`
 
 const NumberInput = ({
   name,
@@ -25,7 +25,7 @@ const NumberInput = ({
   rightOfLabel,
   borderRadius = 4,
   fontSize = 18,
-  className,
+  className
 }) => {
   return (
     <InputField

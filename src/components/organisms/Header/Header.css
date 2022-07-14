@@ -266,7 +266,7 @@ header.bridge_header {
     visibility: hidden;
     transition: all 0.3s ease;
   }
-  .mb_header_container.active {
+  .mb_header_container.active{
     visibility: visible;
     opacity: 1;
     width: 300px;

@@ -33,7 +33,7 @@ const SuccessModal = ({ txid, show, onClose }) => {
       axios
         .get(viewMarketURL)
         .then((res) => {
-          const data = Object.values(res.data)[0];
+          const data = Object.values(res.data)[0]
           setAlias(data.alias);
           setBaseAsset(data.baseAsset.symbol);
           setQuoteAsset(data.quoteAsset.symbol);
@@ -85,9 +85,7 @@ const SuccessModal = ({ txid, show, onClose }) => {
         mb={6}
         fontSize={14}
       >
-        <ExternalLink href={"trade.zigzag.exchange"}>
-          View your market
-        </ExternalLink>
+        <ExternalLink href={"trade.zigzag.exchange"}>View your market</ExternalLink>
         <StyledLink
           to={{
             pathname: "/",

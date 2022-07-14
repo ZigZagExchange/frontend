@@ -1,5 +1,5 @@
-import React from "react";
-import styled from "styled-components";
+import React from 'react'
+import styled from 'styled-components'
 
 import {
   PlusIcon,
@@ -42,9 +42,9 @@ import {
   CheckMarkCircleIcon,
   ExternalLinkIcon,
   SpinnerIcon,
-} from "./index";
+} from './index'
 
-import { LoadingSpinner } from "../LoadingSpinner";
+import { LoadingSpinner } from '../LoadingSpinner'
 
 const Row = styled.div`
   display: grid;
@@ -55,7 +55,7 @@ const Row = styled.div`
   justify-content: center;
   justify-items: center;
   color: ${({ theme }) => theme.colors.textSecondary};
-`;
+`
 
 const IconDemo = () => {
   return (

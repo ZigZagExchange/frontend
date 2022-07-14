@@ -13,9 +13,7 @@ export function useCoinEstimator() {
 
   return useMemo(() => {
     let priceArray = {};
-    const remaining = Object.keys(pairPrices).filter(
-      (token) => !stables.includes(token)
-    );
+    const remaining = Object.keys(pairPrices).filter((token) => !stables.includes(token));
     Object.keys(pairPrices).forEach((pair) => {
       const pairPrice = pairPrices[pair].price;
       if (Number.isNaN(pairPrice) || !Number.isFinite(pairPrice)) return;
@@ -29,7 +27,7 @@ export function useCoinEstimator() {
           arr.push(pairPrice);
           priceArray[base] = arr;
         } else {
-          priceArray[base] = [pairPrice];
+          priceArray[base] = [pairPrice]
         }
 
         const index = remaining.indexOf(base);
@@ -51,7 +49,7 @@ export function useCoinEstimator() {
       let pairPrice = pairPrices[pair].price;
       if (Number.isNaN(pairPrice) || !Number.isFinite(pairPrice)) return;
       const [base, quote] = pair.split("-").map((s) => s.toUpperCase());
-
+      
       if (quote in prices && !stables.includes(base)) {
         pairPrice *= prices[quote];
         if (base in priceArray) {
@@ -59,7 +57,7 @@ export function useCoinEstimator() {
           arr.push(pairPrice);
           priceArray[base] = arr;
         } else {
-          priceArray[base] = [pairPrice];
+          priceArray[base] = [pairPrice]
         }
       }
     });
@@ -70,8 +68,8 @@ export function useCoinEstimator() {
       prices[token] = sum / priceArray[token].length;
     });
 
-    if ("ETH" in prices && !("WETH" in prices)) prices.WETH = prices.ETH;
-    if ("WETH" in prices && !("ETH" in prices)) prices.ETH = prices.WETH;
+    if('ETH' in prices && !('WETH' in prices)) prices.WETH = prices.ETH;
+    if('WETH' in prices && !('ETH' in prices)) prices.ETH = prices.WETH;
 
     return (token) => {
       return parseFloat(prices && prices[token] ? prices[token] : 0).toFixed(2);
