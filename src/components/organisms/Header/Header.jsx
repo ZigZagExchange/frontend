@@ -487,7 +487,7 @@ export const Header = (props) => {
 
             <Dropdown
               adClass="network-dropdown"
-              width={162}
+              width={190}
               item={networkItems}
               context={networkName}
               clickFunction={changeNetwork}
