@@ -584,26 +584,27 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Amount
+                  Filled
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
                   </SortIconWrapper> */}
               </HeaderWrapper>
             </th>
-            <th scope="col">
+            {/* <th scope="col">
               <HeaderWrapper>
                 <Text
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
+              </HeaderWrapper>
                   Remaining
-                </Text>
+                </Text>*/}
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
                   </SortIconWrapper> */}
-              </HeaderWrapper>
-            </th>
+             {/*  </HeaderWrapper>
+            </th> */}
             <th scope="col">
               <HeaderWrapper>
                 <Text
@@ -786,17 +787,17 @@ export default function OrdersTable(props) {
                       font="primaryExtraSmallSemiBold"
                       color="foregroundHighEmphasis"
                     >
-                      {baseQuantity.toPrecision(6) / 1} {baseCurrency}
+                      {(baseQuantity.toPrecision(6) / 1 - remaining.toPrecision(6) / 1) / (baseQuantity.toPrecision(6) / 1)}
                     </Text>
                   </td>
-                  <td data-label="Remaining">
+                  {/* <td data-label="Remaining">
                     <Text
                       font="primaryExtraSmallSemiBold"
                       color="foregroundHighEmphasis"
                     >
                       {remaining.toPrecision(6) / 1} {baseCurrency}
                     </Text>
-                  </td>
+                  </td> */}
                   <td data-label="Expiry">
                     <Text
                       font="primaryExtraSmallSemiBold"
