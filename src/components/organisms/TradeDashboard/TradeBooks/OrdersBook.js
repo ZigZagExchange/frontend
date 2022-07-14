@@ -166,6 +166,7 @@ export default function OrdersBook(props) {
     if (api.isEVMChain()) {
         for (let orderid in allOrders) {
             const order = allOrders[orderid];
+            const market = order[2];
             const side = order[3];
             const price = order[4];
             const remaining = order[10] === null ? order[5] : order[10];
@@ -180,9 +181,10 @@ export default function OrdersBook(props) {
                 order: order,
             };
 
-            if (side === "b" && ["o", "pm", "pf"].includes(orderStatus)) {
+            if (market === props.currentMarket && side === "b" && ["o", "pm", "pf"].includes(orderStatus)) {
                 orderbookBids.push(orderRow);
             } else if (
+                market === props.currentMarket && 
                 side === "s" &&
                 ["o", "pm", "pf"].includes(orderStatus)
             ) {

@@ -2,6 +2,7 @@ import { createSlice, createAction } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 import { formatPrice } from "lib/utils";
 import api from "lib/api";
+import { getLayout } from "lib/helpers/storage/layouts";
 import FillCard from "components/organisms/TradeDashboard/TradeTables/OrdersTable/FillCard";
 import {
     initialLayouts,
@@ -11,19 +12,19 @@ import {
 const makeScope = (state) => `${state.network}-${state.userId}`;
 
 const initialUISettings = {
-    showNightPriceChange: false,
-    showCancelOrders: false,
-    disableOrderNotification: false,
-    stackOrderbook: true,
-    disableSlippageWarning: false,
-    disabledisableOrderBookFlash: false,
-    hideAddress: false,
-    hideBalance: false,
-    hideGuidePopup: false,
-    disableTradeIDCard: false,
-    layouts: initialLayouts,
-    layoutsCustomized: false,
-    editable: false,
+  showNightPriceChange: false,
+  showCancelOrders: false,
+  disableOrderNotification: true,
+  stackOrderbook: true,
+  disableSlippageWarning: false,
+  disabledisableOrderBookFlash: false,
+  hideAddress: false,
+  hideBalance: false,
+  hideGuidePopup: false,
+  disableTradeIDCard: false,
+  layouts: initialLayouts,
+  layoutsCustomized: false,
+  editable: false,
 };
 
 export const apiSlice = createSlice({
@@ -31,7 +32,8 @@ export const apiSlice = createSlice({
     initialState: {
         network: 1,
         userId: null,
-        currentMarket: "ETH-USDC",
+        layout: getLayout() || 0,
+        currentMarket: api.apiProvider.defaultMarket,
         marketFills: {},
         bridgeReceipts: [],
         lastPrices: {},
@@ -48,105 +50,105 @@ export const apiSlice = createSlice({
         settings: initialUISettings,
         slippageValue: "1.00",
         highSlippageModal: {
-            open: false,
-            confirmed: "",
-            delta: 0,
-            type: "sell",
-            marketInfo: " ",
-            xToken: 0,
-            yToken: 0,
-            userPrice: 0,
-            pairPrice: 0,
+        open: false,
+        confirmed: "",
+        delta: 0,
+        type: "sell",
+        marketInfo: " ",
+        xToken: 0,
+        yToken: 0,
+        userPrice: 0,
+        pairPrice: 0,
         },
     },
     reducers: {
         _error(state, { payload }) {
-            const op = payload[0];
-            const errorMessage = payload[1];
-            // we dont want to show some errors
-            if (errorMessage.includes("Order is no longer open")) {
-                console.error(`Error at ${op}: ${errorMessage}`);
-                return;
-            }
-
-            const renderToastContent = () => {
-                return (
-                    <>
-                        An unknown error has occurred while processing '{op}' (
-                        {errorMessage}). Please{" "}
-                        <a
-                            href={"https://info.zigzag.exchange/#contact"}
-                            style={{
-                                color: "white",
-                                textDecoration: "underline",
-                                fontWeight: "bold",
-                            }}
-                            target="_blank"
-                            rel="noreferrer"
-                        >
-                            contact us
-                        </a>{" "}
-                        or join the{" "}
-                        <a
-                            href={"https://discord.gg/zigzag"}
-                            style={{
-                                color: "white",
-                                textDecoration: "underline",
-                                fontWeight: "bold",
-                            }}
-                            target="_blank"
-                            rel="noreferrer"
-                        >
-                            Discord
-                        </a>{" "}
-                        to report and solve this bug.
-                    </>
-                );
-            };
-            const toastContent = renderToastContent(op, errorMessage);
-            toast.error(toastContent, {
-                toastId: op,
-                closeOnClick: false,
-                autoClose: false,
-            });
+          const op = payload[0];
+          const errorMessage = payload[1];
+          // we dont want to show some errors
+          if (errorMessage.includes("Order is no longer open")) {
+            console.error(`Error at ${op}: ${errorMessage}`);
+            return;
+          }
+    
+          const renderToastContent = () => {
+            return (
+              <>
+                An unknown error has occurred while processing '{op}' (
+                {errorMessage}). Please{" "}
+                <a
+                  href={"https://info.zigzag.exchange/#contact"}
+                  style={{
+                    color: "white",
+                    textDecoration: "underline",
+                    fontWeight: "bold",
+                  }}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  contact us
+                </a>{" "}
+                or join the{" "}
+                <a
+                  href={"https://discord.gg/zigzag"}
+                  style={{
+                    color: "white",
+                    textDecoration: "underline",
+                    fontWeight: "bold",
+                  }}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Discord
+                </a>{" "}
+                to report and solve this bug.
+              </>
+            );
+          };
+          const toastContent = renderToastContent(op, errorMessage);
+          toast.error(toastContent, {
+            toastId: op,
+            closeOnClick: false,
+            autoClose: false,
+          });
         },
         _marketinfo(state, { payload }) {
-            if (payload[0].error) {
-                console.error(payload[0]);
-            } else {
-                state.marketinfo = payload[0];
-            }
+          if (payload[0].error) {
+            console.error(payload[0]);
+          } else {
+            state.marketinfo = payload[0];
+          }
         },
         _fills(state, { payload }) {
-            payload[0].forEach((fill) => {
-                const fillid = fill[1];
-                // taker and maker user ids have to be matched lowercase because addresses
-                // sometimes come back in camelcase checksum format
-                const takerUserId = fill[8] && fill[8].toLowerCase();
-                const makerUserId = fill[9] && fill[9].toLowerCase();
-                if (
-                    ["f", "pf"].includes(fill[6]) &&
-                    fill[2] === state.currentMarket &&
-                    fill[0] === state.network
-                ) {
-                    state.marketFills[fillid] = fill;
-                }
-                if (
-                    state.userId &&
-                    takerUserId === state.userId.toString().toLowerCase()
-                ) {
-                    state.userFills[fillid] = fill;
-                }
-                // for maker fills we need to flip the side and set fee to 0
-                if (
-                    state.userId &&
-                    makerUserId === state.userId.toString().toLowerCase()
-                ) {
-                    fill[3] = fill[3] === "b" ? "s" : "b";
-                    fill[10] = 0;
-                    state.userFills[fillid] = fill;
-                }
-            });
+          payload[0].forEach((fill) => {
+            const fillid = fill[1];
+            // taker and maker user ids have to be matched lowercase because addresses
+            // sometimes come back in camelcase checksum format
+            const takerUserId = fill[8] && fill[8].toLowerCase();
+            const makerUserId = fill[9] && fill[9].toLowerCase();
+            if (
+              ["f", "pf"].includes(fill[6]) &&
+              fill[2] === state.currentMarket &&
+              fill[0] === state.network
+            ) {
+              state.marketFills[fillid] = fill;
+            }
+            if (
+              state.userId &&
+              takerUserId === state.userId.toString().toLowerCase()
+            ) {
+              state.userFills[fillid] = fill;
+            }
+            // for maker fills we need to flip the side and set fee to 0
+            if (
+              state.userId &&
+              makerUserId === state.userId.toString().toLowerCase()
+            ) {
+              fill[3] = fill[3] === "b" ? "s" : "b";
+              fill[10] = 0;
+              state.userFills[fillid] = fill;
+            }
+          });
         },
         _fillstatus(state, { payload }) {
             payload[0].forEach((update) => {

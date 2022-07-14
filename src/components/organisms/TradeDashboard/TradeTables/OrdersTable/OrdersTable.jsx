@@ -1419,6 +1419,28 @@ export default function OrdersTable(props) {
       break;
     case 2:
       if (props.user.committed) {
+        const tokenBalanceInOrder = {};
+        const userOrders = getUserOrders();
+        if (userOrders) {
+          Object.keys(userOrders).forEach(orderId => {
+            const order = userOrders[orderId];
+            if (order) return;
+            let sellToken, amount;
+            if (order[3] === 's') {
+              sellToken = order[2].split('-')[0];
+              amount = order[10];
+            } else {
+              sellToken = order[2].split('-')[1];
+              amount = order[4] * order[10];
+            }
+            if (sellToken in tokenBalanceInOrder) {
+              tokenBalanceInOrder[sellToken] += amount;
+            } else {
+              tokenBalanceInOrder[sellToken] = amount;
+            }
+          });
+        }
+
         const balancesContent = walletList.map((token) => {
           return (
             <tr>
@@ -1448,6 +1470,19 @@ export default function OrdersTable(props) {
                   {settings.hideBalance
                     ? "****.****"
                     : formatToken(
+                      token.valueReadable - (tokenBalanceInOrder[token] ? tokenBalanceInOrder[token] : 0),
+                      token.token
+                    )}
+                </Text>
+              </td>
+              <td data-label="Balance">
+                <Text
+                  font="primaryExtraSmallSemiBold"
+                  color="foregroundHighEmphasis"
+                >
+                  {settings.hideBalance
+                    ? "****.****"
+                    : formatToken(
                       token.valueReadable * coinEstimator(token.token)
                     )}
                 </Text>
@@ -1455,6 +1490,7 @@ export default function OrdersTable(props) {
             </tr>
           );
         });
+        console.log(balancesContent)
         footerContent = (
           <div style={{ textAlign: "center", marginTop: "8px" }}>
             <table>
@@ -1528,6 +1564,19 @@ export default function OrdersTable(props) {
                           <SortDownIcon />
                         </SortIconWrapper>
                       )}
+                    </HeaderWrapper>
+                  </th>
+                  <th
+                    scope="col"
+                    style={{ cursor: "pointer" }}
+                  >
+                    <HeaderWrapper>
+                      <Text
+                        font="primaryExtraSmallSemiBold"
+                        color="foregroundLowEmphasis"
+                      >
+                        Available balance
+                      </Text>
                     </HeaderWrapper>
                   </th>
                   <th

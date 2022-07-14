@@ -188,7 +188,7 @@ const AccountDropdown = ({ notext, networkName }) => {
   };
 
   const disconnect = () => {
-    api.signOut();
+    api.signOut(true);
     toggle();
   };
 

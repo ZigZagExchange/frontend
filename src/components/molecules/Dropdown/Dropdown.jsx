@@ -2,8 +2,11 @@ import React, { useState, cloneElement, isValidElement, useRef } from 'react'
 import styled from 'styled-components'
 import { ExpandableButton } from '../ExpandableButton'
 import { IconButton as baseIcon } from "../IconButton";
-import Text from '../../atoms/Text/Text'
-import { HideMenuOnOutsideClicked } from 'lib/utils'
+import Text from "../../atoms/Text/Text";
+import { HideMenuOnOutsideClicked } from "lib/utils";
+import { Box } from '@mui/material';
+import { useEffect } from 'react';
+import _ from 'lodash';
 
 const DropdownWrapper = styled.div`
     position: relative;
@@ -101,73 +104,130 @@ const DropdownListContainer = styled.div`
 `
 
 const IconButton = styled(baseIcon)`
-    width: 24px;
-    height: 24px;
-    background: transparent;
-    border-radius: 9999px;
-    padding: 0px !important;
-    svg {
-        margin-right: 0px !important;
-        margin-left: 0px !important;
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  border-radius: 9999px;
+  padding: 0px !important;
+  svg {
+    margin-right: 0px !important;
+    margin-left: 0px !important;
+  }
+
+  &:not(.network-dropdown):not(.menu-dropdown) {
+    border: 1px solid ${({ theme }) => theme.colors.foreground400};
+  }
+
+  &.network-dropdown path {
+    fill: ${(p) => p.theme.colors.foregroundHighEmphasis};
+  }
+
+  &.menu-dropdown button svg path {
+    fill: ${(p) => p.theme.colors.foregroundMediumEmphasis};
+  }
+`;
+
+const Dropdown = ({
+  width = 0,
+  item,
+  context,
+  leftIcon,
+  rightIcon,
+  transparent,
+  clickFunction,
+  isMobile = false,
+  adClass = "",
+}) => {
+  const [isOpened, setIsOpened] = useState(false);
+  const [index, setIndex] = useState(0);
+  const wrapperRef = useRef(null);
+
+  useEffect(() => {
+    if (!context) return;
+    const index = _.findIndex(item, { text: context })
+    if (index !== -1)
+      setIndex(index)
+  }, [context])
+
+  HideMenuOnOutsideClicked(wrapperRef, setIsOpened);
+
+  const toggle = () => {
+    setIsOpened(!isOpened);
+  };
+
+  const handleClick = (url, text, value) => {
+    if (url !== "#") {
+      window.open(url, "_blank");
+    } else {
+      if (value) {
+        clickFunction(text, value);
+      }
+      toggle();
     }
+  };
 
-    &:not(.network-dropdown):not(.menu-dropdown) {
-        border: 1px solid ${({ theme }) => theme.colors.foreground400};
-    }
+  return (
+    <DropdownWrapper ref={wrapperRef} className={adClass}>
+      <ExpandableButton
+        width={width}
+        transparent={transparent}
+        expanded={isOpened}
+        onClick={toggle}
+      >
+        <Box display="flex" justifyContent={'center'} alignItems="center">
+          {item[index]?.image && 
+            <img 
+              src={item[index].image} 
+              style={{ width: 14, height: 14, borderRadius: "50%", marginRight: '10px' }} 
+            />
+          }
+          {context}
+        </Box>
+      </ExpandableButton>
+      {isOpened && (
+        <Wrapper
+          width={width}
+          className={`${adClass} ${isMobile ? "mobile-mode" : ""}`}
+        >
+          {item.map((items) => {
+            const { text, value, url, icon, selectedIcon, iconSelected } =
+              items;
+            const menuIcon = iconSelected ? selectedIcon : icon;
+            return (
+              <DropdownListContainer
+                className={`${adClass} ${
+                  iconSelected ? "active" : ""
+                } flex gap-3`}
+                key={items.text}
+                leftIcon={leftIcon}
+                onClick={() => handleClick(url, text, value)}
+              >
+                {leftIcon && icon && (
+                  <div className="px-0.5 py-0.5 border dark:border-black border-white rounded-2xl">
+                    {icon}
+                  </div>
+                )}
+                <Text
+                  font="primaryExtraSmallSemiBold"
+                  color="foregroundHighEmphasis"
+                  className={!iconSelected ? "selected-icon" : ""}
+                >
+                  {items.image != "" && items.image ? (
+                    <img
+                      src={items.image}
+                      style={{ width: 14, height: 14, borderRadius: "50%" }}
+                    />
+                  ) : null}
+                  {text}
+                </Text>
+                {/* {rightIcon && isValidElement(menuIcon) && <IconButton className={adClass} variant="secondary" endIcon={cloneElement(menuIcon)}></IconButton>} */}
+              </DropdownListContainer>
+            );
+          })}
+        </Wrapper>
+      )}
+    </DropdownWrapper>
+  );
+};
 
-    &.network-dropdown path {
-        fill: ${(p) => p.theme.colors.foregroundHighEmphasis};
-    }
-
-    &.menu-dropdown button svg path {
-        fill: ${(p) => p.theme.colors.foregroundMediumEmphasis};
-    }
-`
-
-const Dropdown = ({ width = 0, item, context, leftIcon, rightIcon, transparent, clickFunction, isMobile = false, adClass = "" }) => {
-    const [isOpened, setIsOpened] = useState(false)
-    const wrapperRef = useRef(null)
-
-    HideMenuOnOutsideClicked(wrapperRef, setIsOpened)
-
-    const toggle = () => {
-        setIsOpened(!isOpened)
-    }
-
-    const handleClick = (url, text, value) => {
-        if (url !== '#') {
-            window.open(url, "_blank");
-        } else {
-            if(value) {
-                clickFunction(text, value)
-            }
-            toggle()
-        }
-    }
-
-    return (
-        <DropdownWrapper ref={wrapperRef} className={adClass}>
-            <ExpandableButton width={width} transparent={transparent} expanded={isOpened} onClick={toggle}>{context}</ExpandableButton>
-            {isOpened &&
-                <Wrapper width={width} className={`${adClass} ${isMobile ? "mobile-mode" : ""}`} >
-                    {item.map((items) => {
-                        const { text, value, url, icon, selectedIcon, iconSelected } = items
-                        const menuIcon = iconSelected ? selectedIcon : icon;
-                        return (
-                            <DropdownListContainer className={`${adClass} ${iconSelected ? "active" : ""}`} key={items.text} leftIcon={leftIcon} onClick={() => handleClick(url, text, value)}>
-                                {/* {leftIcon && isValidElement(menuIcon) && <IconButton className={adClass} variant="secondary" startIcon={cloneElement(menuIcon)}></IconButton>} */}
-                                <Text font="primaryExtraSmallSemiBold" color="foregroundHighEmphasis" className={!iconSelected ? "selected-icon" : ""}>
-                                    {(items.image != "" && items.image) ? <img src={items.image} style={{width: 14, height: 14, borderRadius: "50%"}} /> : null}
-                                    {text}
-                                </Text>
-                                {/* {rightIcon && isValidElement(menuIcon) && <IconButton className={adClass} variant="secondary" endIcon={cloneElement(menuIcon)}></IconButton>} */}
-                            </DropdownListContainer>
-                        )
-                    })}
-                </Wrapper>
-            }
-        </DropdownWrapper >
-    )
-}
-
-export default Dropdown
+export default Dropdown;

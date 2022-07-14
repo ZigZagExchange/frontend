@@ -13,6 +13,7 @@ export default class APIArbitrumProvider extends APIProvider {
   evmCompatible = true;
   zksyncCompatible = false;
   _tokenInfo = {};
+  defaultMarket = "WETH-USDC"
 
   getAccountState = async () => {
     return this.accountState;
@@ -30,7 +31,7 @@ export default class APIArbitrumProvider extends APIProvider {
     for(let i = 1; i < tokens.length; i++) {
       const token = tokens[i];
       const tokenInfo = this.api.getCurrencyInfo(token);
-      if (!tokenInfo || !tokenInfo.address) return;
+      if (!tokenInfo || !tokenInfo.address) continue;
 
       tokenInfoList.push(tokenInfo);
       tokenList.push(tokenInfo.address);
@@ -110,8 +111,8 @@ export default class APIArbitrumProvider extends APIProvider {
         marketInfo.quoteAsset.decimals
       );
       takerAmountBN = takerAmountBN.mul(99999).div(100000);
-      gasFee = ethers.utils.parseUnits (
-        marketInfo.baseFee.toString(),
+      gasFee = ethers.utils.parseUnits(
+        parseFloat(marketInfo.baseFee).toFixed(marketInfo.baseAsset.decimals),
         marketInfo.baseAsset.decimals 
       )
       const makerFee = baseAmount * Number(marketInfo.makerVolumeFee)
