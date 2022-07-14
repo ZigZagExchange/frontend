@@ -1,10 +1,11 @@
-import React, { useState, cloneElement, isValidElement, useRef } from "react";
+import React, { useState, useRef } from "react";
 import styled from "styled-components";
 import { ExpandableButton } from "../ExpandableButton";
-import { IconButton as baseIcon } from "../IconButton";
 import Text from "../../atoms/Text/Text";
 import { HideMenuOnOutsideClicked } from "lib/utils";
-import useTheme from "components/hooks/useTheme";
+import { Box } from '@mui/material';
+import { useEffect } from 'react';
+import _ from 'lodash';
 
 const DropdownWrapper = styled.div`
   position: relative;
@@ -95,30 +96,6 @@ const DropdownListContainer = styled.div`
   }
 `;
 
-const IconButton = styled(baseIcon)`
-  width: 24px;
-  height: 24px;
-  background: transparent;
-  border-radius: 9999px;
-  padding: 0px !important;
-  svg {
-    margin-right: 0px !important;
-    margin-left: 0px !important;
-  }
-
-  &:not(.network-dropdown):not(.menu-dropdown) {
-    border: 1px solid ${({ theme }) => theme.colors.foreground400};
-  }
-
-  &.network-dropdown path {
-    fill: ${(p) => p.theme.colors.foregroundHighEmphasis};
-  }
-
-  &.menu-dropdown button svg path {
-    fill: ${(p) => p.theme.colors.foregroundMediumEmphasis};
-  }
-`;
-
 const Dropdown = ({
   width = 0,
   item,
@@ -131,7 +108,15 @@ const Dropdown = ({
   adClass = "",
 }) => {
   const [isOpened, setIsOpened] = useState(false);
+  const [index, setIndex] = useState(0);
   const wrapperRef = useRef(null);
+
+  useEffect(() => {
+    if (!context) return;
+    const index = _.findIndex(item, { text: context })
+    if (index !== -1)
+      setIndex(index)
+  }, [context])
 
   HideMenuOnOutsideClicked(wrapperRef, setIsOpened);
 
@@ -158,7 +143,15 @@ const Dropdown = ({
         expanded={isOpened}
         onClick={toggle}
       >
-        {context}
+        <Box display="flex" justifyContent={'center'} alignItems="center">
+          {item[index]?.image && 
+            <img 
+              src={item[index].image} 
+              style={{ width: 14, height: 14, borderRadius: "50%", marginRight: '10px' }} 
+            />
+          }
+          {context}
+        </Box>
       </ExpandableButton>
       {isOpened && (
         <Wrapper
@@ -196,7 +189,6 @@ const Dropdown = ({
                   ) : null}
                   {text}
                 </Text>
-                {/* {rightIcon && isValidElement(menuIcon) && <IconButton className={adClass} variant="secondary" endIcon={cloneElement(menuIcon)}></IconButton>} */}
               </DropdownListContainer>
             );
           })}
