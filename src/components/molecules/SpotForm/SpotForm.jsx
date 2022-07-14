@@ -32,28 +32,29 @@ class SpotForm extends React.Component {
   }
 
   getExchangePercentage(baseAmount, quoteAmount) {
+    if (!this.props.user.id) return 0;
     let result;
     if (this.props.side === "s") {
       const baseBalance = this.getBaseBalance();
       const baseFee = this.getBaseFee();
-      result = ((baseAmount + baseFee) / baseBalance) * 100;
+      result = ((Number(baseAmount) + Number(baseFee)) / baseBalance) * 100;
     } else {
       const quoteBalance = this.getQuoteBalance();
       const quoteFee = this.getQuoteFee();
-      result = ((quoteAmount + quoteFee) / quoteBalance) * 100;
+      result = ((Number(quoteAmount) + Number(quoteFee)) / quoteBalance) * 100;
     }
     if (Number.isNaN(result) || result <= 0) {
       return 0;
     } else if (!Number.isFinite(result) || result >= 100) {
       return 100;
-    }
+    } 
     return result.toFixed(0);
   }
 
   updatePrice(e) {
     const newState = { ...this.state };
-    newState.price = e.target.value.replace(",", ".").replace(/[^0-9.]/g, "");
-    if (this.props.side === "b") {
+    newState.price = e.target.value.replace(',','.').replace(/[^0-9.]/g, "");
+    if (this.props.quoteChanged) {
       // for buy quoteAmount should be fixed
       const fee = this.getQuoteFee(newState.quoteAmount);
       newState.baseAmount = (newState.quoteAmount - fee) / newState.price;
@@ -75,14 +76,15 @@ class SpotForm extends React.Component {
 
   updateBaseAmount(e) {
     const newState = { ...this.state };
-    newState.baseAmount = e.target.value
-      .replace(",", ".")
-      .replace(/[^0-9.]/g, "");
-    const fee = this.getBaseFee(newState.baseAmount);
-    newState.quoteAmount = this.currentPrice() * (newState.baseAmount - fee);
-    if (newState.quoteAmount <= 0) {
+    if ((/^0\.?0*$/).test(newState.baseAmount) || Number.isNaN(newState.baseAmount)) {
       newState.quoteAmount = "";
-      newState.baseAmount = "";
+    } else {
+      const fee = this.getBaseFee(newState.baseAmount);
+      newState.quoteAmount = this.currentPrice() * (newState.baseAmount - fee);
+      if (newState.quoteAmount < 0) {
+        newState.quoteAmount = "";
+        newState.baseAmount = "";
+      }
     }
     newState.baseChanged = true;
     newState.quoteChanged = false;
@@ -91,15 +93,17 @@ class SpotForm extends React.Component {
 
   updateQuoteAmount(e) {
     const newState = { ...this.state };
-    newState.quoteAmount = e.target.value
-      .replace(",", ".")
-      .replace(/[^0-9.]/g, "");
-    const fee = this.getQuoteFee(newState.quoteAmount);
-    newState.baseAmount = (newState.quoteAmount - fee) / this.currentPrice();
-    if (newState.baseAmount <= 0) {
-      newState.quoteAmount = "";
+    newState.quoteAmount = e.target.value.replace(',','.').replace(/[^0-9.]/g, "");
+    if ((/^0\.?0*$/).test(newState.quoteAmount) || Number.isNaN(newState.quoteAmount)) {
       newState.baseAmount = "";
-    }
+    } else {
+      const fee = this.getQuoteFee(newState.quoteAmount);
+      newState.baseAmount = (newState.quoteAmount - fee) / this.currentPrice();
+      if (newState.baseAmount < 0) {
+        newState.quoteAmount = "";
+        newState.baseAmount = "";
+      }
+    }    
     newState.baseChanged = false;
     newState.quoteChanged = true;
     this.setState(newState);
@@ -108,8 +112,8 @@ class SpotForm extends React.Component {
   increasePrice(e) {
     e.preventDefault();
     const newState = { ...this.state };
-    newState.price = this.state.price * 1.001;
-    if (this.props.side === "b") {
+    newState.price = formatPrice(this.state.price * 1.001);
+    if (this.props.quoteChanged) {
       // for buy quoteAmount should be fixed
       const fee = this.getQuoteFee(newState.quoteAmount);
       newState.baseAmount = (newState.quoteAmount - fee) / newState.price;
@@ -134,8 +138,8 @@ class SpotForm extends React.Component {
   decreasePrice(e) {
     e.preventDefault();
     const newState = { ...this.state };
-    newState.price = this.state.price * 0.999;
-    if (this.props.side === "b") {
+    newState.price = formatPrice(this.state.price * 0.999);
+    if (this.props.quoteChanged) {
       // for buy quoteAmount should be fixed
       const fee = this.getQuoteFee(newState.quoteAmount);
       newState.baseAmount = (newState.quoteAmount - fee) / newState.price;
@@ -577,29 +581,23 @@ class SpotForm extends React.Component {
     let baseAmount = this.state.baseAmount;
     let quoteAmount = this.state.quoteAmount;
     // show msg with no fee
-    let price =
-      this.props.side === "b"
-        ? (quoteAmount - this.getQuoteFee(quoteAmount)) / baseAmount
-        : quoteAmount / (baseAmount - this.getBaseFee(baseAmount));
-
-    const delta =
-      this.props.side === "b"
-        ? ((price - this.props.lastPrice) / this.props.lastPrice) * 100
-        : ((this.props.lastPrice - price) / this.props.lastPrice) * 100;
+    const fairPrice = this.currentPrice();
+    let price = (this.props.side === 'b')
+      ? (quoteAmount - this.getQuoteFee(quoteAmount)) / baseAmount
+      : quoteAmount / (baseAmount - this.getBaseFee(baseAmount));
+    const delta = (this.props.side === 'b')
+      ? ((price - fairPrice) / fairPrice) * 100
+      : ((fairPrice - price) / fairPrice) * 100;
     if (
-      (delta > 10 &&
-        this.props.orderType === "limit" &&
-        !this.props.settings.disableSlippageWarning) ||
-      (delta > 2.5 &&
-        this.props.orderType === "market" &&
-        !this.props.settings.disableSlippageWarning)
+      (delta > 10 && this.props.orderType === "limit" && !this.props.settings.disableSlippageWarning) ||
+      (delta > 2 && this.props.orderType === "market" && !this.props.settings.disableSlippageWarning)
     ) {
       this.props.setHighSlippageModal({
         xToken: baseAmount,
         yToken: quoteAmount,
         userPrice: price,
-        pairPrice: this.props.lastPrice,
-        type: this.props.side === "b" ? "buy" : "sell",
+        pairPrice: fairPrice,
+        type: this.props.side === 'b' ? 'buy' : 'sell',
         open: true,
         delta: delta,
       });
@@ -613,15 +611,15 @@ class SpotForm extends React.Component {
             {this.props.side === "s" ? "Sell" : "Buy"} Order pending
           </p>
           <p style={{ fontSize: "14px", lineHeight: "24px" }}>
-            {addComma(formatToken(baseAmount))} {marketInfo.baseAsset.symbol} @{" "}
-            {addComma(
-              ["USDC", "USDT", "DAI", "FRAX"].includes(
-                marketInfo.quoteAsset.symbol
-              )
-                ? parseFloat(price).toFixed(2)
-                : formatPrice(price)
-            )}{" "}
+            {addComma(formatPrice(baseAmount))} {marketInfo.baseAsset.symbol} @{" "}
+            {addComma(formatPrice(price))}{" "}
             {marketInfo.quoteAsset.symbol}
+          </p>
+          <p style={{ fontSize: "14px", lineHeight: "24px" }}>
+            Transaction fee: {this.props.side === 's' 
+              ? `${addComma(formatPrice(marketInfo.baseFee))} ${marketInfo.baseAsset.symbol}`
+              : `${addComma(formatPrice(marketInfo.quoteFee))} ${marketInfo.quoteAsset.symbol}`
+            }
           </p>
           <p style={{ fontSize: "14px", lineHeight: "24px" }}>
             Sign or Cancel to continue...
@@ -644,10 +642,9 @@ class SpotForm extends React.Component {
       await api.submitOrder(
         this.props.currentMarket,
         this.props.side,
-        price,
         baseAmount,
         quoteAmount,
-        this.props.orderType
+        this.props.orderType,
       );
 
       if (!this.props.settings.disableOrderNotification) {
@@ -656,8 +653,14 @@ class SpotForm extends React.Component {
         });
       }
     } catch (e) {
-      toast.error(e.message);
-      console.error(e);
+      console.log(e);
+      toast.error(
+        `Error submitting the order: ${e.message}`,
+        {
+          autoClose: 20000,
+          toastId: 'submitOrder',
+        },
+      );
     }
 
     if (!this.props.settings.disableOrderNotification) {
@@ -666,21 +669,6 @@ class SpotForm extends React.Component {
 
     newstate = { ...this.state };
     this.setState(newstate);
-  }
-
-  amountPercentOfMax() {
-    if (!this.props.user.id) return 0;
-    if (this.props.side === "s") {
-      let baseBalance = this.getBaseBalance();
-      baseBalance -= this.getBaseFee(baseBalance);
-      const baseAmount = this.state.baseAmount || 0;
-      return Math.round((baseAmount / baseBalance) * 100);
-    } else if (this.props.side === "b") {
-      let quoteBalance = this.getQuoteBalance();
-      quoteBalance -= this.getQuoteFee(quoteBalance);
-      const quoteAmount = this.state.quoteAmount || 0;
-      return Math.round((quoteAmount / quoteBalance) * 100);
-    }
   }
 
   currentPrice() {
@@ -766,14 +754,28 @@ class SpotForm extends React.Component {
       this.props.marketInfo !== prevProps.marketInfo
     ) {
       const newState = { ...this.state };
-      if (this.props.side === "s") {
+      if (this.props.side === 's' && !Number.isNaN(newState.baseAmount)) {
         // follow fee for sell order
-        newState.baseAmount +=
-          this.props.marketInfo.baseFee - prevProps.marketInfo.baseFee;
-      } else {
+        const newBaseAmount = newState.baseAmount + this.props.marketInfo.baseFee - prevProps.marketInfo.baseFee;
+        if (newBaseAmount <= 0 || newState.quoteChanged === "") {
+          newState.baseAmount= "";
+          newState.quoteAmount= "";
+          newState.baseChanged= false;
+          newState.quoteChanged= false;
+        } else {
+          newState.baseAmount = newBaseAmount;
+        }
+      } else if (this.props.side === 'b' && !Number.isNaN(this.props.quoteChanged)) {
         // follow fee for buy order
-        newState.quoteAmount +=
-          this.props.marketInfo.quoteFee - prevProps.marketInfo.quoteFee;
+        const newQuoteAmount = newState.quoteAmount + this.props.marketInfo.quoteFee - prevProps.marketInfo.quoteFee;
+        if (newQuoteAmount <= 0 || newState.baseAmount === "") {
+          newState.baseAmount= "";
+          newState.quoteAmount= "";
+          newState.baseChanged= false;
+          newState.quoteChanged= false;
+        } else {
+          newState.quoteAmount = newQuoteAmount;
+        }
       }
       this.setState(newState);
     }
@@ -795,12 +797,13 @@ class SpotForm extends React.Component {
     }
 
     if (this.props.currentMarket !== prevProps.currentMarket) {
-      this.setState((state) => ({
-        ...state,
-        price: "",
-        baseAmount: "",
-        quoteAmount: "",
-      }));
+      const newState = { ...this.state };
+      newState.price= "";
+      newState.baseAmount= "";
+      newState.quoteAmount= "";
+      newState.baseChanged= false;
+      newState.quoteChanged= false;
+      this.setState(newState);
     }
   }
 
@@ -865,7 +868,7 @@ class SpotForm extends React.Component {
         color="foregroundMediumEmphasis"
         textAlign="right"
       >
-        {formatToken(quoteBalance, marketInfo && marketInfo.quoteAsset?.symbol)}{" "}
+        {addComma(formatToken(quoteBalance, marketInfo && marketInfo.quoteAsset?.symbol))}{" "}
         {marketInfo && marketInfo.quoteAsset?.symbol}
       </Text>
     );
@@ -876,7 +879,7 @@ class SpotForm extends React.Component {
         color="foregroundMediumEmphasis"
         textAlign="right"
       >
-        {formatToken(baseBalance, marketInfo && marketInfo.baseAsset?.symbol)}{" "}
+        {addComma(formatToken(baseBalance, marketInfo && marketInfo.baseAsset?.symbol))}{" "}
         {marketInfo && marketInfo.baseAsset?.symbol}
       </Text>
     );
@@ -946,117 +949,137 @@ class SpotForm extends React.Component {
     }
 
     const exchangePercentage = this.getExchangePercentage(
-      this.state.baseAmount,
-      this.state.quoteAmount
+      baseAmount,
+      quoteAmount
     );
-    this.state.maxSizeSelected = exchangePercentage === 100;
+    this.state.maxSizeSelected = (exchangePercentage === 100);
+    const showAmountPlusBox = (
+      !this.props.user.id ||
+      exchangePercentage >= 100 ||
+      (marketInfo && this.props.side === 's' && baseBalance < marketInfo.baseFee) ||
+      (marketInfo && this.props.side === 'b' && quoteBalance < marketInfo.quoteFee)
+    );
+    const showMinusBox = (
+      !this.props.user.id ||
+      this.state.baseAmount === "" ||
+      this.state.baseAmount <= 0
+    )
 
     return (
       <>
-        <StyledForm isMobile={isMobile}>
-          <InputBox>
-            {this.props.orderType !== "market" && (
-              <IconButton
-                variant="secondary"
-                startIcon={<MinusIcon />}
-                onClick={this.decreasePrice.bind(this)}
-              ></IconButton>
-            )}
-            <InputField
-              type="text"
-              pattern="\d+(?:[.,]\d+)?"
-              placeholder={`Price (${
-                marketInfo && marketInfo.quoteAsset?.symbol
-              }-${marketInfo && marketInfo.baseAsset?.symbol})`}
-              value={
-                this.props.orderType === "limit"
-                  ? this.state.price
-                  : addComma(formatPrice(this.currentPrice()))
-              }
-              onChange={this.updatePrice.bind(this)}
-              disabled={this.props.orderType === "market"}
-            />
-            {this.props.orderType !== "market" && (
-              <IconButton
-                variant="secondary"
-                startIcon={<PlusIcon />}
-                onClick={this.increasePrice.bind(this)}
-              ></IconButton>
-            )}
-          </InputBox>
-          <InputBox>
-            <IconButton
-              variant="secondary"
-              startIcon={<MinusIcon />}
-              onClick={this.decreaseAmount.bind(this)}
-            ></IconButton>
-            <InputField
-              type="text"
-              pattern="\d+(?:[.,]\d+)?"
-              placeholder={`Amount (${
-                marketInfo && marketInfo.baseAsset?.symbol
-              })`}
-              value={
-                this.state.baseAmount !== ""
-                  ? this.state.baseChanged
-                    ? this.state.baseAmount
-                    : addComma(formatPrice(this.state.baseAmount))
-                  : ""
-              }
-              onChange={this.updateBaseAmount.bind(this)}
-            />
-            <IconButton
-              variant="secondary"
-              startIcon={<PlusIcon />}
-              onClick={this.increaseAmount.bind(this)}
-            ></IconButton>
-          </InputBox>
-          <FormHeader>
-            <Text font="primaryTiny" color="foregroundMediumEmphasis">
-              Available balance
-            </Text>
-            {baseBalanceHtml}
-          </FormHeader>
-          <InputBox>
-            <IconButton
-              variant="secondary"
-              startIcon={<MinusIcon />}
-              onClick={this.decreaseAmount.bind(this)}
-            ></IconButton>
-            <InputField
-              type="text"
-              pattern="\d+(?:[.,]\d+)?"
-              placeholder={`Total (${
-                marketInfo && marketInfo.quoteAsset?.symbol
-              })`}
-              value={
-                this.state.quoteAmount !== ""
-                  ? this.state.quoteChanged
-                    ? this.state.quoteAmount
-                    : addComma(formatPrice(this.state.quoteAmount))
-                  : ""
-              }
-              onChange={this.updateQuoteAmount.bind(this)}
-            />
-            <IconButton
-              variant="secondary"
-              startIcon={<PlusIcon />}
-              onClick={this.increaseAmount.bind(this)}
-            ></IconButton>
-          </InputBox>
-          <FormHeader>
-            <Text font="primaryTiny" color="foregroundMediumEmphasis">
-              Available balance
-            </Text>
-            {quoteBalanceHtml}
-          </FormHeader>
-          <RangeWrapper>
-            <RangeSlider
-              value={this.amountPercentOfMax()}
-              onChange={this.rangeSliderHandler.bind(this)}
-            />
-            <span className="current_progress">{exchangePercentage}%</span>
-          </RangeWrapper>
+      <StyledForm isMobile={isMobile}>
+        <InputBox>
+        {this.props.orderType !== "market" && <IconButton
+            variant="secondary"
+            startIcon={<MinusIcon />}
+            onClick={this.decreasePrice.bind(this)}
+            show={!this.props.user.id}
+            disabled={!this.props.user.id}
+          ></IconButton>}
+          <InputField
+            type="text"
+            pattern="\d+(?:[.,]\d+)?"
+            placeholder={`Price (${
+              marketInfo && marketInfo.quoteAsset?.symbol
+            }-${
+              marketInfo && marketInfo.baseAsset?.symbol
+            })`}
+            value={this.props.orderType === 'limit'
+              ? this.state.price
+              : addComma(formatPrice(this.currentPrice()))
+          }
+            onChange={this.updatePrice.bind(this)}
+            disabled={this.props.orderType === "market"}
+          />
+          {this.props.orderType !== "market" && <IconButton
+            variant="secondary"
+            startIcon={<PlusIcon />}
+            onClick={this.increasePrice.bind(this)}
+            show={!this.props.user.id}
+            disabled={!this.props.user.id}
+          ></IconButton>}
+        </InputBox>
+        <InputBox>
+          <IconButton
+            variant="secondary"
+            startIcon={<MinusIcon />}
+            onClick={this.decreaseAmount.bind(this)}
+            show={showMinusBox}
+            disabled={showMinusBox}
+          ></IconButton>
+          <InputField
+            type="text"
+            pattern="\d+(?:[.,]\d+)?"
+            placeholder={`Amount (${
+              marketInfo && marketInfo.baseAsset?.symbol
+            })`}
+            value={this.state.baseAmount !== ""
+              ? this.state.baseChanged
+                ? this.state.baseAmount
+                : addComma(formatPrice(this.state.baseAmount))
+              : ""
+            }
+            onChange={this.updateBaseAmount.bind(this)}
+          />
+          <IconButton
+            variant="secondary"
+            startIcon={<PlusIcon />}
+            onClick={this.increaseAmount.bind(this)}
+            show={showAmountPlusBox}
+            disabled={showAmountPlusBox}
+          ></IconButton>
+        </InputBox>
+        <FormHeader>
+          <Text font="primaryTiny" color="foregroundMediumEmphasis">
+            Available balance
+          </Text>
+          {baseBalanceHtml}
+        </FormHeader>
+        <InputBox>
+          <IconButton
+            variant="secondary"
+            startIcon={<MinusIcon />}
+            onClick={this.decreaseAmount.bind(this)}
+            show={showMinusBox}
+            disabled={showMinusBox}
+          ></IconButton>
+          <InputField
+            type="text"
+            pattern="\d+(?:[.,]\d+)?"
+            placeholder={`Total (${
+              marketInfo && marketInfo.quoteAsset?.symbol
+            })`}
+            value={this.state.quoteAmount !== ""
+              ? this.state.quoteChanged
+                ? this.state.quoteAmount
+                : addComma(formatPrice(this.state.quoteAmount))
+              : ""
+            }
+            onChange={this.updateQuoteAmount.bind(this)}
+          />
+          <IconButton
+            variant="secondary"
+            startIcon={<PlusIcon />}
+            onClick={this.increaseAmount.bind(this)}
+            show={showAmountPlusBox}
+            disabled={showAmountPlusBox}
+          ></IconButton>
+        </InputBox>
+        <FormHeader>
+          <Text font="primaryTiny" color="foregroundMediumEmphasis">
+            Available balance
+          </Text>
+          {quoteBalanceHtml}
+        </FormHeader>
+        <RangeWrapper>
+          <RangeSlider
+            value={exchangePercentage}
+            onChange={this.rangeSliderHandler.bind(this)}
+          />
+          <span className="current_progress">
+            {exchangePercentage}%
+          </span>
+        </RangeWrapper>
           {this.props.user.id ? (
             <div className="">
               <Button

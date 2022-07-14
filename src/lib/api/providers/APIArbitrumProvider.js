@@ -98,83 +98,35 @@ export default class APIArbitrumProvider extends APIProvider {
     return ethers.BigNumber.from(allowance);
   };
 
-  submitOrder = async (
-    market,
-    side,
-    price,
-    baseAmount,
-    quoteAmount,
-    orderType
-  ) => {
+  submitOrder = async (market, side, baseAmountBN, quoteAmountBN, expirationTimeSeconds) => {
     const marketInfo = this.api.marketInfo[market];
 
-    if (!quoteAmount) quoteAmount = baseAmount * price;
-    if (!baseAmount) baseAmount = quoteAmount / price;
-
-    let makerToken,
-      takerToken,
-      makerAmountBN,
-      takerAmountBN,
-      gasFee,
-      makerVolumeFeeBN,
-      takerVolumeFeeBN;
-    if (side === "s") {
+    let makerToken, takerToken, makerAmountBN, takerAmountBN, gasFee, makerVolumeFeeBN, takerVolumeFeeBN;
+    if(side === 's') {
       makerToken = marketInfo.baseAsset.address;
       takerToken = marketInfo.quoteAsset.address;
-      makerAmountBN = ethers.utils.parseUnits(
-        baseAmount.toFixed(marketInfo.baseAsset.decimals),
-        marketInfo.baseAsset.decimals
-      );
-      takerAmountBN = ethers.utils.parseUnits(
-        quoteAmount.toFixed(marketInfo.quoteAsset.decimals),
-        marketInfo.quoteAsset.decimals
-      );
-      takerAmountBN = takerAmountBN.mul(99999).div(100000);
-      gasFee = ethers.utils.parseUnits(
-        parseFloat(marketInfo.baseFee).toFixed(marketInfo.baseAsset.decimals),
-        marketInfo.baseAsset.decimals
-      );
-      const makerFee = baseAmount * Number(marketInfo.makerVolumeFee);
-      makerVolumeFeeBN = ethers.utils.parseUnits(
-        makerFee.toFixed(marketInfo.baseAsset.decimals),
-        marketInfo.baseAsset.decimals
-      );
-      const takerFee = baseAmount * Number(marketInfo.takerVolumeFee);
-      takerVolumeFeeBN = ethers.utils.parseUnits(
-        takerFee.toFixed(marketInfo.baseAsset.decimals),
-        marketInfo.baseAsset.decimals
-      );
+      makerAmountBN = baseAmountBN;
+      takerAmountBN = quoteAmountBN.mul(99999).div(100000);
+      gasFee = ethers.utils.parseUnits (
+        marketInfo.baseFee.toString(),
+        marketInfo.baseAsset.decimals 
+      )
+      makerVolumeFeeBN = baseAmountBN.div(10000).mul(marketInfo.makerVolumeFee * 100)
+      takerVolumeFeeBN = quoteAmountBN.div(10000).mul(marketInfo.takerVolumeFee * 100)
+      makerAmountBN = makerAmountBN.sub(gasFee).sub(makerVolumeFeeBN)
     } else {
       makerToken = marketInfo.quoteAsset.address;
       takerToken = marketInfo.baseAsset.address;
-      makerAmountBN = ethers.utils.parseUnits(
-        quoteAmount.toFixed(marketInfo.quoteAsset.decimals),
-        marketInfo.quoteAsset.decimals
-      );
-      takerAmountBN = ethers.utils.parseUnits(
-        baseAmount.toFixed(marketInfo.baseAsset.decimals),
-        marketInfo.baseAsset.decimals
-      );
-      gasFee = ethers.utils.parseUnits(
+      makerAmountBN = quoteAmountBN;
+      takerAmountBN = baseAmountBN.mul(99999).div(100000);
+      gasFee = ethers.utils.parseUnits (
         marketInfo.quoteFee.toString(),
         marketInfo.quoteAsset.decimals
-      );
-      const makerFee = quoteAmount * Number(marketInfo.makerVolumeFee);
-      makerVolumeFeeBN = ethers.utils.parseUnits(
-        makerFee.toFixed(marketInfo.quoteAsset.decimals),
-        marketInfo.quoteAsset.decimals
-      );
-      const takerFee = quoteAmount * Number(marketInfo.takerVolumeFee);
-      takerVolumeFeeBN = ethers.utils.parseUnits(
-        takerFee.toFixed(marketInfo.quoteAsset.decimals),
-        marketInfo.quoteAsset.decimals
-      );
+      )
+      makerVolumeFeeBN = quoteAmountBN.div(10000).mul(marketInfo.makerVolumeFee * 100)
+      takerVolumeFeeBN = baseAmountBN.div(10000).mul(marketInfo.takerVolumeFee * 100)
+      makerAmountBN = makerAmountBN.sub(gasFee).sub(makerVolumeFeeBN)
     }
-
-    const expirationTimeSeconds =
-      orderType === "market"
-        ? Date.now() / 1000 + 60 * 2 // two minutes
-        : Date.now() / 1000 + 60 * 60 * 24 * 7; // one week
 
     const Order = {
       makerAddress: this.accountState.address,

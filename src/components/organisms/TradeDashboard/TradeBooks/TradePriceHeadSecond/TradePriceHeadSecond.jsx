@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { formatPrice } from "lib/utils";
+import { addComma, formatPrice } from "lib/utils";
 import Text from "components/atoms/Text/Text";
 import { ArrowUpIcon, ArrowDownIcon } from "components/atoms/Svg";
 
@@ -45,21 +45,17 @@ const TradePriceHeadSecond = (props) => {
   return (
     <Wrapper isIncrease={isIncrease}>
       <div>
-        <Text
-          font="primaryTitleDisplay"
-          color={isIncrease ? "successHighEmphasis" : "dangerHighEmphasis"}
-        >
-          {parseFloat(formatPrice(lastPrice))}
-        </Text>
-        {isIncrease ? <ArrowUpIcon /> : <ArrowDownIcon />}
+        <Text font="primaryTitleDisplay" color={isIncrease ? "successHighEmphasis" : "dangerHighEmphasis"}>{addComma(parseFloat(formatPrice(lastPrice)))}</Text>
+        {isIncrease ? <ArrowUpIcon /> : <ArrowDownIcon />} 
       </div>
       <Text font="primaryMediumSmallSemiBold" color="foregroundMediumEmphasis">
-        ${" "}
-        {formatPrice(
-          props.marketInfo?.baseAsset?.usdPrice
-            ? props.marketInfo.baseAsset.usdPrice
-            : "--"
-        )}
+        $ {
+          addComma(parseFloat(formatPrice(
+            (props.marketInfo?.baseAsset?.usdPrice)
+              ? props.marketInfo.baseAsset.usdPrice
+              : "--"
+          )))
+        }
       </Text>
     </Wrapper>
   );

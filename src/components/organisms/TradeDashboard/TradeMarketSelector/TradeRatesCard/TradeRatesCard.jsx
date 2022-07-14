@@ -244,8 +244,7 @@ const TradeRatesCard = ({
                   }
                 >
                   {marketSummary.priceChange &&
-                    formatPrice(marketSummary.priceChange / 1)}
-                  {" | "}
+                    addComma(formatPrice(marketSummary.priceChange / 1))}{" | "}
                   {percentChange !== "NaN" ? `${percentChange}%` : "--"}
                 </Text>
               </RatesCard>

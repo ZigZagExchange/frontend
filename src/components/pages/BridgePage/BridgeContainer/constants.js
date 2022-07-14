@@ -45,15 +45,15 @@ export const NETWORKS = [
     },
     to: [
       { name: "Ethereum", id: "ethereum", icon: ethLogo },
-      { name: "Polygon", id: "polygon", icon: polygonLogo },
+      //{ name: "Polygon", id: "polygon", icon: polygonLogo },
     ],
   },
-  {
-    from: {
-      name: "Polygon",
-      id: "polygon",
-      icon: polygonLogo,
-    },
-    to: [{ name: "zkSync", id: "zksync", icon: zksyncLogo }],
-  },
+  //{
+  //  from: {
+  //    name: "Polygon",
+  //    id: "polygon",
+  //    icon: polygonLogo,
+  //  },
+  //  to: [{ name: "zkSync", id: "zksync", icon: zksyncLogo }],
+  //},
 ];
