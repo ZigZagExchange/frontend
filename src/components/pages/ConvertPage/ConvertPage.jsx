@@ -348,7 +348,7 @@ const ConvertPage = () => {
     const p = fromTokenOptions.find((item) => item.name === buyToken.name);
     setSellToken(p);
     setBuyToken(sellToken);
-    setSellAmounts(buyAmounts);
+    setSellAmounts(isNaN(buyAmounts) ? "" : buyAmounts);
   };
 
   const onChangeSellAmounts = (event) => {
