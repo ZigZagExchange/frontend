@@ -19,8 +19,7 @@ const Svg = styled.svg`
   fill: ${({ theme, color }) => getThemeValue(`colors.${color}`, color)(theme)};
   flex-shrink: 0;
 
-  ${({ spin }) => spin && spinStyle}
-  // ${space}
+  ${({ spin }) => spin && spinStyle}// ${space}
 `;
 
 export default Svg;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import styled from "styled-components";
 import { formatPrice, addComma } from "lib/utils";
 import { SettingsIcon } from "components/atoms/Svg";
@@ -11,7 +11,10 @@ import SettingsModal from "./SettingsModal";
 import { TokenPairDropdown } from "components/molecules/Dropdown";
 import useModal from "components/hooks/useModal";
 import useTheme from "components/hooks/useTheme";
-import { settingsSelector } from "lib/store/features/api/apiSlice";
+import {
+  settingsSelector,
+  setUISettings,
+} from "lib/store/features/api/apiSlice";
 import {
   fetchFavourites,
   addFavourite,
@@ -19,6 +22,8 @@ import {
 } from "lib/helpers/storage/favourites";
 import { ActivatedStarIcon, StarIcon } from "components/atoms/Svg";
 import { Box } from "@material-ui/core";
+import LockOpenIcon from "@mui/icons-material/LockOpen";
+import LockIcon from "@mui/icons-material/Lock";
 import _ from "lodash";
 import { darkColors, lightColors } from "lib/theme/colors";
 
@@ -29,22 +34,20 @@ const TradeRatesCard = ({
   currentMarket,
   marketInfo,
 }) => {
-  const { isDark } = useTheme()
-
+  const { isDark } = useTheme();
   const [lastPrice, setLastPrice] = useState(0);
   const [isIncrease, setIncrease] = useState(true);
-  const [favourites, setFavourites] = useState(fetchFavourites())
+  const [favourites, setFavourites] = useState(fetchFavourites());
   const [isOpen, setOpen] = useState(false);
+  const dispatch = useDispatch();
 
   const settings = useSelector(settingsSelector);
 
   useEffect(() => {
-    if (marketSummary.price > lastPrice)
-      setIncrease(true)
-    else if (marketSummary.price < lastPrice)
-      setIncrease(false)
-    setLastPrice(marketSummary.price)
-  }, [marketSummary.price])
+    if (marketSummary.price > lastPrice) setIncrease(true);
+    else if (marketSummary.price < lastPrice) setIncrease(false);
+    setLastPrice(marketSummary.price);
+  }, [marketSummary.price]);
 
   const handleOnModalClose = () => {
     onSettingsModalClose();
@@ -58,7 +61,12 @@ const TradeRatesCard = ({
     onSettingsModal();
   };
 
+  const toggleLayout = () => {
+    dispatch(setUISettings({ key: "editable", value: !settings.editable }));
+  };
+
   const isMobile = window.innerWidth < 800;
+  const isOverflow = window.innerWidth < 1210;
   const percentChange = (
     (marketSummary.priceChange / marketSummary.price) *
     100
@@ -69,13 +77,13 @@ const TradeRatesCard = ({
 
     let favourites = [];
     if (!isFavourited) {
-        favourites = addFavourite(pair);
+      favourites = addFavourite(pair);
     } else {
-        favourites = removeFavourite(pair);
+      favourites = removeFavourite(pair);
     }
 
-    setFavourites(favourites)
-}
+    setFavourites(favourites);
+  };
 
   return (
     <Wrapper>
@@ -88,43 +96,104 @@ const TradeRatesCard = ({
             updateMarketChain={updateMarketChain}
             currentMarket={currentMarket}
             marketInfo={marketInfo}
-            onFavourited={(items) => { setFavourites(items);}}
+            onFavourited={(items) => {
+              setFavourites(items);
+            }}
             favourited={favourites}
           />
         </MarketSelector>
         <RatesCardsWrapper>
-          <Box style={{ cursor: 'pointer' }} position="relative" onMouseEnter={() => { setOpen(true) }} onMouseLeave={() => { setOpen(false) }}>
-            <Box display={'flex'} onClick={()=>favouritePair(currentMarket)}>
-            {_.indexOf(favourites, currentMarket) !== -1 ? <ActivatedStarIcon /> : <StarIcon />}
+          <Box
+            style={{ cursor: "pointer" }}
+            position="relative"
+            onMouseEnter={() => {
+              setOpen(true);
+            }}
+            onMouseLeave={() => {
+              setOpen(false);
+            }}
+          >
+            <Box display={"flex"} onClick={() => favouritePair(currentMarket)}>
+              {_.indexOf(favourites, currentMarket) !== -1 ? (
+                <ActivatedStarIcon />
+              ) : (
+                <StarIcon />
+              )}
             </Box>
-            {isOpen && <Box position='absolute' left="-50px" top="calc(100% - 2px)" width="140px" borderRadius={'5px'} overflow="hidden" display='flex' flexDirection="column" zIndex={1000}>
+            {isOpen && (
               <Box
-                px="15px"
-                py="7px"
-                boxSizing="boder-box"
-                fontSize={16}
-                fontWeight="bold"
-                borderBottom={`1px solid ${isDark ? darkColors.foreground400 : lightColors.foreground400}`}
-                bgcolor={isDark ? darkColors.backgroundLowEmphasis : lightColors.backgroundLowEmphasis}
-                color={isDark ? darkColors.foregroundHighEmphasis : lightColors.foregroundHighEmphasis}
-              >Favorites</Box>
-              {_.map(favourites, (item, index) => {
-                return <FavItem
+                position="absolute"
+                left="-50px"
+                top="calc(100% - 2px)"
+                width="140px"
+                borderRadius={"5px"}
+                overflow="hidden"
+                display="flex"
+                flexDirection="column"
+                zIndex={1000}
+              >
+                <Box
                   px="15px"
                   py="7px"
-                  key={index}
                   boxSizing="boder-box"
-                  fontSize={14}
-                  borderBottom={index !== favourites.length - 1 ? `1px solid ${isDark ? darkColors.foreground400 : lightColors.foreground400}` : ''}
-                  bgcolor={isDark ? darkColors.backgroundLowEmphasis : lightColors.backgroundLowEmphasis}
-                  color={isDark ? darkColors.foregroundHighEmphasis : lightColors.foregroundHighEmphasis}
-                  onClick={() => {
-                    updateMarketChain(item);
-                    setOpen(false)
-                  }}
-                >{item.replace('-', '/')}</FavItem>
-              })}
-            </Box>}
+                  fontSize={16}
+                  fontWeight="bold"
+                  borderBottom={`1px solid ${
+                    isDark
+                      ? darkColors.foreground400
+                      : lightColors.foreground400
+                  }`}
+                  bgcolor={
+                    isDark
+                      ? darkColors.backgroundLowEmphasis
+                      : lightColors.backgroundLowEmphasis
+                  }
+                  color={
+                    isDark
+                      ? darkColors.foregroundHighEmphasis
+                      : lightColors.foregroundHighEmphasis
+                  }
+                >
+                  Favorites
+                </Box>
+                {_.map(favourites, (item, index) => {
+                  return (
+                    <FavItem
+                      px="15px"
+                      py="7px"
+                      key={index}
+                      boxSizing="boder-box"
+                      fontSize={14}
+                      borderBottom={
+                        index !== favourites.length - 1
+                          ? `1px solid ${
+                              isDark
+                                ? darkColors.foreground400
+                                : lightColors.foreground400
+                            }`
+                          : ""
+                      }
+                      bgcolor={
+                        isDark
+                          ? darkColors.backgroundLowEmphasis
+                          : lightColors.backgroundLowEmphasis
+                      }
+                      color={
+                        isDark
+                          ? darkColors.foregroundHighEmphasis
+                          : lightColors.foregroundHighEmphasis
+                      }
+                      onClick={() => {
+                        updateMarketChain(item);
+                        setOpen(false);
+                      }}
+                    >
+                      {item.replace("-", "/")}
+                    </FavItem>
+                  );
+                })}
+              </Box>
+            )}
           </Box>
           <RatesCard>
             <Text
@@ -133,21 +202,19 @@ const TradeRatesCard = ({
                 percentChange === "NaN"
                   ? "black"
                   : isIncrease
-                    ? "successHighEmphasis"
-                    : "dangerHighEmphasis"
+                  ? "successHighEmphasis"
+                  : "dangerHighEmphasis"
               }
             >
-              {marketSummary.price ? addComma(formatPrice(marketSummary.price)) : "--"}
+              {marketSummary.price
+                ? addComma(formatPrice(marketSummary.price))
+                : "--"}
             </Text>
-            <Text
-              font="primaryTiny"
-              color="foregroundHighEmphasis"
-            >
-              $ {
-                (marketInfo?.baseAsset?.usdPrice)
-                  ? addComma(marketInfo.baseAsset.usdPrice)
-                  : "--"
-              }
+            <Text font="primaryTiny" color="foregroundHighEmphasis">
+              ${" "}
+              {marketInfo?.baseAsset?.usdPrice
+                ? addComma(marketInfo.baseAsset.usdPrice)
+                : "--"}
             </Text>
           </RatesCard>
           {isMobile ? (
@@ -163,8 +230,7 @@ const TradeRatesCard = ({
                   <>
                     {settings.showNightPriceChange
                       ? "UTC Change"
-                      : "24h Change"
-                    }
+                      : "24h Change"}
                   </>
                 </Text>
                 <Text
@@ -173,8 +239,8 @@ const TradeRatesCard = ({
                     percentChange === "NaN"
                       ? "black"
                       : parseFloat(marketSummary["priceChange"]) >= 0
-                        ? "successHighEmphasis"
-                        : "dangerHighEmphasis"
+                      ? "successHighEmphasis"
+                      : "dangerHighEmphasis"
                   }
                 >
                   {marketSummary.priceChange &&
@@ -188,18 +254,32 @@ const TradeRatesCard = ({
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  <>
-                    {settings.showNightPriceChange
-                      ? "UTC High"
-                      : "24h High"
-                    }
-                  </>
+                  <>{settings.showNightPriceChange ? "UTC High" : "24h High"}</>
                 </Text>
                 <Text
                   font="primaryMediumSmallSemiBold"
                   color="foregroundHighEmphasis"
                 >
-                  {marketSummary && marketSummary["24hi"] ? addComma(formatPrice(marketSummary["24hi"])): "--"}
+                  {marketSummary && marketSummary["24hi"]
+                    ? addComma(formatPrice(marketSummary["24hi"]))
+                    : "--"}
+                </Text>
+              </RatesCard>
+              <Divider />
+              <RatesCard>
+                <Text
+                  font="primaryExtraSmallSemiBold"
+                  color="foregroundLowEmphasis"
+                >
+                  <>{settings.showNightPriceChange ? "UTC Low" : "24h Low"}</>
+                </Text>
+                <Text
+                  font="primaryMediumSmallSemiBold"
+                  color="foregroundHighEmphasis"
+                >
+                  {marketSummary && marketSummary["24lo"]
+                    ? addComma(formatPrice(marketSummary["24lo"]))
+                    : "--"}
                 </Text>
               </RatesCard>
               <Divider />
@@ -210,16 +290,21 @@ const TradeRatesCard = ({
                 >
                   <>
                     {settings.showNightPriceChange
-                      ? "UTC Low"
-                      : "24h Low"
-                    }
+                      ? `UTC Volume(${
+                          marketInfo && marketInfo.baseAsset.symbol
+                        })`
+                      : `24h Volume(${
+                          marketInfo && marketInfo.baseAsset.symbol
+                        })`}
                   </>
                 </Text>
                 <Text
                   font="primaryMediumSmallSemiBold"
                   color="foregroundHighEmphasis"
                 >
-                  {marketSummary && marketSummary["24lo"] ? addComma(formatPrice(marketSummary["24lo"])): "--"}
+                  {marketSummary && marketSummary.baseVolume
+                    ? addComma(formatPrice(marketSummary.baseVolume))
+                    : "--"}
                 </Text>
               </RatesCard>
               <Divider />
@@ -230,57 +315,69 @@ const TradeRatesCard = ({
                 >
                   <>
                     {settings.showNightPriceChange
-                      ? `UTC Volume(${marketInfo && marketInfo.baseAsset.symbol})`
-                      : `24h Volume(${marketInfo && marketInfo.baseAsset.symbol})`
-                    }
+                      ? `UTC Volume(${
+                          marketInfo && marketInfo.quoteAsset.symbol
+                        })`
+                      : `24h Volume(${
+                          marketInfo && marketInfo.quoteAsset.symbol
+                        })`}
                   </>
                 </Text>
                 <Text
                   font="primaryMediumSmallSemiBold"
                   color="foregroundHighEmphasis"
                 >
-                  {marketSummary && marketSummary.baseVolume ? addComma(formatPrice(marketSummary.baseVolume)): "--"}
-                </Text>
-              </RatesCard>
-              <Divider />
-              <RatesCard>
-                <Text
-                  font="primaryExtraSmallSemiBold"
-                  color="foregroundLowEmphasis"
-                >
-                  <>
-                    {settings.showNightPriceChange
-                      ? `UTC Volume(${marketInfo && marketInfo.quoteAsset.symbol})`
-                      : `24h Volume(${marketInfo && marketInfo.quoteAsset.symbol})`
-                    }
-                  </>
-                </Text>
-                <Text
-                  font="primaryMediumSmallSemiBold"
-                  color="foregroundHighEmphasis"
-                >
-                  {marketSummary && marketSummary.quoteVolume ? addComma(formatPrice(marketSummary.quoteVolume)): "--"}
+                  {marketSummary && marketSummary.quoteVolume
+                    ? addComma(formatPrice(marketSummary.quoteVolume))
+                    : "--"}
                 </Text>
               </RatesCard>
             </>
           )}
         </RatesCardsWrapper>
       </LeftWrapper>
-      {isMobile ? (
-        <SettingsIcon
-          style={{ marginRight: "20px" }}
-          onClick={handleSettings}
-        />
+      {isOverflow ? (
+        <div style={{ marginRight: "20px", display: "flex" }}>
+          {settings.editable ? (
+            <LockIcon
+              style={{ marginRight: "20px" }}
+              onClick={toggleLayout}
+            ></LockIcon>
+          ) : (
+            ""
+          )}
+
+          <SettingsIcon
+            style={{ marginRight: "20px" }}
+            onClick={handleSettings}
+          />
+        </div>
       ) : (
-        <Button
-          endIcon={<SettingsIcon />}
-          variant="outlined"
-          scale="imd"
-          mr="20px"
-          onClick={handleSettings}
-        >
-          Settings
-        </Button>
+        <div style={{ marginRight: "20px" }}>
+          {settings.editable ? (
+            <Button
+              endIcon={<LockOpenIcon />}
+              variant="outlined"
+              scale="imd"
+              mr="20px"
+              style={{ marginRight: "10px" }}
+              onClick={toggleLayout}
+            >
+              Lock Interface
+            </Button>
+          ) : (
+            ""
+          )}
+
+          <Button
+            endIcon={<SettingsIcon />}
+            variant="outlined"
+            scale="imd"
+            onClick={handleSettings}
+          >
+            Settings
+          </Button>
+        </div>
       )}
     </Wrapper>
   );
@@ -330,11 +427,14 @@ const RatesCard = styled.div`
 const Divider = styled.div`
   width: 1px;
   height: 32px;
-  background-color: ${({ theme, isDark }) => isDark === "false" ? theme.colors.backgroundMediumEmphasis : theme.colors.foreground400};
+  background-color: ${({ theme, isDark }) =>
+    isDark === "false"
+      ? theme.colors.backgroundMediumEmphasis
+      : theme.colors.foreground400};
 `;
 
 const FavItem = styled(Box)`
   &:hover {
-    background-color: ${({ theme }) => theme.colors.backgroundHighEmphasis };
+    background-color: ${({ theme }) => theme.colors.backgroundHighEmphasis};
   }
-`
+`;

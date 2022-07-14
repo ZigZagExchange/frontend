@@ -4,6 +4,10 @@ import { formatPrice } from "lib/utils";
 import api from "lib/api";
 import { getLayout } from "lib/helpers/storage/layouts";
 import FillCard from "components/organisms/TradeDashboard/TradeTables/OrdersTable/FillCard";
+import {
+  initialLayouts,
+  stackedLayouts,
+} from "components/organisms/TradeDashboard/ReactGridLayout/layoutSettings";
 
 const makeScope = (state) => `${state.network}-${state.userId}`;
 
@@ -18,6 +22,9 @@ const initialUISettings = {
   hideBalance: false,
   hideGuidePopup: false,
   disableTradeIDCard: false,
+  layouts: initialLayouts,
+  layoutsCustomized: false,
+  editable: false,
 };
 
 export const apiSlice = createSlice({
@@ -598,7 +605,7 @@ export const apiSlice = createSlice({
       state.arweaveAllocation = payload;
     },
     setLayout(state, { payload }) {
-      state.layout = payload;
+      state.settings.layouts = payload;
     },
     setConnecting(state, { payload }) {
       state.isConnecting = payload;
@@ -635,6 +642,14 @@ export const apiSlice = createSlice({
     resetUISettings(state) {
       state.settings = initialUISettings;
     },
+    resetTradeLayout(state) {
+      if (!state.settings.stackOrderbook) {
+        state.settings.layouts = stackedLayouts;
+      } else {
+        state.settings.layouts = initialLayouts;
+      }
+      state.settings.layoutsCustomized = false;
+    },
     setSlippageValue(state, { payload }) {
       state.slippageValue = payload.value;
     },
@@ -657,6 +672,8 @@ export const {
   setHighSlippageModal,
   setUISettings,
   resetUISettings,
+  resetTradeLayout,
+  setLayout,
   setSlippageValue,
 } = apiSlice.actions;
 
