@@ -76,6 +76,7 @@ class SpotForm extends React.Component {
 
   updateBaseAmount(e) {
     const newState = { ...this.state };
+    newState.baseAmount = e.target.value.replace(',','.').replace(/[^0-9.]/g, "");
     if ((/^0\.?0*$/).test(newState.baseAmount) || Number.isNaN(newState.baseAmount)) {
       newState.quoteAmount = "";
     } else {
