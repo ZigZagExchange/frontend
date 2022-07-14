@@ -52,6 +52,7 @@ const TableWrapper = styled.div`
     width: 100%;
     height: 100%;
     gap: 8px;
+    overflow: auto;
 `;
 
 const Divider = styled.div`

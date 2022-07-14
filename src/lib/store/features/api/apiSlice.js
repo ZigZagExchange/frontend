@@ -3,7 +3,10 @@ import { toast } from "react-toastify";
 import { formatPrice } from "lib/utils";
 import api from "lib/api";
 import FillCard from "components/organisms/TradeDashboard/TradeTables/OrdersTable/FillCard";
-import { initialLayouts } from "components/organisms/TradeDashboard/ReactGridLayout/layoutSettings";
+import {
+    initialLayouts,
+    stackedLayouts,
+} from "components/organisms/TradeDashboard/ReactGridLayout/layoutSettings";
 
 const makeScope = (state) => `${state.network}-${state.userId}`;
 
@@ -663,7 +666,11 @@ export const apiSlice = createSlice({
             state.settings = initialUISettings;
         },
         resetTradeLayout(state) {
-            state.settings.layouts = initialLayouts;
+            if (!state.settings.stackOrderbook) {
+                state.settings.layouts = stackedLayouts;
+            } else {
+                state.settings.layouts = initialLayouts;
+            }
             state.settings.layoutsCustomized = false;
         },
         setSlippageValue(state, { payload }) {
