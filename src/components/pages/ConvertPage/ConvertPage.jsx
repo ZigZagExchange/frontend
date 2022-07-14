@@ -360,7 +360,8 @@ const ConvertPage = () => {
       tType === "buy"
         ? getLadderPrice() * (1 + slippageValue / 100)
         : getLadderPrice() * (1 - slippageValue / 100);
-    const x = amount * price;
+    const x = amount / price;
+    console.log(tType, getLadderPrice());
     setBuyAmounts(x.toPrecision(6));
   };
 
@@ -371,7 +372,8 @@ const ConvertPage = () => {
       tType === "buy"
         ? getLadderPrice() * (1 + slippageValue / 100)
         : getLadderPrice() * (1 - slippageValue / 100);
-    const x = amount / price;
+    const x = amount * price;
+    console.log(3);
     setSellAmounts(x.toPrecision(6));
   };
 
