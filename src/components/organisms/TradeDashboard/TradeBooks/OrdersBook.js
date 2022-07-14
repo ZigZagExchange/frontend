@@ -161,15 +161,15 @@ export default function OrdersBook(props) {
         });
     }
 
-  if (api.isEVMChain()) {
-    for (let orderid in allOrders) {
-      const order = allOrders[orderid];
-      const market = order[2];
-      const side = order[3];
-      const price = order[4];
-      const remaining = order[10] === null ? order[5] : order[10];
-      const remainingQuote = remaining * price;
-      const orderStatus = order[9];
+    if (api.isEVMChain()) {
+        for (let orderid in allOrders) {
+            const order = allOrders[orderid];
+            const market = order[2];
+            const side = order[3];
+            const price = order[4];
+            const remaining = order[10] === null ? order[5] : order[10];
+            const remainingQuote = remaining * price;
+            const orderStatus = order[9];
 
             const orderRow = {
                 td1: price,
@@ -179,11 +179,12 @@ export default function OrdersBook(props) {
                 order: order,
             };
 
-      if (market === props.currentMarket && side === "b" && ["o", "pm", "pf"].includes(orderStatus)) {
-        orderbookBids.push(orderRow);
-      } else if (market === props.currentMarket && side === "s" && ["o", "pm", "pf"].includes(orderStatus)) {
-        orderbookAsks.push(orderRow);
-      }
+            if (market === props.currentMarket && side === "b" && ["o", "pm", "pf"].includes(orderStatus)) {
+                orderbookBids.push(orderRow);
+            } else if (market === props.currentMarket && side === "s" && ["o", "pm", "pf"].includes(orderStatus)) {
+                orderbookAsks.push(orderRow);
+            }
+        }
     }
 
     orderbookAsks.sort((a, b) => b.td1 - a.td1);
