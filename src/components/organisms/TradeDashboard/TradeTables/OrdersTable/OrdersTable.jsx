@@ -117,11 +117,11 @@ export default function OrdersTable(props) {
       )
       .filter(
         (i) =>
-        (
           selectedTradeType === "All" ||
-          (selectedTradeType === 'Taker' && i[8].toLowerCase() === (`${props?.user?.id}`).toLowerCase()) ||
-          (selectedTradeType === 'Maker' && i[9].toLowerCase() === (`${props?.user?.id}`).toLowerCase())
-        )
+          (selectedTradeType === "Taker" &&
+            i[8].toLowerCase() === `${props?.user?.id}`.toLowerCase()) ||
+          (selectedTradeType === "Maker" &&
+            i[9].toLowerCase() === `${props?.user?.id}`.toLowerCase())
       )
       .sort((a, b) => b[1] - a[1]);
   };
@@ -643,6 +643,20 @@ export default function OrdersTable(props) {
                   </SortIconWrapper> */}
               </HeaderWrapper>
             </th>
+            <th className="w-36">
+              {isOpenStatus(getUserOrders()) && settings.showCancelOrders ? (
+                <StyledButton
+                  variant="outlined"
+                  width="100px"
+                  scale="md"
+                  onClick={api.cancelAllOrders}
+                >
+                  Cancel All
+                </StyledButton>
+              ) : (
+                ""
+              )}
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -698,9 +712,7 @@ export default function OrdersTable(props) {
                 statusClass = "successHighEmphasis";
                 break;
               case "pm":
-                statusText = (
-                  <span>partial match</span>
-                );
+                statusText = <span>partial match</span>;
                 statusClass = "warningHighEmphasis";
                 break;
               case "m":
@@ -823,6 +835,7 @@ export default function OrdersTable(props) {
                       ""
                     )}
                   </td>
+                  <td className="w-36"></td>
                 </tr>
               </>
             );
@@ -848,7 +861,10 @@ export default function OrdersTable(props) {
             const sidetext = side === "b" ? "buy" : "sell";
             const sideclassname =
               side === "b" ? "successHighEmphasis" : "dangerHighEmphasis";
-            const tradeTypeText = fill[8].toLowerCase() === (`${props?.user?.id}`).toLowerCase() ? "Taker" : "Maker";
+            const tradeTypeText =
+              fill[8].toLowerCase() === `${props?.user?.id}`.toLowerCase()
+                ? "Taker"
+                : "Maker";
             const txhash = fill[7];
             const feeamount = Number(fill[10]);
             const feetoken = fill[11];
@@ -954,9 +970,7 @@ export default function OrdersTable(props) {
                           >
                             {sidetext}
                           </Text>
-                          <Text
-                            font="primaryExtraSmallSemiBold"
-                          >
+                          <Text font="primaryExtraSmallSemiBold">
                             {tradeTypeText}
                           </Text>
                         </div>
@@ -986,7 +1000,10 @@ export default function OrdersTable(props) {
                               textAlign="right"
                               onClick={() =>
                                 window.open(
-                                  api.getExplorerTxLink(api.apiProvider.network, txhash),
+                                  api.getExplorerTxLink(
+                                    api.apiProvider.network,
+                                    txhash
+                                  ),
                                   "_blank"
                                 )
                               }
@@ -1231,7 +1248,10 @@ export default function OrdersTable(props) {
             const sidetext = side === "b" ? "buy" : "sell";
             const sideclassname =
               side === "b" ? "successHighEmphasis" : "dangerHighEmphasis";
-            const tradeTypeText = fill[8].toLowerCase() === (`${props?.user?.id}`).toLowerCase() ? "Taker" : "Maker";
+            const tradeTypeText =
+              fill[8].toLowerCase() === `${props?.user?.id}`.toLowerCase()
+                ? "Taker"
+                : "Maker";
             const txhash = fill[7];
             const feeamount = Number(fill[10]);
             const feetoken = fill[11];
@@ -1342,9 +1362,7 @@ export default function OrdersTable(props) {
                   </Text>
                 </td>
                 <td data-label="Trade">
-                  <Text font="primaryExtraSmallSemiBold">
-                    {tradeTypeText}
-                  </Text>
+                  <Text font="primaryExtraSmallSemiBold">{tradeTypeText}</Text>
                 </td>
                 <td data-label="Quantity">
                   <Text
@@ -1390,7 +1408,10 @@ export default function OrdersTable(props) {
                       color="primaryHighEmphasis"
                       onClick={() =>
                         window.open(
-                          api.getExplorerTxLink(api.apiProvider.network, txhash),
+                          api.getExplorerTxLink(
+                            api.apiProvider.network,
+                            txhash
+                          ),
                           "_blank"
                         )
                       }
@@ -1448,8 +1469,8 @@ export default function OrdersTable(props) {
                   {settings.hideBalance
                     ? "****.****"
                     : formatToken(
-                      token.valueReadable * coinEstimator(token.token)
-                    )}
+                        token.valueReadable * coinEstimator(token.token)
+                      )}
                 </Text>
               </td>
             </tr>
@@ -1574,10 +1595,15 @@ export default function OrdersTable(props) {
               color="primaryHighEmphasis"
               textAlign="center"
               className="view-account-button"
-              onClick={() => window.open(
-                api.getExplorerAccountLink(api.apiProvider.network, props.user.address),
-                "_blank"
-              )}
+              onClick={() =>
+                window.open(
+                  api.getExplorerAccountLink(
+                    api.apiProvider.network,
+                    props.user.address
+                  ),
+                  "_blank"
+                )
+              }
             >
               View Account on Explorer
             </ActionWrapper>
@@ -1591,10 +1617,15 @@ export default function OrdersTable(props) {
               color="primaryHighEmphasis"
               textAlign="center"
               className="view-account-button"
-              onClick={() => window.open(
-                api.getExplorerAccountLink(api.apiProvider.network, props.user.address),
-                "_blank"
-              )}
+              onClick={() =>
+                window.open(
+                  api.getExplorerAccountLink(
+                    api.apiProvider.network,
+                    props.user.address
+                  ),
+                  "_blank"
+                )
+              }
             >
               View Account on Explorer
             </ActionWrapper>
@@ -1620,19 +1651,6 @@ export default function OrdersTable(props) {
               <Tab>Order History ({getFills().length})</Tab>
               <Tab>Balances</Tab>
             </StyledTabMenu>
-
-            {isOpenStatus(getUserOrders()) && settings.showCancelOrders ? (
-              <StyledButton
-                variant="outlined"
-                width="100px"
-                scale="md"
-                onClick={api.cancelAllOrders}
-              >
-                Cancel All
-              </StyledButton>
-            ) : (
-              ""
-            )}
           </TableHeaderWrapper>
           {isMobile ? (
             <MobileWrapper>{footerContent}</MobileWrapper>
