@@ -11,10 +11,9 @@ import {
   balancesSelector,
   settingsSelector,
 } from "lib/store/features/api/apiSlice";
-import { formatUSD, formatToken, HideMenuOnOutsideClicked } from "lib/utils";
+import { formatUSD, formatToken, HideMenuOnOutsideClicked, addComma } from "lib/utils";
 import { userSelector } from "lib/store/features/auth/authSlice";
 import api from "lib/api";
-import { IconButton as baseIcon } from "../IconButton";
 import Text from "components/atoms/Text/Text";
 import {
   PlusIcon,
@@ -147,24 +146,6 @@ const LoaderContainer = styled.div`
   height: 100px;
 `;
 
-const IconButtonWrapper = styled.div`
-  display: grid;
-  grid-auto-flow: column;
-  gap: 10px;
-`;
-
-const IconButton = styled(baseIcon)`
-  width: 24px;
-  height: 24px;
-  background: transparent;
-  border: 1px solid ${({ theme }) => theme.colors.foreground400};
-  border-radius: 9999px;
-  padding: 0px !important;
-  svg {
-    margin-right: 0px !important;
-    margin-left: 0px !important;
-  }
-`;
 
 const AccountDropdown = ({ notext, networkName }) => {
   const [isOpened, setIsOpened] = useState(false);
@@ -188,7 +169,7 @@ const AccountDropdown = ({ notext, networkName }) => {
   };
 
   const disconnect = () => {
-    api.signOut();
+    api.signOut(true);
     toggle();
   };
 
@@ -293,7 +274,7 @@ const AccountDropdown = ({ notext, networkName }) => {
               <Text font="primaryHeading6" color="foregroundHighEmphasis">
                 {settings.hideBalance
                   ? "****.****"
-                  : "$ " + formatUSD(totalBalance)}
+                  : "$ " + addComma(formatUSD(totalBalance))}
               </Text>
             </div>
             <ToggleButton

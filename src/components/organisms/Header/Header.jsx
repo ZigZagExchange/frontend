@@ -33,7 +33,8 @@ const langList = [
 ];
 
 const networkLists = [
-  { text: "zkSync - Mainnet",
+  {
+    text: "zkSync - Mainnet",
     value: 1,
     url: "#",
     selectedIcon: <CheckIcon />,
@@ -285,15 +286,16 @@ export const Header = (props) => {
 
     api.setAPIProvider(value);
     try {
-      await api.refreshNetwork()
+      await api.refreshNetwork();
     } catch (err) {
       console.log(err);
     }
 
     if (
-      (/^\/wrap(\/.*)?/.test(location.pathname) && (!api.isEVMChain())) ||
-      (/^\/bridge(\/.*)?/.test(location.pathname) && (!api.isImplemented("depositL2"))) ||
-      (/^\/list-pair(\/.*)?/.test(location.pathname) && (api.isEVMChain()))
+      (/^\/wrap(\/.*)?/.test(location.pathname) && !api.isEVMChain()) ||
+      (/^\/bridge(\/.*)?/.test(location.pathname) &&
+        !api.isImplemented("depositL2")) ||
+      (/^\/list-pair(\/.*)?/.test(location.pathname) && api.isEVMChain())
     ) {
       setIndex(0);
       history.push("/");
@@ -326,11 +328,9 @@ export const Header = (props) => {
         setIndex(newIndex);
         localStorage.setItem("tab_index", newIndex);
         history.push("/dsl");
-	      break;
+        break;
       case 5:
-        setIndex(newIndex);
-        localStorage.setItem("tab_index", newIndex);
-        history.push("/wrap");
+        window.open("https://app.uniswap.org/#/swap?inputCurrency=ETH&outputCurrency=0x82af49447d8a07e3bd95bd0d56f35241523fbab1&chain=arbitrum", '_blank');
         break;
       default:
         break;
@@ -377,14 +377,17 @@ export const Header = (props) => {
               style={{ paddingTop: "20px" }}
             >
               <Tab>TRADE</Tab>
-              <Tab>CONVERT</Tab>
+              <Tab display={!isEVM}>CONVERT</Tab>
               <Tab display={hasBridge}>BRIDGE</Tab>
               <Tab display={!isEVM}>LIST PAIR</Tab>
               <Tab display={false}>
                 DOCS
                 <ExternalLinkIcon size={12} />
               </Tab>
-              <Tab display={isEVM}>WRAP</Tab>
+              <Tab display={isEVM}>
+                WRAP
+                <ExternalLinkIcon size={12} />
+              </Tab>
             </TabMenu>
           </NavWrapper>
           <ActionsWrapper>
@@ -393,7 +396,7 @@ export const Header = (props) => {
               adClass="menu-dropdown"
               width={200}
               item={supportLists}
-              context={'Support'}
+              context={"Support"}
               leftIcon={true}
               transparent
             />
@@ -401,7 +404,7 @@ export const Header = (props) => {
               adClass="menu-dropdown"
               width={162}
               item={communityLists}
-              context={'Community'}
+              context={"Community"}
               leftIcon={true}
               transparent
             />
@@ -443,7 +446,7 @@ export const Header = (props) => {
 
             <Dropdown
               adClass="network-dropdown"
-              width={162}
+              width={190}
               item={networkItems}
               context={networkName}
               clickFunction={changeNetwork}
@@ -479,7 +482,7 @@ export const Header = (props) => {
               DOCS
               <ExternalLinkIcon size={12} />
             </Tab>
-              {isEVM && <Tab>WRAP</Tab>}
+            {isEVM && <Tab>WRAP</Tab>}
           </TabMenu>
           <HorizontalDivider />
           {/* <ActionSideMenuWrapper>
@@ -501,7 +504,7 @@ export const Header = (props) => {
             adClass="menu-dropdown"
             width={200}
             item={supportLists}
-            context={'Support'}
+            context={"Support"}
             leftIcon={true}
             transparent
           />
@@ -509,7 +512,7 @@ export const Header = (props) => {
             adClass="menu-dropdown"
             width={162}
             item={communityLists}
-            context={'Community'}
+            context={"Community"}
             leftIcon={true}
             transparent
           />

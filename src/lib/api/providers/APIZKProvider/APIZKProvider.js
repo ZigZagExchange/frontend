@@ -28,8 +28,16 @@ export default class APIZKProvider extends APIProvider {
   _tokenInfo = {};
   eligibleFastWithdrawTokens = ["ETH", "FRAX", "UST"];
   fastWithdrawContractAddress = ZKSYNC_ETHEREUM_FAST_BRIDGE.address;
+  defaultMarket = "ETH-USDC";
 
-  handleBridgeReceipt = (_receipt, amount, token, type, target, walletAddress) => {
+  handleBridgeReceipt = (
+    _receipt,
+    amount,
+    token,
+    type,
+    target,
+    walletAddress
+  ) => {
     let receipt = {
       date: +new Date(),
       network: this.network,
@@ -149,109 +157,36 @@ export default class APIZKProvider extends APIProvider {
   submitOrder = async (
     market,
     side,
-    price,
-    baseAmount,
-    quoteAmount,
-    orderType
+    baseAmountBN,
+    quoteAmountBN,
+    expirationTimeSeconds
   ) => {
     const accountActivated = await this.checkAccountActivated();
-    if (!accountActivated) {
-      toast.error(
-        "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
-        {
-          autoClose: 60000,
-        },
-        {
-          toastId:
-            "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
-        }
-      );
-      return;
-    }
+    if (!accountActivated)
+      throw new Error('Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.');
+  
     const marketInfo = this.api.marketInfo[market];
+    const tokenRatio = {};
+    tokenRatio[marketInfo.baseAsset.id] = ethers.utils.formatUnits(
+      baseAmountBN,
+      marketInfo.baseAsset.decimals
+    );
+    tokenRatio[marketInfo.quoteAsset.id] = ethers.utils.formatUnits(
+      quoteAmountBN,
+      marketInfo.quoteAsset.decimals
+    );
 
-    if (!APIZKProvider.VALID_SIDES.includes(side)) {
-      throw new Error("Invalid side");
-    }
-
-    quoteAmount = quoteAmount
-      ? parseFloat(quoteAmount).toFixed(marketInfo.quoteAsset.decimals)
-      : null;
-    baseAmount = baseAmount
-      ? parseFloat(baseAmount).toFixed(marketInfo.baseAsset.decimals)
-      : null;
-
-    let tokenBuy,
-      tokenSell,
-      sellQuantity,
-      sellQuantityWithFee,
-      tokenRatio = {},
-      sellQuantityBN;
-    if (side === "b") {
-      // quoteAmount is first choice for buy
-      if (quoteAmount) {
-        sellQuantity = parseFloat(quoteAmount);
-        sellQuantityWithFee = (sellQuantity + marketInfo.quoteFee).toFixed(
-          marketInfo.quoteAsset.decimals
-        );
-        tokenSell = marketInfo.quoteAsset.id;
-        tokenBuy = marketInfo.baseAsset.id;
-        tokenRatio[marketInfo.baseAsset.id] = (quoteAmount / price).toFixed(
-          marketInfo.baseAsset.decimals
-        );
-        tokenRatio[marketInfo.quoteAsset.id] = sellQuantityWithFee;
-      } else {
-        sellQuantity = parseFloat(baseAmount * price);
-        sellQuantityWithFee = (sellQuantity + marketInfo.quoteFee).toFixed(
-          marketInfo.quoteAsset.decimals
-        );
-        tokenSell = marketInfo.quoteAsset.id;
-        tokenBuy = marketInfo.baseAsset.id;
-        tokenRatio[marketInfo.baseAsset.id] = baseAmount;
-        tokenRatio[marketInfo.quoteAsset.id] = sellQuantityWithFee;
-      }
-      sellQuantityBN = ethers.utils.parseUnits(
-        sellQuantityWithFee,
-        marketInfo.quoteAsset.decimals
-      );
+    let sellQuantityBN, tokenSell, tokenBuy;
+    if (side === 's') {
+      sellQuantityBN = baseAmountBN;
+      tokenSell = marketInfo.baseAsset.id;
+      tokenBuy = marketInfo.quoteAsset.id;
     } else {
-      // baseAmount is first choice for sell
-      if (baseAmount) {
-        sellQuantity = parseFloat(baseAmount);
-        sellQuantityWithFee = (sellQuantity + marketInfo.baseFee).toFixed(
-          marketInfo.baseAsset.decimals
-        );
-        tokenSell = marketInfo.baseAsset.id;
-        tokenBuy = marketInfo.quoteAsset.id;
-        tokenRatio[marketInfo.baseAsset.id] = sellQuantityWithFee;
-        tokenRatio[marketInfo.quoteAsset.id] = (baseAmount * price).toFixed(
-          marketInfo.quoteAsset.decimals
-        );
-      } else {
-        sellQuantity = parseFloat(quoteAmount / price);
-        sellQuantityWithFee = (sellQuantity + marketInfo.baseFee).toFixed(
-          marketInfo.baseAsset.decimals
-        );
-        tokenSell = marketInfo.baseAsset.id;
-        tokenBuy = marketInfo.quoteAsset.id;
-        tokenRatio[marketInfo.baseAsset.id] = sellQuantityWithFee;
-        tokenRatio[marketInfo.quoteAsset.id] = quoteAmount;
-      }
-      sellQuantityBN = ethers.utils.parseUnits(
-        sellQuantityWithFee,
-        marketInfo.baseAsset.decimals
-      );
+      sellQuantityBN = quoteAmountBN;
+      tokenSell = marketInfo.quoteAsset.id;
+      tokenBuy = marketInfo.baseAsset.id;
     }
 
-    const now_unix = (Date.now() / 1000) | 0;
-    const two_minute_expiry = now_unix + 120;
-    const one_week_expiry = now_unix + 7 * 24 * 3600;
-    let validUntil;
-    if (orderType === "limit") {
-      validUntil = one_week_expiry;
-    } else {
-      validUntil = two_minute_expiry;
-    }
     const packedSellQuantity =
       zksync.utils.closestPackableTransactionAmount(sellQuantityBN);
     const order = await this.syncWallet.signOrder({
@@ -259,9 +194,10 @@ export default class APIZKProvider extends APIProvider {
       tokenBuy,
       amount: packedSellQuantity.toString(),
       ratio: zksync.utils.tokenRatio(tokenRatio),
-      validUntil,
+      validUntil: expirationTimeSeconds,
     });
 
+    // argent wallet sig change
     if (order.ethereumSignature && !order.ethSignature) {
       order.ethSignature = order.ethereumSignature;
       delete order.ethereumSignature;
@@ -282,14 +218,13 @@ export default class APIZKProvider extends APIProvider {
         account && account.committed
           ? account.committed.balances[ticker] || 0
           : 0;
-      if (!balance) return true;
       balances[ticker] = {
         value: balance,
         valueReadable:
           (balance && currencyInfo && balance / 10 ** currencyInfo.decimals) ||
           0,
         allowance: ethers.constants.MaxUint256,
-        allowanceReadable: 9007199254740991 // max save int
+        allowanceReadable: 9007199254740991, // max save int
       };
     });
 
@@ -556,7 +491,7 @@ export default class APIZKProvider extends APIProvider {
   signIn = async () => {
     try {
       this.syncProvider = await zksync.getDefaultProvider(
-        this.network === 1 ? 'mainnet' : 'rinkeby'
+        this.network === 1 ? "mainnet" : "rinkeby"
       );
     } catch (e) {
       toast.error("Zksync is down. Try again later");
@@ -775,9 +710,12 @@ export default class APIZKProvider extends APIProvider {
 
   getChainName = (chainId) => {
     switch (Number(chainId)) {
-      case 1: return 'mainnet';
-      case 1000: return 'rinkeby';
-      default: throw Error("Chain ID not understood");
+      case 1:
+        return "mainnet";
+      case 1000:
+        return "rinkeby";
+      default:
+        throw Error("Chain ID not understood");
     }
   };
 
