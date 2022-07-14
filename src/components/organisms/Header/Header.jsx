@@ -421,7 +421,7 @@ export const Header = (props) => {
               style={{ paddingTop: "20px" }}
             >
               <Tab>TRADE</Tab>
-              <Tab>CONVERT</Tab>
+              <Tab display={!isEVM}>CONVERT</Tab>
               <Tab display={hasBridge}>BRIDGE</Tab>
               <Tab display={!isEVM}>LIST PAIR</Tab>
               <Tab display={false}>
