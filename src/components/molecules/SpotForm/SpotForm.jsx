@@ -719,7 +719,7 @@ class SpotForm extends React.Component {
       const newState = { ...this.state };
       if (this.props.side === 's' && !Number.isNaN(newState.baseAmount)) {
         // follow fee for sell order
-        const newBaseAmount = newState.baseAmount + this.props.marketInfo.baseFee - prevProps.marketInfo.baseFee;
+        const newBaseAmount = Number(newState.baseAmount) + this.props.marketInfo.baseFee - prevProps.marketInfo.baseFee;
         if (newBaseAmount <= 0 || newState.quoteChanged === "") {
           newState.baseAmount= "";
           newState.quoteAmount= "";
@@ -730,7 +730,7 @@ class SpotForm extends React.Component {
         }
       } else if (this.props.side === 'b' && !Number.isNaN(this.props.quoteChanged)) {
         // follow fee for buy order
-        const newQuoteAmount = newState.quoteAmount + this.props.marketInfo.quoteFee - prevProps.marketInfo.quoteFee;
+        const newQuoteAmount = Number(newState.quoteAmount) + this.props.marketInfo.quoteFee - prevProps.marketInfo.quoteFee;
         if (newQuoteAmount <= 0 || newState.baseAmount === "") {
           newState.baseAmount= "";
           newState.quoteAmount= "";
