@@ -1,5 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+    resetTradeLayout,
+    settingsSelector,
+} from "lib/store/features/api/apiSlice";
 import TradePage from "components/pages/TradePage/TradePage";
 import BridgePage from "components/pages/BridgePage/BridgePage";
 import ConvertPage from "components/pages/ConvertPage/ConvertPage";
@@ -10,23 +15,37 @@ import DSLPage from "./components/pages/DSLPage/DSLPage";
 import WrapPage from "./components/pages/WrapPage/WrapPage";
 
 const AppRoutes = () => {
-  return (
-    <>
-      <Router>
-        <Switch>
-          <Route exact path="/" component={TradePage} />
-          <Route exact path="/bridge/:tab?" component={BridgePage} />
-          <Route exact path="/convert/:tab?" component={ConvertPage} />
-          <Route exact path="/pool" component={PoolPage} />
-          <Route exact path="/list-pair" component={ListPairPage} />
-          <Route exact path="/wrap" component={WrapPage} />
-          <Dev>
-            <Route exact path="/dsl" component={DSLPage} />
-          </Dev>
-        </Switch>
-      </Router>
-    </>
-  );
+    const settings = useSelector(settingsSelector);
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        console.log(settings);
+        if (!settings.layouts) {
+            dispatch(resetTradeLayout());
+        }
+    }, []);
+
+    return (
+        <>
+            <Router>
+                <Switch>
+                    <Route exact path="/" component={TradePage} />
+                    <Route exact path="/bridge/:tab?" component={BridgePage} />
+                    <Route
+                        exact
+                        path="/convert/:tab?"
+                        component={ConvertPage}
+                    />
+                    <Route exact path="/pool" component={PoolPage} />
+                    <Route exact path="/list-pair" component={ListPairPage} />
+                    <Route exact path="/wrap" component={WrapPage} />
+                    <Dev>
+                        <Route exact path="/dsl" component={DSLPage} />
+                    </Dev>
+                </Switch>
+            </Router>
+        </>
+    );
 };
 
 export default AppRoutes;
