@@ -75,13 +75,13 @@ const Table = styled.table`
 
   ::-webkit-scrollbar-track {
     border-radius: 0px;
-    background: ${({ theme }) => theme.colors.backgroundHighEmphasis};
+    background: hsla(0, 0%, 100%, 0.15) !important;
     height: 23px;
   }
 
   ::-webkit-scrollbar-thumb {
-    border-radius: 0px;
-    background: ${({ theme }) => theme.colors.foreground400};
+    border-radius: 4px;
+    background: #292D3F21 !important;
   }
 
   ::-webkit-scrollbar-thumb:window-inactive {
