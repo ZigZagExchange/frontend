@@ -10,7 +10,7 @@ const makeScope = (state) => `${state.network}-${state.userId}`;
 const initialUISettings = {
   showNightPriceChange: false,
   showCancelOrders: false,
-  disableOrderNotification: true,
+  disableOrderNotification: false,
   stackOrderbook: true,
   disableSlippageWarning: false,
   disabledisableOrderBookFlash: false,
