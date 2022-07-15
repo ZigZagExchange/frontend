@@ -643,7 +643,7 @@ export default function OrdersTable(props) {
                   </SortIconWrapper> */}
               </HeaderWrapper>
             </th>
-            {!settings.showCancelOrders && (
+            {isOpenStatus(getUserOrders()) && !settings.showCancelOrders && (
               <th className="w-36">
                 <StyledButton
                   variant="outlined"
@@ -833,7 +833,8 @@ export default function OrdersTable(props) {
                       ""
                     )}
                   </td>
-                  {!settings.showCancelOrders && <td className="w-36"></td>}
+                  {isOpenStatus(getUserOrders()) &&
+                    !settings.showCancelOrders && <td className="w-36"></td>}
                 </tr>
               </>
             );

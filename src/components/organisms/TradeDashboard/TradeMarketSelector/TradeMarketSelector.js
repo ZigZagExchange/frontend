@@ -7,6 +7,7 @@ import {
   marketInfoSelector,
   lastPricesSelector,
 } from "lib/store/features/api/apiSlice";
+import { formatPrice, addComma } from "lib/utils";
 
 const StyledTradeMarketSelector = styled.header`
   display: flex;
@@ -39,7 +40,7 @@ export default function TradeMarketSelector(props) {
     usdVolume = parseFloat(lastPrices[market].quoteVolume) * quoteCurrencyPrice;
     lastPriceTableData.push({
       td1: market,
-      td2: price,
+      td2: addComma(formatPrice(price)),
       td3: pctchange,
       usdVolume,
     });
