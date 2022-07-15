@@ -489,7 +489,7 @@ export default function OrdersTable(props) {
                         color="foregroundHighEmphasis"
                         textAlign="right"
                       >
-                        {(baseQuantity.toPrecision(6) / 1 - remaining.toPrecision(6) / 1)} / {(baseQuantity.toPrecision(6) / 1)}
+                        {(baseQuantity.toPrecision(6) / 1 - remaining.toPrecision(6) / 1)} / {(baseQuantity.toPrecision(6) / 1)}&nbsp;
                         {baseCurrency}
                       </Text>
                     </td>
@@ -769,7 +769,7 @@ export default function OrdersTable(props) {
                       font="primaryExtraSmallSemiBold"
                       color="foregroundHighEmphasis"
                     >
-                      {(baseQuantity.toPrecision(6) / 1 - remaining.toPrecision(6) / 1)} / {(baseQuantity.toPrecision(6) / 1)}
+                      {(baseQuantity.toPrecision(6) / 1 - remaining.toPrecision(6) / 1)} / {(baseQuantity.toPrecision(6) / 1)}&nbsp;
                       {baseCurrency}
                     </Text>
                   </td>
