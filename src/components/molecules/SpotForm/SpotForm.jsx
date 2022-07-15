@@ -45,7 +45,7 @@ class SpotForm extends React.Component {
     }
     if (Number.isNaN(result) || result <= 0) {
       return 0;
-    } else if (!Number.isFinite(result) || result >= 100) {
+    } else if (!Number.isFinite(result) || result >= 99.5) {
       return 100;
     } 
     return result.toFixed(0);
@@ -56,21 +56,14 @@ class SpotForm extends React.Component {
     newState.price = e.target.value.replace(',','.').replace(/[^0-9.]/g, "");
     if (this.props.quoteChanged) {
       // for buy quoteAmount should be fixed
-      const fee = this.getQuoteFee(newState.quoteAmount);
-      newState.baseAmount = (newState.quoteAmount - fee) / newState.price;
-      if (newState.baseAmount <= 0) {
-        newState.quoteAmount = ""
-        newState.baseAmount = ""
-      }
+      newState.baseAmount = newState.quoteAmount / newState.price;
     } else {
       // for sell baseAmount should be fixed
-      const fee = this.getBaseFee(newState.baseAmount);
-      newState.quoteAmount = newState.price * (newState.baseAmount - fee);
-      if (newState.quoteAmount <= 0) {
-        newState.quoteAmount = ""
-        newState.baseAmount = ""
-      }
+      newState.quoteAmount = newState.price * newState.baseAmount;
     }
+    
+    newState.quoteChanged = false;
+    newState.baseChanged = false;
     this.setState(newState);
   }
 
@@ -80,11 +73,11 @@ class SpotForm extends React.Component {
     if ((/^0\.?0*$/).test(newState.baseAmount) || Number.isNaN(newState.baseAmount)) {
       newState.quoteAmount = "";
     } else {
-      const fee = this.getBaseFee(newState.baseAmount);
-      newState.quoteAmount = this.currentPrice() * (newState.baseAmount - fee);
-      if (newState.quoteAmount < 0) {
+      const price = this.currentPrice();
+      if (price) {
+        newState.quoteAmount = price * newState.baseAmount;
+      } else {
         newState.quoteAmount = "";
-        newState.baseAmount = "";
       }
     }
     newState.baseChanged = true;
@@ -98,10 +91,10 @@ class SpotForm extends React.Component {
     if ((/^0\.?0*$/).test(newState.quoteAmount) || Number.isNaN(newState.quoteAmount)) {
       newState.baseAmount = "";
     } else {
-      const fee = this.getQuoteFee(newState.quoteAmount);
-      newState.baseAmount = (newState.quoteAmount - fee) / this.currentPrice();
-      if (newState.baseAmount < 0) {
-        newState.quoteAmount = "";
+      const price = this.currentPrice();
+      if (price) {
+        newState.baseAmount = newState.quoteAmount / price;
+      } else {
         newState.baseAmount = "";
       }
     }    
@@ -116,23 +109,14 @@ class SpotForm extends React.Component {
     newState.price = formatPrice(this.state.price * 1.001);
     if (this.props.quoteChanged) {
       // for buy quoteAmount should be fixed
-      const fee = this.getQuoteFee(newState.quoteAmount);
-      newState.baseAmount = (newState.quoteAmount - fee) / newState.price;
-      if (newState.baseAmount <= 0) {
-        newState.quoteAmount = ""
-        newState.baseAmount = ""
-      }
+      newState.baseAmount = newState.quoteAmount / newState.price;
     } else {
       // for sell baseAmount should be fixed
-      const fee = this.getBaseFee(newState.baseAmount);
-      newState.quoteAmount = newState.price * (newState.baseAmount - fee);
-      if (newState.quoteAmount <= 0) {
-        newState.quoteAmount = ""
-        newState.baseAmount = ""
-      }
+      newState.quoteAmount = newState.price * newState.baseAmount;
     }
-    newState.baseChanged = false;
+
     newState.quoteChanged = false;
+    newState.baseChanged = false;
     this.setState(newState);
   }
 
@@ -142,53 +126,37 @@ class SpotForm extends React.Component {
     newState.price = formatPrice(this.state.price * 0.999);
     if (this.props.quoteChanged) {
       // for buy quoteAmount should be fixed
-      const fee = this.getQuoteFee(newState.quoteAmount);
-      newState.baseAmount = (newState.quoteAmount - fee) / newState.price;
-      if (newState.baseAmount <= 0) {
-        newState.quoteAmount = ""
-        newState.baseAmount = ""
-      }
+      newState.baseAmount = newState.quoteAmount / newState.price;
     } else {
       // for sell baseAmount should be fixed
-      const fee = this.getBaseFee(newState.baseAmount);
-      newState.quoteAmount = newState.price * (newState.baseAmount - fee);
-      if (newState.quoteAmount <= 0) {
-        newState.quoteAmount = ""
-        newState.baseAmount = ""
-      }
+      newState.quoteAmount = newState.price * newState.baseAmount;
     }
-    newState.baseChanged = false;
+
     newState.quoteChanged = false;
+    newState.baseChanged = false;
     this.setState(newState);
   }
 
   increaseAmount(e) {
     e.preventDefault();
     const newState = { ...this.state };
-    const price = this.currentPrice();
 
     if (this.props.side === 'b') {
       // for buy order we cant exceed the quoteBalance
       let quoteBalance = this.getQuoteBalance();
       const newQuoteAmount = Number(this.state.quoteAmount) + quoteBalance * 0.02;
+
+      quoteBalance -= this.getQuoteFee(newQuoteAmount);
       newState.quoteAmount = newQuoteAmount > quoteBalance ? quoteBalance : newQuoteAmount;
-      const fee = this.getQuoteFee(newState.quoteAmount);
-      newState.baseAmount = (newState.quoteAmount - fee) / this.currentPrice();
-      if (newState.baseAmount < 0) {
-        newState.baseAmount = "";
-        newState.quoteAmount = "";
-      }
+      newState.baseAmount = newState.quoteAmount / this.currentPrice();
     } else {
       // for sell order we cant exceed the baseBalance
       let baseBalance = this.getBaseBalance();
       const newBaseAmount = Number(this.state.baseAmount) + baseBalance * 0.02;
+      
+      baseBalance -= this.getBaseFee(newBaseAmount);
       newState.baseAmount = newBaseAmount > baseBalance ? baseBalance : newBaseAmount;
-      const fee = this.getBaseFee(newState.baseAmount);
-      newState.quoteAmount = (newState.baseAmount - fee) * this.currentPrice();
-      if (newState.quoteAmount < 0) {
-        newState.baseAmount = "";
-        newState.quoteAmount = "";
-      }
+      newState.quoteAmount = newState.baseAmount * this.currentPrice();
     }
 
     newState.quoteChanged = false;
@@ -203,24 +171,14 @@ class SpotForm extends React.Component {
       // for buy order we cant exceed the quoteBalance
       let quoteBalance = this.getQuoteBalance();
       const newQuoteAmount = Number(this.state.quoteAmount) - quoteBalance * 0.02;
-      newState.quoteAmount = newQuoteAmount > quoteBalance ? quoteBalance : newQuoteAmount;
-      const fee = this.getQuoteFee(newState.quoteAmount);
-      newState.baseAmount = (newState.quoteAmount - fee) / this.currentPrice();
-      if (newState.baseAmount < 0) {
-        newState.baseAmount = "";
-        newState.quoteAmount = "";
-      }
+      newState.quoteAmount = newQuoteAmount < 0 ? 0 : newQuoteAmount;
+      newState.baseAmount = newState.quoteAmount / this.currentPrice();
     } else {
       // for sell order we cant exceed the baseBalance
       let baseBalance = this.getBaseBalance();
       const newBaseAmount = Number(this.state.baseAmount) - baseBalance * 0.02;
-      newState.baseAmount = newBaseAmount > baseBalance ? baseBalance : newBaseAmount;
-      const fee = this.getBaseFee(newState.baseAmount);
-      newState.quoteAmount = (newState.baseAmount - fee) * this.currentPrice();
-      if (newState.quoteAmount < 0) {
-        newState.baseAmount = "";
-        newState.quoteAmount = "";
-      }
+      newState.baseAmount = newBaseAmount < 0 ? 0 : newBaseAmount;
+      newState.quoteAmount = newState.baseAmount * this.currentPrice();
     }
 
     newState.quoteChanged = false;
@@ -545,9 +503,7 @@ class SpotForm extends React.Component {
     let quoteAmount = this.state.quoteAmount;
     // show msg with no fee
     const fairPrice = this.currentPrice();
-    let price = (this.props.side === 'b')
-      ? (quoteAmount - this.getQuoteFee(quoteAmount)) / baseAmount
-      : quoteAmount / (baseAmount - this.getBaseFee(baseAmount));
+    let price = quoteAmount / baseAmount;
     const delta = (this.props.side === 'b')
       ? ((price - fairPrice) / fairPrice) * 100
       : ((fairPrice - price) / fairPrice) * 100;
@@ -670,24 +626,28 @@ class SpotForm extends React.Component {
     if (this.props.side === "s") {
       let baseBalance = this.getBaseBalance();
       let amount = (baseBalance * val) / 100;
-      newstate.baseAmount = amount > baseBalance ? baseBalance : amount;
-      const fee = this.getBaseFee(newstate.baseAmount);
-      newstate.quoteAmount = (newstate.baseAmount - fee) * this.currentPrice();
-      if (newstate.quoteAmount < 0) {
+      baseBalance -= this.getBaseFee(newstate.baseAmount);
+      if (baseBalance < 0) {
         newstate.baseAmount = "";
         newstate.quoteAmount = "";
-      }
+      } else {
+        newstate.baseAmount = amount > baseBalance ? baseBalance : amount;
+        newstate.quoteAmount = newstate.baseAmount * this.currentPrice();
+      }      
     } else if (this.props.side === "b") {
       let quoteBalance = this.getQuoteBalance();
       let amount = (quoteBalance * val) / 100;
-      newstate.quoteAmount = amount > quoteBalance ? quoteBalance : amount;
-      const fee = this.getQuoteFee(newstate.quoteAmount);
-      newstate.baseAmount = (newstate.quoteAmount - fee) / this.currentPrice();
-      if (newstate.baseAmount < 0) {
+      quoteBalance -= this.getQuoteFee(newstate.quoteAmount);
+      if (quoteBalance < 0) {
         newstate.baseAmount = "";
         newstate.quoteAmount = "";
-      }
+      } else {
+        newstate.quoteAmount = amount > quoteBalance ? quoteBalance : amount;
+        newstate.baseAmount = newstate.quoteAmount / this.currentPrice();
+      }      
     }
+    if (newstate.quoteAmount === 0) newstate.quoteAmount = "";
+    if (newstate.baseAmount === 0) newstate.baseAmount = "";
     newstate.baseChanged = false;
     newstate.quoteChanged = false;
     this.setState(newstate);
@@ -714,38 +674,11 @@ class SpotForm extends React.Component {
     }
 
     if (
-      this.props.marketInfo && prevProps.marketInfo && this.props.marketInfo !== prevProps.marketInfo
+      (this.props.orderType !== prevProps.orderType) ||
+      (this.props.side !== prevProps.side)
     ) {
       const newState = { ...this.state };
-      if (this.props.side === 's' && !Number.isNaN(newState.baseAmount)) {
-        // follow fee for sell order
-        const newBaseAmount = Number(newState.baseAmount) + this.props.marketInfo.baseFee - prevProps.marketInfo.baseFee;
-        if (newBaseAmount <= 0 || newState.quoteChanged === "") {
-          newState.baseAmount= "";
-          newState.quoteAmount= "";
-          newState.baseChanged= false;
-          newState.quoteChanged= false;
-        } else {
-          newState.baseAmount = newBaseAmount;
-        }
-      } else if (this.props.side === 'b' && !Number.isNaN(this.props.quoteChanged)) {
-        // follow fee for buy order
-        const newQuoteAmount = Number(newState.quoteAmount) + this.props.marketInfo.quoteFee - prevProps.marketInfo.quoteFee;
-        if (newQuoteAmount <= 0 || newState.baseAmount === "") {
-          newState.baseAmount= "";
-          newState.quoteAmount= "";
-          newState.baseChanged= false;
-          newState.quoteChanged= false;
-        } else {
-          newState.quoteAmount = newQuoteAmount;
-        }
-      }
-      this.setState(newState);
-    }
-
-    if (this.props.orderType !== prevProps.orderType) {
-      const newState = { ...this.state };
-      if (this.props.side === 'b') {
+      if (this.props.quoteChanged) {
         // for buy quoteAmount should be fixed
         newState.baseAmount = newState.quoteAmount / this.currentPrice();
         newState.baseAmount = newState.baseAmount === 0 ? "" : newState.baseAmount;
@@ -816,10 +749,10 @@ class SpotForm extends React.Component {
       baseAllowance = 0;
       quoteAllowance = 0;
     }
-    if (isNaN(baseBalance)) {
+    if (isNaN(baseBalance) || baseBalance < marketInfo.baseFee) { // hide small balances
       baseBalance = 0;
     }
-    if (isNaN(quoteBalance)) {
+    if (isNaN(quoteBalance) || quoteBalance < marketInfo.quoteFee) { // hide small balances
       quoteBalance = 0;
     }
 

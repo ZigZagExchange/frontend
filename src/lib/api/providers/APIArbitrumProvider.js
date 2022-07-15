@@ -95,31 +95,46 @@ export default class APIArbitrumProvider extends APIProvider {
   submitOrder = async (market, side, baseAmountBN, quoteAmountBN, expirationTimeSeconds) => {
     const marketInfo = this.api.marketInfo[market];
 
-    let makerToken, takerToken, makerAmountBN, takerAmountBN, gasFee, makerVolumeFeeBN, takerVolumeFeeBN;
+    const [baseToken, quoteToken] = market.split('-');
+    let makerToken, takerToken, makerAmountBN, takerAmountBN, gasFeeBN, balanceBN;
     if(side === 's') {
       makerToken = marketInfo.baseAsset.address;
       takerToken = marketInfo.quoteAsset.address;
       makerAmountBN = baseAmountBN;
       takerAmountBN = quoteAmountBN.mul(99999).div(100000);
-      gasFee = ethers.utils.parseUnits (
-        parseFloat(marketInfo.baseFee).toFixed(marketInfo.baseAsset.decimals),
-        marketInfo.baseAsset.decimals 
-      )
-      makerVolumeFeeBN = baseAmountBN.div(10000).mul(marketInfo.makerVolumeFee * 100)
-      takerVolumeFeeBN = quoteAmountBN.div(10000).mul(marketInfo.takerVolumeFee * 100)
-      makerAmountBN = makerAmountBN.sub(gasFee).sub(makerVolumeFeeBN)
+      gasFeeBN = ethers.utils.parseUnits (
+        Number(marketInfo.baseFee).toFixed(marketInfo.baseAsset.decimals),
+        marketInfo.baseAsset.decimals
+      );
+      balanceBN = ethers.BigNumber.from(this.api.balances[baseToken].value);
     } else {
       makerToken = marketInfo.quoteAsset.address;
       takerToken = marketInfo.baseAsset.address;
       makerAmountBN = quoteAmountBN;
       takerAmountBN = baseAmountBN.mul(99999).div(100000);
-      gasFee = ethers.utils.parseUnits (
-        parseFloat(marketInfo.quoteFee).toFixed(marketInfo.quoteAsset.decimals),
+      gasFeeBN = ethers.utils.parseUnits (
+        Number(marketInfo.quoteFee).toFixed(marketInfo.quoteAsset.decimals),
         marketInfo.quoteAsset.decimals
-      )
-      makerVolumeFeeBN = quoteAmountBN.div(10000).mul(marketInfo.makerVolumeFee * 100)
-      takerVolumeFeeBN = baseAmountBN.div(10000).mul(marketInfo.takerVolumeFee * 100)
-      makerAmountBN = makerAmountBN.sub(gasFee).sub(makerVolumeFeeBN)
+      );
+      balanceBN = ethers.BigNumber.from(this.api.balances[quoteToken].value);
+    }
+
+    const makerVolumeFeeBN = quoteAmountBN.div(10000).mul(marketInfo.makerVolumeFee * 100)
+    const takerVolumeFeeBN = baseAmountBN.div(10000).mul(marketInfo.takerVolumeFee * 100)
+
+    // size check
+    if (makerVolumeFeeBN.gte(takerVolumeFeeBN)) {
+      balanceBN = balanceBN.sub(gasFeeBN).sub(makerVolumeFeeBN);
+    } else {
+      balanceBN = balanceBN.sub(gasFeeBN).sub(takerVolumeFeeBN);
+    }
+    const delta = makerAmountBN.mul('1000').div(balanceBN).toNumber();
+    if (delta > 1001) { // 100.1 %
+      throw new Error(`Amount exceeds balance.`);
+    }
+    // prevent dust issues
+    if (delta > 999) { // 99.9 %
+      makerAmountBN = balanceBN;
     }
 
     const Order = {
@@ -131,7 +146,7 @@ export default class APIArbitrumProvider extends APIProvider {
       takerAssetAmount: takerAmountBN.toString(),
       makerVolumeFee: makerVolumeFeeBN.toString(),
       takerVolumeFee: takerVolumeFeeBN.toString(),
-      gasFee: gasFee.toString(),
+      gasFee: gasFeeBN.toString(),
       expirationTimeSeconds: expirationTimeSeconds.toFixed(0),
       salt: (Math.random() * 123456789).toFixed(0),
     };
