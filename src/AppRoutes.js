@@ -23,9 +23,7 @@ const AppRoutes = () => {
         if (!settings.layouts) {
             dispatch(resetTradeLayout());
         }
-        if (!settings.layouts) {
-            dispatch(setUISettings({ key: "editable", value: false }));
-        }
+        dispatch(setUISettings({ key: "editable", value: false }));
     }, []);
 
     return (
