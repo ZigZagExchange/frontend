@@ -1061,7 +1061,7 @@ class SpotForm extends React.Component {
                     </InputBox>
                     <RangeWrapper>
                         <RangeSlider
-                            value={this.amountPercentOfMax()}
+                            value={this.state.exchangePercent}
                             onChange={this.rangeSliderHandler.bind(this)}
                         />
                         <span className="current_progress">
