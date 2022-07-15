@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
     resetTradeLayout,
     settingsSelector,
+    setUISettings,
 } from "lib/store/features/api/apiSlice";
 import TradePage from "components/pages/TradePage/TradePage";
 import BridgePage from "components/pages/BridgePage/BridgePage";
@@ -19,9 +20,11 @@ const AppRoutes = () => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        console.log(settings);
         if (!settings.layouts) {
             dispatch(resetTradeLayout());
+        }
+        if (!settings.layouts) {
+            dispatch(setUISettings({ key: "editable", value: false }));
         }
     }, []);
 
