@@ -127,6 +127,14 @@ export const apiSlice = createSlice({
           state.marketFills[fillid] = fill;
         }
         if (
+          fill[6] === "m" &&
+          fill[2] === state.currentMarket &&
+          fill[0] === state.network
+        ) {
+          state.marketFills[fillid] = fill;
+          delete state.marketFills[Object.keys(state.marketFills)[0]];
+        }
+        if (
           state.userId &&
           takerUserId === state.userId.toString().toLowerCase()
         ) {
