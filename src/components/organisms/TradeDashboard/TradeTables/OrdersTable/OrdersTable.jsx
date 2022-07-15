@@ -480,7 +480,7 @@ export default function OrdersTable(props) {
                         font="primaryExtraSmallSemiBold"
                         color="foregroundLowEmphasis"
                       >
-                        Amount
+                        Filled
                       </Text>
                     </td>
                     <td>
@@ -489,26 +489,8 @@ export default function OrdersTable(props) {
                         color="foregroundHighEmphasis"
                         textAlign="right"
                       >
-                        {baseQuantity.toPrecision(6) / 1} {baseCurrency}
-                      </Text>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <Text
-                        font="primaryExtraSmallSemiBold"
-                        color="foregroundLowEmphasis"
-                      >
-                        Fee
-                      </Text>
-                    </td>
-                    <td>
-                      <Text
-                        font="primaryExtraSmallSemiBold"
-                        color="foregroundHighEmphasis"
-                        textAlign="right"
-                      >
-                        {remaining.toPrecision(6) / 1} {baseCurrency}
+                        {(baseQuantity.toPrecision(6) / 1 - remaining.toPrecision(6) / 1)} / {(baseQuantity.toPrecision(6) / 1)}
+                        {baseCurrency}
                       </Text>
                     </td>
                   </tr>
