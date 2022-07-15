@@ -23,7 +23,9 @@ const ButtonWrapper = styled.div`
   gap: 8px;
   width: 130px;
   img {
-    height: 1.6rem;
+    height: 24px;
+    width: auto;
+    max-width: unset;
   }
 `
 
@@ -196,7 +198,7 @@ const DropdownContent = styled.div`
   overflow-y: auto;
 `;
 
-const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, updateMarketChain, rowData, onFavourited }) => {
+const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, updateMarketChain, rowData, onFavourited, favourited }) => {
     // const [foundPairs, setFoundPairs] = useState([])
     const [pairs, setPairs] = useState([])
     const [categorySelected, setCategorySelected] = useState(0)
@@ -217,6 +219,11 @@ const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, upda
     const [_marketInfo, setMarketInfo] = useState(null);
     const [_rowData, setRowData] = useState([]);
     const [isIncrease, setIsIncrease] = useState([]);
+
+    useEffect(()=>{
+        if(favourited)
+            setFavourites(favourited);
+    },[favourited])
 
     HideMenuOnOutsideClicked(wrapperRef, setIsOpened)
 
@@ -483,6 +490,7 @@ const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, upda
         const shown_pairs = pairs
             .map((pair) => [pair, _rowData.find((row) => row.td1 === pair)])
             .sort(([_, d], [__, d2]) => {
+		if (!d || !d2) return 0;
                 if (changeSorted) {
                     return changeDirection ? d.td3 - d2.td3 : d2.td3 - d.td3;
                 } else if (volumeSorted) {

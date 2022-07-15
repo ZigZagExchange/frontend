@@ -29,11 +29,10 @@ const TransactionSettings = ({
             text={
               <div>
                 <p>
-                  Your order will only get filled within your slippage
-                  tolerance.
+                  Your order will only get filled within your slippage tolerance.
                 </p>
                 <p>
-                  Otherwise the order stays open and turns into a limit order.
+                  Unfilled orders remain open for 60 seconds and are automatically closed after.
                 </p>
               </div>
             }

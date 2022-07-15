@@ -4,7 +4,7 @@ import styled from "@xstyled/styled-components";
 import TradeSidebar from "./TradeSidebar/TradeSidebar";
 import TradeMarketSelector from "./TradeMarketSelector/TradeMarketSelector";
 import TradeTables from "./TradeTables/TradeTables";
-import TradeFooter from "./TradeFooter/TradeFooter";
+// import TradeFooter from "./TradeFooter/TradeFooter";
 import TradeChartArea from "./TradeChartArea/TradeChartArea";
 import OrdersBook from "./TradeBooks/OrdersBook";
 import TradesBook from "./TradeBooks/TradesBook";
@@ -25,13 +25,13 @@ import { userSelector } from "lib/store/features/auth/authSlice";
 import api from "lib/api";
 import { useLocation, useHistory } from "react-router-dom";
 import {
-  getChainIdFromMarketChain,
   marketQueryParam,
   networkQueryParam,
 } from "../../pages/ListPairPage/SuccessModal";
 import TradesTable from "./TradeBooks/TradesTable";
 import { HighSlippageModal } from "components/molecules/HighSlippageModal";
 import _ from "lodash";
+import { formatPrice, addComma } from "lib/utils";
 
 const TradeContainer = styled.div`
   color: #aeaebf;
@@ -111,14 +111,14 @@ export function TradeDashboard() {
 
   useEffect(()=>{
     if(_.isEmpty(marketSummary)) return
-    document.title = `${marketSummary.price} | ${marketSummary.market??'--'} | ZigZag Exchange`;
+    document.title = `${addComma(formatPrice(marketSummary.price))} | ${marketSummary.market??'--'} | ZigZag Exchange`;
   }, [marketSummary])
 
   useEffect(() => {
     const urlParams = new URLSearchParams(search);
     const marketFromURL = urlParams.get(marketQueryParam);
     const networkFromURL = urlParams.get(networkQueryParam);
-    const chainid = getChainIdFromMarketChain(networkFromURL);
+    const chainid = api.getChainIdFromName(networkFromURL);
     if (marketFromURL && currentMarket !== marketFromURL) {
       updateMarketChain(marketFromURL);
     }
@@ -136,6 +136,8 @@ export function TradeDashboard() {
       networkText = "zksync";
     } else if (network === 1000) {
       networkText = "zksync-rinkeby";
+    } else if (network === 42161) {
+      networkText = "arbitrum";
     }
     history.push(`/?market=${currentMarket}&network=${networkText}`);
   }, [network, currentMarket]);
