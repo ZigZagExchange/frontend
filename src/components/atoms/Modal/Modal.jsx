@@ -4,6 +4,7 @@ import { CSSTransition } from "react-transition-group";
 import styled from 'styled-components';
 import "./Modal.css";
 import Text from 'components/atoms/Text/Text'
+import useTheme from "components/hooks/useTheme";
 
 const ModalWrapper = styled.div`
   &.currency-modal {
@@ -20,6 +21,10 @@ const ModalWrapper = styled.div`
       background: ${({ theme }) => theme.colors.backgroundHighEmphasis};
     }
 
+    .zig_modal_body_light {
+      background: ${({ theme }) => theme.colors.backgroundHighEmphasis};
+    }
+
     .bridge_searchbox input {
       background: ${({ theme }) => theme.colors.backgroundHighEmphasis};
       color: ${({ theme }) => theme.colors.foregroundHighEmphasis};
@@ -27,6 +32,12 @@ const ModalWrapper = styled.div`
     }
 
     .zig_modal_body ul li {
+      background: ${({ theme }) => theme.colors.backgroundHighEmphasis};
+      border: 1px solid ${({ theme }) => theme.colors.foreground400};
+      color: ${({ theme }) => theme.colors.foregroundHighEmphasis};
+    }
+
+    .zig_modal_body_light ul li {
       background: ${({ theme }) => theme.colors.backgroundHighEmphasis};
       border: 1px solid ${({ theme }) => theme.colors.foreground400};
       color: ${({ theme }) => theme.colors.foregroundHighEmphasis};
@@ -40,6 +51,7 @@ const Divider = styled.div`
 `
 
 export const Modal = (props) => {
+  const {isDark} = useTheme();
   const closeOnEscapeKeyDown = (e) => {
     if ((e.charCode || e.keyCode) === 27) {
       props.onClose();
@@ -60,13 +72,13 @@ export const Modal = (props) => {
       timeout={{ enter: 0, exit: 300 }}
     >
       <div className="zig_modal" onClick={props.onClose}>
-        <ModalWrapper className={`zig_modal_content  ${props.adClass}`} onClick={(e) => e.stopPropagation()}>
+        <ModalWrapper className={isDark ? `zig_modal_content  ${props.adClass}` : `zig_modal_content_light  ${props.adClass}`} onClick={(e) => e.stopPropagation()}>
           <div className="zig_modal_header">
             <Text font='primaryHeading6' color="foregroundHighEmphasis">{props.title}</Text>
 
             <Divider />
           </div>
-          <div className="zig_modal_body zig_scrollstyle">{props.children}</div>
+          <div className={isDark ?"zig_modal_body zig_scrollstyle" : "zig_modal_body_light zig_scrollstyle"}>{props.children}</div>
         </ModalWrapper>
       </div>
     </CSSTransition>,

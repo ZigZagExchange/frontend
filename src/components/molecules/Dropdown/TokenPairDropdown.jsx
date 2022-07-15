@@ -514,6 +514,8 @@ const TokenPairDropdown = ({ width, transparent, currentMarket, marketInfo, upda
                         onClick={(e) => {
                             if (selected) return;
                             updateMarketChain(pair);
+                            if(isMobile)
+                                setIsOpened(false)
                         }}
                         className={selected ? "selected" : ""}
                     >

@@ -31,6 +31,8 @@ import {
 import { formatPrice, formatUSD, formatToken, addComma } from "lib/utils";
 import { LoadingSpinner } from "components/atoms/LoadingSpinner";
 
+const isMobile = window.innerWidth < 410;
+
 const ConvertPage = () => {
   const coinEstimator = useCoinEstimator();
   const userOrders = useSelector(userOrdersSelector);
@@ -772,7 +774,7 @@ const ConvertPage = () => {
       {!loading && (
         <div className={classNames("flex justify-center", { dark: isDark })}>
           <div className="w-full max-w-lg px-1 sm:px-0">
-            <p className="mt-10 text-3xl font-semibold font-work ">
+            <p className={isMobile ? "text-3xl font-semibold font-work ":"mt-10 text-3xl font-semibold font-work "}>
               ZigZag Convert
             </p>
             <ConvertContianer

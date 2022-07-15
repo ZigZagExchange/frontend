@@ -8,6 +8,8 @@ import {
 } from "lib/store/features/api/apiSlice";
 import api from "lib/api";
 
+const isMobile = window.innerWidth < 500;
+
 const TransferHistory = () => {
   const receipts = useSelector(bridgeReceiptsSelector);
   const dispatch = useDispatch();
@@ -79,7 +81,7 @@ const TransferHistory = () => {
                         })}
                       />
                       <p className="text-xs font-semibold ">
-                        {item.amount} {item.token}
+                        {Math.round(Number(item.amount) * 10 **6)/10**6} {item.token}
                       </p>
                     </div>
                     <div className="flex gap-5">
@@ -88,7 +90,9 @@ const TransferHistory = () => {
                         target="_blank"
                         rel="noreferrer"
                         className="text-xs text-gray-400 hover:underline underline-offset-2"
-                      >{`${item.txId.substr(0, 10)}...${item.txId.substr(
+                      >{isMobile ? `${item.txId.substr(0, 5)}...${item.txId.substr(
+                        -4
+                      )}` : `${item.txId.substr(0, 10)}...${item.txId.substr(
                         -6
                       )}`}</a>
                       <p className="text-xs font-semibold text-gray-400 ">
