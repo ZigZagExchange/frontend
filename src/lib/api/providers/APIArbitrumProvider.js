@@ -108,7 +108,7 @@ export default class APIArbitrumProvider extends APIProvider {
       makerAmountBN = baseAmountBN;
       takerAmountBN = quoteAmountBN.mul(99999).div(100000);
       gasFee = ethers.utils.parseUnits (
-        marketInfo.baseFee.toString(),
+        parseFloat(marketInfo.baseFee).toFixed(marketInfo.baseAsset.decimals),
         marketInfo.baseAsset.decimals 
       )
       makerVolumeFeeBN = baseAmountBN.div(10000).mul(marketInfo.makerVolumeFee * 100)
@@ -120,7 +120,7 @@ export default class APIArbitrumProvider extends APIProvider {
       makerAmountBN = quoteAmountBN;
       takerAmountBN = baseAmountBN.mul(99999).div(100000);
       gasFee = ethers.utils.parseUnits (
-        marketInfo.quoteFee.toString(),
+        parseFloat(marketInfo.quoteFee).toFixed(marketInfo.quoteAsset.decimals),
         marketInfo.quoteAsset.decimals
       )
       makerVolumeFeeBN = quoteAmountBN.div(10000).mul(marketInfo.makerVolumeFee * 100)

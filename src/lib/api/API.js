@@ -26,20 +26,20 @@ const chainMap = {
 };
 
 export default class API extends Emitter {
-  networks = {}
-  ws = null
-  apiProvider = null
-  mainnetProvider = null
-  rollupProvider = null
-  currencies = null
-  isArgent = false
-  marketInfo = {}
-  lastPrices = {}
-  balances = {}
-  _signInProgress = null
-  _profiles = {}
-  _pendingOrders = []
-  _pendingFills = []
+  networks = {};
+  ws = null;
+  apiProvider = null;
+  mainnetProvider = null;
+  rollupProvider = null;
+  currencies = null;
+  isArgent = false;
+  marketInfo = {};
+  lastPrices = {};
+  balances = {};
+  _signInProgress = null;
+  _profiles = {};
+  _pendingOrders = [];
+  _pendingFills = [];
 
   constructor({ infuraId, networks, currencies, validMarkets }) {
     super();
@@ -273,19 +273,36 @@ export default class API extends Emitter {
 
   refreshNetwork = async () => {
     if (!window.ethereum) return;
-    let ethereumChainId;
+    let ethereumChainId, ethereumChainInfo;
 
     // await this.signOut();
 
     switch (this.apiProvider.network) {
       case 1:
         ethereumChainId = "0x1";
+        ethereumChainInfo = {
+          chainId: "0x1",
+        };
         break;
       case 1000:
         ethereumChainId = "0x4";
+        ethereumChainInfo = {
+          chainId: "0x4",
+        };
         break;
       case 42161:
         ethereumChainId = "0xa4b1";
+        ethereumChainInfo = {
+          chainId: "0xA4B1",
+          chainName: "Arbitrum",
+          nativeCurrency: {
+            name: "Arbitrum Coin",
+            symbol: "ETH",
+            decimals: 18,
+          },
+          rpcUrls: ["https://arb1.arbitrum.io/rpc"],
+          blockExplorerUrls: ["https://arbiscan.io/"],
+        };
         break;
       default:
         return;
@@ -296,10 +313,24 @@ export default class API extends Emitter {
       params: [{ eth_accounts: {} }],
     });
 
-    await window.ethereum.request({
-      method: "wallet_switchEthereumChain",
-      params: [{ chainId: ethereumChainId }],
-    });
+    try {
+      await window.ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: ethereumChainId }],
+      });
+    } catch (switchError) {
+      try {
+        if (switchError.code === 4902) {
+          await window.ethereum.request({
+            method: "wallet_addEthereumChain",
+            params: [ethereumChainInfo],
+          });
+        }
+      } catch (addError) {
+        console.error(addError);
+        throw addError;
+      }
+    }
   };
 
   _socketError = (e) => {
@@ -419,13 +450,12 @@ export default class API extends Emitter {
     if (isMobile) window.localStorage.clear();
     else window.localStorage.removeItem("walletconnect");
 
-
-    this.marketInfo = {}
-    this.lastPrices = {}
-    this.balances = {}
-    this._profiles = {}
-    this._pendingOrders = []
-    this._pendingFills = []
+    this.marketInfo = {};
+    this.lastPrices = {};
+    this.balances = {};
+    this._profiles = {};
+    this._pendingOrders = [];
+    this._pendingFills = [];
 
     this.web3 = null;
     this.web3Modal = null;
@@ -840,54 +870,48 @@ export default class API extends Emitter {
     };
   };
 
-  submitOrder = async (
-    market,
-    side,
-    baseAmount,
-    quoteAmount,
-    orderType
-  ) => {
+  submitOrder = async (market, side, baseAmount, quoteAmount, orderType) => {
     if (!quoteAmount || !baseAmount) {
       throw new Error("Set base or quote amount");
     }
-    
+
     const marketInfo = this.marketInfo[market];
-    let baseAmountBN = ethers.utils.parseUnits (
+    let baseAmountBN = ethers.utils.parseUnits(
       Number(baseAmount).toFixed(marketInfo.baseAsset.decimals),
       marketInfo.baseAsset.decimals
     );
-    let quoteAmountBN = ethers.utils.parseUnits (
+    let quoteAmountBN = ethers.utils.parseUnits(
       Number(quoteAmount).toFixed(marketInfo.quoteAsset.decimals),
       marketInfo.quoteAsset.decimals
     );
-    
-    const [baseToken, quoteToken] = market.split('-');
-    if (side === 's') {
+
+    const [baseToken, quoteToken] = market.split("-");
+    if (side === "s") {
       const delta = baseAmount / this.balances[baseToken].valueReadable;
-      
+
       if (delta > 100.05) {
-        throw new Error(`Amount exceeds ${baseToken} balance.`)
+        throw new Error(`Amount exceeds ${baseToken} balance.`);
       }
       if (delta > 99.95) {
         baseAmountBN = this.balances[baseToken].value;
       }
-    } else if (side === 'b'){
+    } else if (side === "b") {
       const delta = quoteAmount / this.balances[quoteToken].valueReadable;
       if (delta > 100.05) {
-        throw new Error(`Amount exceeds ${quoteToken} balance.`)
+        throw new Error(`Amount exceeds ${quoteToken} balance.`);
       }
       if (delta > 99.95) {
         quoteAmountBN = this.balances[quoteToken].value;
       }
-    } else {      
-      throw new Error(`Bad side ${side}.`)
+    } else {
+      throw new Error(`Bad side ${side}.`);
     }
 
     const expirationTimeSeconds = Math.floor(
-      (orderType === 'market')
+      orderType === "market"
         ? Date.now() / 1000 + 60 * 2 // two minutes
         : Date.now() / 1000 + 60 * 60 * 24 * 7 // one week
-    )
+    );
 
     await this.apiProvider.submitOrder(
       market,
@@ -932,7 +956,7 @@ export default class API extends Emitter {
   checkAccountActivated = async () => {
     if (!this.apiProvider.isZksyncChain) return true;
     return this.apiProvider.checkAccountActivated();
-  }
+  };
 
   warpETH = async (amount) => {
     if (!amount) throw new Error("No amount set");
