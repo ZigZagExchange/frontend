@@ -749,10 +749,10 @@ class SpotForm extends React.Component {
       baseAllowance = 0;
       quoteAllowance = 0;
     }
-    if (isNaN(baseBalance) || baseBalance < marketInfo.baseFee) { // hide small balances
+    if (isNaN(baseBalance) || (marketInfo?.baseFee && baseBalance < marketInfo.baseFee)) { // hide small balances
       baseBalance = 0;
     }
-    if (isNaN(quoteBalance) || quoteBalance < marketInfo.quoteFee) { // hide small balances
+    if (isNaN(quoteBalance) || (marketInfo?.quoteFee && quoteBalance < marketInfo.quoteFee)) { // hide small balances
       quoteBalance = 0;
     }
 
