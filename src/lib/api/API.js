@@ -272,20 +272,37 @@ export default class API extends Emitter {
   };
 
   refreshNetwork = async () => {
-    if (!window.ethereum) return;
-    let ethereumChainId;
+    if (!window.ethereum) return
+    let ethereumChainId, ethereumChainInfo;
 
     // await this.signOut();
 
     switch (this.apiProvider.network) {
       case 1:
         ethereumChainId = "0x1";
+        ethereumChainInfo = {
+          chainId: "0x1"
+        }
         break;
       case 1000:
         ethereumChainId = "0x4";
+        ethereumChainInfo = {
+          chainId: "0x4"
+        }
         break;
       case 42161:
         ethereumChainId = "0xa4b1";
+        ethereumChainInfo = {
+          chainId: '0xA4B1',
+          chainName: 'Arbitrum',
+          nativeCurrency: {
+              name: 'Arbitrum Coin',
+              symbol: 'ETH',
+              decimals: 18
+          },
+          rpcUrls: ['https://arb1.arbitrum.io/rpc'],
+          blockExplorerUrls: ['https://arbiscan.io/']
+        }
         break;
       default:
         return;
@@ -296,10 +313,24 @@ export default class API extends Emitter {
       params: [{ eth_accounts: {} }],
     });
 
-    await window.ethereum.request({
-      method: "wallet_switchEthereumChain",
-      params: [{ chainId: ethereumChainId }],
-    });
+    try {
+      await window.ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: ethereumChainId }],
+      });
+    } catch (switchError) {
+      try {
+        if (switchError.code === 4902) {
+          await window.ethereum.request({
+            method: "wallet_addEthereumChain",
+            params: [ethereumChainInfo],
+          });
+        }
+      } catch (addError) {
+        console.error(addError);
+        throw addError;
+      }
+    }
   };
 
   _socketError = (e) => {
