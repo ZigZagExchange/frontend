@@ -787,7 +787,8 @@ export default function OrdersTable(props) {
                       font="primaryExtraSmallSemiBold"
                       color="foregroundHighEmphasis"
                     >
-                      {(baseQuantity.toPrecision(6) / 1 - remaining.toPrecision(6) / 1) / (baseQuantity.toPrecision(6) / 1)}
+                      {(baseQuantity.toPrecision(6) / 1 - remaining.toPrecision(6) / 1)} / {(baseQuantity.toPrecision(6) / 1)}
+                      {baseCurrency}
                     </Text>
                   </td>
                   {/* <td data-label="Remaining">
