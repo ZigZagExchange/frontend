@@ -532,11 +532,11 @@ const ConvertPage = () => {
 
     const [baseToken, quoteToken] = currentMarket.split('-');
     if (baseToken !== buyToken?.name && quoteToken !== buyToken?.name) {
-      setError("Buy token not it current market.")
+      setError("Buy token not in current market.")
       return;
     }
     if (baseToken !== sellToken?.name && quoteToken !== sellToken?.name) {
-      setError("Sell token not it current market.")
+      setError("Sell token not in current market.")
       return;
     }
 
@@ -558,9 +558,7 @@ const ConvertPage = () => {
       return;
     }
 
-    const price = tType === 'buy'
-      ? quoteAmount + getQuoteFee(quoteAmount) / baseAmount
-      : quoteAmount / baseAmount + getBaseFee(baseAmount);
+    const price = quoteAmount / baseAmount;
     const targetPrice = currentPrice;
     if (!targetPrice || !price) {
       setError("No price available")
@@ -641,8 +639,6 @@ const ConvertPage = () => {
       : buyAmountParsed;
 
     const price = quoteAmount / baseAmount;
-    baseAmount = tType === 'buy' ? baseAmount : baseAmount + getBaseFee(baseAmount);
-    quoteAmount = tType === 'buy' ? quoteAmount + getQuoteFee(quoteAmount) : quoteAmount;
 
     const renderGuidContent = () => {
       return (

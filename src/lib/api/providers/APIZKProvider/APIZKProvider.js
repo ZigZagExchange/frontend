@@ -158,26 +158,44 @@ export default class APIZKProvider extends APIProvider {
     if (!accountActivated)
       throw new Error('Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.');
   
+    const [baseToken, quoteToken] = market.split('-');
     const marketInfo = this.api.marketInfo[market];
     const tokenRatio = {};
-    tokenRatio[marketInfo.baseAsset.id] = ethers.utils.formatUnits(
-      baseAmountBN,
-      marketInfo.baseAsset.decimals
-    );
-    tokenRatio[marketInfo.quoteAsset.id] = ethers.utils.formatUnits(
-      quoteAmountBN,
-      marketInfo.quoteAsset.decimals
-    );
 
-    let sellQuantityBN, tokenSell, tokenBuy;
+    let sellQuantityBN, tokenSell, tokenBuy, balanceBN;
     if (side === 's') {
       sellQuantityBN = baseAmountBN;
       tokenSell = marketInfo.baseAsset.id;
       tokenBuy = marketInfo.quoteAsset.id;
+      const sellFeeBN = ethers.utils.parseUnits(
+        marketInfo.baseFee.toFixed(marketInfo.baseAsset.decimals),
+        marketInfo.baseAsset.decimals
+      );
+      sellQuantityBN = sellQuantityBN.add(sellFeeBN);
+      tokenRatio[marketInfo.baseAsset.id] = baseAmountBN.add(sellFeeBN).toString();
+      tokenRatio[marketInfo.quoteAsset.id] = quoteAmountBN;
+      balanceBN = ethers.BigNumber.from(this.api.balances[baseToken].value);
     } else {
       sellQuantityBN = quoteAmountBN;
       tokenSell = marketInfo.quoteAsset.id;
       tokenBuy = marketInfo.baseAsset.id;
+      const sellFeeBN = ethers.utils.parseUnits(
+        marketInfo.quoteFee.toFixed(marketInfo.quoteAsset.decimals),
+        marketInfo.quoteAsset.decimals
+      );
+      sellQuantityBN = sellQuantityBN.add(sellFeeBN);
+      tokenRatio[marketInfo.baseAsset.id] = baseAmountBN;
+      tokenRatio[marketInfo.quoteAsset.id] = quoteAmountBN.add(sellFeeBN).toString();
+      balanceBN = ethers.BigNumber.from(this.api.balances[quoteToken].value);
+    }
+    
+      // size check
+    const delta = sellQuantityBN.mul('1000').div(balanceBN).toNumber();
+    if (delta > 1001) { // 100.1 %
+      throw new Error(`Amount exceeds balance.`);
+    }
+    if (delta > 999) { // 99.9 %
+      sellQuantityBN = balanceBN;
     }
 
     const packedSellQuantity =
@@ -186,7 +204,7 @@ export default class APIZKProvider extends APIProvider {
       tokenSell,
       tokenBuy,
       amount: packedSellQuantity.toString(),
-      ratio: zksync.utils.tokenRatio(tokenRatio),
+      ratio: zksync.utils.weiRatio(tokenRatio),
       validUntil: expirationTimeSeconds,
     });
 

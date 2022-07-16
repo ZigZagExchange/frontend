@@ -872,28 +872,6 @@ export default class API extends Emitter {
       marketInfo.quoteAsset.decimals
     );
     
-    const [baseToken, quoteToken] = market.split('-');
-    if (side === 's') {
-      const delta = baseAmount / this.balances[baseToken].valueReadable;
-      
-      if (delta > 100.05) {
-        throw new Error(`Amount exceeds ${baseToken} balance.`)
-      }
-      if (delta > 99.95) {
-        baseAmountBN = this.balances[baseToken].value;
-      }
-    } else if (side === 'b'){
-      const delta = quoteAmount / this.balances[quoteToken].valueReadable;
-      if (delta > 100.05) {
-        throw new Error(`Amount exceeds ${quoteToken} balance.`)
-      }
-      if (delta > 99.95) {
-        quoteAmountBN = this.balances[quoteToken].value;
-      }
-    } else {      
-      throw new Error(`Bad side ${side}.`)
-    }
-
     const expirationTimeSeconds = Math.floor(
       (orderType === 'market')
         ? Date.now() / 1000 + 60 * 2 // two minutes

@@ -34,6 +34,7 @@ export default function TradesBook(props) {
   const one_day_ago = Date.now() - 86400 * 1000;
   Object.values(marketFills)
     .filter((fill) => Date.parse(fill[12]) > one_day_ago)
+    .filter((fill) => fill[6] === 'f')
     .sort((a, b) => b[1] - a[1])
     .forEach((fill) => {
       fillData.push({
