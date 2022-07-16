@@ -1640,7 +1640,7 @@ export default function OrdersTable(props) {
               textAlign="center"
               className="view-account-button"
               onClick={() => window.open(
-                api.getExplorerAccountLink(api.apiProvider.network, props.user.address),
+                api.getExplorerAccountLink(api.apiProvider.network, props.user.address, 2),
                 "_blank"
               )}
             >

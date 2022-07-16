@@ -1138,9 +1138,8 @@ export default class API extends Emitter {
   getExplorerAccountLink = (chainId, address, layer = 2) => {
     if(layer === 1){
       switch (Number(chainId)) {
-        case 1: return 'https://etherscan.io/address/' + address;
+        case 1: case 42161: return 'https://etherscan.io/address/' + address;
         case 1000: return 'https://rinkeby.etherscan.io/address/' + address;
-        case 42161: return 'https://etherscan.io/address/' + address;
         default: throw Error("Chain ID not understood");
       }
     }
