@@ -702,11 +702,46 @@ class SpotForm extends React.Component {
   }
 
   showLabel() {    
-   if(this.props.network === 42161) {
+    if(this.props.network === 42161) {
+      const marketInfo = this.props.marketInfo;
+      let gasFee, feeToken, gasFeeUsdValue, makerFee, takerFee, makerFeeUsdValue, takerFeeUsdValue;
+      if (marketInfo) {
+        gasFee = this.props.side === 'b' ? marketInfo.quoteFee : marketInfo.baseFee;
+        gasFee = formatToken(gasFee);
+        feeToken = this.props.side === 'b' ? marketInfo.quoteAsset.symbol : marketInfo.baseAsset.symbol;
+        const amount = this.state.side === 'b' ? this.state.quoteAmount : this.state.baseAmount;
+        if (amount && !Number.isNaN(amount)) {
+          makerFee = amount * marketInfo.makerVolumeFee;
+          takerFee = amount * marketInfo.takerVolumeFee;
+        } else {
+          makerFee = 0;
+          takerFee = 0;
+        }
+        
+        const usdPrice = this.props.side === 'b' ? marketInfo.quoteAsset.usdPrice : marketInfo.baseAsset.usdPrice;
+        gasFeeUsdValue = (gasFee * usdPrice).toFixed(2);
+        makerFeeUsdValue = (makerFee * usdPrice).toFixed(2);
+        takerFeeUsdValue = (takerFee * usdPrice).toFixed(2);
+      }
+
       return (
         <div>
-          <p>Arbitrum's network swap fees are dynamic and sit around ~$1</p>
-          <p>covered by the ZigZag operator, but paid by the taker</p>
+          <p className="font-sans text-sm">Arbitrum's network swap fees are dynamic and</p>
+          <p className="font-sans text-sm">covered by the ZigZag operator, but paid by the taker.</p>
+          { marketInfo && (
+            <div>
+              <p className="font-sans text-s"><hr></hr></p>
+              <p className="font-sans text-sm">Breakdown:</p>
+              <p className="font-sans text-sm">{`Gas fee: ${
+                gasFee} ${feeToken} - (~$ ${gasFeeUsdValue})`}</p>
+              <p className="font-sans text-sm">{`Maker fee (${
+                marketInfo.makerVolumeFee * 100} %): ${
+                  makerFee} ${feeToken} - (~$ ${makerFeeUsdValue})`}</p>
+              <p className="font-sans text-sm">{`Taker fee (${
+                marketInfo.takerVolumeFee * 100} %): ${
+                  takerFee} ${feeToken} - (~$ ${takerFeeUsdValue})`}</p>
+            </div>)
+          }
         </div>
       );
     } else {
@@ -716,7 +751,7 @@ class SpotForm extends React.Component {
           <p>covered by the market maker, but paid by the trader</p>
         </div>
       );
-    }    
+    }
   }
 
   render() {
