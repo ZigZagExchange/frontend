@@ -1135,7 +1135,7 @@ export default class API extends Emitter {
     }
   }
 
-  getExplorerAccountLink = (chainId, address, layer = 1) => {
+  getExplorerAccountLink = (chainId, address, layer = 2) => {
     if(layer === 1){
       switch (Number(chainId)) {
         case 1: return 'https://etherscan.io/address/' + address;
