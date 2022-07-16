@@ -579,6 +579,7 @@ const BridgeContainer = () => {
         })
         .catch((e) => {
           console.error("error sending transaction::", e);
+          toast.error(e.message);
           setTimeout(() => api.getAccountState(), 1000);
         })
         .finally(() => {
