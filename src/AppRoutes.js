@@ -8,11 +8,12 @@ import {
 } from "lib/store/features/api/apiSlice";
 import TradePage from "components/pages/TradePage/TradePage";
 import BridgePage from "components/pages/BridgePage/BridgePage";
-import SwapPage from "components/pages/SwapPage/SwapPage";
+import ConvertPage from "components/pages/ConvertPage/ConvertPage";
 import PoolPage from "components/pages/PoolPage/PoolPage";
 import ListPairPage from "components/pages/ListPairPage/ListPairPage";
 import { Dev } from "./lib/helpers/env";
 import DSLPage from "./components/pages/DSLPage/DSLPage";
+import WrapPage from "./components/pages/WrapPage/WrapPage";
 
 const AppRoutes = () => {
     const settings = useSelector(settingsSelector);

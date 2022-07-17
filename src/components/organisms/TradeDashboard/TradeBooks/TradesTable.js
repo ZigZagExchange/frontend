@@ -10,7 +10,7 @@ const TradesTableWrapper = styled.div`
   grid-area: stack;
   flex-direction: column;
   gap: 8px;
-`
+`;
 
 export default function TradesTable() {
   const currentMarket = useSelector(currentMarketSelector);
@@ -29,14 +29,14 @@ export default function TradesTable() {
     <>
       <TradesTableWrapper>
         <OrdersBook
-            currentMarket={currentMarket}
-            changeFixedPoint={changeFixedPoint}
-            changeSide={changeSide}
+          currentMarket={currentMarket}
+          changeFixedPoint={changeFixedPoint}
+          changeSide={changeSide}
         />
         <TradesBook
-            currentMarket={currentMarket}
-            fixedPoint={fixedPoint}
-            side={side}
+          currentMarket={currentMarket}
+          fixedPoint={fixedPoint}
+          side={side}
         />
       </TradesTableWrapper>
     </>

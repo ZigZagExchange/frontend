@@ -1,30 +1,30 @@
-import React, { useRef } from "react";
+import React from "react";
 import styled from "styled-components";
 import { toast } from "react-toastify";
 import { connect } from "react-redux";
 import api from "lib/api";
 import { RangeSlider, QuestionHelper } from "components";
-import { formatPrice, formatToken } from "lib/utils";
+import { formatPrice, formatToken, addComma } from "lib/utils";
 import "./SpotForm.css";
 import { Button, ConnectWalletButton } from "components/molecules/Button";
 import InputField from "components/atoms/InputField/InputField";
 import Text from "components/atoms/Text/Text";
 import { IconButton as BaseIcon } from "../IconButton";
-import { InfoIcon, MinusIcon, PlusIcon } from "components/atoms/Svg";
+import { MinusIcon, PlusIcon } from "components/atoms/Svg";
 import { setHighSlippageModal } from "lib/store/features/api/apiSlice";
 
-const rx_live = /^\d*(?:[.,]\d*)?$/;
+const isMobile = window.innerWidth < 500;
+
 class SpotForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      userHasEditedPrice: false,
       price: props.lastPrice,
       baseAmount: "",
-      totalAmount: "",
       quoteAmount: "",
-      orderButtonDisabled: true,
       maxSizeSelected: false,
+      baseChanged: false,
+      quoteChanged: false,
     };
   }
 
@@ -33,141 +33,279 @@ class SpotForm extends React.Component {
     else return false;
   }
 
+  getExchangePercentage(baseAmount, quoteAmount) {
+    if (!this.props.user.id) return 0;
+    let result;
+    if (this.props.side === "s") {
+      const baseBalance = this.getBaseBalance();
+      const baseFee = this.getBaseFee();
+      result = ((Number(baseAmount) + Number(baseFee)) / baseBalance) * 100;
+    } else {
+      const quoteBalance = this.getQuoteBalance();
+      const quoteFee = this.getQuoteFee();
+      result = ((Number(quoteAmount) + Number(quoteFee)) / quoteBalance) * 100;
+    }
+    if (Number.isNaN(result) || result <= 0) {
+      return 0;
+    } else if (!Number.isFinite(result) || result >= 99.5) {
+      return 100;
+    }
+    return result.toFixed(0);
+  }
+
   updatePrice(e) {
     const newState = { ...this.state };
-    newState.price = rx_live.test(e.target.value)
-      ? e.target.value
-      : this.state.price;
-    newState.userHasEditedPrice = true;
-    newState.totalAmount =
-      this.props.orderType === "limit"
-        ? (newState.price * newState.baseAmount).toPrecision(6)
-        : (this.props.marketSummary.price * newState.baseAmount).toPrecision(6);
-    newState.orderButtonDisabled = this.isInvalidNumber(newState.totalAmount);
+    newState.price = e.target.value.replace(",", ".").replace(/[^0-9.]/g, "");
+    if (this.props.quoteChanged) {
+      // for buy quoteAmount should be fixed
+      newState.baseAmount = newState.quoteAmount / newState.price;
+    } else {
+      // for sell baseAmount should be fixed
+      newState.quoteAmount = newState.price * newState.baseAmount;
+    }
+
+    newState.quoteChanged = false;
+    newState.baseChanged = false;
+    this.setState(newState);
+  }
+
+  updateBaseAmount(e) {
+    const newState = { ...this.state };
+    newState.baseAmount = e.target.value
+      .replace(",", ".")
+      .replace(/[^0-9.]/g, "");
+    if (
+      /^0\.?0*$/.test(newState.baseAmount) ||
+      Number.isNaN(newState.baseAmount)
+    ) {
+      newState.quoteAmount = "";
+    } else {
+      const price = this.currentPrice();
+      if (price) {
+        newState.quoteAmount = price * newState.baseAmount;
+      } else {
+        newState.quoteAmount = "";
+      }
+    }
+    newState.baseChanged = true;
+    newState.quoteChanged = false;
+    this.setState(newState);
+  }
+
+  updateQuoteAmount(e) {
+    const newState = { ...this.state };
+    newState.quoteAmount = e.target.value
+      .replace(",", ".")
+      .replace(/[^0-9.]/g, "");
+    if (
+      /^0\.?0*$/.test(newState.quoteAmount) ||
+      Number.isNaN(newState.quoteAmount)
+    ) {
+      newState.baseAmount = "";
+    } else {
+      const price = this.currentPrice();
+      if (price) {
+        newState.baseAmount = newState.quoteAmount / price;
+      } else {
+        newState.baseAmount = "";
+      }
+    }
+    newState.baseChanged = false;
+    newState.quoteChanged = true;
     this.setState(newState);
   }
 
   increasePrice(e) {
     e.preventDefault();
     const newState = { ...this.state };
-    newState.price = (Number(this.state.price) + 1).toString();
-    newState.userHasEditedPrice = true;
-    newState.totalAmount =
-      this.props.orderType === "limit"
-        ? (this.currentPrice() * newState.baseAmount).toPrecision(6)
-        : (this.props.marketSummary.price * newState.baseAmount).toPrecision(6);
-    newState.orderButtonDisabled = this.isInvalidNumber(newState.totalAmount);
+    newState.price = formatPrice(this.state.price * 1.001);
+    if (this.props.quoteChanged) {
+      // for buy quoteAmount should be fixed
+      newState.baseAmount = newState.quoteAmount / newState.price;
+    } else {
+      // for sell baseAmount should be fixed
+      newState.quoteAmount = newState.price * newState.baseAmount;
+    }
+
+    newState.quoteChanged = false;
+    newState.baseChanged = false;
     this.setState(newState);
   }
 
   decreasePrice(e) {
     e.preventDefault();
     const newState = { ...this.state };
-    newState.price =
-      Number(this.state.price) - 1 < 0
-        ? "0"
-        : (Number(this.state.price) - 1).toString();
-    newState.userHasEditedPrice = true;
-    newState.totalAmount =
-      this.props.orderType === "limit"
-        ? (this.currentPrice() * newState.baseAmount).toPrecision(6)
-        : (this.props.marketSummary.price * newState.baseAmount).toPrecision(6);
-    newState.orderButtonDisabled = this.isInvalidNumber(newState.totalAmount);
-    this.setState(newState);
-  }
+    newState.price = formatPrice(this.state.price * 0.999);
+    if (this.props.quoteChanged) {
+      // for buy quoteAmount should be fixed
+      newState.baseAmount = newState.quoteAmount / newState.price;
+    } else {
+      // for sell baseAmount should be fixed
+      newState.quoteAmount = newState.price * newState.baseAmount;
+    }
 
-  updateAmount(e) {
-    const newState = { ...this.state };
-
-    newState.baseAmount = rx_live.test(e.target.value)
-      ? e.target.value
-      : this.state.baseAmount;
-    newState.quoteAmount = "";
-    newState.baseAmount === ""
-      ? (newState.totalAmount = "")
-      : (newState.totalAmount =
-          this.props.orderType === "limit"
-            ? (this.currentPrice() * newState.baseAmount).toPrecision(6)
-            : (
-                this.props.marketSummary.price * newState.baseAmount
-              ).toPrecision(6));
-    newState.orderButtonDisabled = this.isInvalidNumber(newState.totalAmount);
-    this.setState(newState);
-  }
-
-  updateTotalAmount(e) {
-    const newState = { ...this.state };
-
-    newState.totalAmount = rx_live.test(e.target.value)
-      ? e.target.value
-      : this.state.totalAmount;
-    newState.quoteAmount = "";
-    newState.totalAmount === ""
-      ? (newState.baseAmount = "")
-      : (newState.baseAmount =
-          this.props.orderType === "limit"
-            ? (newState.totalAmount / this.currentPrice()).toPrecision(6)
-            : (
-                newState.totalAmount / this.props.marketSummary.price
-              ).toPrecision(6));
-    newState.orderButtonDisabled = this.isInvalidNumber(newState.totalAmount);
+    newState.quoteChanged = false;
+    newState.baseChanged = false;
     this.setState(newState);
   }
 
   increaseAmount(e) {
     e.preventDefault();
     const newState = { ...this.state };
-    newState.baseAmount = (Number(this.state.baseAmount) + 1).toString();
-    newState.quoteAmount = "";
-    newState.baseAmount === ""
-      ? (newState.totalAmount = "")
-      : (newState.totalAmount =
-          this.props.orderType === "limit"
-            ? (this.currentPrice() * newState.baseAmount).toPrecision(6)
-            : (
-                this.props.marketSummary.price * newState.baseAmount
-              ).toPrecision(6));
-    newState.orderButtonDisabled = this.isInvalidNumber(newState.totalAmount);
+
+    if (this.props.side === "b") {
+      // for buy order we cant exceed the quoteBalance
+      let quoteBalance = this.getQuoteBalance();
+      const newQuoteAmount =
+        Number(this.state.quoteAmount) + quoteBalance * 0.02;
+
+      quoteBalance -= this.getQuoteFee(newQuoteAmount);
+      newState.quoteAmount =
+        newQuoteAmount > quoteBalance ? quoteBalance : newQuoteAmount;
+      newState.baseAmount = newState.quoteAmount / this.currentPrice();
+    } else {
+      // for sell order we cant exceed the baseBalance
+      let baseBalance = this.getBaseBalance();
+      const newBaseAmount = Number(this.state.baseAmount) + baseBalance * 0.02;
+
+      baseBalance -= this.getBaseFee(newBaseAmount);
+      newState.baseAmount =
+        newBaseAmount > baseBalance ? baseBalance : newBaseAmount;
+      newState.quoteAmount = newState.baseAmount * this.currentPrice();
+    }
+
+    newState.quoteChanged = false;
+    newState.baseChanged = false;
     this.setState(newState);
   }
 
   decreaseAmount(e) {
     e.preventDefault();
     const newState = { ...this.state };
-    newState.baseAmount =
-      Number(this.state.baseAmount) - 1 < 0
-        ? "0"
-        : (Number(this.state.baseAmount) - 1).toString();
-    newState.quoteAmount = "";
-    newState.maxSizeSelected = false;
-    newState.baseAmount === ""
-      ? (newState.totalAmount = "")
-      : (newState.totalAmount =
-          this.props.orderType === "limit"
-            ? (this.currentPrice() * newState.baseAmount).toPrecision(6)
-            : (
-                this.props.marketSummary.price * newState.baseAmount
-              ).toPrecision(6));
-    newState.orderButtonDisabled = this.isInvalidNumber(newState.totalAmount);
+    if (this.props.side === "b") {
+      // for buy order we cant exceed the quoteBalance
+      let quoteBalance = this.getQuoteBalance();
+      const newQuoteAmount =
+        Number(this.state.quoteAmount) - quoteBalance * 0.02;
+      newState.quoteAmount = newQuoteAmount < 0 ? 0 : newQuoteAmount;
+      newState.baseAmount = newState.quoteAmount / this.currentPrice();
+    } else {
+      // for sell order we cant exceed the baseBalance
+      let baseBalance = this.getBaseBalance();
+      const newBaseAmount = Number(this.state.baseAmount) - baseBalance * 0.02;
+      newState.baseAmount = newBaseAmount < 0 ? 0 : newBaseAmount;
+      newState.quoteAmount = newState.baseAmount * this.currentPrice();
+    }
+
+    newState.quoteChanged = false;
+    newState.baseChanged = false;
     this.setState(newState);
   }
 
   getBaseBalance() {
     const marketInfo = this.props.marketInfo;
     if (!marketInfo) return 0;
-    return (
-      this.props.user.committed.balances[marketInfo.baseAsset.symbol] /
-      Math.pow(10, marketInfo.baseAsset.decimals)
-    );
+    if (
+      !this.props.balances?.[marketInfo.zigzagChainId]?.[
+        marketInfo.baseAsset.symbol
+      ]?.valueReadable
+    )
+      return 0;
+    let totalBalance =
+      this.props.balances[marketInfo.zigzagChainId][marketInfo.baseAsset.symbol]
+        .valueReadable;
+    if (!this.props.userOrders) return totalBalance;
+
+    Object.keys(this.props.userOrders).forEach((orderId) => {
+      const order = this.props.userOrders[orderId];
+      const sellToken =
+        order[3] === "s" ? order[2].split("-")[0] : order[2].split("-")[1];
+      if (sellToken === marketInfo.baseAsset.symbol) {
+        totalBalance -= order[10]; // remove remaining order size
+      }
+    });
+
+    return Number(totalBalance);
   }
 
   getQuoteBalance() {
     const marketInfo = this.props.marketInfo;
     if (!marketInfo) return 0;
-    return (
-      this.props.user.committed.balances[marketInfo.quoteAsset.symbol] /
-      Math.pow(10, marketInfo.quoteAsset.decimals)
+    if (
+      !this.props.balances?.[marketInfo.zigzagChainId]?.[
+        marketInfo.quoteAsset.symbol
+      ]?.valueReadable
+    )
+      return 0;
+    let totalBalance =
+      this.props.balances[marketInfo.zigzagChainId][
+        marketInfo.quoteAsset.symbol
+      ].valueReadable;
+    if (!this.props.userOrders) return totalBalance;
+
+    Object.keys(this.props.userOrders).forEach((orderId) => {
+      const order = this.props.userOrders[orderId];
+      const sellToken =
+        order[3] === "s" ? order[2].split("-")[0] : order[2].split("-")[1];
+      if (sellToken === marketInfo.quoteAsset.symbol) {
+        totalBalance -= order[4] * order[10]; // remove remaining order size
+      }
+    });
+
+    return Number(totalBalance);
+  }
+
+  getBaseAllowance() {
+    const marketInfo = this.props.marketInfo;
+    if (!marketInfo) return 0;
+    if (
+      !this.props.balances?.[marketInfo.zigzagChainId]?.[
+        marketInfo.baseAsset.symbol
+      ]?.allowanceReadable
+    )
+      return 0;
+    return Number(
+      this.props.balances[marketInfo.zigzagChainId][marketInfo.baseAsset.symbol]
+        .allowanceReadable
     );
+  }
+
+  getQuoteAllowance() {
+    const marketInfo = this.props.marketInfo;
+    if (!marketInfo) return 0;
+    if (
+      !this.props.balances?.[marketInfo.zigzagChainId]?.[
+        marketInfo.quoteAsset.symbol
+      ]?.allowanceReadable
+    )
+      return 0;
+    return Number(
+      this.props.balances[marketInfo.zigzagChainId][
+        marketInfo.quoteAsset.symbol
+      ].allowanceReadable
+    );
+  }
+
+  getBaseFee(amount) {
+    const marketInfo = this.props.marketInfo;
+    if (!marketInfo) return 0;
+    let fee = marketInfo.baseFee;
+    fee +=
+      marketInfo.makerVolumeFee && amount
+        ? amount * marketInfo.makerVolumeFee
+        : 0;
+    return fee;
+  }
+
+  getQuoteFee(amount) {
+    const marketInfo = this.props.marketInfo;
+    if (!marketInfo) return 0;
+    let fee = marketInfo.quoteFee;
+    fee +=
+      marketInfo.makerVolumeFee && amount
+        ? amount * marketInfo.makerVolumeFee
+        : 0;
+    return fee;
   }
 
   /*
@@ -203,56 +341,93 @@ class SpotForm extends React.Component {
       }
     }
     if (!price) return 0;
-    return formatPrice(price);
+    return price;
   }
 
-  //getLadderPrice() {
-  //  let baseAmount = this.state.baseAmount;
-  //  const side = this.props.side;
-  //
-  //  if (!baseAmount) baseAmount = 0;
-  //
-  //  let price;
-  //  if (side === "b") {
-  //    // get order book
-  //
-  //    for (let i = 0; i < asks.length; i++) {
-  //      if (asks[i][2] >= baseAmount || i === asks.length - 1) {
-  //        price = asks[i][1];
-  //        break;
-  //      }
-  //    }
-  //  } else if (side === "s") {
-  //    // get order book
-  //
-  //    for (let i = 0; i < bids.length; i++) {
-  //      if (bids[i][2] >= baseAmount || i === bids.length - 1) {
-  //        price = bids[i][1];
-  //        break;
-  //      }
-  //    }
-  //  }
-  //  if (!price) return 0;
-  //  return formatPrice(price);
-  //}
+  getLadderPrice() {
+    const orderbookAsks = [];
+    const orderbookBids = [];
+    let baseAmount = this.state.baseAmount;
+    const side = this.props.side;
+    if (!baseAmount) baseAmount = 0;
+
+    for (let orderid in this.props.allOrders) {
+      const order = this.props.allOrders[orderid];
+      const side = order[3];
+      const price = order[4];
+      const remaining = isNaN(Number(order[10])) ? order[5] : order[10];
+      const orderStatus = order[9];
+
+      const orderEntry = [price, remaining];
+
+      if (side === "b" && ["o", "pm", "pf"].includes(orderStatus)) {
+        orderbookBids.push(orderEntry);
+      } else if (side === "s" && ["o", "pm", "pf"].includes(orderStatus)) {
+        orderbookAsks.push(orderEntry);
+      }
+    }
+
+    let price;
+    let unfilled = baseAmount;
+    if (side === "b" && orderbookAsks) {
+      for (let i = orderbookAsks.length - 1; i >= 0; i--) {
+        if (orderbookAsks[i][1] >= unfilled || i === 0) {
+          price = orderbookAsks[i][0];
+          break;
+        } else {
+          unfilled -= orderbookAsks[i][1];
+        }
+      }
+    } else if (side === "s" && orderbookBids) {
+      for (let i = orderbookBids.length - 1; i >= 0; i--) {
+        if (orderbookBids[i][1] >= unfilled || i === 0) {
+          price = orderbookBids[i][0];
+          break;
+        } else {
+          unfilled -= orderbookBids[i][1];
+        }
+      }
+    }
+    if (!price) return 0;
+    return price;
+  }
+
+  async approveHandler(e) {
+    e.preventDefault();
+    const marketInfo = this.props.marketInfo;
+    const token =
+      this.props.side === "s"
+        ? marketInfo.baseAsset.symbol
+        : marketInfo.quoteAsset.symbol;
+
+    let newstate = { ...this.state };
+    this.setState(newstate);
+    let orderApproveToast = toast.info(
+      "Approve pending. Sign or Cancel to continue...",
+      {
+        toastId: "Approve pending. Sign or Cancel to continue...",
+        autoClose: false,
+      }
+    );
+
+    try {
+      await api.approveExchangeContract(
+        token,
+        0 // amount = 0 ==> MAX_ALLOWANCE
+      );
+    } catch (e) {
+      console.log(e);
+      toast.error(e.message);
+    }
+
+    toast.dismiss(orderApproveToast);
+    newstate = { ...this.state };
+    this.setState(newstate);
+  }
 
   async buySellHandler(e) {
     e.preventDefault();
-    let baseAmount, quoteAmount;
-    if (typeof this.state.baseAmount === "string") {
-      baseAmount = parseFloat(this.state.baseAmount.replace(",", "."));
-    } else {
-      baseAmount = this.state.baseAmount;
-    }
-    if (typeof this.state.quoteAmount === "string") {
-      quoteAmount = parseFloat(this.state.quoteAmount.replace(",", "."));
-    } else {
-      quoteAmount = this.state.quoteAmount;
-    }
-
-    quoteAmount = isNaN(quoteAmount) ? 0 : quoteAmount;
-    baseAmount = isNaN(baseAmount) ? 0 : baseAmount;
-    if (!baseAmount && !quoteAmount) {
+    if (!this.state.quoteAmount || !this.state.baseAmount) {
       toast.error("No amount available", {
         toastId: "No amount available",
       });
@@ -275,38 +450,29 @@ class SpotForm extends React.Component {
       return;
     }
 
-    this.props.setHighSlippageModal({
-      xToken: baseAmount,
-      yToken: baseAmount * price,
-      userPrice: price,
-      pairPrice: this.props.lastPrice,
-    });
-
     if (this.props.activeOrderCount > 0 && api.isZksyncChain()) {
       toast.error("Only one active order permitted at a time", {
         toastId: "Only one active order permitted at a time",
       });
       return;
     }
-    let baseBalance, quoteBalance;
+    let baseBalance, quoteBalance, baseAllowance, quoteAllowance;
     if (this.props.user.id) {
       baseBalance = this.getBaseBalance();
       quoteBalance = this.getQuoteBalance();
+      baseAllowance = this.getBaseAllowance();
+      quoteAllowance = this.getQuoteAllowance();
     } else {
       baseBalance = 0;
       quoteBalance = 0;
+      baseAllowance = 0;
+      quoteAllowance = 0;
     }
 
     const marketInfo = this.props.marketInfo;
     baseBalance = parseFloat(baseBalance);
     quoteBalance = parseFloat(quoteBalance);
-    let baseAmountMsg;
     if (this.props.side === "s") {
-      baseAmount = baseAmount ? baseAmount : quoteAmount / price;
-      quoteAmount = 0;
-      baseAmountMsg = formatPrice(baseAmount);
-      this.props.setHighSlippageModal({ type: "sell" });
-
       if (isNaN(baseBalance)) {
         toast.error(`No ${marketInfo.baseAsset.symbol} balance`, {
           toastId: `No ${marketInfo.baseAsset.symbol} balance`,
@@ -314,86 +480,64 @@ class SpotForm extends React.Component {
         return;
       }
 
-      if (baseAmount && baseAmount + marketInfo.baseFee > baseBalance) {
+      if (this.state.baseAmount > baseBalance) {
         toast.error(`Amount exceeds ${marketInfo.baseAsset.symbol} balance`, {
           toastId: `Amount exceeds ${marketInfo.baseAsset.symbol} balance`,
         });
         return;
       }
 
-      if (baseAmount && baseAmount < marketInfo.baseFee) {
+      const fee = this.getBaseFee(this.state.baseAmount);
+      if (this.state.baseAmount < fee) {
         toast.error(
-          `Minimum order size is ${marketInfo.baseFee.toPrecision(5)} ${
+          `Minimum order size is ${fee.toPrecision(5)} ${
             marketInfo.baseAsset.symbol
           }`
         );
         return;
       }
 
-      const askPrice = this.getFirstAsk();
-      const delta = ((askPrice - price) / askPrice) * 100;
-      if (
-        delta > 10 &&
-        this.props.orderType === "limit" &&
-        !this.props.settings.disableSlippageWarning
-      ) {
-        this.props.setHighSlippageModal({ open: true, delta: delta });
+      if (this.state.baseAmount > baseAllowance) {
+        toast.error(`Amount exceeds ${marketInfo.baseAsset.symbol} allowance`, {
+          toastId: `Amount exceeds ${marketInfo.baseAsset.symbol} allowance`,
+        });
         return;
-      }
-
-      if (
-        this.props.orderType === "market" &&
-        !this.props.settings.disableSlippageWarning
-      ) {
-        price *= 0.9985;
-        if (delta > 2) {
-          this.props.setHighSlippageModal({ open: true, delta: delta });
-          return;
-        }
       }
     } else if (this.props.side === "b") {
-      this.props.setHighSlippageModal({ type: "buy" });
-
-      quoteAmount = quoteAmount ? quoteAmount : baseAmount * price;
-      baseAmount = 0;
-      baseAmountMsg = formatPrice(quoteAmount / price);
-
-      const bidPrice = this.getFirstBid();
-      const delta = ((price - bidPrice) / bidPrice) * 100;
-
       if (isNaN(quoteBalance)) {
-        this.props.setHighSlippageModal({ open: true, delta: delta });
+        toast.error(`No ${marketInfo.quoteAsset.symbol} balance`, {
+          toastId: `No ${marketInfo.quoteAsset.symbol} balance`,
+        });
         return;
       }
 
-      if (quoteAmount && quoteAmount + marketInfo.quoteFee > quoteBalance) {
-        this.props.setHighSlippageModal({ open: true, delta: delta });
+      if (this.state.quoteAmount > quoteBalance) {
+        toast.error(`Amount exceeds ${marketInfo.quoteAsset.symbol} balance`, {
+          toastId: `Amount exceeds ${marketInfo.quoteAsset.symbol} balance`,
+        });
         return;
       }
 
-      if (quoteAmount && quoteAmount < marketInfo.quoteFee) {
-        this.props.setHighSlippageModal({ open: true, delta: delta });
+      const fee = this.getQuoteFee(this.state.quoteAmount);
+      if (this.state.quoteAmount < fee) {
+        toast.error(
+          `Minimum order size is ${fee.toPrecision(5)} ${
+            marketInfo.quoteAsset.symbol
+          }`,
+          {
+            toastId: `Minimum order size is ${fee.toPrecision(5)} ${
+              marketInfo.quoteAsset.symbol
+            }`,
+          }
+        );
         return;
       }
 
-      if (
-        delta > 10 &&
-        this.props.orderType === "limit" &&
-        !this.props.settings.disableSlippageWarning
-      ) {
-        this.props.setHighSlippageModal({ open: true, delta: delta });
+      if (this.state.quoteAmount > quoteAllowance) {
+        toast.error(`Total exceeds ${marketInfo.quoteAsset.symbol} allowance`, {
+          toastId: `Total exceeds ${marketInfo.quoteAsset.symbol} allowance`,
+        });
         return;
-      }
-
-      if (
-        this.props.orderType === "market" &&
-        !this.props.settings.disableSlippageWarning
-      ) {
-        price *= 1.0015;
-        if (delta > 2) {
-          this.props.setHighSlippageModal({ open: true, delta: delta });
-          return;
-        }
       }
     }
 
@@ -401,14 +545,36 @@ class SpotForm extends React.Component {
   }
 
   async handleOrder() {
-    let baseAmountMsg;
+    const marketInfo = this.props.marketInfo;
+    if (!marketInfo) return;
     let baseAmount = this.state.baseAmount;
     let quoteAmount = this.state.quoteAmount;
-    let price = this.state.price;
-    const marketInfo = this.props.marketInfo;
-    baseAmount = baseAmount ? baseAmount : quoteAmount / price;
-    quoteAmount = 0;
-    baseAmountMsg = formatPrice(baseAmount);
+    // show msg with no fee
+    const fairPrice = this.currentPrice();
+    let price = quoteAmount / baseAmount;
+    const delta =
+      this.props.side === "b"
+        ? ((price - fairPrice) / fairPrice) * 100
+        : ((fairPrice - price) / fairPrice) * 100;
+    if (
+      (delta > 10 &&
+        this.props.orderType === "limit" &&
+        !this.props.settings.disableSlippageWarning) ||
+      (delta > 2 &&
+        this.props.orderType === "market" &&
+        !this.props.settings.disableSlippageWarning)
+    ) {
+      this.props.setHighSlippageModal({
+        xToken: baseAmount,
+        yToken: quoteAmount,
+        userPrice: price,
+        pairPrice: fairPrice,
+        type: this.props.side === "b" ? "buy" : "sell",
+        open: true,
+        delta: delta,
+      });
+      return;
+    }
 
     const renderGuidContent = () => {
       return (
@@ -417,13 +583,18 @@ class SpotForm extends React.Component {
             {this.props.side === "s" ? "Sell" : "Buy"} Order pending
           </p>
           <p style={{ fontSize: "14px", lineHeight: "24px" }}>
-            {baseAmountMsg} {marketInfo.baseAsset.symbol} @{" "}
-            {["USDC", "USDT", "DAI", "FRAX"].includes(
-              marketInfo.quoteAsset.symbol
-            )
-              ? parseFloat(price).toFixed(2)
-              : formatPrice(price)}{" "}
-            {marketInfo.quoteAsset.symbol}
+            {addComma(formatPrice(baseAmount))} {marketInfo.baseAsset.symbol} @{" "}
+            {addComma(formatPrice(price))} {marketInfo.quoteAsset.symbol}
+          </p>
+          <p style={{ fontSize: "14px", lineHeight: "24px" }}>
+            Transaction fee:{" "}
+            {this.props.side === "s"
+              ? `${addComma(formatPrice(marketInfo.baseFee))} ${
+                  marketInfo.baseAsset.symbol
+                }`
+              : `${addComma(formatPrice(marketInfo.quoteFee))} ${
+                  marketInfo.quoteAsset.symbol
+                }`}
           </p>
           <p style={{ fontSize: "14px", lineHeight: "24px" }}>
             Sign or Cancel to continue...
@@ -433,7 +604,6 @@ class SpotForm extends React.Component {
     };
 
     let newstate = { ...this.state };
-    newstate.orderButtonDisabled = true;
     this.setState(newstate);
     let orderPendingToast;
     if (!this.props.settings.disableOrderNotification) {
@@ -447,7 +617,6 @@ class SpotForm extends React.Component {
       await api.submitOrder(
         this.props.currentMarket,
         this.props.side,
-        price,
         baseAmount,
         quoteAmount,
         this.props.orderType
@@ -459,7 +628,11 @@ class SpotForm extends React.Component {
         });
       }
     } catch (e) {
-      toast.error(e.message);
+      console.log(e);
+      toast.error(`Error submitting the order: ${e.message}`, {
+        autoClose: 20000,
+        toastId: "submitOrder",
+      });
     }
 
     if (!this.props.settings.disableOrderNotification) {
@@ -467,35 +640,7 @@ class SpotForm extends React.Component {
     }
 
     newstate = { ...this.state };
-    newstate.orderButtonDisabled = false;
     this.setState(newstate);
-  }
-
-  priceIsDisabled() {
-    return this.props.orderType === "market";
-  }
-
-  amountPercentOfMax() {
-    if (!this.props.user.id) return 0;
-
-    const marketInfo = this.props.marketInfo;
-    if (!this.props.marketInfo) return 0;
-
-    if (this.props.side === "s") {
-      const baseBalance = this.getBaseBalance() - marketInfo.baseFee;
-      const baseAmount = this.state.baseAmount || 0;
-      return Math.round((baseAmount / baseBalance) * 100);
-    } else if (this.props.side === "b") {
-      const quoteBalance = this.getQuoteBalance() - marketInfo.quoteFee;
-      if (this.state.quoteAmount) {
-        const quoteAmount = this.state.quoteAmount || 0;
-        return Math.round((quoteAmount / quoteBalance) * 100);
-      } else {
-        const baseAmount = this.state.baseAmount || 0;
-        const total = baseAmount * this.currentPrice();
-        return Math.round((total / quoteBalance) * 100);
-      }
-    }
   }
 
   currentPrice() {
@@ -505,109 +650,57 @@ class SpotForm extends React.Component {
     if (this.props.orderType === "limit" && this.state.price) {
       return this.state.price;
     } else {
+      let price;
       if (api.isZksyncChain()) {
-        return this.getLadderPriceZkSync_v1();
+        price = this.getLadderPriceZkSync_v1();
       } else {
-        console.log("this.getLadderPrice() not implemented for not zkSync_v1");
-        // return this.getLadderPrice();
+        price = this.getLadderPrice();
       }
+      price *= this.props.side === "b" ? 1 + 0.0015 : 1 - 0.0015;
+
+      return price;
     }
-  }
-
-  getFirstAsk() {
-    const marketInfo = this.props.marketInfo;
-    if (!marketInfo) return 0;
-    const asks = this.props.liquidity
-      .filter((l) => l[0] === "s")
-      .map((l) => l[1]);
-    return formatPrice(Math.min(...asks));
-  }
-
-  getFirstBid() {
-    const marketInfo = this.props.marketInfo;
-    if (!marketInfo) return 0;
-    const bids = this.props.liquidity
-      .filter((l) => l[0] === "b")
-      .map((l) => l[1]);
-    return formatPrice(Math.max(...bids));
   }
 
   rangeSliderHandler(e, val) {
     const marketInfo = this.props.marketInfo;
+
     if (!marketInfo) return 0;
     if (!this.props.user.id) return false;
 
     const newstate = { ...this.state };
-    if (val === 100) {
+    if (val > 99.9) {
       newstate.maxSizeSelected = true;
-      if (this.props.side === "b") {
-        val = 99.9;
-      }
-      if (this.props.side === "s") {
-        val = 99.9;
-      }
     } else {
       newstate.maxSizeSelected = false;
     }
     if (this.props.side === "s") {
-      const baseBalance = this.getBaseBalance();
-      const decimals = marketInfo.baseAsset.decimals;
-      let displayAmount = (baseBalance * val) / 100;
-      displayAmount -= marketInfo.baseFee;
-      displayAmount = parseFloat(displayAmount.toFixed(decimals));
-      displayAmount =
-        displayAmount > 9999
-          ? displayAmount.toFixed(0)
-          : displayAmount.toPrecision(5);
-
-      if (displayAmount < 1e-5) {
-        newstate.baseAmount = 0;
+      let baseBalance = this.getBaseBalance();
+      let amount = (baseBalance * val) / 100;
+      baseBalance -= this.getBaseFee(newstate.baseAmount);
+      if (baseBalance < 0) {
+        newstate.baseAmount = "";
+        newstate.quoteAmount = "";
       } else {
-        newstate.baseAmount = displayAmount;
+        newstate.baseAmount = amount > baseBalance ? baseBalance : amount;
+        newstate.quoteAmount = newstate.baseAmount * this.currentPrice();
       }
-
-      newstate.baseAmount === ""
-        ? (newstate.totalAmount = "")
-        : (newstate.totalAmount =
-            this.props.orderType === "limit"
-              ? (this.currentPrice() * newstate.baseAmount).toPrecision(6)
-              : (
-                  this.props.marketSummary.price * newstate.baseAmount
-                ).toPrecision(6));
     } else if (this.props.side === "b") {
-      const quoteBalance = this.getQuoteBalance();
-      const quoteDecimals = marketInfo.quoteAsset.decimals;
-      const baseDecimals = marketInfo.baseAsset.decimals;
-      let displayAmount = (quoteBalance * val) / 100;
-      displayAmount -= marketInfo.quoteFee;
-      displayAmount = parseFloat(displayAmount.toFixed(quoteDecimals));
-      displayAmount =
-        displayAmount > 9999
-          ? displayAmount.toFixed(0)
-          : displayAmount.toPrecision(5);
-
-      if (displayAmount < 1e-5) {
-        newstate.quoteAmount = 0;
+      let quoteBalance = this.getQuoteBalance();
+      let amount = (quoteBalance * val) / 100;
+      quoteBalance -= this.getQuoteFee(newstate.quoteAmount);
+      if (quoteBalance < 0) {
+        newstate.baseAmount = "";
+        newstate.quoteAmount = "";
       } else {
-        newstate.quoteAmount = displayAmount;
-        const baseDisplayAmount = parseFloat(
-          (displayAmount / this.currentPrice()).toFixed(baseDecimals)
-        );
-        newstate.baseAmount =
-          baseDisplayAmount > 9999
-            ? baseDisplayAmount.toFixed(0)
-            : baseDisplayAmount.toPrecision(5);
-        newstate.totalAmount =
-          baseDisplayAmount > 9999
-            ? baseDisplayAmount.toFixed(0) * this.currentPrice()
-            : baseDisplayAmount.toPrecision(5) * this.currentPrice();
+        newstate.quoteAmount = amount > quoteBalance ? quoteBalance : amount;
+        newstate.baseAmount = newstate.quoteAmount / this.currentPrice();
       }
     }
-
-    if (isNaN(newstate.baseAmount)) newstate.baseAmount = 0;
-    if (isNaN(newstate.totalAmount)) newstate.totalAmount = 0;
-    if (isNaN(newstate.quoteAmount)) newstate.quoteAmount = 0;
-    newstate.orderButtonDisabled = this.isInvalidNumber(newstate.totalAmount);
+    if (newstate.quoteAmount === 0) newstate.quoteAmount = "";
+    if (newstate.baseAmount === 0) newstate.baseAmount = "";
+    newstate.baseChanged = false;
+    newstate.quoteChanged = false;
     this.setState(newstate);
   }
 
@@ -631,76 +724,193 @@ class SpotForm extends React.Component {
       this.rangeSliderHandler(null, 100);
     }
 
+    if (
+      this.props.orderType !== prevProps.orderType ||
+      this.props.side !== prevProps.side
+    ) {
+      const newState = { ...this.state };
+      if (this.props.quoteChanged) {
+        // for buy quoteAmount should be fixed
+        newState.baseAmount = newState.quoteAmount / this.currentPrice();
+        newState.baseAmount =
+          newState.baseAmount === 0 ? "" : newState.baseAmount;
+      } else {
+        // for sell baseAmount should be fixed
+        newState.quoteAmount = this.currentPrice() * newState.baseAmount;
+        newState.quoteAmount =
+          newState.quoteAmount === 0 ? "" : newState.quoteAmount;
+      }
+      this.setState(newState);
+    }
+
     if (this.props.currentMarket !== prevProps.currentMarket) {
-      this.setState((state) => ({
-        ...state,
-        price: "",
-        baseAmount: "",
-        quoteAmount: "",
-      }));
+      const newState = { ...this.state };
+      newState.price = "";
+      newState.baseAmount = "";
+      newState.quoteAmount = "";
+      newState.baseChanged = false;
+      newState.quoteChanged = false;
+      this.setState(newState);
     }
   }
 
   showLabel() {
-    return (
-      <div>
-        <p>zkSync's network swap fees are dynamic and sit around ~$0.10</p>
-        <p>covered by the market maker, but paid by the trader</p>
-      </div>
-    );
+    if (this.props.network === 42161) {
+      const marketInfo = this.props.marketInfo;
+      let gasFee,
+        feeToken,
+        gasFeeUsdValue,
+        makerFee,
+        takerFee,
+        makerFeeUsdValue,
+        takerFeeUsdValue;
+      if (marketInfo) {
+        gasFee =
+          this.props.side === "b" ? marketInfo.quoteFee : marketInfo.baseFee;
+        gasFee = formatToken(gasFee);
+        feeToken =
+          this.props.side === "b"
+            ? marketInfo.quoteAsset.symbol
+            : marketInfo.baseAsset.symbol;
+        const amount =
+          this.state.side === "b"
+            ? this.state.quoteAmount
+            : this.state.baseAmount;
+        if (amount && !Number.isNaN(amount)) {
+          makerFee = amount * marketInfo.makerVolumeFee;
+          takerFee = amount * marketInfo.takerVolumeFee;
+        } else {
+          makerFee = 0;
+          takerFee = 0;
+        }
+
+        const usdPrice =
+          this.props.side === "b"
+            ? marketInfo.quoteAsset.usdPrice
+            : marketInfo.baseAsset.usdPrice;
+        gasFeeUsdValue = (gasFee * usdPrice).toFixed(2);
+        makerFeeUsdValue = (makerFee * usdPrice).toFixed(2);
+        takerFeeUsdValue = (takerFee * usdPrice).toFixed(2);
+      }
+
+      return (
+        <div>
+          <p className="font-sans text-sm">
+            Arbitrum's network swap fees are dynamic and
+          </p>
+          <p className="font-sans text-sm">
+            covered by the ZigZag operator, but paid by the taker.
+          </p>
+          {marketInfo && (
+            <div>
+              <p className="font-sans text-s">
+                <hr></hr>
+              </p>
+              <p className="font-sans text-sm">Breakdown:</p>
+              <p className="font-sans text-sm">{`Gas fee: ${gasFee} ${feeToken} - (~$ ${gasFeeUsdValue})`}</p>
+              <p className="font-sans text-sm">{`Maker fee (${
+                marketInfo.makerVolumeFee * 100
+              } %): ${makerFee} ${feeToken} - (~$ ${makerFeeUsdValue})`}</p>
+              <p className="font-sans text-sm">{`Taker fee (${
+                marketInfo.takerVolumeFee * 100
+              } %): ${takerFee} ${feeToken} - (~$ ${takerFeeUsdValue})`}</p>
+            </div>
+          )}
+        </div>
+      );
+    } else {
+      return (
+        <div>
+          <p>zkSync's network swap fees are dynamic and sit around ~$0.10</p>
+          <p>covered by the market maker, but paid by the trader</p>
+        </div>
+      );
+    }
   }
 
   render() {
-    // const ethInput = useRef(null);
-    // const usdInput = useRef(null);
     const isMobile = window.innerWidth < 430;
     const marketInfo = this.props.marketInfo;
+    let baseAmount, quoteAmount;
+    if (typeof this.state.baseAmount === "string") {
+      baseAmount = parseFloat(this.state.baseAmount.replace(",", "."));
+    } else {
+      baseAmount = this.state.baseAmount;
+    }
+    if (typeof this.state.quoteAmount === "string") {
+      quoteAmount = parseFloat(this.state.quoteAmount.replace(",", "."));
+    } else {
+      quoteAmount = this.state.quoteAmount;
+    }
 
     let price = this.currentPrice();
     if (price === 0) price = "";
 
-    let baseBalance, quoteBalance;
+    let baseBalance, quoteBalance, baseAllowance, quoteAllowance;
     if (this.props.user.id) {
       baseBalance = this.getBaseBalance();
       quoteBalance = this.getQuoteBalance();
+      baseAllowance = this.getBaseAllowance();
+      quoteAllowance = this.getQuoteAllowance();
     } else {
-      baseBalance = "-";
-      quoteBalance = "-";
+      baseBalance = 0;
+      quoteBalance = 0;
+      baseAllowance = 0;
+      quoteAllowance = 0;
     }
-    if (isNaN(baseBalance)) {
+    if (
+      isNaN(baseBalance) ||
+      (marketInfo?.baseFee && baseBalance < marketInfo.baseFee)
+    ) {
+      // hide small balances
       baseBalance = 0;
     }
-    if (isNaN(quoteBalance)) {
+    if (
+      isNaN(quoteBalance) ||
+      (marketInfo?.quoteFee && quoteBalance < marketInfo.quoteFee)
+    ) {
+      // hide small balances
       quoteBalance = 0;
     }
 
-    const balance1Html = (
+    const quoteBalanceHtml = (
       <Text
         font="primaryExtraSmallSemiBold"
         color="foregroundMediumEmphasis"
         textAlign="right"
       >
-        {formatToken(quoteBalance, marketInfo && marketInfo.quoteAsset?.symbol)}{" "}
+        {addComma(
+          formatToken(quoteBalance, marketInfo && marketInfo.quoteAsset?.symbol)
+        )}{" "}
         {marketInfo && marketInfo.quoteAsset?.symbol}
       </Text>
     );
 
-    const balance2Html = (
+    const baseBalanceHtml = (
       <Text
         font="primaryExtraSmallSemiBold"
         color="foregroundMediumEmphasis"
         textAlign="right"
       >
-        {formatToken(baseBalance, marketInfo && marketInfo.baseAsset?.symbol)}{" "}
+        {addComma(
+          formatToken(baseBalance, marketInfo && marketInfo.baseAsset?.symbol)
+        )}{" "}
         {marketInfo && marketInfo.baseAsset?.symbol}
       </Text>
     );
 
-    let buttonText, feeAmount, buttonType;
+    let buttonText,
+      feeAmount,
+      buttonType,
+      approveNeeded = false;
     if (this.props.side === "b") {
       buttonType = "BUY";
-      buttonText =
-        buttonType + " " + (marketInfo && marketInfo.baseAsset?.symbol);
+      if (quoteAmount > quoteAllowance) {
+        buttonText = `Approve ${marketInfo && marketInfo.quoteAsset?.symbol}`;
+        approveNeeded = true;
+      } else {
+        buttonText = `BUY ${marketInfo && marketInfo.baseAsset?.symbol}`;
+      }
       feeAmount = (
         <FormHeader>
           <InfoWrapper>
@@ -714,9 +924,8 @@ class SpotForm extends React.Component {
             color="foregroundMediumEmphasis"
           >
             {marketInfo &&
-              marketInfo.quoteFee &&
               formatToken(
-                Number(marketInfo.quoteFee),
+                Number(this.getQuoteFee(quoteAmount)),
                 marketInfo && marketInfo.quoteAsset.symbol
               )}{" "}
             {marketInfo && marketInfo.quoteAsset.symbol}
@@ -725,8 +934,12 @@ class SpotForm extends React.Component {
       );
     } else if (this.props.side === "s") {
       buttonType = "SELL";
-      buttonText =
-        buttonType + " " + (marketInfo && marketInfo.baseAsset?.symbol);
+      if (baseAmount > baseAllowance) {
+        buttonText = `Approve ${marketInfo && marketInfo.baseAsset?.symbol}`;
+        approveNeeded = true;
+      } else {
+        buttonText = `SELL ${marketInfo && marketInfo.baseAsset?.symbol}`;
+      }
       feeAmount = (
         <FormHeader>
           <InfoWrapper>
@@ -740,9 +953,8 @@ class SpotForm extends React.Component {
             color="foregroundMediumEmphasis"
           >
             {marketInfo &&
-              marketInfo.baseFee &&
               formatToken(
-                Number(marketInfo.baseFee),
+                Number(this.getBaseFee(baseAmount)),
                 marketInfo && marketInfo.baseAsset.symbol
               )}{" "}
             {marketInfo && marketInfo.baseAsset.symbol}
@@ -751,45 +963,69 @@ class SpotForm extends React.Component {
       );
     }
 
+    const exchangePercentage = this.getExchangePercentage(
+      baseAmount,
+      quoteAmount
+    );
+    this.state.maxSizeSelected = exchangePercentage === 100;
+    const showAmountPlusBox =
+      !this.props.user.id ||
+      exchangePercentage >= 100 ||
+      (marketInfo &&
+        this.props.side === "s" &&
+        baseBalance < marketInfo.baseFee) ||
+      (marketInfo &&
+        this.props.side === "b" &&
+        quoteBalance < marketInfo.quoteFee);
+    const showMinusBox =
+      !this.props.user.id ||
+      this.state.baseAmount === "" ||
+      this.state.baseAmount <= 0;
+
     return (
       <>
         <StyledForm isMobile={isMobile}>
           <InputBox>
-            <IconButton
-              variant="secondary"
-              startIcon={<MinusIcon />}
-              disabled={this.priceIsDisabled()}
-              onClick={this.decreasePrice.bind(this)}
-            ></IconButton>
+            {this.props.orderType !== "market" && (
+              <IconButton
+                variant="secondary"
+                startIcon={<MinusIcon />}
+                onClick={this.decreasePrice.bind(this)}
+                show={!this.props.user.id}
+                disabled={!this.props.user.id}
+              ></IconButton>
+            )}
             <InputField
               type="text"
               pattern="\d+(?:[.,]\d+)?"
               placeholder={`Price (${
                 marketInfo && marketInfo.quoteAsset?.symbol
-              })`}
+              }-${marketInfo && marketInfo.baseAsset?.symbol})`}
               value={
-                this.state.userHasEditedPrice
+                this.props.orderType === "limit"
                   ? this.state.price
-                  : this.currentPrice()
+                  : addComma(formatPrice(this.currentPrice()))
               }
               onChange={this.updatePrice.bind(this)}
-              disabled={this.priceIsDisabled()}
+              disabled={this.props.orderType === "market"}
             />
-            <IconButton
-              variant="secondary"
-              startIcon={<PlusIcon />}
-              disabled={this.priceIsDisabled()}
-              onClick={this.increasePrice.bind(this)}
-            ></IconButton>
-            {/* <span className={this.priceIsDisabled() ? "text-disabled" : ""}>
-              {marketInfo && marketInfo.quoteAsset.symbol}
-            </span> */}
+            {this.props.orderType !== "market" && (
+              <IconButton
+                variant="secondary"
+                startIcon={<PlusIcon />}
+                onClick={this.increasePrice.bind(this)}
+                show={!this.props.user.id}
+                disabled={!this.props.user.id}
+              ></IconButton>
+            )}
           </InputBox>
           <InputBox>
             <IconButton
               variant="secondary"
               startIcon={<MinusIcon />}
               onClick={this.decreaseAmount.bind(this)}
+              show={showMinusBox}
+              disabled={showMinusBox}
             ></IconButton>
             <InputField
               type="text"
@@ -797,57 +1033,93 @@ class SpotForm extends React.Component {
               placeholder={`Amount (${
                 marketInfo && marketInfo.baseAsset?.symbol
               })`}
-              value={this.state.baseAmount}
-              onChange={this.updateAmount.bind(this)}
+              value={
+                this.state.baseAmount !== ""
+                  ? this.state.baseChanged
+                    ? this.state.baseAmount
+                    : addComma(formatPrice(this.state.baseAmount))
+                  : ""
+              }
+              onChange={this.updateBaseAmount.bind(this)}
             />
             <IconButton
               variant="secondary"
               startIcon={<PlusIcon />}
               onClick={this.increaseAmount.bind(this)}
+              show={showAmountPlusBox}
+              disabled={showAmountPlusBox}
             ></IconButton>
-            {/* <span>{marketInfo && marketInfo.baseAsset.symbol}</span> */}
           </InputBox>
-          <RangeWrapper>
-            <RangeSlider
-              value={this.amountPercentOfMax()}
-              onChange={this.rangeSliderHandler.bind(this)}
-            />
-          </RangeWrapper>
           <FormHeader>
             <Text font="primaryTiny" color="foregroundMediumEmphasis">
-              {marketInfo && marketInfo.quoteAsset?.symbol} balance
+              {isMobile ? "Balance" : "Available balance"}
             </Text>
-            {balance1Html}
-          </FormHeader>
-          <FormHeader>
-            <Text font="primaryTiny" color="foregroundMediumEmphasis">
-              {marketInfo && marketInfo.baseAsset?.symbol} balance
-            </Text>
-            {balance2Html}
+            {baseBalanceHtml}
           </FormHeader>
           <InputBox>
-            {/* <IconButton variant="secondary" startIcon={<MinusIcon />}></IconButton> */}
+            <IconButton
+              variant="secondary"
+              startIcon={<MinusIcon />}
+              onClick={this.decreaseAmount.bind(this)}
+              show={showMinusBox}
+              disabled={showMinusBox}
+            ></IconButton>
             <InputField
               type="text"
               pattern="\d+(?:[.,]\d+)?"
               placeholder={`Total (${
                 marketInfo && marketInfo.quoteAsset?.symbol
               })`}
-              value={this.state.totalAmount}
-              onChange={this.updateTotalAmount.bind(this)}
+              value={
+                this.state.quoteAmount !== ""
+                  ? this.state.quoteChanged
+                    ? this.state.quoteAmount
+                    : addComma(formatPrice(this.state.quoteAmount))
+                  : ""
+              }
+              onChange={this.updateQuoteAmount.bind(this)}
             />
-            {/* <IconButton variant="secondary" startIcon={<PlusIcon />}></IconButton> */}
-            {/* <span>{marketInfo && marketInfo.baseAsset.symbol}</span> */}
+            <IconButton
+              variant="secondary"
+              startIcon={<PlusIcon />}
+              onClick={this.increaseAmount.bind(this)}
+              show={showAmountPlusBox}
+              disabled={showAmountPlusBox}
+            ></IconButton>
           </InputBox>
-          {feeAmount}
+          <FormHeader>
+            <Text font="primaryTiny" color="foregroundMediumEmphasis">
+              {isMobile ? "Balance" : "Available balance"}
+            </Text>
+            {quoteBalanceHtml}
+          </FormHeader>
+          <RangeWrapper>
+            <RangeSlider
+              value={exchangePercentage}
+              onChange={this.rangeSliderHandler.bind(this)}
+            />
+            <span className="current_progress">{exchangePercentage}%</span>
+          </RangeWrapper>
           {this.props.user.id ? (
             <div className="">
               <Button
                 variant={buttonType.toLowerCase()}
                 width="100%"
                 scale="imd"
-                disabled={this.state.orderButtonDisabled}
-                onClick={this.buySellHandler.bind(this)}
+                disabled={
+                  this.isInvalidNumber(this.state.quoteAmount) ||
+                  this.isInvalidNumber(this.state.baseAmount) ||
+                  this.isInvalidNumber(this.currentPrice()) ||
+                  (this.state.quoteAmount > this.getQuoteBalance() &&
+                    this.props.side === "b") ||
+                  (this.state.baseAmount > this.getBaseBalance() &&
+                    this.props.side === "s")
+                }
+                onClick={
+                  approveNeeded
+                    ? this.approveHandler.bind(this)
+                    : this.buySellHandler.bind(this)
+                }
               >
                 {buttonText}
               </Button>
@@ -855,6 +1127,7 @@ class SpotForm extends React.Component {
           ) : (
             <ConnectWalletButton />
           )}
+          {feeAmount}
         </StyledForm>
       </>
     );
@@ -933,22 +1206,26 @@ const InputBox = styled.div`
 `;
 
 const RangeWrapper = styled.div`
+  position: relative;
   width: 98%;
   padding-left: 10px;
-
+  .current_progress {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+  }
   .custom_range {
     &::before {
       border: 2px solid ${({ theme }) => theme.colors.foregroundLowEmphasis} !important;
       background-color: ${({ theme }) =>
         theme.colors.backgroundMediumEmphasis} !important;
     }
-
     &::before {
       width: 10px !important;
       height: 10px !important;
     }
   }
-
   .MuiSlider-rail {
     top: 50%;
     height: 6px;

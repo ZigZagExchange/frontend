@@ -56,6 +56,7 @@ export default function OrdersTable(props) {
   const coinEstimator = useCoinEstimator();
   const [tab, setTabIndex] = useState(0);
   const [selectedSide, setSelectedSide] = useState("All");
+  const [selectedTradeType, setSelectedTradeType] = useState("All");
   const [tokenDirection, setTokenDirection] = useState(false);
   const [balanceDirection, setBalanceDirection] = useState(false);
   const [walletList, setWalletList] = useState([]);
@@ -65,6 +66,11 @@ export default function OrdersTable(props) {
     { text: "All", url: "#", iconSelected: true, value: "All" },
     { text: "Buy", url: "#", value: "Buy" },
     { text: "Sell", url: "#", value: "Sell" },
+  ]);
+  const [tradeTypeItems, setTradeTypeItems] = useState([
+    { text: "All", url: "#", iconSelected: true, value: "All" },
+    { text: "Maker", url: "#", value: "Maker" },
+    { text: "Taker", url: "#", value: "Taker" },
   ]);
   const isMobile = window.innerWidth < 1064;
 
@@ -109,6 +115,14 @@ export default function OrdersTable(props) {
           i[6] === "f" &&
           (selectedSide === "All" || i[3] === selectedSide.toLowerCase()[0])
       )
+      .filter(
+        (i) =>
+          selectedTradeType === "All" ||
+          (selectedTradeType === "Taker" &&
+            i[8].toLowerCase() === `${props?.user?.id}`.toLowerCase()) ||
+          (selectedTradeType === "Maker" &&
+            i[9].toLowerCase() === `${props?.user?.id}`.toLowerCase())
+      )
       .sort((a, b) => b[1] - a[1]);
   };
 
@@ -143,6 +157,25 @@ export default function OrdersTable(props) {
     }, []);
     setSelectedSide(newSide);
     setSideItems(newItems);
+  };
+
+  const changeTradeType = (newType) => {
+    const newItems = tradeTypeItems.reduce((acc, item) => {
+      if (item.text === newType) {
+        acc.push({
+          ...item,
+          iconSelected: true,
+        });
+      } else {
+        acc.push({
+          ...item,
+          iconSelected: false,
+        });
+      }
+      return acc;
+    }, []);
+    setSelectedTradeType(newType);
+    setTradeTypeItems(newItems);
   };
 
   const sortByNotional = (cur1, cur2) => {
@@ -273,7 +306,7 @@ export default function OrdersTable(props) {
             const time = order[7] && formatDateTime(new Date(order[7] * 1000));
             let price = order[4];
             let baseQuantity = order[5];
-            let remaining = isNaN(Number(order[11])) ? order[5] : order[11];
+            let remaining = order[10] === null ? baseQuantity : order[10];
             const orderStatus = order[9];
             const baseCurrency = order[2].split("-")[0];
             const side = order[3] === "b" ? "buy" : "sell";
@@ -293,8 +326,8 @@ export default function OrdersTable(props) {
               expiryText = "--";
             }
 
-            const orderWithoutFee = api.getOrderDetailsWithoutFee(order);
             if (api.isZksyncChain()) {
+              const orderWithoutFee = api.getOrderDetailsWithoutFee(order);
               price = orderWithoutFee.price;
               baseQuantity = orderWithoutFee.baseQuantity;
               remaining = orderWithoutFee.remaining;
@@ -447,7 +480,7 @@ export default function OrdersTable(props) {
                         font="primaryExtraSmallSemiBold"
                         color="foregroundLowEmphasis"
                       >
-                        Amount
+                        Filled
                       </Text>
                     </td>
                     <td>
@@ -456,7 +489,10 @@ export default function OrdersTable(props) {
                         color="foregroundHighEmphasis"
                         textAlign="right"
                       >
-                        {baseQuantity.toPrecision(6) / 1} {baseCurrency}
+                        {baseQuantity.toPrecision(6) / 1 -
+                          remaining.toPrecision(6) / 1}{" "}
+                        / {baseQuantity.toPrecision(6) / 1}&nbsp;
+                        {baseCurrency}
                       </Text>
                     </td>
                   </tr>
@@ -476,6 +512,25 @@ export default function OrdersTable(props) {
                         textAlign="right"
                       >
                         {remaining.toPrecision(6) / 1} {baseCurrency}
+                      </Text>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <Text
+                        font="primaryExtraSmallSemiBold"
+                        color="foregroundLowEmphasis"
+                      >
+                        Expiry
+                      </Text>
+                    </td>
+                    <td>
+                      <Text
+                        font="primaryExtraSmallSemiBold"
+                        color="foregroundHighEmphasis"
+                        textAlign="right"
+                      >
+                        {expiryText}
                       </Text>
                     </td>
                   </tr>
@@ -551,20 +606,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Amount
-                </Text>
-                {/* <SortIconWrapper>
-                    <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper> */}
-              </HeaderWrapper>
-            </th>
-            <th scope="col">
-              <HeaderWrapper>
-                <Text
-                  font="primaryExtraSmallSemiBold"
-                  color="foregroundLowEmphasis"
-                >
-                  Remaining
+                  Filled
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -619,7 +661,7 @@ export default function OrdersTable(props) {
             const time = order[7] && formatDate(new Date(order[7] * 1000));
             let price = order[4];
             let baseQuantity = order[5];
-            let remaining = isNaN(Number(order[11])) ? order[5] : order[11];
+            let remaining = order[10] === null ? baseQuantity : order[10];
             let orderStatus = order[9];
             const baseCurrency = order[2].split("-")[0];
             const side = order[3] === "b" ? "buy" : "sell";
@@ -644,8 +686,8 @@ export default function OrdersTable(props) {
               orderStatus = "e";
             }
 
-            const orderWithoutFee = api.getOrderDetailsWithoutFee(order);
             if (api.isZksyncChain()) {
+              const orderWithoutFee = api.getOrderDetailsWithoutFee(order);
               price = orderWithoutFee.price;
               baseQuantity = orderWithoutFee.baseQuantity;
               remaining = orderWithoutFee.remaining;
@@ -665,16 +707,7 @@ export default function OrdersTable(props) {
                 statusClass = "successHighEmphasis";
                 break;
               case "pm":
-                statusText = (
-                  <span>
-                    partial match
-                    <img
-                      className="loading-gif"
-                      src={loadingGif}
-                      alt="Pending"
-                    />
-                  </span>
-                );
+                statusText = <span>partial match</span>;
                 statusClass = "warningHighEmphasis";
                 break;
               case "m":
@@ -755,20 +788,15 @@ export default function OrdersTable(props) {
                       {addComma(price.toPrecision(6) / 1)}
                     </Text>
                   </td>
-                  <td data-label="Quantity">
+                  <td data-label="filled">
                     <Text
                       font="primaryExtraSmallSemiBold"
                       color="foregroundHighEmphasis"
                     >
-                      {baseQuantity.toPrecision(6) / 1} {baseCurrency}
-                    </Text>
-                  </td>
-                  <td data-label="Remaining">
-                    <Text
-                      font="primaryExtraSmallSemiBold"
-                      color="foregroundHighEmphasis"
-                    >
-                      {remaining.toPrecision(6) / 1} {baseCurrency}
+                      {baseQuantity.toPrecision(6) / 1 -
+                        remaining.toPrecision(6) / 1}{" "}
+                      / {baseQuantity.toPrecision(6) / 1}&nbsp;
+                      {baseCurrency}
                     </Text>
                   </td>
                   <td data-label="Expiry">
@@ -785,7 +813,7 @@ export default function OrdersTable(props) {
                     </Text>
                   </td>
                   <td data-label="Action">
-                    {orderStatus === "o" ? (
+                    {["o", "pf", "pm"].includes(orderStatus) ? (
                       <ActionWrapper
                         font="primaryExtraSmallSemiBold"
                         color="primaryHighEmphasis"
@@ -807,18 +835,6 @@ export default function OrdersTable(props) {
   };
 
   const renderFillTable = (fills) => {
-    let baseExplorerUrl;
-    switch (api.apiProvider.network) {
-      case 1001:
-        baseExplorerUrl = "https://goerli.voyager.online/tx/";
-        break;
-      case 1000:
-        baseExplorerUrl = "https://rinkeby.zkscan.io/explorer/transactions/";
-        break;
-      case 1:
-      default:
-        baseExplorerUrl = "https://zkscan.io/explorer/transactions/";
-    }
     return isMobile ? (
       <table>
         <tbody>
@@ -834,6 +850,10 @@ export default function OrdersTable(props) {
             const sidetext = side === "b" ? "buy" : "sell";
             const sideclassname =
               side === "b" ? "successHighEmphasis" : "dangerHighEmphasis";
+            const tradeTypeText =
+              fill[8].toLowerCase() === `${props?.user?.id}`.toLowerCase()
+                ? "Taker"
+                : "Maker";
             const txhash = fill[7];
             const feeamount = Number(fill[10]);
             const feetoken = fill[11];
@@ -939,6 +959,9 @@ export default function OrdersTable(props) {
                           >
                             {sidetext}
                           </Text>
+                          <Text font="primaryExtraSmallSemiBold">
+                            {tradeTypeText}
+                          </Text>
                         </div>
                         <Text
                           font="primaryExtraSmallSemiBold"
@@ -965,7 +988,13 @@ export default function OrdersTable(props) {
                               color="primaryHighEmphasis"
                               textAlign="right"
                               onClick={() =>
-                                window.open(baseExplorerUrl + txhash, "_blank")
+                                window.open(
+                                  api.getExplorerTxLink(
+                                    api.apiProvider.network,
+                                    txhash
+                                  ),
+                                  "_blank"
+                                )
                               }
                             >
                               View Tx
@@ -1107,6 +1136,20 @@ export default function OrdersTable(props) {
                 />
               </HeaderWrapper>
             </th>
+            <th scope="col">
+              <HeaderWrapper style={{ position: "relative" }}>
+                {/* <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis" onClick>Side</Text> */}
+                <Dropdown
+                  adClass="side-dropdown size-wide"
+                  transparent={true}
+                  width={162}
+                  item={tradeTypeItems}
+                  context="Type"
+                  leftIcon={false}
+                  clickFunction={changeTradeType}
+                />
+              </HeaderWrapper>
+            </th>
             <th>
               <HeaderWrapper>
                 <Text
@@ -1194,6 +1237,10 @@ export default function OrdersTable(props) {
             const sidetext = side === "b" ? "buy" : "sell";
             const sideclassname =
               side === "b" ? "successHighEmphasis" : "dangerHighEmphasis";
+            const tradeTypeText =
+              fill[8].toLowerCase() === `${props?.user?.id}`.toLowerCase()
+                ? "Taker"
+                : "Maker";
             const txhash = fill[7];
             const feeamount = Number(fill[10]);
             const feetoken = fill[11];
@@ -1303,6 +1350,9 @@ export default function OrdersTable(props) {
                     {sidetext}
                   </Text>
                 </td>
+                <td data-label="Trade">
+                  <Text font="primaryExtraSmallSemiBold">{tradeTypeText}</Text>
+                </td>
                 <td data-label="Quantity">
                   <Text
                     font="primaryExtraSmallSemiBold"
@@ -1346,7 +1396,13 @@ export default function OrdersTable(props) {
                       font="primaryExtraSmallSemiBold"
                       color="primaryHighEmphasis"
                       onClick={() =>
-                        window.open(baseExplorerUrl + txhash, "_blank")
+                        window.open(
+                          api.getExplorerTxLink(
+                            api.apiProvider.network,
+                            txhash
+                          ),
+                          "_blank"
+                        )
                       }
                     >
                       View Tx
@@ -1363,18 +1419,6 @@ export default function OrdersTable(props) {
     );
   };
 
-  let explorerLink;
-  switch (api.apiProvider.network) {
-    case 1000:
-      explorerLink =
-        "https://rinkeby.zkscan.io/explorer/accounts/" + props.user.address;
-      break;
-    case 1:
-    default:
-      explorerLink =
-        "https://zkscan.io/explorer/accounts/" + props.user.address;
-  }
-
   let footerContent;
   switch (tab) {
     case 0:
@@ -1385,6 +1429,28 @@ export default function OrdersTable(props) {
       break;
     case 2:
       if (props.user.committed) {
+        const tokenBalanceInOrder = {};
+        const userOrders = getUserOrders();
+        if (userOrders) {
+          Object.keys(userOrders).forEach((orderId) => {
+            const order = userOrders[orderId];
+            if (order) return;
+            let sellToken, amount;
+            if (order[3] === "s") {
+              sellToken = order[2].split("-")[0];
+              amount = order[10];
+            } else {
+              sellToken = order[2].split("-")[1];
+              amount = order[4] * order[10];
+            }
+            if (sellToken in tokenBalanceInOrder) {
+              tokenBalanceInOrder[sellToken] += amount;
+            } else {
+              tokenBalanceInOrder[sellToken] = amount;
+            }
+          });
+        }
+
         const balancesContent = walletList.map((token) => {
           return (
             <tr>
@@ -1404,6 +1470,22 @@ export default function OrdersTable(props) {
                   {settings.hideBalance
                     ? "****.****"
                     : formatToken(token.valueReadable, token.token)}
+                </Text>
+              </td>
+              <td data-label="Balance">
+                <Text
+                  font="primaryExtraSmallSemiBold"
+                  color="foregroundHighEmphasis"
+                >
+                  {settings.hideBalance
+                    ? "****.****"
+                    : formatToken(
+                        token.valueReadable -
+                          (tokenBalanceInOrder[token]
+                            ? tokenBalanceInOrder[token]
+                            : 0),
+                        token.token
+                      )}
                 </Text>
               </td>
               <td data-label="Balance">
@@ -1496,6 +1578,16 @@ export default function OrdersTable(props) {
                       )}
                     </HeaderWrapper>
                   </th>
+                  <th scope="col" style={{ cursor: "pointer" }}>
+                    <HeaderWrapper>
+                      <Text
+                        font="primaryExtraSmallSemiBold"
+                        color="foregroundLowEmphasis"
+                      >
+                        Available balance
+                      </Text>
+                    </HeaderWrapper>
+                  </th>
                   <th
                     scope="col"
                     style={{ cursor: "pointer" }}
@@ -1535,13 +1627,20 @@ export default function OrdersTable(props) {
               </thead>
               <tbody>{balancesContent}</tbody>
             </table>
-
             <ActionWrapper
               font="primaryExtraSmallSemiBold"
               color="primaryHighEmphasis"
               textAlign="center"
               className="view-account-button"
-              onClick={() => window.open(explorerLink, "_blank")}
+              onClick={() =>
+                window.open(
+                  api.getExplorerAccountLink(
+                    api.apiProvider.network,
+                    props.user.address
+                  ),
+                  "_blank"
+                )
+              }
             >
               View Account on Explorer
             </ActionWrapper>
@@ -1555,7 +1654,16 @@ export default function OrdersTable(props) {
               color="primaryHighEmphasis"
               textAlign="center"
               className="view-account-button"
-              onClick={() => window.open(explorerLink, "_blank")}
+              onClick={() =>
+                window.open(
+                  api.getExplorerAccountLink(
+                    api.apiProvider.network,
+                    props.user.address,
+                    2
+                  ),
+                  "_blank"
+                )
+              }
             >
               View Account on Explorer
             </ActionWrapper>

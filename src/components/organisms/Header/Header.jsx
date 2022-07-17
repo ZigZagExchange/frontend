@@ -1,11 +1,11 @@
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import CheckIcon from "@mui/icons-material/Check";
-import { useLocation } from "react-router-dom";
 import { userSelector } from "lib/store/features/auth/authSlice";
+import { useMediaQuery } from "react-responsive";
 import {
   networkSelector,
   isConnectingSelector,
@@ -27,6 +27,15 @@ import {
 } from "components/atoms/Svg";
 import ToggleTheme from "components/molecules/Toggle/ToggleTheme";
 import useTheme from "components/hooks/useTheme";
+import {
+  MdOutlineArticle,
+  MdOutlineQuiz,
+  MdSignalCellularAlt,
+  MdAccountBalance,
+  MdCreate,
+  MdOutlineContactMail,
+} from "react-icons/md";
+import { FaDiscord, FaGithub } from "react-icons/fa";
 
 const langList = [
   { text: "EN", url: "#" },
@@ -34,7 +43,8 @@ const langList = [
 ];
 
 const networkLists = [
-  { text: "zkSync - Mainnet",
+  {
+    text: "zkSync - Mainnet",
     value: 1,
     url: "#",
     selectedIcon: <CheckIcon />,
@@ -48,8 +58,8 @@ const networkLists = [
     image: zksyncLogo,
   },
   {
-    text: "Arbitrum (soon)",
-    value: null,
+    text: "Arbitrum (alpha)",
+    value: 42161,
     url: "#",
     selectedIcon: <CheckIcon />,
     image: arbitrumLogo,
@@ -62,16 +72,49 @@ const accountLists = [
 ];
 
 const supportLists = [
-  { text: "Live Support", url: "https://discord.com/invite/zigzag" },
-  { text: "FAQ", url: "https://info.zigzag.exchange/" },
-  { text: "Docs", url: "https://docs.zigzag.exchange/" },
-  { text: "GitHub", url: "https://github.com/ZigZagExchange/" },
-  { text: "Uptime Status", url: "https://status.zigzag.exchange/" },
+  {
+    text: "Live Support",
+    url: "https://discord.com/invite/zigzag",
+    icon: <FaDiscord size={14} />,
+  },
+  {
+    text: "FAQ",
+    url: "https://info.zigzag.exchange/",
+    icon: <MdOutlineQuiz size={14} />,
+  },
+  {
+    text: "Docs",
+    url: "https://docs.zigzag.exchange/",
+    icon: <MdOutlineArticle size={14} />,
+  },
+  {
+    text: "GitHub",
+    url: "https://github.com/ZigZagExchange/",
+    icon: <FaGithub size={14} />,
+  },
+  {
+    text: "Uptime Status",
+    url: "https://status.zigzag.exchange/",
+    icon: <MdSignalCellularAlt size={14} />,
+  },
+  {
+    text: "Contact",
+    url: "https://info.zigzag.exchange/#contact",
+    icon: <MdOutlineContactMail size={14} />,
+  },
 ];
 
 const communityLists = [
-  { text: "Governance", url: "https://forum.zigzaglabs.io/t/zigzag-exchange" },
-  { text: "Blog", url: "https://blog.zigzag.exchange/" },
+  {
+    text: "Governance",
+    url: "https://forum.zigzaglabs.io/t/zigzag-exchange",
+    icon: <MdAccountBalance size={14} />,
+  },
+  {
+    text: "Blog",
+    url: "https://blog.zigzag.exchange/",
+    icon: <MdCreate size={14} />,
+  },
 ];
 
 const HeaderWrapper = styled.div`
@@ -215,6 +258,7 @@ export const Header = (props) => {
   const user = useSelector(userSelector);
   const network = useSelector(networkSelector);
   const hasBridge = api.isImplemented("depositL2");
+  const isEVM = api.isEVMChain();
   const history = useHistory();
   const [index, setIndex] = useState(0);
   const [language, setLanguage] = useState(langList[0].text);
@@ -261,9 +305,11 @@ export const Header = (props) => {
         setIndex(3);
         break;
       case "/dsl":
+        setIndex(4);
+        break;
+      case "/wrap":
         setIndex(5);
         break;
-
       default:
         setIndex(0);
         break;
@@ -278,18 +324,31 @@ export const Header = (props) => {
     alert(text);
   };
 
-  const changeNetwork = (text, value) => {
+  const changeNetwork = async (text, value) => {
     setNetworkName(text);
 
     api.setAPIProvider(value);
-    api.refreshNetwork().catch((err) => {
+    try {
+      await api.refreshNetwork();
+    } catch (err) {
       console.log(err);
-    });
+    }
+
+    if (
+      (/^\/wrap(\/.*)?/.test(location.pathname) && !api.isEVMChain()) ||
+      (/^\/bridge(\/.*)?/.test(location.pathname) &&
+        !api.isImplemented("depositL2")) ||
+      (/^\/list-pair(\/.*)?/.test(location.pathname) && api.isEVMChain())
+    ) {
+      setIndex(0);
+      history.push("/");
+    }
   };
 
   const handleClick = (newIndex) => {
     switch (newIndex) {
       case 0:
+        setIndex(newIndex);
         history.push("/");
         break;
       case 1:
@@ -313,12 +372,18 @@ export const Header = (props) => {
         localStorage.setItem("tab_index", newIndex);
         history.push("/dsl");
         break;
+      case 5:
+        window.open(
+          "https://app.uniswap.org/#/swap?inputCurrency=ETH&outputCurrency=0x82af49447d8a07e3bd95bd0d56f35241523fbab1&chain=arbitrum",
+          "_blank"
+        );
+        break;
       default:
         break;
     }
   };
 
-  const isMobile = window.innerWidth < 1034;
+  const isMobile = useMediaQuery({ maxWidth: 1224 });
 
   return (
     <HeaderWrapper isMobile={isMobile}>
@@ -358,12 +423,17 @@ export const Header = (props) => {
               style={{ paddingTop: "20px" }}
             >
               <Tab>TRADE</Tab>
-              {hasBridge && <Tab>CONVERT</Tab>}
-              {hasBridge && <Tab>BRIDGE</Tab>}
-              <Tab>LIST PAIR</Tab>
-              {/* {hasBridge && <Tab>DSL</Tab>} */}
-
-              {/* {hasBridge && <Tab>Old BRIDGE</Tab>} */}
+              <Tab display={!isEVM}>CONVERT</Tab>
+              <Tab display={hasBridge}>BRIDGE</Tab>
+              <Tab display={!isEVM}>LIST PAIR</Tab>
+              <Tab display={false}>
+                DOCS
+                <ExternalLinkIcon size={12} />
+              </Tab>
+              <Tab display={isEVM}>
+                WRAP
+                <ExternalLinkIcon size={12} />
+              </Tab>
             </TabMenu>
           </NavWrapper>
           <ActionsWrapper>
@@ -372,7 +442,7 @@ export const Header = (props) => {
               adClass="menu-dropdown"
               width={200}
               item={supportLists}
-              context={'Support'}
+              context={"Support"}
               leftIcon={true}
               transparent
             />
@@ -380,7 +450,7 @@ export const Header = (props) => {
               adClass="menu-dropdown"
               width={162}
               item={communityLists}
-              context={'Community'}
+              context={"Community"}
               leftIcon={true}
               transparent
             />
@@ -422,7 +492,7 @@ export const Header = (props) => {
 
             <Dropdown
               adClass="network-dropdown"
-              width={162}
+              width={190}
               item={networkItems}
               context={networkName}
               clickFunction={changeNetwork}
@@ -451,16 +521,14 @@ export const Header = (props) => {
           />
           <TabMenu row activeIndex={index} onItemClick={handleClick}>
             <Tab>TRADE</Tab>
-            {hasBridge && <Tab>CONVERT</Tab>}
+            <Tab>CONVERT</Tab>
             {hasBridge && <Tab>BRIDGE</Tab>}
             <Tab>LIST PAIR</Tab>
-            {/* {hasBridge && (
-              <Tab>
-                DOCS
-                <ExternalLinkIcon size={12} />
-              </Tab>
-            )} */}
-            {/* {hasBridge && <Tab>DSL</Tab>} */}
+            {/* <Tab>
+              DOCS
+              <ExternalLinkIcon size={12} />
+            </Tab> */}
+            {isEVM && <Tab>WRAP</Tab>}
           </TabMenu>
           <HorizontalDivider />
           {/* <ActionSideMenuWrapper>
@@ -482,7 +550,7 @@ export const Header = (props) => {
             adClass="menu-dropdown"
             width={200}
             item={supportLists}
-            context={'Support'}
+            context={"Support"}
             leftIcon={true}
             transparent
           />
@@ -490,11 +558,11 @@ export const Header = (props) => {
             adClass="menu-dropdown"
             width={162}
             item={communityLists}
-            context={'Community'}
+            context={"Community"}
             leftIcon={true}
             transparent
           />
-          <SocialWrapper style={{ justifySelf: "center" }}>
+          <SocialWrapper style={{ justifySelf: "center", marginTop: "150px" }}>
             <SocialLink
               target="_blank"
               rel="noreferrer"

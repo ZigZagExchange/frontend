@@ -15,12 +15,13 @@ const FillCard = ({ fill, closeToast }) => {
   const tradeId = fill[1];
   const market = fill[2];
   const fillstatus = fill[6];
-  const feeamount = fill[10];
+  let feeamount = fill[10];
   const feetoken = fill[11];
   const side = fill[3];
   let feeText = "1 USDC";
   const marketInfo = api.marketInfo["ETH-USDC"];
   if (feeamount && feetoken) {
+    feeamount = Number(feeamount);
     const displayFee =
       feeamount > 9999 ? feeamount.toFixed(0) : feeamount.toPrecision(4);
     feeText = feeamount !== 0 ? `${displayFee} ${feetoken}` : "--";
@@ -61,22 +62,6 @@ const FillCard = ({ fill, closeToast }) => {
         console.log(err);
       });
   }, [ref]);
-
-  const getHashViewURL = () => {
-    let baseExplorerUrl;
-    switch (api.apiProvider.network) {
-      case 1001:
-        baseExplorerUrl = "https://goerli.voyager.online/tx/";
-        break;
-      case 1000:
-        baseExplorerUrl = "https://rinkeby.zkscan.io/explorer/transactions/";
-        break;
-      case 1:
-      default:
-        baseExplorerUrl = "https://zkscan.io/explorer/transactions/";
-    }
-    return baseExplorerUrl;
-  };
 
   return (
     <div ref={ref} className={classNames({ dark: isDark })}>
@@ -120,7 +105,10 @@ const FillCard = ({ fill, closeToast }) => {
                 Trade ID:{" "}
                 <button
                   onClick={() => {
-                    window.open(getHashViewURL() + fill[7], "_blank");
+                    window.open(
+                      api.getExplorerTxLink(fill[0], fill[7]),
+                      "_blank"
+                    );
                   }}
                   className="flex items-center gap-2 text-sm font-semibold underline hover:no-underline text-primary-900 underline-offset-1 font-work"
                 >

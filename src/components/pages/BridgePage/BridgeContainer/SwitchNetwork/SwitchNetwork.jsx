@@ -24,7 +24,7 @@ const SwitchNetwork = ({
       </div>
       <div className="flex items-end justify-center pb-2">
         <button
-          className="flex items-center justify-center w-10 h-10 border rounded-full shadow-xl border-foreground-500"
+          className="flex items-center justify-center w-10 h-10 border rounded-full shadow-xl dark:border-foreground-400 border-primary-500"
           onClick={onClickSwitchNetwork}
         >
           <SwitchHorizontalIcon className="w-6 text-gray-900 transition-all duration-300 ease-in-out origin-center dark:text-white hover:opacity-80 hover:rotate-180" />

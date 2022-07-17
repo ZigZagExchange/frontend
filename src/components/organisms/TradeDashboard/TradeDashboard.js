@@ -4,7 +4,7 @@ import styled from "@xstyled/styled-components";
 import TradeSidebar from "./TradeSidebar/TradeSidebar";
 import TradeMarketSelector from "./TradeMarketSelector/TradeMarketSelector";
 import TradeTables from "./TradeTables/TradeTables";
-import TradeFooter from "./TradeFooter/TradeFooter";
+// import TradeFooter from "./TradeFooter/TradeFooter";
 import TradeChartArea from "./TradeChartArea/TradeChartArea";
 import GridLayoutRow from "./ReactGridLayout/ReactGridRow";
 import GridLayoutCell from "./ReactGridLayout/ReactGridCell";
@@ -38,6 +38,7 @@ import {
 import TradesTable from "./TradeBooks/TradesTable";
 import { HighSlippageModal } from "components/molecules/HighSlippageModal";
 import _ from "lodash";
+import { formatPrice, addComma } from "lib/utils";
 
 const TradeContainer = styled.div`
     color: #aeaebf;
