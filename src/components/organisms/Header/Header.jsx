@@ -372,7 +372,10 @@ export const Header = (props) => {
         history.push("/dsl");
         break;
       case 5:
-        window.open("https://app.uniswap.org/#/swap?inputCurrency=ETH&outputCurrency=0x82af49447d8a07e3bd95bd0d56f35241523fbab1&chain=arbitrum", '_blank');
+        window.open(
+          "https://app.uniswap.org/#/swap?inputCurrency=ETH&outputCurrency=0x82af49447d8a07e3bd95bd0d56f35241523fbab1&chain=arbitrum",
+          "_blank"
+        );
         break;
       default:
         break;

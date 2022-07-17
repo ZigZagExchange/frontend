@@ -5,13 +5,13 @@ import Input from "./Input";
 const InputField = styled(Input)`
   padding: 4px 2px;
   border: 1px solid;
-  border-color: ${({theme}) => theme.colors.foreground300};
+  border-color: ${({ theme }) => theme.colors.foreground300};
   &:focus {
     outline: none;
   }
   background: none;
-  color: ${({theme}) => theme.colors.foregroundHighEmphasis};
-`
+  color: ${({ theme }) => theme.colors.foregroundHighEmphasis};
+`;
 
 const TextInput = ({
   name,
@@ -25,7 +25,7 @@ const TextInput = ({
   rightOfLabel,
   borderRadius = 4,
   fontSize = 18,
-  className
+  className,
 }) => {
   return (
     <InputField

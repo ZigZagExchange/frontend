@@ -2,7 +2,10 @@ import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
 import useTheme from "components/hooks/useTheme";
-import { marketInfoSelector, settingsSelector } from "lib/store/features/api/apiSlice";
+import {
+  marketInfoSelector,
+  settingsSelector,
+} from "lib/store/features/api/apiSlice";
 import { numStringToSymbol, addComma } from "lib/utils";
 import Text from "components/atoms/Text/Text";
 
@@ -11,13 +14,14 @@ const Table = styled.table`
   flex: auto;
   overflow: auto;
   padding: 0px;
-  height: ${({ isLeft }) => isLeft ? '' : '242px'};
+  height: ${({ isLeft }) => (isLeft ? "" : "242px")};
   flex-direction: column;
-  scrollbar-color: ${({ theme }) => theme.colors.foreground400} rgba(0,0,0,0.1);
+  scrollbar-color: ${({ theme }) => theme.colors.foreground400}
+    rgba(0, 0, 0, 0.1);
   scrollbar-width: thin !important;
-  
+
   &:not(.no-space) {
-    justify-content: ${({ isLeft }) => isLeft ? 'space-between' : 'start'};
+    justify-content: ${({ isLeft }) => (isLeft ? "space-between" : "start")};
   }
 
   &:first-type-of {
@@ -108,7 +112,7 @@ const TradePriceTable = (props) => {
   const settings = useSelector(settingsSelector);
   const ref = useRef(null);
   const [isUpdateScroll, setUpdateScroll] = useState(false);
-  const isMobile = window.innerWidth < 500
+  const isMobile = window.innerWidth < 500;
 
   useEffect(() => {
     if (!ref.current) return;
@@ -149,15 +153,17 @@ const TradePriceTable = (props) => {
                 Amount
               </Text>
             </th>
-            {!isMobile && <th>
-              <Text
-                font="tableHeader"
-                color="foregroundLowEmphasis"
-                textAlign="right"
-              >
-                Total({marketInfo && marketInfo.quoteAsset.symbol})
-              </Text>
-            </th>}
+            {!isMobile && (
+              <th>
+                <Text
+                  font="tableHeader"
+                  color="foregroundLowEmphasis"
+                  textAlign="right"
+                >
+                  Total({marketInfo && marketInfo.quoteAsset.symbol})
+                </Text>
+              </th>
+            )}
           </tr>
         </thead>
       )}
@@ -172,10 +178,13 @@ const TradePriceTable = (props) => {
           const breakpoint = Math.round((total_step / total_total) * 100);
           let rowStyle;
           if (props.useGradient) {
-            let dir
-            if((d.side === "b" && !settings.stackOrderbook) || (d.side !== "b" && settings.stackOrderbook))
-              dir = "to left"
-            else dir = "to right"
+            let dir;
+            if (
+              (d.side === "b" && !settings.stackOrderbook) ||
+              (d.side !== "b" && settings.stackOrderbook)
+            )
+              dir = "to left";
+            else dir = "to right";
             rowStyle = {
               background: `linear-gradient(${dir}, ${color}, ${color} ${breakpoint}%, ${theme.colors.backgroundHighEmphasis} 0%)`,
             };
@@ -213,22 +222,21 @@ const TradePriceTable = (props) => {
                   color="foregroundHighEmphasis"
                   textAlign="right"
                 >
-                  
-                  {
-                    addComma(Number(numStringToSymbol(amount, 2)))
-                  }
+                  {addComma(Number(numStringToSymbol(amount, 2)))}
                 </Text>
               </td>
-              {!isMobile && <td>
-                <Text
-                  font="tableContent"
-                  color="foregroundHighEmphasis"
-                  textAlign="right"
-                >
-                  {/* {numStringToSymbol(total, 2)} */}
-                  {addComma(total)}
-                </Text>
-              </td>}
+              {!isMobile && (
+                <td>
+                  <Text
+                    font="tableContent"
+                    color="foregroundHighEmphasis"
+                    textAlign="right"
+                  >
+                    {/* {numStringToSymbol(total, 2)} */}
+                    {addComma(total)}
+                  </Text>
+                </td>
+              )}
             </tr>
           );
         })}

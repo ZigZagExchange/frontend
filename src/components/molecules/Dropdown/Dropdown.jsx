@@ -3,9 +3,9 @@ import styled from "styled-components";
 import { ExpandableButton } from "../ExpandableButton";
 import Text from "../../atoms/Text/Text";
 import { HideMenuOnOutsideClicked } from "lib/utils";
-import { Box } from '@mui/material';
-import { useEffect } from 'react';
-import _ from 'lodash';
+import { Box } from "@mui/material";
+import { useEffect } from "react";
+import _ from "lodash";
 
 const DropdownWrapper = styled.div`
   position: relative;
@@ -113,10 +113,9 @@ const Dropdown = ({
 
   useEffect(() => {
     if (!context) return;
-    const index = _.findIndex(item, { text: context })
-    if (index !== -1)
-      setIndex(index)
-  }, [context])
+    const index = _.findIndex(item, { text: context });
+    if (index !== -1) setIndex(index);
+  }, [context]);
 
   HideMenuOnOutsideClicked(wrapperRef, setIsOpened);
 
@@ -143,13 +142,18 @@ const Dropdown = ({
         expanded={isOpened}
         onClick={toggle}
       >
-        <Box display="flex" justifyContent={'center'} alignItems="center">
-          {item[index]?.image && 
-            <img 
-              src={item[index].image} 
-              style={{ width: 14, height: 14, borderRadius: "50%", marginRight: '10px' }} 
+        <Box display="flex" justifyContent={"center"} alignItems="center">
+          {item[index]?.image && (
+            <img
+              src={item[index].image}
+              style={{
+                width: 14,
+                height: 14,
+                borderRadius: "50%",
+                marginRight: "10px",
+              }}
             />
-          }
+          )}
           {context}
         </Box>
       </ExpandableButton>
