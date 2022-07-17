@@ -26,19 +26,20 @@ const chainMap = {
 };
 
 export default class API extends Emitter {
-  networks = {}
-  ws = null
-  apiProvider = null
-  mainnetProvider = null
-  rollupProvider = null
-  currencies = null
-  isArgent = false
-  marketInfo = {}
-  lastPrices = {}
-  _signInProgress = null
-  _profiles = {}
-  _pendingOrders = []
-  _pendingFills = []
+  networks = {};
+  ws = null;
+  apiProvider = null;
+  mainnetProvider = null;
+  rollupProvider = null;
+  currencies = null;
+  isArgent = false;
+  marketInfo = {};
+  lastPrices = {};
+  balances = {};
+  _signInProgress = null;
+  _profiles = {};
+  _pendingOrders = [];
+  _pendingFills = [];
 
   constructor({ infuraId, networks, currencies, validMarkets }) {
     super();
@@ -77,16 +78,16 @@ export default class API extends Emitter {
   };
 
   setAPIProvider = (network, networkChanged = true) => {
-    const chainName = this.getChainName(network)
+    const chainName = this.getChainName(network);
 
     if (!chainName) {
-      console.error (`Can't get chainName for ${network}`);
-      this.signOut()
-      return
+      console.error(`Can't get chainName for ${network}`);
+      this.signOut();
+      return;
     }
 
-    const apiProvider = this.getAPIProvider(network)
-    this.apiProvider = apiProvider
+    const apiProvider = this.getAPIProvider(network);
+    this.apiProvider = apiProvider;
 
     // Change WebSocket if necessary
     if (this.ws) {
@@ -99,12 +100,13 @@ export default class API extends Emitter {
     }
 
     this.web3 = new Web3(
-      window.ethereum || new Web3.providers.HttpProvider(
-        `https://${chainName}.infura.io/v3/${this.infuraId}`
-      )
-    )
+      window.ethereum ||
+        new Web3.providers.HttpProvider(
+          `https://${chainName}.infura.io/v3/${this.infuraId}`
+        )
+    );
 
-    if (chainName === 'arbitrum') {
+    if (chainName === "arbitrum") {
       this.web3Modal = new Web3Modal({
         network: chainName,
         cacheProvider: true,
@@ -114,10 +116,10 @@ export default class API extends Emitter {
             package: WalletConnectProvider,
             options: {
               infuraId: this.infuraId,
-            }
+            },
           },
-        }
-      })
+        },
+      });
     } else {
       this.web3Modal = new Web3Modal({
         network: chainName,
@@ -128,13 +130,13 @@ export default class API extends Emitter {
             package: WalletConnectProvider,
             options: {
               infuraId: this.infuraId,
-            }
+            },
           },
           "custom-argent": {
             display: {
               logo: "https://images.prismic.io/argentwebsite/313db37e-055d-42ee-9476-a92bda64e61d_logo.svg?auto=format%2Ccompress&fit=max&q=50",
               name: "Argent zkSync",
-              description: "Connect to your Argent zkSync wallet"
+              description: "Connect to your Argent zkSync wallet",
             },
             package: WalletConnectProvider,
             options: {
@@ -145,20 +147,18 @@ export default class API extends Emitter {
               await provider.enable();
               this.isArgent = true;
               return provider;
-            }
-          }
-        }
-      })
+            },
+          },
+        },
+      });
     }
 
-    this.getAccountState()
-      .catch(err => {
-        console.log('Failed to switch providers', err)
-      })
+    this.getAccountState().catch((err) => {
+      console.log("Failed to switch providers", err);
+    });
 
-    if (networkChanged)
-      this.emit('providerChange', network)
-  }
+    if (networkChanged) this.emit("providerChange", network);
+  };
 
   getProfile = async (address) => {
     const getProfileFromIPFS = async (address) => {
@@ -199,32 +199,32 @@ export default class API extends Emitter {
     };
 
     if (!this._profiles[address]) {
-      const profile = this._profiles[address] = {
+      const profile = (this._profiles[address] = {
         description: null,
         website: null,
         image: null,
         address,
-      }
+      });
 
       if (!address) {
-        return profile
+        return profile;
       }
 
-      profile.name = `${address.substr(0, 6)}…${address.substr(-6)}`
+      profile.name = `${address.substr(0, 6)}…${address.substr(-6)}`;
       Object.assign(
         profile,
         ...(await Promise.all([
           fetchENSName(address),
           getProfileFromIPFS(address),
         ]))
-      )
+      );
 
       if (!profile.image) {
-        profile.image = createIcon({ seed: address }).toDataURL()
+        profile.image = createIcon({ seed: address }).toDataURL();
       }
     }
 
-    return this._profiles[address]
+    return this._profiles[address];
   };
 
   _socketOpen = () => {
@@ -269,37 +269,68 @@ export default class API extends Emitter {
         .filter((pair) => !this.marketInfo[pair]);
       this.cacheMarketInfoFromNetwork(noInfoPairs);
     }
-  }
+  };
 
   refreshNetwork = async () => {
-    if (!window.ethereum) return
-    let ethereumChainId
+    if (!window.ethereum) return;
+    let ethereumChainId, ethereumChainInfo;
 
     // await this.signOut();
 
     switch (this.apiProvider.network) {
       case 1:
         ethereumChainId = "0x1";
+        ethereumChainInfo = {
+          chainId: "0x1",
+        };
         break;
       case 1000:
         ethereumChainId = "0x4";
+        ethereumChainInfo = {
+          chainId: "0x4",
+        };
         break;
       case 42161:
         ethereumChainId = "0xa4b1";
+        ethereumChainInfo = {
+          chainId: "0xA4B1",
+          chainName: "Arbitrum",
+          nativeCurrency: {
+            name: "Arbitrum Coin",
+            symbol: "ETH",
+            decimals: 18,
+          },
+          rpcUrls: ["https://arb1.arbitrum.io/rpc"],
+          blockExplorerUrls: ["https://arbiscan.io/"],
+        };
         break;
       default:
-        return
+        return;
     }
 
     await window.ethereum.request({
-      method: 'eth_requestAccounts',
-      params: [{ eth_accounts: {} }]
+      method: "eth_requestAccounts",
+      params: [{ eth_accounts: {} }],
     });
 
-    await window.ethereum.request({
-      method: "wallet_switchEthereumChain",
-      params: [{ chainId: ethereumChainId }],
-    });
+    try {
+      await window.ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: ethereumChainId }],
+      });
+    } catch (switchError) {
+      try {
+        if (switchError.code === 4902) {
+          await window.ethereum.request({
+            method: "wallet_addEthereumChain",
+            params: [ethereumChainInfo],
+          });
+        }
+      } catch (addError) {
+        console.error(addError);
+        throw addError;
+      }
+    }
   };
 
   _socketError = (e) => {
@@ -359,14 +390,12 @@ export default class API extends Emitter {
           await this.sleep(1000);
           const web3Provider = await this.web3Modal.connect();
           this.web3.setProvider(web3Provider);
-          this.rollupProvider = new ethers.providers.Web3Provider(
-            web3Provider
-          );
+          this.rollupProvider = new ethers.providers.Web3Provider(web3Provider);
 
           this.mainnetProvider = new ethers.providers.InfuraProvider(
             this.getChainNameL1(network),
             this.infuraId
-          )
+          );
 
           // set up polygon providers. mumbai for testnet. polygon for mainnet
           this.polygonProvider = new ethers.providers.JsonRpcProvider(
@@ -382,10 +411,10 @@ export default class API extends Emitter {
           }
 
           try {
-            accountState.profile = await this.getProfile(accountState.address)
+            accountState.profile = await this.getProfile(accountState.address);
           } catch (e) {
             accountState.profile = {};
-          }           
+          }
 
           this.emit("signIn", accountState);
 
@@ -421,12 +450,12 @@ export default class API extends Emitter {
     if (isMobile) window.localStorage.clear();
     else window.localStorage.removeItem("walletconnect");
 
-
-    this.marketInfo = {}
-    this.lastPrices = {}
-    this._profiles = {}
-    this._pendingOrders = []
-    this._pendingFills = []
+    this.marketInfo = {};
+    this.lastPrices = {};
+    this.balances = {};
+    this._profiles = {};
+    this._pendingOrders = [];
+    this._pendingFills = [];
 
     this.web3 = null;
     this.web3Modal = null;
@@ -442,10 +471,11 @@ export default class API extends Emitter {
   };
 
   getPolygonUrl(network) {
-    switch(network) {
-      case 1: case 42161:
+    switch (network) {
+      case 1:
+      case 42161:
         return `https://polygon-mainnet.infura.io/v3/${this.infuraId}`;
-      case 1000: 
+      case 1000:
         return `https://polygon-mumbai.infura.io/v3/${this.infuraId}`;
       default:
         throw new Error(`getPolygonUrl network: ${network} not understood.`);
@@ -453,24 +483,30 @@ export default class API extends Emitter {
   }
 
   getPolygonChainId(network) {
-    switch(network) {
-      case 1: case 42161:
+    switch (network) {
+      case 1:
+      case 42161:
         return "0x89";
-      case 1000: 
-      return "0x13881";
+      case 1000:
+        return "0x13881";
       default:
-        throw new Error(`getPolygonChainId network: ${network} not understood.`);
+        throw new Error(
+          `getPolygonChainId network: ${network} not understood.`
+        );
     }
   }
 
   getPolygonWethContract(network) {
-    switch(network) {
-      case 1: case 42161:
+    switch (network) {
+      case 1:
+      case 42161:
         return POLYGON_MAINNET_WETH_ADDRESS;
-      case 1000: 
-      return POLYGON_MUMBAI_WETH_ADDRESS;
+      case 1000:
+        return POLYGON_MUMBAI_WETH_ADDRESS;
       default:
-        throw new Error(`getPolygonWethContract network: ${network} not understood.`);
+        throw new Error(
+          `getPolygonWethContract network: ${network} not understood.`
+        );
     }
   }
 
@@ -571,20 +607,28 @@ export default class API extends Emitter {
 
   getChainName = (chainId) => {
     switch (chainId) {
-      case 1: return 'mainnet';
-      case 1000: return 'rinkeby';
-      case 42161: return 'arbitrum';
-      default: return null
+      case 1:
+        return "mainnet";
+      case 1000:
+        return "rinkeby";
+      case 42161:
+        return "arbitrum";
+      default:
+        return null;
     }
-  }
+  };
 
   getChainNameL1 = (chainId) => {
     switch (chainId) {
-      case 1: case 42161: return 'mainnet';
-      case 1000: return 'rinkeby';
-      default: return null
+      case 1:
+      case 42161:
+        return "mainnet";
+      case 1000:
+        return "rinkeby";
+      default:
+        return null;
     }
-  }
+  };
 
   getChainIdFromName = (name) => {
     return this.networks?.[name]?.[1];
@@ -592,14 +636,22 @@ export default class API extends Emitter {
 
   getNetworkDisplayName = (network) => {
     switch (network) {
-      case 1: case 1000: return 'zkSync';
-      case 42161: return 'Arbitrum';
-      default: return 'ZigZag';
+      case 1:
+      case 1000:
+        return "zkSync";
+      case 42161:
+        return "Arbitrum";
+      default:
+        return "ZigZag";
     }
   };
 
   subscribeToMarket = (market, showNightPriceChange = false) => {
-    this.send("subscribemarket", [this.apiProvider.network, market, showNightPriceChange]);
+    this.send("subscribemarket", [
+      this.apiProvider.network,
+      market,
+      showNightPriceChange,
+    ]);
   };
 
   unsubscribeToMarket = (market) => {
@@ -719,7 +771,7 @@ export default class API extends Emitter {
     try {
       const netContract = this.getNetworkContract();
       const [account] = await this.web3.eth.getAccounts();
-      if (!account || account === '0x') return result;
+      if (!account || account === "0x") return result;
 
       if (currency === "ETH") {
         result.balance = await this.mainnetProvider.getBalance(account);
@@ -781,6 +833,7 @@ export default class API extends Emitter {
 
   getBalances = async () => {
     const balances = await this.apiProvider.getBalances();
+    this.balances = balances;
     this.emit("balanceUpdate", this.apiProvider.network, balances);
     return balances;
   };
@@ -789,7 +842,7 @@ export default class API extends Emitter {
     const side = order[3];
     const baseQuantity = order[5];
     const quoteQuantity = order[4] * order[5];
-    const remaining = isNaN(Number(order[11])) ? order[5] : order[11];
+    const remaining = Number(order[11]) !== null ? order[5] : order[11];
     const market = order[2];
     const marketInfo = this.marketInfo[market];
     let baseQuantityWithoutFee,
@@ -817,24 +870,33 @@ export default class API extends Emitter {
     };
   };
 
-  submitOrder = async (
-    product,
-    side,
-    price,
-    baseAmount,
-    quoteAmount,
-    orderType
-  ) => {
-    if (!quoteAmount && !baseAmount) {
+  submitOrder = async (market, side, baseAmount, quoteAmount, orderType) => {
+    if (!quoteAmount || !baseAmount) {
       throw new Error("Set base or quote amount");
     }
+
+    const marketInfo = this.marketInfo[market];
+    let baseAmountBN = ethers.utils.parseUnits(
+      Number(baseAmount).toFixed(marketInfo.baseAsset.decimals),
+      marketInfo.baseAsset.decimals
+    );
+    let quoteAmountBN = ethers.utils.parseUnits(
+      Number(quoteAmount).toFixed(marketInfo.quoteAsset.decimals),
+      marketInfo.quoteAsset.decimals
+    );
+
+    const expirationTimeSeconds = Math.floor(
+      orderType === "market"
+        ? Date.now() / 1000 + 60 * 2 // two minutes
+        : Date.now() / 1000 + 60 * 60 * 24 * 7 // one week
+    );
+
     await this.apiProvider.submitOrder(
-      product,
+      market,
       side,
-      price,
-      Number(baseAmount),
-      Number(quoteAmount),
-      orderType
+      baseAmountBN,
+      quoteAmountBN,
+      expirationTimeSeconds
     );
   };
 
@@ -867,29 +929,30 @@ export default class API extends Emitter {
 
   approveExchangeContract = async (token, amount) => {
     return this.apiProvider.approveExchangeContract(token, amount);
-  }
+  };
+
+  checkAccountActivated = async () => {
+    if (!this.apiProvider.isZksyncChain) return true;
+    return this.apiProvider.checkAccountActivated();
+  };
 
   warpETH = async (amount) => {
-    if (!amount) throw new Error('No amount set');
-    let amountBN = ethers.utils.parseEther(
-      amount.toFixed(18)
-    );
+    if (!amount) throw new Error("No amount set");
+    let amountBN = ethers.utils.parseEther(amount.toFixed(18));
 
     return this.apiProvider.warpETH(amountBN);
-  }
+  };
 
   unWarpETH = async (amount) => {
-    if (!amount) throw new Error('No amount set');
-    let amountBN = ethers.utils.parseEther(
-      amount.toFixed(18)
-    );
+    if (!amount) throw new Error("No amount set");
+    let amountBN = ethers.utils.parseEther(amount.toFixed(18));
 
     return this.apiProvider.unWarpETH(amountBN);
-  }
+  };
 
   getWrapFees = async () => {
     return this.apiProvider.getWrapFees();
-  }
+  };
 
   uploadArweaveFile = async (sender, timestamp, signature, file) => {
     const formData = new FormData();
@@ -935,14 +998,15 @@ export default class API extends Emitter {
     if (pairs.length === 0) return;
     if (!this.apiProvider.network) return;
     const pairText = pairs.join(",");
-    const url = (this.apiProvider.network === 1)
-      ? `https://zigzag-markets.herokuapp.com/markets?id=${pairText}&chainid=${this.apiProvider.network}`
-      : `https://secret-thicket-93345.herokuapp.com/api/v1/marketinfos?chain_id=${this.apiProvider.network}&market=${pairText}`
+    const url =
+      this.apiProvider.network === 1
+        ? `https://zigzag-markets.herokuapp.com/markets?id=${pairText}&chainid=${this.apiProvider.network}`
+        : `https://secret-thicket-93345.herokuapp.com/api/v1/marketinfos?chain_id=${this.apiProvider.network}&market=${pairText}`;
     const marketInfoArray = await fetch(url).then((r) => r.json());
     if (!(marketInfoArray instanceof Array)) return;
     marketInfoArray.forEach((info) => (this.marketInfo[info.alias] = info));
     return;
-  }
+  };
 
   get fastWithdrawTokenAddresses() {
     if (this.apiProvider.network === 1) {
@@ -1039,10 +1103,13 @@ export default class API extends Emitter {
     // request status update
     if (fillRequestIds.length > 0) {
       for (let i in fillRequestIds) {
-        this.send("fillreceiptreq", [this.apiProvider.network, Number(fillRequestIds[i])])
+        this.send("fillreceiptreq", [
+          this.apiProvider.network,
+          Number(fillRequestIds[i]),
+        ]);
       }
     }
-  }
+  };
 
   getPairs = () => {
     return Object.keys(this.lastPrices);
@@ -1074,28 +1141,38 @@ export default class API extends Emitter {
 
   getExplorerTxLink = (chainId, txhash) => {
     switch (Number(chainId)) {
-      case 1: return 'https://zkscan.io/explorer/transactions/' + txhash;
-      case 1000: return 'https://rinkeby.zkscan.io/explorer/transactions/' + txhash;
-      case 42161: return 'https://arbiscan.io/tx/' + txhash;
-      default: throw Error("Chain ID not understood");
+      case 1:
+        return "https://zkscan.io/explorer/transactions/" + txhash;
+      case 1000:
+        return "https://rinkeby.zkscan.io/explorer/transactions/" + txhash;
+      case 42161:
+        return "https://arbiscan.io/tx/" + txhash;
+      default:
+        throw Error("Chain ID not understood");
     }
-  }
+  };
 
-  getExplorerAccountLink = (chainId, address, layer = 1) => {
-    if(layer === 1){
+  getExplorerAccountLink = (chainId, address, layer = 2) => {
+    if (layer === 1) {
       switch (Number(chainId)) {
-        case 1: return 'https://etherscan.io/address/' + address;
-        case 1000: return 'https://rinkeby.etherscan.io/address/' + address;
-        case 42161: return 'https://etherscan.io/address/' + address;
-        default: throw Error("Chain ID not understood");
+        case 1:
+        case 42161:
+          return "https://etherscan.io/address/" + address;
+        case 1000:
+          return "https://rinkeby.etherscan.io/address/" + address;
+        default:
+          throw Error("Chain ID not understood");
       }
-    }
-    else{
+    } else {
       switch (Number(chainId)) {
-        case 1: return 'https://zkscan.io/explorer/accounts/' + address;
-        case 1000: return 'https://rinkeby.zkscan.io/explorer/accounts/' + address;
-        case 42161: return 'https://arbiscan.io/address/' + address;
-        default: throw Error("Chain ID not understood");
+        case 1:
+          return "https://zkscan.io/explorer/accounts/" + address;
+        case 1000:
+          return "https://rinkeby.zkscan.io/explorer/accounts/" + address;
+        case 42161:
+          return "https://arbiscan.io/address/" + address;
+        default:
+          throw Error("Chain ID not understood");
       }
     }
   };

@@ -13,7 +13,8 @@ const Table = styled.table`
   height: 200px;
   padding: 0px;
   flex-direction: column;
-  scrollbar-color: ${({ theme }) => theme.colors.foreground400} rgba(0,0,0,0.1);
+  scrollbar-color: ${({ theme }) => theme.colors.foreground400}
+    rgba(0, 0, 0, 0.1);
   scrollbar-width: thin !important;
 
   tbody {
@@ -75,13 +76,13 @@ const Table = styled.table`
 
   ::-webkit-scrollbar-track {
     border-radius: 0px;
-    background: ${({ theme }) => theme.colors.backgroundHighEmphasis};
+    background: hsla(0, 0%, 100%, 0.15) !important;
     height: 23px;
   }
 
   ::-webkit-scrollbar-thumb {
-    border-radius: 0px;
-    background: ${({ theme }) => theme.colors.foreground400};
+    border-radius: 4px;
+    background: #292d3f21 !important;
   }
 
   ::-webkit-scrollbar-thumb:window-inactive {

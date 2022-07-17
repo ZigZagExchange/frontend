@@ -1,15 +1,15 @@
 import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
 import { CSSTransition } from "react-transition-group";
-import styled from 'styled-components';
+import styled from "styled-components";
 import "./Modal.css";
-import Text from 'components/atoms/Text/Text'
+import Text from "components/atoms/Text/Text";
 
 const ModalWrapper = styled.div`
   &.currency-modal {
     background: ${({ theme }) => theme.colors.backgroundHighEmphasis};
     border: 1px solid ${({ theme }) => theme.colors.foreground400};
-    box-shadow: 0px 8px 16px 0px #0101011A;
+    box-shadow: 0px 8px 16px 0px #0101011a;
     border-radius: 8px;
 
     .zig_modal_title {
@@ -32,12 +32,12 @@ const ModalWrapper = styled.div`
       color: ${({ theme }) => theme.colors.foregroundHighEmphasis};
     }
   }
-`
+`;
 const Divider = styled.div`
   height: 1px;
   background: ${({ theme }) => theme.colors.foreground400};
   margin-top: 20px;
-`
+`;
 
 export const Modal = (props) => {
   const closeOnEscapeKeyDown = (e) => {
@@ -60,9 +60,14 @@ export const Modal = (props) => {
       timeout={{ enter: 0, exit: 300 }}
     >
       <div className="zig_modal" onClick={props.onClose}>
-        <ModalWrapper className={`zig_modal_content  ${props.adClass}`} onClick={(e) => e.stopPropagation()}>
+        <ModalWrapper
+          className={`zig_modal_content  ${props.adClass}`}
+          onClick={(e) => e.stopPropagation()}
+        >
           <div className="zig_modal_header">
-            <Text font='primaryHeading6' color="foregroundHighEmphasis">{props.title}</Text>
+            <Text font="primaryHeading6" color="foregroundHighEmphasis">
+              {props.title}
+            </Text>
 
             <Divider />
           </div>

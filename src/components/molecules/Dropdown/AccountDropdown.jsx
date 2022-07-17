@@ -11,10 +11,14 @@ import {
   balancesSelector,
   settingsSelector,
 } from "lib/store/features/api/apiSlice";
-import { formatUSD, formatToken, HideMenuOnOutsideClicked } from "lib/utils";
+import {
+  formatUSD,
+  formatToken,
+  HideMenuOnOutsideClicked,
+  addComma,
+} from "lib/utils";
 import { userSelector } from "lib/store/features/auth/authSlice";
 import api from "lib/api";
-import { IconButton as baseIcon } from "../IconButton";
 import Text from "components/atoms/Text/Text";
 import {
   PlusIcon,
@@ -147,25 +151,6 @@ const LoaderContainer = styled.div`
   height: 100px;
 `;
 
-const IconButtonWrapper = styled.div`
-  display: grid;
-  grid-auto-flow: column;
-  gap: 10px;
-`;
-
-const IconButton = styled(baseIcon)`
-  width: 24px;
-  height: 24px;
-  background: transparent;
-  border: 1px solid ${({ theme }) => theme.colors.foreground400};
-  border-radius: 9999px;
-  padding: 0px !important;
-  svg {
-    margin-right: 0px !important;
-    margin-left: 0px !important;
-  }
-`;
-
 const AccountDropdown = ({ notext, networkName }) => {
   const [isOpened, setIsOpened] = useState(false);
   const network = useSelector(networkSelector);
@@ -185,10 +170,12 @@ const AccountDropdown = ({ notext, networkName }) => {
   const wallet =
     selectedLayer === 1 ? balanceData.wallet : balanceData[network];
 
-  useEffect(()=>{
-    const explorerLink = user.address ? api.getExplorerAccountLink(network, user.address, selectedLayer) : null;
-    setExplorer(explorerLink)
-  }, [network, user.address, selectedLayer])
+  useEffect(() => {
+    const explorerLink = user.address
+      ? api.getExplorerAccountLink(network, user.address, selectedLayer)
+      : null;
+    setExplorer(explorerLink);
+  }, [network, user.address, selectedLayer]);
 
   const toggle = () => {
     setIsOpened(!isOpened);
@@ -200,8 +187,8 @@ const AccountDropdown = ({ notext, networkName }) => {
   };
 
   const openWallet = () => {
-    if(explorer){
-      window.open( explorer, "_blank");
+    if (explorer) {
+      window.open(explorer, "_blank");
     }
   };
 
@@ -231,7 +218,6 @@ const AccountDropdown = ({ notext, networkName }) => {
       return 1;
     } else return 0;
   };
-
 
   useEffect(() => {
     if (wallet?.length === 0) return;
@@ -263,7 +249,7 @@ const AccountDropdown = ({ notext, networkName }) => {
               <Text font="primaryHeading6" color="foregroundHighEmphasis">
                 {settings.hideBalance
                   ? "****.****"
-                  : "$ " + formatUSD(totalBalance)}
+                  : "$ " + addComma(formatUSD(totalBalance))}
               </Text>
             </div>
             <ToggleButton
@@ -342,7 +328,11 @@ const AccountDropdown = ({ notext, networkName }) => {
                 textAlign="center"
               >
                 <ExternalLinkIcon size={10} />
-                {selectedLayer === 1 ? "Etherscan" : networkName.includes("zkSync") ? "zkScan" : "Arbiscan"}
+                {selectedLayer === 1
+                  ? "Etherscan"
+                  : networkName.includes("zkSync")
+                  ? "zkScan"
+                  : "Arbiscan"}
               </Text>
             </Button>
             <Button variant="outlined" scale="imd" onClick={disconnect}>
