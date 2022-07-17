@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { formatPrice } from "lib/utils";
+import { addComma, formatPrice } from "lib/utils";
 import Text from "components/atoms/Text/Text";
 import { ArrowUpIcon, ArrowDownIcon } from "components/atoms/Svg";
 
@@ -17,7 +17,10 @@ const Wrapper = styled.div`
     align-items: center;
 
     svg path {
-      fill: ${({ theme, isIncrease }) => (isIncrease ? theme.colors.successHighEmphasis : theme.colors.dangerHighEmphasis)};
+      fill: ${({ theme, isIncrease }) =>
+        isIncrease
+          ? theme.colors.successHighEmphasis
+          : theme.colors.dangerHighEmphasis};
     }
   }
 
@@ -28,33 +31,39 @@ const Wrapper = styled.div`
   @media screen and (max-width: 991px) {
     width: 100%;
   }
-`
+`;
 
 const TradePriceHeadSecond = (props) => {
   const [lastPrice, setLastPrice] = useState(0);
   const [isIncrease, setIncrease] = useState(true);
 
-  useEffect(()=>{
-    if(props.lastPrice > lastPrice)
-      setIncrease(true)
-    else if(props.lastPrice < lastPrice)
-      setIncrease(false)
-    setLastPrice(props.lastPrice)
-  },[props.lastPrice])
+  useEffect(() => {
+    if (props.lastPrice > lastPrice) setIncrease(true);
+    else if (props.lastPrice < lastPrice) setIncrease(false);
+    setLastPrice(props.lastPrice);
+  }, [props.lastPrice]);
   return (
     <Wrapper isIncrease={isIncrease}>
       <div>
-        <Text font="primaryTitleDisplay" color={isIncrease ? "successHighEmphasis" : "dangerHighEmphasis"}>{parseFloat(formatPrice(lastPrice))}</Text>
-        {isIncrease ? <ArrowUpIcon /> : <ArrowDownIcon />} 
+        <Text
+          font="primaryTitleDisplay"
+          color={isIncrease ? "successHighEmphasis" : "dangerHighEmphasis"}
+        >
+          {addComma(parseFloat(formatPrice(lastPrice)))}
+        </Text>
+        {isIncrease ? <ArrowUpIcon /> : <ArrowDownIcon />}
       </div>
       <Text font="primaryMediumSmallSemiBold" color="foregroundMediumEmphasis">
-        $ {
-          formatPrice(
-            (props.marketInfo?.baseAsset?.usdPrice)
-              ? props.marketInfo.baseAsset.usdPrice
-              : "--"
+        ${" "}
+        {addComma(
+          parseFloat(
+            formatPrice(
+              props.marketInfo?.baseAsset?.usdPrice
+                ? props.marketInfo.baseAsset.usdPrice
+                : "--"
+            )
           )
-        }
+        )}
       </Text>
     </Wrapper>
   );

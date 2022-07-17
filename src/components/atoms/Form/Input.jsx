@@ -6,13 +6,13 @@ import styled from "styled-components";
 import { useRef } from "react";
 
 const Wrapper = styled.div`
-  input[type=number]::-webkit-inner-spin-button, 
-  input[type=number]::-webkit-outer-spin-button { 
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      appearance: none; 
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
   }
-`
+`;
 
 const Input = ({
   name,
@@ -36,7 +36,7 @@ const Input = ({
     : validate === required;
 
   const [field, meta, helpers] = useField({ name, type, validate: validators });
-  const [selectValue, setSelectValue] = useState()
+  const [selectValue, setSelectValue] = useState();
   const isError = meta.error && meta.touched;
   const Component = x.input;
 
@@ -61,8 +61,7 @@ const Input = ({
         </Label>
       )}
       <Wrapper className={styles}>
-        {
-          type === "select" ? 
+        {type === "select" ? (
           <CustomSelect
             value={selectValue}
             {...rest}
@@ -72,8 +71,11 @@ const Input = ({
               }
               setSelectValue(name);
             }}
-          >{children}</CustomSelect>
-          :<Component
+          >
+            {children}
+          </CustomSelect>
+        ) : (
+          <Component
             {...field}
             {...rest}
             name={name}
@@ -87,7 +89,7 @@ const Input = ({
             value={field.value}
             children={children}
           />
-        }
+        )}
       </Wrapper>
       {isError && !hideValidation && <ErrorMessage error={meta.error} />}
     </FieldSet>
@@ -121,7 +123,7 @@ const Label = ({
     <x.label
       for={name}
       mb={1}
-      fontSize={{ xs: 'xs', md: '14px' }}
+      fontSize={{ xs: "xs", md: "14px" }}
       color={"blue-gray-500"}
       display={"flex"}
       justifyContent={rightOfLabel ? "space-between" : "inherit"}
@@ -145,56 +147,61 @@ const Label = ({
   );
 };
 
-const CustomSelect = ({children, value, onChange, ...props}) => {
-  useEffect(()=>{
+const CustomSelect = ({ children, value, onChange, ...props }) => {
+  useEffect(() => {
     // onChange(children[0].props.data_id|"no-value", children[0].props.data_name|"no-value")
-    onChange(children[0].props.data_id, children[0].props.data_name)
-  }, [])
+    onChange(children[0].props.data_id, children[0].props.data_name);
+  }, []);
   const [isOpen, setIsOpen] = useState(false);
-  const ref = useRef(null)
-  useEffect(()=>{
-    window.addEventListener('click', (e)=> {
-      if(!ref.current?.contains(e.target)){
-        setIsOpen(false)
+  const ref = useRef(null);
+  useEffect(() => {
+    window.addEventListener("click", (e) => {
+      if (!ref.current?.contains(e.target)) {
+        setIsOpen(false);
       }
-    })
-  }, [])
-  return <CustomSelectCont onClick={()=>setIsOpen(!isOpen)} ref={ref} {...props}>
-    <CustomSelectItem>{value}</CustomSelectItem>
-    <CustomSelectField isOpen={isOpen}>{
-      children.map((each, index)=> {
-        return <CustomSelectOption onClick={()=>onChange(each.props.data_id, each.props.data_name)}>
-          {each.props.data_name}
-        </CustomSelectOption>
-      })
-    }</CustomSelectField>
-  </CustomSelectCont>
-}
+    });
+  }, []);
+  return (
+    <CustomSelectCont onClick={() => setIsOpen(!isOpen)} ref={ref} {...props}>
+      <CustomSelectItem>{value}</CustomSelectItem>
+      <CustomSelectField isOpen={isOpen}>
+        {children.map((each, index) => {
+          return (
+            <CustomSelectOption
+              onClick={() => onChange(each.props.data_id, each.props.data_name)}
+            >
+              {each.props.data_name}
+            </CustomSelectOption>
+          );
+        })}
+      </CustomSelectField>
+    </CustomSelectCont>
+  );
+};
 const CustomSelectCont = styled.div`
   border-radius: 8px;
   position: relative;
-`
+`;
 const CustomSelectItem = styled.div`
   user-select: none;
-`
+`;
 const CustomSelectOption = styled.div`
   padding: 5px;
   box-sizing: border-box;
-  background-color: ${({theme}) => theme.colors.backgroundMediumEmphasis};
+  background-color: ${({ theme }) => theme.colors.backgroundMediumEmphasis};
   z-index: 1000;
   user-select: none;
-  color: ${({theme}) => theme.colors.foregroundHighEmphasis};
+  color: ${({ theme }) => theme.colors.foregroundHighEmphasis};
   border-radius: 5px;
-`
+`;
 const CustomSelectField = styled.div`
   position: absolute;
   top: 100%;
   left: 0%;
   width: 100%;
-  display: ${p=> p.isOpen?"flex":"none"};
+  display: ${(p) => (p.isOpen ? "flex" : "none")};
   flex-direction: column;
-  border-color: ${({theme}) => theme.colors.background100};
-`
-
+  border-color: ${({ theme }) => theme.colors.background100};
+`;
 
 export default Input;

@@ -24,7 +24,8 @@ const StyledTradeBooks = styled.section`
   grid-area: orders;
   flex-direction: row;
   justify-content: space-between;
-  padding: ${({ isLeft }) => isLeft ? '21px 10px 12px 20px' : '21px 10px 0px 10px'};
+  padding: ${({ isLeft }) =>
+    isLeft ? "21px 10px 12px 20px" : "21px 10px 0px 10px"};
   border-top: 1px solid ${({ theme }) => theme.colors.foreground400};
   border-bottom: 1px solid ${({ theme }) => theme.colors.foreground400};
   overflow: hidden;
@@ -65,7 +66,7 @@ const OrderFooterWrapper = styled.div`
   button {
     height: auto;
   }
-  padding-bottom: ${({ isStack }) => isStack ? '6px' : '0'};
+  padding-bottom: ${({ isStack }) => (isStack ? "6px" : "0")};
 `;
 
 const OrderFooterRight = styled.div`
@@ -178,9 +179,17 @@ export default function OrdersBook(props) {
         order: order,
       };
 
-      if (market === props.currentMarket && side === "b" && ["o", "pm", "pf"].includes(orderStatus)) {
+      if (
+        market === props.currentMarket &&
+        side === "b" &&
+        ["o", "pm", "pf"].includes(orderStatus)
+      ) {
         orderbookBids.push(orderRow);
-      } else if (market === props.currentMarket && side === "s" && ["o", "pm", "pf"].includes(orderStatus)) {
+      } else if (
+        market === props.currentMarket &&
+        side === "s" &&
+        ["o", "pm", "pf"].includes(orderStatus)
+      ) {
         orderbookAsks.push(orderRow);
       }
     }

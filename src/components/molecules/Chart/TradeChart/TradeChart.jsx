@@ -7,7 +7,7 @@ import { TRADING_VIEW_CHART_KEY } from "../../../pages/ListPairPage/ListPairPage
 import useTheme from "components/hooks/useTheme";
 
 export const TradeChart = () => {
-  const { isDark } = useTheme()
+  const { isDark } = useTheme();
   const marketInfo = useSelector(marketInfoSelector);
 
   let symbol = "";

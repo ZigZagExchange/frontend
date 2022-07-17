@@ -63,22 +63,6 @@ const FillCard = ({ fill, closeToast }) => {
       });
   }, [ref]);
 
-  const getHashViewURL = () => {
-    let baseExplorerUrl;
-    switch (api.apiProvider.network) {
-      case 1001:
-        baseExplorerUrl = "https://goerli.voyager.online/tx/";
-        break;
-      case 1000:
-        baseExplorerUrl = "https://rinkeby.zkscan.io/explorer/transactions/";
-        break;
-      case 1:
-      default:
-        baseExplorerUrl = "https://zkscan.io/explorer/transactions/";
-    }
-    return baseExplorerUrl;
-  };
-
   return (
     <div ref={ref} className={classNames({ dark: isDark })}>
       <div className="dark:bg-[#2B2E4A] relative bg-[#ddf1f7] border dark:border-foreground-400 border-slate-300 shadow-lg rounded-lg p-4 pr-2">
@@ -121,7 +105,10 @@ const FillCard = ({ fill, closeToast }) => {
                 Trade ID:{" "}
                 <button
                   onClick={() => {
-                    window.open(getHashViewURL() + fill[7], "_blank");
+                    window.open(
+                      api.getExplorerTxLink(fill[0], fill[7]),
+                      "_blank"
+                    );
                   }}
                   className="flex items-center gap-2 text-sm font-semibold underline hover:no-underline text-primary-900 underline-offset-1 font-work"
                 >
