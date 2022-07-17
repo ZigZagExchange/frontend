@@ -763,7 +763,13 @@ const ConvertPage = () => {
       {!loading && (
         <div className={classNames("flex justify-center", { dark: isDark })}>
           <div className="w-full max-w-lg px-1 sm:px-0">
-            <p className={isMobile ? "text-3xl font-semibold font-work ":"mt-10 text-3xl font-semibold font-work "}>
+            <p
+              className={
+                isMobile
+                  ? "text-3xl font-semibold font-work "
+                  : "mt-10 text-3xl font-semibold font-work "
+              }
+            >
               ZigZag Convert
             </p>
             <ConvertContianer

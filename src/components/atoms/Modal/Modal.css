@@ -40,7 +40,7 @@
   transition: all 0.3s ease-in-out;
   transform: translateY(-200px);
   border-radius: 6px;
-  color: #191A33;
+  color: #191a33;
 }
 
 .zig_modal.enter-done .zig_modal_content {
@@ -68,7 +68,6 @@
 .zig_modal_body_light {
   padding: 15px;
 }
-
 
 .zig_modal_body {
   background: rgba(0, 0, 0, 0.3);

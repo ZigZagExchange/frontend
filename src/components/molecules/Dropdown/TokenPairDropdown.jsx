@@ -407,119 +407,6 @@ const TokenPairDropdown = ({
 
     sorted_pairs.sort(function compareFn(firstEl, secondEl) {
       if (toggled) {
-        return parseFloat(firstEl.usdVolume) - parseFloat(secondEl.usdVolume);
-      } else {
-        return parseFloat(secondEl.usdVolume) - parseFloat(firstEl.usdVolume);
-      }
-    });
-
-    setPairs(sorted_pairs);
-    setPairSorted(false);
-    setPairDirection(false);
-    setPriceSorted(false);
-    setPriceDirection(false);
-    setVolumeSorted(true);
-    setVolumeDirection(toggled);
-    setChangeSorted(false);
-    setChangeDirection(false);
-  };
-
-  const renderPairs = (pairs) => {
-    const shown_pairs = pairs
-      .map((pair) => [pair, _rowData.find((row) => row.td1 === pair)])
-      .sort(([_, d], [__, d2]) => {
-        if (!d || !d2) return 0;
-        if (changeSorted) {
-          return changeDirection ? d.td3 - d2.td3 : d2.td3 - d.td3;
-        } else if (volumeSorted) {
-          return volumeDirection
-            ? d.usdVolume - d2.usdVolume
-            : d2.usdVolume - d.usdVolume;
-        } else if (priceSorted) {
-          return priceDirection ? d.td2 - d2.td2 : d2.td2 - d.td2;
-        } else if (pairSorted) {
-          return pairDirection
-            ? d.td1 < d2.td1
-              ? -1
-              : 1
-            : d.td1 < d2.td1
-            ? 1
-            : -1;
-        } else {
-          return d && d2 ? d.usdVolumn - d2.usdVolumn : 0;
-        }
-      })
-      .map(([pair, d], i) => {
-        if (!d) return "";
-        const selected = currentMarket === pair; //if current market selected
-        const isFavourited = favourites.includes(pair); //if contains, isFavourited
-        const increaseObj = _.find(isIncrease, { td1: pair });
-        return (
-          <tr
-            key={i}
-            onClick={(e) => {
-              if (selected) return;
-              updateMarketChain(pair);
-              if (isMobile) setIsOpened(false);
-            }}
-            className={selected ? "selected" : ""}
-          >
-            <td>
-              <PairWrapper>
-                <span
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    favouritePair(d);
-                  }}
-                >
-                  {isFavourited ? <ActivatedStarIcon /> : <StarIcon />}
-                </span>
-                <Text font="primaryExtraSmall" color="foregroundHighEmphasis">
-                  {pair.replace("-", "/")}
-                </Text>
-                <span>{d.span}</span>
-              </PairWrapper>
-            </td>
-            <td style={{ paddingLeft: "30px" }}>
-              <Text
-                font="tableContent"
-                color={
-                  increaseObj.increase === false
-                    ? "dangerHighEmphasis"
-                    : "successHighEmphasis"
-                }
-                align="right"
-              >
-                {addComma(d.td2)}
-              </Text>
-            </td>
-            <td>
-              <Text
-                font="tableContent"
-                color="foregroundHighEmphasis"
-                align="right"
-              >
-                {d.usdVolume.toLocaleString("en-US", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-              </Text>
-            </td>
-            <td>
-              <Text
-                font="tableContent"
-                color={d.td3 < 0 ? "dangerHighEmphasis" : "successHighEmphasis"}
-                align="right"
-              >
-                {d.td3}%
-              </Text>
-            </td>
-          </tr>
-        );
-      });
-
-    sorted_pairs.sort(function compareFn(firstEl, secondEl) {
-      if (toggled) {
         return firstEl.td1 < secondEl.td1 ? -1 : 1;
       } else {
         return firstEl.td1 < secondEl.td1 ? 1 : -1;
@@ -644,6 +531,8 @@ const TokenPairDropdown = ({
             onClick={(e) => {
               if (selected) return;
               updateMarketChain(pair);
+              if(isMobile)
+                setIsOpened(false);
             }}
             className={selected ? "selected" : ""}
           >

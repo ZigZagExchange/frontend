@@ -81,7 +81,8 @@ const TransferHistory = () => {
                         })}
                       />
                       <p className="text-xs font-semibold ">
-                        {Math.round(Number(item.amount) * 10 **6)/10**6} {item.token}
+                        {Math.round(Number(item.amount) * 10 ** 6) / 10 ** 6}{" "}
+                        {item.token}
                       </p>
                     </div>
                     <div className="flex gap-5">
@@ -90,11 +91,15 @@ const TransferHistory = () => {
                         target="_blank"
                         rel="noreferrer"
                         className="text-xs text-gray-400 hover:underline underline-offset-2"
-                      >{isMobile ? `${item.txId.substr(0, 5)}...${item.txId.substr(
-                        -4
-                      )}` : `${item.txId.substr(0, 10)}...${item.txId.substr(
-                        -6
-                      )}`}</a>
+                      >
+                        {isMobile
+                          ? `${item.txId.substr(0, 5)}...${item.txId.substr(
+                              -4
+                            )}`
+                          : `${item.txId.substr(0, 10)}...${item.txId.substr(
+                              -6
+                            )}`}
+                      </a>
                       <p className="text-xs font-semibold text-gray-400 ">
                         {format(item.date, "H:mm")}
                       </p>

@@ -561,7 +561,7 @@ export const Header = (props) => {
             leftIcon={true}
             transparent
           />
-          <SocialWrapper style={{ justifySelf: "center", marginTop: '150px' }}>
+          <SocialWrapper style={{ justifySelf: "center", marginTop: "150px" }}>
             <SocialLink
               target="_blank"
               rel="noreferrer"
