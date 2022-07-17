@@ -516,6 +516,25 @@ export default function OrdersTable(props) {
                     </td>
                   </tr>
                   <tr>
+                    <td>
+                      <Text
+                        font="primaryExtraSmallSemiBold"
+                        color="foregroundLowEmphasis"
+                      >
+                        Expiry
+                      </Text>
+                    </td>
+                    <td>
+                      <Text
+                        font="primaryExtraSmallSemiBold"
+                        color="foregroundHighEmphasis"
+                        textAlign="right"
+                      >
+                        {expiryText}
+                      </Text>
+                    </td>
+                  </tr>
+                  <tr>
                     <td colSpan={2}></td>
                   </tr>
                 </table>

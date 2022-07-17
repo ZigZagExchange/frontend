@@ -523,10 +523,10 @@ export const Header = (props) => {
             <Tab>CONVERT</Tab>
             {hasBridge && <Tab>BRIDGE</Tab>}
             <Tab>LIST PAIR</Tab>
-            <Tab>
+            {/* <Tab>
               DOCS
               <ExternalLinkIcon size={12} />
-            </Tab>
+            </Tab> */}
             {isEVM && <Tab>WRAP</Tab>}
           </TabMenu>
           <HorizontalDivider />
@@ -561,7 +561,7 @@ export const Header = (props) => {
             leftIcon={true}
             transparent
           />
-          <SocialWrapper style={{ justifySelf: "center" }}>
+          <SocialWrapper style={{ justifySelf: "center", marginTop: "150px" }}>
             <SocialLink
               target="_blank"
               rel="noreferrer"
