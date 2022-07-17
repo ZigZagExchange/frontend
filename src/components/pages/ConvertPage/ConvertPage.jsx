@@ -840,16 +840,6 @@ const ConvertPage = () => {
             >
               Approve {sellToken?.name}
             </Button>}
-            {!user.address &&
-              <ConnectWalletButton
-                className="w-full py-3 my-3 uppercase"
-                variant="sell"
-                scale="imd"
-                onClick={approveHandler}
-              >
-                Approve {sellToken?.name}
-              </Button>
-            )}
             {!user.address && (
               <ConnectWalletButton className="w-full py-3 my-3 uppercase" />
             )}
