@@ -842,7 +842,7 @@ export default class API extends Emitter {
     const side = order[3];
     const baseQuantity = order[5];
     const quoteQuantity = order[4] * order[5];
-    const remaining = isNaN(Number(order[11])) ? order[5] : order[11];
+    const remaining = Number(order[11]) !== null ? order[5] : order[11];
     const market = order[2];
     const marketInfo = this.marketInfo[market];
     let baseQuantityWithoutFee,

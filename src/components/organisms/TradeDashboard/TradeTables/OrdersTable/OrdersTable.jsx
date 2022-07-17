@@ -480,7 +480,7 @@ export default function OrdersTable(props) {
                         font="primaryExtraSmallSemiBold"
                         color="foregroundLowEmphasis"
                       >
-                        Amount
+                        Filled
                       </Text>
                     </td>
                     <td>
@@ -489,7 +489,10 @@ export default function OrdersTable(props) {
                         color="foregroundHighEmphasis"
                         textAlign="right"
                       >
-                        {baseQuantity.toPrecision(6) / 1} {baseCurrency}
+                        {baseQuantity.toPrecision(6) / 1 -
+                          remaining.toPrecision(6) / 1}{" "}
+                        / {baseQuantity.toPrecision(6) / 1}&nbsp;
+                        {baseCurrency}
                       </Text>
                     </td>
                   </tr>
@@ -584,20 +587,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Amount
-                </Text>
-                {/* <SortIconWrapper>
-                    <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper> */}
-              </HeaderWrapper>
-            </th>
-            <th scope="col">
-              <HeaderWrapper>
-                <Text
-                  font="primaryExtraSmallSemiBold"
-                  color="foregroundLowEmphasis"
-                >
-                  Remaining
+                  Filled
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -779,20 +769,15 @@ export default function OrdersTable(props) {
                       {addComma(price.toPrecision(6) / 1)}
                     </Text>
                   </td>
-                  <td data-label="Quantity">
+                  <td data-label="filled">
                     <Text
                       font="primaryExtraSmallSemiBold"
                       color="foregroundHighEmphasis"
                     >
-                      {baseQuantity.toPrecision(6) / 1} {baseCurrency}
-                    </Text>
-                  </td>
-                  <td data-label="Remaining">
-                    <Text
-                      font="primaryExtraSmallSemiBold"
-                      color="foregroundHighEmphasis"
-                    >
-                      {remaining.toPrecision(6) / 1} {baseCurrency}
+                      {baseQuantity.toPrecision(6) / 1 -
+                        remaining.toPrecision(6) / 1}{" "}
+                      / {baseQuantity.toPrecision(6) / 1}&nbsp;
+                      {baseCurrency}
                     </Text>
                   </td>
                   <td data-label="Expiry">
