@@ -32,9 +32,14 @@ const AppRoutes = () => {
                 <Switch>
                     <Route exact path="/" component={TradePage} />
                     <Route exact path="/bridge/:tab?" component={BridgePage} />
-                    <Route exact path="/convert/:tab?" component={SwapPage} />
+                    <Route
+                        exact
+                        path="/convert/:tab?"
+                        component={ConvertPage}
+                    />
                     <Route exact path="/pool" component={PoolPage} />
                     <Route exact path="/list-pair" component={ListPairPage} />
+                    <Route exact path="/wrap" component={WrapPage} />
                     <Dev>
                         <Route exact path="/dsl" component={DSLPage} />
                     </Dev>
