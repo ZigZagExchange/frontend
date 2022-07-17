@@ -28,9 +28,16 @@ export default class APIZKProvider extends APIProvider {
   _tokenInfo = {};
   eligibleFastWithdrawTokens = ["ETH", "FRAX", "UST"];
   fastWithdrawContractAddress = ZKSYNC_ETHEREUM_FAST_BRIDGE.address;
-  defaultMarket = "ETH-USDC"
+  defaultMarket = "ETH-USDC";
 
-  handleBridgeReceipt = (_receipt, amount, token, type, target, walletAddress) => {
+  handleBridgeReceipt = (
+    _receipt,
+    amount,
+    token,
+    type,
+    target,
+    walletAddress
+  ) => {
     let receipt = {
       date: +new Date(),
       network: this.network,
@@ -156,28 +163,54 @@ export default class APIZKProvider extends APIProvider {
   ) => {
     const accountActivated = await this.checkAccountActivated();
     if (!accountActivated)
-      throw new Error('Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.');
-  
+      throw new Error(
+        "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet."
+      );
+
+    const [baseToken, quoteToken] = market.split("-");
     const marketInfo = this.api.marketInfo[market];
     const tokenRatio = {};
-    tokenRatio[marketInfo.baseAsset.id] = ethers.utils.formatUnits(
-      baseAmountBN,
-      marketInfo.baseAsset.decimals
-    );
-    tokenRatio[marketInfo.quoteAsset.id] = ethers.utils.formatUnits(
-      quoteAmountBN,
-      marketInfo.quoteAsset.decimals
-    );
 
-    let sellQuantityBN, tokenSell, tokenBuy;
-    if (side === 's') {
+    let sellQuantityBN, tokenSell, tokenBuy, balanceBN;
+    if (side === "s") {
       sellQuantityBN = baseAmountBN;
       tokenSell = marketInfo.baseAsset.id;
       tokenBuy = marketInfo.quoteAsset.id;
+      const sellFeeBN = ethers.utils.parseUnits(
+        marketInfo.baseFee.toFixed(marketInfo.baseAsset.decimals),
+        marketInfo.baseAsset.decimals
+      );
+      sellQuantityBN = sellQuantityBN.add(sellFeeBN);
+      tokenRatio[marketInfo.baseAsset.id] = baseAmountBN
+        .add(sellFeeBN)
+        .toString();
+      tokenRatio[marketInfo.quoteAsset.id] = quoteAmountBN;
+      balanceBN = ethers.BigNumber.from(this.api.balances[baseToken].value);
     } else {
       sellQuantityBN = quoteAmountBN;
       tokenSell = marketInfo.quoteAsset.id;
       tokenBuy = marketInfo.baseAsset.id;
+      const sellFeeBN = ethers.utils.parseUnits(
+        marketInfo.quoteFee.toFixed(marketInfo.quoteAsset.decimals),
+        marketInfo.quoteAsset.decimals
+      );
+      sellQuantityBN = sellQuantityBN.add(sellFeeBN);
+      tokenRatio[marketInfo.baseAsset.id] = baseAmountBN;
+      tokenRatio[marketInfo.quoteAsset.id] = quoteAmountBN
+        .add(sellFeeBN)
+        .toString();
+      balanceBN = ethers.BigNumber.from(this.api.balances[quoteToken].value);
+    }
+
+    // size check
+    const delta = sellQuantityBN.mul("1000").div(balanceBN).toNumber();
+    if (delta > 1001) {
+      // 100.1 %
+      throw new Error(`Amount exceeds balance.`);
+    }
+    if (delta > 999) {
+      // 99.9 %
+      sellQuantityBN = balanceBN;
     }
 
     const packedSellQuantity =
@@ -186,7 +219,7 @@ export default class APIZKProvider extends APIProvider {
       tokenSell,
       tokenBuy,
       amount: packedSellQuantity.toString(),
-      ratio: zksync.utils.tokenRatio(tokenRatio),
+      ratio: zksync.utils.weiRatio(tokenRatio),
       validUntil: expirationTimeSeconds,
     });
 
@@ -217,7 +250,7 @@ export default class APIZKProvider extends APIProvider {
           (balance && currencyInfo && balance / 10 ** currencyInfo.decimals) ||
           0,
         allowance: ethers.constants.MaxUint256,
-        allowanceReadable: 9007199254740991 // max save int
+        allowanceReadable: 9007199254740991, // max save int
       };
     });
 
@@ -484,7 +517,7 @@ export default class APIZKProvider extends APIProvider {
   signIn = async () => {
     try {
       this.syncProvider = await zksync.getDefaultProvider(
-        this.network === 1 ? 'mainnet' : 'rinkeby'
+        this.network === 1 ? "mainnet" : "rinkeby"
       );
     } catch (e) {
       toast.error("Zksync is down. Try again later");
@@ -703,9 +736,12 @@ export default class APIZKProvider extends APIProvider {
 
   getChainName = (chainId) => {
     switch (Number(chainId)) {
-      case 1: return 'mainnet';
-      case 1000: return 'rinkeby';
-      default: throw Error("Chain ID not understood");
+      case 1:
+        return "mainnet";
+      case 1000:
+        return "rinkeby";
+      default:
+        throw Error("Chain ID not understood");
     }
   };
 

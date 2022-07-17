@@ -11,7 +11,12 @@ import {
   balancesSelector,
   settingsSelector,
 } from "lib/store/features/api/apiSlice";
-import { formatUSD, formatToken, HideMenuOnOutsideClicked, addComma } from "lib/utils";
+import {
+  formatUSD,
+  formatToken,
+  HideMenuOnOutsideClicked,
+  addComma,
+} from "lib/utils";
 import { userSelector } from "lib/store/features/auth/authSlice";
 import api from "lib/api";
 import Text from "components/atoms/Text/Text";
@@ -146,7 +151,6 @@ const LoaderContainer = styled.div`
   height: 100px;
 `;
 
-
 const AccountDropdown = ({ notext, networkName }) => {
   const [isOpened, setIsOpened] = useState(false);
   const network = useSelector(networkSelector);
@@ -166,10 +170,12 @@ const AccountDropdown = ({ notext, networkName }) => {
   const wallet =
     selectedLayer === 1 ? balanceData.wallet : balanceData[network];
 
-  useEffect(()=>{
-    const explorerLink = user.address ? api.getExplorerAccountLink(network, user.address, selectedLayer) : null;
-    setExplorer(explorerLink)
-  }, [network, user.address, selectedLayer])
+  useEffect(() => {
+    const explorerLink = user.address
+      ? api.getExplorerAccountLink(network, user.address, selectedLayer)
+      : null;
+    setExplorer(explorerLink);
+  }, [network, user.address, selectedLayer]);
 
   const toggle = () => {
     setIsOpened(!isOpened);
@@ -181,8 +187,8 @@ const AccountDropdown = ({ notext, networkName }) => {
   };
 
   const openWallet = () => {
-    if(explorer){
-      window.open( explorer, "_blank");
+    if (explorer) {
+      window.open(explorer, "_blank");
     }
   };
 
@@ -212,7 +218,6 @@ const AccountDropdown = ({ notext, networkName }) => {
       return 1;
     } else return 0;
   };
-
 
   useEffect(() => {
     if (wallet?.length === 0) return;
@@ -323,7 +328,11 @@ const AccountDropdown = ({ notext, networkName }) => {
                 textAlign="center"
               >
                 <ExternalLinkIcon size={10} />
-                {selectedLayer === 1 ? "Etherscan" : networkName.includes("zkSync") ? "zkScan" : "Arbiscan"}
+                {selectedLayer === 1
+                  ? "Etherscan"
+                  : networkName.includes("zkSync")
+                  ? "zkScan"
+                  : "Arbiscan"}
               </Text>
             </Button>
             <Button variant="outlined" scale="imd" onClick={disconnect}>

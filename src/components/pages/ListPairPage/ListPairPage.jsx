@@ -2,7 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { RiErrorWarningLine } from "react-icons/all";
 import { userSelector } from "lib/store/features/auth/authSlice";
-import { arweaveAllocationSelector, networkSelector } from "lib/store/features/api/apiSlice";
+import {
+  arweaveAllocationSelector,
+  networkSelector,
+} from "lib/store/features/api/apiSlice";
 import api from "lib/api";
 import { x } from "@xstyled/styled-components";
 import styled from "styled-components";
@@ -55,7 +58,7 @@ const ListContainer = styled.div`
   @media screen and (max-width: 480px) {
     padding: 0 10px;
   }
-`
+`;
 
 export default function ListPairPage() {
   const user = useSelector(userSelector);
@@ -134,9 +137,9 @@ export default function ListPairPage() {
     });
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     document.title = "ZigZag List Pair";
-  },[])
+  }, []);
 
   useEffect(() => {
     refreshUserArweaveAllocation();
@@ -162,15 +165,26 @@ export default function ListPairPage() {
               List New Pair
             </p>
 
-            <x.div fontSize={{ xs: 'xs', md: '14px' }} lineHeight={1} color={"blue-gray-400"}>
+            <x.div
+              fontSize={{ xs: "xs", md: "14px" }}
+              lineHeight={1}
+              color={"blue-gray-400"}
+            >
               <x.div marginBottom="4px">No Internal ID?</x.div>
               <x.div>
                 <x.a
                   target={"_blank"}
-                  color={{ _: "foregroundHighEmphasis", hover: "foregroundLowEmphasis" }}
-                  href={"https://zkscan.io/explorer/tokens"}>
+                  color={{
+                    _: "foregroundHighEmphasis",
+                    hover: "foregroundLowEmphasis",
+                  }}
+                  href={"https://zkscan.io/explorer/tokens"}
+                >
                   List your token on zkSync
-                  <HiExternalLink size="14px" style={{ marginLeft: "6px", marginBottom: "2px" }} />
+                  <HiExternalLink
+                    size="14px"
+                    style={{ marginLeft: "6px", marginBottom: "2px" }}
+                  />
                 </x.a>
               </x.div>
             </x.div>
