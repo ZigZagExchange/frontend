@@ -79,7 +79,7 @@ export function TradeDashboard() {
 
     useEffect(() => {
         if (_.isEmpty(marketSummary)) return;
-        document.title = `${marketSummary.price} | ${
+        document.title = `${addComma(formatPrice(marketSummary.price))} | ${
             marketSummary.market ?? "--"
         } | ZigZag Exchange`;
     }, [marketSummary]);
@@ -88,7 +88,7 @@ export function TradeDashboard() {
         const urlParams = new URLSearchParams(search);
         const marketFromURL = urlParams.get(marketQueryParam);
         const networkFromURL = urlParams.get(networkQueryParam);
-        const chainid = getChainIdFromMarketChain(networkFromURL);
+        const chainid = api.getChainIdFromName(networkFromURL);
         if (marketFromURL && currentMarket !== marketFromURL) {
             updateMarketChain(marketFromURL);
         }
@@ -98,6 +98,38 @@ export function TradeDashboard() {
         }
         api.getWalletBalances();
     }, []);
+
+    // Update URL when market or network update
+    useEffect(() => {
+        let networkText;
+        if (network === 1) {
+            networkText = "zksync";
+        } else if (network === 1000) {
+            networkText = "zksync-rinkeby";
+        } else if (network === 42161) {
+            networkText = "arbitrum";
+        }
+        history.push(`/?market=${currentMarket}&network=${networkText}`);
+    }, [network, currentMarket]);
+
+    useEffect(() => {
+        if (user.address && !user.id) {
+            history.push("/bridge");
+            toast.error(
+                "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
+                {
+                    autoClose: 60000,
+                }
+            );
+        }
+    }, []);
+
+    useEffect(() => {
+        if (_.isEmpty(marketSummary)) return;
+        document.title = `${marketSummary.price} | ${
+            marketSummary.market ?? "--"
+        } | ZigZag Exchange`;
+    }, [marketSummary]);
 
     // Update URL when market or network update
     useEffect(() => {
