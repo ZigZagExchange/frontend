@@ -105,7 +105,10 @@ const FillCard = ({ fill, closeToast }) => {
                 Trade ID:{" "}
                 <button
                   onClick={() => {
-                    window.open(api.getExplorerTxLink(fill[0], fill[7]), "_blank");
+                    window.open(
+                      api.getExplorerTxLink(fill[0], fill[7]),
+                      "_blank"
+                    );
                   }}
                   className="flex items-center gap-2 text-sm font-semibold underline hover:no-underline text-primary-900 underline-offset-1 font-work"
                 >

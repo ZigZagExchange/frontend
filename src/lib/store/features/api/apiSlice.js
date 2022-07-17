@@ -120,7 +120,7 @@ export const apiSlice = createSlice({
         const takerUserId = fill[8] && fill[8].toLowerCase();
         const makerUserId = fill[9] && fill[9].toLowerCase();
         if (
-          (["f", "pf", "m"]).includes(fill[6]) &&
+          ["f", "pf", "m"].includes(fill[6]) &&
           fill[2] === state.currentMarket &&
           fill[0] === state.network
         ) {
