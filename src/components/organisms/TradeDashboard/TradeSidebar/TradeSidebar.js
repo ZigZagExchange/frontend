@@ -72,12 +72,13 @@ export default function TradeSidebar(props) {
   const liquidity = useSelector(liquiditySelector);
   const { isDark } = useTheme();
   const isMobile = window.innerWidth < 992;
+  const isSmallScreen = window.innerHeight < 875;
   const joinDiscord = () => {
     window.open("https://discord.gg/zigzag", "_blank");
   };
   return (
     <StyledTradeSidebar isDark={isDark}>
-      {isMobile ? (
+      {isMobile || isSmallScreen? (
         <></>
       ) : (
         <InfoWrapper isDark={isDark}>
