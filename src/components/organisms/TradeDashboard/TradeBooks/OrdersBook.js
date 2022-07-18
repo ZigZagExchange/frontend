@@ -422,6 +422,39 @@ export default function OrdersBook(props) {
               ) : (
                 side === "sell" ? 
                 <>
+                  <HeaderWrapper>
+                    <TradePriceHeadSecond
+                      lastPrice={marketSummary.price}
+                      marketSummary={marketSummary}
+                      marketInfo={marketInfo}
+                      fixedPoint={fixedPoint}
+                    />
+                    <OrderFooterWrapper isStack={settings.stackOrderbook}>
+                      <OrderFooterRight>
+                        <OrderButtonWrapper
+                          onClick={() => {
+                            changeSide("all");
+                          }}
+                        >
+                          <SideAllButton />
+                        </OrderButtonWrapper>
+                        <OrderButtonWrapper
+                          onClick={() => {
+                            changeSide("sell");
+                          }}
+                        >
+                          <SideSellButton />
+                        </OrderButtonWrapper>
+                        <OrderButtonWrapper
+                          onClick={() => {
+                            changeSide("buy");
+                          }}
+                        >
+                          <SideBuyButton />
+                        </OrderButtonWrapper>
+                      </OrderFooterRight>
+                    </OrderFooterWrapper>
+                  </HeaderWrapper>
                   <Divider />
                   <TableWrapper>
                     <>
@@ -436,76 +469,9 @@ export default function OrdersBook(props) {
                     </>
                   </TableWrapper>
                   <Divider />
-                  <HeaderWrapper>
-                    <TradePriceHeadSecond
-                      lastPrice={marketSummary.price}
-                      marketSummary={marketSummary}
-                      marketInfo={marketInfo}
-                      fixedPoint={fixedPoint}
-                    />
-                    <OrderFooterWrapper isStack={settings.stackOrderbook}>
-                      <OrderFooterRight>
-                        <OrderButtonWrapper
-                          onClick={() => {
-                            changeSide("all");
-                          }}
-                        >
-                          <SideAllButton />
-                        </OrderButtonWrapper>
-                        <OrderButtonWrapper
-                          onClick={() => {
-                            changeSide("sell");
-                          }}
-                        >
-                          <SideSellButton />
-                        </OrderButtonWrapper>
-                        <OrderButtonWrapper
-                          onClick={() => {
-                            changeSide("buy");
-                          }}
-                        >
-                          <SideBuyButton />
-                        </OrderButtonWrapper>
-                      </OrderFooterRight>
-                    </OrderFooterWrapper>
-                  </HeaderWrapper>
                 </> 
                 : 
                 <>
-                  <Divider />
-                  <HeaderWrapper>
-                    <TradePriceHeadSecond
-                      lastPrice={marketSummary.price}
-                      marketSummary={marketSummary}
-                      marketInfo={marketInfo}
-                      fixedPoint={fixedPoint}
-                    />
-                    <OrderFooterWrapper isStack={settings.stackOrderbook}>
-                      <OrderFooterRight>
-                        <OrderButtonWrapper
-                          onClick={() => {
-                            changeSide("all");
-                          }}
-                        >
-                          <SideAllButton />
-                        </OrderButtonWrapper>
-                        <OrderButtonWrapper
-                          onClick={() => {
-                            changeSide("sell");
-                          }}
-                        >
-                          <SideSellButton />
-                        </OrderButtonWrapper>
-                        <OrderButtonWrapper
-                          onClick={() => {
-                            changeSide("buy");
-                          }}
-                        >
-                          <SideBuyButton />
-                        </OrderButtonWrapper>
-                      </OrderFooterRight>
-                    </OrderFooterWrapper>
-                  </HeaderWrapper>
                   <Divider />
                   <TableWrapper>
                     <>
@@ -518,6 +484,40 @@ export default function OrdersBook(props) {
                       />
                     </>
                   </TableWrapper>
+                  <Divider />
+                  <HeaderWrapper>
+                    <TradePriceHeadSecond
+                      lastPrice={marketSummary.price}
+                      marketSummary={marketSummary}
+                      marketInfo={marketInfo}
+                      fixedPoint={fixedPoint}
+                    />
+                    <OrderFooterWrapper isStack={settings.stackOrderbook}>
+                      <OrderFooterRight>
+                        <OrderButtonWrapper
+                          onClick={() => {
+                            changeSide("all");
+                          }}
+                        >
+                          <SideAllButton />
+                        </OrderButtonWrapper>
+                        <OrderButtonWrapper
+                          onClick={() => {
+                            changeSide("sell");
+                          }}
+                        >
+                          <SideSellButton />
+                        </OrderButtonWrapper>
+                        <OrderButtonWrapper
+                          onClick={() => {
+                            changeSide("buy");
+                          }}
+                        >
+                          <SideBuyButton />
+                        </OrderButtonWrapper>
+                      </OrderFooterRight>
+                    </OrderFooterWrapper>
+                  </HeaderWrapper>
                 </> 
               )
             } 
