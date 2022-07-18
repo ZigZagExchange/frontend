@@ -665,7 +665,8 @@ export const apiSlice = createSlice({
             state.settings[payload.key] = payload.value;
         },
         resetUISettings(state) {
-            state.settings = initialUISettings;
+            let layout = state.settings.layouts;
+            state.settings = { ...initialUISettings, layouts: layout };
         },
         resetTradeLayout(state) {
             if (!state.settings.stackOrderbook) {
