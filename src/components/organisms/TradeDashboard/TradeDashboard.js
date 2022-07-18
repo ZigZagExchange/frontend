@@ -60,9 +60,7 @@ const TradeGrid = styled.article`
   @media screen and (max-width: 991px) {
     height: auto;
     grid-template-rows: ${({ isLeft }) =>
-      isLeft
-        ? "56px 410px 459px 508px 1fr"
-        : "56px 410px 459px 519px 1fr"};
+      isLeft ? "56px 410px 459px 508px 1fr" : "56px 410px 459px 519px 1fr"};
     grid-template-columns: ${({ isLeft }) => (isLeft ? "1fr 1fr" : "1fr")};
     grid-template-areas: ${({ isLeft }) =>
       isLeft
@@ -109,10 +107,12 @@ export function TradeDashboard() {
     dispatch(setCurrentMarket(market));
   };
 
-  useEffect(()=>{
-    if(_.isEmpty(marketSummary)) return
-    document.title = `${addComma(formatPrice(marketSummary.price))} | ${marketSummary.market??'--'} | ZigZag Exchange`;
-  }, [marketSummary])
+  useEffect(() => {
+    if (_.isEmpty(marketSummary)) return;
+    document.title = `${addComma(formatPrice(marketSummary.price))} | ${
+      marketSummary.market ?? "--"
+    } | ZigZag Exchange`;
+  }, [marketSummary]);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(search);

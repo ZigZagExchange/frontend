@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import CheckIcon from "@mui/icons-material/Check";
 import { userSelector } from "lib/store/features/auth/authSlice";
+import { useMediaQuery } from "react-responsive";
 import {
   networkSelector,
   isConnectingSelector,
@@ -372,14 +373,17 @@ export const Header = (props) => {
         history.push("/dsl");
         break;
       case 5:
-        window.open("https://app.uniswap.org/#/swap?inputCurrency=ETH&outputCurrency=0x82af49447d8a07e3bd95bd0d56f35241523fbab1&chain=arbitrum", '_blank');
+        window.open(
+          "https://app.uniswap.org/#/swap?inputCurrency=ETH&outputCurrency=0x82af49447d8a07e3bd95bd0d56f35241523fbab1&chain=arbitrum",
+          "_blank"
+        );
         break;
       default:
         break;
     }
   };
 
-  const isMobile = window.innerWidth < 1034;
+  const isMobile = useMediaQuery({ maxWidth: 1224 });
 
   return (
     <HeaderWrapper isMobile={isMobile}>
@@ -520,10 +524,10 @@ export const Header = (props) => {
             <Tab>CONVERT</Tab>
             {hasBridge && <Tab>BRIDGE</Tab>}
             <Tab>LIST PAIR</Tab>
-            <Tab>
+            {/* <Tab>
               DOCS
               <ExternalLinkIcon size={12} />
-            </Tab>
+            </Tab> */}
             {isEVM && <Tab>WRAP</Tab>}
           </TabMenu>
           <HorizontalDivider />
@@ -558,7 +562,7 @@ export const Header = (props) => {
             leftIcon={true}
             transparent
           />
-          <SocialWrapper style={{ justifySelf: "center" }}>
+          <SocialWrapper style={{ justifySelf: "center", marginTop: "150px" }}>
             <SocialLink
               target="_blank"
               rel="noreferrer"

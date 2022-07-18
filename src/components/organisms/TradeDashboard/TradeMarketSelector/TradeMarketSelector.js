@@ -2,7 +2,11 @@ import React from "react";
 import { useSelector } from "react-redux";
 import TradeHead from "./TradeHead/TradeHead";
 import styled from "@xstyled/styled-components";
-import { marketSummarySelector, marketInfoSelector, lastPricesSelector } from "lib/store/features/api/apiSlice";
+import {
+  marketSummarySelector,
+  marketInfoSelector,
+  lastPricesSelector,
+} from "lib/store/features/api/apiSlice";
 import { formatPrice, addComma } from "lib/utils";
 
 const StyledTradeMarketSelector = styled.header`

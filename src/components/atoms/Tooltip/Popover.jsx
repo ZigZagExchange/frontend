@@ -1,24 +1,24 @@
-import React, { useState } from 'react'
-import { usePopper } from 'react-popper'
-import styled from 'styled-components'
-import Portal from '@reach/portal'
+import React, { useState } from "react";
+import { usePopper } from "react-popper";
+import styled from "styled-components";
+import Portal from "@reach/portal";
 
 const PopoverContainer = styled.div`
   z-index: 9999;
 
-  visibility: ${(props) => (props.show ? 'visible' : 'hidden')};
+  visibility: ${(props) => (props.show ? "visible" : "hidden")};
   opacity: ${(props) => (props.show ? 1 : 0)};
   transition: visibility 150ms linear, opacity 150ms linear;
 
   background: ${({ theme }) => theme.colors.backgroundHighEmphasis};
   color: ${({ theme }) => theme.colors.foregroundHighEmphasis};
   border-radius: 8px;
-  box-shadow: 0px 8px 16px 0px #0101011A;
-`
+  box-shadow: 0px 8px 16px 0px #0101011a;
+`;
 
 const ReferenceElement = styled.div`
   display: inline-block;
-`
+`;
 
 const Arrow = styled.div`
   width: 8px;
@@ -31,7 +31,7 @@ const Arrow = styled.div`
     height: 8px;
     z-index: 9998;
 
-    content: '';
+    content: "";
     transform: rotate(45deg);
     background: ${({ theme }) => theme.colors.backgroundHighEmphasis};
   }
@@ -68,29 +68,41 @@ const Arrow = styled.div`
       border-top: none;
     }
   }
-`
+`;
 
-export default function Popover({ content, show, children, placement = 'auto' }) {
-  const [referenceElement, setReferenceElement] = useState(null)
-  const [popperElement, setPopperElement] = useState(null)
-  const [arrowElement, setArrowElement] = useState(null)
+export default function Popover({
+  content,
+  show,
+  children,
+  placement = "auto",
+}) {
+  const [referenceElement, setReferenceElement] = useState(null);
+  const [popperElement, setPopperElement] = useState(null);
+  const [arrowElement, setArrowElement] = useState(null);
   const { styles, attributes } = usePopper(referenceElement, popperElement, {
     placement,
-    strategy: 'fixed',
+    strategy: "fixed",
     modifiers: [
-      { name: 'offset', options: { offset: [8, 8] } },
-      { name: 'arrow', options: { element: arrowElement } },
+      { name: "offset", options: { offset: [8, 8] } },
+      { name: "arrow", options: { element: arrowElement } },
     ],
-  })
+  });
 
   return (
     <>
       <ReferenceElement ref={setReferenceElement}>{children}</ReferenceElement>
       <Portal>
-        <PopoverContainer show={show} ref={setPopperElement} style={styles.popper} {...attributes.popper}>
+        <PopoverContainer
+          show={show}
+          ref={setPopperElement}
+          style={styles.popper}
+          {...attributes.popper}
+        >
           {content}
           <Arrow
-            className={`arrow-${attributes.popper?.['data-popper-placement'] ?? ''}`}
+            className={`arrow-${
+              attributes.popper?.["data-popper-placement"] ?? ""
+            }`}
             ref={setArrowElement}
             style={styles.arrow}
             {...attributes.arrow}
@@ -98,5 +110,5 @@ export default function Popover({ content, show, children, placement = 'auto' })
         </PopoverContainer>
       </Portal>
     </>
-  )
+  );
 }
