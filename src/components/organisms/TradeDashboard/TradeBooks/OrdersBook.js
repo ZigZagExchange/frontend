@@ -27,7 +27,7 @@ const StyledTradeBooks = styled.section`
   padding: ${({ isLeft }) =>
     isLeft ? "21px 10px 12px 20px" : "21px 10px 0px 10px"};
   border-top: 1px solid ${({ theme }) => theme.colors.foreground400};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.foreground400};
+  border-bottom: 1px solid ${({ theme, isStack }) => isStack ? theme.colors.foreground400 : 'none'};
   overflow: hidden;
 `;
 
@@ -75,8 +75,7 @@ const OrderFooterRight = styled.div`
 
   img {
     margin-left: 5px;
-    // border: 1px solid ${({ theme }) =>
-      theme.colors.foregroundMediumEmphasis};
+    // border: 1px solid ${({ theme }) => theme.colors.foregroundMediumEmphasis};
     cursor: pointer;
   }
 `;
@@ -240,13 +239,6 @@ export default function OrdersBook(props) {
               </Text>
               {side === "sell" ? (
                 <>
-                  <TradePriceHeadSecond
-                    lastPrice={marketSummary.price}
-                    marketSummary={marketSummary}
-                    marketInfo={marketInfo}
-                    fixedPoint={fixedPoint}
-                  />
-                  <Divider />
                   <TradePriceTable
                     head
                     className="trade_table_asks sell-side"
@@ -255,6 +247,13 @@ export default function OrdersBook(props) {
                     priceTableData={askBins}
                     currentMarket={props.currentMarket}
                     scrollToBottom={true}
+                    fixedPoint={fixedPoint}
+                  />
+                  <Divider />
+                  <TradePriceHeadSecond
+                    lastPrice={marketSummary.price}
+                    marketSummary={marketSummary}
+                    marketInfo={marketInfo}
                     fixedPoint={fixedPoint}
                   />
                 </>
@@ -353,104 +352,175 @@ export default function OrdersBook(props) {
               <Text font="primaryTitleDisplay" color="foregroundHighEmphasis">
                 Order Book
               </Text>
-              <Divider />
-              <HeaderWrapper>
-                <TradePriceHeadSecond
-                  lastPrice={marketSummary.price}
-                  marketSummary={marketSummary}
-                  marketInfo={marketInfo}
-                  fixedPoint={fixedPoint}
-                />
-                <OrderFooterWrapper isStack={settings.stackOrderbook}>
-                  {/* <Dropdown
-                    adClass="side-dropdown"
-                    transparent={true}
-                    width={162}
-                    item={fixedPointItems}
-                    context={`${fixedPoint} decimal`}
-                    leftIcon={false}
-                    clickFunction={changeFixedPoint}
-                  /> */}
+              {side === "all" ? (
+                <>
+                  <Divider />
+                  <HeaderWrapper>
+                    <TradePriceHeadSecond
+                      lastPrice={marketSummary.price}
+                      marketSummary={marketSummary}
+                      marketInfo={marketInfo}
+                      fixedPoint={fixedPoint}
+                    />
+                    <OrderFooterWrapper isStack={settings.stackOrderbook}>
+                      {/* <Dropdown
+                        adClass="side-dropdown"
+                        transparent={true}
+                        width={162}
+                        item={fixedPointItems}
+                        context={`${fixedPoint} decimal`}
+                        leftIcon={false}
+                        clickFunction={changeFixedPoint}
+                      /> */}
 
-                  <OrderFooterRight>
-                    <OrderButtonWrapper
-                      onClick={() => {
-                        changeSide("all");
-                      }}
-                    >
-                      <SideAllButton />
-                    </OrderButtonWrapper>
-                    <OrderButtonWrapper
-                      onClick={() => {
-                        changeSide("sell");
-                      }}
-                    >
-                      <SideSellButton />
-                    </OrderButtonWrapper>
-                    <OrderButtonWrapper
-                      onClick={() => {
-                        changeSide("buy");
-                      }}
-                    >
-                      <SideBuyButton />
-                    </OrderButtonWrapper>
-                  </OrderFooterRight>
-                </OrderFooterWrapper>
-              </HeaderWrapper>
-              <Divider />
-              <TableWrapper>
-                {side === "sell" ? (
-                  <>
-                    <TradePriceTable
-                      head
-                      className="trade_table_asks sell-side"
-                      useGradient={!settings.disableOrderBookFlash}
-                      adClass="no-space"
-                      priceTableData={askBins}
-                      currentMarket={props.currentMarket}
-                      scrollToBottom={false}
+                      <OrderFooterRight>
+                        <OrderButtonWrapper
+                          onClick={() => {
+                            changeSide("all");
+                          }}
+                        >
+                          <SideAllButton />
+                        </OrderButtonWrapper>
+                        <OrderButtonWrapper
+                          onClick={() => {
+                            changeSide("sell");
+                          }}
+                        >
+                          <SideSellButton />
+                        </OrderButtonWrapper>
+                        <OrderButtonWrapper
+                          onClick={() => {
+                            changeSide("buy");
+                          }}
+                        >
+                          <SideBuyButton />
+                        </OrderButtonWrapper>
+                      </OrderFooterRight>
+                    </OrderFooterWrapper>
+                  </HeaderWrapper>
+                  <Divider />
+                  <TableWrapper>
+                    <>
+                      <TradePriceTable
+                        head
+                        useGradient={!settings.disableOrderBookFlash}
+                        currentMarket={props.currentMarket}
+                        priceTableData={bidBins}
+                        fixedPoint={fixedPoint}
+                      />
+                      <TradePriceTable
+                        head
+                        className="trade_table_asks sell-side"
+                        useGradient={!settings.disableOrderBookFlash}
+                        priceTableData={askBins}
+                        currentMarket={props.currentMarket}
+                        fixedPoint={fixedPoint}
+                      />
+                    </>
+                  </TableWrapper>
+                </>
+              ) : (
+                side === "sell" ? 
+                <>
+                  <Divider />
+                  <TableWrapper>
+                    <>
+                      <TradePriceTable
+                        head
+                        className="trade_table_asks sell-side"
+                        useGradient={!settings.disableOrderBookFlash}
+                        priceTableData={askBins}
+                        currentMarket={props.currentMarket}
+                        fixedPoint={fixedPoint}
+                      />
+                    </>
+                  </TableWrapper>
+                  <Divider />
+                  <HeaderWrapper>
+                    <TradePriceHeadSecond
+                      lastPrice={marketSummary.price}
+                      marketSummary={marketSummary}
+                      marketInfo={marketInfo}
                       fixedPoint={fixedPoint}
                     />
-                  </>
-                ) : (
-                  ""
-                )}
-                {side === "buy" ? (
-                  <>
-                    <TradePriceTable
-                      head
-                      useGradient={!settings.disableOrderBookFlash}
-                      adClass="no-space"
-                      currentMarket={props.currentMarket}
-                      priceTableData={bidBins}
+                    <OrderFooterWrapper isStack={settings.stackOrderbook}>
+                      <OrderFooterRight>
+                        <OrderButtonWrapper
+                          onClick={() => {
+                            changeSide("all");
+                          }}
+                        >
+                          <SideAllButton />
+                        </OrderButtonWrapper>
+                        <OrderButtonWrapper
+                          onClick={() => {
+                            changeSide("sell");
+                          }}
+                        >
+                          <SideSellButton />
+                        </OrderButtonWrapper>
+                        <OrderButtonWrapper
+                          onClick={() => {
+                            changeSide("buy");
+                          }}
+                        >
+                          <SideBuyButton />
+                        </OrderButtonWrapper>
+                      </OrderFooterRight>
+                    </OrderFooterWrapper>
+                  </HeaderWrapper>
+                </> 
+                : 
+                <>
+                  <Divider />
+                  <HeaderWrapper>
+                    <TradePriceHeadSecond
+                      lastPrice={marketSummary.price}
+                      marketSummary={marketSummary}
+                      marketInfo={marketInfo}
                       fixedPoint={fixedPoint}
                     />
-                  </>
-                ) : (
-                  ""
-                )}
-                {side === "all" ? (
-                  <>
-                    <TradePriceTable
-                      head
-                      useGradient={!settings.disableOrderBookFlash}
-                      currentMarket={props.currentMarket}
-                      priceTableData={bidBins}
-                      fixedPoint={fixedPoint}
-                    />
-                    <TradePriceTable
-                      head
-                      className="trade_table_asks sell-side"
-                      useGradient={!settings.disableOrderBookFlash}
-                      priceTableData={askBins}
-                      currentMarket={props.currentMarket}
-                      fixedPoint={fixedPoint}
-                    />
-                  </>
-                ) : (
-                  ""
-                )}
-              </TableWrapper>
+                    <OrderFooterWrapper isStack={settings.stackOrderbook}>
+                      <OrderFooterRight>
+                        <OrderButtonWrapper
+                          onClick={() => {
+                            changeSide("all");
+                          }}
+                        >
+                          <SideAllButton />
+                        </OrderButtonWrapper>
+                        <OrderButtonWrapper
+                          onClick={() => {
+                            changeSide("sell");
+                          }}
+                        >
+                          <SideSellButton />
+                        </OrderButtonWrapper>
+                        <OrderButtonWrapper
+                          onClick={() => {
+                            changeSide("buy");
+                          }}
+                        >
+                          <SideBuyButton />
+                        </OrderButtonWrapper>
+                      </OrderFooterRight>
+                    </OrderFooterWrapper>
+                  </HeaderWrapper>
+                  <Divider />
+                  <TableWrapper>
+                    <>
+                      <TradePriceTable
+                        head
+                        useGradient={!settings.disableOrderBookFlash}
+                        currentMarket={props.currentMarket}
+                        priceTableData={bidBins}
+                        fixedPoint={fixedPoint}
+                      />
+                    </>
+                  </TableWrapper>
+                </> 
+              )
+            } 
             </>
           )}
         </BooksWrapper>
