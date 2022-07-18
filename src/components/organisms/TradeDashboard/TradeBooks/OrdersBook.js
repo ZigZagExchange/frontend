@@ -262,19 +262,19 @@ export default function OrdersBook(props) {
               )}
               {side === "buy" ? (
                 <>
-                  <TradePriceHeadSecond
-                    lastPrice={marketSummary.price}
-                    marketSummary={marketSummary}
-                    marketInfo={marketInfo}
-                    fixedPoint={fixedPoint}
-                  />
-                  <Divider />
                   <TradePriceTable
                     head
                     useGradient={!settings.disableOrderBookFlash}
                     adClass="no-space"
                     currentMarket={props.currentMarket}
                     priceTableData={bidBins}
+                    fixedPoint={fixedPoint}
+                  />
+                  <Divider />
+                  <TradePriceHeadSecond
+                    lastPrice={marketSummary.price}
+                    marketSummary={marketSummary}
+                    marketInfo={marketInfo}
                     fixedPoint={fixedPoint}
                   />
                 </>
@@ -355,6 +355,26 @@ export default function OrdersBook(props) {
               {side === "all" ? (
                 <>
                   <Divider />
+                  <TableWrapper>
+                    <>
+                      <TradePriceTable
+                        head
+                        useGradient={!settings.disableOrderBookFlash}
+                        currentMarket={props.currentMarket}
+                        priceTableData={bidBins}
+                        fixedPoint={fixedPoint}
+                      />
+                      <TradePriceTable
+                        head
+                        className="trade_table_asks sell-side"
+                        useGradient={!settings.disableOrderBookFlash}
+                        priceTableData={askBins}
+                        currentMarket={props.currentMarket}
+                        fixedPoint={fixedPoint}
+                      />
+                    </>
+                  </TableWrapper>
+                  <Divider />
                   <HeaderWrapper>
                     <TradePriceHeadSecond
                       lastPrice={marketSummary.price}
@@ -398,16 +418,13 @@ export default function OrdersBook(props) {
                       </OrderFooterRight>
                     </OrderFooterWrapper>
                   </HeaderWrapper>
+                </>
+              ) : (
+                side === "sell" ? 
+                <>
                   <Divider />
                   <TableWrapper>
                     <>
-                      <TradePriceTable
-                        head
-                        useGradient={!settings.disableOrderBookFlash}
-                        currentMarket={props.currentMarket}
-                        priceTableData={bidBins}
-                        fixedPoint={fixedPoint}
-                      />
                       <TradePriceTable
                         head
                         className="trade_table_asks sell-side"
@@ -418,10 +435,7 @@ export default function OrdersBook(props) {
                       />
                     </>
                   </TableWrapper>
-                </>
-              ) : (
-                side === "sell" ? 
-                <>
+                  <Divider />
                   <HeaderWrapper>
                     <TradePriceHeadSecond
                       lastPrice={marketSummary.price}
@@ -455,20 +469,6 @@ export default function OrdersBook(props) {
                       </OrderFooterRight>
                     </OrderFooterWrapper>
                   </HeaderWrapper>
-                  <Divider />
-                  <TableWrapper>
-                    <>
-                      <TradePriceTable
-                        head
-                        className="trade_table_asks sell-side"
-                        useGradient={!settings.disableOrderBookFlash}
-                        priceTableData={askBins}
-                        currentMarket={props.currentMarket}
-                        fixedPoint={fixedPoint}
-                      />
-                    </>
-                  </TableWrapper>
-                  <Divider />
                 </> 
                 : 
                 <>
