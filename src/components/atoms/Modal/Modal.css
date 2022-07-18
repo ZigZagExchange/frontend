@@ -33,6 +33,16 @@
   color: #cedafb;
 }
 
+.zig_modal_content_light {
+  width: 500px;
+  max-width: 90%;
+  background-color: #ddf1f7;
+  transition: all 0.3s ease-in-out;
+  transform: translateY(-200px);
+  border-radius: 6px;
+  color: #191a33;
+}
+
 .zig_modal.enter-done .zig_modal_content {
   transform: translateY(0);
 }
@@ -41,13 +51,34 @@
   transform: translateY(-200px);
 }
 
+.zig_modal.enter-done .zig_modal_content_light {
+  transform: translateY(0);
+}
+
+.zig_modal.exit .zig_modal_content_light {
+  transform: translateY(-200px);
+}
+
 .zig_modal_header,
 .zig_modal_body {
   padding: 15px;
 }
 
+.zig_modal_header,
+.zig_modal_body_light {
+  padding: 15px;
+}
+
 .zig_modal_body {
   background: rgba(0, 0, 0, 0.3);
+  border-radius: 0 0 6px 6px;
+  font-size: 0.8rem;
+  max-height: 400px;
+  overflow: auto;
+}
+
+.zig_modal_body_light {
+  background: rgba(0, 0, 0, 0.1);
   border-radius: 0 0 6px 6px;
   font-size: 0.8rem;
   max-height: 400px;
@@ -72,6 +103,27 @@
 }
 
 .zig_modal_body::-webkit-scrollbar-thumb:window-inactive {
+  background: #fff;
+}
+
+.zig_modal_body_light::-webkit-scrollbar {
+  width: 5px;
+  position: relative;
+  z-index: 20;
+}
+
+.zig_modal_body_light::-webkit-scrollbar-track {
+  border-radius: 0px;
+  background: hsla(0, 0%, 100%, 0.15);
+  height: 23px;
+}
+
+.zig_modal_body_light::-webkit-scrollbar-thumb {
+  border-radius: 0px;
+  background: hsla(0, 0%, 100%, 0.4);
+}
+
+.zig_modal_body_light::-webkit-scrollbar-thumb:window-inactive {
   background: #fff;
 }
 

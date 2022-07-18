@@ -182,8 +182,7 @@ export default class APIZKProvider extends APIProvider {
       );
       sellQuantityBN = sellQuantityBN.add(sellFeeBN);
       tokenRatio[marketInfo.baseAsset.id] = baseAmountBN
-        .add(sellFeeBN)
-        .toString();
+        .add(sellFeeBN);
       tokenRatio[marketInfo.quoteAsset.id] = quoteAmountBN;
       balanceBN = ethers.BigNumber.from(this.api.balances[baseToken].value);
     } else {
@@ -197,8 +196,7 @@ export default class APIZKProvider extends APIProvider {
       sellQuantityBN = sellQuantityBN.add(sellFeeBN);
       tokenRatio[marketInfo.baseAsset.id] = baseAmountBN;
       tokenRatio[marketInfo.quoteAsset.id] = quoteAmountBN
-        .add(sellFeeBN)
-        .toString();
+        .add(sellFeeBN);
       balanceBN = ethers.BigNumber.from(this.api.balances[quoteToken].value);
     }
 
@@ -213,13 +211,22 @@ export default class APIZKProvider extends APIProvider {
       sellQuantityBN = balanceBN;
     }
 
+    tokenRatio[marketInfo.baseAsset.id] = ethers.utils.formatUnits(
+      tokenRatio[marketInfo.baseAsset.id],
+      marketInfo.baseAsset.decimals
+    );
+    tokenRatio[marketInfo.quoteAsset.id] = ethers.utils.formatUnits(
+      tokenRatio[marketInfo.quoteAsset.id],
+      marketInfo.quoteAsset.decimals
+    );
+
     const packedSellQuantity =
       zksync.utils.closestPackableTransactionAmount(sellQuantityBN);
     const order = await this.syncWallet.signOrder({
       tokenSell,
       tokenBuy,
       amount: packedSellQuantity.toString(),
-      ratio: zksync.utils.weiRatio(tokenRatio),
+      ratio: zksync.utils.tokenRatio(tokenRatio),
       validUntil: expirationTimeSeconds,
     });
 

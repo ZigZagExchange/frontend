@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import CheckIcon from "@mui/icons-material/Check";
 import { userSelector } from "lib/store/features/auth/authSlice";
+import { useMediaQuery } from "react-responsive";
 import {
   networkSelector,
   isConnectingSelector,
@@ -382,7 +383,7 @@ export const Header = (props) => {
     }
   };
 
-  const isMobile = window.innerWidth < 1034;
+  const isMobile = useMediaQuery({ maxWidth: 1224 });
 
   return (
     <HeaderWrapper isMobile={isMobile}>
@@ -523,10 +524,10 @@ export const Header = (props) => {
             <Tab>CONVERT</Tab>
             {hasBridge && <Tab>BRIDGE</Tab>}
             <Tab>LIST PAIR</Tab>
-            <Tab>
+            {/* <Tab>
               DOCS
               <ExternalLinkIcon size={12} />
-            </Tab>
+            </Tab> */}
             {isEVM && <Tab>WRAP</Tab>}
           </TabMenu>
           <HorizontalDivider />
@@ -561,7 +562,7 @@ export const Header = (props) => {
             leftIcon={true}
             transparent
           />
-          <SocialWrapper style={{ justifySelf: "center" }}>
+          <SocialWrapper style={{ justifySelf: "center", marginTop: "150px" }}>
             <SocialLink
               target="_blank"
               rel="noreferrer"

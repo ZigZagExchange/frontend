@@ -406,7 +406,7 @@ const TokenPairDropdown = ({
     const toggled = !pairDirection;
 
     const sorted_pairs = pairs;
-
+    
     sorted_pairs.sort(function compareFn(firstEl, secondEl) {
       if (toggled) {
         return firstEl.td1 < secondEl.td1 ? -1 : 1;
@@ -533,6 +533,8 @@ const TokenPairDropdown = ({
             onClick={(e) => {
               if (selected) return;
               updateMarketChain(pair);
+              if(isMobile)
+                setIsOpened(false);
             }}
             className={selected ? "selected" : ""}
           >

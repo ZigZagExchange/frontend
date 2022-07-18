@@ -13,6 +13,8 @@ import { IconButton as BaseIcon } from "../IconButton";
 import { MinusIcon, PlusIcon } from "components/atoms/Svg";
 import { setHighSlippageModal } from "lib/store/features/api/apiSlice";
 
+const isMobile = window.innerWidth < 500;
+
 class SpotForm extends React.Component {
   constructor(props) {
     super(props);
@@ -1050,7 +1052,7 @@ class SpotForm extends React.Component {
           </InputBox>
           <FormHeader>
             <Text font="primaryTiny" color="foregroundMediumEmphasis">
-              Available balance
+              {isMobile ? "Balance" : "Available balance"}
             </Text>
             {baseBalanceHtml}
           </FormHeader>
@@ -1087,7 +1089,7 @@ class SpotForm extends React.Component {
           </InputBox>
           <FormHeader>
             <Text font="primaryTiny" color="foregroundMediumEmphasis">
-              Available balance
+              {isMobile ? "Balance" : "Available balance"}
             </Text>
             {quoteBalanceHtml}
           </FormHeader>
