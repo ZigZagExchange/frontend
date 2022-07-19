@@ -10,6 +10,7 @@ const TradesTableWrapper = styled.div`
   grid-area: stack;
   flex-direction: column;
   gap: 8px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.foreground400};
 `;
 
 export default function TradesTable() {
