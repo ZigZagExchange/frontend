@@ -70,8 +70,11 @@ const ConvertPage = () => {
   const [changedBuyAmount, setChangedBuyAmount] = useState(false);
   const [changedSellAmount, setChangedSellAmount] = useState(false);
 
+  const [transactionFee, setTransactionFee] = useState(0);
+
   const estimatedValueSell = sellAmounts * coinEstimator(sellToken?.name) || 0;
   const estimatedValueBuy = buyAmounts * coinEstimator(buyToken?.name) || 0;
+  const estimatedValueFee = transactionFee * coinEstimator(sellToken?.name) || 0;
 
   const zkBalances = useMemo(
     () => (balanceData[network] ? balanceData[network] : {}),
@@ -172,10 +175,14 @@ const ConvertPage = () => {
     };
   }, [network, currentMarket, api.ws, settings.showNightPriceChange]);
 
-  useEffect(() => {
+  useEffect(()=>{
+    const fee = tType === 'sell' 
+      ? getBaseFee(Number(buyAmounts))
+      : getQuoteFee(Number(sellAmounts))
+    setTransactionFee(fee);
     isValid();
-  }, [sellAmounts, buyAmounts, userOrders]);
-
+  }, [sellAmounts, buyAmounts, userOrders, marketInfo]);
+  
   useEffect(() => {
     let price;
     if (api.isZksyncChain()) {
@@ -797,40 +804,43 @@ const ConvertPage = () => {
               transactionType={tType}
               onSetSlippageValue={onChangeSlippageValue}
               slippageValue={slippageValue}
+              transactionFee={transactionFee}
+              feeToken={marketInfo
+                 ? (tType === "buy"
+                    ? marketInfo.quoteAsset.symbol
+                    : marketInfo.baseAsset.symbol
+                  )
+                : ""
+              }
+              estimatedValueFee={estimatedValueFee}
             />
-            {!errorMsg && user.address && !approveNeeded && (
-              <Button
-                isLoading={false}
-                className="w-full py-3 my-3 uppercase"
-                scale="imd"
-                onClick={onClickExchange}
-                disabled={orderButtonDisabled}
-              >
-                Convert {sellToken?.name}
-              </Button>
-            )}
-            {errorMsg && user.address && !approveNeeded && (
-              <Button
-                isLoading={false}
-                className="w-full py-3 my-3 uppercase"
-                variant="sell"
-                scale="imd"
-                disabled
-              >
-                {errorMsg}
-              </Button>
-            )}
-            {user.address && approveNeeded && api.isEVMChain() && (
-              <Button
-                isLoading={false}
-                className="w-full py-3 my-3 uppercase"
-                variant="sell"
-                scale="imd"
-                onClick={approveHandler}
-              >
-                Approve {sellToken?.name}
-              </Button>
-            )}
+            {!errorMsg && user.address && !approveNeeded && Number(sellAmounts) > 0  &&<Button
+              isLoading={false}
+              className="w-full py-3 my-3 uppercase"
+              scale="imd"
+              onClick={onClickExchange}
+              disabled={orderButtonDisabled}
+            >
+              Convert {sellToken?.name}
+            </Button>}
+            {errorMsg && user.address && !approveNeeded && <Button
+              isLoading={false}
+              className="w-full py-3 my-3 uppercase"
+              variant="sell"
+              scale="imd"
+              disabled
+            >
+              {errorMsg}
+            </Button>}
+            {user.address && approveNeeded && api.isEVMChain() && <Button
+              isLoading={false}
+              className="w-full py-3 my-3 uppercase"
+              variant="sell"
+              scale="imd"
+              onClick={approveHandler}
+            >
+              Approve {sellToken?.name}
+            </Button>}
             {!user.address && (
               <ConnectWalletButton className="w-full py-3 my-3 uppercase" />
             )}

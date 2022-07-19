@@ -923,12 +923,14 @@ class SpotForm extends React.Component {
             font="primaryExtraSmallSemiBold"
             color="foregroundMediumEmphasis"
           >
-            {marketInfo &&
-              formatToken(
+            {marketInfo && `${formatToken(
                 Number(this.getQuoteFee(quoteAmount)),
                 marketInfo && marketInfo.quoteAsset.symbol
-              )}{" "}
-            {marketInfo && marketInfo.quoteAsset.symbol}
+              )} ${marketInfo && marketInfo.quoteAsset.symbol}`
+            }
+            {marketInfo?.quoteAsset?.usdPrice && ` (~$${
+              (this.getQuoteFee(quoteAmount) * marketInfo.quoteAsset.usdPrice).toFixed(2)
+            })`}
           </Text>
         </FormHeader>
       );
@@ -952,12 +954,14 @@ class SpotForm extends React.Component {
             font="primaryExtraSmallSemiBold"
             color="foregroundMediumEmphasis"
           >
-            {marketInfo &&
-              formatToken(
+            {marketInfo && `${formatToken(
                 Number(this.getBaseFee(baseAmount)),
                 marketInfo && marketInfo.baseAsset.symbol
-              )}{" "}
-            {marketInfo && marketInfo.baseAsset.symbol}
+              )} ${marketInfo && marketInfo.baseAsset.symbol}`
+            }
+            {marketInfo?.baseAsset?.usdPrice && ` (~$${
+              (this.getBaseFee(baseAmount) * marketInfo.baseAsset.usdPrice).toFixed(2)
+            })`}
           </Text>
         </FormHeader>
       );
@@ -999,8 +1003,8 @@ class SpotForm extends React.Component {
               type="text"
               pattern="\d+(?:[.,]\d+)?"
               placeholder={`Price (${
-                marketInfo && marketInfo.quoteAsset?.symbol
-              }-${marketInfo && marketInfo.baseAsset?.symbol})`}
+                marketInfo && marketInfo.baseAsset?.symbol
+              }-${marketInfo && marketInfo.quoteAsset?.symbol})`}
               value={
                 this.props.orderType === "limit"
                   ? this.state.price

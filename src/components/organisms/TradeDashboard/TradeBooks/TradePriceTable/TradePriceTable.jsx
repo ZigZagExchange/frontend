@@ -14,7 +14,7 @@ const Table = styled.table`
   flex: auto;
   overflow: auto;
   padding: 0px;
-  height: ${({ isLeft }) => (isLeft ? "" : "242px")};
+  height: ${({ isLeft }) => (isLeft ? "" : "249px")};
   flex-direction: column;
   scrollbar-color: ${({ theme }) => theme.colors.foreground400}
     rgba(0, 0, 0, 0.1);
