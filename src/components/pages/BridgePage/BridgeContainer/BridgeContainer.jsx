@@ -370,15 +370,18 @@ const BridgeContainer = () => {
     }
 
     const feeCurrencyInfo = api.getCurrencyInfo(L2FeeToken);
-    if (balances.length === 0) return false;
-    const feeTokenBalance = parseFloat(
-      balances[L2FeeToken] &&
-        balances[L2FeeToken].value / 10 ** feeCurrencyInfo.decimals
-    );
-
-    if (inputValue > 0 && L2FeeAmount > feeTokenBalance) {
-      error = "Not enough balance to pay for fees";
+    if (feeCurrencyInfo && feeCurrencyInfo.decimals) {
+      if (balances.length === 0) return false;
+      const feeTokenBalance = parseFloat(
+        balances[L2FeeToken] &&
+          balances[L2FeeToken].value / 10 ** feeCurrencyInfo.decimals
+      );
+  
+      if (inputValue > 0 && L2FeeAmount > feeTokenBalance) {
+        error = "Not enough balance to pay for fees";
+      }
     }
+    
 
     if (error) {
       setFormErr(error);
