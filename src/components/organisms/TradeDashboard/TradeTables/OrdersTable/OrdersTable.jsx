@@ -647,11 +647,20 @@ export default function OrdersTable(props) {
                 >
                   Action
                 </Text>
-                {/* <SortIconWrapper>
-                    <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper> */}
               </HeaderWrapper>
             </th>
+            {isOpenStatus(getUserOrders()) && !settings.showCancelOrders && (
+              <th className="w-36">
+                <StyledButton
+                  variant="outlined"
+                  width="100px"
+                  scale="md"
+                  onClick={api.cancelAllOrders}
+                >
+                  Cancel All
+                </StyledButton>
+              </th>
+            )}
           </tr>
         </thead>
         <tbody>
@@ -825,6 +834,8 @@ export default function OrdersTable(props) {
                       ""
                     )}
                   </td>
+                  {isOpenStatus(getUserOrders()) &&
+                    !settings.showCancelOrders && <td className="w-36"></td>}
                 </tr>
               </>
             );
@@ -1689,19 +1700,6 @@ export default function OrdersTable(props) {
               <Tab>Order History ({getFills().length})</Tab>
               <Tab>Balances</Tab>
             </StyledTabMenu>
-
-            {isOpenStatus(getUserOrders()) && settings.showCancelOrders ? (
-              <StyledButton
-                variant="outlined"
-                width="100px"
-                scale="md"
-                onClick={api.cancelAllOrders}
-              >
-                Cancel All
-              </StyledButton>
-            ) : (
-              ""
-            )}
           </TableHeaderWrapper>
           {isMobile ? (
             <MobileWrapper>{footerContent}</MobileWrapper>

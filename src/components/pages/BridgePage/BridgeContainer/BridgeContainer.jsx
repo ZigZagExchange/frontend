@@ -12,6 +12,7 @@ import {
   networkSelector,
   balancesSelector,
   userOrdersSelector,
+  settingsSelector,
 } from "lib/store/features/api/apiSlice";
 import { MAX_ALLOWANCE } from "lib/api/constants";
 import { formatUSD } from "lib/utils";
@@ -44,6 +45,7 @@ const BridgeContainer = () => {
 
   const user = useSelector(userSelector);
   const balanceData = useSelector(balancesSelector);
+  const settings = useSelector(settingsSelector);
   const [isApproving, setApproving] = useState(false);
   const [formErr, setFormErr] = useState("");
   const [L2FeeAmount, setL2FeeAmount] = useState(null);
@@ -348,14 +350,16 @@ const BridgeContainer = () => {
           openOrders.length > 0
         ) {
           error = "Open limit order prevents you from bridging";
-          toast.error(
-            "zkSync 1.0 allows one open order at a time. Please cancel your limit order or wait for it to be filled before bridging. Otherwise your limit order will fail.",
-            {
-              toastId:
-                "zkSync 1.0 allows one open order at a time. Please cancel your limit order or wait for it to be filled before bridging. Otherwise your limit order will fail.",
-              autoClose: 20000,
-            }
-          );
+          if (!settings.disableOrderNotification) {
+            toast.error(
+              "zkSync 1.0 allows one open order at a time. Please cancel your limit order or wait for it to be filled before bridging. Otherwise your limit order will fail.",
+              {
+                toastId:
+                  "zkSync 1.0 allows one open order at a time. Please cancel your limit order or wait for it to be filled before bridging. Otherwise your limit order will fail.",
+                autoClose: 20000,
+              }
+            );
+          }
         }
       }
     }
@@ -483,6 +487,9 @@ const BridgeContainer = () => {
       })
       .catch((err) => {
         console.log(err);
+        if (!settings.disableOrderNotification) {
+          toast.error(err.message);
+        }
         setApproving(false);
       });
   };
@@ -524,10 +531,12 @@ const BridgeContainer = () => {
         `${swapDetails.amount}`,
         user.address
       );
-      toast.info(renderGuidContent(), {
-        closeOnClick: false,
-        autoClose: 15000,
-      });
+      if (!settings.disableOrderNotification) {
+        toast.info(renderGuidContent(), {
+          closeOnClick: false,
+          autoClose: 15000,
+        });
+      }
     } else if (fromNetwork.id === "zksync" && toNetwork.id === "polygon") {
       deferredXfer = api.transferToBridge(
         `${swapDetails.amount}`,
@@ -568,7 +577,24 @@ const BridgeContainer = () => {
       setFormErr("Wrong from/to combination");
       return false;
     }
+
+    const renderGuidContent = () => {
+      return (
+        <div>
+          <p className="text-sm">
+            Bridge transaction in process. Confirm or Reject to continue...
+          </p>
+        </div>
+      );
+    };
+    let orderPendingToast;
     if (deferredXfer) {
+      if (!settings.disableOrderNotification) {
+        orderPendingToast = toast.info(renderGuidContent(), {
+          toastId: "Order pending",
+          autoClose: true,
+        });
+      }
       deferredXfer
         .then(() => {
           setTimeout(() => {
@@ -579,6 +605,10 @@ const BridgeContainer = () => {
         })
         .catch((e) => {
           console.error("error sending transaction::", e);
+          if (!settings.disableOrderNotification) {
+            toast.error(e.message);
+            toast.dismiss(orderPendingToast);
+          }
           setTimeout(() => api.getAccountState(), 1000);
         })
         .finally(() => {
@@ -720,6 +750,9 @@ const BridgeContainer = () => {
       })
       .catch((e) => {
         console.error("error sending transaction::", e);
+        if (!settings.disableOrderNotification) {
+          toast.error(e.message);
+        }
         setTimeout(() => api.getAccountState(), 1000);
       })
       .finally(() => {
