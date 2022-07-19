@@ -405,7 +405,7 @@ const TokenPairDropdown = ({
   const togglePairSorting = () => {
     const toggled = !pairDirection;
 
-    const sorted_pairs = pairs;
+    const sorted_pairs = _rowData;
     
     sorted_pairs.sort(function compareFn(firstEl, secondEl) {
       if (toggled) {
@@ -415,7 +415,7 @@ const TokenPairDropdown = ({
       }
     });
 
-    setPairs(sorted_pairs);
+    setPairs(sorted_pairs.map((r) => r.td1));
     setPairSorted(true);
     setPairDirection(toggled);
     setPriceSorted(false);
@@ -428,17 +428,17 @@ const TokenPairDropdown = ({
 
   const toggleChangeSorting = () => {
     const toggled = !changeDirection;
-    const sorted_pairs = [...pairs];
+    const sorted_pairs = _rowData;
 
     sorted_pairs.sort(function compareFn(firstEl, secondEl) {
       if (toggled) {
-        return parseInt(firstEl.td3) - parseInt(secondEl.td3);
+        return parseFloat(firstEl.td3) - parseFloat(secondEl.td3);
       } else {
-        return parseInt(secondEl.td3) - parseInt(firstEl.td3);
+        return parseFloat(secondEl.td3) - parseFloat(firstEl.td3);
       }
     });
 
-    setPairs(sorted_pairs);
+    setPairs(sorted_pairs.map((r) => r.td1));
     setPairSorted(false);
     setPairDirection(false);
     setPriceSorted(false);
@@ -452,17 +452,17 @@ const TokenPairDropdown = ({
   const togglePriceSorting = () => {
     const toggled = !priceDirection;
 
-    const sorted_pairs = pairs;
+    const sorted_pairs = _rowData;
 
     sorted_pairs.sort(function compareFn(firstEl, secondEl) {
       if (toggled) {
-        return parseInt(firstEl.td2) - parseInt(secondEl.td2);
+        return parseFloat(firstEl.td2.replace(',', '')) - parseFloat(secondEl.td2.replace(',', ''));
       } else {
-        return parseInt(secondEl.td2) - parseInt(firstEl.td2);
+        return parseFloat(secondEl.td2.replace(',', '')) - parseFloat(firstEl.td2.replace(',', ''));
       }
     });
 
-    setPairs(sorted_pairs);
+    setPairs(sorted_pairs.map((r) => r.td1));
     setPairSorted(false);
     setPairDirection(false);
     setPriceSorted(true);
@@ -476,7 +476,7 @@ const TokenPairDropdown = ({
   const toggleVolumeSorting = () => {
     const toggled = !volumeDirection;
 
-    const sorted_pairs = pairs;
+    const sorted_pairs = _rowData;
 
     sorted_pairs.sort(function compareFn(firstEl, secondEl) {
       if (toggled) {
@@ -486,7 +486,7 @@ const TokenPairDropdown = ({
       }
     });
 
-    setPairs(sorted_pairs);
+    setPairs(sorted_pairs.map((r) => r.td1));
     setPairSorted(false);
     setPairDirection(false);
     setPriceSorted(false);
