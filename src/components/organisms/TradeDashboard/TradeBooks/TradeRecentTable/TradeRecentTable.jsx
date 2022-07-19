@@ -10,7 +10,7 @@ const Table = styled.table`
   display: flex;
   flex: auto;
   overflow: auto;
-  height: 200px;
+  height: 199px;
   padding: 0px;
   flex-direction: column;
   scrollbar-color: ${({ theme }) => theme.colors.foreground400}
