@@ -928,9 +928,9 @@ class SpotForm extends React.Component {
                 marketInfo && marketInfo.quoteAsset.symbol
               )} ${marketInfo && marketInfo.quoteAsset.symbol}`
             }
-            {marketInfo?.quoteAsset?.usdPrice && ` (~${
+            {marketInfo?.quoteAsset?.usdPrice && ` (~$${
               (this.getQuoteFee(quoteAmount) * marketInfo.quoteAsset.usdPrice).toFixed(2)
-            }$)`}
+            })`}
           </Text>
         </FormHeader>
       );
@@ -959,9 +959,9 @@ class SpotForm extends React.Component {
                 marketInfo && marketInfo.baseAsset.symbol
               )} ${marketInfo && marketInfo.baseAsset.symbol}`
             }
-            {marketInfo?.baseAsset?.usdPrice && ` - ${
+            {marketInfo?.baseAsset?.usdPrice && ` (~$${
               (this.getBaseFee(baseAmount) * marketInfo.baseAsset.usdPrice).toFixed(2)
-            }$`}
+            })`}
           </Text>
         </FormHeader>
       );
@@ -1003,8 +1003,8 @@ class SpotForm extends React.Component {
               type="text"
               pattern="\d+(?:[.,]\d+)?"
               placeholder={`Price (${
-                marketInfo && marketInfo.quoteAsset?.symbol
-              }-${marketInfo && marketInfo.baseAsset?.symbol})`}
+                marketInfo && marketInfo.baseAsset?.symbol
+              }-${marketInfo && marketInfo.quoteAsset?.symbol})`}
               value={
                 this.props.orderType === "limit"
                   ? this.state.price
