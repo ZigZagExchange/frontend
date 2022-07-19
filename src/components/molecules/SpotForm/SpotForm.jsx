@@ -928,9 +928,9 @@ class SpotForm extends React.Component {
                 marketInfo && marketInfo.quoteAsset.symbol
               )} ${marketInfo && marketInfo.quoteAsset.symbol}`
             }
-            {marketInfo?.quoteAsset?.usdPrice && ` - ${
+            {marketInfo?.quoteAsset?.usdPrice && ` (~${
               (this.getQuoteFee(quoteAmount) * marketInfo.quoteAsset.usdPrice).toFixed(2)
-            }$`}
+            }$)`}
           </Text>
         </FormHeader>
       );

@@ -119,7 +119,7 @@ const TransactionSettings = ({
                   <p className="font-sans text-sm ">Bridge fee:</p>
                   <p className="font-sans text-sm ">{`~${formatPrice(
                       ZigZagFee
-                    )} ${ZigZagFeeToken} - ($${
+                    )} ${ZigZagFeeToken} ($${
                       (ZigZagFee * coinEstimator(ZigZagFeeToken)).toFixed(2)
                     })`}
                   </p>
@@ -130,7 +130,7 @@ const TransactionSettings = ({
                   <p className="font-sans text-sm ">Ethereum L1 gas:</p>
                   <p className="font-sans text-sm ">{`~${
                       formatPrice(L1Fee)
-                    } ${swapDetails.currency} - ($${
+                    } ${swapDetails.currency} ($${
                       (L1Fee * coinEstimator(swapDetails.currency)).toFixed(2)
                     })`}
                   </p>
@@ -140,7 +140,7 @@ const TransactionSettings = ({
                 <div className="flex items-center justify-between mt-3">
                   <p className="font-sans text-sm ">zkSync L2 gas fee:</p>
                   <p className="font-sans text-sm ">{`~${formatPrice(
-                    L2Fee)} ${L2FeeToken} - ($${
+                    L2Fee)} ${L2FeeToken} ($${
                       (L2Fee * coinEstimator(L2FeeToken)).toFixed(2)
                     })`}
                   </p>
@@ -171,7 +171,7 @@ const TransactionSettings = ({
                   <p className="font-sans text-sm ">Bridge fee:</p>
                   <p className="font-sans text-sm ">{`~${formatPrice(
                       ZigZagFee
-                    )} ${ZigZagFeeToken} - ($${
+                    )} ${ZigZagFeeToken} ($${
                       (ZigZagFee * coinEstimator(ZigZagFeeToken)).toFixed(2)
                     })`}
                   </p>
@@ -184,7 +184,7 @@ const TransactionSettings = ({
                   </p>
                   <p className="font-sans text-sm ">
                     {fromNetwork.id === "ethereum" &&
-                      `~${formatPrice(L1Fee)} ETH - ($${
+                      `~${formatPrice(L1Fee)} ETH ($${
                       (L1Fee * coinEstimator('ETH')).toFixed(2)
                     })`}
                   </p>
@@ -197,7 +197,7 @@ const TransactionSettings = ({
                   </p>
                   <p className="font-sans text-sm ">
                     {fromNetwork.id === "polygon" &&
-                      `~${formatPrice(L1Fee)} MATIC - ($${
+                      `~${formatPrice(L1Fee)} MATIC ($${
                       (L1Fee * coinEstimator('MATIC')).toFixed(2)
                     })`}
                   </p>
