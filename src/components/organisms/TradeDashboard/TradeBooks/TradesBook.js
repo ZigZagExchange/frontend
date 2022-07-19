@@ -11,9 +11,10 @@ const StyledTradeBooks = styled.section`
   grid-area: trades;
   flex-direction: row;
   justify-content: space-between;
-  padding: ${({ isLeft }) => (isLeft ? "21px 20px 12px 10px" : "10px")};
+  padding: ${({ isLeft }) => (isLeft ? "21px 20px 12px 10px" : "10px 0 10px 0")};
+  margin: ${({ isLeft }) => (isLeft ? "0" : "0 10px 0 10px")};
   border-top: 1px solid ${({ theme }) => theme.colors.foreground400};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.foreground400};
+  // border-bottom: 1px solid ${({ theme }) => theme.colors.foreground400};
 `;
 
 const TradesWrapper = styled.div`
