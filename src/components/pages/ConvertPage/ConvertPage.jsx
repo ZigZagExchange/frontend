@@ -376,8 +376,8 @@ const ConvertPage = () => {
       });
       const s = p.sort((a, b) => {
         return (
-          parseFloat(b.balance.substring(1).replace(",", "")) -
-          parseFloat(a.balance.substring(1).replace(",", ""))
+          parseFloat(b.price.substring(2).replace(",", "")) -
+          parseFloat(a.price.substring(2).replace(",", ""))
         );
       });
       if (!sellToken) {
@@ -441,9 +441,10 @@ const ConvertPage = () => {
         index === self.findIndex((t) => t.name === value.name)
     );
     const s = filtered.sort((a, b) => {
+      console.log(a.price, a.price.substring(2))
       return (
-        parseFloat(b.balance.substring(1).replace(",", "")) -
-        parseFloat(a.balance.substring(1).replace(",", ""))
+        parseFloat(b.price.substring(2).replace(",", "")) -
+        parseFloat(a.price.substring(2).replace(",", ""))
       );
     });
     return s;
