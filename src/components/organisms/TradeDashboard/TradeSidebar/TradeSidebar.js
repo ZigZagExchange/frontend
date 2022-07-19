@@ -29,9 +29,10 @@ const StyledTradeSidebar = styled.aside`
   overflow-y: auto;
   scrollbar-color: ${({ theme }) => theme.colors.foreground400}
     rgba(0, 0, 0, 0.1);
-  scrollbar-width: thin !important;
+  scrollbar-width: none !important;
 
   ::-webkit-scrollbar {
+    display: none;
     width: 5px;
     position: relative;
     z-index: 20;
@@ -78,7 +79,7 @@ export default function TradeSidebar(props) {
   };
   return (
     <StyledTradeSidebar isDark={isDark}>
-      {isMobile || isSmallScreen? (
+      {isMobile || isSmallScreen ? (
         <></>
       ) : (
         <InfoWrapper isDark={isDark}>
