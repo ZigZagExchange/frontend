@@ -53,7 +53,6 @@ const HeaderWrapper = styled.div`
   flex-direction: row;
   justify-content: space-between;
   width: 100%;
-  height: 100%;
   gap: 8px;
 `;
 
