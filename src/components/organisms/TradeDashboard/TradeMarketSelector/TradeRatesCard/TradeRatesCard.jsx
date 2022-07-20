@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import styled from "styled-components";
 import { formatPrice, addComma } from "lib/utils";
 import { SettingsIcon } from "components/atoms/Svg";
@@ -11,7 +11,10 @@ import SettingsModal from "./SettingsModal";
 import { TokenPairDropdown } from "components/molecules/Dropdown";
 import useModal from "components/hooks/useModal";
 import useTheme from "components/hooks/useTheme";
-import { settingsSelector } from "lib/store/features/api/apiSlice";
+import {
+  settingsSelector,
+  setUISettings,
+} from "lib/store/features/api/apiSlice";
 import {
   fetchFavourites,
   addFavourite,
@@ -19,6 +22,8 @@ import {
 } from "lib/helpers/storage/favourites";
 import { ActivatedStarIcon, StarIcon } from "components/atoms/Svg";
 import { Box } from "@material-ui/core";
+import LockOpenIcon from "@mui/icons-material/LockOpen";
+import LockIcon from "@mui/icons-material/Lock";
 import _ from "lodash";
 import { darkColors, lightColors } from "lib/theme/colors";
 
@@ -35,6 +40,7 @@ const TradeRatesCard = ({
   const [isIncrease, setIncrease] = useState(true);
   const [favourites, setFavourites] = useState(fetchFavourites());
   const [isOpen, setOpen] = useState(false);
+  const dispatch = useDispatch();
 
   const settings = useSelector(settingsSelector);
 
@@ -56,7 +62,13 @@ const TradeRatesCard = ({
     onSettingsModal();
   };
 
+  const toggleLayout = () => {
+    dispatch(setUISettings({ key: "editable", value: !settings.editable }));
+  };
+
   const isMobile = window.innerWidth < 800;
+  const isOverflow = window.innerWidth < 1210;
+
   const percentChange = (
     (marketSummary.priceChange / marketSummary.price) *
     100
@@ -327,21 +339,48 @@ const TradeRatesCard = ({
           )}
         </RatesCardsWrapper>
       </LeftWrapper>
-      {isMobile ? (
-        <SettingsIcon
-          style={{ marginRight: "20px" }}
-          onClick={handleSettings}
-        />
+      {isOverflow ? (
+        <div style={{ marginRight: "20px", display: "flex" }}>
+          {settings.editable ? (
+            <LockIcon
+              style={{ marginRight: "20px" }}
+              onClick={toggleLayout}
+            ></LockIcon>
+          ) : (
+            ""
+          )}
+
+          <SettingsIcon
+            style={{ marginRight: "20px" }}
+            onClick={handleSettings}
+          />
+        </div>
       ) : (
-        <Button
-          endIcon={<SettingsIcon />}
-          variant="outlined"
-          scale="imd"
-          mr="20px"
-          onClick={handleSettings}
-        >
-          Settings
-        </Button>
+        <div style={{ marginRight: "20px" }}>
+          {settings.editable ? (
+            <Button
+              endIcon={<LockOpenIcon />}
+              variant="outlined"
+              scale="imd"
+              mr="20px"
+              style={{ marginRight: "10px" }}
+              onClick={toggleLayout}
+            >
+              Lock Interface
+            </Button>
+          ) : (
+            ""
+          )}
+
+          <Button
+            endIcon={<SettingsIcon />}
+            variant="outlined"
+            scale="imd"
+            onClick={handleSettings}
+          >
+            Settings
+          </Button>
+        </div>
       )}
     </Wrapper>
   );

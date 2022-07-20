@@ -8,6 +8,8 @@ import { RestartIcon, EditIcon } from "components/atoms/Svg";
 import {
   settingsSelector,
   resetUISettings,
+  resetTradeLayout,
+  setUISettings,
 } from "lib/store/features/api/apiSlice";
 
 const SettingModalWrapper = styled(GenericModal)`
@@ -70,24 +72,33 @@ const SettingsModal = ({ onDismiss }) => {
     dispatch(resetUISettings());
   };
 
+  const resetLayout = () => {
+    dispatch(resetTradeLayout());
+  };
+
+  const editLayout = () => {
+    dispatch(setUISettings({ key: "editable", value: !settings.editable }));
+    onDismiss();
+  };
+
   return (
     <SettingModalWrapper isOpened onClose={onDismiss}>
       <ModalHeader>
         <Text font="primaryHeading6" color="foregroundHighEmphasis">
           Settings
         </Text>
-        {/* <ActionsWrapper>
-          <ActionWrapper>
+        <ActionsWrapper>
+          <ActionWrapper onClick={editLayout}>
             <EditIcon />
             <Text
               font="primaryMediumBody"
               color="foregroundHighEmphasis"
               style={{ cursor: "pointer" }}
             >
-              Edit Layout
+              {settings.editable ? "Lock Layout" : "Unlock & Customise Layout"}
             </Text>
           </ActionWrapper>
-          <ActionWrapper>
+          <ActionWrapper onClick={resetLayout}>
             <RestartIcon />
             <Text
               font="primaryMediumBody"
@@ -97,7 +108,7 @@ const SettingsModal = ({ onDismiss }) => {
               Reset Layout
             </Text>
           </ActionWrapper>
-        </ActionsWrapper> */}
+        </ActionsWrapper>
       </ModalHeader>
       <Divider />
       <ModalBody>
@@ -109,7 +120,7 @@ const SettingsModal = ({ onDismiss }) => {
             settingKey="showCancelOrders"
           />
           <Text font="primarySmall" color="foregroundHighEmphasis">
-            Disable Cancel All button on Open Orders tab
+            Enable Cancel All button on Open Orders tab
           </Text>
         </ToggleWrapper>
         <ToggleWrapper>
@@ -193,7 +204,10 @@ const SettingsModal = ({ onDismiss }) => {
           <Toggle
             isChecked={settings.stackOrderbook}
             scale="md"
-            onChange={toggle}
+            onChange={() => {
+              toggle();
+              dispatch(resetTradeLayout());
+            }}
             settingKey="stackOrderbook"
           />
           <Text font="primarySmall" color="foregroundHighEmphasis">
@@ -209,7 +223,10 @@ const SettingsModal = ({ onDismiss }) => {
             <Text
               font="primaryMediumBody"
               color="primaryHighEmphasis"
-              style={{ textDecoration: "underline", cursor: "pointer" }}
+              style={{
+                textDecoration: "underline",
+                cursor: "pointer",
+              }}
               textAlign="right"
             >
               Reset All Settings
