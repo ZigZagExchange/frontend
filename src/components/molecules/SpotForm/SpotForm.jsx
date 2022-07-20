@@ -556,8 +556,8 @@ class SpotForm extends React.Component {
     console.log(fairPrice, price);
     const delta =
       this.props.side === "b"
-        ? Math.abs(((price - fairPrice) / fairPrice) * 100)
-        : Math.abs(((fairPrice - price) / fairPrice) * 100);
+        ? ((price - fairPrice) / fairPrice) * 100
+        : ((fairPrice - price) / fairPrice) * 100;
     console.log(delta);
     if (
       (delta > 10 &&
