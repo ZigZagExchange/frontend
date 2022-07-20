@@ -11,6 +11,9 @@ import TradeChartArea from "./TradeChartArea/TradeChartArea";
 import OrdersBook from "./TradeBooks/OrdersBook";
 import TradesBook from "./TradeBooks/TradesBook";
 import "react-toastify/dist/ReactToastify.css";
+import "react-grid-layout/css/styles.css";
+import "react-resizable/css/styles.css";
+import "./ReactGridLayout/custom-grid-layout.css";
 import { toast } from "react-toastify";
 import {
   networkSelector,
