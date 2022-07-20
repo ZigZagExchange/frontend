@@ -110,7 +110,7 @@ const Wrapper = styled.div`
     isDark
       ? theme.colors.backgroundMediumEmphasis
       : theme.colors.backgroundHighEmphasis};
-  height: ${({ isMobile }) => (isMobile ? "457px" : "428px")};
+  height: ${({ isMobile }) => (isMobile ? "457px" : "470px")};
 `;
 
 const ToggleWrapper = styled.div`

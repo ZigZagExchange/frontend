@@ -12,6 +12,7 @@ import Text from "components/atoms/Text/Text";
 import { IconButton as BaseIcon } from "../IconButton";
 import { MinusIcon, PlusIcon } from "components/atoms/Svg";
 import { setHighSlippageModal } from "lib/store/features/api/apiSlice";
+import { Box } from "@mui/material";
 
 const isMobile = window.innerWidth < 500;
 
@@ -1102,7 +1103,17 @@ class SpotForm extends React.Component {
               value={exchangePercentage}
               onChange={this.rangeSliderHandler.bind(this)}
             />
-            <span className="current_progress">{exchangePercentage}%</span>
+            <Box display="flex" alignItems="center" ml="20px">
+              <CustomInput 
+                value={exchangePercentage}
+                onChange={(e)=>{
+                  let val = Number(e.target.value) ? Number(e.target.value) : 0
+                  if(val > 100) val = 100;
+                  this.rangeSliderHandler(null, val);
+                }}
+              />
+              <Box ml="5px">%</Box>
+            </Box>
           </RangeWrapper>
           {this.props.user.id ? (
             <div className="">
@@ -1150,9 +1161,9 @@ const StyledForm = styled.form`
   display: grid;
   grid-auto-flow: row;
   align-items: center;
-  gap: ${({ isMobile }) => (isMobile ? "11px" : "5px")};
+  gap: ${({ isMobile }) => (isMobile ? "11px" : "10px")};
   padding: ${({ isMobile }) =>
-    isMobile ? "0px 5px 8px 5px" : "0px 20px 20px 20px"};
+    isMobile ? "0px 5px 8px 5px" : "20px"};
 `;
 
 const FormHeader = styled.div`
@@ -1213,6 +1224,8 @@ const RangeWrapper = styled.div`
   position: relative;
   width: 98%;
   padding-left: 10px;
+  display: flex;
+  align-items: center;
   .current_progress {
     position: absolute;
     top: 50%;
@@ -1263,3 +1276,12 @@ const IconButton = styled(BaseIcon)`
     margin-left: 0px !important;
   }
 `;
+
+const CustomInput = styled.input`
+  outline: none;
+  border: 1px solid #FFFFFF14;
+  background-color: #FFFFFF0D;
+  border-radius: 3px;
+  text-align: center;
+  width: 26px;
+`
