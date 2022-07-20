@@ -27,8 +27,13 @@ const StyledTradeBooks = styled.section`
   padding: ${({ isLeft }) =>
     isLeft ? "21px 10px 12px 20px" : "21px 10px 0px 10px"};
   border-top: 1px solid ${({ theme }) => theme.colors.foreground400};
-  border-bottom: 1px solid ${({ theme, isStack }) => isStack ? theme.colors.foreground400 : 'none'};
+  border-bottom: 1px solid
+    ${({ theme, isStack }) => (isStack ? theme.colors.foreground400 : "none")};
   overflow: hidden;
+
+  table {
+    height: ${({ isStack }) => (isStack ? "calc(50% - 50px)" : "249px")};
+  }
 `;
 
 const BooksWrapper = styled.div`
@@ -75,7 +80,8 @@ const OrderFooterRight = styled.div`
 
   img {
     margin-left: 5px;
-    // border: 1px solid ${({ theme }) => theme.colors.foregroundMediumEmphasis};
+    // border: 1px solid ${({ theme }) =>
+      theme.colors.foregroundMediumEmphasis};
     cursor: pointer;
   }
 `;
@@ -419,8 +425,7 @@ export default function OrdersBook(props) {
                     </OrderFooterWrapper>
                   </HeaderWrapper>
                 </>
-              ) : (
-                side === "sell" ? 
+              ) : side === "sell" ? (
                 <>
                   <Divider />
                   <TableWrapper>
@@ -469,8 +474,8 @@ export default function OrdersBook(props) {
                       </OrderFooterRight>
                     </OrderFooterWrapper>
                   </HeaderWrapper>
-                </> 
-                : 
+                </>
+              ) : (
                 <>
                   <Divider />
                   <TableWrapper>
@@ -518,9 +523,8 @@ export default function OrdersBook(props) {
                       </OrderFooterRight>
                     </OrderFooterWrapper>
                   </HeaderWrapper>
-                </> 
-              )
-            } 
+                </>
+              )}
             </>
           )}
         </BooksWrapper>
