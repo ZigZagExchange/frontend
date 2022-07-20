@@ -383,8 +383,8 @@ const ConvertPage = () => {
       });
       const s = p.sort((a, b) => {
         return (
-          parseFloat(b.price.substring(2).replace(",", "")) -
-          parseFloat(a.price.substring(2).replace(",", ""))
+          parseFloat(b.price.substring(1).replace(",", "").replace(" ", "")) -
+          parseFloat(a.price.substring(1).replace(",", "").replace(" ", ""))
         );
       });
       if (!sellToken) {
@@ -450,8 +450,8 @@ const ConvertPage = () => {
     const s = filtered.sort((a, b) => {
       console.log(a.price, a.price.substring(2))
       return (
-        parseFloat(b.price.substring(2).replace(",", "")) -
-        parseFloat(a.price.substring(2).replace(",", ""))
+        parseFloat(b.price.substring(1).replace(",", "").replace(" ", "")) -
+        parseFloat(a.price.substring(1).replace(",", "").replace(" ", ""))
       );
     });
     return s;
