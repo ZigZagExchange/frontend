@@ -550,12 +550,15 @@ class SpotForm extends React.Component {
     let baseAmount = this.state.baseAmount;
     let quoteAmount = this.state.quoteAmount;
     // show msg with no fee
-    const fairPrice = this.currentPrice();
+    const fairPrice = this.props.lastPrice;
     let price = quoteAmount / baseAmount;
+
+    console.log(fairPrice, price);
     const delta =
       this.props.side === "b"
-        ? ((price - fairPrice) / fairPrice) * 100
-        : ((fairPrice - price) / fairPrice) * 100;
+        ? Math.abs(((price - fairPrice) / fairPrice) * 100)
+        : Math.abs(((fairPrice - price) / fairPrice) * 100);
+    console.log(delta);
     if (
       (delta > 10 &&
         this.props.orderType === "limit" &&
@@ -923,14 +926,15 @@ class SpotForm extends React.Component {
             font="primaryExtraSmallSemiBold"
             color="foregroundMediumEmphasis"
           >
-            {marketInfo && `${formatToken(
+            {marketInfo &&
+              `${formatToken(
                 Number(this.getQuoteFee(quoteAmount)),
                 marketInfo && marketInfo.quoteAsset.symbol
-              )} ${marketInfo && marketInfo.quoteAsset.symbol}`
-            }
-            {marketInfo?.quoteAsset?.usdPrice && ` (~$${
-              (this.getQuoteFee(quoteAmount) * marketInfo.quoteAsset.usdPrice).toFixed(2)
-            })`}
+              )} ${marketInfo && marketInfo.quoteAsset.symbol}`}
+            {marketInfo?.quoteAsset?.usdPrice &&
+              ` (~$${(
+                this.getQuoteFee(quoteAmount) * marketInfo.quoteAsset.usdPrice
+              ).toFixed(2)})`}
           </Text>
         </FormHeader>
       );
@@ -954,14 +958,15 @@ class SpotForm extends React.Component {
             font="primaryExtraSmallSemiBold"
             color="foregroundMediumEmphasis"
           >
-            {marketInfo && `${formatToken(
+            {marketInfo &&
+              `${formatToken(
                 Number(this.getBaseFee(baseAmount)),
                 marketInfo && marketInfo.baseAsset.symbol
-              )} ${marketInfo && marketInfo.baseAsset.symbol}`
-            }
-            {marketInfo?.baseAsset?.usdPrice && ` (~$${
-              (this.getBaseFee(baseAmount) * marketInfo.baseAsset.usdPrice).toFixed(2)
-            })`}
+              )} ${marketInfo && marketInfo.baseAsset.symbol}`}
+            {marketInfo?.baseAsset?.usdPrice &&
+              ` (~$${(
+                this.getBaseFee(baseAmount) * marketInfo.baseAsset.usdPrice
+              ).toFixed(2)})`}
           </Text>
         </FormHeader>
       );
