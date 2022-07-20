@@ -30,6 +30,10 @@ const StyledTradeBooks = styled.section`
   border-bottom: 1px solid
     ${({ theme, isStack }) => (isStack ? theme.colors.foreground400 : "none")};
   overflow: hidden;
+
+  table {
+    height: ${({ isStack }) => (isStack ? "calc(50% - 50px)" : "249px")};
+  }
 `;
 
 const BooksWrapper = styled.div`
