@@ -448,6 +448,7 @@ const ConvertPage = () => {
         index === self.findIndex((t) => t.name === value.name)
     );
     const s = filtered.sort((a, b) => {
+      console.log(b.price.substring(1).replaceAll(",", "").replaceAll(" ", ""), b.price);
       return (
         parseFloat(b.price.substring(1).replaceAll(",", "").replaceAll(" ", "")) -
         parseFloat(a.price.substring(1).replaceAll(",", "").replaceAll(" ", ""))
