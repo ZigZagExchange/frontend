@@ -27,7 +27,8 @@ const StyledTradeBooks = styled.section`
   padding: ${({ isLeft }) =>
     isLeft ? "21px 10px 12px 20px" : "21px 10px 0px 10px"};
   border-top: 1px solid ${({ theme }) => theme.colors.foreground400};
-  border-bottom: 1px solid ${({ theme, isStack }) => isStack ? theme.colors.foreground400 : 'none'};
+  border-bottom: 1px solid
+    ${({ theme, isStack }) => (isStack ? theme.colors.foreground400 : "none")};
   overflow: hidden;
 `;
 
@@ -35,7 +36,12 @@ const BooksWrapper = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
+  height: ${({ isStack }) => (!isStack ? "calc(100% - 80px)" : "auto")};
   gap: 8px;
+
+  table {
+    height: ${({ isStack }) => (!isStack ? "100%" : "")};
+  }
 `;
 
 const HeaderWrapper = styled.div`
@@ -43,6 +49,7 @@ const HeaderWrapper = styled.div`
   flex-direction: row;
   justify-content: space-between;
   width: 100%;
+  height: 100%;
   gap: 8px;
 `;
 
@@ -50,11 +57,13 @@ const TableWrapper = styled.div`
   display: flex;
   flex-direction: row;
   width: 100%;
+  height: 100%;
   gap: 8px;
 `;
 
 const Divider = styled.div`
-  height: 1px;
+  // height: 1px;
+  padding-top: 1px;
   margin-right: 2px;
   background: ${({ theme }) => theme.colors.foreground400};
 `;
@@ -75,7 +84,8 @@ const OrderFooterRight = styled.div`
 
   img {
     margin-left: 5px;
-    // border: 1px solid ${({ theme }) => theme.colors.foregroundMediumEmphasis};
+    // border: 1px solid ${({ theme }) =>
+      theme.colors.foregroundMediumEmphasis};
     cursor: pointer;
   }
 `;
@@ -231,7 +241,7 @@ export default function OrdersBook(props) {
   return (
     <>
       <StyledTradeBooks isStack={settings.stackOrderbook}>
-        <BooksWrapper>
+        <BooksWrapper isStack={settings.stackOrderbook}>
           {settings.stackOrderbook ? (
             <>
               <Text font="primaryTitleDisplay" color="foregroundHighEmphasis">
@@ -419,8 +429,7 @@ export default function OrdersBook(props) {
                     </OrderFooterWrapper>
                   </HeaderWrapper>
                 </>
-              ) : (
-                side === "sell" ? 
+              ) : side === "sell" ? (
                 <>
                   <Divider />
                   <TableWrapper>
@@ -469,8 +478,8 @@ export default function OrdersBook(props) {
                       </OrderFooterRight>
                     </OrderFooterWrapper>
                   </HeaderWrapper>
-                </> 
-                : 
+                </>
+              ) : (
                 <>
                   <Divider />
                   <TableWrapper>
@@ -518,9 +527,8 @@ export default function OrdersBook(props) {
                       </OrderFooterRight>
                     </OrderFooterWrapper>
                   </HeaderWrapper>
-                </> 
-              )
-            } 
+                </>
+              )}
             </>
           )}
         </BooksWrapper>
