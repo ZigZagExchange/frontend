@@ -382,6 +382,7 @@ const ConvertPage = () => {
         };
       });
       const s = p.sort((a, b) => {
+        console.log(b.price.substring(1).replace(",", "").replace(" ", ""), parseFloat(b.price.substring(1).replace(",", "").replace(" ", "")));
         return (
           parseFloat(b.price.substring(1).replace(",", "").replace(" ", "")) -
           parseFloat(a.price.substring(1).replace(",", "").replace(" ", ""))
