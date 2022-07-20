@@ -185,7 +185,7 @@ const SettingsModal = ({ onDismiss }) => {
             settingKey="showCancelOrders"
           />
           <Text font="primarySmall" color="foregroundHighEmphasis">
-            Enable Cancel All button on Open Orders tab
+            Disable Cancel All button on Open Orders tab
           </Text>
         </ToggleWrapper>
         <ToggleWrapper>
