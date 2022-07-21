@@ -39,14 +39,12 @@ class SpotForm extends React.Component {
     let result;
     if (this.props.side === "s") {
       const baseBalance = this.getBaseBalance();
-      // const baseFee = this.getBaseFee();
-      result = (Number(baseAmount) / baseBalance) * 100;
-      // result = ((Number(baseAmount) + Number(baseFee)) / baseBalance) * 100;
+      const baseFee = this.getBaseFee();
+      result = ((Number(baseAmount) + Number(baseFee)) / baseBalance) * 100;
     } else {
       const quoteBalance = this.getQuoteBalance();
-      // const quoteFee = this.getQuoteFee();
-      result = (Number(quoteAmount) / quoteBalance) * 100;
-      // result = ((Number(quoteAmount) + Number(quoteFee)) / quoteBalance) * 100;
+      const quoteFee = this.getQuoteFee();
+      result = ((Number(quoteAmount) + Number(quoteFee)) / quoteBalance) * 100;
     }
     if (Number.isNaN(result) || result <= 0) {
       return 0;
@@ -681,7 +679,7 @@ class SpotForm extends React.Component {
     if (this.props.side === "s") {
       let baseBalance = this.getBaseBalance();
       let amount = (baseBalance * val) / 100;
-      // baseBalance -= this.getBaseFee(newstate.baseAmount);
+      baseBalance -= this.getBaseFee(newstate.baseAmount);
       if (baseBalance < 0) {
         newstate.baseAmount = "";
         newstate.quoteAmount = "";
@@ -692,7 +690,7 @@ class SpotForm extends React.Component {
     } else if (this.props.side === "b") {
       let quoteBalance = this.getQuoteBalance();
       let amount = (quoteBalance * val) / 100;
-      // quoteBalance -= this.getQuoteFee(newstate.quoteAmount);
+      quoteBalance -= this.getQuoteFee(newstate.quoteAmount);
       if (quoteBalance < 0) {
         newstate.baseAmount = "";
         newstate.quoteAmount = "";
@@ -1133,12 +1131,6 @@ class SpotForm extends React.Component {
                   (this.state.quoteAmount > this.getQuoteBalance() &&
                     this.props.side === "b") ||
                   (this.state.baseAmount > this.getBaseBalance() &&
-                    this.props.side === "s") ||
-                  (this.state.quoteAmount <
-                    this.getQuoteFee(this.state.quoteAmount) &&
-                    this.props.side === "b") ||
-                  (this.state.baseAmount <
-                    this.getBaseFee(this.state.baseAmount) &&
                     this.props.side === "s")
                 }
                 onClick={
