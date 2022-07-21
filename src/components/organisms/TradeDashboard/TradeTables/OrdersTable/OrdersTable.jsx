@@ -1442,10 +1442,9 @@ export default function OrdersTable(props) {
       if (props.user.committed) {
         const tokenBalanceInOrder = {};
         const userOrders = getUserOrders();
-        if (userOrders) {
-          Object.keys(userOrders).forEach((orderId) => {
-            const order = userOrders[orderId];
-            if (order) return;
+        if (userOrders.length > 0) {
+          userOrders.forEach((order) => {
+            if (order.length === 0) return;
             let sellToken, amount;
             if (order[3] === "s") {
               sellToken = order[2].split("-")[0];
@@ -1461,7 +1460,7 @@ export default function OrdersTable(props) {
             }
           });
         }
-
+        
         const balancesContent = walletList.map((token) => {
           return (
             <tr>
@@ -1492,8 +1491,8 @@ export default function OrdersTable(props) {
                     ? "****.****"
                     : formatToken(
                         token.valueReadable -
-                          (tokenBalanceInOrder[token]
-                            ? tokenBalanceInOrder[token]
+                          (tokenBalanceInOrder[token.token]
+                            ? tokenBalanceInOrder[token.token]
                             : 0),
                         token.token
                       )}
