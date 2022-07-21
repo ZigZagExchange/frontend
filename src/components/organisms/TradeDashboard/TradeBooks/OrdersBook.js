@@ -40,7 +40,7 @@ const BooksWrapper = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: ${({ isStack }) => (!isStack ? "calc(100% - 80px)" : "auto")};
+  height: 100%;
   gap: 8px;
 
   table {
@@ -53,7 +53,6 @@ const HeaderWrapper = styled.div`
   flex-direction: row;
   justify-content: space-between;
   width: 100%;
-  height: 100%;
   gap: 8px;
 `;
 
@@ -61,7 +60,7 @@ const TableWrapper = styled.div`
   display: flex;
   flex-direction: row;
   width: 100%;
-  height: 100%;
+  height: ${({ isStack }) => (!isStack ? "calc(100% - 80px)" : "auto")};
   gap: 8px;
 `;
 
