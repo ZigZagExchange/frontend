@@ -12,6 +12,7 @@ import Text from "components/atoms/Text/Text";
 import { IconButton as BaseIcon } from "../IconButton";
 import { MinusIcon, PlusIcon } from "components/atoms/Svg";
 import { setHighSlippageModal } from "lib/store/features/api/apiSlice";
+import { Box } from "@mui/material";
 
 const isMobile = window.innerWidth < 500;
 
@@ -38,12 +39,14 @@ class SpotForm extends React.Component {
     let result;
     if (this.props.side === "s") {
       const baseBalance = this.getBaseBalance();
-      const baseFee = this.getBaseFee();
-      result = ((Number(baseAmount) + Number(baseFee)) / baseBalance) * 100;
+      // const baseFee = this.getBaseFee();
+      result = ((Number(baseAmount)) / baseBalance) * 100;
+      // result = ((Number(baseAmount) + Number(baseFee)) / baseBalance) * 100;
     } else {
       const quoteBalance = this.getQuoteBalance();
-      const quoteFee = this.getQuoteFee();
-      result = ((Number(quoteAmount) + Number(quoteFee)) / quoteBalance) * 100;
+      // const quoteFee = this.getQuoteFee();
+      result = ((Number(quoteAmount)) / quoteBalance) * 100;
+      // result = ((Number(quoteAmount) + Number(quoteFee)) / quoteBalance) * 100;
     }
     if (Number.isNaN(result) || result <= 0) {
       return 0;
@@ -680,7 +683,7 @@ class SpotForm extends React.Component {
     if (this.props.side === "s") {
       let baseBalance = this.getBaseBalance();
       let amount = (baseBalance * val) / 100;
-      baseBalance -= this.getBaseFee(newstate.baseAmount);
+      // baseBalance -= this.getBaseFee(newstate.baseAmount);
       if (baseBalance < 0) {
         newstate.baseAmount = "";
         newstate.quoteAmount = "";
@@ -691,7 +694,7 @@ class SpotForm extends React.Component {
     } else if (this.props.side === "b") {
       let quoteBalance = this.getQuoteBalance();
       let amount = (quoteBalance * val) / 100;
-      quoteBalance -= this.getQuoteFee(newstate.quoteAmount);
+      // quoteBalance -= this.getQuoteFee(newstate.quoteAmount);
       if (quoteBalance < 0) {
         newstate.baseAmount = "";
         newstate.quoteAmount = "";
@@ -1107,7 +1110,17 @@ class SpotForm extends React.Component {
               value={exchangePercentage}
               onChange={this.rangeSliderHandler.bind(this)}
             />
-            <span className="current_progress">{exchangePercentage}%</span>
+            <Box display="flex" alignItems="center" ml="20px">
+              <CustomInput 
+                value={exchangePercentage}
+                onChange={(e)=>{
+                  let val = Number(e.target.value) ? Number(e.target.value) : 0
+                  if(val > 100) val = 100;
+                  this.rangeSliderHandler(null, val);
+                }}
+              />
+              <Box ml="5px">%</Box>
+            </Box>
           </RangeWrapper>
           {this.props.user.id ? (
             <div className="">
@@ -1122,7 +1135,11 @@ class SpotForm extends React.Component {
                   (this.state.quoteAmount > this.getQuoteBalance() &&
                     this.props.side === "b") ||
                   (this.state.baseAmount > this.getBaseBalance() &&
-                    this.props.side === "s")
+                    this.props.side === "s") ||
+                  (this.state.quoteAmount < this.getQuoteFee(this.state.quoteAmount) &&
+                    this.props.side === "b") ||
+                  (this.state.baseAmount < this.getBaseFee(this.state.baseAmount) &&
+                    this.props.side === "s") 
                 }
                 onClick={
                   approveNeeded
@@ -1155,9 +1172,9 @@ const StyledForm = styled.form`
   display: grid;
   grid-auto-flow: row;
   align-items: center;
-  gap: ${({ isMobile }) => (isMobile ? "11px" : "5px")};
+  gap: ${({ isMobile }) => (isMobile ? "11px" : "10px")};
   padding: ${({ isMobile }) =>
-    isMobile ? "0px 5px 8px 5px" : "0px 20px 20px 20px"};
+    isMobile ? "0px 5px 8px 5px" : "20px"};
 `;
 
 const FormHeader = styled.div`
@@ -1218,6 +1235,8 @@ const RangeWrapper = styled.div`
   position: relative;
   width: 98%;
   padding-left: 10px;
+  display: flex;
+  align-items: center;
   .current_progress {
     position: absolute;
     top: 50%;
@@ -1268,3 +1287,12 @@ const IconButton = styled(BaseIcon)`
     margin-left: 0px !important;
   }
 `;
+
+const CustomInput = styled.input`
+  outline: none;
+  border: 1px solid #FFFFFF14;
+  background-color: #FFFFFF0D;
+  border-radius: 3px;
+  text-align: center;
+  width: 26px;
+`
