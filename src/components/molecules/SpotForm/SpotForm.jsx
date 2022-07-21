@@ -39,14 +39,12 @@ class SpotForm extends React.Component {
     let result;
     if (this.props.side === "s") {
       const baseBalance = this.getBaseBalance();
-      // const baseFee = this.getBaseFee();
-      result = (Number(baseAmount) / baseBalance) * 100;
-      // result = ((Number(baseAmount) + Number(baseFee)) / baseBalance) * 100;
+      const baseFee = this.getBaseFee();
+      result = (Number(baseAmount) / (baseBalance - Number(baseFee))) * 100;
     } else {
       const quoteBalance = this.getQuoteBalance();
-      // const quoteFee = this.getQuoteFee();
-      result = (Number(quoteAmount) / quoteBalance) * 100;
-      // result = ((Number(quoteAmount) + Number(quoteFee)) / quoteBalance) * 100;
+      const quoteFee = this.getQuoteFee();
+      result = (Number(quoteAmount) / (quoteBalance - Number(quoteFee))) * 100;
     }
     if (Number.isNaN(result) || result <= 0) {
       return 0;
@@ -553,7 +551,12 @@ class SpotForm extends React.Component {
     let baseAmount = this.state.baseAmount;
     let quoteAmount = this.state.quoteAmount;
     // show msg with no fee
-    const fairPrice = this.props.lastPrice;
+    let fairPrice;
+    if (api.isZksyncChain()) {
+      fairPrice = this.getLadderPriceZkSync_v1();
+    } else {
+      fairPrice = this.getLadderPrice();
+    }
     let price = quoteAmount / baseAmount;
 
     const delta =
@@ -680,8 +683,8 @@ class SpotForm extends React.Component {
     }
     if (this.props.side === "s") {
       let baseBalance = this.getBaseBalance();
+      baseBalance -= this.getBaseFee(newstate.baseAmount);
       let amount = (baseBalance * val) / 100;
-      // baseBalance -= this.getBaseFee(newstate.baseAmount);
       if (baseBalance < 0) {
         newstate.baseAmount = "";
         newstate.quoteAmount = "";
@@ -691,8 +694,8 @@ class SpotForm extends React.Component {
       }
     } else if (this.props.side === "b") {
       let quoteBalance = this.getQuoteBalance();
+      quoteBalance -= this.getQuoteFee(newstate.quoteAmount);
       let amount = (quoteBalance * val) / 100;
-      // quoteBalance -= this.getQuoteFee(newstate.quoteAmount);
       if (quoteBalance < 0) {
         newstate.baseAmount = "";
         newstate.quoteAmount = "";
@@ -1107,6 +1110,11 @@ class SpotForm extends React.Component {
             <RangeSlider
               value={exchangePercentage}
               onChange={this.rangeSliderHandler.bind(this)}
+              disabled={ 
+                this.props.marketInfo && 
+                ((this.props.side === 's' && baseBalance < this.props.marketInfo.baseFee) ||
+                (this.props.side === 'b' && quoteBalance < this.props.marketInfo.quoteFee))
+              }
             />
             <Box display="flex" alignItems="center" ml="20px">
               <CustomInput
@@ -1133,12 +1141,6 @@ class SpotForm extends React.Component {
                   (this.state.quoteAmount > this.getQuoteBalance() &&
                     this.props.side === "b") ||
                   (this.state.baseAmount > this.getBaseBalance() &&
-                    this.props.side === "s") ||
-                  (this.state.quoteAmount <
-                    this.getQuoteFee(this.state.quoteAmount) &&
-                    this.props.side === "b") ||
-                  (this.state.baseAmount <
-                    this.getBaseFee(this.state.baseAmount) &&
                     this.props.side === "s")
                 }
                 onClick={
