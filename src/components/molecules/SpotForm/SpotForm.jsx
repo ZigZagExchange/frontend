@@ -683,8 +683,8 @@ class SpotForm extends React.Component {
     }
     if (this.props.side === "s") {
       let baseBalance = this.getBaseBalance();
-      let amount = (baseBalance * val) / 100;
       baseBalance -= this.getBaseFee(newstate.baseAmount);
+      let amount = (baseBalance * val) / 100;
       if (baseBalance < 0) {
         newstate.baseAmount = "";
         newstate.quoteAmount = "";
@@ -694,8 +694,8 @@ class SpotForm extends React.Component {
       }
     } else if (this.props.side === "b") {
       let quoteBalance = this.getQuoteBalance();
-      let amount = (quoteBalance * val) / 100;
       quoteBalance -= this.getQuoteFee(newstate.quoteAmount);
+      let amount = (quoteBalance * val) / 100;
       if (quoteBalance < 0) {
         newstate.baseAmount = "";
         newstate.quoteAmount = "";
@@ -1110,6 +1110,11 @@ class SpotForm extends React.Component {
             <RangeSlider
               value={exchangePercentage}
               onChange={this.rangeSliderHandler.bind(this)}
+              disabled={ 
+                this.props.marketInfo && 
+                ((this.props.side === 's' && baseBalance < this.props.marketInfo.baseFee) ||
+                (this.props.side === 'b' && quoteBalance < this.props.marketInfo.quoteFee))
+              }
             />
             <Box display="flex" alignItems="center" ml="20px">
               <CustomInput
