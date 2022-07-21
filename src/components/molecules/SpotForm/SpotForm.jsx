@@ -251,7 +251,7 @@ class SpotForm extends React.Component {
         (order[3] === "b" && order[2].split("-")[1] === marketInfo.quoteAsset.symbol) ||
         (order[3] === "s" && order[2].split("-")[0] === marketInfo.quoteAsset.symbol)
       ) {
-        totalBalance = order[4] * order[10];
+        totalBalance -= order[4] * order[10];
       }
     });
 
