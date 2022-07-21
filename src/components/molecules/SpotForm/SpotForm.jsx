@@ -551,7 +551,12 @@ class SpotForm extends React.Component {
     let baseAmount = this.state.baseAmount;
     let quoteAmount = this.state.quoteAmount;
     // show msg with no fee
-    const fairPrice = this.props.lastPrice;
+    let fairPrice;
+    if (api.isZksyncChain()) {
+      fairPrice = this.getLadderPriceZkSync_v1();
+    } else {
+      fairPrice = this.getLadderPrice();
+    }
     let price = quoteAmount / baseAmount;
 
     const delta =
