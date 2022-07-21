@@ -26,7 +26,7 @@ const StyledTradeSidebar = styled.aside`
     isDark
       ? theme.colors.backgroundMediumEmphasis
       : theme.colors.backgroundHighEmphasis};
-  overflow-y: auto;
+  overflow-y: hidden;
   scrollbar-color: ${({ theme }) => theme.colors.foreground400}
     rgba(0, 0, 0, 0.1);
   scrollbar-width: none !important;
