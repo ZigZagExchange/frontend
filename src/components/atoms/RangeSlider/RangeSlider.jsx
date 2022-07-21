@@ -77,6 +77,7 @@ export const RangeSlider = (props) => {
         }}
         value={props.value}
         onChange={props.onChange}
+        disabled={props.disabled}
       />
     </>
   );
