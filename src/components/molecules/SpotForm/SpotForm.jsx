@@ -219,10 +219,12 @@ class SpotForm extends React.Component {
 
     Object.keys(this.props.userOrders).forEach((orderId) => {
       const order = this.props.userOrders[orderId];
-      const sellToken =
-        order[3] === "s" ? order[2].split("-")[0] : order[2].split("-")[1];
-      if (sellToken === marketInfo.baseAsset.symbol) {
+      const [baseToken, quoteToken] = order[2].split("-");
+      if (baseToken === marketInfo.baseAsset.symbol) {
         totalBalance -= order[10]; // remove remaining order size
+      }
+      if (quoteToken === marketInfo.baseAsset.symbol) {
+        totalBalance -= order[4] * order[10]; // remove remaining order size
       }
     });
 
@@ -246,9 +248,11 @@ class SpotForm extends React.Component {
 
     Object.keys(this.props.userOrders).forEach((orderId) => {
       const order = this.props.userOrders[orderId];
-      const sellToken =
-        order[3] === "s" ? order[2].split("-")[0] : order[2].split("-")[1];
-      if (sellToken === marketInfo.quoteAsset.symbol) {
+      const [baseToken, quoteToken] = order[2].split("-");
+      if (baseToken === marketInfo.baseAsset.symbol) {
+        totalBalance -= order[10]; // remove remaining order size
+      }
+      if (quoteToken === marketInfo.baseAsset.symbol) {
         totalBalance -= order[4] * order[10]; // remove remaining order size
       }
     });
