@@ -26,17 +26,16 @@ const StyledTradeSidebar = styled.aside`
     isDark
       ? theme.colors.backgroundMediumEmphasis
       : theme.colors.backgroundHighEmphasis};
-  overflow-y: hidden;
+  // overflow-y: hidden;
   scrollbar-color: ${({ theme }) => theme.colors.foreground400}
     rgba(0, 0, 0, 0.1);
-  scrollbar-width: none !important;
+  // scrollbar-width: none !important;
 
-  ::-webkit-scrollbar {
-    display: none;
-    width: 5px;
-    position: relative;
-    z-index: 20;
-  }
+  // ::-webkit-scrollbar {
+  //   width: 5px;
+  //   position: relative;
+  //   z-index: 20;
+  // }
 
   //   ::-webkit-scrollbar-track {
   //     border-radius: 4px;
