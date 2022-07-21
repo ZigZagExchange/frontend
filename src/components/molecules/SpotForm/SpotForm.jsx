@@ -40,11 +40,11 @@ class SpotForm extends React.Component {
     if (this.props.side === "s") {
       const baseBalance = this.getBaseBalance();
       const baseFee = this.getBaseFee();
-      result = ((Number(baseAmount) + Number(baseFee)) / baseBalance) * 100;
+      result = (Number(baseAmount) / (baseBalance + Number(baseFee))) * 100;
     } else {
       const quoteBalance = this.getQuoteBalance();
       const quoteFee = this.getQuoteFee();
-      result = ((Number(quoteAmount) + Number(quoteFee)) / quoteBalance) * 100;
+      result = (Number(quoteAmount) / (quoteBalance - Number(quoteFee))) * 100;
     }
     if (Number.isNaN(result) || result <= 0) {
       return 0;
