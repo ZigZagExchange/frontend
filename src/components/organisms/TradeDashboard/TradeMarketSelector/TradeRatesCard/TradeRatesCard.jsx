@@ -340,7 +340,7 @@ const TradeRatesCard = ({
         </RatesCardsWrapper>
       </LeftWrapper>
       {isOverflow ? (
-        <div style={{ marginRight: "20px", display: "flex" }}>
+        <div style={{ display: "flex" }}>
           {settings.editable ? (
             <LockIcon
               style={{ marginRight: "20px" }}
@@ -350,13 +350,10 @@ const TradeRatesCard = ({
             ""
           )}
 
-          <SettingsIcon
-            style={{ marginRight: "20px" }}
-            onClick={handleSettings}
-          />
+          <SettingsIcon onClick={handleSettings} />
         </div>
       ) : (
-        <div style={{ marginRight: "20px" }}>
+        <div>
           {settings.editable ? (
             <Button
               endIcon={<LockOpenIcon />}
