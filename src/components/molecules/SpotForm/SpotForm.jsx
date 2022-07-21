@@ -40,12 +40,12 @@ class SpotForm extends React.Component {
     if (this.props.side === "s") {
       const baseBalance = this.getBaseBalance();
       // const baseFee = this.getBaseFee();
-      result = ((Number(baseAmount)) / baseBalance) * 100;
+      result = (Number(baseAmount) / baseBalance) * 100;
       // result = ((Number(baseAmount) + Number(baseFee)) / baseBalance) * 100;
     } else {
       const quoteBalance = this.getQuoteBalance();
       // const quoteFee = this.getQuoteFee();
-      result = ((Number(quoteAmount)) / quoteBalance) * 100;
+      result = (Number(quoteAmount) / quoteBalance) * 100;
       // result = ((Number(quoteAmount) + Number(quoteFee)) / quoteBalance) * 100;
     }
     if (Number.isNaN(result) || result <= 0) {
@@ -556,12 +556,10 @@ class SpotForm extends React.Component {
     const fairPrice = this.props.lastPrice;
     let price = quoteAmount / baseAmount;
 
-    console.log(fairPrice, price);
     const delta =
       this.props.side === "b"
         ? ((price - fairPrice) / fairPrice) * 100
         : ((fairPrice - price) / fairPrice) * 100;
-    console.log(delta);
     if (
       (delta > 10 &&
         this.props.orderType === "limit" &&
@@ -571,8 +569,8 @@ class SpotForm extends React.Component {
         !this.props.settings.disableSlippageWarning)
     ) {
       this.props.setHighSlippageModal({
-        xToken: baseAmount,
-        yToken: quoteAmount,
+        xToken: parseFloat(baseAmount).toPrecision(4),
+        yToken: parseFloat(quoteAmount).toPrecision(4),
         userPrice: price,
         pairPrice: fairPrice,
         type: this.props.side === "b" ? "buy" : "sell",
@@ -1111,11 +1109,11 @@ class SpotForm extends React.Component {
               onChange={this.rangeSliderHandler.bind(this)}
             />
             <Box display="flex" alignItems="center" ml="20px">
-              <CustomInput 
+              <CustomInput
                 value={exchangePercentage}
-                onChange={(e)=>{
-                  let val = Number(e.target.value) ? Number(e.target.value) : 0
-                  if(val > 100) val = 100;
+                onChange={(e) => {
+                  let val = Number(e.target.value) ? Number(e.target.value) : 0;
+                  if (val > 100) val = 100;
                   this.rangeSliderHandler(null, val);
                 }}
               />
@@ -1136,10 +1134,12 @@ class SpotForm extends React.Component {
                     this.props.side === "b") ||
                   (this.state.baseAmount > this.getBaseBalance() &&
                     this.props.side === "s") ||
-                  (this.state.quoteAmount < this.getQuoteFee(this.state.quoteAmount) &&
+                  (this.state.quoteAmount <
+                    this.getQuoteFee(this.state.quoteAmount) &&
                     this.props.side === "b") ||
-                  (this.state.baseAmount < this.getBaseFee(this.state.baseAmount) &&
-                    this.props.side === "s") 
+                  (this.state.baseAmount <
+                    this.getBaseFee(this.state.baseAmount) &&
+                    this.props.side === "s")
                 }
                 onClick={
                   approveNeeded
@@ -1173,8 +1173,7 @@ const StyledForm = styled.form`
   grid-auto-flow: row;
   align-items: center;
   gap: ${({ isMobile }) => (isMobile ? "11px" : "10px")};
-  padding: ${({ isMobile }) =>
-    isMobile ? "0px 5px 8px 5px" : "20px"};
+  padding: ${({ isMobile }) => (isMobile ? "0px 5px 8px 5px" : "20px")};
 `;
 
 const FormHeader = styled.div`
@@ -1290,9 +1289,9 @@ const IconButton = styled(BaseIcon)`
 
 const CustomInput = styled.input`
   outline: none;
-  border: 1px solid #FFFFFF14;
-  background-color: #FFFFFF0D;
+  border: 1px solid #ffffff14;
+  background-color: #ffffff0d;
   border-radius: 3px;
   text-align: center;
   width: 26px;
-`
+`;
