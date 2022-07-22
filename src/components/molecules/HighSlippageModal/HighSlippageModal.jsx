@@ -106,14 +106,16 @@ const FormDialog = () => {
     dispatch(
       setHighSlippageModal({
         open: false,
-        confirmed: textValue === "CONFIRM" ? true : false,
+        confirmed: textValue === "confirm" ? true : false,
       })
     );
   };
 
   const onChangeTextValue = (e) => {
-    setConfirmed(e.currentTarget.value === "CONFIRM" ? true : false);
-    setTextValue(e.currentTarget.value);
+    setConfirmed(
+      e.currentTarget.value.toLocaleLowerCase() === "confirm" ? true : false
+    );
+    setTextValue(e.currentTarget.value.toLocaleLowerCase());
   };
 
   const getCapitalize = (text) => {

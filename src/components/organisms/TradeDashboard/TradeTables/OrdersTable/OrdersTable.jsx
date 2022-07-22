@@ -309,7 +309,7 @@ export default function OrdersTable(props) {
             let remaining = order[10] === null ? baseQuantity : order[10];
             const orderStatus = order[9];
             const baseCurrency = order[2].split("-")[0];
-            const side = order[3] === "b" ? "buy" : "sell";
+            const side = order[3] === "b" ? "Buy" : "Sell";
             const sideclassname =
               order[3] === "b" ? "successHighEmphasis" : "dangerHighEmphasis";
             const expiration = order[7];
@@ -335,21 +335,21 @@ export default function OrdersTable(props) {
             let statusText, statusClass;
             switch (order[9]) {
               case "r":
-                statusText = "rejected";
+                statusText = "Rejected";
                 statusClass = "dangerHighEmphasis";
                 break;
               case "pf":
-                statusText = "partial fill";
+                statusText = "Partial fill";
                 statusClass = "successHighEmphasis";
                 break;
               case "f":
-                statusText = "filled";
+                statusText = "Filled";
                 statusClass = "successHighEmphasis";
                 break;
               case "pm":
                 statusText = (
                   <span>
-                    partial match
+                    Partial match
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -362,7 +362,7 @@ export default function OrdersTable(props) {
               case "m":
                 statusText = (
                   <span>
-                    matched{" "}
+                    Matched{" "}
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -375,7 +375,7 @@ export default function OrdersTable(props) {
               case "b":
                 statusText = (
                   <span>
-                    <span style={{ display: "inline" }}>committing </span>
+                    <span style={{ display: "inline" }}>Committing </span>
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -387,15 +387,15 @@ export default function OrdersTable(props) {
                 statusClass = "warningHighEmphasis";
                 break;
               case "o":
-                statusText = "open";
+                statusText = "Open";
                 statusClass = "successHighEmphasis";
                 break;
               case "c":
-                statusText = "canceled";
+                statusText = "Canceled";
                 statusClass = "dangerHighEmphasis";
                 break;
               case "e":
-                statusText = "expired";
+                statusText = "Expired";
                 statusClass = "warningHighEmphasis";
                 break;
               default:
@@ -496,25 +496,7 @@ export default function OrdersTable(props) {
                       </Text>
                     </td>
                   </tr>
-                  <tr>
-                    <td>
-                      <Text
-                        font="primaryExtraSmallSemiBold"
-                        color="foregroundLowEmphasis"
-                      >
-                        Fee
-                      </Text>
-                    </td>
-                    <td>
-                      <Text
-                        font="primaryExtraSmallSemiBold"
-                        color="foregroundHighEmphasis"
-                        textAlign="right"
-                      >
-                        {remaining.toPrecision(6) / 1} {baseCurrency}
-                      </Text>
-                    </td>
-                  </tr>
+
                   <tr>
                     <td>
                       <Text
@@ -673,7 +655,7 @@ export default function OrdersTable(props) {
             let remaining = order[10] === null ? baseQuantity : order[10];
             let orderStatus = order[9];
             const baseCurrency = order[2].split("-")[0];
-            const side = order[3] === "b" ? "buy" : "sell";
+            const side = order[3] === "b" ? "Buy" : "Sell";
             const sideclassname =
               order[3] === "b" ? "successHighEmphasis" : "dangerHighEmphasis";
             const expiration = order[7];
@@ -704,25 +686,25 @@ export default function OrdersTable(props) {
             let statusText, statusClass;
             switch (orderStatus) {
               case "r":
-                statusText = "rejected";
+                statusText = "Rejected";
                 statusClass = "dangerHighEmphasis";
                 break;
               case "pf":
-                statusText = "partial fill";
+                statusText = "Partial fill";
                 statusClass = "successHighEmphasis";
                 break;
               case "f":
-                statusText = "filled";
+                statusText = "Filled";
                 statusClass = "successHighEmphasis";
                 break;
               case "pm":
-                statusText = <span>partial match</span>;
+                statusText = <span>Partial match</span>;
                 statusClass = "warningHighEmphasis";
                 break;
               case "m":
                 statusText = (
                   <span>
-                    matched{" "}
+                    Matched{" "}
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -735,7 +717,7 @@ export default function OrdersTable(props) {
               case "b":
                 statusText = (
                   <span>
-                    <span style={{ display: "inline" }}>committing </span>
+                    <span style={{ display: "inline" }}>Committing </span>
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -747,15 +729,15 @@ export default function OrdersTable(props) {
                 statusClass = "warningHighEmphasis";
                 break;
               case "o":
-                statusText = "open";
+                statusText = "Open";
                 statusClass = "successHighEmphasis";
                 break;
               case "c":
-                statusText = "canceled";
+                statusText = "Canceled";
                 statusClass = "dangerHighEmphasis";
                 break;
               case "e":
-                statusText = "expired";
+                statusText = "Expired";
                 statusClass = "warningHighEmphasis";
                 break;
               default:
@@ -858,7 +840,7 @@ export default function OrdersTable(props) {
             let price = fill[4];
             let baseQuantity = fill[5];
             const fillstatus = fill[6];
-            const sidetext = side === "b" ? "buy" : "sell";
+            const sidetext = side === "b" ? "Buy" : "Sell";
             const sideclassname =
               side === "b" ? "successHighEmphasis" : "dangerHighEmphasis";
             const tradeTypeText =
@@ -883,21 +865,21 @@ export default function OrdersTable(props) {
             let statusText, statusClass;
             switch (fillstatus) {
               case "r":
-                statusText = "rejected";
+                statusText = "Rejected";
                 statusClass = "dangerHighEmphasis";
                 break;
               case "pf":
-                statusText = "partial fill";
+                statusText = "Partial fill";
                 statusClass = "successHighEmphasis";
                 break;
               case "f":
-                statusText = "filled";
+                statusText = "Filled";
                 statusClass = "successHighEmphasis";
                 break;
               case "pm":
                 statusText = (
                   <span>
-                    partial match
+                    Partial match
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -910,7 +892,7 @@ export default function OrdersTable(props) {
               case "m":
                 statusText = (
                   <span>
-                    matched{" "}
+                    Matched{" "}
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -923,7 +905,7 @@ export default function OrdersTable(props) {
               case "b":
                 statusText = (
                   <span>
-                    <span style={{ display: "inline" }}>committing </span>
+                    <span style={{ display: "inline" }}>Committing </span>
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -935,15 +917,15 @@ export default function OrdersTable(props) {
                 statusClass = "warningHighEmphasis";
                 break;
               case "o":
-                statusText = "open";
+                statusText = "Open";
                 statusClass = "successHighEmphasis";
                 break;
               case "c":
-                statusText = "canceled";
+                statusText = "Canceled";
                 statusClass = "dangerHighEmphasis";
                 break;
               case "e":
-                statusText = "expired";
+                statusText = "Expired";
                 statusClass = "warningHighEmphasis";
                 break;
               default:
@@ -1245,7 +1227,7 @@ export default function OrdersTable(props) {
             let baseQuantity = fill[5];
             const baseCurrency = fill[2].split("-")[0];
             const fillstatus = fill[6];
-            const sidetext = side === "b" ? "buy" : "sell";
+            const sidetext = side === "b" ? "Buy" : "Sell";
             const sideclassname =
               side === "b" ? "successHighEmphasis" : "dangerHighEmphasis";
             const tradeTypeText =
@@ -1270,21 +1252,21 @@ export default function OrdersTable(props) {
             let statusText, statusClass;
             switch (fillstatus) {
               case "r":
-                statusText = "rejected";
+                statusText = "Rejected";
                 statusClass = "dangerHighEmphasis";
                 break;
               case "pf":
-                statusText = "partial fill";
+                statusText = "Partial fill";
                 statusClass = "successHighEmphasis";
                 break;
               case "f":
-                statusText = "filled";
+                statusText = "Filled";
                 statusClass = "successHighEmphasis";
                 break;
               case "pm":
                 statusText = (
                   <span>
-                    partial match
+                    Partial match
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -1297,7 +1279,7 @@ export default function OrdersTable(props) {
               case "m":
                 statusText = (
                   <span>
-                    matched{" "}
+                    Matched{" "}
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -1310,7 +1292,7 @@ export default function OrdersTable(props) {
               case "b":
                 statusText = (
                   <span>
-                    <span style={{ display: "inline" }}>committing </span>
+                    <span style={{ display: "inline" }}>Committing </span>
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -1322,15 +1304,15 @@ export default function OrdersTable(props) {
                 statusClass = "warningHighEmphasis";
                 break;
               case "o":
-                statusText = "open";
+                statusText = "Open";
                 statusClass = "successHighEmphasis";
                 break;
               case "c":
-                statusText = "canceled";
+                statusText = "Canceled";
                 statusClass = "dangerHighEmphasis";
                 break;
               case "e":
-                statusText = "expired";
+                statusText = "Expired";
                 statusClass = "warningHighEmphasis";
                 break;
               default:
@@ -1442,10 +1424,9 @@ export default function OrdersTable(props) {
       if (props.user.committed) {
         const tokenBalanceInOrder = {};
         const userOrders = getUserOrders();
-        if (userOrders) {
-          Object.keys(userOrders).forEach((orderId) => {
-            const order = userOrders[orderId];
-            if (order) return;
+        if (userOrders.length > 0) {
+          userOrders.forEach((order) => {
+            if (order.length === 0) return;
             let sellToken, amount;
             if (order[3] === "s") {
               sellToken = order[2].split("-")[0];
@@ -1461,11 +1442,11 @@ export default function OrdersTable(props) {
             }
           });
         }
-
+        
         const balancesContent = walletList.map((token) => {
           return (
             <tr>
-              <td data-label="Token">
+              <td data-label="Token" style={{width: '80px', paddingRight: 0}}>
                 <Text
                   font="primaryExtraSmallSemiBold"
                   color="foregroundHighEmphasis"
@@ -1492,8 +1473,8 @@ export default function OrdersTable(props) {
                     ? "****.****"
                     : formatToken(
                         token.valueReadable -
-                          (tokenBalanceInOrder[token]
-                            ? tokenBalanceInOrder[token]
+                          (tokenBalanceInOrder[token.token]
+                            ? tokenBalanceInOrder[token.token]
                             : 0),
                         token.token
                       )}
@@ -1516,12 +1497,12 @@ export default function OrdersTable(props) {
         });
         footerContent = (
           <div style={{ textAlign: "center", marginTop: "8px" }}>
-            <table>
+            <CustomTable>
               <thead>
                 <tr>
                   <th
                     scope="col"
-                    style={{ cursor: "pointer" }}
+                    style={{ cursor: "pointer", width: '80px' }}
                     onClick={() => {
                       sortByToken();
                     }}
@@ -1637,7 +1618,7 @@ export default function OrdersTable(props) {
                 </tr>
               </thead>
               <tbody>{balancesContent}</tbody>
-            </table>
+            </CustomTable>
             <ActionWrapper
               font="primaryExtraSmallSemiBold"
               color="primaryHighEmphasis"
@@ -1711,3 +1692,11 @@ export default function OrdersTable(props) {
     </>
   );
 }
+
+const CustomTable = styled.table`
+  min-width: 600px;
+  @media screen and (max-width: 600px){
+    min-width: 510px;
+  }
+
+`

@@ -1,17 +1,18 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
 import { EditIcon } from "components/atoms/Svg";
 import { CheckIcon } from "@heroicons/react/solid";
-import { marketInfoSelector } from "lib/store/features/api/apiSlice";
 import { QuestionHelper } from "components";
+import { formatPrice } from "lib/utils";
 
 const TransactionSettings = ({
   transactionType,
   onSetSlippageValue,
   slippageValue,
+  transactionFee,
+  feeToken,
+  estimatedValueFee,
 }) => {
   const [editableSlippage, setEditableSlippage] = useState(false);
-  const marketInfo = useSelector(marketInfoSelector);
   const onEditableSlippage = () => {
     setEditableSlippage(!editableSlippage);
     if (editableSlippage && slippageValue === "") {
@@ -73,22 +74,13 @@ const TransactionSettings = ({
           Estimated gas fee
         </p>
         <div className="flex items-center gap-2 text-base ">
-          {transactionType === "buy" && (
-            <div>
-              {marketInfo &&
-                marketInfo.quoteFee &&
-                Number(marketInfo.quoteFee).toPrecision(5)}{" "}
-              {marketInfo && marketInfo.quoteAsset.symbol}
-            </div>
-          )}
-          {transactionType === "sell" && (
-            <div>
-              {marketInfo &&
-                marketInfo.baseFee &&
-                Number(marketInfo.baseFee).toPrecision(5)}{" "}
-              {marketInfo && marketInfo.baseAsset.symbol}
-            </div>
-          )}
+          {
+            `${formatPrice(transactionFee)} ${
+              feeToken
+            } (~$${
+              estimatedValueFee.toFixed(2)
+            })`
+          }
         </div>
       </div>
     </div>
