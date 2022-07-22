@@ -14,6 +14,24 @@ export function formatUSD(floatNum) {
   return num.join(".");
 }
 
+export function formatMillonAmount(floatNum) {
+  if (floatNum >= 10000000 && floatNum < 100000000) {
+    floatNum = floatNum / 1000000;
+    floatNum = floatNum.toFixed(3);
+    return floatNum+'M';
+  } else if (floatNum >= 100000000 && floatNum < 1000000000) {
+    floatNum = floatNum / 1000000;
+    floatNum = floatNum.toFixed(2)
+    return floatNum+'M';
+  } else if(floatNum >= 1000000000 && floatNum < 10000000000) {
+    floatNum = floatNum / 1000000;
+    floatNum = floatNum.toFixed(1);
+    return floatNum+'M'
+  } else {
+    return addComma(floatNum);
+  }
+}
+
 export function addComma(floatNum) {
   const parts = floatNum.toString().split(".");
   parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");

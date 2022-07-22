@@ -3,7 +3,7 @@ import styled from "styled-components";
 // css
 import "./TradeRecentTable.css";
 import useTheme from "components/hooks/useTheme";
-import { numStringToSymbol, addComma } from "lib/utils";
+import { numStringToSymbol, addComma, formatMillonAmount } from "lib/utils";
 import Text from "components/atoms/Text/Text";
 
 const Table = styled.table`
@@ -188,7 +188,7 @@ const TradeRecentTable = (props) => {
                         textAlign="right"
                       >
                         {/* {numStringToSymbol(amount, 2)} */}
-                        {addComma(amount)}
+                        {formatMillonAmount(amount)}
                       </Text>
                     </td>
                     <td>

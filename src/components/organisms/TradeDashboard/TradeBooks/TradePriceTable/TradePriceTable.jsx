@@ -6,7 +6,7 @@ import {
   marketInfoSelector,
   settingsSelector,
 } from "lib/store/features/api/apiSlice";
-import { numStringToSymbol, addComma } from "lib/utils";
+import { numStringToSymbol, addComma, formatMillonAmount } from "lib/utils";
 import Text from "components/atoms/Text/Text";
 
 const Table = styled.table`
@@ -233,7 +233,7 @@ const TradePriceTable = (props) => {
                     textAlign="right"
                   >
                     {/* {numStringToSymbol(total, 2)} */}
-                    {addComma(total)}
+                    {formatMillonAmount(total)}
                   </Text>
                 </td>
               )}
