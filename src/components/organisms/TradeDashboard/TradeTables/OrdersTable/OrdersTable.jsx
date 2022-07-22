@@ -496,25 +496,7 @@ export default function OrdersTable(props) {
                       </Text>
                     </td>
                   </tr>
-                  <tr>
-                    <td>
-                      <Text
-                        font="primaryExtraSmallSemiBold"
-                        color="foregroundLowEmphasis"
-                      >
-                        Fee
-                      </Text>
-                    </td>
-                    <td>
-                      <Text
-                        font="primaryExtraSmallSemiBold"
-                        color="foregroundHighEmphasis"
-                        textAlign="right"
-                      >
-                        {remaining.toPrecision(6) / 1} {baseCurrency}
-                      </Text>
-                    </td>
-                  </tr>
+
                   <tr>
                     <td>
                       <Text
