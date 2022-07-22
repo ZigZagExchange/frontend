@@ -126,9 +126,11 @@ const TradePriceTable = (props) => {
     }
   }, [props.priceTableData.length]);
 
-  let total_total = 0;
+  let total_total = 0, total_step = 0;
   props.priceTableData.map((d) => (total_total += d.td2));
-  let total_step = props.className === "trade_table_asks" ? total_total : 0;
+  if (props.priceTableData.length > 0 && props.priceTableData[0].side === "s") {
+    total_step = total_total;
+  }
 
   let onClickRow;
   if (props.onClickRow) onClickRow = props.onClickRow;
@@ -171,11 +173,14 @@ const TradePriceTable = (props) => {
         {props.priceTableData.map((d, i) => {
           const color =
             d.side === "b" ? theme.colors.success400 : theme.colors.danger400;
-          if (props.className !== "trade_table_asks") {
+          if (d.side === "b") {
             total_step += d.td2;
           }
-
           const breakpoint = Math.round((total_step / total_total) * 100);
+          if (d.side === "s") {
+            total_step -= d.td2;
+          }
+
           let rowStyle;
           if (props.useGradient) {
             let dir;
