@@ -1464,7 +1464,7 @@ export default function OrdersTable(props) {
         const balancesContent = walletList.map((token) => {
           return (
             <tr>
-              <td data-label="Token">
+              <td data-label="Token" style={{width: '80px', paddingRight: 0}}>
                 <Text
                   font="primaryExtraSmallSemiBold"
                   color="foregroundHighEmphasis"
@@ -1515,12 +1515,12 @@ export default function OrdersTable(props) {
         });
         footerContent = (
           <div style={{ textAlign: "center", marginTop: "8px" }}>
-            <table>
+            <CustomTable>
               <thead>
                 <tr>
                   <th
                     scope="col"
-                    style={{ cursor: "pointer" }}
+                    style={{ cursor: "pointer", width: '80px' }}
                     onClick={() => {
                       sortByToken();
                     }}
@@ -1636,7 +1636,7 @@ export default function OrdersTable(props) {
                 </tr>
               </thead>
               <tbody>{balancesContent}</tbody>
-            </table>
+            </CustomTable>
             <ActionWrapper
               font="primaryExtraSmallSemiBold"
               color="primaryHighEmphasis"
@@ -1710,3 +1710,11 @@ export default function OrdersTable(props) {
     </>
   );
 }
+
+const CustomTable = styled.table`
+  min-width: 600px;
+  @media screen and (max-width: 600px){
+    min-width: 510px;
+  }
+
+`
