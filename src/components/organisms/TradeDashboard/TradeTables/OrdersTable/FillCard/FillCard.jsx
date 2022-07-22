@@ -83,7 +83,7 @@ const FillCard = ({ fill, closeToast }) => {
             </p>
           </div>
           <XIcon
-            className="w-5 dark:text-foreground-900 text-background-900 hover:opacity-75"
+            className="w-5 h-5 dark:text-foreground-900 text-background-900 hover:opacity-75"
             onClick={closeToast}
           />
         </div>
@@ -115,7 +115,7 @@ const FillCard = ({ fill, closeToast }) => {
                   #{fill[1]}
                 </button>
                 <SaveAsIcon
-                  className="w-4 hover:opacity-80 text-primary-900"
+                  className="w-4 h-4 hover:opacity-80 text-primary-900"
                   onClick={() => {
                     navigator.clipboard.writeText(fill[1]);
                   }}
