@@ -37,7 +37,7 @@ const ConvertContianer = ({
         <p className="text-lg font-work">From</p>
         <p className="text-sm font-normal ">
           Available Balance:{" "}
-          {balances[fromToken?.name] && estimatedValueFrom > 0.1
+          {balances[fromToken?.name]
             ? Number(balances[fromToken?.name].valueReadable).toPrecision(8)
             : "0.00"}
           {` ${fromToken?.name}`}
