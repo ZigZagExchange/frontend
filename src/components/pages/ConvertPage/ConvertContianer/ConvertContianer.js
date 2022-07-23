@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import TokenDropDownModal from "components/organisms/TokenDropdownModal";
 import { formatUSD, formatPrice } from "lib/utils";
@@ -26,6 +26,20 @@ const ConvertContianer = ({
   onClickMax,
   transactionType,
 }) => {
+  const [switchType, setSwitchType] = useState('sell');
+
+  const onChangeAmounts = () => {
+    if (switchType === 'sell') {
+      setSwitchType('buy');
+    } else {      
+      setSwitchType('sell');
+    }    
+  };
+
+  useEffect(() => {
+    setSwitchType(transactionType);
+  }, [transactionType])
+
   return (
     <div className="p-4 mt-5 border rounded-lg dark:border-foreground-400 border-primary-500">
       <div className="flex items-center justify-between">
@@ -74,7 +88,7 @@ const ConvertContianer = ({
       <div className="flex items-center justify-between">
         <p className="text-lg font-work">To</p>
         <p className="flex items-center text-sm font-normal ">
-          {transactionType === 'sell'
+          {switchType === 'sell'
             ? `1 ${fromToken?.name} = ${formatPrice(basePrice)} ${
                 toToken?.name
               }`
