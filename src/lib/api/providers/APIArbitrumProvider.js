@@ -306,6 +306,6 @@ export default class APIArbitrumProvider extends APIProvider {
 
   getExchangeAddress = () => {
     const marketInfoArray = Object.values(this.api.marketInfo);
-    return marketInfoArray[0].exchangeAddress;
+    return marketInfoArray[0]?.exchangeAddress;
   };
 }
