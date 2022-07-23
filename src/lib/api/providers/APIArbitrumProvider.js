@@ -118,7 +118,7 @@ export default class APIArbitrumProvider extends APIProvider {
       makerToken = marketInfo.baseAsset.address;
       takerToken = marketInfo.quoteAsset.address;
       makerAmountBN = baseAmountBN;
-      takerAmountBN = quoteAmountBN.mul(999999).div(1000000);
+      takerAmountBN = quoteAmountBN.mul(9999999).div(10000000);
       gasFeeBN = ethers.utils.parseUnits(
         Number(marketInfo.baseFee).toFixed(marketInfo.baseAsset.decimals),
         marketInfo.baseAsset.decimals
