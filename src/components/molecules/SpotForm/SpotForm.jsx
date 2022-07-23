@@ -219,6 +219,7 @@ class SpotForm extends React.Component {
 
     Object.keys(this.props.userOrders).forEach((orderId) => {
       const order = this.props.userOrders[orderId];
+      if (['c', 'e', 'r', 'f'].includes(order[9])) return;
       if (
         (order[3] === "s" && order[2].split("-")[0] === marketInfo.baseAsset.symbol) ||
         (order[3] === "b" && order[2].split("-")[1] === marketInfo.baseAsset.symbol)
@@ -247,6 +248,7 @@ class SpotForm extends React.Component {
 
     Object.keys(this.props.userOrders).forEach((orderId) => {
       const order = this.props.userOrders[orderId];
+      if (['c', 'e', 'r', 'f'].includes(order[9])) return;
       if (
         (order[3] === "b" && order[2].split("-")[1] === marketInfo.quoteAsset.symbol) ||
         (order[3] === "s" && order[2].split("-")[0] === marketInfo.quoteAsset.symbol)
