@@ -82,7 +82,7 @@ class SpotForm extends React.Component {
       newState.quoteAmount = "";
     } else {
       const price = this.currentPrice();
-      if (price) {
+      if (price && newState.baseAmount) {
         newState.quoteAmount = price * newState.baseAmount;
       } else {
         newState.quoteAmount = "";
@@ -105,7 +105,7 @@ class SpotForm extends React.Component {
       newState.baseAmount = "";
     } else {
       const price = this.currentPrice();
-      if (price) {
+      if (price && newState.quoteAmount) {
         newState.baseAmount = newState.quoteAmount / price;
       } else {
         newState.baseAmount = "";
