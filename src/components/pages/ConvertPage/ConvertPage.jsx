@@ -127,7 +127,7 @@ const ConvertPage = () => {
       const p_name = sellToken.name + "-" + buyToken.name;
       const r_p_name = buyToken.name + "-" + sellToken.name;
       let c = false;
-      Object.keys(pairPrices).forEach((pair) => {
+      Object.keys(pairPrices[network]).forEach((pair) => {
         if (pair === p_name) {
           setTtype("sell");
           dispatch(setCurrentMarket(p_name));
@@ -135,7 +135,7 @@ const ConvertPage = () => {
         }
       });
       if (c === false) {
-        Object.keys(pairPrices).forEach((pair) => {
+        Object.keys(pairPrices[network]).forEach((pair) => {
           if (pair === r_p_name) {
             setTtype("buy");
             dispatch(setCurrentMarket(r_p_name));

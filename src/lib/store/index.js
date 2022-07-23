@@ -14,7 +14,6 @@ import apiReducer, {
   addBridgeReceipt,
   setNetwork,
   clearUserOrders,
-  clearLastPrices,
   setArweaveAllocation,
   setCurrentMarket,
   setConnecting,
@@ -101,7 +100,6 @@ api.on("signOut", (accountState) => {
 });
 
 api.on("providerChange", (network) => {
-  store.dispatch(clearLastPrices());
   store.dispatch(setNetwork(network));
   store.dispatch(setCurrentMarket(api.apiProvider.defaultMarket));
 });
