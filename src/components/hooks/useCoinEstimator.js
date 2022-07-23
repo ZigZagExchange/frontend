@@ -14,31 +14,34 @@ export function useCoinEstimator() {
 
   return useMemo(() => {
     let priceArray = {};
-    const remaining = Object.keys(pairPrices[network]).filter(
-      (token) => !stables.includes(token)
-    );
-    Object.keys(pairPrices[network]).forEach((pair) => {
-      const pairPrice = pairPrices[network][pair].price;
-      if (Number.isNaN(pairPrice) || !Number.isFinite(pairPrice)) return;
+    let remaining = [];
+    if (pairPrices[network]) {
+      remaining = Object.keys(pairPrices[network]).filter(
+        (token) => !stables.includes(token)
+      );
+      Object.keys(pairPrices[network]).forEach((pair) => {
+        const pairPrice = pairPrices[network][pair].price;
+        if (Number.isNaN(pairPrice) || !Number.isFinite(pairPrice)) return;
 
-      const [base, quote] = pair.split("-").map((s) => s.toUpperCase());
+        const [base, quote] = pair.split("-").map((s) => s.toUpperCase());
 
-      // add prices form stable pairs
-      if (stables.includes(quote) && !stables.includes(base)) {
-        if (base in priceArray) {
-          const arr = priceArray[base];
-          arr.push(pairPrice);
-          priceArray[base] = arr;
-        } else {
-          priceArray[base] = [pairPrice];
+        // add prices form stable pairs
+        if (stables.includes(quote) && !stables.includes(base)) {
+          if (base in priceArray) {
+            const arr = priceArray[base];
+            arr.push(pairPrice);
+            priceArray[base] = arr;
+          } else {
+            priceArray[base] = [pairPrice];
+          }
+
+          const index = remaining.indexOf(base);
+          if (index > -1) {
+            remaining.splice(index, 1);
+          }
         }
-
-        const index = remaining.indexOf(base);
-        if (index > -1) {
-          remaining.splice(index, 1);
-        }
-      }
-    });
+      });
+    }
 
     // get mid price of all pairs found with stable pair
     Object.keys(priceArray).forEach((token) => {

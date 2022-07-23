@@ -1115,6 +1115,7 @@ export default class API extends Emitter {
   };
 
   getPairs = (chainId = this.apiProvider.network) => {
+    if (!this.lastPrices[chainId]) return [];
     return Object.keys(this.lastPrices[chainId]);
   };
 
