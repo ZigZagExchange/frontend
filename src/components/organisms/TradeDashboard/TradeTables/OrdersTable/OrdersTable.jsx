@@ -1427,6 +1427,8 @@ export default function OrdersTable(props) {
         if (userOrders.length > 0) {
           userOrders.forEach((order) => {
             if (order.length === 0) return;
+            if (['c', 'e', 'r', 'f'].includes(order[9])) return;
+            
             let sellToken, amount;
             if (order[3] === "s") {
               sellToken = order[2].split("-")[0];

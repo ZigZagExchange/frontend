@@ -71,6 +71,7 @@ const SpotBox = ({
       marketSummary={marketSummary}
       settings={settings}
       allOrders={allOrders}
+      userOrders={userOrders}
       balances={balances}
       network={network}
     />
