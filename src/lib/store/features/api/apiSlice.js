@@ -266,6 +266,8 @@ export const apiSlice = createSlice({
       };
     },
     _lastprice(state, { payload }) {
+      const chainId = payload[1];
+      if (chainId != state.network) return;
       payload[0].forEach((update) => {
         const market = update[0];
         const price = update[1];
