@@ -21,9 +21,9 @@ export default class APIArbitrumProvider extends APIProvider {
     if (!this.accountState.address) return balances;
 
     // allways get ETH - generate token list
-    const tokens = ["ETH"].concat(this.api.getCurrencies());
-    const tokenInfoList = [{ decimals: 18 }];
-    const tokenList = [ethers.constants.AddressZero];
+    const tokens = this.api.getCurrencies();
+    const tokenInfoList = [];
+    const tokenList = [];
 
     for (let i = 1; i < tokens.length; i++) {
       const token = tokens[i];
@@ -47,14 +47,15 @@ export default class APIArbitrumProvider extends APIProvider {
     const exchangeAddress = this.getExchangeAddress();
 
     // generate object
-    for (let i = 0; i < tokens.length; i++) {
+    for (let i = 0; i < tokenInfoList.length; i++) {
       const balanceBN = balanceList[i];
       const currencyInfo = tokenInfoList[i];
 
-      const allowanceBN =
-        tokens[i] === "ETH"
-          ? ethers.constants.MaxUint256
-          : await this.getAllowance(currencyInfo.address, exchangeAddress); // TODO replace
+      let allowanceBN = ethers.BigNumber.from(0);
+      if (currencyInfo.symbol === "ETH") allowanceBN = ethers.constants.MaxUint256;
+      else if (currencyInfo && exchangeAddress) {
+        allowanceBN = await this.getAllowance(currencyInfo.address, exchangeAddress); // TODO replace
+      }
       const valueReadable =
         balanceBN && currencyInfo
           ? ethers.utils.formatUnits(
