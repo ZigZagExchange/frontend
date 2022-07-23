@@ -5,6 +5,7 @@ import { stables } from "lib/helpers/categories";
 
 export function useCoinEstimator() {
   const pairPrices = useSelector(lastPricesSelector);
+
   let prices = {};
   // add all stablecoins
   stables.forEach((stable) => {
@@ -74,7 +75,8 @@ export function useCoinEstimator() {
     if ("WETH" in prices && !("ETH" in prices)) prices.ETH = prices.WETH;
 
     return (token) => {
-      return parseFloat(prices && prices[token] ? prices[token] : 0).toFixed(2);
+      const t = token.toUpperCase();
+      return parseFloat(prices && prices[t] ? prices[t] : 0).toFixed(2);
     };
   }, [pairPrices]);
 }
