@@ -19,7 +19,7 @@ import {
   balancesSelector,
   lastPricesSelector,
   currentMarketSelector,
-  marketInfoSelector,
+  marketInfosSelector,
   liquiditySelector,
   setCurrentMarket,
   resetData,
@@ -49,7 +49,7 @@ const ConvertPage = () => {
   const allOrders = useSelector(allOrdersSelector);
   const currentMarket = useSelector(currentMarketSelector);
   const network = useSelector(networkSelector);
-  const marketInfo = useSelector(marketInfoSelector);
+  const marketInfos = useSelector(marketInfosSelector);
   const slippageValue = useSelector(slippageValueSelector);
 
   const [pairs, setGetPairs] = useState([]);
@@ -63,6 +63,7 @@ const ConvertPage = () => {
 
   const [balances, setBalances] = useState([]);
   const [currentPrice, setCurrentPrice] = useState(1);
+  const [marketInfo, setMarketInfo] = useState(null);
 
   const [orderButtonDisabled, setOrderButtonDisabled] = useState(false);
   const [errorMsg, setError] = useState("");
@@ -88,6 +89,7 @@ const ConvertPage = () => {
 
   useEffect(() => {
     setLoading(true);
+    setMarketInfo(marketInfos?.[currentMarket])
     const timer = setInterval(() => {
       setSellTokenList(api.getCurrencies());
       setGetPairs(api.getPairs());
@@ -529,6 +531,11 @@ const ConvertPage = () => {
       return;
     }
 
+    if(!marketInfo) {
+      setError('Issue validatin your order');
+      console.error(`Convert: no marketinfo for ${currentMarket}`)
+    }
+
     const [baseToken, quoteToken] = currentMarket.split("-");
     if (baseToken !== buyToken?.name && quoteToken !== buyToken?.name) {
       setError("Buy token not in current market.");
@@ -646,17 +653,17 @@ const ConvertPage = () => {
             {tType === "sell" ? "Sell" : "Buy"} Order pending
           </p>
           <p style={{ fontSize: "14px", lineHeight: "24px" }}>
-            {addComma(formatPrice(baseAmount))} {marketInfo.baseAsset.symbol} @{" "}
-            {addComma(formatPrice(price))} {marketInfo.quoteAsset.symbol}
+            {addComma(formatPrice(baseAmount))} {marketInfo?.baseAsset.symbol} @{" "}
+            {addComma(formatPrice(price))} {marketInfo?.quoteAsset.symbol}
           </p>
           <p style={{ fontSize: "14px", lineHeight: "24px" }}>
             Transaction fee:{" "}
             {tType === "sell"
               ? `${addComma(formatPrice(getBaseFee(baseAmount)))} ${
-                  marketInfo.baseAsset.symbol
+                  marketInfo?.baseAsset.symbol
                 }`
               : `${addComma(formatPrice(getQuoteFee(quoteAmount)))} ${
-                  marketInfo.quoteAsset.symbol
+                  marketInfo?.quoteAsset.symbol
                 }`}
           </p>
           <p style={{ fontSize: "14px", lineHeight: "24px" }}>
@@ -701,10 +708,13 @@ const ConvertPage = () => {
 
   const approveHandler = async (e) => {
     e.preventDefault();
+    if (!marketInfo) return;
+    
     const token =
       tType === "sell"
         ? marketInfo.baseAsset.symbol
         : marketInfo.quoteAsset.symbol;
+
 
     let orderApproveToast = toast.info(
       "Approve pending. Sign or Cancel to continue...",

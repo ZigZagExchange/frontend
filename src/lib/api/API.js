@@ -268,10 +268,6 @@ export default class API extends Emitter {
         if (!this.lastPrices[chainId]) this.lastPrices[chainId] = {};
         this.lastPrices[chainId][l[0]] = l
       });
-      const noInfoPairs = lastPricesUpdate
-        .map((l) => l[0])
-        .filter((pair) => !this.marketInfo[pair]);
-      this.cacheMarketInfoFromNetwork(noInfoPairs);
     }
   };
 
@@ -996,7 +992,7 @@ export default class API extends Emitter {
     }
   }
 
-  // marketinfo calls can get expesnive so it's good to cache them
+  /*
   cacheMarketInfoFromNetwork = async (pairs) => {
     if (pairs.length === 0) return;
     if (!this.apiProvider.network) return;
@@ -1010,6 +1006,7 @@ export default class API extends Emitter {
     marketInfoArray.forEach((info) => (this.marketInfo[info.alias] = info));
     return;
   };
+  */
 
   get fastWithdrawTokenAddresses() {
     if (this.apiProvider.network === 1) {

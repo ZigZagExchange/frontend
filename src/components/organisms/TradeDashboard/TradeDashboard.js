@@ -7,7 +7,7 @@ import TradeTables from "./TradeTables/TradeTables";
 // import TradeFooter from "./TradeFooter/TradeFooter";
 import TradeChartArea from "./TradeChartArea/TradeChartArea";
 import OrdersBook from "./TradeBooks/OrdersBook";
-import TradesBook from "./TradeBooks/TradesBook";
+import TradesBook from "./TradeBooks/TradesBook"; 
 import "react-toastify/dist/ReactToastify.css";
 import { toast } from "react-toastify";
 import {
@@ -20,6 +20,10 @@ import {
   layoutSelector,
   settingsSelector,
   marketSummarySelector,
+  marketInfosSelector,
+  lastPricesSelector,
+  liquiditySelector,
+  allOrdersSelector,
 } from "lib/store/features/api/apiSlice";
 import { userSelector } from "lib/store/features/auth/authSlice";
 import api from "lib/api";
@@ -95,9 +99,16 @@ export function TradeDashboard() {
   const userFills = useSelector(userFillsSelector);
   const layout = useSelector(layoutSelector);
   const settings = useSelector(settingsSelector);
+  const marketInfos = useSelector(marketInfosSelector);
   const marketSummary = useSelector(marketSummarySelector);
+  const lastPrices = useSelector(lastPricesSelector);
+  const liquidity = useSelector(liquiditySelector);
+  const allOrders = useSelector(allOrdersSelector);
+  
   const [fixedPoint, setFixedPoint] = useState(2);
   const [side, setSide] = useState("all");
+  const [currentPairLastPrice, setCurrentPairLastPrice] = useState(0);
+
   const dispatch = useDispatch();
 
   const { search } = useLocation();
@@ -108,11 +119,20 @@ export function TradeDashboard() {
   };
 
   useEffect(() => {
-    if (_.isEmpty(marketSummary)) return;
-    document.title = `${addComma(formatPrice(marketSummary.price))} | ${
-      marketSummary.market ?? "--"
+    const price = lastPrices?.[network]?.[currentMarket]?.price;
+    if (price) {
+      setCurrentPairLastPrice(price);
+    } else {
+      setCurrentPairLastPrice(0);
+    }
+  }, [currentMarket, network, lastPrices])
+
+  useEffect(() => {
+    if (!currentPairLastPrice) return;
+    document.title = `${addComma(formatPrice(currentPairLastPrice))} | ${
+      currentMarket ?? "--"
     } | ZigZag Exchange`;
-  }, [marketSummary]);
+  }, [currentPairLastPrice]);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(search);
@@ -185,12 +205,111 @@ export function TradeDashboard() {
     activeOrderStatuses.includes(order[9])
   ).length;
 
+  const orderbookBids = [];
+  const orderbookAsks = [];
+
+  if (api.isZksyncChain() && liquidity) {
+    liquidity.forEach((liq) => {
+      const side = liq[0];
+      const price = liq[1];
+      const quantity = liq[2];
+      if (side === "b") {
+        orderbookBids.push({
+          td1: price,
+          td2: quantity,
+          td3: price * quantity,
+          side: "b",
+        });
+      }
+      if (side === "s") {
+        orderbookAsks.push({
+          td1: price,
+          td2: quantity,
+          td3: price * quantity,
+          side: "s",
+        });
+      }
+    });
+  }
+
+  if (api.isEVMChain() && allOrders) {
+    for (let orderid in allOrders) {
+      const order = allOrders[orderid];
+      const market = order[2];
+      const side = order[3];
+      const price = order[4];
+      const remaining = order[10] === null ? order[5] : order[10];
+      const remainingQuote = remaining * price;
+      const orderStatus = order[9];
+
+      const orderRow = {
+        td1: price,
+        td2: remaining,
+        td3: remainingQuote,
+        side,
+        order: order,
+      };
+
+      if (
+        market === currentMarket &&
+        side === "b" &&
+        ["o", "pm", "pf"].includes(orderStatus)
+      ) {
+        orderbookBids.push(orderRow);
+      } else if (
+        market === currentMarket &&
+        side === "s" &&
+        ["o", "pm", "pf"].includes(orderStatus)
+      ) {
+        orderbookAsks.push(orderRow);
+      }
+    }
+  }
+
+  orderbookAsks.sort((a, b) => b.td1 - a.td1);
+  orderbookBids.sort((a, b) => b.td1 - a.td1);
+  let askBins = [];
+  for (let i = 0; i < orderbookAsks.length; i++) {
+    const lastAskIndex = askBins.length - 1; // => -1
+    if (i === 0) {
+      askBins.push(orderbookAsks[i]);
+    } else if (
+      orderbookAsks[i].td1.toPrecision(6) ===
+      askBins[lastAskIndex].td1.toPrecision(6)
+    ) {
+      askBins[lastAskIndex].td2 += orderbookAsks[i].td2;
+      askBins[lastAskIndex].td3 += orderbookAsks[i].td3;
+    } else {
+      askBins.push(orderbookAsks[i]);
+    }
+  }
+
+  let bidBins = [];
+  for (let i in orderbookBids) {
+    const lastBidIndex = bidBins.length - 1; // => -1
+    if (i === "0") {
+      bidBins.push(orderbookBids[i]);
+    } else if (
+      orderbookBids[i].td1.toPrecision(6) ===
+      bidBins[lastBidIndex].td1.toPrecision(6)
+    ) {
+      bidBins[lastBidIndex].td2 += orderbookBids[i].td2;
+      bidBins[lastBidIndex].td3 += orderbookBids[i].td3;
+    } else {
+      bidBins.push(orderbookBids[i]);
+    }
+  }
+
   return (
     <TradeContainer>
       <TradeGrid layout={layout} isLeft={settings.stackOrderbook}>
         <TradeMarketSelector
           updateMarketChain={updateMarketChain}
           currentMarket={currentMarket}
+          network={network}
+          marketInfo={marketInfos?.[currentMarket]}
+          marketSummary={marketSummary}
+          lastPrices={lastPrices?.[network]}
         />
         {/* TradePriceBtcTable, Spotbox */}
         <TradeSidebar
@@ -198,6 +317,12 @@ export function TradeDashboard() {
           currentMarket={currentMarket}
           user={user}
           activeOrderCount={activeUserOrders}
+          marketInfo={marketInfos?.[currentMarket]}
+          marketSummary={marketSummary}
+          userOrders={userOrders}
+          lastPrice={currentPairLastPrice}
+          askBins={askBins}
+          bidBins={bidBins}
         />
         {settings.stackOrderbook ? (
           <>
@@ -206,6 +331,12 @@ export function TradeDashboard() {
               currentMarket={currentMarket}
               changeFixedPoint={changeFixedPoint}
               changeSide={changeSide}
+              marketInfo={marketInfos?.[currentMarket]}
+              marketSummary={marketSummary}
+              settings={settings}
+              lastPrice={currentPairLastPrice}
+              askBins={askBins}
+              bidBins={bidBins}
             />
             <TradesBook
               currentMarket={currentMarket}
@@ -217,7 +348,7 @@ export function TradeDashboard() {
           <TradesTable />
         )}
         {/* TradeChartArea */}
-        <TradeChartArea />
+        <TradeChartArea marketInfo={marketInfos?.[currentMarket]} />
         {/* OrdersTable */}
         <TradeTables
           userFills={userFills}
