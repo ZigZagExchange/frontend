@@ -399,6 +399,11 @@ class SpotForm extends React.Component {
 
   async approveHandler(e) {
     e.preventDefault();
+    if (!api.isEVMChain) {
+      console.error("Approve only on EVM chains");
+      return;
+    }
+    
     const marketInfo = this.props.marketInfo;
     const token =
       this.props.side === "s"
@@ -918,7 +923,7 @@ class SpotForm extends React.Component {
       buttonType = "BUY";
       if (quoteAmount > quoteAllowance) {
         buttonText = `Approve ${marketInfo && marketInfo.quoteAsset?.symbol}`;
-        approveNeeded = true;
+        if (api.isEVMChain) approveNeeded = true;
       } else {
         buttonText = `BUY ${marketInfo && marketInfo.baseAsset?.symbol}`;
       }
@@ -950,7 +955,7 @@ class SpotForm extends React.Component {
       buttonType = "SELL";
       if (baseAmount > baseAllowance) {
         buttonText = `Approve ${marketInfo && marketInfo.baseAsset?.symbol}`;
-        approveNeeded = true;
+        if (api.isEVMChain) approveNeeded = true;
       } else {
         buttonText = `SELL ${marketInfo && marketInfo.baseAsset?.symbol}`;
       }
