@@ -25,7 +25,7 @@ export default class APIArbitrumProvider extends APIProvider {
     const tokenInfoList = [];
     const tokenList = [];
 
-    for (let i = 1; i < tokens.length; i++) {
+    for (let i = 0; i < tokens.length; i++) {
       const token = tokens[i];
       const tokenInfo = this.api.getCurrencyInfo(token);
       if (!tokenInfo || !tokenInfo.address) continue;
