@@ -118,7 +118,7 @@ export const apiSlice = createSlice({
         // taker and maker user ids have to be matched lowercase because addresses
         // sometimes come back in camelcase checksum format
         const takerUserId = fill[8] && fill[8].toLowerCase();
-        const makerUserId = fill[9] && fill[9].toLowerCase();   
+        const makerUserId = fill[9] && fill[9].toLowerCase();
         if (
           ["f", "pf", "m"].includes(fill[6]) &&
           fill[2] === state.currentMarket &&
