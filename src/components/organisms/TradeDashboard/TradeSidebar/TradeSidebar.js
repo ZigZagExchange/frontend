@@ -29,6 +29,8 @@ const StyledTradeSidebar = styled.aside`
   // overflow-y: hidden;
   scrollbar-color: ${({ theme }) => theme.colors.foreground400}
     rgba(0, 0, 0, 0.1);
+
+  overflow: auto;
   // scrollbar-width: none !important;
 
   // ::-webkit-scrollbar {
