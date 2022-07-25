@@ -222,7 +222,7 @@ const TradePriceTable = (props) => {
                   color="foregroundHighEmphasis"
                   textAlign="right"
                 >
-                  {addComma(Number(numStringToSymbol(amount, 2)))}
+                  {formatMillonAmount(amount)}
                 </Text>
               </td>
               {!isMobile && (

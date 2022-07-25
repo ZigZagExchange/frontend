@@ -33,7 +33,7 @@ export function formatMillonAmount(floatNum) {
 }
 
 export function addComma(floatNum) {
-  const parts = floatNum.toString().split(".");
+  const parts = Number(floatNum).toString().split(".");
   parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   return parts.join(".");
 }
