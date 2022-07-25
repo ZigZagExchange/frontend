@@ -4,6 +4,7 @@ import { formatPrice } from "lib/utils";
 import api from "lib/api";
 import { getLayout } from "lib/helpers/storage/layouts";
 import FillCard from "components/organisms/TradeDashboard/TradeTables/OrdersTable/FillCard";
+import { sr } from "date-fns/locale";
 
 const makeScope = (state) => `${state.network}-${state.userId}`;
 
@@ -53,6 +54,7 @@ export const apiSlice = createSlice({
       userPrice: 0,
       pairPrice: 0,
     },
+    serverDelta: 0
   },
   reducers: {
     _error(state, { payload }) {
@@ -148,7 +150,7 @@ export const apiSlice = createSlice({
         // console.log(update);
         const fillid = update[1];
         const newstatus = update[2];
-        const timestamp = update[7];
+        const timestamp = new Date(update[7].valueOf() + state.serverDelta);
         let txhash;
         let feeamount;
         let feetoken;
@@ -400,6 +402,8 @@ export const apiSlice = createSlice({
     _orders(state, { payload }) {
       const orders = payload[0]
         .filter((order) => order[0] === state.network)
+        .map((order) => order[7] =
+          new Date(order[7].valueOf() + state.serverDelta))
         .reduce((res, order) => {
           res[order[1]] = order;
           return res;
@@ -640,6 +644,9 @@ export const apiSlice = createSlice({
     setSlippageValue(state, { payload }) {
       state.slippageValue = payload.value;
     },
+    setServerDelta(state, { payload }) {
+      state.serverDelta = payload;
+    },
   },
 });
 
@@ -659,6 +666,7 @@ export const {
   setUISettings,
   resetUISettings,
   setSlippageValue,
+  setServerDelta,
 } = apiSlice.actions;
 
 export const layoutSelector = (state) => state.api.layout;
