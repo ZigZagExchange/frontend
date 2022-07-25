@@ -161,26 +161,25 @@ const TradePriceTable = (props) => {
         {props.priceTableData.map((d, i) => {
           const color =
             d.side === "b" ? theme.colors.success400 : theme.colors.danger400;
-          if (d.side === "b") {
-            total_step += d.td2;
-          }
-          const breakpoint = Math.round((total_step / total_total) * 100);
-          if (d.side === "s") {
-            total_step -= d.td2;
-          }
-
+          
           let rowStyle;
           if (props.useGradient) {
-            let dir;
-            if (
-              (d.side === "b" && !props.settings?.stackOrderbook) ||
-              (d.side !== "b" && props.settings?.stackOrderbook)
-            )
-              dir = "to left";
-            else dir = "to right";
+            if (d.side === "b") {
+              total_step += d.td2;
+            }
+            const breakpoint = Math.round((total_step / total_total) * 100);
+            if (d.side === "s") {
+              total_step -= d.td2;
+            }
+            
             rowStyle = {
-              background: `linear-gradient(${dir}, ${color}, ${color} ${breakpoint}%, ${theme.colors.backgroundHighEmphasis} 0%)`,
+              background: `linear-gradient(to right, ${color}, ${color} ${breakpoint}%, ${theme.colors.backgroundHighEmphasis} 0%)`,
             };
+            
+            // reduce after, next one needs to be this percentage
+            if (props.className === "trade_table_asks") {
+              total_step -= d.td2;
+            }
           } else {
             rowStyle = {};
           }
@@ -191,10 +190,6 @@ const TradePriceTable = (props) => {
           const total =
             typeof d.td3 === "number" ? d.td3.toPrecision(6) : d.td3;
 
-          // reduce after, net one needs to be this percentage
-          if (props.className === "trade_table_asks") {
-            total_step -= d.td2;
-          }
           return (
             <tr key={i} style={rowStyle} onClick={() => onClickRow(d)}>
               <td>
