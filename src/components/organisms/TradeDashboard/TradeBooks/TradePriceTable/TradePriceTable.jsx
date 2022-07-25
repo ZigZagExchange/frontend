@@ -1,11 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
 import styled from "styled-components";
 import useTheme from "components/hooks/useTheme";
-import {
-  marketInfoSelector,
-  settingsSelector,
-} from "lib/store/features/api/apiSlice";
 import { numStringToSymbol, addComma } from "lib/utils";
 import Text from "components/atoms/Text/Text";
 
@@ -100,16 +95,9 @@ const Table = styled.table`
     background: ${({ theme }) => theme.colors.foreground400};
   }
 `;
-const Divider = styled.div`
-  height: 1px;
-  background: ${({ theme }) => theme.colors.foreground400};
-  margin-top: 20px;
-`;
 
 const TradePriceTable = (props) => {
   const { theme } = useTheme();
-  const marketInfo = useSelector(marketInfoSelector);
-  const settings = useSelector(settingsSelector);
   const ref = useRef(null);
   const [isUpdateScroll, setUpdateScroll] = useState(false);
   const isMobile = window.innerWidth < 500;
@@ -137,7 +125,7 @@ const TradePriceTable = (props) => {
   else onClickRow = () => null;
 
   return (
-    <Table ref={ref} className={props.adClass} isLeft={settings.stackOrderbook}>
+    <Table ref={ref} className={props.adClass} isLeft={props.settings?.stackOrderbook}>
       {props.head && (
         <thead>
           <tr>
@@ -162,7 +150,7 @@ const TradePriceTable = (props) => {
                   color="foregroundLowEmphasis"
                   textAlign="right"
                 >
-                  Total({marketInfo && marketInfo.quoteAsset.symbol})
+                  Total({props.marketInfo && props.marketInfo.quoteAsset.symbol})
                 </Text>
               </th>
             )}
@@ -183,7 +171,7 @@ const TradePriceTable = (props) => {
             if (d.side === "s") {
               total_step -= d.td2;
             }
-
+            
             rowStyle = {
               background: `linear-gradient(to right, ${color}, ${color} ${breakpoint}%, ${theme.colors.backgroundHighEmphasis} 0%)`,
             };

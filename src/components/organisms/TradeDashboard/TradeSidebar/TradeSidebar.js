@@ -6,11 +6,7 @@ import Text from "components/atoms/Text/Text";
 import { DiscordIcon } from "components/atoms/Svg";
 import {
   liquiditySelector,
-  marketSummarySelector,
-  marketInfoSelector,
   balancesSelector,
-  allOrdersSelector,
-  userOrdersSelector,
 } from "lib/store/features/api/apiSlice";
 import { Button } from "components/molecules/Button";
 import useTheme from "components/hooks/useTheme";
@@ -64,11 +60,7 @@ const InfoWrapper = styled.div`
 `;
 
 export default function TradeSidebar(props) {
-  const allOrders = useSelector(allOrdersSelector);
-  const userOrders = useSelector(userOrdersSelector);
   const balances = useSelector(balancesSelector);
-  const marketInfo = useSelector(marketInfoSelector);
-  const marketSummary = useSelector(marketSummarySelector);
   const liquidity = useSelector(liquiditySelector);
   const { isDark } = useTheme();
   const isMobile = window.innerWidth < 992;
@@ -104,16 +96,17 @@ export default function TradeSidebar(props) {
         </InfoWrapper>
       )}
       <SpotBox
-        lastPrice={marketSummary.price}
+        lastPrice={props.lastPrice}
         user={props.user}
         activeOrderCount={props.activeOrderCount}
         liquidity={liquidity}
         currentMarket={props.currentMarket}
-        marketSummary={marketSummary}
-        marketInfo={marketInfo}
+        marketSummary={props.marketInfo}
+        marketInfo={props.marketInfo}
         balances={balances}
-        allOrders={allOrders}
-        userOrders={userOrders}
+        askBins={props.askBins}
+        bidBins={props.bidBins}
+        userOrders={props.userOrders}
       />
     </StyledTradeSidebar>
   );

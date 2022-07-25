@@ -31,7 +31,7 @@ export const apiSlice = createSlice({
     bridgeReceipts: [],
     lastPrices: {},
     marketSummary: {},
-    marketinfo: null,
+    marketinfos: {},
     balances: {},
     liquidity: [],
     userOrders: {},
@@ -47,7 +47,7 @@ export const apiSlice = createSlice({
       confirmed: "",
       delta: 0,
       type: "sell",
-      marketInfo: " ",
+      marketinfos: " ",
       xToken: 0,
       yToken: 0,
       userPrice: 0,
@@ -109,8 +109,16 @@ export const apiSlice = createSlice({
       if (payload[0].error) {
         console.error(payload[0]);
       } else {
-        state.marketinfo = payload[0];
+        const marketinfos = payload[0];
+        if (!marketinfos) return;
+        state.marketinfos[marketinfos.alias] = marketinfos;
       }
+    },
+    _marketinfo2(state, {payload}) {
+      payload[0].forEach((marketinfos) => {
+        if (!marketinfos) return;
+        state.marketinfos[marketinfos.alias] = marketinfos;
+      });
     },
     _fills(state, { payload }) {
       payload[0].forEach((fill) => {
@@ -586,7 +594,7 @@ export const apiSlice = createSlice({
       state.bridgeReceipts.unshift(payload);
     },
     resetData(state) {
-      state.marketinfo = null;
+      state.marketinfos = {};
       state.marketFills = {};
       state.marketSummary = {};
       state.orders = {};
@@ -614,9 +622,9 @@ export const apiSlice = createSlice({
         confirmed: payload.confirmed ? payload.confirmed : false,
         delta: payload.delta ? payload.delta : state.highSlippageModal.delta,
         type: payload.type ? payload.type : state.highSlippageModal.type,
-        marketInfo: payload.marketInfo
-          ? payload.marketInfo
-          : state.highSlippageModal.marketInfo,
+        marketinfos: payload.marketinfos
+          ? payload.marketinfos
+          : state.highSlippageModal.marketinfos,
         xToken: payload.xToken
           ? payload.xToken
           : state.highSlippageModal.xToken,
@@ -672,7 +680,7 @@ export const marketSummarySelector = (state) => state.api.marketSummary;
 export const liquiditySelector = (state) => state.api.liquidity;
 export const currentMarketSelector = (state) => state.api.currentMarket;
 export const bridgeReceiptsSelector = (state) => state.api.bridgeReceipts;
-export const marketInfoSelector = (state) => state.api.marketinfo;
+export const marketInfosSelector = (state) => state.api.marketinfos;
 export const arweaveAllocationSelector = (state) => state.api.arweaveAllocation;
 export const isConnectingSelector = (state) => state.api.isConnecting;
 export const isBridgeConnectingSelector = (state) =>

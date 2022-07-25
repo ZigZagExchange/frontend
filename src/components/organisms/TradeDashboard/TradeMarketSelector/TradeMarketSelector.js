@@ -1,13 +1,6 @@
 import React from "react";
-import { useSelector } from "react-redux";
 import TradeHead from "./TradeHead/TradeHead";
 import styled from "@xstyled/styled-components";
-import {
-  marketSummarySelector,
-  marketInfoSelector,
-  lastPricesSelector,
-  networkSelector,
-} from "lib/store/features/api/apiSlice";
 import { formatPrice, addComma } from "lib/utils";
 
 const StyledTradeMarketSelector = styled.header`
@@ -16,19 +9,14 @@ const StyledTradeMarketSelector = styled.header`
 `;
 
 export default function TradeMarketSelector(props) {
-  const marketInfo = useSelector(marketInfoSelector);
-  const marketSummary = useSelector(marketSummarySelector);
-  const lastPrices = useSelector(lastPricesSelector);
-  const network = useSelector(networkSelector);
-
   const lastPriceTableData = [];
   const markets = [];
 
-  if (lastPrices[network]) {
-    Object.keys(lastPrices[network]).forEach((market) => {
+  if (props.lastPrices) {
+    Object.keys(props.lastPrices).forEach((market) => {
       markets.push(market);
-      const price = lastPrices[network][market].price;
-      const change = lastPrices[network][market].change;
+      const price = props.lastPrices[market].price;
+      const change = props.lastPrices[market].change;
       const pctchange = ((change / price) * 100).toFixed(2);
       const quoteCurrency = market.split("-")[1];
       const quoteCurrencyUSDC = quoteCurrency + "-USDC";
@@ -36,11 +24,11 @@ export default function TradeMarketSelector(props) {
       if (quoteCurrency === "USDC" || quoteCurrency === "USDT") {
         quoteCurrencyPrice = 1;
       }
-      if (lastPrices[network][quoteCurrencyUSDC]) {
-        quoteCurrencyPrice = lastPrices[network][quoteCurrencyUSDC].price;
+      if (props.lastPrices[quoteCurrencyUSDC]) {
+        quoteCurrencyPrice = props.lastPrices[quoteCurrencyUSDC].price;
       }
       let usdVolume = 0;
-      usdVolume = parseFloat(lastPrices[network][market].quoteVolume) * quoteCurrencyPrice;
+      usdVolume = parseFloat(props.lastPrices[market].quoteVolume) * quoteCurrencyPrice;
       lastPriceTableData.push({
         td1: market,
         td2: addComma(formatPrice(price)),
@@ -54,10 +42,10 @@ export default function TradeMarketSelector(props) {
     <StyledTradeMarketSelector>
       <TradeHead
         updateMarketChain={props.updateMarketChain}
-        marketSummary={marketSummary}
+        marketSummary={props.marketSummary}
         rowData={lastPriceTableData}
         currentMarket={props.currentMarket}
-        marketInfo={marketInfo}
+        marketInfo={props.marketInfo}
       />
     </StyledTradeMarketSelector>
   );
