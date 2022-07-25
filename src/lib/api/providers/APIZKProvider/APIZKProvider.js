@@ -779,7 +779,7 @@ export default class APIZKProvider extends APIProvider {
   };
 
   getPairs = () => {
-    return Object.keys(this.lastPrices);
+    return Object.keys(this.lastPrices[this.network]);
   };
 
   getCurrencyInfo(currency) {

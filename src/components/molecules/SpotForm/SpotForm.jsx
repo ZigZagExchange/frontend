@@ -82,7 +82,7 @@ class SpotForm extends React.Component {
       newState.quoteAmount = "";
     } else {
       const price = this.currentPrice();
-      if (price) {
+      if (price && newState.baseAmount) {
         newState.quoteAmount = price * newState.baseAmount;
       } else {
         newState.quoteAmount = "";
@@ -105,7 +105,7 @@ class SpotForm extends React.Component {
       newState.baseAmount = "";
     } else {
       const price = this.currentPrice();
-      if (price) {
+      if (price && newState.quoteAmount) {
         newState.baseAmount = newState.quoteAmount / price;
       } else {
         newState.baseAmount = "";
@@ -219,6 +219,7 @@ class SpotForm extends React.Component {
 
     Object.keys(this.props.userOrders).forEach((orderId) => {
       const order = this.props.userOrders[orderId];
+      if (['c', 'e', 'r', 'f'].includes(order[9])) return;
       if (
         (order[3] === "s" && order[2].split("-")[0] === marketInfo.baseAsset.symbol) ||
         (order[3] === "b" && order[2].split("-")[1] === marketInfo.baseAsset.symbol)
@@ -247,6 +248,7 @@ class SpotForm extends React.Component {
 
     Object.keys(this.props.userOrders).forEach((orderId) => {
       const order = this.props.userOrders[orderId];
+      if (['c', 'e', 'r', 'f'].includes(order[9])) return;
       if (
         (order[3] === "b" && order[2].split("-")[1] === marketInfo.quoteAsset.symbol) ||
         (order[3] === "s" && order[2].split("-")[0] === marketInfo.quoteAsset.symbol)
@@ -397,6 +399,11 @@ class SpotForm extends React.Component {
 
   async approveHandler(e) {
     e.preventDefault();
+    if (!api.isEVMChain) {
+      console.error("Approve only on EVM chains");
+      return;
+    }
+    
     const marketInfo = this.props.marketInfo;
     const token =
       this.props.side === "s"
@@ -916,7 +923,7 @@ class SpotForm extends React.Component {
       buttonType = "BUY";
       if (quoteAmount > quoteAllowance) {
         buttonText = `Approve ${marketInfo && marketInfo.quoteAsset?.symbol}`;
-        approveNeeded = true;
+        if (api.isEVMChain) approveNeeded = true;
       } else {
         buttonText = `BUY ${marketInfo && marketInfo.baseAsset?.symbol}`;
       }
@@ -948,7 +955,7 @@ class SpotForm extends React.Component {
       buttonType = "SELL";
       if (baseAmount > baseAllowance) {
         buttonText = `Approve ${marketInfo && marketInfo.baseAsset?.symbol}`;
-        approveNeeded = true;
+        if (api.isEVMChain) approveNeeded = true;
       } else {
         buttonText = `SELL ${marketInfo && marketInfo.baseAsset?.symbol}`;
       }

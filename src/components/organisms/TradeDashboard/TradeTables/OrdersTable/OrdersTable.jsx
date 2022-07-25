@@ -190,10 +190,10 @@ export default function OrdersTable(props) {
 
   const filterSmallBalances = (currency) => {
     const balance = wallet[currency].valueReadable;
-    const usd_balance =
-      coinEstimator(currency) * wallet[currency].valueReadable;
+    const usdPrice = coinEstimator(currency);
+    const usd_balance = usdPrice * wallet[currency].valueReadable;
 
-    if (usd_balance < 0.02) return false;
+    if (usd_balance < 0.02 && Number(usdPrice) !== 0) return false;
 
     if (balance) {
       return Number(balance) > 0;
@@ -361,7 +361,7 @@ export default function OrdersTable(props) {
                 break;
               case "m":
                 statusText = (
-                  <span>
+                  <span className="flex items-center gap-1">
                     Matched{" "}
                     <img
                       className="loading-gif"
@@ -703,7 +703,7 @@ export default function OrdersTable(props) {
                 break;
               case "m":
                 statusText = (
-                  <span>
+                  <span className="flex items-center gap-1">
                     Matched{" "}
                     <img
                       className="loading-gif"
@@ -891,7 +891,7 @@ export default function OrdersTable(props) {
                 break;
               case "m":
                 statusText = (
-                  <span>
+                  <span className="flex items-center gap-1">
                     Matched{" "}
                     <img
                       className="loading-gif"
@@ -1278,7 +1278,7 @@ export default function OrdersTable(props) {
                 break;
               case "m":
                 statusText = (
-                  <span>
+                  <span className="flex items-center gap-1">
                     Matched{" "}
                     <img
                       className="loading-gif"
@@ -1427,6 +1427,8 @@ export default function OrdersTable(props) {
         if (userOrders.length > 0) {
           userOrders.forEach((order) => {
             if (order.length === 0) return;
+            if (["c", "e", "r", "f"].includes(order[9])) return;
+
             let sellToken, amount;
             if (order[3] === "s") {
               sellToken = order[2].split("-")[0];

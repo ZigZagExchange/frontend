@@ -266,23 +266,28 @@ export const apiSlice = createSlice({
       };
     },
     _lastprice(state, { payload }) {
+      const chainId = payload[1];
+      if (chainId != state.network) return;
       payload[0].forEach((update) => {
         const market = update[0];
         const price = update[1];
         const change = update[2];
 
         if (!price || Number.isNaN(price)) return;
-        state.lastPrices[market] = {
+
+        if (!state.lastPrices[chainId]) state.lastPrices[chainId] = {};
+
+        state.lastPrices[chainId][market] = {
           price: update[1],
           change: update[2],
-          quoteVolume: state.lastPrices[market]
-            ? state.lastPrices[market].quoteVolume
+          quoteVolume: state.lastPrices[chainId][market]
+            ? state.lastPrices[chainId][market].quoteVolume
             : 0,
         };
         // Sometimes lastprice doesn't have volume data
         // Keep the old data if it doesn't
         if (update[3]) {
-          state.lastPrices[market].quoteVolume = update[3];
+          state.lastPrices[chainId][market].quoteVolume = update[3];
         }
         if (update[0] === state.currentMarket) {
           state.marketSummary.price = price;
@@ -591,9 +596,6 @@ export const apiSlice = createSlice({
       state.userOrders = {};
       state.userFills = {};
     },
-    clearLastPrices(state) {
-      state.lastPrices = {};
-    },
     setArweaveAllocation(state, { payload }) {
       state.arweaveAllocation = payload;
     },
@@ -650,7 +652,6 @@ export const {
   setCurrentMarket,
   resetData,
   clearUserOrders,
-  clearLastPrices,
   setArweaveAllocation,
   setConnecting,
   setBridgeConnecting,
