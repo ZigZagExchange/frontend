@@ -82,7 +82,7 @@ class SpotForm extends React.Component {
       newState.quoteAmount = "";
     } else {
       const price = this.currentPrice();
-      if (price) {
+      if (price && newState.baseAmount) {
         newState.quoteAmount = price * newState.baseAmount;
       } else {
         newState.quoteAmount = "";
@@ -105,7 +105,7 @@ class SpotForm extends React.Component {
       newState.baseAmount = "";
     } else {
       const price = this.currentPrice();
-      if (price) {
+      if (price && newState.quoteAmount) {
         newState.baseAmount = newState.quoteAmount / price;
       } else {
         newState.baseAmount = "";
@@ -219,10 +219,12 @@ class SpotForm extends React.Component {
 
     Object.keys(this.props.userOrders).forEach((orderId) => {
       const order = this.props.userOrders[orderId];
-      const sellToken =
-        order[3] === "s" ? order[2].split("-")[0] : order[2].split("-")[1];
-      if (sellToken === marketInfo.baseAsset.symbol) {
-        totalBalance -= order[10]; // remove remaining order size
+      if (['c', 'e', 'r', 'f'].includes(order[9])) return;
+      if (
+        (order[3] === "s" && order[2].split("-")[0] === marketInfo.baseAsset.symbol) ||
+        (order[3] === "b" && order[2].split("-")[1] === marketInfo.baseAsset.symbol)
+      ) {
+        totalBalance -= order[10];
       }
     });
 
@@ -246,10 +248,12 @@ class SpotForm extends React.Component {
 
     Object.keys(this.props.userOrders).forEach((orderId) => {
       const order = this.props.userOrders[orderId];
-      const sellToken =
-        order[3] === "s" ? order[2].split("-")[0] : order[2].split("-")[1];
-      if (sellToken === marketInfo.quoteAsset.symbol) {
-        totalBalance -= order[4] * order[10]; // remove remaining order size
+      if (['c', 'e', 'r', 'f'].includes(order[9])) return;
+      if (
+        (order[3] === "b" && order[2].split("-")[1] === marketInfo.quoteAsset.symbol) ||
+        (order[3] === "s" && order[2].split("-")[0] === marketInfo.quoteAsset.symbol)
+      ) {
+        totalBalance -= order[4] * order[10];
       }
     });
 
@@ -346,46 +350,30 @@ class SpotForm extends React.Component {
   }
 
   getLadderPrice() {
-    const orderbookAsks = [];
-    const orderbookBids = [];
-    let baseAmount = this.state.baseAmount;
-    const side = this.props.side;
+    let baseAmount = Number(this.state.baseAmount);
+    const side = this.props.side;    
     if (!baseAmount) baseAmount = 0;
-
-    for (let orderid in this.props.allOrders) {
-      const order = this.props.allOrders[orderid];
-      const side = order[3];
-      const price = order[4];
-      const remaining = isNaN(Number(order[10])) ? order[5] : order[10];
-      const orderStatus = order[9];
-
-      const orderEntry = [price, remaining];
-
-      if (side === "b" && ["o", "pm", "pf"].includes(orderStatus)) {
-        orderbookBids.push(orderEntry);
-      } else if (side === "s" && ["o", "pm", "pf"].includes(orderStatus)) {
-        orderbookAsks.push(orderEntry);
-      }
-    }
 
     let price;
     let unfilled = baseAmount;
-    if (side === "b" && orderbookAsks) {
-      for (let i = orderbookAsks.length - 1; i >= 0; i--) {
-        if (orderbookAsks[i][1] >= unfilled || i === 0) {
-          price = orderbookAsks[i][0];
+    if (side === "b" && this.props.askBins) {
+      for (let i = this.props.askBins.length - 1; i >= 0; i--) {
+        const amount = Number(this.props.askBins[i].td2);
+        if (amount >= unfilled || i === 0) {
+          price = this.props.askBins[i].td1;
           break;
         } else {
-          unfilled -= orderbookAsks[i][1];
+          unfilled -= amount;
         }
       }
-    } else if (side === "s" && orderbookBids) {
-      for (let i = orderbookBids.length - 1; i >= 0; i--) {
-        if (orderbookBids[i][1] >= unfilled || i === 0) {
-          price = orderbookBids[i][0];
+    } else if (side === "s" && this.props.bidBins) {
+      for (let i = 0; i <= this.props.bidBins.length; i++) {
+        const amount = Number(this.props.bidBins[i].td2);
+        if (amount >= unfilled || i < this.props.bidBins.length) {
+          price = this.props.bidBins[i].td1;
           break;
         } else {
-          unfilled -= orderbookBids[i][1];
+          unfilled -= amount;
         }
       }
     }
@@ -395,6 +383,11 @@ class SpotForm extends React.Component {
 
   async approveHandler(e) {
     e.preventDefault();
+    if (!api.isEVMChain) {
+      console.error("Approve only on EVM chains");
+      return;
+    }
+    
     const marketInfo = this.props.marketInfo;
     const token =
       this.props.side === "s"
@@ -914,7 +907,7 @@ class SpotForm extends React.Component {
       buttonType = "BUY";
       if (quoteAmount > quoteAllowance) {
         buttonText = `Approve ${marketInfo && marketInfo.quoteAsset?.symbol}`;
-        approveNeeded = true;
+        if (api.isEVMChain) approveNeeded = true;
       } else {
         buttonText = `BUY ${marketInfo && marketInfo.baseAsset?.symbol}`;
       }
@@ -946,7 +939,7 @@ class SpotForm extends React.Component {
       buttonType = "SELL";
       if (baseAmount > baseAllowance) {
         buttonText = `Approve ${marketInfo && marketInfo.baseAsset?.symbol}`;
-        approveNeeded = true;
+        if (api.isEVMChain) approveNeeded = true;
       } else {
         buttonText = `SELL ${marketInfo && marketInfo.baseAsset?.symbol}`;
       }

@@ -37,7 +37,7 @@ export const apiSlice = createSlice({
     bridgeReceipts: [],
     lastPrices: {},
     marketSummary: {},
-    marketinfo: null,
+    marketinfos: {},
     balances: {},
     liquidity: [],
     userOrders: {},
@@ -53,7 +53,7 @@ export const apiSlice = createSlice({
       confirmed: "",
       delta: 0,
       type: "sell",
-      marketInfo: " ",
+      marketinfos: " ",
       xToken: 0,
       yToken: 0,
       userPrice: 0,
@@ -115,8 +115,16 @@ export const apiSlice = createSlice({
       if (payload[0].error) {
         console.error(payload[0]);
       } else {
-        state.marketinfo = payload[0];
+        const marketinfos = payload[0];
+        if (!marketinfos) return;
+        state.marketinfos[marketinfos.alias] = marketinfos;
       }
+    },
+    _marketinfo2(state, {payload}) {
+      payload[0].forEach((marketinfos) => {
+        if (!marketinfos) return;
+        state.marketinfos[marketinfos.alias] = marketinfos;
+      });
     },
     _fills(state, { payload }) {
       payload[0].forEach((fill) => {
@@ -272,23 +280,28 @@ export const apiSlice = createSlice({
       };
     },
     _lastprice(state, { payload }) {
+      const chainId = payload[1];
+      if (chainId != state.network) return;
       payload[0].forEach((update) => {
         const market = update[0];
         const price = update[1];
         const change = update[2];
 
         if (!price || Number.isNaN(price)) return;
-        state.lastPrices[market] = {
+
+        if (!state.lastPrices[chainId]) state.lastPrices[chainId] = {};
+
+        state.lastPrices[chainId][market] = {
           price: update[1],
           change: update[2],
-          quoteVolume: state.lastPrices[market]
-            ? state.lastPrices[market].quoteVolume
+          quoteVolume: state.lastPrices[chainId][market]
+            ? state.lastPrices[chainId][market].quoteVolume
             : 0,
         };
         // Sometimes lastprice doesn't have volume data
         // Keep the old data if it doesn't
         if (update[3]) {
-          state.lastPrices[market].quoteVolume = update[3];
+          state.lastPrices[chainId][market].quoteVolume = update[3];
         }
         if (update[0] === state.currentMarket) {
           state.marketSummary.price = price;
@@ -587,7 +600,7 @@ export const apiSlice = createSlice({
       state.bridgeReceipts.unshift(payload);
     },
     resetData(state) {
-      state.marketinfo = null;
+      state.marketinfos = {};
       state.marketFills = {};
       state.marketSummary = {};
       state.orders = {};
@@ -596,9 +609,6 @@ export const apiSlice = createSlice({
     clearUserOrders(state) {
       state.userOrders = {};
       state.userFills = {};
-    },
-    clearLastPrices(state) {
-      state.lastPrices = {};
     },
     setArweaveAllocation(state, { payload }) {
       state.arweaveAllocation = payload;
@@ -618,9 +628,9 @@ export const apiSlice = createSlice({
         confirmed: payload.confirmed ? payload.confirmed : false,
         delta: payload.delta ? payload.delta : state.highSlippageModal.delta,
         type: payload.type ? payload.type : state.highSlippageModal.type,
-        marketInfo: payload.marketInfo
-          ? payload.marketInfo
-          : state.highSlippageModal.marketInfo,
+        marketinfos: payload.marketinfos
+          ? payload.marketinfos
+          : state.highSlippageModal.marketinfos,
         xToken: payload.xToken
           ? payload.xToken
           : state.highSlippageModal.xToken,
@@ -667,7 +677,6 @@ export const {
   setCurrentMarket,
   resetData,
   clearUserOrders,
-  clearLastPrices,
   setArweaveAllocation,
   setConnecting,
   setBridgeConnecting,
@@ -689,7 +698,7 @@ export const marketSummarySelector = (state) => state.api.marketSummary;
 export const liquiditySelector = (state) => state.api.liquidity;
 export const currentMarketSelector = (state) => state.api.currentMarket;
 export const bridgeReceiptsSelector = (state) => state.api.bridgeReceipts;
-export const marketInfoSelector = (state) => state.api.marketinfo;
+export const marketInfosSelector = (state) => state.api.marketinfos;
 export const arweaveAllocationSelector = (state) => state.api.arweaveAllocation;
 export const isConnectingSelector = (state) => state.api.isConnecting;
 export const isBridgeConnectingSelector = (state) =>

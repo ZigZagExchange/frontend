@@ -20,7 +20,8 @@ const SpotBox = ({
   activeOrderCount,
   liquidity,
   marketSummary,
-  allOrders,
+  askBins,
+  bidBins,
   userOrders,
   balances,
 }) => {
@@ -51,7 +52,8 @@ const SpotBox = ({
       marketInfo={marketInfo}
       marketSummary={marketSummary}
       settings={settings}
-      allOrders={allOrders}
+      askBins={askBins}
+      bidBins={bidBins}
       userOrders={userOrders}
       balances={balances}
       network={network}
@@ -70,7 +72,9 @@ const SpotBox = ({
       marketInfo={marketInfo}
       marketSummary={marketSummary}
       settings={settings}
-      allOrders={allOrders}
+      askBins={askBins}
+      bidBins={bidBins}
+      userOrders={userOrders}
       balances={balances}
       network={network}
     />

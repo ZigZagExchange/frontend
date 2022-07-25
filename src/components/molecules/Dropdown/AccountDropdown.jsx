@@ -194,11 +194,11 @@ const AccountDropdown = ({ notext, networkName }) => {
 
   const filterSmallBalances = (currency) => {
     const balance = wallet[currency].valueReadable;
-    const usd_balance =
-      coinEstimator(currency) * wallet[currency].valueReadable;
+    const usdPrice = coinEstimator(currency);
+    const usd_balance = usdPrice * wallet[currency].valueReadable;
 
     //filter out small balances L2 below 2cents
-    if (selectedLayer !== 1) {
+    if (selectedLayer !== 1 && Number(usdPrice) !== 0) {
       if (usd_balance < 0.02) return false;
     }
 
