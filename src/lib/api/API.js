@@ -40,6 +40,7 @@ export default class API extends Emitter {
   _profiles = {};
   _pendingOrders = [];
   _pendingFills = [];
+  serverDelta = 0;
 
   constructor({ infuraId, networks, currencies, validMarkets }) {
     super();
@@ -341,6 +342,26 @@ export default class API extends Emitter {
     console.warn("Zigzag websocket connection failed");
   };
 
+  calculateServerDelta = async () => {
+    const url = (this.apiProvider.websocketUrl).replace('wss','https');
+    let serverTime, res;
+    try {
+      res = await axios.get(`${url}/api/v1/time`);
+      serverTime = res.data.serverTimestamp;
+    } catch (e) {
+      console.log(e);
+      console.log(res);
+      serverTime = Date.now();
+    }
+    const clientTime = Date.now();
+    this.serverDelta = serverTime - clientTime;
+    if (this.serverDelta < -5000 || this.serverDelta > 5000) {
+      console.warn(`Your PC clock is not synced (delta: ${
+        this.serverDelta / 60000
+        } min). Please sync it via settings > date/time > sync now`);
+    }
+  }
+
   start = () => {
     if (this.ws) this.stop();
     this.ws = new WebSocket(this.apiProvider.websocketUrl);
@@ -358,6 +379,8 @@ export default class API extends Emitter {
         accountState.id && accountState.id.toString(),
       ]);
     }
+
+    if(!this.serverDelta) this.calculateServerDelta();    
   };
 
   stop = () => {
@@ -899,7 +922,7 @@ export default class API extends Emitter {
       side,
       baseAmountBN,
       quoteAmountBN,
-      expirationTimeSeconds
+      (expirationTimeSeconds + this.serverDelta)
     );
   };
 
