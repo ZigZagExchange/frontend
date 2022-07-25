@@ -275,6 +275,10 @@ export function TradeDashboard() {
       <TradeMarketSelector
         updateMarketChain={updateMarketChain}
         currentMarket={currentMarket}
+        network={network}
+        marketInfo={marketInfos?.[currentMarket]}
+        marketSummary={marketSummary}
+        lastPrices={lastPrices?.[network]}
       />
       <GridLayoutRow
         rowHeight={(window.innerHeight - 112) / 30}
