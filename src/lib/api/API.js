@@ -263,11 +263,11 @@ export default class API extends Emitter {
     }
     if (msg.op === "lastprice") {
       const lastPricesUpdate = msg.args[0];
-      lastPricesUpdate.forEach((l) => (this.lastPrices[l[0]] = l));
-      const noInfoPairs = lastPricesUpdate
-        .map((l) => l[0])
-        .filter((pair) => !this.marketInfo[pair]);
-      this.cacheMarketInfoFromNetwork(noInfoPairs);
+      const chainId = msg.args[1];
+      lastPricesUpdate.forEach((l) => {
+        if (!this.lastPrices[chainId]) this.lastPrices[chainId] = {};
+        this.lastPrices[chainId][l[0]] = l
+      });
     }
   };
 
@@ -451,7 +451,6 @@ export default class API extends Emitter {
     else window.localStorage.removeItem("walletconnect");
 
     this.marketInfo = {};
-    this.lastPrices = {};
     this.balances = {};
     this._profiles = {};
     this._pendingOrders = [];
@@ -993,7 +992,7 @@ export default class API extends Emitter {
     }
   }
 
-  // marketinfo calls can get expesnive so it's good to cache them
+  /*
   cacheMarketInfoFromNetwork = async (pairs) => {
     if (pairs.length === 0) return;
     if (!this.apiProvider.network) return;
@@ -1007,6 +1006,7 @@ export default class API extends Emitter {
     marketInfoArray.forEach((info) => (this.marketInfo[info.alias] = info));
     return;
   };
+  */
 
   get fastWithdrawTokenAddresses() {
     if (this.apiProvider.network === 1) {
@@ -1111,8 +1111,9 @@ export default class API extends Emitter {
     }
   };
 
-  getPairs = () => {
-    return Object.keys(this.lastPrices);
+  getPairs = (chainId = this.apiProvider.network) => {
+    if (!this.lastPrices[chainId]) return [];
+    return Object.keys(this.lastPrices[chainId]);
   };
 
   getCurrencyInfo = (currency) => {
@@ -1130,11 +1131,11 @@ export default class API extends Emitter {
     return null;
   };
 
-  getCurrencies = () => {
+  getCurrencies = (chainId = this.apiProvider.network) => {
     const tickers = new Set();
-    for (let market in this.lastPrices) {
-      tickers.add(this.lastPrices[market][0].split("-")[0]);
-      tickers.add(this.lastPrices[market][0].split("-")[1]);
+    for (let market in this.lastPrices[chainId]) {
+      tickers.add(this.lastPrices[chainId][market][0].split("-")[0]);
+      tickers.add(this.lastPrices[chainId][market][0].split("-")[1]);
     }
     return [...tickers];
   };

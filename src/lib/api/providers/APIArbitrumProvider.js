@@ -18,21 +18,22 @@ export default class APIArbitrumProvider extends APIProvider {
 
   getBalances = async () => {
     const balances = {};
-    if (!this.accountState.address) return balances;
+    if (!this.accountState?.address) return balances;
 
-    // allways get ETH - generate token list
-    const tokens = ["ETH"].concat(this.api.getCurrencies());
-    const tokenInfoList = [{ decimals: 18 }];
-    const tokenList = [ethers.constants.AddressZero];
-
-    for (let i = 1; i < tokens.length; i++) {
-      const token = tokens[i];
+    // generate token list
+    const tokenInfoList = [];
+    const tokenList = [];
+    this.api.getCurrencies().forEach((token) => {
       const tokenInfo = this.api.getCurrencyInfo(token);
-      if (!tokenInfo || !tokenInfo.address) continue;
+      if (!tokenInfo || !tokenInfo.address) return;
 
       tokenInfoList.push(tokenInfo);
       tokenList.push(tokenInfo.address);
-    }
+    })
+
+    // allways get ETH
+    tokenInfoList.push({ decimals: 18, symbol: 'ETH' });
+    tokenList.push(ethers.constants.AddressZero);
 
     // get token balance
     const erc20Contract = new ethers.Contract(
@@ -47,33 +48,41 @@ export default class APIArbitrumProvider extends APIProvider {
     const exchangeAddress = this.getExchangeAddress();
 
     // generate object
-    for (let i = 0; i < tokens.length; i++) {
-      const balanceBN = balanceList[i];
+    for (let i = 0; i < tokenInfoList.length; i++) {
+      let balanceBN = balanceList[i];
       const currencyInfo = tokenInfoList[i];
 
-      const allowanceBN =
-        tokens[i] === "ETH"
-          ? ethers.constants.MaxUint256
-          : await this.getAllowance(currencyInfo.address, exchangeAddress); // TODO replace
+      let allowanceBN = ethers.BigNumber.from(0);
+      if (currencyInfo.symbol === "ETH") {
+        allowanceBN = ethers.constants.MaxUint256;
+      } else if (
+        currencyInfo &&
+        exchangeAddress &&
+        balanceBN.toNumber() > 0
+      ) {
+        allowanceBN = await this.getAllowance(currencyInfo.address, exchangeAddress); // TODO replace
+      }
+      balanceBN = balanceBN.toFixed(currencyInfo.decimals)
+      allowanceBN = allowanceBN.toFixed(currencyInfo.decimals);
       const valueReadable =
         balanceBN && currencyInfo
           ? ethers.utils.formatUnits(
-              balanceBN.toString(),
+              balanceBN,
               currencyInfo.decimals
             )
           : 0;
       const allowanceReadable =
         allowanceBN && currencyInfo
           ? ethers.utils.formatUnits(
-              allowanceBN.toString(),
+              allowanceBN,
               currencyInfo.decimals
             )
           : 0;
 
-      balances[tokens[i]] = {
-        value: balanceBN.toString(),
+      balances[currencyInfo.symbol] = {
+        value: balanceBN,
         valueReadable,
-        allowance: allowanceBN.toString(),
+        allowance: allowanceBN,
         allowanceReadable,
       };
     }
@@ -82,8 +91,7 @@ export default class APIArbitrumProvider extends APIProvider {
   };
 
   getAllowance = async (tokenAddress, contractAddress) => {
-    if (!this.accountState.address || !contractAddress) return 0;
-
+    if (!this.accountState.address || !contractAddress || !tokenAddress) return 0;
     const erc20Contract = new ethers.Contract(
       tokenAddress,
       erc20ContractABI,
@@ -306,6 +314,6 @@ export default class APIArbitrumProvider extends APIProvider {
 
   getExchangeAddress = () => {
     const marketInfoArray = Object.values(this.api.marketInfo);
-    return marketInfoArray[0].exchangeAddress;
+    return marketInfoArray[0]?.exchangeAddress;
   };
 }

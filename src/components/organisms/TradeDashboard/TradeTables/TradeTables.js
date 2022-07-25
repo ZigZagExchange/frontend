@@ -25,6 +25,8 @@ export default function TradeTables(props) {
         userFills={props.userFills}
         userOrders={props.userOrders}
         user={props.user}
+        settings={props.settings}
+        network={props.network}
       />
     </StyledTradeTables>
   );

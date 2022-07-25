@@ -10,8 +10,6 @@ import loadingGif from "assets/icons/loading.svg";
 import FillCard from "./FillCard";
 import {
   balancesSelector,
-  networkSelector,
-  settingsSelector,
 } from "lib/store/features/api/apiSlice";
 import api from "lib/api";
 import { formatDate, formatDateTime, formatToken, addComma } from "lib/utils";
@@ -50,9 +48,7 @@ const TableHeaderWrapper = styled.div`
 `;
 
 export default function OrdersTable(props) {
-  const network = useSelector(networkSelector);
   const balanceData = useSelector(balancesSelector);
-  const settings = useSelector(settingsSelector);
   const coinEstimator = useCoinEstimator();
   const [tab, setTabIndex] = useState(0);
   const [selectedSide, setSelectedSide] = useState("All");
@@ -74,7 +70,7 @@ export default function OrdersTable(props) {
   ]);
   const isMobile = window.innerWidth < 1064;
 
-  const wallet = balanceData[network];
+  const wallet = balanceData[props.network];
 
   useEffect(() => {
     let walletArray = [];
@@ -190,10 +186,10 @@ export default function OrdersTable(props) {
 
   const filterSmallBalances = (currency) => {
     const balance = wallet[currency].valueReadable;
-    const usd_balance =
-      coinEstimator(currency) * wallet[currency].valueReadable;
+    const usdPrice = coinEstimator(currency);
+    const usd_balance = usdPrice * wallet[currency].valueReadable;
 
-    if (usd_balance < 0.02) return false;
+    if (usd_balance < 0.02 && Number(usdPrice) !== 0) return false;
 
     if (balance) {
       return Number(balance) > 0;
@@ -272,7 +268,7 @@ export default function OrdersTable(props) {
     try {
       await api.cancelOrder(orderId);
 
-      if (!settings.disableOrderNotification) {
+      if (!props.settings?.disableOrderNotification) {
         toast.info("Order cancelled", {
           toastId: "Order cancelled.",
         });
@@ -361,7 +357,7 @@ export default function OrdersTable(props) {
                 break;
               case "m":
                 statusText = (
-                  <span>
+                  <span className="flex items-center gap-1">
                     Matched{" "}
                     <img
                       className="loading-gif"
@@ -631,7 +627,7 @@ export default function OrdersTable(props) {
                 </Text>
               </HeaderWrapper>
             </th>
-            {isOpenStatus(getUserOrders()) && !settings.showCancelOrders && (
+            {isOpenStatus(getUserOrders()) && !props.settings?.showCancelOrders && (
               <th className="w-36">
                 <StyledButton
                   variant="outlined"
@@ -703,7 +699,7 @@ export default function OrdersTable(props) {
                 break;
               case "m":
                 statusText = (
-                  <span>
+                  <span className="flex items-center gap-1">
                     Matched{" "}
                     <img
                       className="loading-gif"
@@ -817,7 +813,7 @@ export default function OrdersTable(props) {
                     )}
                   </td>
                   {isOpenStatus(getUserOrders()) &&
-                    !settings.showCancelOrders && <td className="w-36"></td>}
+                    !props.settings?.showCancelOrders && <td className="w-36"></td>}
                 </tr>
               </>
             );
@@ -891,7 +887,7 @@ export default function OrdersTable(props) {
                 break;
               case "m":
                 statusText = (
-                  <span>
+                  <span className="flex items-center gap-1">
                     Matched{" "}
                     <img
                       className="loading-gif"
@@ -1278,7 +1274,7 @@ export default function OrdersTable(props) {
                 break;
               case "m":
                 statusText = (
-                  <span>
+                  <span className="flex items-center gap-1">
                     Matched{" "}
                     <img
                       className="loading-gif"
@@ -1427,6 +1423,8 @@ export default function OrdersTable(props) {
         if (userOrders.length > 0) {
           userOrders.forEach((order) => {
             if (order.length === 0) return;
+            if (["c", "e", "r", "f"].includes(order[9])) return;
+
             let sellToken, amount;
             if (order[3] === "s") {
               sellToken = order[2].split("-")[0];
@@ -1442,11 +1440,11 @@ export default function OrdersTable(props) {
             }
           });
         }
-        
+
         const balancesContent = walletList.map((token) => {
           return (
             <tr>
-              <td data-label="Token" style={{width: '80px', paddingRight: 0}}>
+              <td data-label="Token" style={{ width: "80px", paddingRight: 0 }}>
                 <Text
                   font="primaryExtraSmallSemiBold"
                   color="foregroundHighEmphasis"
@@ -1459,7 +1457,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundHighEmphasis"
                 >
-                  {settings.hideBalance
+                  {props.settings?.hideBalance
                     ? "****.****"
                     : formatToken(token.valueReadable, token.token)}
                 </Text>
@@ -1469,7 +1467,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundHighEmphasis"
                 >
-                  {settings.hideBalance
+                  {props.settings?.hideBalance
                     ? "****.****"
                     : formatToken(
                         token.valueReadable -
@@ -1485,7 +1483,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundHighEmphasis"
                 >
-                  {settings.hideBalance
+                  {props.settings?.hideBalance
                     ? "****.****"
                     : formatToken(
                         token.valueReadable * coinEstimator(token.token)
@@ -1502,7 +1500,7 @@ export default function OrdersTable(props) {
                 <tr>
                   <th
                     scope="col"
-                    style={{ cursor: "pointer", width: '80px' }}
+                    style={{ cursor: "pointer", width: "80px" }}
                     onClick={() => {
                       sortByToken();
                     }}
@@ -1695,8 +1693,7 @@ export default function OrdersTable(props) {
 
 const CustomTable = styled.table`
   min-width: 600px;
-  @media screen and (max-width: 600px){
+  @media screen and (max-width: 600px) {
     min-width: 510px;
   }
-
-`
+`;

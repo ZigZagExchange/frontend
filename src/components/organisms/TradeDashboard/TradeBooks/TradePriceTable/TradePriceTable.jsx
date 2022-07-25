@@ -1,12 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
 import styled from "styled-components";
 import useTheme from "components/hooks/useTheme";
-import {
-  marketInfoSelector,
-  settingsSelector,
-} from "lib/store/features/api/apiSlice";
-import { numStringToSymbol, addComma, formatMillonAmount } from "lib/utils";
+import { numStringToSymbol, addComma } from "lib/utils";
 import Text from "components/atoms/Text/Text";
 
 const Table = styled.table`
@@ -100,16 +95,9 @@ const Table = styled.table`
     background: ${({ theme }) => theme.colors.foreground400};
   }
 `;
-const Divider = styled.div`
-  height: 1px;
-  background: ${({ theme }) => theme.colors.foreground400};
-  margin-top: 20px;
-`;
 
 const TradePriceTable = (props) => {
   const { theme } = useTheme();
-  const marketInfo = useSelector(marketInfoSelector);
-  const settings = useSelector(settingsSelector);
   const ref = useRef(null);
   const [isUpdateScroll, setUpdateScroll] = useState(false);
   const isMobile = window.innerWidth < 500;
@@ -126,16 +114,18 @@ const TradePriceTable = (props) => {
     }
   }, [props.priceTableData.length]);
 
-  let total_total = 0;
+  let total_total = 0, total_step = 0;
   props.priceTableData.map((d) => (total_total += d.td2));
-  let total_step = props.className === "trade_table_asks" ? total_total : 0;
+  if (props.priceTableData.length > 0 && props.priceTableData[0].side === "s") {
+    total_step = total_total;
+  }
 
   let onClickRow;
   if (props.onClickRow) onClickRow = props.onClickRow;
   else onClickRow = () => null;
 
   return (
-    <Table ref={ref} className={props.adClass} isLeft={settings.stackOrderbook}>
+    <Table ref={ref} className={props.adClass} isLeft={props.settings?.stackOrderbook}>
       {props.head && (
         <thead>
           <tr>
@@ -160,7 +150,7 @@ const TradePriceTable = (props) => {
                   color="foregroundLowEmphasis"
                   textAlign="right"
                 >
-                  Total({marketInfo && marketInfo.quoteAsset.symbol})
+                  Total({props.marketInfo && props.marketInfo.quoteAsset.symbol})
                 </Text>
               </th>
             )}
@@ -171,23 +161,25 @@ const TradePriceTable = (props) => {
         {props.priceTableData.map((d, i) => {
           const color =
             d.side === "b" ? theme.colors.success400 : theme.colors.danger400;
-          if (props.className !== "trade_table_asks") {
-            total_step += d.td2;
-          }
-
-          const breakpoint = Math.round((total_step / total_total) * 100);
+          
           let rowStyle;
           if (props.useGradient) {
-            let dir;
-            if (
-              (d.side === "b" && !settings.stackOrderbook) ||
-              (d.side !== "b" && settings.stackOrderbook)
-            )
-              dir = "to left";
-            else dir = "to right";
+            if (d.side === "b") {
+              total_step += d.td2;
+            }
+            const breakpoint = Math.round((total_step / total_total) * 100);
+            if (d.side === "s") {
+              total_step -= d.td2;
+            }
+            
             rowStyle = {
-              background: `linear-gradient(${dir}, ${color}, ${color} ${breakpoint}%, ${theme.colors.backgroundHighEmphasis} 0%)`,
+              background: `linear-gradient(to right, ${color}, ${color} ${breakpoint}%, ${theme.colors.backgroundHighEmphasis} 0%)`,
             };
+            
+            // reduce after, next one needs to be this percentage
+            if (props.className === "trade_table_asks") {
+              total_step -= d.td2;
+            }
           } else {
             rowStyle = {};
           }
@@ -198,10 +190,6 @@ const TradePriceTable = (props) => {
           const total =
             typeof d.td3 === "number" ? d.td3.toPrecision(6) : d.td3;
 
-          // reduce after, net one needs to be this percentage
-          if (props.className === "trade_table_asks") {
-            total_step -= d.td2;
-          }
           return (
             <tr key={i} style={rowStyle} onClick={() => onClickRow(d)}>
               <td>
