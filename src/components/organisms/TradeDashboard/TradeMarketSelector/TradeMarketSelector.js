@@ -13,7 +13,6 @@ export default function TradeMarketSelector(props) {
   const markets = [];
 
   if (props.lastPrices) {
-    console.log(props.lastPrices)
     Object.keys(props.lastPrices).forEach((market) => {
       markets.push(market);
       const price = props.lastPrices[market].price;

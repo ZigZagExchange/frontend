@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import styled from "@xstyled/styled-components";
 import TradePriceTable from "./TradePriceTable/TradePriceTable";
 import TradePriceHeadSecond from "./TradePriceHeadSecond/TradePriceHeadSecond";

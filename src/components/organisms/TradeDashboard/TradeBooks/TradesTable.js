@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
 import styled from "@xstyled/styled-components";
-import { currentMarketSelector } from "lib/store/features/api/apiSlice";
 import OrdersBook from "./OrdersBook";
 import TradesBook from "./TradesBook";
 
@@ -13,8 +11,7 @@ const TradesTableWrapper = styled.div`
   border-bottom: 1px solid ${({ theme }) => theme.colors.foreground400};
 `;
 
-export default function TradesTable() {
-  const currentMarket = useSelector(currentMarketSelector);
+export default function TradesTable(props) {
   const [fixedPoint, setFixedPoint] = useState(2);
   const [side, setSide] = useState("all");
 
@@ -30,12 +27,18 @@ export default function TradesTable() {
     <>
       <TradesTableWrapper>
         <OrdersBook
-          currentMarket={currentMarket}
+          currentMarket={props.currentMarket}
           changeFixedPoint={changeFixedPoint}
           changeSide={changeSide}
+          marketInfo={props.marketInfo}
+          marketSummary={props.marketSummary}
+          settings={props.settings}
+          lastPrice={props.lastPrice}
+          askBins={props.askBins}
+          bidBins={props.bidBins}
         />
         <TradesBook
-          currentMarket={currentMarket}
+          currentMarket={props.currentMarket}
           fixedPoint={fixedPoint}
           side={side}
         />

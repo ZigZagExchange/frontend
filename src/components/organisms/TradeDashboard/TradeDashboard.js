@@ -345,7 +345,17 @@ export function TradeDashboard() {
             />
           </>
         ) : (
-          <TradesTable />
+          <TradesTable 
+            currentMarket={currentMarket}
+            changeFixedPoint={changeFixedPoint}
+            changeSide={changeSide}
+            marketInfo={marketInfos?.[currentMarket]}
+            marketSummary={marketSummary}
+            settings={settings}
+            lastPrice={currentPairLastPrice}
+            askBins={askBins}
+            bidBins={bidBins}
+          />
         )}
         {/* TradeChartArea */}
         <TradeChartArea marketInfo={marketInfos?.[currentMarket]} />
@@ -354,6 +364,8 @@ export function TradeDashboard() {
           userFills={userFills}
           userOrders={userOrders}
           user={user}
+          settings={settings}
+          network={network}
         />
         {/* <TradeFooter /> */}
 
