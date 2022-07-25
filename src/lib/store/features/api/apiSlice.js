@@ -54,7 +54,6 @@ export const apiSlice = createSlice({
       userPrice: 0,
       pairPrice: 0,
     },
-    serverDelta: 0
   },
   reducers: {
     _error(state, { payload }) {
@@ -122,10 +121,6 @@ export const apiSlice = createSlice({
         const takerUserId = fill[8] && fill[8].toLowerCase();
         const makerUserId = fill[9] && fill[9].toLowerCase();
         
-        // update timestamp with serverDelta
-        if (fill[12]) {
-          fill[12] = new Date(fill[12].valueOf() + state.serverDelta);
-        }
         if (
           ["f", "pf", "m"].includes(fill[6]) &&
           fill[2] === state.currentMarket &&
@@ -155,10 +150,7 @@ export const apiSlice = createSlice({
         // console.log(update);
         const fillid = update[1];
         const newstatus = update[2];
-        // update timestamp with serverDelta
         const timestamp = update[7]
-          ? new Date()
-          : new Date(update[7].valueOf() + state.serverDelta);
         let txhash;
         let feeamount;
         let feetoken;
@@ -410,9 +402,6 @@ export const apiSlice = createSlice({
     _orders(state, { payload }) {
       const orders = payload[0]
         .filter((order) => order[0] === state.network)
-        // update timestamp with serverDelta
-        .map((order) => order[7] =
-          new Date(order[7].valueOf() + state.serverDelta))
         .reduce((res, order) => {
           res[order[1]] = order;
           return res;
@@ -653,9 +642,6 @@ export const apiSlice = createSlice({
     setSlippageValue(state, { payload }) {
       state.slippageValue = payload.value;
     },
-    setServerDelta(state, { payload }) {
-      state.serverDelta = payload;
-    },
   },
 });
 
@@ -675,7 +661,6 @@ export const {
   setUISettings,
   resetUISettings,
   setSlippageValue,
-  setServerDelta,
 } = apiSlice.actions;
 
 export const layoutSelector = (state) => state.api.layout;

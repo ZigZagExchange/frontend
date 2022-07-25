@@ -359,7 +359,6 @@ export default class API extends Emitter {
       console.warn(`Your PC clock is not synced (delta: ${
         this.serverDelta / 60000
         } min). Please sync it via settings > date/time > sync now`);
-      this.emit("setServerDelta", this.setServerDelta);
     }
   }
 

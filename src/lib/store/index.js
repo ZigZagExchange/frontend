@@ -19,7 +19,6 @@ import apiReducer, {
   setConnecting,
   setBridgeConnecting,
   setUISettings,
-  setServerDelta,
 } from "lib/store/features/api/apiSlice";
 import autoMergeLevel2 from "redux-persist/lib/stateReconciler/autoMergeLevel2";
 import api from "lib/api";
@@ -119,10 +118,6 @@ api.on("bridge_connecting", (flag) => {
 
 api.on("settings", (payload) => {
   store.dispatch(setUISettings(payload));
-});
-
-api.on("setServerDelta", (payload) => {
-  store.dispatch(setServerDelta(payload));
 });
 
 export default store;
