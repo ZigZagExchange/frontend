@@ -781,7 +781,6 @@ const ConvertPage = () => {
               ZigZag Convert
             </p>
             <ConvertContianer
-              setTransactionType={(type) => setTtype(type)}
               transactionType={tType}
               balances={balances}
               fromToken={sellToken}
