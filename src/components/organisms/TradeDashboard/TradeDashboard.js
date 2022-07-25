@@ -304,6 +304,12 @@ export function TradeDashboard() {
               currentMarket={currentMarket}
               user={user}
               activeOrderCount={activeUserOrders}
+              marketInfo={marketInfos?.[currentMarket]}
+              marketSummary={marketSummary}
+              userOrders={userOrders}
+              lastPrice={currentPairLastPrice}
+              askBins={askBins}
+              bidBins={bidBins}
             />
           </GridLayoutCell>
         </div>
