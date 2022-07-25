@@ -7,7 +7,7 @@ import {
   SwitchHorizontalIcon,
 } from "@heroicons/react/solid";
 
-const SwapContianer = ({
+const ConvertContianer = ({
   balances,
   fromToken,
   fromTokenOptions,
@@ -30,6 +30,7 @@ const SwapContianer = ({
   const onChangeAmounts = () => {
     setSwitchType(!switchType);
   };
+
   return (
     <div className="p-4 mt-5 border rounded-lg dark:border-foreground-400 border-primary-500">
       <div className="flex items-center justify-between">
@@ -37,7 +38,7 @@ const SwapContianer = ({
         <p className="text-sm font-normal ">
           Available Balance:{" "}
           {balances[fromToken?.name]
-            ? balances[fromToken?.name].valueReadable.toPrecision(8)
+            ? Number(balances[fromToken?.name].valueReadable).toPrecision(8)
             : "0.00"}
           {` ${fromToken?.name}`}
         </p>
@@ -116,4 +117,4 @@ const SwapContianer = ({
   );
 };
 
-export default SwapContianer;
+export default ConvertContianer;

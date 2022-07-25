@@ -93,10 +93,10 @@ export const LaptopWrapper = styled.div`
     height: 100%; // 111px;
     // min-height: 217px;
     max-height: calc(100% - 42px);
-    overflow: auto;
+    overflow: overlay;
 
     ::-webkit-scrollbar {
-      width: 5px;
+      width: 10px;
       position: relative;
       z-index: 20;
     }

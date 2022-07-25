@@ -51,7 +51,7 @@ const TokenDropDownModal = ({
         <button
           type="button"
           onClick={openModal}
-          className="flex items-center p-2 text-sm font-medium rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 hover:dark:bg-foreground-400 hover:bg-primary-400"
+          className="flex items-center p-2 text-sm font-medium rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 hover:dark:bg-foreground-400 hover:bg-primary-400 "
         >
           {
             <img
@@ -145,7 +145,7 @@ const TokenDropDownModal = ({
                                 key={item.id}
                                 className={({ active }) =>
                                   `relative cursor-default select-none py-2 font-work pl-10 pr-4 mx-3 bg-foreground-100 rounded-md mb-2 border-t border-l border-r border-b dark:border-foreground-400 border-primary-500 ${
-                                    active ? "bg-teal-600" : "hover:opacity-75"
+                                    item.id === selectedOption.id ? "bg-teal-600" : "hover:opacity-75"
                                   }`
                                 }
                                 value={item}
@@ -155,7 +155,7 @@ const TokenDropDownModal = ({
                                     <div className="flex items-center justify-between">
                                       <div
                                         className={`flex items-center truncate   ${
-                                          selected
+                                          item.id === selectedOption.id
                                             ? "font-medium"
                                             : "font-normal "
                                         }`}
@@ -181,10 +181,10 @@ const TokenDropDownModal = ({
                                         </p>
                                       </div>
                                     </div>
-                                    {selected ? (
+                                    {item.id === selectedOption.id ? (
                                       <span
                                         className={`absolute  inset-y-0 left-0 flex items-center pl-3 ${
-                                          active
+                                          item.id === selectedOption.id
                                             ? "text-white"
                                             : "text-teal-600"
                                         }`}

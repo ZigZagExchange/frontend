@@ -18,22 +18,29 @@ import {
 
 import axios from "axios";
 import { isMobile } from "react-device-detect";
+import get from "lodash/get";
 
 const chainMap = {
   "0x1": 1,
   "0x4": 1000,
+  "0xa4b1": 42161,
 };
+
 export default class API extends Emitter {
   networks = {};
   ws = null;
   apiProvider = null;
-  ethersProvider = null;
+  mainnetProvider = null;
+  rollupProvider = null;
   currencies = null;
   isArgent = false;
   marketInfo = {};
-  lastprices = {};
+  lastPrices = {};
+  balances = {};
   _signInProgress = null;
   _profiles = {};
+  _pendingOrders = [];
+  _pendingFills = [];
 
   constructor({ infuraId, networks, currencies, validMarkets }) {
     super();
@@ -62,7 +69,8 @@ export default class API extends Emitter {
 
       this.setAPIProvider(chainMap[window.ethereum.chainId] || 1);
     } else {
-      this.setAPIProvider(this.networks.mainnet[0]);
+      console.log(this.networks);
+      this.setAPIProvider(this.networks.zksync[0]);
     }
   }
 
@@ -71,9 +79,10 @@ export default class API extends Emitter {
   };
 
   setAPIProvider = (network, networkChanged = true) => {
-    const networkName = this.getNetworkName(network);
+    const chainName = this.getChainName(network);
 
-    if (!networkName) {
+    if (!chainName) {
+      console.error(`Can't get chainName for ${network}`);
       this.signOut();
       return;
     }
@@ -91,16 +100,30 @@ export default class API extends Emitter {
       }
     }
 
-    if (this.isZksyncChain()) {
-      this.web3 = new Web3(
-        window.ethereum ||
-          new Web3.providers.HttpProvider(
-            `https://${networkName}.infura.io/v3/${this.infuraId}`
-          )
-      );
+    this.web3 = new Web3(
+      window.ethereum ||
+        new Web3.providers.HttpProvider(
+          `https://${chainName}.infura.io/v3/${this.infuraId}`
+        )
+    );
 
+    if (chainName === "arbitrum") {
       this.web3Modal = new Web3Modal({
-        network: networkName,
+        network: chainName,
+        cacheProvider: true,
+        theme: "dark",
+        providerOptions: {
+          walletconnect: {
+            package: WalletConnectProvider,
+            options: {
+              infuraId: this.infuraId,
+            },
+          },
+        },
+      });
+    } else {
+      this.web3Modal = new Web3Modal({
+        network: chainName,
         cacheProvider: true,
         theme: "dark",
         providerOptions: {
@@ -138,21 +161,44 @@ export default class API extends Emitter {
     if (networkChanged) this.emit("providerChange", network);
   };
 
-  getExplorer = (address, layer) => {
-    let explorer = "https://etherscan.io/address/";
-    let subdomain = this.apiProvider.network === 1 ? "" : "rinkeby.";
-
-    switch (layer) {
-      case 1:
-        explorer = `https://${subdomain}etherscan.io/address/${address}`;
-        return explorer;
-      default:
-        explorer = `https://${subdomain}zkscan.io/explorer/accounts/${address}`;
-        return explorer;
-    }
-  };
-
   getProfile = async (address) => {
+    const getProfileFromIPFS = async (address) => {
+      try {
+        const { data } = await axios.get(
+          `https://ipfs.3box.io/profile?address=${address}`
+        );
+        const profile = {
+          coverPhoto: get(data, "coverPhoto.0.contentUrl./"),
+          image: get(data, "image.0.contentUrl./"),
+          description: data.description,
+          emoji: data.emoji,
+          website: data.website,
+          location: data.location,
+          twitter_proof: data.twitter_proof,
+        };
+
+        if (data.name) {
+          profile.name = data.name;
+        }
+        if (profile.image) {
+          profile.image = `https://gateway.ipfs.io/ipfs/${profile.image}`;
+        }
+
+        return profile;
+      } catch (err) {
+        if (!err.response) {
+          throw err;
+        }
+      }
+      return {};
+    };
+
+    const fetchENSName = async (address) => {
+      let name = await getENSName(address);
+      if (name) return { name };
+      return {};
+    };
+
     if (!this._profiles[address]) {
       const profile = (this._profiles[address] = {
         description: null,
@@ -169,8 +215,8 @@ export default class API extends Emitter {
       Object.assign(
         profile,
         ...(await Promise.all([
-          this._fetchENSName(address),
-          this.apiProvider.getProfile(address),
+          fetchENSName(address),
+          getProfileFromIPFS(address),
         ]))
       );
 
@@ -180,12 +226,6 @@ export default class API extends Emitter {
     }
 
     return this._profiles[address];
-  };
-
-  _fetchENSName = async (address) => {
-    let name = await getENSName(address);
-    if (name) return { name };
-    return {};
   };
 
   _socketOpen = () => {
@@ -213,22 +253,88 @@ export default class API extends Emitter {
     if (msg.op === "marketinfo") {
       const marketInfo = msg.args[0];
       if (!marketInfo) return;
-      this.apiProvider.marketInfo[marketInfo.alias] = marketInfo;
+      this.marketInfo[marketInfo.alias] = marketInfo;
     }
     if (msg.op === "marketinfo2") {
       const marketInfos = msg.args[0];
       marketInfos.forEach((marketInfo) => {
         if (!marketInfo) return;
-        this.apiProvider.marketInfo[marketInfo.alias] = marketInfo;
+        this.marketInfo[marketInfo.alias] = marketInfo;
       });
     }
     if (msg.op === "lastprice") {
-      const lastprices = msg.args[0];
-      lastprices.forEach((l) => (this.apiProvider.lastPrices[l[0]] = l));
-      const noInfoPairs = lastprices
+      const lastPricesUpdate = msg.args[0];
+      const chainId = msg.args[1];
+      lastPricesUpdate.forEach((l) => {
+        if (!this.lastPrices[chainId]) this.lastPrices[chainId] = {};
+        this.lastPrices[chainId][l[0]] = l
+      });
+      const noInfoPairs = lastPricesUpdate
         .map((l) => l[0])
-        .filter((pair) => !this.apiProvider.marketInfo[pair]);
-      this.apiProvider.cacheMarketInfoFromNetwork(noInfoPairs);
+        .filter((pair) => !this.marketInfo[pair]);
+      this.cacheMarketInfoFromNetwork(noInfoPairs);
+    }
+  };
+
+  refreshNetwork = async () => {
+    if (!window.ethereum) return;
+    let ethereumChainId, ethereumChainInfo;
+
+    // await this.signOut();
+
+    switch (this.apiProvider.network) {
+      case 1:
+        ethereumChainId = "0x1";
+        ethereumChainInfo = {
+          chainId: "0x1",
+        };
+        break;
+      case 1000:
+        ethereumChainId = "0x4";
+        ethereumChainInfo = {
+          chainId: "0x4",
+        };
+        break;
+      case 42161:
+        ethereumChainId = "0xa4b1";
+        ethereumChainInfo = {
+          chainId: "0xA4B1",
+          chainName: "Arbitrum",
+          nativeCurrency: {
+            name: "Arbitrum Coin",
+            symbol: "ETH",
+            decimals: 18,
+          },
+          rpcUrls: ["https://arb1.arbitrum.io/rpc"],
+          blockExplorerUrls: ["https://arbiscan.io/"],
+        };
+        break;
+      default:
+        return;
+    }
+
+    await window.ethereum.request({
+      method: "eth_requestAccounts",
+      params: [{ eth_accounts: {} }],
+    });
+
+    try {
+      await window.ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: ethereumChainId }],
+      });
+    } catch (switchError) {
+      try {
+        if (switchError.code === 4902) {
+          await window.ethereum.request({
+            method: "wallet_addEthereumChain",
+            params: [ethereumChainInfo],
+          });
+        }
+      } catch (addError) {
+        console.error(addError);
+        throw addError;
+      }
     }
   };
 
@@ -273,34 +379,6 @@ export default class API extends Emitter {
     return this.ws.send(JSON.stringify({ op, args }));
   };
 
-  refreshNetwork = async () => {
-    if (!window.ethereum) return;
-    let ethereumChainId;
-
-    // await this.signOut();
-
-    switch (this.apiProvider.network) {
-      case 1:
-        ethereumChainId = "0x1";
-        break;
-      case 1000:
-        ethereumChainId = "0x4";
-        break;
-      default:
-        return;
-    }
-
-    await window.ethereum.request({
-      method: "eth_requestAccounts",
-      params: [{ eth_accounts: {} }],
-    });
-
-    await window.ethereum.request({
-      method: "wallet_switchEthereumChain",
-      params: [{ chainId: ethereumChainId }],
-    });
-  };
-
   sleep = (ms) => {
     return new Promise((resolve) => setTimeout(resolve, ms));
   };
@@ -309,21 +387,20 @@ export default class API extends Emitter {
     if (!this._signInProgress) {
       this._signInProgress = Promise.resolve()
         .then(async () => {
-          const apiProvider = this.apiProvider;
-
           if (network) {
             this.apiProvider = this.getAPIProvider(network);
           }
 
           await this.refreshNetwork();
           await this.sleep(1000);
-          if (this.isZksyncChain()) {
-            const web3Provider = await this.web3Modal.connect();
-            this.web3.setProvider(web3Provider);
-            this.ethersProvider = new ethers.providers.Web3Provider(
-              web3Provider
-            );
-          }
+          const web3Provider = await this.web3Modal.connect();
+          this.web3.setProvider(web3Provider);
+          this.rollupProvider = new ethers.providers.Web3Provider(web3Provider);
+
+          this.mainnetProvider = new ethers.providers.InfuraProvider(
+            this.getChainNameL1(network),
+            this.infuraId
+          );
 
           // set up polygon providers. mumbai for testnet. polygon for mainnet
           this.polygonProvider = new ethers.providers.JsonRpcProvider(
@@ -332,11 +409,19 @@ export default class API extends Emitter {
 
           let accountState;
           try {
-            accountState = await apiProvider.signIn(...args);
+            accountState = await this.apiProvider.signIn(...args);
           } catch (err) {
             await this.signOut();
             throw err;
           }
+
+          try {
+            accountState.profile = await this.getProfile(accountState.address);
+          } catch (e) {
+            accountState.profile = {};
+          }
+
+          this.emit("signIn", accountState);
 
           if (accountState && accountState.id) {
             this.send("login", [
@@ -344,8 +429,6 @@ export default class API extends Emitter {
               accountState.id && accountState.id.toString(),
             ]);
           }
-
-          this.emit("signIn", accountState);
 
           // fetch blances
           await this.getBalances();
@@ -362,19 +445,26 @@ export default class API extends Emitter {
     return this._signInProgress;
   };
 
-  signOut = async () => {
+  signOut = async (clearCatch = false) => {
     if (!this.apiProvider) {
       return;
-    } else if (this.web3Modal) {
-      await this.web3Modal.clearCachedProvider();
+    } else if (this.web3Modal && clearCatch) {
+      this.web3Modal.clearCachedProvider();
     }
 
     if (isMobile) window.localStorage.clear();
     else window.localStorage.removeItem("walletconnect");
 
+    this.marketInfo = {};
+    this.balances = {};
+    this._profiles = {};
+    this._pendingOrders = [];
+    this._pendingFills = [];
+
     this.web3 = null;
     this.web3Modal = null;
-    this.ethersProvider = null;
+    this.rollupProvider = null;
+    this.mainnetProvider = null;
     this.isArgent = false;
     this.setAPIProvider(this.apiProvider.network, false);
     this.emit("balanceUpdate", "wallet", {});
@@ -385,26 +475,42 @@ export default class API extends Emitter {
   };
 
   getPolygonUrl(network) {
-    if (network === 1000) {
-      return `https://polygon-mumbai.infura.io/v3/${this.infuraId}`;
-    } else {
-      return `https://polygon-mainnet.infura.io/v3/${this.infuraId}`;
+    switch (network) {
+      case 1:
+      case 42161:
+        return `https://polygon-mainnet.infura.io/v3/${this.infuraId}`;
+      case 1000:
+        return `https://polygon-mumbai.infura.io/v3/${this.infuraId}`;
+      default:
+        throw new Error(`getPolygonUrl network: ${network} not understood.`);
     }
   }
 
   getPolygonChainId(network) {
-    if (network === 1000) {
-      return "0x13881";
-    } else {
-      return "0x89";
+    switch (network) {
+      case 1:
+      case 42161:
+        return "0x89";
+      case 1000:
+        return "0x13881";
+      default:
+        throw new Error(
+          `getPolygonChainId network: ${network} not understood.`
+        );
     }
   }
 
   getPolygonWethContract(network) {
-    if (network === 1000) {
-      return POLYGON_MUMBAI_WETH_ADDRESS;
-    } else if (network === 1) {
-      return POLYGON_MAINNET_WETH_ADDRESS;
+    switch (network) {
+      case 1:
+      case 42161:
+        return POLYGON_MAINNET_WETH_ADDRESS;
+      case 1000:
+        return POLYGON_MUMBAI_WETH_ADDRESS;
+      default:
+        throw new Error(
+          `getPolygonWethContract network: ${network} not understood.`
+        );
     }
   }
 
@@ -415,6 +521,8 @@ export default class API extends Emitter {
       this.apiProvider.network
     );
     if (!this.polygonProvider) return 0;
+    if (!polygonEthAddress) return 0;
+
     const ethContract = new ethers.Contract(
       polygonEthAddress,
       erc20ContractABI,
@@ -445,11 +553,6 @@ export default class API extends Emitter {
       const polygonProvider = new ethers.providers.Web3Provider(
         window.web3.currentProvider
       );
-      // const currentNetwork = await polygonProvider.getNetwork(); // This is not correct on the brave browser.
-
-      // if ("0x"+currentNetwork.chainId.toString(16) !== polygonChainId)
-      //   throw new Error("Must approve network change");
-      // const signer = polygonProvider.getSigner();
 
       networkSwitched = true;
 
@@ -506,8 +609,53 @@ export default class API extends Emitter {
     return keys[keys.findIndex((key) => network === this.networks[key][0])];
   };
 
+  getChainName = (chainId) => {
+    switch (chainId) {
+      case 1:
+        return "mainnet";
+      case 1000:
+        return "rinkeby";
+      case 42161:
+        return "arbitrum";
+      default:
+        return null;
+    }
+  };
+
+  getChainNameL1 = (chainId) => {
+    switch (chainId) {
+      case 1:
+      case 42161:
+        return "mainnet";
+      case 1000:
+        return "rinkeby";
+      default:
+        return null;
+    }
+  };
+
+  getChainIdFromName = (name) => {
+    return this.networks?.[name]?.[1];
+  };
+
+  getNetworkDisplayName = (network) => {
+    switch (network) {
+      case 1:
+      case 1000:
+        return "zkSync";
+      case 42161:
+        return "Arbitrum";
+      default:
+        return "ZigZag";
+    }
+  };
+
   subscribeToMarket = (market, showNightPriceChange = false) => {
-    this.send("subscribemarket", [this.apiProvider.network, market, showNightPriceChange]);
+    this.send("subscribemarket", [
+      this.apiProvider.network,
+      market,
+      showNightPriceChange,
+    ]);
   };
 
   unsubscribeToMarket = (market) => {
@@ -516,6 +664,10 @@ export default class API extends Emitter {
 
   isZksyncChain = () => {
     return !!this.apiProvider.zksyncCompatible;
+  };
+
+  isEVMChain = () => {
+    return !!this.apiProvider.evmCompatible;
   };
 
   cancelOrder = async (orderId) => {
@@ -550,15 +702,8 @@ export default class API extends Emitter {
   };
 
   getEthereumFee = async () => {
-    if (this.ethersProvider) {
-      const feeData = await this.ethersProvider.getFeeData();
-      return feeData;
-    }
-  };
-
-  getEthereumFee = async () => {
-    if (this.ethersProvider) {
-      const feeData = await this.ethersProvider.getFeeData();
+    if (this.mainnetProvider) {
+      const feeData = await this.mainnetProvider.getFeeData();
       return feeData;
     }
   };
@@ -678,25 +823,29 @@ export default class API extends Emitter {
   getBalanceOfCurrency = async (currency) => {
     const currencyInfo = this.getCurrencyInfo(currency);
     let result = { balance: 0, allowance: ethersConstants.Zero };
-    if (!this.ethersProvider) return result;
+    if (!this.mainnetProvider) return result;
 
     try {
       const netContract = this.getNetworkContract();
       const [account] = await this.web3.eth.getAccounts();
+      if (!account || account === "0x") return result;
+
       if (currency === "ETH") {
-        result.balance = await this.web3.eth.getBalance(account);
+        result.balance = await this.mainnetProvider.getBalance(account);
         return result;
       }
 
-      if (!currencyInfo) return result;
-      const contract = new this.web3.eth.Contract(
+      if (!currencyInfo || !currencyInfo.address) return result;
+
+      const contract = new ethers.Contract(
+        currencyInfo.address,
         erc20ContractABI,
-        currencyInfo.address
+        this.mainnetProvider
       );
-      result.balance = await contract.methods.balanceOf(account).call();
+      result.balance = await contract.balanceOf(account);
       if (netContract) {
         result.allowance = ethers.BigNumber.from(
-          await contract.methods.allowance(account, netContract).call()
+          await contract.allowance(account, netContract)
         );
       }
       return result;
@@ -717,7 +866,7 @@ export default class API extends Emitter {
         allowance,
         valueReadable: "0",
       };
-      if (currencyInfo) {
+      if (balance && currencyInfo) {
         balances[ticker].valueReadable = formatAmount(balance, currencyInfo);
       } else if (ticker === "ETH") {
         balances[ticker].valueReadable = formatAmount(balance, {
@@ -741,6 +890,7 @@ export default class API extends Emitter {
 
   getBalances = async () => {
     const balances = await this.apiProvider.getBalances();
+    this.balances = balances;
     this.emit("balanceUpdate", this.apiProvider.network, balances);
     return balances;
   };
@@ -749,9 +899,9 @@ export default class API extends Emitter {
     const side = order[3];
     const baseQuantity = order[5];
     const quoteQuantity = order[4] * order[5];
-    const remaining = isNaN(Number(order[11])) ? order[5] : order[11];
+    const remaining = Number(order[11]) !== null ? order[5] : order[11];
     const market = order[2];
-    const marketInfo = this.apiProvider.marketInfo[market];
+    const marketInfo = this.marketInfo[market];
     let baseQuantityWithoutFee,
       quoteQuantityWithoutFee,
       priceWithoutFee,
@@ -777,24 +927,33 @@ export default class API extends Emitter {
     };
   };
 
-  submitOrder = async (
-    product,
-    side,
-    price,
-    baseAmount,
-    quoteAmount,
-    orderType
-  ) => {
-    if (!quoteAmount && !baseAmount) {
+  submitOrder = async (market, side, baseAmount, quoteAmount, orderType) => {
+    if (!quoteAmount || !baseAmount) {
       throw new Error("Set base or quote amount");
     }
+
+    const marketInfo = this.marketInfo[market];
+    let baseAmountBN = ethers.utils.parseUnits(
+      Number(baseAmount).toFixed(marketInfo.baseAsset.decimals),
+      marketInfo.baseAsset.decimals
+    );
+    let quoteAmountBN = ethers.utils.parseUnits(
+      Number(quoteAmount).toFixed(marketInfo.quoteAsset.decimals),
+      marketInfo.quoteAsset.decimals
+    );
+
+    const expirationTimeSeconds = Math.floor(
+      orderType === "market"
+        ? Date.now() / 1000 + 60 * 2 // two minutes
+        : Date.now() / 1000 + 60 * 60 * 24 * 7 // one week
+    );
+
     await this.apiProvider.submitOrder(
-      product,
+      market,
       side,
-      price,
-      baseAmount,
-      quoteAmount,
-      orderType
+      baseAmountBN,
+      quoteAmountBN,
+      expirationTimeSeconds
     );
   };
 
@@ -825,6 +984,33 @@ export default class API extends Emitter {
     return this.apiProvider.signMessage(message);
   };
 
+  approveExchangeContract = async (token, amount) => {
+    return this.apiProvider.approveExchangeContract(token, amount);
+  };
+
+  checkAccountActivated = async () => {
+    if (!this.apiProvider.isZksyncChain) return true;
+    return this.apiProvider.checkAccountActivated();
+  };
+
+  warpETH = async (amount) => {
+    if (!amount) throw new Error("No amount set");
+    let amountBN = ethers.utils.parseEther(amount.toFixed(18));
+
+    return this.apiProvider.warpETH(amountBN);
+  };
+
+  unWarpETH = async (amount) => {
+    if (!amount) throw new Error("No amount set");
+    let amountBN = ethers.utils.parseEther(amount.toFixed(18));
+
+    return this.apiProvider.unWarpETH(amountBN);
+  };
+
+  getWrapFees = async () => {
+    return this.apiProvider.getWrapFees();
+  };
+
   uploadArweaveFile = async (sender, timestamp, signature, file) => {
     const formData = new FormData();
     formData.append("sender", sender);
@@ -848,18 +1034,6 @@ export default class API extends Emitter {
     return this.apiProvider.tokenPrice(tokenLike, chainId);
   };
 
-  getCurrencies = () => {
-    return this.apiProvider.getCurrencies();
-  };
-
-  getPairs = () => {
-    return this.apiProvider.getPairs();
-  };
-
-  getCurrencyInfo(currency) {
-    return this.apiProvider.getCurrencyInfo(currency);
-  }
-
   getCurrencyLogo(currency) {
     try {
       return require(`assets/images/currency/${currency}.svg`).default;
@@ -875,6 +1049,21 @@ export default class API extends Emitter {
       }
     }
   }
+
+  // marketinfo calls can get expesnive so it's good to cache them
+  cacheMarketInfoFromNetwork = async (pairs) => {
+    if (pairs.length === 0) return;
+    if (!this.apiProvider.network) return;
+    const pairText = pairs.join(",");
+    const url =
+      this.apiProvider.network === 1
+        ? `https://zigzag-markets.herokuapp.com/markets?id=${pairText}&chainid=${this.apiProvider.network}`
+        : `https://secret-thicket-93345.herokuapp.com/api/v1/marketinfos?chain_id=${this.apiProvider.network}&market=${pairText}`;
+    const marketInfoArray = await fetch(url).then((r) => r.json());
+    if (!(marketInfoArray instanceof Array)) return;
+    marketInfoArray.forEach((info) => (this.marketInfo[info.alias] = info));
+    return;
+  };
 
   get fastWithdrawTokenAddresses() {
     if (this.apiProvider.network === 1) {
@@ -895,21 +1084,21 @@ export default class API extends Emitter {
   }
 
   async getL2FastWithdrawLiquidity() {
-    if (this.ethersProvider) {
+    if (this.mainnetProvider) {
       const currencyMaxes = {};
       if (!this.apiProvider.eligibleFastWithdrawTokens) return currencyMaxes;
       for (const currency of this.apiProvider.eligibleFastWithdrawTokens) {
         let max = 0;
         try {
           if (currency === "ETH") {
-            max = await this.ethersProvider.getBalance(
+            max = await this.mainnetProvider.getBalance(
               this.apiProvider.fastWithdrawContractAddress
             );
           } else {
             const contract = new ethers.Contract(
               this.fastWithdrawTokenAddresses[currency],
               erc20ContractABI,
-              this.ethersProvider
+              this.mainnetProvider
             );
             max = await contract.balanceOf(
               this.apiProvider.fastWithdrawContractAddress
@@ -970,10 +1159,79 @@ export default class API extends Emitter {
     });
     // request status update
     if (fillRequestIds.length > 0) {
-      this.send("fillreceiptreq", [
-        this.apiProvider.network,
-        Number(fillRequestIds),
-      ]);
+      for (let i in fillRequestIds) {
+        this.send("fillreceiptreq", [
+          this.apiProvider.network,
+          Number(fillRequestIds[i]),
+        ]);
+      }
+    }
+  };
+
+  getPairs = (chainId = this.apiProvider.network) => {
+    if (!this.lastPrices[chainId]) return [];
+    return Object.keys(this.lastPrices[chainId]);
+  };
+
+  getCurrencyInfo = (currency) => {
+    const pairs = this.getPairs();
+    for (let i = 0; i < pairs.length; i++) {
+      const pair = pairs[i];
+      const baseCurrency = pair.split("-")[0];
+      const quoteCurrency = pair.split("-")[1];
+      if (baseCurrency === currency && this.marketInfo[pair]) {
+        return this.marketInfo[pair].baseAsset;
+      } else if (quoteCurrency === currency && this.marketInfo[pair]) {
+        return this.marketInfo[pair].quoteAsset;
+      }
+    }
+    return null;
+  };
+
+  getCurrencies = (chainId = this.apiProvider.network) => {
+    const tickers = new Set();
+    for (let market in this.lastPrices[chainId]) {
+      tickers.add(this.lastPrices[chainId][market][0].split("-")[0]);
+      tickers.add(this.lastPrices[chainId][market][0].split("-")[1]);
+    }
+    return [...tickers];
+  };
+
+  getExplorerTxLink = (chainId, txhash) => {
+    switch (Number(chainId)) {
+      case 1:
+        return "https://zkscan.io/explorer/transactions/" + txhash;
+      case 1000:
+        return "https://rinkeby.zkscan.io/explorer/transactions/" + txhash;
+      case 42161:
+        return "https://arbiscan.io/tx/" + txhash;
+      default:
+        throw Error("Chain ID not understood");
+    }
+  };
+
+  getExplorerAccountLink = (chainId, address, layer = 2) => {
+    if (layer === 1) {
+      switch (Number(chainId)) {
+        case 1:
+        case 42161:
+          return "https://etherscan.io/address/" + address;
+        case 1000:
+          return "https://rinkeby.etherscan.io/address/" + address;
+        default:
+          throw Error("Chain ID not understood");
+      }
+    } else {
+      switch (Number(chainId)) {
+        case 1:
+          return "https://zkscan.io/explorer/accounts/" + address;
+        case 1000:
+          return "https://rinkeby.zkscan.io/explorer/accounts/" + address;
+        case 42161:
+          return "https://arbiscan.io/address/" + address;
+        default:
+          throw Error("Chain ID not understood");
+      }
     }
   };
 }

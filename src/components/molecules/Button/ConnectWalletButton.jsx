@@ -30,7 +30,9 @@ const ConnectWalletButton = (props) => {
       const walletBalance = formatAmount(state.committed.balances["ETH"], {
         decimals: 18,
       });
-      const activationFee = await api.apiProvider.changePubKeyFee("ETH");
+      const activationFee = api.apiProvider.zksyncCompatible
+        ? await api.apiProvider.changePubKeyFee("ETH")
+        : 0;
 
       if (
         !state.id &&

@@ -17,8 +17,8 @@
 }
 
 .zig_scrollstyle_light::-webkit-scrollbar-thumb {
-  border-radius: 4px;         
-  background: #292D3F21;
+  border-radius: 4px;
+  background: #292d3f21;
 }
 
 .zig_scrollstyle_dark::-webkit-scrollbar {
@@ -34,8 +34,8 @@
 }
 
 .zig_scrollstyle_dark::-webkit-scrollbar-thumb {
-  border-radius: 4px;         
-  background: #FFFFFF21;
+  border-radius: 4px;
+  background: #ffffff21;
 }
 
 h1,
@@ -72,15 +72,15 @@ html {
   color: #c4384e !important;
 }
 
-.zig-dropdown .rc-dropdown-menu>.rc-dropdown-menu-item {
+.zig-dropdown .rc-dropdown-menu > .rc-dropdown-menu-item {
   font-size: 18px;
   padding: 15px;
   cursor: pointer;
 }
 
-.zig-dropdown .rc-dropdown-menu>.rc-dropdown-menu-item:hover,
-.zig-dropdown .rc-dropdown-menu>.rc-dropdown-menu-item-active,
-.zig-dropdown .rc-dropdown-menu>.rc-dropdown-menu-item-selected {
+.zig-dropdown .rc-dropdown-menu > .rc-dropdown-menu-item:hover,
+.zig-dropdown .rc-dropdown-menu > .rc-dropdown-menu-item-active,
+.zig-dropdown .rc-dropdown-menu > .rc-dropdown-menu-item-selected {
   background-color: #c0cff8;
   color: #43f;
 }
@@ -94,36 +94,36 @@ html {
 }
 
 @font-face {
-  font-family: 'WorkSans-Regular';
-  src: url('./assets/fonts/WorkSans-Regular.ttf') format('truetype');
+  font-family: "WorkSans-Regular";
+  src: url("./assets/fonts/WorkSans-Regular.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'WorkSans-Medium';
-  src: url('./assets/fonts/WorkSans-Medium.ttf') format('truetype');
+  font-family: "WorkSans-Medium";
+  src: url("./assets/fonts/WorkSans-Medium.ttf") format("truetype");
   font-weight: 500;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'WorkSans-SemiBold';
-  src: url('./assets/fonts/WorkSans-SemiBold.ttf') format('truetype');
+  font-family: "WorkSans-SemiBold";
+  src: url("./assets/fonts/WorkSans-SemiBold.ttf") format("truetype");
   font-weight: 600;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'WorkSans-Bold';
-  src: url('./assets/fonts/WorkSans-Bold.ttf') format('truetype');
+  font-family: "WorkSans-Bold";
+  src: url("./assets/fonts/WorkSans-Bold.ttf") format("truetype");
   font-weight: 700;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'IBMPlexMono-Medium';
-  src: url('./assets/fonts/IBMPlexMono-Medium.ttf') format('truetype');
+  font-family: "IBMPlexMono-Medium";
+  src: url("./assets/fonts/IBMPlexMono-Medium.ttf") format("truetype");
   font-weight: 500;
   font-style: normal;
 }
@@ -159,17 +159,24 @@ html {
   padding: 0px;
 }
 
-.Toastify__toast-container{
+.Toastify__toast-container {
   min-width: 350px;
 }
 
+@media only screen and (max-width: 600px) {
+  .Toastify__toast-container {
+    width: 100%;
+    min-width: 100%;
+  }
+}
+
 .Toastify__toast-theme--colored.Toastify__toast--info {
-  background: #2AABEEB8;
+  background: #2aabeeb8;
   border: 1px solid rgba(255, 255, 255, 0.13);
   box-shadow: 0px 8px 16px rgba(1, 1, 1, 0.5);
   backdrop-filter: blur(16px);
   border-radius: 8px;
-  padding:8px;
+  padding: 8px;
 }
 
 .Toastify__toast-theme--colored.Toastify__toast--success {
@@ -210,4 +217,3 @@ html {
   border-radius: 8px;
   padding: 0px;
 }
-

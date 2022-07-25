@@ -38,7 +38,7 @@ const AllocationModal = ({ onClose, show, onSuccess, bytesToPurchase }) => {
       if (totalPrice) {
         let usdcBalance = 0;
         const feeCurrency = "USDC";
-        const mainnetNetwork = api.networks.mainnet[0];
+        const mainnetNetwork = api.networks.zksync[0];
         if (
           mainnetNetwork in balanceData &&
           feeCurrency in balanceData[mainnetNetwork]
