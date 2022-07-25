@@ -49,7 +49,7 @@ export default class APIArbitrumProvider extends APIProvider {
 
     // generate object
     for (let i = 0; i < tokenInfoList.length; i++) {
-      const balanceBN = balanceList[i];
+      let balanceBN = balanceList[i];
       const currencyInfo = tokenInfoList[i];
 
       let allowanceBN = ethers.BigNumber.from(0);
@@ -62,25 +62,27 @@ export default class APIArbitrumProvider extends APIProvider {
       ) {
         allowanceBN = await this.getAllowance(currencyInfo.address, exchangeAddress); // TODO replace
       }
+      balanceBN = balanceBN.toFixed(currencyInfo.decimals)
+      allowanceBN = allowanceBN.toFixed(currencyInfo.decimals);
       const valueReadable =
         balanceBN && currencyInfo
           ? ethers.utils.formatUnits(
-              balanceBN.toString(),
+              balanceBN,
               currencyInfo.decimals
             )
           : 0;
       const allowanceReadable =
         allowanceBN && currencyInfo
           ? ethers.utils.formatUnits(
-              allowanceBN.toString(),
+              allowanceBN,
               currencyInfo.decimals
             )
           : 0;
 
       balances[currencyInfo.symbol] = {
-        value: balanceBN.toString(),
+        value: balanceBN,
         valueReadable,
-        allowance: allowanceBN.toString(),
+        allowance: allowanceBN,
         allowanceReadable,
       };
     }
