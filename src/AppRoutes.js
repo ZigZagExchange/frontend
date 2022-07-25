@@ -8,6 +8,7 @@ import ListPairPage from "components/pages/ListPairPage/ListPairPage";
 import { Dev } from "./lib/helpers/env";
 import DSLPage from "./components/pages/DSLPage/DSLPage";
 import WrapPage from "./components/pages/WrapPage/WrapPage";
+import NotFoundPage from "components/pages/NotFoundPage/NotFoundPage";
 
 const AppRoutes = () => {
   return (
@@ -20,6 +21,7 @@ const AppRoutes = () => {
           <Route exact path="/pool" component={PoolPage} />
           <Route exact path="/list-pair" component={ListPairPage} />
           <Route exact path="/wrap" component={WrapPage} />
+          <Route path="*" component={NotFoundPage} />
           <Dev>
             <Route exact path="/dsl" component={DSLPage} />
           </Dev>
