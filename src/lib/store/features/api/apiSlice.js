@@ -4,7 +4,6 @@ import { formatPrice } from "lib/utils";
 import api from "lib/api";
 import { getLayout } from "lib/helpers/storage/layouts";
 import FillCard from "components/organisms/TradeDashboard/TradeTables/OrdersTable/FillCard";
-import { sr } from "date-fns/locale";
 
 const makeScope = (state) => `${state.network}-${state.userId}`;
 
@@ -119,8 +118,7 @@ export const apiSlice = createSlice({
         // taker and maker user ids have to be matched lowercase because addresses
         // sometimes come back in camelcase checksum format
         const takerUserId = fill[8] && fill[8].toLowerCase();
-        const makerUserId = fill[9] && fill[9].toLowerCase();
-        
+        const makerUserId = fill[9] && fill[9].toLowerCase();   
         if (
           ["f", "pf", "m"].includes(fill[6]) &&
           fill[2] === state.currentMarket &&
@@ -150,7 +148,7 @@ export const apiSlice = createSlice({
         // console.log(update);
         const fillid = update[1];
         const newstatus = update[2];
-        const timestamp = update[7]
+        const timestamp = update[7];
         let txhash;
         let feeamount;
         let feetoken;
