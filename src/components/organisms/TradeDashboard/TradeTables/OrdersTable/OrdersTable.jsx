@@ -190,10 +190,10 @@ export default function OrdersTable(props) {
 
   const filterSmallBalances = (currency) => {
     const balance = wallet[currency].valueReadable;
-    const usd_balance =
-      coinEstimator(currency) * wallet[currency].valueReadable;
+    const usdPrice = coinEstimator(currency);
+    const usd_balance = usdPrice * wallet[currency].valueReadable;
 
-    if (usd_balance < 0.02) return false;
+    if (usd_balance < 0.02 && Number(usdPrice) !== 0) return false;
 
     if (balance) {
       return Number(balance) > 0;

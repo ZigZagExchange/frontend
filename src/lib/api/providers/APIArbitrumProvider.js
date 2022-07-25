@@ -18,21 +18,22 @@ export default class APIArbitrumProvider extends APIProvider {
 
   getBalances = async () => {
     const balances = {};
-    if (!this.accountState.address) return balances;
+    if (!this.accountState?.address) return balances;
 
-    // allways get ETH - generate token list
-    const tokens = this.api.getCurrencies();
+    // generate token list
     const tokenInfoList = [];
     const tokenList = [];
-
-    for (let i = 0; i < tokens.length; i++) {
-      const token = tokens[i];
+    this.api.getCurrencies().forEach((token) => {
       const tokenInfo = this.api.getCurrencyInfo(token);
-      if (!tokenInfo || !tokenInfo.address) continue;
+      if (!tokenInfo || !tokenInfo.address) return;
 
       tokenInfoList.push(tokenInfo);
       tokenList.push(tokenInfo.address);
-    }
+    })
+
+    // allways get ETH
+    tokenInfoList.push({ decimals: 18, symbol: 'ETH' });
+    tokenList.push(ethers.constants.AddressZero);
 
     // get token balance
     const erc20Contract = new ethers.Contract(
@@ -52,8 +53,13 @@ export default class APIArbitrumProvider extends APIProvider {
       const currencyInfo = tokenInfoList[i];
 
       let allowanceBN = ethers.BigNumber.from(0);
-      if (currencyInfo.symbol === "ETH") allowanceBN = ethers.constants.MaxUint256;
-      else if (currencyInfo && exchangeAddress) {
+      if (currencyInfo.symbol === "ETH") {
+        allowanceBN = ethers.constants.MaxUint256;
+      } else if (
+        currencyInfo &&
+        exchangeAddress &&
+        balanceBN.toNumber() > 0
+      ) {
         allowanceBN = await this.getAllowance(currencyInfo.address, exchangeAddress); // TODO replace
       }
       const valueReadable =
@@ -71,7 +77,7 @@ export default class APIArbitrumProvider extends APIProvider {
             )
           : 0;
 
-      balances[tokens[i]] = {
+      balances[currencyInfo.symbol] = {
         value: balanceBN.toString(),
         valueReadable,
         allowance: allowanceBN.toString(),
@@ -83,8 +89,7 @@ export default class APIArbitrumProvider extends APIProvider {
   };
 
   getAllowance = async (tokenAddress, contractAddress) => {
-    if (!this.accountState.address || !contractAddress) return 0;
-
+    if (!this.accountState.address || !contractAddress || !tokenAddress) return 0;
     const erc20Contract = new ethers.Contract(
       tokenAddress,
       erc20ContractABI,
