@@ -1,9 +1,6 @@
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
-import {
-  lastPricesSelector,
-  networkSelector,
-} from "lib/store/features/api/apiSlice";
+import { lastPricesSelector, networkSelector } from "lib/store/features/api/apiSlice";
 import { stables } from "lib/helpers/categories";
 
 export function useCoinEstimator() {
@@ -81,8 +78,7 @@ export function useCoinEstimator() {
     if ("WETH" in prices && !("ETH" in prices)) prices.ETH = prices.WETH;
 
     return (token) => {
-      const t = token.toUpperCase();
-      return parseFloat(prices && prices[t] ? prices[t] : 0).toFixed(2);
+      return parseFloat(prices && prices[token] ? prices[token] : 0).toFixed(2);
     };
   }, [pairPrices]);
 }
