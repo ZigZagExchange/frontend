@@ -1,18 +1,3 @@
-/* login reg btn */
-.login_reg_btn {
-  width: 100%;
-  padding: 10px 20px;
-  border: none;
-  color: white;
-  font-weight: 500;
-  border-radius: 5px;
-  background-color: #08aff3;
-}
-
-.login_reg_btn span {
-  font-weight: 300;
-}
-
 /* bg_btn */
 .bg_btn {
   display: flex;
@@ -41,10 +26,6 @@
   position: absolute;
 }
 
-.bg_err {
-  background: #b66;
-}
-
 .zig_btn {
   box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.01);
   text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.35);
@@ -67,16 +48,6 @@
   padding: 0 10px;
   width: auto;
   height: 27px;
-}
-
-.zig_btn_disabled {
-  pointer-events: none;
-  cursor: default;
-}
-
-.zig_disabled {
-  opacity: 0.6;
-  pointer-events: none;
 }
 
 .zig_btn_loading {

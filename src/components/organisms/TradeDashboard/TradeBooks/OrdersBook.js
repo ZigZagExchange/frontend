@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styled from "@xstyled/styled-components";
 import TradePriceTable from "./TradePriceTable/TradePriceTable";
 import TradePriceHeadSecond from "./TradePriceHeadSecond/TradePriceHeadSecond";
@@ -91,31 +91,8 @@ const OrderButtonWrapper = styled.div`
   }
 `;
 
-const fixedPoints = [
-  { text: "2", url: "#", value: 2 },
-  { text: "3", url: "#", value: 3 },
-  { text: "4", url: "#", value: 4 },
-];
-
 export default function OrdersBook(props) {
-  const [fixedPoint, setFixedPoint] = useState(2);
   const [side, setSide] = useState("all");
-  const [fixedPointItems, setFixedPointItems] = useState(fixedPoints);
-
-  useEffect(() => {
-    let newFixedPoints = [...fixedPointItems];
-    newFixedPoints.forEach((item) => {
-      item.iconSelected = item.value === fixedPoint;
-    });
-    setFixedPointItems(newFixedPoints);
-  }, [fixedPoint]);
-
-  const changeFixedPoint = (text, value) => {
-    setFixedPoint(parseInt(value));
-    if (props.changeFixedPoint) {
-      props.changeFixedPoint(parseInt(value));
-    }
-  };
 
   const changeSide = (type) => {
     setSide(type);
@@ -143,7 +120,6 @@ export default function OrdersBook(props) {
                     priceTableData={props.askBins}
                     currentMarket={props.currentMarket}
                     scrollToBottom={true}
-                    fixedPoint={fixedPoint}
                     marketInfo={props.marketInfo}
                     settings={props.settings}
                   />
@@ -152,7 +128,6 @@ export default function OrdersBook(props) {
                     lastPrice={props.lastPrice}
                     marketSummary={props.marketSummary}
                     marketInfo={props.marketInfo}
-                    fixedPoint={fixedPoint}
                   />
                 </>
               ) : (
@@ -166,7 +141,6 @@ export default function OrdersBook(props) {
                     adClass="no-space"
                     currentMarket={props.currentMarket}
                     priceTableData={props.bidBins}
-                    fixedPoint={fixedPoint}
                     marketInfo={props.marketInfo}
                     settings={props.settings}
                   />
@@ -175,7 +149,6 @@ export default function OrdersBook(props) {
                     lastPrice={props.lastPrice}
                     marketSummary={props.marketSummary}
                     marketInfo={props.marketInfo}
-                    fixedPoint={fixedPoint}
                   />
                 </>
               ) : (
@@ -190,7 +163,6 @@ export default function OrdersBook(props) {
                     priceTableData={props.askBins}
                     currentMarket={props.currentMarket}
                     scrollToBottom={true}
-                    fixedPoint={fixedPoint}
                     marketInfo={props.marketInfo}
                     settings={props.settings}
                   />
@@ -199,14 +171,12 @@ export default function OrdersBook(props) {
                     lastPrice={props.lastPrice}
                     marketSummary={props.marketSummary}
                     marketInfo={props.marketInfo}
-                    fixedPoint={fixedPoint}
                   />
                   <Divider />
                   <TradePriceTable
                     useGradient={!props.settings?.disableOrderBookFlash}
                     currentMarket={props.currentMarket}
                     priceTableData={props.bidBins}
-                    fixedPoint={fixedPoint}
                     marketInfo={props.marketInfo}
                     settings={props.settings}
                   />
@@ -256,7 +226,6 @@ export default function OrdersBook(props) {
                         useGradient={!props.settings?.disableOrderBookFlash}
                         currentMarket={props.currentMarket}
                         priceTableData={props.bidBins}
-                        fixedPoint={fixedPoint}
                         marketInfo={props.marketInfo}
                         settings={props.settings}
                       />
@@ -266,7 +235,6 @@ export default function OrdersBook(props) {
                         useGradient={!props.settings?.disableOrderBookFlash}
                         priceTableData={props.askBins}
                         currentMarket={props.currentMarket}
-                        fixedPoint={fixedPoint}
                         marketInfo={props.marketInfo}
                         settings={props.settings}
                       />
@@ -278,7 +246,6 @@ export default function OrdersBook(props) {
                       lastPrice={props.lastPrice}
                       marketSummary={props.marketSummary}
                       marketInfo={props.marketInfo}
-                      fixedPoint={fixedPoint}
                     />
                     <OrderFooterWrapper isStack={props.settings?.stackOrderbook}>
                       <OrderFooterRight>
@@ -318,7 +285,6 @@ export default function OrdersBook(props) {
                         useGradient={!props.settings?.disableOrderBookFlash}
                         priceTableData={props.askBins}
                         currentMarket={props.currentMarket}
-                        fixedPoint={fixedPoint}
                         marketInfo={props.marketInfo}
                         settings={props.settings}
                       />
@@ -330,7 +296,6 @@ export default function OrdersBook(props) {
                       lastPrice={props.lastPrice}
                       marketSummary={props.marketSummary}
                       marketInfo={props.marketInfo}
-                      fixedPoint={fixedPoint}
                     />
                     <OrderFooterWrapper isStack={props.settings?.stackOrderbook}>
                       <OrderFooterRight>
@@ -369,7 +334,6 @@ export default function OrdersBook(props) {
                         useGradient={!props.settings?.disableOrderBookFlash}
                         currentMarket={props.currentMarket}
                         priceTableData={props.bidBins}
-                        fixedPoint={fixedPoint}
                         marketInfo={props.marketInfo}
                         settings={props.settings}
                       />
@@ -381,7 +345,6 @@ export default function OrdersBook(props) {
                       lastPrice={props.lastPrice}
                       marketSummary={props.marketSummary}
                       marketInfo={props.marketInfo}
-                      fixedPoint={fixedPoint}
                     />
                     <OrderFooterWrapper isStack={props.settings?.stackOrderbook}>
                       <OrderFooterRight>
