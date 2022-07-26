@@ -367,7 +367,8 @@ class SpotForm extends React.Component {
         }
       }
     } else if (side === "s" && this.props.bidBins) {
-      for (let i = 0; i <= this.props.bidBins.length; i++) {
+      console.log(this.props.bidBins);
+      for (let i = 0; i < this.props.bidBins.length; i++) {
         const amount = Number(this.props.bidBins[i].td2);
         if (amount >= unfilled || i < this.props.bidBins.length) {
           price = this.props.bidBins[i].td1;
