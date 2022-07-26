@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import useTheme from "components/hooks/useTheme";
-import { numStringToSymbol, addComma } from "lib/utils";
+import { numStringToSymbol, addComma, formatMillonAmount } from "lib/utils";
 import Text from "components/atoms/Text/Text";
 
 const Table = styled.table`
