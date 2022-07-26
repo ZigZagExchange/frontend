@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import useTheme from "components/hooks/useTheme";
-import { numStringToSymbol, addComma } from "lib/utils";
+import { numStringToSymbol, addComma, formatMillonAmount } from "lib/utils";
 import Text from "components/atoms/Text/Text";
 
 const Table = styled.table`
@@ -210,7 +210,7 @@ const TradePriceTable = (props) => {
                   color="foregroundHighEmphasis"
                   textAlign="right"
                 >
-                  {addComma(Number(numStringToSymbol(amount, 2)))}
+                  {formatMillonAmount(amount)}
                 </Text>
               </td>
               {!isMobile && (
@@ -221,7 +221,7 @@ const TradePriceTable = (props) => {
                     textAlign="right"
                   >
                     {/* {numStringToSymbol(total, 2)} */}
-                    {addComma(total)}
+                    {formatMillonAmount(total)}
                   </Text>
                 </td>
               )}
