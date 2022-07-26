@@ -139,7 +139,7 @@ export const LaptopWrapper = styled.div`
   }
 
   table tbody td {
-    padding: 5px 20px 0px 20px;
+    padding: 6px 20px 0px 20px;
   }
 
   img.loading-gif {
@@ -181,7 +181,7 @@ export const MobileWrapper = styled.div`
   }
 
   table tbody td {
-    padding: 5px 20px 0px 20px;
+    padding: 6px 20px 0px 20px;
   }
 
   // table tbody tr:last-child {
