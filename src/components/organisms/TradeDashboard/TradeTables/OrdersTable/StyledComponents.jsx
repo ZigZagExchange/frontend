@@ -139,7 +139,7 @@ export const LaptopWrapper = styled.div`
   }
 
   table tbody td {
-    padding: 6px 20px 0px 20px;
+    padding: 5px 20px 0px 20px;
   }
 
   img.loading-gif {
@@ -152,6 +152,7 @@ export const MobileWrapper = styled.div`
   display: block;
   height: 100%;
   overflow: auto;
+  overflow-x: hidden;
 
   > tr {
     display: block;
@@ -181,7 +182,7 @@ export const MobileWrapper = styled.div`
   }
 
   table tbody td {
-    padding: 6px 20px 0px 20px;
+    padding: 5px 20px 0px 20px;
   }
 
   // table tbody tr:last-child {
@@ -191,6 +192,23 @@ export const MobileWrapper = styled.div`
   img.loading-gif {
     width: 30px;
     height: 30px;
+  }
+
+  &::-webkit-scrollbar {
+    width: 5px;
+    position: relative;
+    z-index: 20;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background: #ffffff21;
+  }
+
+  &::-webkit-scrollbar-track {
+    border-radius: 4px;
+    background: transparent;
+    height: 23px;
   }
 
   @media screen and (max-width: 992px) {

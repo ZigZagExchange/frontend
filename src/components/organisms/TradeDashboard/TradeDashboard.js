@@ -340,7 +340,7 @@ export function TradeDashboard() {
         </div>
         <div key="c">
           <GridLayoutCell editable={settings.editable}>
-            <TradeChartArea />
+            <TradeChartArea marketInfo={marketInfos?.[currentMarket]} />
           </GridLayoutCell>
         </div>
         <div key="d">
@@ -349,6 +349,8 @@ export function TradeDashboard() {
               userFills={userFills}
               userOrders={userOrders}
               user={user}
+              settings={settings}
+              network={network}
             />
           </GridLayoutCell>
         </div>
