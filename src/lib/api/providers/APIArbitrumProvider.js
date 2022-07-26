@@ -58,12 +58,10 @@ export default class APIArbitrumProvider extends APIProvider {
       } else if (
         currencyInfo &&
         exchangeAddress &&
-        balanceBN.toNumber() > 0
+        balanceBN.gt(0)
       ) {
         allowanceBN = await this.getAllowance(currencyInfo.address, exchangeAddress); // TODO replace
       }
-      balanceBN = balanceBN.toFixed(currencyInfo.decimals)
-      allowanceBN = allowanceBN.toFixed(currencyInfo.decimals);
       const valueReadable =
         balanceBN && currencyInfo
           ? ethers.utils.formatUnits(
