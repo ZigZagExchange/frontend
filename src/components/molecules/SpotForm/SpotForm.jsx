@@ -367,7 +367,7 @@ class SpotForm extends React.Component {
         }
       }
     } else if (side === "s" && this.props.bidBins) {
-      for (let i = 0; i <= this.props.bidBins.length; i++) {
+      for (let i = 0; i < this.props.bidBins.length; i++) {
         const amount = Number(this.props.bidBins[i].td2);
         if (amount >= unfilled || i < this.props.bidBins.length) {
           price = this.props.bidBins[i].td1;
@@ -481,10 +481,11 @@ class SpotForm extends React.Component {
         return;
       }
 
-      const fee = this.getBaseFee(this.state.baseAmount);
+      let fee = this.getBaseFee(this.state.baseAmount);
       if (this.state.baseAmount < fee) {
+        fee = Number(fee).toPrecision(5);
         toast.error(
-          `Minimum order size is ${fee.toPrecision(5)} ${
+          `Minimum order size is ${fee} ${
             marketInfo.baseAsset.symbol
           }`
         );
@@ -512,14 +513,15 @@ class SpotForm extends React.Component {
         return;
       }
 
-      const fee = this.getQuoteFee(this.state.quoteAmount);
+      let fee = this.getQuoteFee(this.state.quoteAmount);
       if (this.state.quoteAmount < fee) {
+        fee = Number(fee).toPrecision(5);
         toast.error(
-          `Minimum order size is ${fee.toPrecision(5)} ${
+          `Minimum order size is ${fee} ${
             marketInfo.quoteAsset.symbol
           }`,
           {
-            toastId: `Minimum order size is ${fee.toPrecision(5)} ${
+            toastId: `Minimum order size is ${fee} ${
               marketInfo.quoteAsset.symbol
             }`,
           }

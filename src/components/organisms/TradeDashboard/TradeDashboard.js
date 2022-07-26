@@ -105,7 +105,6 @@ export function TradeDashboard() {
   const liquidity = useSelector(liquiditySelector);
   const allOrders = useSelector(allOrdersSelector);
   
-  const [fixedPoint, setFixedPoint] = useState(2);
   const [side, setSide] = useState("all");
   const [currentPairLastPrice, setCurrentPairLastPrice] = useState(0);
 
@@ -191,10 +190,6 @@ export function TradeDashboard() {
       }
     };
   }, [network, currentMarket, api.ws, settings.showNightPriceChange]);
-
-  const changeFixedPoint = (point) => {
-    setFixedPoint(point);
-  };
 
   const changeSide = (side) => {
     setSide(side);
@@ -329,7 +324,6 @@ export function TradeDashboard() {
             {/* TradePriceTable, TradePriceHeadSecond */}
             <OrdersBook
               currentMarket={currentMarket}
-              changeFixedPoint={changeFixedPoint}
               changeSide={changeSide}
               marketInfo={marketInfos?.[currentMarket]}
               marketSummary={marketSummary}
@@ -340,14 +334,12 @@ export function TradeDashboard() {
             />
             <TradesBook
               currentMarket={currentMarket}
-              fixedPoint={fixedPoint}
               side={side}
             />
           </>
         ) : (
           <TradesTable 
             currentMarket={currentMarket}
-            changeFixedPoint={changeFixedPoint}
             changeSide={changeSide}
             marketInfo={marketInfos?.[currentMarket]}
             marketSummary={marketSummary}

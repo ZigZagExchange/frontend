@@ -75,7 +75,8 @@ const ConvertPage = () => {
 
   const estimatedValueSell = sellAmounts * coinEstimator(sellToken?.name) || 0;
   const estimatedValueBuy = buyAmounts * coinEstimator(buyToken?.name) || 0;
-  const estimatedValueFee = transactionFee * coinEstimator(sellToken?.name) || 0;
+  const estimatedValueFee =
+    transactionFee * coinEstimator(sellToken?.name) || 0;
 
   const zkBalances = useMemo(
     () => (balanceData[network] ? balanceData[network] : {}),
@@ -89,7 +90,7 @@ const ConvertPage = () => {
 
   useEffect(() => {
     setLoading(true);
-    setMarketInfo(marketInfos?.[currentMarket])
+    setMarketInfo(marketInfos?.[currentMarket]);
     const timer = setInterval(() => {
       setSellTokenList(api.getCurrencies());
       setGetPairs(api.getPairs());
@@ -177,14 +178,15 @@ const ConvertPage = () => {
     };
   }, [network, currentMarket, api.ws, settings.showNightPriceChange]);
 
-  useEffect(()=>{
-    const fee = tType === 'sell' 
-      ? getBaseFee(Number(buyAmounts))
-      : getQuoteFee(Number(sellAmounts))
+  useEffect(() => {
+    const fee =
+      tType === "sell"
+        ? getBaseFee(Number(buyAmounts))
+        : getQuoteFee(Number(sellAmounts));
     setTransactionFee(fee);
     isValid();
   }, [sellAmounts, buyAmounts, userOrders, marketInfo]);
-  
+
   useEffect(() => {
     let price;
     if (api.isZksyncChain()) {
@@ -385,8 +387,12 @@ const ConvertPage = () => {
       });
       const s = p.sort((a, b) => {
         return (
-          parseFloat(b.price.substring(1).replaceAll(",", "").replaceAll(" ", "")) -
-          parseFloat(a.price.substring(1).replaceAll(",", "").replaceAll(" ", ""))
+          parseFloat(
+            b.price.substring(1).replaceAll(",", "").replaceAll(" ", "")
+          ) -
+          parseFloat(
+            a.price.substring(1).replaceAll(",", "").replaceAll(" ", "")
+          )
         );
       });
       if (!sellToken) {
@@ -450,9 +456,14 @@ const ConvertPage = () => {
         index === self.findIndex((t) => t.name === value.name)
     );
     const s = filtered.sort((a, b) => {
-      console.log(b.price.substring(1).replaceAll(",", "").replaceAll(" ", ""), b.price);
+      console.log(
+        b.price.substring(1).replaceAll(",", "").replaceAll(" ", ""),
+        b.price
+      );
       return (
-        parseFloat(b.price.substring(1).replaceAll(",", "").replaceAll(" ", "")) -
+        parseFloat(
+          b.price.substring(1).replaceAll(",", "").replaceAll(" ", "")
+        ) -
         parseFloat(a.price.substring(1).replaceAll(",", "").replaceAll(" ", ""))
       );
     });
@@ -531,9 +542,10 @@ const ConvertPage = () => {
       return;
     }
 
-    if(!marketInfo) {
-      setError('Issue validatin your order');
-      console.error(`Convert: no marketinfo for ${currentMarket}`)
+    if (!marketInfo) {
+      setError("Issue validatin your order");
+      console.error(`Convert: no marketinfo for ${currentMarket}`);
+      return;
     }
 
     const [baseToken, quoteToken] = currentMarket.split("-");
@@ -577,10 +589,11 @@ const ConvertPage = () => {
     }
 
     if (tType === "sell") {
+      console.log(marketInfo);
       const baseBalance = getBaseBalance();
       const fee = getBaseFee(baseAmount);
       if (!baseBalance || baseAmount + fee > baseBalance) {
-        setError(`Amount exceeds ${marketInfo.baseAsset.symbol} balance`);
+        setError(`Amount exceeds ${marketInfo?.baseAsset.symbol} balance`);
         return;
       }
 
@@ -593,7 +606,7 @@ const ConvertPage = () => {
         const allowance = getBaseAllowance();
         if (baseAmount + fee < allowance) {
           setApproveNeeded(true);
-          setError(`Amount exceeds ${marketInfo.baseAsset.symbol} allowance`);
+          setError(`Amount exceeds ${marketInfo?.baseAsset.symbol} allowance`);
           return;
         } else {
           setApproveNeeded(false);
@@ -603,7 +616,7 @@ const ConvertPage = () => {
       const quoteBalance = getQuoteBalance();
       const fee = getQuoteFee(quoteAmount);
       if (!quoteBalance || quoteAmount + fee > quoteBalance) {
-        setError(`Amount exceeds ${marketInfo.quoteAsset.symbol} balance`);
+        setError(`Amount exceeds ${marketInfo?.quoteAsset.symbol} balance`);
         return;
       }
 
@@ -616,7 +629,7 @@ const ConvertPage = () => {
         const allowance = getQuoteAllowance();
         if (quoteAmount + fee < allowance) {
           setApproveNeeded(true);
-          setError(`Amount exceeds ${marketInfo.quoteAsset.symbol} allowance`);
+          setError(`Amount exceeds ${marketInfo?.quoteAsset.symbol} allowance`);
           return;
         } else {
           setApproveNeeded(false);
@@ -709,12 +722,11 @@ const ConvertPage = () => {
   const approveHandler = async (e) => {
     e.preventDefault();
     if (!marketInfo) return;
-    
+
     const token =
       tType === "sell"
         ? marketInfo.baseAsset.symbol
         : marketInfo.quoteAsset.symbol;
-
 
     let orderApproveToast = toast.info(
       "Approve pending. Sign or Cancel to continue...",
@@ -814,42 +826,51 @@ const ConvertPage = () => {
               onSetSlippageValue={onChangeSlippageValue}
               slippageValue={slippageValue}
               transactionFee={transactionFee}
-              feeToken={marketInfo
-                 ? (tType === "buy"
+              feeToken={
+                marketInfo
+                  ? tType === "buy"
                     ? marketInfo.quoteAsset.symbol
                     : marketInfo.baseAsset.symbol
-                  )
-                : ""
+                  : ""
               }
               estimatedValueFee={estimatedValueFee}
             />
-            {!errorMsg && user.address && !approveNeeded && Number(sellAmounts) > 0  &&<Button
-              isLoading={false}
-              className="w-full py-3 my-3 uppercase"
-              scale="imd"
-              onClick={onClickExchange}
-              disabled={orderButtonDisabled}
-            >
-              Convert {sellToken?.name}
-            </Button>}
-            {errorMsg && user.address && !approveNeeded && <Button
-              isLoading={false}
-              className="w-full py-3 my-3 uppercase"
-              variant="sell"
-              scale="imd"
-              disabled
-            >
-              {errorMsg}
-            </Button>}
-            {user.address && approveNeeded && api.isEVMChain() && <Button
-              isLoading={false}
-              className="w-full py-3 my-3 uppercase"
-              variant="sell"
-              scale="imd"
-              onClick={approveHandler}
-            >
-              Approve {sellToken?.name}
-            </Button>}
+            {!errorMsg &&
+              user.address &&
+              !approveNeeded &&
+              Number(sellAmounts) > 0 && (
+                <Button
+                  isLoading={false}
+                  className="w-full py-3 my-3 uppercase"
+                  scale="imd"
+                  onClick={onClickExchange}
+                  disabled={orderButtonDisabled}
+                >
+                  Convert {sellToken?.name}
+                </Button>
+              )}
+            {errorMsg && user.address && !approveNeeded && (
+              <Button
+                isLoading={false}
+                className="w-full py-3 my-3 uppercase"
+                variant="sell"
+                scale="imd"
+                disabled
+              >
+                {errorMsg}
+              </Button>
+            )}
+            {user.address && approveNeeded && api.isEVMChain() && (
+              <Button
+                isLoading={false}
+                className="w-full py-3 my-3 uppercase"
+                variant="sell"
+                scale="imd"
+                onClick={approveHandler}
+              >
+                Approve {sellToken?.name}
+              </Button>
+            )}
             {!user.address && (
               <ConnectWalletButton className="w-full py-3 my-3 uppercase" />
             )}
