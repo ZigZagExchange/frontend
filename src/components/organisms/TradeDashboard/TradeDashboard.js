@@ -34,7 +34,6 @@ import {
 } from "../../pages/ListPairPage/SuccessModal";
 import TradesTable from "./TradeBooks/TradesTable";
 import { HighSlippageModal } from "components/molecules/HighSlippageModal";
-import _ from "lodash";
 import { formatPrice, addComma } from "lib/utils";
 
 const TradeContainer = styled.div`
