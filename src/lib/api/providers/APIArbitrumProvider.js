@@ -129,7 +129,7 @@ export default class APIArbitrumProvider extends APIProvider {
         Number(marketInfo.baseFee).toFixed(marketInfo.baseAsset.decimals),
         marketInfo.baseAsset.decimals
       );
-      balanceBN = ethers.BigNumber.from(this.api.balances[baseToken].value);
+      balanceBN = ethers.BigNumber.from(this.api.balances[this.network][baseToken].value);
     } else {
       makerToken = marketInfo.quoteAsset.address;
       takerToken = marketInfo.baseAsset.address;
@@ -139,7 +139,7 @@ export default class APIArbitrumProvider extends APIProvider {
         Number(marketInfo.quoteFee).toFixed(marketInfo.quoteAsset.decimals),
         marketInfo.quoteAsset.decimals
       );
-      balanceBN = ethers.BigNumber.from(this.api.balances[quoteToken].value);
+      balanceBN = ethers.BigNumber.from(this.api.balances[this.network][quoteToken].value);
     }
 
     const makerVolumeFeeBN = quoteAmountBN

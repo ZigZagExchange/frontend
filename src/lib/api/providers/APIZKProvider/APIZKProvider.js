@@ -182,7 +182,7 @@ export default class APIZKProvider extends APIProvider {
       tokenRatio[marketInfo.baseAsset.id] = baseAmountBN
         .add(sellFeeBN);
       tokenRatio[marketInfo.quoteAsset.id] = quoteAmountBN;
-      balanceBN = ethers.BigNumber.from(this.api.balances[baseToken].value);
+      balanceBN = ethers.BigNumber.from(this.api.balances[this.network][baseToken].value);
     } else {
       sellQuantityBN = quoteAmountBN;
       tokenSell = marketInfo.quoteAsset.id;
@@ -195,7 +195,7 @@ export default class APIZKProvider extends APIProvider {
       tokenRatio[marketInfo.baseAsset.id] = baseAmountBN;
       tokenRatio[marketInfo.quoteAsset.id] = quoteAmountBN
         .add(sellFeeBN);
-      balanceBN = ethers.BigNumber.from(this.api.balances[quoteToken].value);
+      balanceBN = ethers.BigNumber.from(this.api.balances[this.network][quoteToken].value);
     }
 
     // size check

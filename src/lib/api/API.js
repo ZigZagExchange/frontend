@@ -833,7 +833,7 @@ export default class API extends Emitter {
 
   getBalances = async () => {
     const balances = await this.apiProvider.getBalances();
-    this.balances = balances;
+    this.balances[this.apiProvider.network] = balances;
     this.emit("balanceUpdate", this.apiProvider.network, balances);
     return balances;
   };
