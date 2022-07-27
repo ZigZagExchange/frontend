@@ -668,9 +668,10 @@ export default class APIZKProvider extends APIProvider {
   };
 
   getZkSyncBaseUrl = (chainId) => {
-    if (this.getChainName(chainId) === "mainnet") {
+    const chainName = this.api.getChainName(chainId);
+    if (chainName === "mainnet") {
       return "https://api.zksync.io/api/v0.2";
-    } else if (this.getChainName(chainId) === "rinkeby") {
+    } else if (chainName === "rinkeby") {
       return "https://rinkeby-api.zksync.io/api/v0.2";
     } else {
       throw Error("Uknown chain");
