@@ -252,13 +252,13 @@ export default class API extends Emitter {
     if (msg.op === "marketinfo") {
       const marketInfo = msg.args[0];
       if (!marketInfo) return;
-      this.marketInfo[`${this.apiProvider.network}:${marketInfo.alias}`] = marketInfo;
+      this.marketInfo[`${marketInfo.zigzagChainId}:${marketInfo.alias}`] = marketInfo;
     }
     if (msg.op === "marketinfo2") {
       const marketInfos = msg.args[0];
       marketInfos.forEach((marketInfo) => {
         if (!marketInfo) return;
-        this.marketInfo[`${this.apiProvider.network}:${marketInfo.alias}`] = marketInfo;
+        this.marketInfo[`${marketInfo.zigzagChainId}:${marketInfo.alias}`] = marketInfo;
       });
     }
     if (msg.op === "lastprice") {

@@ -110,15 +110,15 @@ export const apiSlice = createSlice({
       if (payload[0].error) {
         console.error(payload[0]);
       } else {
-        const marketinfos = payload[0];
-        if (!marketinfos) return;
-        state.marketinfos[makeScopeMarket(state)] = marketinfos;
+        const marketinfo = payload[0];
+        if (!marketinfo) return;
+        state.marketinfos[`${marketinfo.zigzagChainId}-${marketinfo.alias}`] = marketinfo;
       }
     },
     _marketinfo2(state, {payload}) {
-      payload[0].forEach((marketinfos) => {
-        if (!marketinfos) return;
-        state.marketinfos[makeScopeMarket(state)] = marketinfos;
+      payload[0].forEach((marketinfo) => {
+        if (!marketinfo) return;
+        state.marketinfos[`${marketinfo.zigzagChainId}-${marketinfo.alias}`] = marketinfo;
       });
     },
     _fills(state, { payload }) {
