@@ -423,7 +423,7 @@ export const Header = (props) => {
               style={{ paddingTop: "20px" }}
             >
               <Tab>TRADE</Tab>
-              <Tab display={!isEVM}>CONVERT</Tab>
+              <Tab display={false}>CONVERT</Tab>
               <Tab display={hasBridge}>BRIDGE</Tab>
               <Tab display={!isEVM}>LIST PAIR</Tab>
               <Tab display={false}>
@@ -521,14 +521,17 @@ export const Header = (props) => {
           />
           <TabMenu row activeIndex={index} onItemClick={handleClick}>
             <Tab>TRADE</Tab>
-            <Tab>CONVERT</Tab>
-            {hasBridge && <Tab>BRIDGE</Tab>}
-            <Tab>LIST PAIR</Tab>
-            {/* <Tab>
+            <Tab display={false}>CONVERT</Tab>
+            <Tab display={hasBridge}>BRIDGE</Tab>
+            <Tab display={!isEVM}>LIST PAIR</Tab>
+            <Tab display={false}>
               DOCS
               <ExternalLinkIcon size={12} />
-            </Tab> */}
-            {isEVM && <Tab>WRAP</Tab>}
+            </Tab>
+            <Tab display={isEVM}>
+              WRAP
+              <ExternalLinkIcon size={12} />
+            </Tab>
           </TabMenu>
           <HorizontalDivider />
           {/* <ActionSideMenuWrapper>
