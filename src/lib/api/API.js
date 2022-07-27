@@ -354,10 +354,10 @@ export default class API extends Emitter {
       serverTime = Date.now();
     }
     const clientTime = Date.now();
-    this.serverDelta = serverTime - clientTime;
-    if (this.serverDelta < -5000 || this.serverDelta > 5000) {
+    this.serverDelta = Math.floor((serverTime - clientTime) / 1000);
+    if (this.serverDelta < -5 || this.serverDelta > 5) {
       console.warn(`Your PC clock is not synced (delta: ${
-        this.serverDelta / 60000
+        this.serverDelta / 60
         } min). Please sync it via settings > date/time > sync now`);
     }
   }
@@ -911,18 +911,17 @@ export default class API extends Emitter {
       marketInfo.quoteAsset.decimals
     );
 
-    const expirationTimeSeconds = Math.floor(
-      orderType === "market"
-        ? Date.now() / 1000 + 60 * 2 // two minutes
-        : Date.now() / 1000 + 60 * 60 * 24 * 7 // one week
-    );
+    const expirationTimeSeconds = orderType === "market"
+      ? Date.now() / 1000 + 60 * 2 // two minutes
+      : Date.now() / 1000 + 60 * 60 * 24 * 7; // one week
+    
 
     await this.apiProvider.submitOrder(
       market,
       side,
       baseAmountBN,
       quoteAmountBN,
-      (expirationTimeSeconds + this.serverDelta)
+      Math.floor(expirationTimeSeconds + this.serverDelta)
     );
   };
 
