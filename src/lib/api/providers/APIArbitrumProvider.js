@@ -111,7 +111,7 @@ export default class APIArbitrumProvider extends APIProvider {
     quoteAmountBN,
     expirationTimeSeconds
   ) => {
-    const marketInfo = this.api.marketInfo[market];
+    const marketInfo = this.api.marketInfo[`${this.network}:${market}`];
 
     const [baseToken, quoteToken] = market.split("-");
     let makerToken,
@@ -311,7 +311,7 @@ export default class APIArbitrumProvider extends APIProvider {
   };
 
   getExchangeAddress = () => {
-    const marketInfoArray = Object.values(this.api.marketInfo);
+    const marketInfoArray = Object.values(this.api.marketInfo[`${this.network}:ZZ-USDC`]);
     return marketInfoArray[0]?.exchangeAddress;
   };
 }
