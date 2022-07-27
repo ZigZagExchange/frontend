@@ -36,7 +36,26 @@ export function addComma(floatNum) {
   const str = typeof floatNum === 'string'?floatNum.replaceAll(",", ""):floatNum;
   const parts = Number(str).toString().split(".");
   parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  return parts.join(".");
+  return expToNumber(parts.join("."));
+}
+
+export function expToNumber(number) {
+  const data = String(number).split(/[eE]/);
+  if (data.length === 1) return data[0];
+
+  let z = '',
+    sign = number < 0 ? '-' : '',
+    str = data[0].replace('.', ''),
+    mag = Number(data[1]) + 1;
+
+  if (mag < 0) {
+    z = sign + '0.';
+    while (mag++) z += '0';
+    return z + str.replace(/^\-/, '');
+  }
+  mag -= str.length;
+  while (mag--) z += '0';
+  return str + z;
 }
 
 export function formatToken(floatNum, token = "USDC") {
