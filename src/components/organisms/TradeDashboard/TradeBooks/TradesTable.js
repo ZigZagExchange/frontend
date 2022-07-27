@@ -12,12 +12,7 @@ const TradesTableWrapper = styled.div`
 `;
 
 export default function TradesTable(props) {
-  const [fixedPoint, setFixedPoint] = useState(2);
   const [side, setSide] = useState("all");
-
-  const changeFixedPoint = (point) => {
-    setFixedPoint(point);
-  };
 
   const changeSide = (side) => {
     setSide(side);
@@ -28,7 +23,6 @@ export default function TradesTable(props) {
       <TradesTableWrapper>
         <OrdersBook
           currentMarket={props.currentMarket}
-          changeFixedPoint={changeFixedPoint}
           changeSide={changeSide}
           marketInfo={props.marketInfo}
           marketSummary={props.marketSummary}
@@ -39,7 +33,6 @@ export default function TradesTable(props) {
         />
         <TradesBook
           currentMarket={props.currentMarket}
-          fixedPoint={fixedPoint}
           side={side}
         />
       </TradesTableWrapper>
