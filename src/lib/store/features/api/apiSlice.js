@@ -444,6 +444,7 @@ export const apiSlice = createSlice({
       };
     },
     setCurrentMarket(state, { payload }) {
+      console.log(`Executing setCurrentMarket to ${payload}`)
       if (state.currentMarket !== payload) {
         state.currentMarket = payload;
         state.marketFills = {};

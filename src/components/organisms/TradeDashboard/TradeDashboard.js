@@ -114,6 +114,7 @@ export function TradeDashboard() {
   const history = useHistory();
 
   const updateMarketChain = (market) => {
+    console.log(`TradeDashboard set pair to ${market}`);    
     dispatch(setCurrentMarket(market));
   };
 
