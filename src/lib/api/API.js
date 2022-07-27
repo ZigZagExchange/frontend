@@ -635,7 +635,7 @@ export default class API extends Emitter {
   };
 
   getChainIdFromName = (name) => {
-    return this.networks?.[name]?.[1];
+    return this.networks?.[name]?.[0];
   };
 
   getNetworkDisplayName = (network) => {
@@ -756,7 +756,8 @@ export default class API extends Emitter {
     const { id: userId } = await this.getAccountState();
     const tokenArray = [];
     orderIds.forEach(id => {
-      tokenArray.push(localStorage.getItem(id));
+      const token = localStorage.getItem(id);
+      if (token) tokenArray.push(token);
     })
     if (orderIds.length === tokenArray.length) {
       await this.send("cancelall3", [this.apiProvider.network, userId, tokenArray]);
@@ -764,7 +765,7 @@ export default class API extends Emitter {
       const toastMsg = toast.info('Sing the message to approve canceling the order...', {
         toastId: "Sing the message to approve canceling the order...'",
       });
-      const validUntil = (Date.now() / 1000) + 10;
+      const validUntil = Math.floor(Date.now() / 1000) + 10;
       const message = `cancelall2:${this.apiProvider.network}:${validUntil}`
       const signedMessage = await this.apiProvider.signMessage(message);
       try {
