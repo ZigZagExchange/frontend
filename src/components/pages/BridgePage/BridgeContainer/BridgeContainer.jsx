@@ -304,8 +304,8 @@ const BridgeContainer = () => {
     const swapCurrency = swapDetails.currency;
     if (balances.length === 0) return false;
     const getCurrencyBalance = (cur) =>
-      balances[cur] && swapCurrencyInfo?.decimals
-        ? balances[cur].value / 10 ** swapCurrencyInfo.decimals
+      balances[cur] && balances[cur].valueReadable
+        ? balances[cur].valueReadable
         : 0;
     const userBalance = getCurrencyBalance(swapCurrency);
     const max = getMax(swapCurrency, L2FeeToken);
