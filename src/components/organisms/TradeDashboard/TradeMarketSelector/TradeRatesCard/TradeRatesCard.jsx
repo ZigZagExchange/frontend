@@ -355,6 +355,7 @@ const Wrapper = styled.div`
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  padding-right: 10px;
 `;
 const LeftWrapper = styled.div`
   display: grid;
