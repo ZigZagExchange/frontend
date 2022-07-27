@@ -20,7 +20,7 @@ import {
   layoutSelector,
   settingsSelector,
   marketSummarySelector,
-  marketInfosSelector,
+  marketInfoSelector,
   lastPricesSelector,
   liquiditySelector,
   allOrdersSelector,
@@ -99,7 +99,7 @@ export function TradeDashboard() {
   const userFills = useSelector(userFillsSelector);
   const layout = useSelector(layoutSelector);
   const settings = useSelector(settingsSelector);
-  const marketInfos = useSelector(marketInfosSelector);
+  const marketInfo = useSelector(marketInfoSelector);
   const marketSummary = useSelector(marketSummarySelector);
   const lastPrices = useSelector(lastPricesSelector);
   const liquidity = useSelector(liquiditySelector);
@@ -118,7 +118,7 @@ export function TradeDashboard() {
   };
 
   useEffect(() => {
-    const price = lastPrices?.[network]?.[currentMarket]?.price;
+    const price = lastPrices?.[currentMarket]?.price;
     if (price) {
       setCurrentPairLastPrice(price);
     } else {
@@ -302,9 +302,9 @@ export function TradeDashboard() {
           updateMarketChain={updateMarketChain}
           currentMarket={currentMarket}
           network={network}
-          marketInfo={marketInfos?.[currentMarket]}
+          marketInfo={marketInfo}
           marketSummary={marketSummary}
-          lastPrices={lastPrices?.[network]}
+          lastPrices={lastPrices}
         />
         {/* TradePriceBtcTable, Spotbox */}
         <TradeSidebar
@@ -312,7 +312,7 @@ export function TradeDashboard() {
           currentMarket={currentMarket}
           user={user}
           activeOrderCount={activeUserOrders}
-          marketInfo={marketInfos?.[currentMarket]}
+          marketInfo={marketInfo}
           marketSummary={marketSummary}
           userOrders={userOrders}
           lastPrice={currentPairLastPrice}
@@ -325,7 +325,7 @@ export function TradeDashboard() {
             <OrdersBook
               currentMarket={currentMarket}
               changeSide={changeSide}
-              marketInfo={marketInfos?.[currentMarket]}
+              marketInfo={marketInfo}
               marketSummary={marketSummary}
               settings={settings}
               lastPrice={currentPairLastPrice}
@@ -341,7 +341,7 @@ export function TradeDashboard() {
           <TradesTable 
             currentMarket={currentMarket}
             changeSide={changeSide}
-            marketInfo={marketInfos?.[currentMarket]}
+            marketInfo={marketInfo}
             marketSummary={marketSummary}
             settings={settings}
             lastPrice={currentPairLastPrice}
@@ -350,7 +350,7 @@ export function TradeDashboard() {
           />
         )}
         {/* TradeChartArea */}
-        <TradeChartArea marketInfo={marketInfos?.[currentMarket]} />
+        <TradeChartArea marketInfo={marketInfo} />
         {/* OrdersTable */}
         <TradeTables
           userFills={userFills}

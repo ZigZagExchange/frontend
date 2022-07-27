@@ -2,13 +2,11 @@ import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import {
   lastPricesSelector,
-  networkSelector,
 } from "lib/store/features/api/apiSlice";
 import { stables } from "lib/helpers/categories";
 
 export function useCoinEstimator() {
   const pairPrices = useSelector(lastPricesSelector);
-  const network = useSelector(networkSelector);
   let prices = {};
   // add all stablecoins
   stables.forEach((stable) => {
@@ -18,12 +16,12 @@ export function useCoinEstimator() {
   return useMemo(() => {
     let priceArray = {};
     let remaining = [];
-    if (pairPrices[network]) {
-      remaining = Object.keys(pairPrices[network]).filter(
+    if (pairPrices) {
+      remaining = Object.keys(pairPrices).filter(
         (token) => !stables.includes(token)
       );
-      Object.keys(pairPrices[network]).forEach((pair) => {
-        const pairPrice = pairPrices[network][pair].price;
+      Object.keys(pairPrices).forEach((pair) => {
+        const pairPrice = pairPrices[pair].price;
         if (Number.isNaN(pairPrice) || !Number.isFinite(pairPrice)) return;
 
         const [base, quote] = pair.split("-").map((s) => s.toUpperCase());
@@ -55,7 +53,7 @@ export function useCoinEstimator() {
     // add prices from other pairs
     priceArray = {};
     remaining.forEach((pair) => {
-      let pairPrice = pairPrices[network][pair].price;
+      let pairPrice = pairPrices[pair].price;
       if (Number.isNaN(pairPrice) || !Number.isFinite(pairPrice)) return;
       const [base, quote] = pair.split("-").map((s) => s.toUpperCase());
 
