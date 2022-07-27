@@ -198,7 +198,7 @@ const ConvertPage = () => {
       tType === "buy" ? 1 + slippageValue / 100 : 1 - slippageValue / 100;
 
     setCurrentPrice(price);
-  }, [liquidity, allOrders, slippageValue]);
+  }, [liquidity, allOrders, slippageValue, tType]);
 
   useEffect(() => {
     if (changedBuyAmount) {
@@ -772,7 +772,7 @@ const ConvertPage = () => {
 
   const onChangeSlippageValue = (value) => {
     let amount = value.replace(",", ".").replace(/[^0-9.]/g, ""); //^[1-9][0-9]?$|^100$
-    if (parseFloat(amount) < 0.1 || parseFloat(amount) > 25) {
+    if (parseFloat(amount) < 0 || parseFloat(amount) > 25) {
       dispatch(setSlippageValue({ value: "1.00" }));
     } else {
       dispatch(setSlippageValue({ value: amount }));
