@@ -219,10 +219,12 @@ class SpotForm extends React.Component {
 
     Object.keys(this.props.userOrders).forEach((orderId) => {
       const order = this.props.userOrders[orderId];
-      if (['c', 'e', 'r', 'f'].includes(order[9])) return;
+      if (["c", "e", "r", "f"].includes(order[9])) return;
       if (
-        (order[3] === "s" && order[2].split("-")[0] === marketInfo.baseAsset.symbol) ||
-        (order[3] === "b" && order[2].split("-")[1] === marketInfo.baseAsset.symbol)
+        (order[3] === "s" &&
+          order[2].split("-")[0] === marketInfo.baseAsset.symbol) ||
+        (order[3] === "b" &&
+          order[2].split("-")[1] === marketInfo.baseAsset.symbol)
       ) {
         totalBalance -= order[10];
       }
@@ -248,10 +250,12 @@ class SpotForm extends React.Component {
 
     Object.keys(this.props.userOrders).forEach((orderId) => {
       const order = this.props.userOrders[orderId];
-      if (['c', 'e', 'r', 'f'].includes(order[9])) return;
+      if (["c", "e", "r", "f"].includes(order[9])) return;
       if (
-        (order[3] === "b" && order[2].split("-")[1] === marketInfo.quoteAsset.symbol) ||
-        (order[3] === "s" && order[2].split("-")[0] === marketInfo.quoteAsset.symbol)
+        (order[3] === "b" &&
+          order[2].split("-")[1] === marketInfo.quoteAsset.symbol) ||
+        (order[3] === "s" &&
+          order[2].split("-")[0] === marketInfo.quoteAsset.symbol)
       ) {
         totalBalance -= order[4] * order[10];
       }
@@ -351,7 +355,7 @@ class SpotForm extends React.Component {
 
   getLadderPrice() {
     let baseAmount = Number(this.state.baseAmount);
-    const side = this.props.side;    
+    const side = this.props.side;
     if (!baseAmount) baseAmount = 0;
 
     let price;
@@ -387,7 +391,7 @@ class SpotForm extends React.Component {
       console.error("Approve only on EVM chains");
       return;
     }
-    
+
     const marketInfo = this.props.marketInfo;
     const token =
       this.props.side === "s"
@@ -485,9 +489,7 @@ class SpotForm extends React.Component {
       if (this.state.baseAmount < fee) {
         fee = Number(fee).toPrecision(5);
         toast.error(
-          `Minimum order size is ${fee} ${
-            marketInfo.baseAsset.symbol
-          }`
+          `Minimum order size is ${fee} ${marketInfo.baseAsset.symbol}`
         );
         return;
       }
@@ -517,13 +519,9 @@ class SpotForm extends React.Component {
       if (this.state.quoteAmount < fee) {
         fee = Number(fee).toPrecision(5);
         toast.error(
-          `Minimum order size is ${fee} ${
-            marketInfo.quoteAsset.symbol
-          }`,
+          `Minimum order size is ${fee} ${marketInfo.quoteAsset.symbol}`,
           {
-            toastId: `Minimum order size is ${fee} ${
-              marketInfo.quoteAsset.symbol
-            }`,
+            toastId: `Minimum order size is ${fee} ${marketInfo.quoteAsset.symbol}`,
           }
         );
         return;
@@ -566,18 +564,19 @@ class SpotForm extends React.Component {
         this.props.orderType === "market" &&
         !this.props.settings.disableSlippageWarning)
     ) {
-      this.props.setHighSlippageModal({
-        xToken: parseFloat(baseAmount).toPrecision(4),
-        yToken: parseFloat(quoteAmount).toPrecision(4),
-        userPrice: price,
-        pairPrice: fairPrice,
-        type: this.props.side === "b" ? "buy" : "sell",
-        open: true,
-        delta: delta,
-      });
-      return;
+      if (!this.props.confirmed) {
+        this.props.setHighSlippageModal({
+          xToken: parseFloat(baseAmount).toPrecision(4),
+          yToken: parseFloat(quoteAmount).toPrecision(4),
+          userPrice: price,
+          pairPrice: fairPrice,
+          type: this.props.side === "b" ? "buy" : "sell",
+          open: true,
+          delta: delta,
+        });
+        return;
+      }
     }
-
     const renderGuidContent = () => {
       return (
         <div>
@@ -713,7 +712,6 @@ class SpotForm extends React.Component {
   componentDidUpdate(prevProps, prevState) {
     // Prevents bug where price volatility can cause buy amount to be too large
     // by refreshing a maxed out buy amount to match the new price
-
     if (this.props.confirmed) {
       this.handleOrder();
       this.props.setHighSlippageModal({ confirmed: false });
@@ -1105,10 +1103,12 @@ class SpotForm extends React.Component {
             <RangeSlider
               value={exchangePercentage}
               onChange={this.rangeSliderHandler.bind(this)}
-              disabled={ 
-                this.props.marketInfo && 
-                ((this.props.side === 's' && baseBalance < this.props.marketInfo.baseFee) ||
-                (this.props.side === 'b' && quoteBalance < this.props.marketInfo.quoteFee))
+              disabled={
+                this.props.marketInfo &&
+                ((this.props.side === "s" &&
+                  baseBalance < this.props.marketInfo.baseFee) ||
+                  (this.props.side === "b" &&
+                    quoteBalance < this.props.marketInfo.quoteFee))
               }
             />
             <Box display="flex" alignItems="center" ml="20px">
