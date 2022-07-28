@@ -376,12 +376,11 @@ const BridgeContainer = () => {
         balances[L2FeeToken] &&
           balances[L2FeeToken].value / 10 ** feeCurrencyInfo.decimals
       );
-  
+
       if (inputValue > 0 && L2FeeAmount > feeTokenBalance) {
         error = "Not enough balance to pay for fees";
       }
     }
-    
 
     if (error) {
       setFormErr(error);
