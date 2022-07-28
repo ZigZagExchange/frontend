@@ -774,6 +774,7 @@ export default class API extends Emitter {
 
       if (currency === "ETH") {
         result.balance = await this.mainnetProvider.getBalance(account);
+        result.allowance = ethersConstants.MaxUint256;
         return result;
       }
 
