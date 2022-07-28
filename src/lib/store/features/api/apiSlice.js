@@ -5,7 +5,8 @@ import api from "lib/api";
 import { getLayout } from "lib/helpers/storage/layouts";
 import FillCard from "components/organisms/TradeDashboard/TradeTables/OrdersTable/FillCard";
 
-const makeScope = (state) => `${state.network}-${state.userId}`;
+const makeScopeUser = (state) => `${state.network}-${state.userId}`;
+const makeScopeMarket = (state) => `${state.network}-${state.currentMarket}`;
 
 const initialUISettings = {
   showNightPriceChange: false,
@@ -109,15 +110,15 @@ export const apiSlice = createSlice({
       if (payload[0].error) {
         console.error(payload[0]);
       } else {
-        const marketinfos = payload[0];
-        if (!marketinfos) return;
-        state.marketinfos[marketinfos.alias] = marketinfos;
+        const marketinfo = payload[0];
+        if (!marketinfo) return;
+        state.marketinfos[`${marketinfo.zigzagChainId}-${marketinfo.alias}`] = marketinfo;
       }
     },
     _marketinfo2(state, {payload}) {
-      payload[0].forEach((marketinfos) => {
-        if (!marketinfos) return;
-        state.marketinfos[marketinfos.alias] = marketinfos;
+      payload[0].forEach((marketinfo) => {
+        if (!marketinfo) return;
+        state.marketinfos[`${marketinfo.zigzagChainId}-${marketinfo.alias}`] = marketinfo;
       });
     },
     _fills(state, { payload }) {
@@ -432,7 +433,7 @@ export const apiSlice = createSlice({
       state.userOrders[orderId] = payload;
     },
     setBalances(state, { payload }) {
-      const scope = makeScope(state);
+      const scope = makeScopeUser(state);
       state.balances[scope] = state.balances[scope] || {};
       state.balances[scope] = {
         ...state.balances[scope],
@@ -443,6 +444,7 @@ export const apiSlice = createSlice({
       };
     },
     setCurrentMarket(state, { payload }) {
+      console.log(`Executing setCurrentMarket to ${payload}`)
       if (state.currentMarket !== payload) {
         state.currentMarket = payload;
         state.marketFills = {};
@@ -594,7 +596,6 @@ export const apiSlice = createSlice({
       state.bridgeReceipts.unshift(payload);
     },
     resetData(state) {
-      state.marketinfos = {};
       state.marketFills = {};
       state.marketSummary = {};
       state.orders = {};
@@ -675,12 +676,14 @@ export const userOrdersSelector = (state) => state.api.userOrders;
 export const userFillsSelector = (state) => state.api.userFills;
 export const allOrdersSelector = (state) => state.api.orders;
 export const marketFillsSelector = (state) => state.api.marketFills;
-export const lastPricesSelector = (state) => state.api.lastPrices;
+export const lastPricesSelector = (state) => 
+  state.api.lastPrices[state.api.network];
 export const marketSummarySelector = (state) => state.api.marketSummary;
 export const liquiditySelector = (state) => state.api.liquidity;
 export const currentMarketSelector = (state) => state.api.currentMarket;
 export const bridgeReceiptsSelector = (state) => state.api.bridgeReceipts;
-export const marketInfosSelector = (state) => state.api.marketinfos;
+export const marketInfoSelector = (state) => 
+  state.api.marketinfos[makeScopeMarket(state.api)] || null;
 export const arweaveAllocationSelector = (state) => state.api.arweaveAllocation;
 export const isConnectingSelector = (state) => state.api.isConnecting;
 export const isBridgeConnectingSelector = (state) =>
@@ -688,7 +691,7 @@ export const isBridgeConnectingSelector = (state) =>
 export const settingsSelector = (state) => state.api.settings;
 export const highSlippageModalSelector = (state) => state.api.highSlippageModal;
 export const balancesSelector = (state) =>
-  state.api.balances[makeScope(state.api)] || {};
+  state.api.balances[makeScopeUser(state.api)] || {};
 
 export const handleMessage = createAction("api/handleMessage");
 export const slippageValueSelector = (state) => state.api.slippageValue;
