@@ -42,6 +42,9 @@ import TradesTable from "./TradeBooks/TradesTable";
 import { HighSlippageModal } from "components/molecules/HighSlippageModal";
 import _ from "lodash";
 import { formatPrice, addComma } from "lib/utils";
+import NewFeaturesPopup from "components/organisms/TradeDashboard/NewFeaturesPopup";
+import classNames from "classnames";
+import useTheme from "components/hooks/useTheme";
 
 const TradeContainer = styled.div`
   color: #aeaebf;
@@ -82,6 +85,7 @@ export function TradeDashboard() {
 
   const { search } = useLocation();
   const history = useHistory();
+  const { isDark } = useTheme();
 
   const updateMarketChain = (market) => {
     dispatch(setCurrentMarket(market));
@@ -346,6 +350,16 @@ export function TradeDashboard() {
         </div>
       </GridLayoutRow>
       <HighSlippageModal />
+
+      {!settings.hideLayoutGuidePopup && (
+        <div
+          className={classNames({
+            dark: isDark,
+          })}
+        >
+          <NewFeaturesPopup />
+        </div>
+      )}
     </TradeContainer>
   );
 }

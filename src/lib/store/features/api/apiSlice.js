@@ -24,6 +24,7 @@ const initialUISettings = {
   disableTradeIDCard: false,
   layouts: initialLayouts,
   editable: false,
+  hideLayoutGuidePopup: false,
 };
 
 export const apiSlice = createSlice({
@@ -120,7 +121,7 @@ export const apiSlice = createSlice({
         state.marketinfos[marketinfos.alias] = marketinfos;
       }
     },
-    _marketinfo2(state, {payload}) {
+    _marketinfo2(state, { payload }) {
       payload[0].forEach((marketinfos) => {
         if (!marketinfos) return;
         state.marketinfos[marketinfos.alias] = marketinfos;
