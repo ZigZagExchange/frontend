@@ -752,6 +752,9 @@ class SpotForm extends React.Component {
       newState.quoteChanged = false;
       this.setState(newState);
     }
+    if(this.props.lastPrice !== prevProps.lastPrice) {
+      this.setState({price: this.props.lastPrice})
+    }
   }
 
   showLabel() {
