@@ -11,8 +11,6 @@ import {
   ZKSYNC_ETHEREUM_FAST_BRIDGE,
   ETH_ZKSYNC_BRIDGE,
 } from "components/pages/BridgePage/constants";
-import _ from "lodash";
-import { formatAmount } from "lib/utils";
 
 export default class APIZKProvider extends APIProvider {
   static SEEDS_STORAGE_KEY = "@ZZ/ZKSYNC_SEEDS";
@@ -119,9 +117,9 @@ export default class APIZKProvider extends APIProvider {
       let maxValue = 0;
       const tokens = Object.keys(balances);
       const result = tokens.map(async (token) => {
-        const tokenInfo = await this.getTokenInfo(token);
+        const tokenInfo = await this.api.getCurrencyInfo(token);
         if (tokenInfo.enabledForFees) {
-          const priceInfo = await this.tokenPrice(token);
+          const priceInfo = tokenInfo.usdPrice;
           const usdValue =
             (priceInfo.price * balances[token]) / 10 ** tokenInfo.decimals;
           if (usdValue > maxValue) {
@@ -168,7 +166,7 @@ export default class APIZKProvider extends APIProvider {
       );
 
     const [baseToken, quoteToken] = market.split("-");
-    const marketInfo = this.api.marketInfo[market];
+    const marketInfo = this.api.marketInfo[`${this.network}:${market}`]
     const tokenRatio = {};
 
     let sellQuantityBN, tokenSell, tokenBuy, balanceBN;
@@ -184,7 +182,7 @@ export default class APIZKProvider extends APIProvider {
       tokenRatio[marketInfo.baseAsset.id] = baseAmountBN
         .add(sellFeeBN);
       tokenRatio[marketInfo.quoteAsset.id] = quoteAmountBN;
-      balanceBN = ethers.BigNumber.from(this.api.balances[baseToken].value);
+      balanceBN = ethers.BigNumber.from(this.api.balances[this.network][baseToken].value);
     } else {
       sellQuantityBN = quoteAmountBN;
       tokenSell = marketInfo.quoteAsset.id;
@@ -197,7 +195,7 @@ export default class APIZKProvider extends APIProvider {
       tokenRatio[marketInfo.baseAsset.id] = baseAmountBN;
       tokenRatio[marketInfo.quoteAsset.id] = quoteAmountBN
         .add(sellFeeBN);
-      balanceBN = ethers.BigNumber.from(this.api.balances[quoteToken].value);
+      balanceBN = ethers.BigNumber.from(this.api.balances[this.network][quoteToken].value);
     }
 
     // size check
@@ -435,7 +433,7 @@ export default class APIZKProvider extends APIProvider {
 
   getWithdrawFeeToken = async (tokenToWithdraw) => {
     const backupFeeToken = "ETH";
-    const tokenInfo = await this.getTokenInfo(tokenToWithdraw);
+    const tokenInfo = await this.api.getCurrencyInfo(tokenToWithdraw);
     return tokenInfo.enabledForFees ? tokenToWithdraw : backupFeeToken;
   };
 
@@ -506,7 +504,8 @@ export default class APIZKProvider extends APIProvider {
       if (token === "ETH") {
         return getNumberFormatted(bridgeFee);
       } else if (["FRAX", "UST"].includes(token)) {
-        const priceInfo = await this.tokenPrice("ETH");
+        const tokenInfo = await this.api.getCurrencyInfo('ETH')
+        const priceInfo = tokenInfo.usdPrice;
         const stableFee = (
           ((bridgeFee.toString() / 1e18) *
             priceInfo.price *
@@ -563,32 +562,8 @@ export default class APIZKProvider extends APIProvider {
       this.api.getAccountState(),
       this.checkAccountActivated(),
     ]);
-    if (!accountState.id) {
-      const walletBalance = formatAmount(
-        accountState.committed.balances["ETH"],
-        { decimals: 18 }
-      );
-      const activationFee = await this.changePubKeyFee("ETH");
-
-      if (isNaN(walletBalance) || walletBalance < activationFee) {
-        // toast.error(
-        //   "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
-        //   {
-        //     autoClose: 60000,
-        //   }
-        // );
-      } else {
-        // toast.error(
-        //   "Your zkSync account is not activated. Please activate your zkSync wallet.",
-        //   {
-        //     autoClose: false,
-        //   }
-        // );
-      }
-    } else {
-      if (!accountActivated) {
-        await this.changePubKey();
-      }
+    if (!accountActivated) {
+      await this.changePubKey();
     }
 
     return accountState;
@@ -693,107 +668,13 @@ export default class APIZKProvider extends APIProvider {
   };
 
   getZkSyncBaseUrl = (chainId) => {
-    if (this.getChainName(chainId) === "mainnet") {
+    const chainName = this.api.getChainName(chainId);
+    if (chainName === "mainnet") {
       return "https://api.zksync.io/api/v0.2";
-    } else if (this.getChainName(chainId) === "rinkeby") {
+    } else if (chainName === "rinkeby") {
       return "https://rinkeby-api.zksync.io/api/v0.2";
     } else {
       throw Error("Uknown chain");
     }
   };
-
-  tokenPrice = async (tokenLike, chainId = 1) => {
-    try {
-      const res = await axios.get(
-        this.getZkSyncBaseUrl(chainId) + `/tokens/${tokenLike}/priceIn/usd`
-      );
-      return res.data.result;
-    } catch (e) {
-      console.error("Could not get token price", e);
-    }
-  };
-
-  /*
-   * Gets token info from zkSync REST API
-   * @param  {String} tokenLike:            Symbol or Internal ID
-   * @param  {Number or String} _chainId:   Network ID to query (1 for mainnet, 1000 for rinkeby)
-   * @return {Object}                       {address: string, decimals: number, enabledForFees: bool, id: number, symbol: string}
-   * */
-  getTokenInfo = async (tokenLike, _chainId = this.network) => {
-    const chainId = _chainId.toString();
-    const returnFromCache =
-      this._tokenInfo[chainId] && this._tokenInfo[chainId][tokenLike];
-    try {
-      if (returnFromCache) {
-        return this._tokenInfo[chainId][tokenLike];
-      } else {
-        const res = await axios.get(
-          this.getZkSyncBaseUrl(chainId) + `/tokens/${tokenLike}`
-        );
-        this._tokenInfo[chainId] = {
-          ...this._tokenInfo[chainId],
-          [tokenLike]: res.data.result,
-        };
-        return this._tokenInfo[chainId][tokenLike];
-      }
-    } catch (e) {
-      console.error("Could not get token info", e);
-    }
-  };
-
-  getChainName = (chainId) => {
-    switch (Number(chainId)) {
-      case 1:
-        return "mainnet";
-      case 1000:
-        return "rinkeby";
-      default:
-        throw Error("Chain ID not understood");
-    }
-  };
-
-  tokenPrice = async (tokenLike, chainId = 1) => {
-    try {
-      const res = await axios.get(
-        this.getZkSyncBaseUrl(chainId) + `/tokens/${tokenLike}/priceIn/usd`
-      );
-      return res.data.result;
-    } catch (e) {
-      console.error("Could not get token price", e);
-    }
-  };
-
-  cacheMarketInfoFromNetwork = async (pairs) => {
-    if (pairs.length === 0) return;
-    if (!this.network) return;
-    const pairText = pairs.join(",");
-    const url =
-      this.network === 1
-        ? `https://zigzag-markets.herokuapp.com/markets?id=${pairText}&chainid=${this.network}`
-        : `https://secret-thicket-93345.herokuapp.com/api/v1/marketinfos?chain_id=${this.network}&market=${pairText}`;
-    const marketInfoArray = await fetch(url).then((r) => r.json());
-    // if (!(marketInfoArray instanceof Array)) return;
-    _.forEach(marketInfoArray, (info) => (this.marketInfo[info.alias] = info));
-    // marketInfoArray.forEach((info) => (this.marketInfo[info.alias] = info));
-    return;
-  };
-
-  getPairs = () => {
-    return Object.keys(this.lastPrices[this.network]);
-  };
-
-  getCurrencyInfo(currency) {
-    const pairs = this.getPairs();
-    for (let i = 0; i < pairs.length; i++) {
-      const pair = pairs[i];
-      const baseCurrency = pair.split("-")[0];
-      const quoteCurrency = pair.split("-")[1];
-      if (baseCurrency === currency && this.marketInfo[pair]) {
-        return this.marketInfo[pair].baseAsset;
-      } else if (quoteCurrency === currency && this.marketInfo[pair]) {
-        return this.marketInfo[pair].quoteAsset;
-      }
-    }
-    return null;
-  }
 }

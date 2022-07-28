@@ -34,7 +34,7 @@ const SelectAsset = ({
       }
       const roundedDecimalDigits = Math.min(currencyInfo.decimals, 8);
       let actualBalance =
-        balances[swapDetails.currency].value / 10 ** currencyInfo.decimals;
+        balances[swapDetails.currency].valueReadable;
       if (actualBalance !== 0) {
         let receiveAmount = 0;
         if (feeCurrency === "ETH" && swapDetails.currency === "ETH") {

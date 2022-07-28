@@ -252,13 +252,13 @@ export default class API extends Emitter {
     if (msg.op === "marketinfo") {
       const marketInfo = msg.args[0];
       if (!marketInfo) return;
-      this.marketInfo[marketInfo.alias] = marketInfo;
+      this.marketInfo[`${marketInfo.zigzagChainId}:${marketInfo.alias}`] = marketInfo;
     }
     if (msg.op === "marketinfo2") {
       const marketInfos = msg.args[0];
       marketInfos.forEach((marketInfo) => {
         if (!marketInfo) return;
-        this.marketInfo[marketInfo.alias] = marketInfo;
+        this.marketInfo[`${marketInfo.zigzagChainId}:${marketInfo.alias}`] = marketInfo;
       });
     }
     if (msg.op === "lastprice") {
@@ -334,6 +334,7 @@ export default class API extends Emitter {
   };
 
   _socketError = (e) => {
+    console.log(e)
     console.warn("Zigzag websocket connection failed");
   };
 
@@ -450,7 +451,6 @@ export default class API extends Emitter {
     if (isMobile) window.localStorage.clear();
     else window.localStorage.removeItem("walletconnect");
 
-    this.marketInfo = {};
     this.balances = {};
     this._profiles = {};
     this._pendingOrders = [];
@@ -833,7 +833,7 @@ export default class API extends Emitter {
 
   getBalances = async () => {
     const balances = await this.apiProvider.getBalances();
-    this.balances = balances;
+    this.balances[this.apiProvider.network] = balances;
     this.emit("balanceUpdate", this.apiProvider.network, balances);
     return balances;
   };
@@ -844,7 +844,7 @@ export default class API extends Emitter {
     const quoteQuantity = order[4] * order[5];
     const remaining = Number(order[11]) !== null ? order[5] : order[11];
     const market = order[2];
-    const marketInfo = this.marketInfo[market];
+    const marketInfo = this.marketInfo[`${this.apiProvider.network}:${market}`];
     let baseQuantityWithoutFee,
       quoteQuantityWithoutFee,
       priceWithoutFee,
@@ -875,7 +875,7 @@ export default class API extends Emitter {
       throw new Error("Set base or quote amount");
     }
 
-    const marketInfo = this.marketInfo[market];
+    const marketInfo = this.marketInfo[`${this.apiProvider.network}:${market}`];
     let baseAmountBN = ethers.utils.parseUnits(
       Number(baseAmount).toFixed(marketInfo.baseAsset.decimals),
       marketInfo.baseAsset.decimals
@@ -993,22 +993,6 @@ export default class API extends Emitter {
     }
   }
 
-  /*
-  cacheMarketInfoFromNetwork = async (pairs) => {
-    if (pairs.length === 0) return;
-    if (!this.apiProvider.network) return;
-    const pairText = pairs.join(",");
-    const url =
-      this.apiProvider.network === 1
-        ? `https://zigzag-markets.herokuapp.com/markets?id=${pairText}&chainid=${this.apiProvider.network}`
-        : `https://secret-thicket-93345.herokuapp.com/api/v1/marketinfos?chain_id=${this.apiProvider.network}&market=${pairText}`;
-    const marketInfoArray = await fetch(url).then((r) => r.json());
-    if (!(marketInfoArray instanceof Array)) return;
-    marketInfoArray.forEach((info) => (this.marketInfo[info.alias] = info));
-    return;
-  };
-  */
-
   get fastWithdrawTokenAddresses() {
     if (this.apiProvider.network === 1) {
       return {
@@ -1121,12 +1105,13 @@ export default class API extends Emitter {
     const pairs = this.getPairs();
     for (let i = 0; i < pairs.length; i++) {
       const pair = pairs[i];
+      const marketInfo = this.marketInfo[`${this.apiProvider.network}:${pair}`]
       const baseCurrency = pair.split("-")[0];
       const quoteCurrency = pair.split("-")[1];
-      if (baseCurrency === currency && this.marketInfo[pair]) {
-        return this.marketInfo[pair].baseAsset;
-      } else if (quoteCurrency === currency && this.marketInfo[pair]) {
-        return this.marketInfo[pair].quoteAsset;
+      if (baseCurrency === currency && marketInfo) {
+        return marketInfo.baseAsset;
+      } else if (quoteCurrency === currency && marketInfo) {
+        return marketInfo.quoteAsset;
       }
     }
     return null;

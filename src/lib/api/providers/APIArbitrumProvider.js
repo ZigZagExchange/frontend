@@ -111,7 +111,7 @@ export default class APIArbitrumProvider extends APIProvider {
     quoteAmountBN,
     expirationTimeSeconds
   ) => {
-    const marketInfo = this.api.marketInfo[market];
+    const marketInfo = this.api.marketInfo[`${this.network}:${market}`];
 
     const [baseToken, quoteToken] = market.split("-");
     let makerToken,
@@ -129,7 +129,7 @@ export default class APIArbitrumProvider extends APIProvider {
         Number(marketInfo.baseFee).toFixed(marketInfo.baseAsset.decimals),
         marketInfo.baseAsset.decimals
       );
-      balanceBN = ethers.BigNumber.from(this.api.balances[baseToken].value);
+      balanceBN = ethers.BigNumber.from(this.api.balances[this.network][baseToken].value);
     } else {
       makerToken = marketInfo.quoteAsset.address;
       takerToken = marketInfo.baseAsset.address;
@@ -139,7 +139,7 @@ export default class APIArbitrumProvider extends APIProvider {
         Number(marketInfo.quoteFee).toFixed(marketInfo.quoteAsset.decimals),
         marketInfo.quoteAsset.decimals
       );
-      balanceBN = ethers.BigNumber.from(this.api.balances[quoteToken].value);
+      balanceBN = ethers.BigNumber.from(this.api.balances[this.network][quoteToken].value);
     }
 
     const makerVolumeFeeBN = quoteAmountBN
@@ -311,7 +311,7 @@ export default class APIArbitrumProvider extends APIProvider {
   };
 
   getExchangeAddress = () => {
-    const marketInfoArray = Object.values(this.api.marketInfo);
+    const marketInfoArray = Object.values(this.api.marketInfo[`${this.network}:ZZ-USDC`]);
     return marketInfoArray[0]?.exchangeAddress;
   };
 }

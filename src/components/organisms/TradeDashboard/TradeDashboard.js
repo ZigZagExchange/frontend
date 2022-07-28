@@ -26,7 +26,7 @@ import {
   settingsSelector,
   setUISettings,
   marketSummarySelector,
-  marketInfosSelector,
+  marketInfoSelector,
   lastPricesSelector,
   liquiditySelector,
   allOrdersSelector,
@@ -40,7 +40,6 @@ import {
 } from "../../pages/ListPairPage/SuccessModal";
 import TradesTable from "./TradeBooks/TradesTable";
 import { HighSlippageModal } from "components/molecules/HighSlippageModal";
-import _ from "lodash";
 import { formatPrice, addComma } from "lib/utils";
 import NewFeaturesPopup from "components/organisms/TradeDashboard/NewFeaturesPopup";
 import classNames from "classnames";
@@ -72,7 +71,7 @@ export function TradeDashboard() {
   const userFills = useSelector(userFillsSelector);
   const layout = useSelector(layoutSelector);
   const settings = useSelector(settingsSelector);
-  const marketInfos = useSelector(marketInfosSelector);
+  const marketInfo = useSelector(marketInfoSelector);
   const marketSummary = useSelector(marketSummarySelector);
   const lastPrices = useSelector(lastPricesSelector);
   const liquidity = useSelector(liquiditySelector);
@@ -88,11 +87,12 @@ export function TradeDashboard() {
   const { isDark } = useTheme();
 
   const updateMarketChain = (market) => {
+    console.log(`TradeDashboard set pair to ${market}`);    
     dispatch(setCurrentMarket(market));
   };
 
   useEffect(() => {
-    const price = lastPrices?.[network]?.[currentMarket]?.price;
+    const price = lastPrices?.[currentMarket]?.price;
     if (price) {
       setCurrentPairLastPrice(price);
     } else {
@@ -275,9 +275,9 @@ export function TradeDashboard() {
         updateMarketChain={updateMarketChain}
         currentMarket={currentMarket}
         network={network}
-        marketInfo={marketInfos?.[currentMarket]}
+        marketInfo={marketInfo}
         marketSummary={marketSummary}
-        lastPrices={lastPrices?.[network]}
+        lastPrices={lastPrices}
       />
       <GridLayoutRow
         rowHeight={(window.innerHeight - 112) / 30}
@@ -303,7 +303,7 @@ export function TradeDashboard() {
               currentMarket={currentMarket}
               user={user}
               activeOrderCount={activeUserOrders}
-              marketInfo={marketInfos?.[currentMarket]}
+              marketInfo={marketInfo}
               marketSummary={marketSummary}
               userOrders={userOrders}
               lastPrice={currentPairLastPrice}
@@ -318,7 +318,7 @@ export function TradeDashboard() {
             <OrdersBook
               currentMarket={currentMarket}
               changeSide={changeSide}
-              marketInfo={marketInfos?.[currentMarket]}
+              marketInfo={marketInfo}
               marketSummary={marketSummary}
               settings={settings}
               lastPrice={currentPairLastPrice}
@@ -334,7 +334,7 @@ export function TradeDashboard() {
         </div>
         <div key="c">
           <GridLayoutCell editable={settings.editable}>
-            <TradeChartArea marketInfo={marketInfos?.[currentMarket]} />
+            <TradeChartArea marketInfo={marketInfo} />
           </GridLayoutCell>
         </div>
         <div key="d">
