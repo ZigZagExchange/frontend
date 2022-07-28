@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
-import "./OrdersTable.css";
 import { useCoinEstimator } from "components";
 import styled from "styled-components";
 import loadingGif from "assets/icons/loading.svg";

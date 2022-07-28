@@ -237,7 +237,6 @@ const TokenPairDropdown = ({
   const [isOpened, setIsOpened] = useState(false);
   const isMobile = window.innerWidth < 500;
   const wrapperRef = useRef(null);
-  const [_marketInfo, setMarketInfo] = useState(null);
   const [_rowData, setRowData] = useState([]);
   const [isIncrease, setIsIncrease] = useState([]);
 
@@ -309,12 +308,6 @@ const TokenPairDropdown = ({
       setPairsByCategory(_rowData.map((r) => r.td1));
     }
   }, [_rowData]);
-
-  useEffect(() => {
-    if (marketInfo && marketInfo !== _marketInfo) {
-      setMarketInfo(marketInfo);
-    }
-  }, [marketInfo]);
 
   const categorizePairs = (category_index) => {
     let foundPairs = [];
@@ -703,16 +696,16 @@ const TokenPairDropdown = ({
   };
 
   let marketDisplay = "--/--";
-  if (_marketInfo) {
-    marketDisplay = `${_marketInfo.baseAsset.symbol}/${_marketInfo.quoteAsset.symbol}`;
+  if (marketInfo) {
+    marketDisplay = `${marketInfo.baseAsset.symbol}/${marketInfo.quoteAsset.symbol}`;
   }
 
   return (
     <DropdownWrapper ref={wrapperRef}>
       <ButtonWrapper>
         <img
-          src={api.getCurrencyLogo(_marketInfo?.baseAsset.symbol)}
-          alt={_marketInfo?.baseAsset.symbol}
+          src={api.getCurrencyLogo(marketInfo?.baseAsset.symbol)}
+          alt={marketInfo?.baseAsset.symbol}
         />
         <ExpandableButton
           width={width}
