@@ -19,6 +19,7 @@ const initialUISettings = {
   hideBalance: false,
   hideGuidePopup: false,
   disableTradeIDCard: false,
+  hideLayoutGuidePopup: false
 };
 
 export const apiSlice = createSlice({
