@@ -124,9 +124,9 @@ export const LaptopWrapper = styled.div`
     width: 100%;
     table-layout: fixed;
   }
-  // thead {
-  //     width: calc( 100% - 1em )/* scrollbar is average 1em/16px width, remove it from thead width */
-  // }
+  thead {
+    width: calc( 100% - 10px );
+  }
 
   table {
     display: block;
