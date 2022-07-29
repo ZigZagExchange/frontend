@@ -26,6 +26,7 @@ class SpotForm extends React.Component {
       maxSizeSelected: false,
       baseChanged: false,
       quoteChanged: false,
+      updatePrice: false,
     };
   }
 
@@ -750,10 +751,12 @@ class SpotForm extends React.Component {
       newState.quoteAmount = "";
       newState.baseChanged = false;
       newState.quoteChanged = false;
+      newState.updatePrice = true;
       this.setState(newState);
+      
     }
-    if(this.props.lastPrice !== prevProps.lastPrice) {
-      this.setState({price: this.props.lastPrice})
+    if(this.state.updatePrice) {
+      this.setState({price: this.props.lastPrice, updatePrice: false})
     }
   }
 
