@@ -103,14 +103,14 @@ export const LaptopWrapper = styled.div`
 
     ::-webkit-scrollbar-track {
       border-radius: 0px;
-      background: hsla(0, 0%, 100%, 0.15);
+      background: transparent
       height: 23px;
       border-radius: 5px;
     }
 
     ::-webkit-scrollbar-thumb {
       border-radius: 0px;
-      background: hsla(0, 0%, 100%, 0.4);
+      background: ${({ theme }) => theme.colors.foreground400};
       border-radius: 5px;
     }
 
