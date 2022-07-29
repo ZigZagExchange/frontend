@@ -311,7 +311,7 @@ export default class APIArbitrumProvider extends APIProvider {
   };
 
   getExchangeAddress = () => {
-    const marketInfoArray = Object.values(this.api.marketInfo[`${this.network}:ZZ-USDC`]);
-    return marketInfoArray[0]?.exchangeAddress;
+    const marketInfo = this.api.marketInfo[`${this.network}:ZZ-USDC`];
+    return marketInfo?.exchangeAddress;
   };
 }
