@@ -21,7 +21,6 @@ import { ActivatedStarIcon, StarIcon } from "components/atoms/Svg";
 import { Box } from "@material-ui/core";
 import _ from "lodash";
 import { darkColors, lightColors } from "lib/theme/colors";
-import classNames from "classnames";
 
 const TradeRatesCard = ({
   updateMarketChain,
