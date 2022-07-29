@@ -76,8 +76,6 @@ const TradeRatesCard = ({
     setFavourites(favourites);
   };
 
-  console.log(marketSummary.price);
-
   return (
     <Wrapper>
       <LeftWrapper>
