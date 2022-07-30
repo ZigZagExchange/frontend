@@ -54,6 +54,7 @@ body {
   font-size: 0.9rem;
   /* background-color: #171c28; */
   -webkit-overflow-scrolling: touch;
+  overflow-x: hidden;
 }
 
 article {

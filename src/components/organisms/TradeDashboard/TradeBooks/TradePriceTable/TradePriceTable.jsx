@@ -15,6 +15,14 @@ const Table = styled.table`
     rgba(0, 0, 0, 0.1);
   scrollbar-width: thin !important;
 
+  &.trade_tables_all {
+    flex: 0 0 calc(50% - 76px);
+  }
+
+  &.trade_tables_all.trade_table_asks {
+    flex: 0 0 calc(50% - 47px);
+  }
+
   &:not(.no-space) {
     justify-content: ${({ isLeft }) => (isLeft ? "space-between" : "start")};
   }
@@ -114,7 +122,8 @@ const TradePriceTable = (props) => {
     }
   }, [props.priceTableData.length]);
 
-  let total_total = 0, total_step = 0;
+  let total_total = 0,
+    total_step = 0;
   props.priceTableData.map((d) => (total_total += d.td2));
   if (props.priceTableData.length > 0 && props.priceTableData[0].side === "s") {
     total_step = total_total;
@@ -125,7 +134,11 @@ const TradePriceTable = (props) => {
   else onClickRow = () => null;
 
   return (
-    <Table ref={ref} className={props.adClass} isLeft={props.settings?.stackOrderbook}>
+    <Table
+      ref={ref}
+      className={props.adClass}
+      isLeft={props.settings?.stackOrderbook}
+    >
       {props.head && (
         <thead>
           <tr>
@@ -150,7 +163,8 @@ const TradePriceTable = (props) => {
                   color="foregroundLowEmphasis"
                   textAlign="right"
                 >
-                  Total({props.marketInfo && props.marketInfo.quoteAsset.symbol})
+                  Total({props.marketInfo && props.marketInfo.quoteAsset.symbol}
+                  )
                 </Text>
               </th>
             )}
@@ -161,7 +175,7 @@ const TradePriceTable = (props) => {
         {props.priceTableData.map((d, i) => {
           const color =
             d.side === "b" ? theme.colors.success400 : theme.colors.danger400;
-          
+
           let rowStyle;
           if (props.useGradient) {
             if (d.side === "b") {
@@ -171,11 +185,11 @@ const TradePriceTable = (props) => {
             if (d.side === "s") {
               total_step -= d.td2;
             }
-            
+
             rowStyle = {
               background: `linear-gradient(to right, ${color}, ${color} ${breakpoint}%, ${theme.colors.backgroundHighEmphasis} 0%)`,
             };
-            
+
             // reduce after, next one needs to be this percentage
             if (props.className === "trade_table_asks") {
               total_step -= d.td2;
