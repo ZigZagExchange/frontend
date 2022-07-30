@@ -1,7 +1,7 @@
 import * as zksync from "zksync";
 import { ethers } from "ethers";
 import { toast } from "react-toastify";
-import { toBaseUnit } from "lib/utils";
+import { formatAmount, toBaseUnit } from "lib/utils";
 import APIProvider from "../APIProvider";
 import axios from "axios";
 import { closestPackableTransactionAmount } from "zksync";
@@ -166,7 +166,7 @@ export default class APIZKProvider extends APIProvider {
       );
 
     const [baseToken, quoteToken] = market.split("-");
-    const marketInfo = this.api.marketInfo[`${this.network}:${market}`]
+    const marketInfo = this.api.marketInfo[`${this.network}:${market}`];
     const tokenRatio = {};
 
     let sellQuantityBN, tokenSell, tokenBuy, balanceBN;
@@ -179,10 +179,11 @@ export default class APIZKProvider extends APIProvider {
         marketInfo.baseAsset.decimals
       );
       sellQuantityBN = sellQuantityBN.add(sellFeeBN);
-      tokenRatio[marketInfo.baseAsset.id] = baseAmountBN
-        .add(sellFeeBN);
+      tokenRatio[marketInfo.baseAsset.id] = baseAmountBN.add(sellFeeBN);
       tokenRatio[marketInfo.quoteAsset.id] = quoteAmountBN;
-      balanceBN = ethers.BigNumber.from(this.api.balances[this.network][baseToken].value);
+      balanceBN = ethers.BigNumber.from(
+        this.api.balances[this.network][baseToken].value
+      );
     } else {
       sellQuantityBN = quoteAmountBN;
       tokenSell = marketInfo.quoteAsset.id;
@@ -193,9 +194,10 @@ export default class APIZKProvider extends APIProvider {
       );
       sellQuantityBN = sellQuantityBN.add(sellFeeBN);
       tokenRatio[marketInfo.baseAsset.id] = baseAmountBN;
-      tokenRatio[marketInfo.quoteAsset.id] = quoteAmountBN
-        .add(sellFeeBN);
-      balanceBN = ethers.BigNumber.from(this.api.balances[this.network][quoteToken].value);
+      tokenRatio[marketInfo.quoteAsset.id] = quoteAmountBN.add(sellFeeBN);
+      balanceBN = ethers.BigNumber.from(
+        this.api.balances[this.network][quoteToken].value
+      );
     }
 
     // size check
@@ -504,7 +506,7 @@ export default class APIZKProvider extends APIProvider {
       if (token === "ETH") {
         return getNumberFormatted(bridgeFee);
       } else if (["FRAX", "UST"].includes(token)) {
-        const tokenInfo = await this.api.getCurrencyInfo('ETH')
+        const tokenInfo = await this.api.getCurrencyInfo("ETH");
         const priceInfo = tokenInfo.usdPrice;
         const stableFee = (
           ((bridgeFee.toString() / 1e18) *
@@ -562,8 +564,33 @@ export default class APIZKProvider extends APIProvider {
       this.api.getAccountState(),
       this.checkAccountActivated(),
     ]);
-    if (!accountActivated) {
-      await this.changePubKey();
+
+    if (!accountState.id) {
+      const walletBalance = formatAmount(
+        accountState.committed.balances["ETH"],
+        { decimals: 18 }
+      );
+      const activationFee = await this.changePubKeyFee("ETH");
+
+      if (isNaN(walletBalance) || walletBalance < activationFee) {
+        toast.error(
+          "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
+          {
+            autoClose: 60000,
+          }
+        );
+      } else {
+        toast.error(
+          "Your zkSync account is not activated. Please activate your zkSync wallet.",
+          {
+            autoClose: false,
+          }
+        );
+      }
+    } else {
+      if (!accountActivated) {
+        await this.changePubKey();
+      }
     }
 
     return accountState;
