@@ -131,14 +131,18 @@ export default class APIZKProvider extends APIProvider {
       await Promise.all(result);
     }
 
-    const signingKey = await this.syncWallet.setSigningKey({
-      feeToken,
-      ethAuthType: "ECDSALegacyMessage",
-    });
+    // if (!(await this.syncWallet.isSigningKeySet())) {
+    //   const signingKey = await this.syncWallet.setSigningKey({
+    //     feeToken,
+    //     ethAuthType: "ECDSALegacyMessage",
+    //   });
 
-    await signingKey.awaitReceipt();
+    //   await signingKey.awaitReceipt();
 
-    return signingKey;
+    //   return signingKey;
+    // }
+
+    return;
   };
 
   checkAccountActivated = async () => {
@@ -587,10 +591,10 @@ export default class APIZKProvider extends APIProvider {
           }
         );
       }
-    } else {
-      if (!accountActivated) {
-        await this.changePubKey();
-      }
+    }
+
+    if (!accountActivated) {
+      await this.changePubKey();
     }
 
     return accountState;
