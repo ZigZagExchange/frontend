@@ -5,7 +5,6 @@ import { connect } from "react-redux";
 import api from "lib/api";
 import { RangeSlider, QuestionHelper } from "components";
 import { formatPrice, formatToken, addComma } from "lib/utils";
-import "./SpotForm.css";
 import { Button, ConnectWalletButton } from "components/molecules/Button";
 import InputField from "components/atoms/InputField/InputField";
 import Text from "components/atoms/Text/Text";

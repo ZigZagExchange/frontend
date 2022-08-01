@@ -5,8 +5,6 @@ import { formatPrice, addComma } from "lib/utils";
 import { SettingsIcon } from "components/atoms/Svg";
 import Button from "components/molecules/Button/Button";
 import Text from "components/atoms/Text/Text";
-// css
-import "./TradeRatesCard.css";
 import SettingsModal from "./SettingsModal";
 import { TokenPairDropdown } from "components/molecules/Dropdown";
 import useModal from "components/hooks/useModal";
