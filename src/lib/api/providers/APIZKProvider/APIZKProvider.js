@@ -569,7 +569,9 @@ export default class APIZKProvider extends APIProvider {
       this.checkAccountActivated(),
     ]);
 
-    if (!accountState.id) {
+    if (!accountActivated) {
+      await this.changePubKey();
+    } else if (!accountState.id) {
       const walletBalance = formatAmount(
         accountState.committed.balances["ETH"],
         { decimals: 18 }
@@ -591,10 +593,6 @@ export default class APIZKProvider extends APIProvider {
           }
         );
       }
-    }
-
-    if (!accountActivated) {
-      await this.changePubKey();
     }
 
     return accountState;
