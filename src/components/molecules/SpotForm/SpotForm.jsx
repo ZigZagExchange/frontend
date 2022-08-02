@@ -401,9 +401,9 @@ class SpotForm extends React.Component {
     let newstate = { ...this.state };
     this.setState(newstate);
     let orderApproveToast = toast.info(
-      "Approve pending. Sign or Cancel to continue...",
+      "Approve pending. Confirm or Reject to continue...",
       {
-        toastId: "Approve pending. Sign or Cancel to continue...",
+        toastId: "Approve pending. Confirm or Reject to continue...",
         autoClose: false,
       }
     );
@@ -419,8 +419,8 @@ class SpotForm extends React.Component {
     }
 
     toast.dismiss(orderApproveToast);
-    toast.success(`TOKEN ${marketInfo.baseAsset.symbol} approved.`, {
-      toastId: `TOKEN ${marketInfo.baseAsset.symbol} approved.`,
+    toast.success(`${marketInfo.baseAsset.symbol} approved.`, {
+      toastId: `${marketInfo.baseAsset.symbol} approved.`,
     });
     newstate = { ...this.state };
     this.setState(newstate);
