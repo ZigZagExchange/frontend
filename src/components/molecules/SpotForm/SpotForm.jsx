@@ -5,7 +5,6 @@ import { connect } from "react-redux";
 import api from "lib/api";
 import { RangeSlider, QuestionHelper } from "components";
 import { formatPrice, formatToken, addComma } from "lib/utils";
-import "./SpotForm.css";
 import { Button, ConnectWalletButton } from "components/molecules/Button";
 import InputField from "components/atoms/InputField/InputField";
 import Text from "components/atoms/Text/Text";
@@ -26,6 +25,7 @@ class SpotForm extends React.Component {
       maxSizeSelected: false,
       baseChanged: false,
       quoteChanged: false,
+      updatePrice: false,
     };
   }
 
@@ -750,7 +750,12 @@ class SpotForm extends React.Component {
       newState.quoteAmount = "";
       newState.baseChanged = false;
       newState.quoteChanged = false;
+      newState.updatePrice = true;
       this.setState(newState);
+      
+    }
+    if(this.state.updatePrice) {
+      this.setState({price: this.props.lastPrice, updatePrice: false})
     }
   }
 

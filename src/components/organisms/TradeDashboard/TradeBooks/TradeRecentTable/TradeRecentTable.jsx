@@ -1,9 +1,7 @@
 import React, { useEffect } from "react";
 import styled from "styled-components";
-// css
-import "./TradeRecentTable.css";
 import useTheme from "components/hooks/useTheme";
-import { numStringToSymbol, addComma, formatMillonAmount } from "lib/utils";
+import { addComma, formatMillonAmount } from "lib/utils";
 import Text from "components/atoms/Text/Text";
 
 const Table = styled.table`

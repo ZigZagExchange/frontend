@@ -112,7 +112,11 @@ export default class APIZKProvider extends APIProvider {
       feeToken = "WBTC";
     } else {
       toast.warn(
-        "Your token balances are very low. You might need to bridge in more funds first."
+        "Your zkSync token balances are very low. You might need to bridge in more funds first.",
+        {
+          toastId:
+            "Your zkSync token balances are very low. You might need to bridge in more funds first.",
+        }
       );
       let maxValue = 0;
       const tokens = Object.keys(balances);
@@ -166,7 +170,7 @@ export default class APIZKProvider extends APIProvider {
       );
 
     const [baseToken, quoteToken] = market.split("-");
-    const marketInfo = this.api.marketInfo[`${this.network}:${market}`]
+    const marketInfo = this.api.marketInfo[`${this.network}:${market}`];
     const tokenRatio = {};
 
     let sellQuantityBN, tokenSell, tokenBuy, balanceBN;
@@ -179,10 +183,11 @@ export default class APIZKProvider extends APIProvider {
         marketInfo.baseAsset.decimals
       );
       sellQuantityBN = sellQuantityBN.add(sellFeeBN);
-      tokenRatio[marketInfo.baseAsset.id] = baseAmountBN
-        .add(sellFeeBN);
+      tokenRatio[marketInfo.baseAsset.id] = baseAmountBN.add(sellFeeBN);
       tokenRatio[marketInfo.quoteAsset.id] = quoteAmountBN;
-      balanceBN = ethers.BigNumber.from(this.api.balances[this.network][baseToken].value);
+      balanceBN = ethers.BigNumber.from(
+        this.api.balances[this.network][baseToken].value
+      );
     } else {
       sellQuantityBN = quoteAmountBN;
       tokenSell = marketInfo.quoteAsset.id;
@@ -193,9 +198,10 @@ export default class APIZKProvider extends APIProvider {
       );
       sellQuantityBN = sellQuantityBN.add(sellFeeBN);
       tokenRatio[marketInfo.baseAsset.id] = baseAmountBN;
-      tokenRatio[marketInfo.quoteAsset.id] = quoteAmountBN
-        .add(sellFeeBN);
-      balanceBN = ethers.BigNumber.from(this.api.balances[this.network][quoteToken].value);
+      tokenRatio[marketInfo.quoteAsset.id] = quoteAmountBN.add(sellFeeBN);
+      balanceBN = ethers.BigNumber.from(
+        this.api.balances[this.network][quoteToken].value
+      );
     }
 
     // size check
@@ -504,7 +510,7 @@ export default class APIZKProvider extends APIProvider {
       if (token === "ETH") {
         return getNumberFormatted(bridgeFee);
       } else if (["FRAX", "UST"].includes(token)) {
-        const tokenInfo = await this.api.getCurrencyInfo('ETH')
+        const tokenInfo = await this.api.getCurrencyInfo("ETH");
         const priceInfo = tokenInfo.usdPrice;
         const stableFee = (
           ((bridgeFee.toString() / 1e18) *

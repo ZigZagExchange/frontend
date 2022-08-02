@@ -9,6 +9,7 @@ import { formatAmount } from "lib/utils";
 import erc20ContractABI from "lib/contracts/ERC20.json";
 import wethContractABI from "lib/contracts/WETH.json";
 import { MAX_ALLOWANCE } from "./constants";
+import { toast } from "react-toastify";
 import {
   ZKSYNC_POLYGON_BRIDGE,
   POLYGON_MUMBAI_WETH_ADDRESS,
@@ -40,6 +41,7 @@ export default class API extends Emitter {
   _profiles = {};
   _pendingOrders = [];
   _pendingFills = [];
+  serverDelta = 0;
 
   constructor({ infuraId, networks, currencies, validMarkets }) {
     super();
@@ -338,6 +340,26 @@ export default class API extends Emitter {
     console.warn("Zigzag websocket connection failed");
   };
 
+  calculateServerDelta = async () => {
+    const url = (this.apiProvider.websocketUrl).replace('wss','https');
+    let serverTime, res;
+    try {
+      res = await axios.get(`${url}/api/v1/time`);
+      serverTime = res.data.serverTimestamp;
+    } catch (e) {
+      console.log(e);
+      console.log(res);
+      serverTime = Date.now();
+    }
+    const clientTime = Date.now();
+    this.serverDelta = Math.floor((serverTime - clientTime) / 1000);
+    if (this.serverDelta < -5 || this.serverDelta > 5) {
+      console.warn(`Your PC clock is not synced (delta: ${
+        this.serverDelta / 60
+        } min). Please sync it via settings > date/time > sync now`);
+    }
+  }
+
   start = () => {
     if (this.ws) this.stop();
     this.ws = new WebSocket(this.apiProvider.websocketUrl);
@@ -355,6 +377,8 @@ export default class API extends Emitter {
         accountState.id && accountState.id.toString(),
       ]);
     }
+
+    if(!this.serverDelta) this.calculateServerDelta();    
   };
 
   stop = () => {
@@ -630,7 +654,7 @@ export default class API extends Emitter {
   };
 
   getChainIdFromName = (name) => {
-    return this.networks?.[name]?.[1];
+    return this.networks?.[name]?.[0];
   };
 
   getNetworkDisplayName = (network) => {
@@ -666,7 +690,24 @@ export default class API extends Emitter {
   };
 
   cancelOrder = async (orderId) => {
-    await this.send("cancelorder", [this.apiProvider.network, orderId]);
+    const token = localStorage.getItem(orderId);
+    // token is used to cancel the order - otherwiese the user is asked to sign a msg
+    if (token) {
+      await this.send("cancelorder3", [this.apiProvider.network, orderId, token]);
+    } else {
+      const toastMsg = toast.info('Sign the message to cancel your order...', {
+        toastId: "Sign the message to cancel your order...'",
+      });
+
+      const message = `cancelorder2:${this.apiProvider.network}:${orderId}`
+      const signedMessage = await this.apiProvider.signMessage(message);
+      try {
+        await this.send("cancelorder2", [this.apiProvider.network, orderId, signedMessage]);
+      } finally {
+        toast.dismiss(toastMsg);
+      }
+    }
+    
     return true;
   };
 
@@ -730,9 +771,46 @@ export default class API extends Emitter {
     }
   };
 
-  cancelAllOrders = async () => {
+  cancelAllOrders = async (orderIds) => {
     const { id: userId } = await this.getAccountState();
-    await this.send("cancelall", [this.apiProvider.network, userId]);
+    const tokenArray = [];
+    orderIds.forEach(id => {
+      const token = localStorage.getItem(id);
+      if (token) tokenArray.push(token);
+    })
+    if (orderIds.length === tokenArray.length) {
+      await this.send("cancelall3", [this.apiProvider.network, userId, tokenArray]);
+    } else {
+      const toastMsg = toast.info('Sign the message to cancel your order...', {
+        toastId: "Sign the message to cancel your order...'",
+      });
+      const validUntil = Math.floor(Date.now() / 1000) + 10;
+      const message = `cancelall2:${this.apiProvider.network}:${validUntil}`
+      const signedMessage = await this.apiProvider.signMessage(message);
+      try {
+        await this.send("cancelall2", [this.apiProvider.network, userId, validUntil, signedMessage]);
+      } finally {
+        toast.dismiss(toastMsg);
+      }
+    }
+
+    return true;
+  };
+
+  cancelAllOrdersAllChains = async () => {
+    const toastMsg = toast.info('Sign the message to cancel your order...', {
+      toastId: "Sign the message to cancel your order...'",
+    });
+
+    const validUntil = (Date.now() / 1000) + 10;
+    const message = `cancelall2:0:${validUntil}`
+    const signedMessage = await this.apiProvider.signMessage(message);
+    const { id: userId } = await this.getAccountState();
+    try {
+      await this.send("cancelall2", [0, userId, signedMessage]);
+    } finally {
+      toast.dismiss(toastMsg);
+    }
     return true;
   };
 
@@ -885,18 +963,17 @@ export default class API extends Emitter {
       marketInfo.quoteAsset.decimals
     );
 
-    const expirationTimeSeconds = Math.floor(
-      orderType === "market"
-        ? Date.now() / 1000 + 60 * 2 // two minutes
-        : Date.now() / 1000 + 60 * 60 * 24 * 7 // one week
-    );
+    const expirationTimeSeconds = orderType === "market"
+      ? Date.now() / 1000 + 60 * 2 // two minutes
+      : Date.now() / 1000 + 60 * 60 * 24 * 7; // one week
+    
 
     await this.apiProvider.submitOrder(
       market,
       side,
       baseAmountBN,
       quoteAmountBN,
-      expirationTimeSeconds
+      Math.floor(expirationTimeSeconds + this.serverDelta)
     );
   };
 

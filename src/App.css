@@ -199,9 +199,10 @@ html {
 }
 
 .Toastify__toast-theme--colored.Toastify__toast--warning {
-  background-color: transparent;
+  /* background-color: transparent; */
+  background: rgba(252, 201, 88, 0.72);
   border-radius: 8px;
-  padding: 0px;
+  padding:8px;
   box-shadow: 0px 8px 16px rgba(1, 1, 1, 0.5);
   backdrop-filter: blur(16px);
 }
