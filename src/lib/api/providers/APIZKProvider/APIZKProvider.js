@@ -1,7 +1,7 @@
 import * as zksync from "zksync";
 import { ethers } from "ethers";
 import { toast } from "react-toastify";
-import { formatAmount, toBaseUnit } from "lib/utils";
+import { toBaseUnit } from "lib/utils";
 import APIProvider from "../APIProvider";
 import axios from "axios";
 import { closestPackableTransactionAmount } from "zksync";
@@ -112,7 +112,11 @@ export default class APIZKProvider extends APIProvider {
       feeToken = "WBTC";
     } else {
       toast.warn(
-        "Your token balances are very low. You might need to bridge in more funds first."
+        "Your zkSync token balances are very low. You might need to bridge in more funds first.",
+        {
+          toastId:
+            "Your zkSync token balances are very low. You might need to bridge in more funds first.",
+        }
       );
       let maxValue = 0;
       const tokens = Object.keys(balances);
@@ -131,18 +135,14 @@ export default class APIZKProvider extends APIProvider {
       await Promise.all(result);
     }
 
-    // if (!(await this.syncWallet.isSigningKeySet())) {
-    //   const signingKey = await this.syncWallet.setSigningKey({
-    //     feeToken,
-    //     ethAuthType: "ECDSALegacyMessage",
-    //   });
+    const signingKey = await this.syncWallet.setSigningKey({
+      feeToken,
+      ethAuthType: "ECDSALegacyMessage",
+    });
 
-    //   await signingKey.awaitReceipt();
+    await signingKey.awaitReceipt();
 
-    //   return signingKey;
-    // }
-
-    return;
+    return signingKey;
   };
 
   checkAccountActivated = async () => {
@@ -570,28 +570,10 @@ export default class APIZKProvider extends APIProvider {
     ]);
 
     if (!accountActivated) {
-      await this.changePubKey();
-    } else if (!accountState.id) {
-      const walletBalance = formatAmount(
-        accountState.committed.balances["ETH"],
-        { decimals: 18 }
-      );
-      const activationFee = await this.changePubKeyFee("ETH");
-
-      if (isNaN(walletBalance) || walletBalance < activationFee) {
-        toast.error(
-          "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
-          {
-            autoClose: 60000,
-          }
-        );
-      } else {
-        toast.error(
-          "Your zkSync account is not activated. Please activate your zkSync wallet.",
-          {
-            autoClose: false,
-          }
-        );
+      try {
+        await this.changePubKey();
+      } catch (err) {
+        console.log(err);
       }
     }
 
