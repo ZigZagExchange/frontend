@@ -419,6 +419,9 @@ class SpotForm extends React.Component {
     }
 
     toast.dismiss(orderApproveToast);
+    toast.success(`TOKEN ${marketInfo.baseAsset.symbol} approved.`, {
+      toastId: `TOKEN ${marketInfo.baseAsset.symbol} approved.`,
+    });
     newstate = { ...this.state };
     this.setState(newstate);
   }
@@ -752,10 +755,9 @@ class SpotForm extends React.Component {
       newState.quoteChanged = false;
       newState.updatePrice = true;
       this.setState(newState);
-      
     }
-    if(this.state.updatePrice) {
-      this.setState({price: this.props.lastPrice, updatePrice: false})
+    if (this.state.updatePrice) {
+      this.setState({ price: this.props.lastPrice, updatePrice: false });
     }
   }
 
