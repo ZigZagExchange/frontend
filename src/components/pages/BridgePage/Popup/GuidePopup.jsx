@@ -25,7 +25,7 @@ const GuidePopup = () => {
 
   return (
     open && (
-      <div className="max-w-lg p-6 mx-1 border rounded-lg shadow-lg md:mx-0 xl:max-w-sm xl:fixed bottom-5 left-5 dark:bg-background-700 dark:border-foreground-400 border-primary-400 bg-foreground-600">
+      <div className="max-w-lg p-6 mx-1 border rounded-lg shadow-lg md:mx-0 xl:max-w-sm fixed bottom-5 left-5 dark:bg-background-700 dark:border-foreground-400 border-primary-400 bg-foreground-600">
         <div className="relative">
           <CloseIcon
             className="absolute cursor-pointer right-1 hover:opacity-75"
