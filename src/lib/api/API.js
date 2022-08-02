@@ -676,8 +676,8 @@ export default class API extends Emitter {
     if (token) {
       await this.send("cancelorder3", [this.apiProvider.network, orderId, token]);
     } else {
-      const toastMsg = toast.info('Sing the message to approve canceling the order...', {
-        toastId: "Sing the message to approve canceling the order...'",
+      const toastMsg = toast.info('Sign the message to cancel your order...', {
+        toastId: "Sign the message to cancel your order...'",
       });
 
       const message = `cancelorder2:${this.apiProvider.network}:${orderId}`
@@ -762,8 +762,8 @@ export default class API extends Emitter {
     if (orderIds.length === tokenArray.length) {
       await this.send("cancelall3", [this.apiProvider.network, userId, tokenArray]);
     } else {
-      const toastMsg = toast.info('Sing the message to approve canceling the order...', {
-        toastId: "Sing the message to approve canceling the order...'",
+      const toastMsg = toast.info('Sign the message to cancel your order...', {
+        toastId: "Sign the message to cancel your order...'",
       });
       const validUntil = Math.floor(Date.now() / 1000) + 10;
       const message = `cancelall2:${this.apiProvider.network}:${validUntil}`
@@ -779,8 +779,8 @@ export default class API extends Emitter {
   };
 
   cancelAllOrdersAllChains = async () => {
-    const toastMsg = toast.info('Sing the message to approve canceling the order...', {
-      toastId: "Sing the message to approve canceling the order...'",
+    const toastMsg = toast.info('Sign the message to cancel your order...', {
+      toastId: "Sign the message to cancel your order...'",
     });
 
     const validUntil = (Date.now() / 1000) + 10;
