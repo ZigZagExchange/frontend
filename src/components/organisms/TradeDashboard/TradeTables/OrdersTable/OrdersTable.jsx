@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
-
 import { useCoinEstimator } from "components";
 import styled from "styled-components";
 import loadingGif from "assets/icons/loading.svg";
 
 import FillCard from "./FillCard";
-import {
-  balancesSelector,
-} from "lib/store/features/api/apiSlice";
+import { balancesSelector } from "lib/store/features/api/apiSlice";
 import api from "lib/api";
 import { formatDate, formatDateTime, formatToken, addComma } from "lib/utils";
 import { Tab } from "components/molecules/TabMenu";
@@ -130,12 +127,14 @@ export default function OrdersTable(props) {
       )
       .sort((a, b) => b[1] - a[1]);
   };
-  
+
   const getUserOrderIds = () => {
     const userOrders = getUserOrders();
-    const openOrders = userOrders.filter(o => ['o','pf','pm'].includes(o[9]))
-    return openOrders.map(o => o[1]);
-  }
+    const openOrders = userOrders.filter((o) =>
+      ["o", "pf", "pm"].includes(o[9])
+    );
+    return openOrders.map((o) => o[1]);
+  };
 
   const isOpenStatus = (orders) => {
     return orders.findIndex((order) => order[9] === "o") !== -1;
@@ -304,7 +303,9 @@ export default function OrdersTable(props) {
           {orders.map((order, i) => {
             const orderId = order[1];
             const market = order[2];
-            const time = order[7] && formatDateTime(new Date(order[7] * 1000));
+            const t = new Date(order[7] * 1000);
+            const d = new Date(t.toUTCString().slice(0, -4));
+            const time = order[7] && formatDateTime(d);
             let price = order[4];
             let baseQuantity = order[5];
             let remaining = order[10] === null ? baseQuantity : order[10];
@@ -632,25 +633,28 @@ export default function OrdersTable(props) {
                 </Text>
               </HeaderWrapper>
             </th>
-            {isOpenStatus(getUserOrders()) && !props.settings?.showCancelOrders && (
-              <th className="w-36">
-                <StyledButton
-                  variant="outlined"
-                  width="100px"
-                  scale="md"
-                  onClick={() => api.cancelAllOrders(getUserOrderIds())}
-                >
-                  Cancel All
-                </StyledButton>
-              </th>
-            )}
+            {isOpenStatus(getUserOrders()) &&
+              !props.settings?.showCancelOrders && (
+                <th className="w-36">
+                  <StyledButton
+                    variant="outlined"
+                    width="100px"
+                    scale="md"
+                    onClick={() => api.cancelAllOrders(getUserOrderIds())}
+                  >
+                    Cancel All
+                  </StyledButton>
+                </th>
+              )}
           </tr>
         </thead>
         <tbody>
           {orders.map((order, i) => {
             const orderId = order[1];
             const market = order[2];
-            const time = order[7] && formatDate(new Date(order[7] * 1000));
+            const t = new Date(order[7] * 1000);
+            const d = new Date(t.toUTCString().slice(0, -4));
+            const time = order[7] && formatDateTime(d);
             let price = order[4];
             let baseQuantity = order[5];
             let remaining = order[10] === null ? baseQuantity : order[10];
@@ -818,7 +822,9 @@ export default function OrdersTable(props) {
                     )}
                   </td>
                   {isOpenStatus(getUserOrders()) &&
-                    !props.settings?.showCancelOrders && <td className="w-36"></td>}
+                    !props.settings?.showCancelOrders && (
+                      <td className="w-36"></td>
+                    )}
                 </tr>
               </>
             );
@@ -836,7 +842,10 @@ export default function OrdersTable(props) {
             const fillid = fill[1];
             const market = fill[2];
             const baseCurrency = fill[2].split("-")[0];
-            const time = fill[12] && formatDateTime(new Date(fill[12]));
+            const t = new Date(fill[12]);
+            const d = new Date(t.toUTCString().slice(0, -4));
+            const time = fill[12] && formatDateTime(d);
+            // const time = fill[12] && formatDateTime(new Date(fill[12]));
             const side = fill[3];
             let price = fill[4];
             let baseQuantity = fill[5];
@@ -1219,9 +1228,11 @@ export default function OrdersTable(props) {
         </thead>
         <tbody>
           {fills.map((fill, i) => {
+            const t = new Date(fill[12]);
+            const d = new Date(t.toUTCString().slice(0, -4));
             const fillid = fill[1];
             const market = fill[2];
-            const time = fill[12] && formatDate(new Date(fill[12]));
+            const time = fill[12] && formatDate(d);
             const side = fill[3];
             let price = fill[4];
             let baseQuantity = fill[5];
