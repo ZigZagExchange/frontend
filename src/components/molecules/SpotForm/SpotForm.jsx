@@ -5,7 +5,6 @@ import { connect } from "react-redux";
 import api from "lib/api";
 import { RangeSlider, QuestionHelper } from "components";
 import { formatPrice, formatToken, addComma } from "lib/utils";
-import "./SpotForm.css";
 import { Button, ConnectWalletButton } from "components/molecules/Button";
 import InputField from "components/atoms/InputField/InputField";
 import Text from "components/atoms/Text/Text";
@@ -402,9 +401,9 @@ class SpotForm extends React.Component {
     let newstate = { ...this.state };
     this.setState(newstate);
     let orderApproveToast = toast.info(
-      "Approve pending. Sign or Cancel to continue...",
+      "Approve pending. Confirm or Reject to continue...",
       {
-        toastId: "Approve pending. Sign or Cancel to continue...",
+        toastId: "Approve pending. Confirm or Reject to continue...",
         autoClose: false,
       }
     );
@@ -420,6 +419,9 @@ class SpotForm extends React.Component {
     }
 
     toast.dismiss(orderApproveToast);
+    toast.success(`${marketInfo.baseAsset.symbol} approved.`, {
+      toastId: `${marketInfo.baseAsset.symbol} approved.`,
+    });
     newstate = { ...this.state };
     this.setState(newstate);
   }
@@ -753,10 +755,9 @@ class SpotForm extends React.Component {
       newState.quoteChanged = false;
       newState.updatePrice = true;
       this.setState(newState);
-      
     }
-    if(this.state.updatePrice) {
-      this.setState({price: this.props.lastPrice, updatePrice: false})
+    if (this.state.updatePrice) {
+      this.setState({ price: formatPrice(this.props.lastPrice), updatePrice: false });
     }
   }
 
@@ -911,7 +912,9 @@ class SpotForm extends React.Component {
       approveNeeded = false;
     if (this.props.side === "b") {
       buttonType = "BUY";
-      if (quoteAmount > quoteAllowance) {
+      if (
+        (quoteAmount <= quoteBalance) && (quoteAmount > quoteAllowance)
+      ) {
         buttonText = `Approve ${marketInfo && marketInfo.quoteAsset?.symbol}`;
         if (api.isEVMChain) approveNeeded = true;
       } else {
@@ -943,7 +946,9 @@ class SpotForm extends React.Component {
       );
     } else if (this.props.side === "s") {
       buttonType = "SELL";
-      if (baseAmount > baseAllowance) {
+      if (
+        (baseAmount <= baseBalance) && (baseAmount > baseAllowance)
+      ) {
         buttonText = `Approve ${marketInfo && marketInfo.baseAsset?.symbol}`;
         if (api.isEVMChain) approveNeeded = true;
       } else {
@@ -1136,13 +1141,15 @@ class SpotForm extends React.Component {
                 width="100%"
                 scale="imd"
                 disabled={
-                  this.isInvalidNumber(this.state.quoteAmount) ||
-                  this.isInvalidNumber(this.state.baseAmount) ||
-                  this.isInvalidNumber(this.currentPrice()) ||
-                  (this.state.quoteAmount > this.getQuoteBalance() &&
-                    this.props.side === "b") ||
-                  (this.state.baseAmount > this.getBaseBalance() &&
-                    this.props.side === "s")
+                  !approveNeeded && (
+                    this.isInvalidNumber(this.state.quoteAmount) ||
+                    this.isInvalidNumber(this.state.baseAmount) ||
+                    this.isInvalidNumber(this.currentPrice()) ||
+                    (this.state.quoteAmount > this.getQuoteBalance() &&
+                      this.props.side === "b") ||
+                    (this.state.baseAmount > this.getBaseBalance() &&
+                      this.props.side === "s")
+                  )                  
                 }
                 onClick={
                   approveNeeded

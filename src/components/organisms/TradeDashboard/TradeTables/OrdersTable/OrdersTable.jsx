@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
-import "./OrdersTable.css";
 import { useCoinEstimator } from "components";
 import styled from "styled-components";
 import loadingGif from "assets/icons/loading.svg";
@@ -131,6 +130,12 @@ export default function OrdersTable(props) {
       )
       .sort((a, b) => b[1] - a[1]);
   };
+  
+  const getUserOrderIds = () => {
+    const userOrders = getUserOrders();
+    const openOrders = userOrders.filter(o => ['o','pf','pm'].includes(o[9]))
+    return openOrders.map(o => o[1]);
+  }
 
   const isOpenStatus = (orders) => {
     return orders.findIndex((order) => order[9] === "o") !== -1;
@@ -633,7 +638,7 @@ export default function OrdersTable(props) {
                   variant="outlined"
                   width="100px"
                   scale="md"
-                  onClick={api.cancelAllOrders}
+                  onClick={() => api.cancelAllOrders(getUserOrderIds())}
                 >
                   Cancel All
                 </StyledButton>

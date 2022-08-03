@@ -112,13 +112,15 @@ export const apiSlice = createSlice({
       } else {
         const marketinfo = payload[0];
         if (!marketinfo) return;
-        state.marketinfos[`${marketinfo.zigzagChainId}-${marketinfo.alias}`] = marketinfo;
+        state.marketinfos[`${marketinfo.zigzagChainId}-${marketinfo.alias}`] =
+          marketinfo;
       }
     },
-    _marketinfo2(state, {payload}) {
+    _marketinfo2(state, { payload }) {
       payload[0].forEach((marketinfo) => {
         if (!marketinfo) return;
-        state.marketinfos[`${marketinfo.zigzagChainId}-${marketinfo.alias}`] = marketinfo;
+        state.marketinfos[`${marketinfo.zigzagChainId}-${marketinfo.alias}`] =
+          marketinfo;
       });
     },
     _fills(state, { payload }) {
@@ -432,6 +434,14 @@ export const apiSlice = createSlice({
       const orderId = payload[1];
       state.userOrders[orderId] = payload;
     },
+    _userorderack(state, { payload }) {
+      const orderId = payload[1].toString();
+      if (payload[11]) {
+        const token = payload[11].toString();
+        localStorage.setItem(orderId, token);
+      }
+      state.userOrders[orderId] = payload.slice(0,12);      
+    },
     setBalances(state, { payload }) {
       const scope = makeScopeUser(state);
       state.balances[scope] = state.balances[scope] || {};
@@ -444,7 +454,7 @@ export const apiSlice = createSlice({
       };
     },
     setCurrentMarket(state, { payload }) {
-      console.log(`Executing setCurrentMarket to ${payload}`)
+      console.log(`Executing setCurrentMarket to ${payload}`);
       if (state.currentMarket !== payload) {
         state.currentMarket = payload;
         state.marketFills = {};
@@ -676,13 +686,13 @@ export const userOrdersSelector = (state) => state.api.userOrders;
 export const userFillsSelector = (state) => state.api.userFills;
 export const allOrdersSelector = (state) => state.api.orders;
 export const marketFillsSelector = (state) => state.api.marketFills;
-export const lastPricesSelector = (state) => 
+export const lastPricesSelector = (state) =>
   state.api.lastPrices[state.api.network];
 export const marketSummarySelector = (state) => state.api.marketSummary;
 export const liquiditySelector = (state) => state.api.liquidity;
 export const currentMarketSelector = (state) => state.api.currentMarket;
 export const bridgeReceiptsSelector = (state) => state.api.bridgeReceipts;
-export const marketInfoSelector = (state) => 
+export const marketInfoSelector = (state) =>
   state.api.marketinfos[makeScopeMarket(state.api)] || null;
 export const arweaveAllocationSelector = (state) => state.api.arweaveAllocation;
 export const isConnectingSelector = (state) => state.api.isConnecting;
