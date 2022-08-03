@@ -435,6 +435,11 @@ export default class API extends Emitter {
             throw err;
           }
 
+          if (accountState.err === 4001) {
+            await this.signOut();
+            return;
+          }
+
           try {
             accountState.profile = await this.getProfile(accountState.address);
           } catch (e) {
