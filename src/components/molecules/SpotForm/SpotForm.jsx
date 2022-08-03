@@ -757,7 +757,7 @@ class SpotForm extends React.Component {
       this.setState(newState);
     }
     if (this.state.updatePrice) {
-      this.setState({ price: this.props.lastPrice, updatePrice: false });
+      this.setState({ price: formatPrice(this.props.lastPrice), updatePrice: false });
     }
   }
 
