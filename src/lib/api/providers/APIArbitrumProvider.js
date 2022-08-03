@@ -314,4 +314,9 @@ export default class APIArbitrumProvider extends APIProvider {
     const marketInfoArray = Object.values(this.api.marketInfo);
     return marketInfoArray[0]?.exchangeAddress;
   };
+
+  signMessage = async (message) => {
+    const signer = await this.api.rollupProvider.getSigner();
+    return await signer.signMessage(message);
+  }
 }
