@@ -310,6 +310,11 @@ const BridgeContainer = () => {
     const userBalance = getCurrencyBalance(swapCurrency);
     const max = getMax(swapCurrency, L2FeeToken);
     const bridgeAmount = inputValue - ZigZagFeeAmount;
+    
+    if (!api.getCurrencyInfo(swapDetails.currency)) {
+      setFormErr('Loading token details...');
+      return;
+    }
 
     let error = null;
     if (inputValue > 0) {
@@ -376,12 +381,11 @@ const BridgeContainer = () => {
         balances[L2FeeToken] &&
           balances[L2FeeToken].value / 10 ** feeCurrencyInfo.decimals
       );
-  
+
       if (inputValue > 0 && L2FeeAmount > feeTokenBalance) {
         error = "Not enough balance to pay for fees";
       }
     }
-    
 
     if (error) {
       setFormErr(error);
@@ -396,6 +400,8 @@ const BridgeContainer = () => {
     L1FeeAmount,
     L2FeeAmount,
     L2FeeToken,
+    api.marketInfo,
+    balances[swapDetails.currency]
   ]);
 
   const setSwapDetails = async (values) => {

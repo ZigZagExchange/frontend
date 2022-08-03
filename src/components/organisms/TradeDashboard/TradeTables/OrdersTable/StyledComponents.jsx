@@ -103,14 +103,14 @@ export const LaptopWrapper = styled.div`
 
     ::-webkit-scrollbar-track {
       border-radius: 0px;
-      background: hsla(0, 0%, 100%, 0.15);
+      background: transparent
       height: 23px;
       border-radius: 5px;
     }
 
     ::-webkit-scrollbar-thumb {
       border-radius: 0px;
-      background: hsla(0, 0%, 100%, 0.4);
+      background: ${({ theme }) => theme.colors.foreground400};
       border-radius: 5px;
     }
 
@@ -124,9 +124,9 @@ export const LaptopWrapper = styled.div`
     width: 100%;
     table-layout: fixed;
   }
-  // thead {
-  //     width: calc( 100% - 1em )/* scrollbar is average 1em/16px width, remove it from thead width */
-  // }
+  thead {
+    width: calc( 100% - 10px );
+  }
 
   table {
     display: block;

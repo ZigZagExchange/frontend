@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
-import "./SpotBox.css";
 // assets
 import { SpotForm } from "components";
 import { ToggleButton } from "components/molecules/Toggle";

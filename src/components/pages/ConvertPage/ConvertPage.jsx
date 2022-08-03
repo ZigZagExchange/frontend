@@ -19,7 +19,7 @@ import {
   balancesSelector,
   lastPricesSelector,
   currentMarketSelector,
-  marketInfosSelector,
+  marketInfoSelector,
   liquiditySelector,
   setCurrentMarket,
   resetData,
@@ -49,7 +49,7 @@ const ConvertPage = () => {
   const allOrders = useSelector(allOrdersSelector);
   const currentMarket = useSelector(currentMarketSelector);
   const network = useSelector(networkSelector);
-  const marketInfos = useSelector(marketInfosSelector);
+  const marketInfo = useSelector(marketInfoSelector);
   const slippageValue = useSelector(slippageValueSelector);
 
   const [pairs, setGetPairs] = useState([]);
@@ -63,7 +63,6 @@ const ConvertPage = () => {
 
   const [balances, setBalances] = useState([]);
   const [currentPrice, setCurrentPrice] = useState(1);
-  const [marketInfo, setMarketInfo] = useState(null);
 
   const [orderButtonDisabled, setOrderButtonDisabled] = useState(false);
   const [errorMsg, setError] = useState("");
@@ -90,7 +89,6 @@ const ConvertPage = () => {
 
   useEffect(() => {
     setLoading(true);
-    setMarketInfo(marketInfos?.[currentMarket]);
     const timer = setInterval(() => {
       setSellTokenList(api.getCurrencies());
       setGetPairs(api.getPairs());
@@ -130,17 +128,19 @@ const ConvertPage = () => {
       const p_name = sellToken.name + "-" + buyToken.name;
       const r_p_name = buyToken.name + "-" + sellToken.name;
       let c = false;
-      Object.keys(pairPrices[network]).forEach((pair) => {
+      Object.keys(pairPrices).forEach((pair) => {
         if (pair === p_name) {
           setTtype("sell");
+          console.log(`Convert set sell pair to ${p_name}`);
           dispatch(setCurrentMarket(p_name));
           c = true;
         }
       });
       if (c === false) {
-        Object.keys(pairPrices[network]).forEach((pair) => {
+        Object.keys(pairPrices).forEach((pair) => {
           if (pair === r_p_name) {
             setTtype("buy");
+            console.log(`Convert set buy pair to ${r_p_name}`);
             dispatch(setCurrentMarket(r_p_name));
           }
         });
@@ -198,7 +198,7 @@ const ConvertPage = () => {
       tType === "buy" ? 1 + slippageValue / 100 : 1 - slippageValue / 100;
 
     setCurrentPrice(price);
-  }, [liquidity, allOrders, slippageValue]);
+  }, [liquidity, allOrders, slippageValue, tType]);
 
   useEffect(() => {
     if (changedBuyAmount) {
@@ -772,7 +772,7 @@ const ConvertPage = () => {
 
   const onChangeSlippageValue = (value) => {
     let amount = value.replace(",", ".").replace(/[^0-9.]/g, ""); //^[1-9][0-9]?$|^100$
-    if (parseFloat(amount) < 0.1 || parseFloat(amount) > 25) {
+    if (parseFloat(amount) < 0 || parseFloat(amount) > 25) {
       dispatch(setSlippageValue({ value: "1.00" }));
     } else {
       dispatch(setSlippageValue({ value: amount }));

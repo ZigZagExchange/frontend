@@ -10,7 +10,7 @@ export function formatUSD(floatNum) {
   const num = parseFloat(floatNum || 0)
     .toFixed(2)
     .split(".");
-  num[0] = parseInt(num[0]).toLocaleString();
+  num[0] = parseInt(num[0]).toString();
   return num.join(".");
 }
 
@@ -18,25 +18,45 @@ export function formatMillonAmount(floatNum) {
   if (floatNum >= 10000000 && floatNum < 100000000) {
     floatNum = floatNum / 1000000;
     floatNum = floatNum.toFixed(3);
-    return floatNum+'M';
+    return floatNum + "M";
   } else if (floatNum >= 100000000 && floatNum < 1000000000) {
     floatNum = floatNum / 1000000;
-    floatNum = floatNum.toFixed(2)
-    return floatNum+'M';
-  } else if(floatNum >= 1000000000 && floatNum < 10000000000) {
+    floatNum = floatNum.toFixed(2);
+    return floatNum + "M";
+  } else if (floatNum >= 1000000000 && floatNum < 10000000000) {
     floatNum = floatNum / 1000000;
     floatNum = floatNum.toFixed(1);
-    return floatNum+'M'
+    return floatNum + "M";
   } else {
     return addComma(floatNum);
   }
 }
 
 export function addComma(floatNum) {
-  const str = typeof floatNum === 'string'?floatNum.replaceAll(",", ""):floatNum;
+  const str =
+    typeof floatNum === "string" ? floatNum.replaceAll(",", "") : floatNum;
   const parts = Number(str).toString().split(".");
   parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  return parts.join(".");
+  return expToNumber(parts.join("."));
+}
+
+export function expToNumber(number) {
+  const data = String(number).split(/[eE]/);
+  if (data.length === 1) return data[0];
+
+  let z = "",
+    sign = number < 0 ? "-" : "",
+    str = data[0].replace(".", ""),
+    mag = Number(data[1]) + 1;
+
+  if (mag < 0) {
+    z = sign + "0.";
+    while (mag++) z += "0";
+    return z + str.replace(/^\-/, "");
+  }
+  mag -= str.length;
+  while (mag--) z += "0";
+  return str + z;
 }
 
 export function formatToken(floatNum, token = "USDC") {

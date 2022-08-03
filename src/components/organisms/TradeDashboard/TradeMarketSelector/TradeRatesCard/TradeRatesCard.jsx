@@ -5,8 +5,6 @@ import { formatPrice, addComma } from "lib/utils";
 import { SettingsIcon } from "components/atoms/Svg";
 import Button from "components/molecules/Button/Button";
 import Text from "components/atoms/Text/Text";
-// css
-import "./TradeRatesCard.css";
 import SettingsModal from "./SettingsModal";
 import { TokenPairDropdown } from "components/molecules/Dropdown";
 import useModal from "components/hooks/useModal";
@@ -21,6 +19,7 @@ import { ActivatedStarIcon, StarIcon } from "components/atoms/Svg";
 import { Box } from "@material-ui/core";
 import _ from "lodash";
 import { darkColors, lightColors } from "lib/theme/colors";
+import classNames from "classnames";
 
 const TradeRatesCard = ({
   updateMarketChain,
@@ -190,13 +189,13 @@ const TradeRatesCard = ({
               font="primaryHeading6"
               color={
                 percentChange === "NaN"
-                  ? "black"
+                  ? "text-warning-900"
                   : isIncrease
                   ? "successHighEmphasis"
                   : "dangerHighEmphasis"
               }
             >
-              {marketSummary.price
+              {marketSummary?.price
                 ? addComma(formatPrice(marketSummary.price))
                 : "--"}
             </Text>
@@ -227,16 +226,17 @@ const TradeRatesCard = ({
                   font="primaryMediumSmallSemiBold"
                   color={
                     percentChange === "NaN"
-                      ? "black"
+                      ? "white"
                       : parseFloat(marketSummary["priceChange"]) >= 0
                       ? "successHighEmphasis"
                       : "dangerHighEmphasis"
                   }
                 >
                   {marketSummary.priceChange &&
-                    addComma(formatPrice(marketSummary.priceChange / 1))}
-                  {" | "}
-                  {percentChange !== "NaN" ? `${percentChange}%` : "--"}
+                    `${addComma(
+                      formatPrice(marketSummary.priceChange / 1)
+                    )} | `}
+                  {percentChange !== "NaN" ? `${percentChange}%` : "-- | --"}
                 </Text>
               </RatesCard>
               <Divider />
@@ -283,9 +283,13 @@ const TradeRatesCard = ({
                     {settings.showNightPriceChange
                       ? `UTC Volume(${
                           marketInfo && marketInfo.baseAsset.symbol
+                            ? marketInfo.baseAsset.symbol
+                            : " -- "
                         })`
                       : `24h Volume(${
                           marketInfo && marketInfo.baseAsset.symbol
+                            ? marketInfo && marketInfo.baseAsset.symbol
+                            : " -- "
                         })`}
                   </>
                 </Text>
@@ -308,9 +312,13 @@ const TradeRatesCard = ({
                     {settings.showNightPriceChange
                       ? `UTC Volume(${
                           marketInfo && marketInfo.quoteAsset.symbol
+                            ? marketInfo.quoteAsset.symbol
+                            : " -- "
                         })`
                       : `24h Volume(${
                           marketInfo && marketInfo.quoteAsset.symbol
+                            ? marketInfo.quoteAsset.symbol
+                            : " -- "
                         })`}
                   </>
                 </Text>
