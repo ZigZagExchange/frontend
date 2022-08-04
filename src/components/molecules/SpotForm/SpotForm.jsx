@@ -731,7 +731,12 @@ class SpotForm extends React.Component {
       this.props.orderType !== prevProps.orderType ||
       this.props.side !== prevProps.side
     ) {
-      const newState = { ...this.state, baseAmount: "", quoteAmount: "" };
+      const newState = {
+        ...this.state,
+        baseAmount: "",
+        quoteAmount: "",
+        price: this.props.lastPrice,
+      };
       this.setState(newState);
     }
 
