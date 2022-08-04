@@ -408,8 +408,9 @@ class SpotForm extends React.Component {
       }
     );
 
+    let success = false;
     try {
-      await api.approveExchangeContract(
+      success = await api.approveExchangeContract(
         token,
         0 // amount = 0 ==> MAX_ALLOWANCE
       );
@@ -419,9 +420,11 @@ class SpotForm extends React.Component {
     }
 
     toast.dismiss(orderApproveToast);
-    toast.success(`${marketInfo.baseAsset.symbol} approved.`, {
-      toastId: `${marketInfo.baseAsset.symbol} approved.`,
-    });
+    if (success) {
+      toast.success(`${token} approved.`, {
+        toastId: `${token} approved.`,
+      });
+    }    
     newstate = { ...this.state };
     this.setState(newstate);
   }

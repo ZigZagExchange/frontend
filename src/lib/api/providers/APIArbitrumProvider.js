@@ -253,11 +253,13 @@ export default class APIArbitrumProvider extends APIProvider {
       signer
     );
 
-    await erc20Contract.approve(exchangeAddress, amountBN);
+    const tx = await erc20Contract.approve(exchangeAddress, amountBN);
+    const { status } = await tx.wait();
 
     // update account balance
-    await this.api.getBalances();
-    return true;
+    if (status) this.api.getBalances();
+    
+    return status;
   };
 
   warpETH = async (amountBN) => {
