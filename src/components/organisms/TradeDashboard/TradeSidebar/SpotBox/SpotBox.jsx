@@ -99,7 +99,7 @@ const SpotBox = ({
         <Tab>Limit</Tab>
         <Tab>Market</Tab>
       </StyledTabMenu>
-      <SpotFormWrapper>{lastPrice ? renderSpotForm() : ""}</SpotFormWrapper>
+      <SpotFormWrapper>{renderSpotForm()}</SpotFormWrapper>
     </Wrapper>
   );
 };
