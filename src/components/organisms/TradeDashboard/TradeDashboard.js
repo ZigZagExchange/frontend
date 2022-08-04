@@ -295,6 +295,8 @@ export function TradeDashboard() {
         draggableHandle=".grid-item__title"
         editable={settings.editable}
         useCSSTransforms={false}
+        compactType="horizontal"
+        isBounded={true}
       >
         <div key="a">
           <GridLayoutCell editable={settings.editable}>
