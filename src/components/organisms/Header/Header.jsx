@@ -50,13 +50,13 @@ const networkLists = [
     selectedIcon: <CheckIcon />,
     image: zksyncLogo,
   },
-  {
-    text: "zkSync - Rinkeby",
-    value: 1000,
-    url: "#",
-    selectedIcon: <CheckIcon />,
-    image: zksyncLogo,
-  },
+  //{
+  //  text: "zkSync - Rinkeby",
+  //  value: 1000,
+  //  url: "#",
+  //  selectedIcon: <CheckIcon />,
+  //  image: zksyncLogo,
+  //},
   {
     text: "Arbitrum (alpha)",
     value: 42161,
