@@ -358,6 +358,7 @@ export default class API extends Emitter {
         this.serverDelta / 60
         } min). Please sync it via settings > date/time > sync now`);
     }
+    this.emit("serverDeltaUpdate", this.serverDelta);
   }
 
   start = () => {
