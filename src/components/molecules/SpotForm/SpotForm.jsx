@@ -731,18 +731,7 @@ class SpotForm extends React.Component {
       this.props.orderType !== prevProps.orderType ||
       this.props.side !== prevProps.side
     ) {
-      const newState = { ...this.state };
-      if (this.props.quoteChanged) {
-        // for buy quoteAmount should be fixed
-        newState.baseAmount = newState.quoteAmount / this.currentPrice();
-        newState.baseAmount =
-          newState.baseAmount === 0 ? "" : newState.baseAmount;
-      } else {
-        // for sell baseAmount should be fixed
-        newState.quoteAmount = this.currentPrice() * newState.baseAmount;
-        newState.quoteAmount =
-          newState.quoteAmount === 0 ? "" : newState.quoteAmount;
-      }
+      const newState = { ...this.state, baseAmount: "", quoteAmount: "" };
       this.setState(newState);
     }
 
@@ -757,7 +746,10 @@ class SpotForm extends React.Component {
       this.setState(newState);
     }
     if (this.state.updatePrice) {
-      this.setState({ price: formatPrice(this.props.lastPrice), updatePrice: false });
+      this.setState({
+        price: formatPrice(this.props.lastPrice),
+        updatePrice: false,
+      });
     }
   }
 
@@ -912,9 +904,7 @@ class SpotForm extends React.Component {
       approveNeeded = false;
     if (this.props.side === "b") {
       buttonType = "BUY";
-      if (
-        (quoteAmount <= quoteBalance) && (quoteAmount > quoteAllowance)
-      ) {
+      if (quoteAmount <= quoteBalance && quoteAmount > quoteAllowance) {
         buttonText = `Approve ${marketInfo && marketInfo.quoteAsset?.symbol}`;
         if (api.isEVMChain) approveNeeded = true;
       } else {
@@ -946,9 +936,7 @@ class SpotForm extends React.Component {
       );
     } else if (this.props.side === "s") {
       buttonType = "SELL";
-      if (
-        (baseAmount <= baseBalance) && (baseAmount > baseAllowance)
-      ) {
+      if (baseAmount <= baseBalance && baseAmount > baseAllowance) {
         buttonText = `Approve ${marketInfo && marketInfo.baseAsset?.symbol}`;
         if (api.isEVMChain) approveNeeded = true;
       } else {
@@ -1141,15 +1129,14 @@ class SpotForm extends React.Component {
                 width="100%"
                 scale="imd"
                 disabled={
-                  !approveNeeded && (
-                    this.isInvalidNumber(this.state.quoteAmount) ||
+                  !approveNeeded &&
+                  (this.isInvalidNumber(this.state.quoteAmount) ||
                     this.isInvalidNumber(this.state.baseAmount) ||
                     this.isInvalidNumber(this.currentPrice()) ||
                     (this.state.quoteAmount > this.getQuoteBalance() &&
                       this.props.side === "b") ||
                     (this.state.baseAmount > this.getBaseBalance() &&
-                      this.props.side === "s")
-                  )                  
+                      this.props.side === "s"))
                 }
                 onClick={
                   approveNeeded
