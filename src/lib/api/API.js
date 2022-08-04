@@ -400,7 +400,11 @@ export default class API extends Emitter {
 
   send = (op, args) => {
     if (!this.ws) return;
-    return this.ws.send(JSON.stringify({ op, args }));
+    if (this.ws.readyState === 1) {
+      return this.ws.send(JSON.stringify({ op, args }));
+    } else {
+      setTimeout(this.send, 500, op, args);
+    }
   };
 
   sleep = (ms) => {
