@@ -19,7 +19,7 @@ class SpotForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      price: props.lastPrice,
+      price: formatPrice(props.lastPrice),
       baseAmount: "",
       quoteAmount: "",
       maxSizeSelected: false,
