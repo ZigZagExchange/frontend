@@ -1,17 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import {
   networkSelector,
   isConnectingSelector,
+  balancesSelector,
 } from "../../../lib/store/features/api/apiSlice";
 import Button from "./Button";
 import api from "../../../lib/api";
 import { useHistory, useLocation } from "react-router-dom";
-import { formatAmount } from "../../../lib/utils";
 
 const ConnectWalletButton = (props) => {
   const network = useSelector(networkSelector);
   const isLoading = useSelector(isConnectingSelector);
+  const balanceData = useSelector(balancesSelector);
   const history = useHistory();
   const location = useLocation();
 
@@ -25,27 +26,22 @@ const ConnectWalletButton = (props) => {
     event.preventDefault();
     try {
       api.emit("connecting", true);
-      // setConnecting(true);
-      const state = await api.signIn(network);
-      const walletBalance = formatAmount(state.committed.balances["ETH"], {
-        decimals: 18,
-      });
-      const activationFee = api.apiProvider.zksyncCompatible
-        ? await api.apiProvider.changePubKeyFee("ETH")
-        : 0;
-
-      if (
-        !state.id &&
-        !/^\/bridge(\/.*)?/.test(location.pathname) &&
-        (isNaN(walletBalance) || walletBalance < activationFee)
-      ) {
-        history.push("/bridge");
+      await api.signIn(network);
+      if (api.zksyncCompatible) {
+        const balance = balanceData?.[network]?.ETH?.valueReadable;
+        const activationFee = await api.apiProvider.changePubKeyFee("ETH");  
+        const activated = await api.apiProvider.checkAccountActivated();
+        if (
+          !activated &&
+          !/^\/bridge(\/.*)?/.test(location.pathname) &&
+          (isNaN(balance) || balance < activationFee)
+        ) {
+          history.push("/bridge");
+        }
       }
-      // setConnecting(false);
       api.emit("connecting", false);
     } catch (e) {
       console.error(e);
-      // setConnecting(false);
       api.emit("connecting", false);
     }
   };

@@ -61,11 +61,12 @@ export default class API extends Emitter {
     this.validMarkets = validMarkets;
 
     if (window.ethereum) {
-      window.ethereum.on("accountsChanged", this.signOut);
+      window.ethereum.on("accountsChanged", () => {
+        this.resetUserData();
+        this.updateUserData();
+      });
       window.ethereum.on("chainChanged", (chainId) => {
-        this.signOut().then(() => {
-          this.setAPIProvider(chainMap[chainId]);
-        });
+        this.setAPIProvider(chainMap[chainId]);
       });
 
       this.setAPIProvider(chainMap[window.ethereum.chainId] || 1);
@@ -79,7 +80,7 @@ export default class API extends Emitter {
     return this.networks[this.getNetworkName(network)][1];
   };
 
-  setAPIProvider = (network, networkChanged = true) => {
+  setAPIProvider = (network) => {
     const chainName = this.getChainName(network);
 
     if (!chainName) {
@@ -88,18 +89,11 @@ export default class API extends Emitter {
       return;
     }
 
-    const apiProvider = this.getAPIProvider(network);
-    this.apiProvider = apiProvider;
+    this.resetNetworkData();
 
-    // Change WebSocket if necessary
-    if (this.ws) {
-      const oldUrl = new URL(this.ws.url);
-      const newUrl = new URL(this.apiProvider.websocketUrl);
-      if (oldUrl.host !== newUrl.host) {
-        // Stopping the WebSocket will trigger an auto-restart in 3 seconds
-        this.stop();
-      }
-    }
+    const apiProvider = this.getAPIProvider(network); 
+    this.apiProvider = apiProvider;   
+    this.emit("providerChange", network);
 
     this.web3 = new Web3(
       window.ethereum ||
@@ -107,6 +101,19 @@ export default class API extends Emitter {
           `https://${chainName}.infura.io/v3/${this.infuraId}`
         )
     );
+
+    // Change WebSocket if necessary
+    if (this.ws) {
+      const oldUrl = new URL(this.ws.url);
+      const newUrl = new URL(this.apiProvider.websocketUrl);
+      if (oldUrl.host !== newUrl.host) {
+        // Starting the WebSocket will trigger an auto-restart in 3 seconds
+        this.start();
+      } else {
+        // get initial marketinfos, returns lastprice and marketinfo2
+        this.send("marketsreq", [this.apiProvider.network, true]);
+      }
+    }
 
     if (chainName === "arbitrum") {
       this.web3Modal = new Web3Modal({
@@ -155,11 +162,7 @@ export default class API extends Emitter {
       });
     }
 
-    this.getAccountState().catch((err) => {
-      console.log("Failed to switch providers", err);
-    });
-
-    if (networkChanged) this.emit("providerChange", network);
+    this.updateUserData();
   };
 
   getProfile = async (address) => {
@@ -257,6 +260,8 @@ export default class API extends Emitter {
       this.marketInfo[`${marketInfo.zigzagChainId}:${marketInfo.alias}`] = marketInfo;
     }
     if (msg.op === "marketinfo2") {
+      console.log("got marketinfo2")
+      console.log(msg.args[0])
       const marketInfos = msg.args[0];
       marketInfos.forEach((marketInfo) => {
         if (!marketInfo) return;
@@ -276,8 +281,6 @@ export default class API extends Emitter {
   refreshNetwork = async () => {
     if (!window.ethereum) return;
     let ethereumChainId, ethereumChainInfo;
-
-    // await this.signOut();
 
     switch (this.apiProvider.network) {
       case 1:
@@ -427,40 +430,7 @@ export default class API extends Emitter {
             this.getPolygonUrl(network)
           );
 
-          let accountState;
-          try {
-            accountState = await this.apiProvider.signIn(...args);
-          } catch (err) {
-            await this.signOut();
-            throw err;
-          }
-
-          if (accountState.err === 4001) {
-            await this.signOut();
-            return;
-          }
-
-          try {
-            accountState.profile = await this.getProfile(accountState.address);
-          } catch (e) {
-            accountState.profile = {};
-          }
-
-          this.emit("signIn", accountState);
-
-          if (accountState && accountState.id) {
-            this.send("login", [
-              network,
-              accountState.id && accountState.id.toString(),
-            ]);
-          }
-
-          // fetch blances
-          await this.getBalances();
-          await this.getWalletBalances();
-          await this.getPolygonWethBalance();
-
-          return accountState;
+          this.updateUserData();
         })
         .finally(() => {
           this._signInProgress = null;
@@ -480,23 +450,69 @@ export default class API extends Emitter {
     if (isMobile) window.localStorage.clear();
     else window.localStorage.removeItem("walletconnect");
 
+    this.resetNetworkData();
+    this.emit("signOut");
+  };
+
+  resetUserData = () => {
     this.balances = {};
     this._profiles = {};
     this._pendingOrders = [];
     this._pendingFills = [];
+    this.isArgent = false;
+
+    this.emit("balanceUpdate", "wallet", {});
+    if (this.apiProvider?.network) 
+      this.emit("balanceUpdate", this.apiProvider.network, {});
+    this.emit("balanceUpdate", "polygon", {});
+    this.emit("accountState", {});
+  }
+
+  resetNetworkData = () => {
+    // if we update the network the user chnages as well
+    this.resetUserData();
 
     this.web3 = null;
     this.web3Modal = null;
     this.rollupProvider = null;
     this.mainnetProvider = null;
-    this.isArgent = false;
-    this.setAPIProvider(this.apiProvider.network, false);
-    this.emit("balanceUpdate", "wallet", {});
-    this.emit("balanceUpdate", this.apiProvider.network, {});
-    this.emit("balanceUpdate", "polygon", {});
-    this.emit("accountState", {});
-    this.emit("signOut");
-  };
+  }
+
+  updateUserData = async () => {
+    console.log(`updateUserData ==> this.rollupProvider ==> ${!!this.rollupProvider}`)
+    if (this.rollupProvider) {
+      let accountState;
+      try {
+        accountState = {...await this.apiProvider.signIn()};
+      } catch (err) {
+        await this.signOut();
+        throw err;
+      }
+  
+      try {
+        accountState.profile = await this.getProfile(accountState.address);
+      } catch (e) {
+        accountState.profile = {};
+      }
+  
+      this.emit("signIn", accountState);
+  
+      if (accountState && accountState.id) {
+        this.send("login", [
+          this.apiProvider.network,
+          accountState.id && accountState.id.toString(),
+        ]);
+      }
+
+      await this.getWalletBalances();
+    }
+
+    if(this.mainnetProvider) {
+      await this.getBalances();
+    }
+
+    await this.getPolygonWethBalance();
+  }
 
   getPolygonUrl(network) {
     switch (network) {
