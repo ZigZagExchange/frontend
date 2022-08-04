@@ -97,7 +97,10 @@ export default class API extends Emitter {
       const newUrl = new URL(this.apiProvider.websocketUrl);
       if (oldUrl.host !== newUrl.host) {
         // Stopping the WebSocket will trigger an auto-restart in 3 seconds
-        this.stop();
+        this.start();
+      } else {
+        // get initial marketinfos, returns lastprice and marketinfo2
+        this.send("marketsreq", [this.apiProvider.network, true]);
       }
     }
 
