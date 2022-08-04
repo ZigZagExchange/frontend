@@ -4,6 +4,7 @@ import Web3Modal from "web3modal";
 import Emitter from "tiny-emitter";
 import { ethers, constants as ethersConstants } from "ethers";
 import WalletConnectProvider from "@walletconnect/web3-provider";
+import CoinbaseWalletSDK from "@coinbase/wallet-sdk";
 import { getENSName } from "lib/ens";
 import { formatAmount } from "lib/utils";
 import erc20ContractABI from "lib/contracts/ERC20.json";
@@ -120,6 +121,13 @@ export default class API extends Emitter {
               infuraId: this.infuraId,
             },
           },
+          coinbasewallet: {
+            package: CoinbaseWalletSDK, 
+            options: {
+              appName: "Coinbase Wallet",
+              infuraId: this.infuraId 
+            }
+          },
         },
       });
     } else {
@@ -133,6 +141,13 @@ export default class API extends Emitter {
             options: {
               infuraId: this.infuraId,
             },
+          },
+          coinbasewallet: {
+            package: CoinbaseWalletSDK,
+            options: {
+              appName: "Coinbase Wallet",
+              infuraId: this.infuraId
+            }
           },
           "custom-argent": {
             display: {
