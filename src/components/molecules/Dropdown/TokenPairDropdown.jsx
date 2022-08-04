@@ -415,6 +415,9 @@ const TokenPairDropdown = ({
   // determines if a row should be visible based on category and search term
   // returns true or false
   const isVisible = (row) => {
+    if (searchValue !== "") {
+      return row.td1.toLowerCase().includes(searchValue.toLowerCase());
+    }
     if (categorySelected === 1) {
       return row.td1.includes("ETH");
     }
@@ -431,9 +434,8 @@ const TokenPairDropdown = ({
       return favourites.includes(row.td1);
     }
     
-    if (searchValue === "") return true;
+    return true;
 
-    return row.td1.toLowerCase().includes(searchValue.toLowerCase());
   }
 
   const renderPairs = () => {
