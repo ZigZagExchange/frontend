@@ -29,7 +29,7 @@ const AccountButton = ({ ...props }) => {
 
   const { expanded, notext, onClick } = props;
 
-  return user.id && user.address ? (
+  return user.address ? (
     <IconButton
       variant="secondary"
       onClick={onClick}
