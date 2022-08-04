@@ -141,7 +141,8 @@ export function TradeDashboard() {
     if (marketFromURL && currentMarket !== marketFromURL) {
       updateMarketChain(marketFromURL);
     }
-    if (chainid && network !== chainid) {
+    if (chainid) { //For #873 and #290. When a browser is refreshed, we have to relogin though the network is not changed. Because all data is initialized when a browser is refreshed.
+    // if (chainid && network !== chainid) {
       api.setAPIProvider(chainid);
       api.signOut();
     }

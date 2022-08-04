@@ -470,10 +470,10 @@ export default class API extends Emitter {
     return this._signInProgress;
   };
 
-  signOut = async (clearCatch = false) => {
+  signOut = async (clearCache = false) => {
     if (!this.apiProvider) {
       return;
-    } else if (this.web3Modal && clearCatch) {
+    } else if (this.web3Modal && clearCache) {
       this.web3Modal.clearCachedProvider();
     }
 
