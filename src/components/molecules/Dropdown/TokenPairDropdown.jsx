@@ -500,7 +500,7 @@ const TokenPairDropdown = ({
               <Text
                 font="tableContent"
                 color={
-                  increaseObj.increase === false
+                  increaseObj && increaseObj.increase === false
                     ? "dangerHighEmphasis"
                     : "successHighEmphasis"
                 }
