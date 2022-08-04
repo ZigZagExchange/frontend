@@ -14,7 +14,7 @@ import {
 import InputField from "components/atoms/InputField/InputField";
 import { TabMenu, Tab } from "../TabMenu";
 import api from "lib/api";
-import { getStables } from "lib/helpers/categories";
+import { stables as STABLES } from "lib/helpers/categories";
 import {
   addFavourite,
   removeFavourite,
@@ -220,10 +220,7 @@ const TokenPairDropdown = ({
   onFavourited,
   favourited,
 }) => {
-  // const [foundPairs, setFoundPairs] = useState([])
-  const [pairs, setPairs] = useState([]);
   const [categorySelected, setCategorySelected] = useState(0);
-  const [pairsByCategory, setPairsByCategory] = useState([]);
   const [favourites, setFavourites] = useState(fetchFavourites());
   const [volumeSorted, setVolumeSorted] = useState(true);
   const [volumeDirection, setVolumeDirection] = useState(false);
@@ -237,7 +234,6 @@ const TokenPairDropdown = ({
   const [isOpened, setIsOpened] = useState(false);
   const isMobile = window.innerWidth < 500;
   const wrapperRef = useRef(null);
-  const [_rowData, setRowData] = useState([]);
   const [isIncrease, setIsIncrease] = useState([]);
 
   useEffect(() => {
@@ -263,18 +259,17 @@ const TokenPairDropdown = ({
     //search all, if you'd prefer to search the current category just set this to use `state.pairs` instead
     //
 
-    foundPairs = pairsByCategory.filter((item) => {
+    foundPairs = rowData.filter((item) => {
       if (!value) return true;
       if (
-        item.toLowerCase().includes(value.toLowerCase()) ||
-        item.toLowerCase().includes(reverseValue.toLowerCase())
+        item.td1.toLowerCase().includes(value.toLowerCase()) ||
+        item.td1.toLowerCase().includes(reverseValue.toLowerCase())
       ) {
         return true;
       }
       return false;
     });
     //update found pairs
-    setPairs(foundPairs);
     setPairSorted(false);
     setPairDirection(false);
     setPriceSorted(false);
@@ -288,26 +283,14 @@ const TokenPairDropdown = ({
   useMemo(() => {
     const tmp = [];
     _.map(rowData, (each, i) => {
-      if (each.td2 > _rowData[i]?.td2)
+      if (each.td2 > rowData[i]?.td2)
         tmp.push({ td1: each.td1, increase: true });
-      else if (each.td2 < _rowData[i]?.td2)
+      else if (each.td2 < rowData[i]?.td2)
         tmp.push({ td1: each.td1, increase: false });
       else tmp.push({ td1: each.td1, increase: isIncrease[i]?.increase });
     });
     setIsIncrease(tmp);
-    setRowData(rowData);
   }, [rowData]);
-
-  useEffect(() => {
-    if (
-      categorySelected !== 4 &&
-      pairsByCategory.length === 0 &&
-      _rowData.length !== 0
-    ) {
-      setPairs(_rowData.map((r) => r.td1));
-      setPairsByCategory(_rowData.map((r) => r.td1));
-    }
-  }, [_rowData]);
 
   const categorizePairs = (category_index) => {
     let foundPairs = [];
@@ -322,63 +305,6 @@ const TokenPairDropdown = ({
     setChangeSorted(false);
     setChangeDirection(false);
     setSearchValue("");
-
-    switch (category_index) {
-      case 0:
-        setPairsByCategory(_rowData.map((row) => row.td1));
-        setPairs(_rowData.map((row) => row.td1));
-        break;
-      case 1:
-        const eth = _rowData
-          .filter((item) => {
-            if (item.td1.toLowerCase().includes("ETH".toLowerCase())) {
-              return true;
-            }
-            return false;
-          })
-          .map((p) => p.td1);
-        setPairsByCategory(eth);
-        setPairs(eth);
-        break;
-      case 2:
-        const wbtc = _rowData
-          .filter((item) => {
-            if (item.td1.toLowerCase().includes("WBTC".toLowerCase())) {
-              return true;
-            }
-            return false;
-          })
-          .map((p) => p.td1);
-        setPairsByCategory(wbtc);
-        setPairs(wbtc);
-        break;
-      case 3:
-        //look for pairs against stables.
-        foundPairs = getStables(_rowData);
-        setPairsByCategory(foundPairs);
-        setPairs(foundPairs);
-        break;
-      case 4:
-        //set favourites from localstorage
-        const favourites = fetchFavourites();
-        foundPairs = [];
-
-        favourites.forEach((value) => {
-          _rowData.forEach((row) => {
-            const pair_name = row.td1;
-
-            //if found query, push it to found pairs
-            if (pair_name.includes(value.toUpperCase())) {
-              foundPairs.push(pair_name);
-            }
-          });
-        });
-        setPairsByCategory(foundPairs);
-        setPairs(foundPairs);
-        break;
-      default:
-        return pairs;
-    }
   };
 
   const favouritePair = (pair) => {
@@ -398,7 +324,7 @@ const TokenPairDropdown = ({
   const togglePairSorting = () => {
     const toggled = !pairDirection;
 
-    const sorted_pairs = _rowData;
+    const sorted_pairs = rowData;
     
     sorted_pairs.sort(function compareFn(firstEl, secondEl) {
       if (toggled) {
@@ -408,7 +334,6 @@ const TokenPairDropdown = ({
       }
     });
 
-    setPairs(sorted_pairs.map((r) => r.td1));
     setPairSorted(true);
     setPairDirection(toggled);
     setPriceSorted(false);
@@ -421,7 +346,7 @@ const TokenPairDropdown = ({
 
   const toggleChangeSorting = () => {
     const toggled = !changeDirection;
-    const sorted_pairs = _rowData;
+    const sorted_pairs = rowData;
 
     sorted_pairs.sort(function compareFn(firstEl, secondEl) {
       if (toggled) {
@@ -431,7 +356,6 @@ const TokenPairDropdown = ({
       }
     });
 
-    setPairs(sorted_pairs.map((r) => r.td1));
     setPairSorted(false);
     setPairDirection(false);
     setPriceSorted(false);
@@ -445,7 +369,7 @@ const TokenPairDropdown = ({
   const togglePriceSorting = () => {
     const toggled = !priceDirection;
 
-    const sorted_pairs = _rowData;
+    const sorted_pairs = rowData;
 
     sorted_pairs.sort(function compareFn(firstEl, secondEl) {
       if (toggled) {
@@ -455,7 +379,6 @@ const TokenPairDropdown = ({
       }
     });
 
-    setPairs(sorted_pairs.map((r) => r.td1));
     setPairSorted(false);
     setPairDirection(false);
     setPriceSorted(true);
@@ -469,7 +392,7 @@ const TokenPairDropdown = ({
   const toggleVolumeSorting = () => {
     const toggled = !volumeDirection;
 
-    const sorted_pairs = _rowData;
+    const sorted_pairs = rowData;
 
     sorted_pairs.sort(function compareFn(firstEl, secondEl) {
       if (toggled) {
@@ -479,7 +402,6 @@ const TokenPairDropdown = ({
       }
     });
 
-    setPairs(sorted_pairs.map((r) => r.td1));
     setPairSorted(false);
     setPairDirection(false);
     setPriceSorted(false);
@@ -490,10 +412,34 @@ const TokenPairDropdown = ({
     setChangeDirection(false);
   };
 
-  const renderPairs = (pairs) => {
-    const shown_pairs = pairs
-      .map((pair) => [pair, _rowData.find((row) => row.td1 === pair)])
-      .sort(([_, d], [__, d2]) => {
+  // determines if a row should be visible based on category and search term
+  // returns true or false
+  const isVisible = (row) => {
+    if (categorySelected === 1) {
+      return row.td1.includes("ETH");
+    }
+    if (categorySelected === 2) {
+      return row.td1.includes("WBTC");
+    }
+    if (categorySelected === 3) {
+      for (let i in STABLES) {
+        if (row.td1.includes(STABLES[i])) return true;
+      }
+      return false;
+    }
+    if (categorySelected === 4) {
+      return favourites.includes(row.td1);
+    }
+    
+    if (searchValue === "") return true;
+
+    return row.td1.toLowerCase().includes(searchValue.toLowerCase());
+  }
+
+  const renderPairs = () => {
+    const shown_pairs = rowData
+      .filter(isVisible)
+      .sort((d, d2) => {
         if (!d || !d2) return 0;
         if (changeSorted) {
           return changeDirection ? d.td3 - d2.td3 : d2.td3 - d.td3;
@@ -515,8 +461,9 @@ const TokenPairDropdown = ({
           return d && d2 ? d.usdVolumn - d2.usdVolumn : 0;
         }
       })
-      .map(([pair, d], i) => {
+      .map((d, i) => {
         if (!d) return "";
+        const pair = d.td1;
         const selected = currentMarket === pair; //if current market selected
         const isFavourited = favourites.includes(pair); //if contains, isFavourited
         const increaseObj = _.find(isIncrease, { td1: pair });
@@ -742,7 +689,7 @@ const TokenPairDropdown = ({
               <Tab>Favorites</Tab>
             </StyledTabMenu>
             <TableContent className="trade_price_btc_table">
-              {renderPairs(pairs)}
+              {renderPairs()}
             </TableContent>
           </DropdownContent>
         </DropdownDisplay>
