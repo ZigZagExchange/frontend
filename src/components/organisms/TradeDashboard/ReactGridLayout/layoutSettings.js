@@ -285,14 +285,14 @@ export const stackedLayouts = {
     },
     {
       w: 40,
-      h: 50,
+      h: 20,
       x: 20,
       y: 20,
       i: "g",
     },
     {
       w: 40,
-      h: 50,
+      h: 20,
       x: 20,
       y: 30,
       i: "h",
