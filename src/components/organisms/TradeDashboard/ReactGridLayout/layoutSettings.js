@@ -113,7 +113,7 @@ export const initialLayouts = {
   xxs: [
     {
       w: 20,
-      h: 20,
+      h: 25,
       x: 0,
       y: 20,
       i: "a",
@@ -134,7 +134,7 @@ export const initialLayouts = {
     },
     {
       w: 20,
-      h: 20,
+      h: 25,
       x: 20,
       y: 20,
       i: "g",
@@ -285,14 +285,14 @@ export const stackedLayouts = {
     },
     {
       w: 40,
-      h: 20,
+      h: 50,
       x: 20,
       y: 20,
       i: "g",
     },
     {
       w: 40,
-      h: 20,
+      h: 50,
       x: 20,
       y: 30,
       i: "h",
