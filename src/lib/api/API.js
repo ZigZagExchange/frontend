@@ -87,7 +87,7 @@ export default class API extends Emitter {
       this.signOut();
       return;
     }
-
+    const oldNetwork = this.apiProvider?.network;
     const apiProvider = this.getAPIProvider(network);
     this.apiProvider = apiProvider;
 
@@ -97,7 +97,11 @@ export default class API extends Emitter {
       const newUrl = new URL(this.apiProvider.websocketUrl);
       if (oldUrl.host !== newUrl.host) {
         // Stopping the WebSocket will trigger an auto-restart in 3 seconds
-        this.stop();
+        this.start();
+      }
+      if (oldNetwork !== this.apiProvider.network) {
+        // get initial marketinfos, returns lastprice and marketinfo2
+        this.send("marketsreq", [this.apiProvider.network, true]);
       }
     }
 
@@ -396,7 +400,11 @@ export default class API extends Emitter {
 
   send = (op, args) => {
     if (!this.ws) return;
-    return this.ws.send(JSON.stringify({ op, args }));
+    if (this.ws.readyState === 1) {
+      return this.ws.send(JSON.stringify({ op, args }));
+    } else {
+      setTimeout(this.send, 500, op, args);
+    }
   };
 
   sleep = (ms) => {
