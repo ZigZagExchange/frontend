@@ -112,7 +112,7 @@ export default class API extends Emitter {
     if (this.ws) {
       const oldUrl = new URL(this.ws.url);
       const newUrl = new URL(this.apiProvider.websocketUrl);
-      if (oldUrl.host !== newUrl.host) 
+      if (oldUrl.host !== newUrl.host) { 
         // Starting the WebSocket will close the old and start a new connection
         this.start();
       }
