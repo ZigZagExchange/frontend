@@ -188,6 +188,11 @@ const TradePriceTable = (props) => {
 
           let rowStyle;
           if (props.useGradient) {
+            let dir
+            if(!props.settings?.stackOrderbook)
+              dir = "to left"
+            else dir = "to right"
+
             if (d.side === "b") {
               total_step += d.td2;
             }
@@ -197,7 +202,7 @@ const TradePriceTable = (props) => {
             }
 
             rowStyle = {
-              background: `linear-gradient(to right, ${color}, ${color} ${breakpoint}%, ${theme.colors.backgroundHighEmphasis} 0%)`,
+              background: `linear-gradient(${dir}, ${color}, ${color} ${breakpoint}%, ${theme.colors.backgroundHighEmphasis} 0%)`,
             };
 
             // reduce after, next one needs to be this percentage
