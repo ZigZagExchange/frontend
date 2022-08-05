@@ -42,28 +42,38 @@ const TradePriceHeadSecond = (props) => {
     else if (props.lastPrice < lastPrice) setIncrease(false);
     setLastPrice(props.lastPrice);
   }, [props.lastPrice]);
+
   return (
     <Wrapper isIncrease={isIncrease}>
-      <div>
-        <Text
-          font="primaryTitleDisplay"
-          color={isIncrease ? "successHighEmphasis" : "dangerHighEmphasis"}
-        >
-          {addComma(parseFloat(formatPrice(lastPrice)))}
-        </Text>
-        {isIncrease ? <ArrowUpIcon /> : <ArrowDownIcon />}
-      </div>
+      {props.lastPrice !== 0 ? (
+        <div>
+          <Text
+            font="primaryTitleDisplay"
+            color={isIncrease ? "successHighEmphasis" : "dangerHighEmphasis"}
+          >
+            {addComma(parseFloat(formatPrice(lastPrice)))}
+          </Text>
+          {isIncrease ? <ArrowUpIcon /> : <ArrowDownIcon />}
+        </div>
+      ) : (
+        <div>
+          <Text
+            font="primaryTitleDisplay"
+            color={isIncrease ? "successHighEmphasis" : "dangerHighEmphasis"}
+          >
+            --
+          </Text>
+        </div>
+      )}
       <Text font="primaryMediumSmallSemiBold" color="foregroundMediumEmphasis">
         ${" "}
-        {addComma(
-          parseFloat(
-            formatPrice(
-              props.marketInfo?.baseAsset?.usdPrice
-                ? props.marketInfo.baseAsset.usdPrice
-                : "--"
-            )
-          )
-        )}
+        {props.marketInfo
+          ? props.marketInfo.baseAsset
+            ? addComma(
+                parseFloat(formatPrice(props.marketInfo.baseAsset.usdPrice))
+              )
+            : "--"
+          : "--"}
       </Text>
     </Wrapper>
   );

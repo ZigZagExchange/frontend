@@ -247,7 +247,9 @@ export default function OrdersBook(props) {
                       marketSummary={props.marketSummary}
                       marketInfo={props.marketInfo}
                     />
-                    <OrderFooterWrapper isStack={props.settings?.stackOrderbook}>
+                    <OrderFooterWrapper
+                      isStack={props.settings?.stackOrderbook}
+                    >
                       <OrderFooterRight>
                         <OrderButtonWrapper
                           onClick={() => {
@@ -297,7 +299,9 @@ export default function OrdersBook(props) {
                       marketSummary={props.marketSummary}
                       marketInfo={props.marketInfo}
                     />
-                    <OrderFooterWrapper isStack={props.settings?.stackOrderbook}>
+                    <OrderFooterWrapper
+                      isStack={props.settings?.stackOrderbook}
+                    >
                       <OrderFooterRight>
                         <OrderButtonWrapper
                           onClick={() => {
@@ -346,7 +350,9 @@ export default function OrdersBook(props) {
                       marketSummary={props.marketSummary}
                       marketInfo={props.marketInfo}
                     />
-                    <OrderFooterWrapper isStack={props.settings?.stackOrderbook}>
+                    <OrderFooterWrapper
+                      isStack={props.settings?.stackOrderbook}
+                    >
                       <OrderFooterRight>
                         <OrderButtonWrapper
                           onClick={() => {

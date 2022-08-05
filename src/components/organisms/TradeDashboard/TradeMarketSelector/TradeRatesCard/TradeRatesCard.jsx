@@ -189,15 +189,19 @@ const TradeRatesCard = ({
               font="primaryHeading6"
               color={
                 percentChange === "NaN"
-                  ? "text-warning-900"
+                  ? "text-gray-900"
                   : isIncrease
                   ? "successHighEmphasis"
                   : "dangerHighEmphasis"
               }
             >
-              {marketSummary?.price
-                ? addComma(formatPrice(marketSummary.price))
-                : "--"}
+              {marketSummary?.price ? (
+                addComma(formatPrice(marketSummary.price))
+              ) : (
+                <Text font="primaryHeading6" color="foregroundHighEmphasis">
+                  --
+                </Text>
+              )}
             </Text>
             <Text font="primaryTiny" color="foregroundHighEmphasis">
               ${" "}
@@ -236,7 +240,16 @@ const TradeRatesCard = ({
                     `${addComma(
                       formatPrice(marketSummary.priceChange / 1)
                     )} | `}
-                  {percentChange !== "NaN" ? `${percentChange}%` : "-- | --"}
+                  {percentChange !== "NaN" ? (
+                    `${percentChange}%`
+                  ) : (
+                    <Text
+                      font="primaryMediumSmallSemiBold"
+                      color="foregroundLowEmphasis"
+                    >
+                      -- | --
+                    </Text>
+                  )}
                 </Text>
               </RatesCard>
               <Divider />
