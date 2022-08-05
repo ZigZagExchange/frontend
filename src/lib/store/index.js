@@ -94,15 +94,15 @@ api.on("signIn", (accountState) => {
   store.dispatch(signIn(accountState));
 });
 
-api.on("signOut", (accountState) => {
+api.on("signOut", () => {
   store.dispatch(clearUserOrders());
   store.dispatch(signOut());
 });
 
-api.on("providerChange", (network) => {
-  console.log(`Index set pair to default: ${api.apiProvider.defaultMarkets}`);    
+api.on("providerChange", (network, defaultPair) => {
+  console.log(`Index set pair to default: ${defaultPair}`);
+  store.dispatch(setCurrentMarket(defaultPair));
   store.dispatch(setNetwork(network));
-  store.dispatch(setCurrentMarket(api.apiProvider.defaultMarket));
 });
 
 api.on("message", (operation, args) => {
@@ -120,5 +120,9 @@ api.on("bridge_connecting", (flag) => {
 api.on("settings", (payload) => {
   store.dispatch(setUISettings(payload));
 });
+
+api.on("resetUser", () => {  
+  store.dispatch(clearUserOrders());
+})
 
 export default store;

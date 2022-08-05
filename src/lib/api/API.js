@@ -32,7 +32,6 @@ export default class API extends Emitter {
   apiProvider = null;
   mainnetProvider = null;
   rollupProvider = null;
-  currencies = null;
   provider = null;
   isArgent = false;
   marketInfo = {};
@@ -44,7 +43,7 @@ export default class API extends Emitter {
   _pendingFills = [];
   serverDelta = 0;
 
-  constructor({ infuraId, networks, currencies, validMarkets }) {
+  constructor({ infuraId, networks }) {
     super();
 
     if (networks) {
@@ -58,8 +57,6 @@ export default class API extends Emitter {
     }
 
     this.infuraId = infuraId;
-    this.currencies = currencies;
-    this.validMarkets = validMarkets;
 
     if (window.ethereum) {
       window.ethereum.on("accountsChanged", async () => {
@@ -106,7 +103,8 @@ export default class API extends Emitter {
       this.rollupProvider = null;
     }
     
-    this.emit("providerChange", network);
+    console.log(`this.apiProvider.defaultMarket ==> ${this.apiProvider.defaultMarket}`)
+    this.emit("providerChange", network, this.apiProvider.defaultMarket);
 
     // Change WebSocket if necessary
     if (this.ws) {
@@ -476,6 +474,7 @@ export default class API extends Emitter {
       this.emit("balanceUpdate", this.apiProvider.network, {});
     this.emit("balanceUpdate", "polygon", {});
     this.emit("accountState", {});
+    this.emit("resetUser")
   }
 
   resetNetworkData = () => {
