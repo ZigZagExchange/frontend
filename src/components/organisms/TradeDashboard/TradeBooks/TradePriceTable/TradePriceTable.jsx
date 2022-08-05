@@ -3,6 +3,7 @@ import styled from "styled-components";
 import useTheme from "components/hooks/useTheme";
 import { numStringToSymbol, addComma, formatMillonAmount } from "lib/utils";
 import Text from "components/atoms/Text/Text";
+import _ from "lodash";
 
 const Table = styled.table`
   display: flex;
@@ -108,7 +109,16 @@ const TradePriceTable = (props) => {
   const { theme } = useTheme();
   const ref = useRef(null);
   const [isUpdateScroll, setUpdateScroll] = useState(false);
+  const [priceData, setPriceData] = useState([])
   const isMobile = window.innerWidth < 500;
+
+  useEffect(()=>{
+    const tmp = _.cloneDeep(props.priceTableData);
+    if(props.priceTableData[0]?.side === "s" && !props.settings?.stackOrderbook) {
+      tmp.reverse();
+    }
+    setPriceData(tmp)
+  }, [props.priceTableData])
 
   useEffect(() => {
     if (!ref.current) return;
@@ -172,7 +182,7 @@ const TradePriceTable = (props) => {
         </thead>
       )}
       <tbody>
-        {props.priceTableData.map((d, i) => {
+        { priceData.map((d, i) => {
           const color =
             d.side === "b" ? theme.colors.success400 : theme.colors.danger400;
 
