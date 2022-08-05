@@ -140,8 +140,10 @@
         "prepare": "husky install"
     },
     "lint-staged": {
-        "**/*.{js,jsx}": [
-            "yarn lint",
+        "*.{js,ts,tsx}": [
+            "eslint --quiet --cache --fix"
+        ],
+        "*.{json,js,ts,jsx,tsx,html}": [
             "prettier --write"
         ]
     },
