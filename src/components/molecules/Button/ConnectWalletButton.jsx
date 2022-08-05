@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useSelector } from "react-redux";
 import {
   networkSelector,
@@ -15,12 +15,6 @@ const ConnectWalletButton = (props) => {
   const balanceData = useSelector(balancesSelector);
   const history = useHistory();
   const location = useLocation();
-
-  useEffect(() => {
-    if (props.isLoading) {
-      api.emit("connecting", props.isLoading);
-    }
-  }, [props.isLoading]);
 
   const connect = async (event) => {
     event.preventDefault();
@@ -48,12 +42,12 @@ const ConnectWalletButton = (props) => {
 
   return (
     <Button
-      isLoading={isLoading}
+      isLoading={isLoading || props.isLoading}
       scale="md"
       onClick={connect}
       style={{
         width: props.width,
-        padding: isLoading ? "8px 5px" : "8px 15px",
+        padding: isLoading || props.isLoading ? "8px 5px" : "8px 15px",
       }}
       className={props?.className}
     >

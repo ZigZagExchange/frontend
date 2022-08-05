@@ -175,7 +175,7 @@ const BridgeContainer = () => {
     }
 
     if (fromNetwork.id === "polygon") {
-      api.getPolygonWethBalance();
+      // api.getPolygonWethBalance();
       setSwapDetails({ amount: "", currency: "WETH" });
       setSellToken({ id: 0, name: "WETH" });
       setFromAmounts();
@@ -536,10 +536,10 @@ const BridgeContainer = () => {
 
     if (fromNetwork.id === "polygon" && toNetwork.id === "zksync") {
       setPolygonLoading(true);
-      deferredXfer = api.transferPolygonWeth(
+      /* deferredXfer = api.transferPolygonWeth(
         `${swapDetails.amount}`,
         user.address
-      );
+      ); */
       if (!settings.disableOrderNotification) {
         toast.info(renderGuidContent(), {
           closeOnClick: false,

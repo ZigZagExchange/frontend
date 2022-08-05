@@ -1,4 +1,3 @@
-import Web3 from "web3";
 import { createIcon } from "@download/blockies";
 import Web3Modal from "web3modal";
 import Emitter from "tiny-emitter";
@@ -7,15 +6,16 @@ import WalletConnectProvider from "@walletconnect/web3-provider";
 import { getENSName } from "lib/ens";
 import { formatAmount } from "lib/utils";
 import erc20ContractABI from "lib/contracts/ERC20.json";
-import wethContractABI from "lib/contracts/WETH.json";
 import { MAX_ALLOWANCE } from "./constants";
 import { toast } from "react-toastify";
+/*
 import {
   ZKSYNC_POLYGON_BRIDGE,
   POLYGON_MUMBAI_WETH_ADDRESS,
   POLYGON_MAINNET_WETH_ADDRESS,
 } from "components/pages/BridgePage/constants";
-
+import wethContractABI from "lib/contracts/WETH.json";
+*/
 import axios from "axios";
 import { isMobile } from "react-device-detect";
 import get from "lodash/get";
@@ -33,6 +33,7 @@ export default class API extends Emitter {
   mainnetProvider = null;
   rollupProvider = null;
   currencies = null;
+  provider = null;
   isArgent = false;
   marketInfo = {};
   lastPrices = {};
@@ -61,18 +62,23 @@ export default class API extends Emitter {
     this.validMarkets = validMarkets;
 
     if (window.ethereum) {
-      window.ethereum.on("accountsChanged", () => {
+      window.ethereum.on("accountsChanged", async () => {
+        this.emit("connecting", true);
         this.resetUserData();
-        this.updateUserData();
+        await this.updateUserData();
+        this.emit("connecting", false);
       });
       window.ethereum.on("chainChanged", (chainId) => {
-        this.setAPIProvider(chainMap[chainId]);
+        this.setAPIProvider(chainMap[chainId], true);
+      });
+      window.ethereum.on("disconnect", () => {
+        this.signOut();
       });
 
-      this.setAPIProvider(chainMap[window.ethereum.chainId] || 1);
+      this.setAPIProvider(chainMap[window.ethereum.chainId] || 1, true);
     } else {
       console.log(this.networks);
-      this.setAPIProvider(this.networks.zksync[0]);
+      this.setAPIProvider(this.networks.zksync[0], true);
     }
   }
 
@@ -80,7 +86,7 @@ export default class API extends Emitter {
     return this.networks[this.getNetworkName(network)][1];
   };
 
-  setAPIProvider = (network) => {
+  setAPIProvider = (network, refreshUserData = false) => {
     const chainName = this.getChainName(network);
 
     if (!chainName) {
@@ -91,25 +97,26 @@ export default class API extends Emitter {
 
     this.resetNetworkData();
 
+    const oldNetwork = this.apiProvider?.network;
     const apiProvider = this.getAPIProvider(network); 
-    this.apiProvider = apiProvider;   
+    this.apiProvider = apiProvider;
+    if (this.web3Provider) {
+      this.rollupProvider = new ethers.providers.Web3Provider(this.web3Provider);      
+    } else {
+      this.rollupProvider = null;
+    }
+    
     this.emit("providerChange", network);
-
-    this.web3 = new Web3(
-      window.ethereum ||
-        new Web3.providers.HttpProvider(
-          `https://${chainName}.infura.io/v3/${this.infuraId}`
-        )
-    );
 
     // Change WebSocket if necessary
     if (this.ws) {
       const oldUrl = new URL(this.ws.url);
       const newUrl = new URL(this.apiProvider.websocketUrl);
       if (oldUrl.host !== newUrl.host) {
-        // Starting the WebSocket will trigger an auto-restart in 3 seconds
+        // Starting the WebSocket will close the old and start a new connection
         this.start();
-      } else {
+      }
+      if (oldNetwork !== this.apiProvider.network) {
         // get initial marketinfos, returns lastprice and marketinfo2
         this.send("marketsreq", [this.apiProvider.network, true]);
       }
@@ -162,7 +169,7 @@ export default class API extends Emitter {
       });
     }
 
-    this.updateUserData();
+    if (refreshUserData) this.updateUserData();
   };
 
   getProfile = async (address) => {
@@ -204,29 +211,28 @@ export default class API extends Emitter {
     };
 
     if (!this._profiles[address]) {
-      const profile = (this._profiles[address] = {
+      const profile = {
         description: null,
         website: null,
         image: null,
         address,
-      });
+      };
 
-      if (!address) {
-        return profile;
+      if (address) {
+        profile.name = `${address.substr(0, 6)}…${address.substr(-6)}`;
+        Object.assign(
+          profile,
+          ...(await Promise.all([
+            fetchENSName(address),
+            getProfileFromIPFS(address),
+          ]))
+        );
+
+        if (!profile.image) {
+          profile.image = createIcon({ seed: address }).toDataURL();
+        }
       }
-
-      profile.name = `${address.substr(0, 6)}…${address.substr(-6)}`;
-      Object.assign(
-        profile,
-        ...(await Promise.all([
-          fetchENSName(address),
-          getProfileFromIPFS(address),
-        ]))
-      );
-
-      if (!profile.image) {
-        profile.image = createIcon({ seed: address }).toDataURL();
-      }
+      this._profiles[address] = profile;
     }
 
     return this._profiles[address];
@@ -260,8 +266,6 @@ export default class API extends Emitter {
       this.marketInfo[`${marketInfo.zigzagChainId}:${marketInfo.alias}`] = marketInfo;
     }
     if (msg.op === "marketinfo2") {
-      console.log("got marketinfo2")
-      console.log(msg.args[0])
       const marketInfos = msg.args[0];
       marketInfos.forEach((marketInfo) => {
         if (!marketInfo) return;
@@ -399,7 +403,11 @@ export default class API extends Emitter {
 
   send = (op, args) => {
     if (!this.ws) return;
-    return this.ws.send(JSON.stringify({ op, args }));
+    if (this.ws.readyState === 1) {
+      return this.ws.send(JSON.stringify({ op, args }));
+    } else {
+      setTimeout(this.send, 500, op, args);
+    }
   };
 
   sleep = (ms) => {
@@ -416,21 +424,21 @@ export default class API extends Emitter {
 
           await this.refreshNetwork();
           await this.sleep(1000);
-          const web3Provider = await this.web3Modal.connect();
-          this.web3.setProvider(web3Provider);
-          this.rollupProvider = new ethers.providers.Web3Provider(web3Provider);
-
+          this.web3Provider = await this.web3Modal.connect();
+          this.rollupProvider = new ethers.providers.Web3Provider(this.web3Provider);
           this.mainnetProvider = new ethers.providers.InfuraProvider(
             this.getChainNameL1(network),
             this.infuraId
           );
 
+          /*
           // set up polygon providers. mumbai for testnet. polygon for mainnet
           this.polygonProvider = new ethers.providers.JsonRpcProvider(
             this.getPolygonUrl(network)
           );
+          */
 
-          this.updateUserData();
+          await this.updateUserData();
         })
         .finally(() => {
           this._signInProgress = null;
@@ -450,6 +458,8 @@ export default class API extends Emitter {
     if (isMobile) window.localStorage.clear();
     else window.localStorage.removeItem("walletconnect");
 
+    this.web3Provider = null;
+    this.rollupProvider = null;
     this.resetNetworkData();
     this.emit("signOut");
   };
@@ -471,49 +481,49 @@ export default class API extends Emitter {
   resetNetworkData = () => {
     // if we update the network the user chnages as well
     this.resetUserData();
-
-    this.web3 = null;
-    this.web3Modal = null;
-    this.rollupProvider = null;
     this.mainnetProvider = null;
   }
 
   updateUserData = async () => {
-    console.log(`updateUserData ==> this.rollupProvider ==> ${!!this.rollupProvider}`)
-    if (this.rollupProvider) {
-      let accountState;
-      try {
-        accountState = {...await this.apiProvider.signIn()};
-      } catch (err) {
-        await this.signOut();
-        throw err;
-      }
-  
-      try {
-        accountState.profile = await this.getProfile(accountState.address);
-      } catch (e) {
-        accountState.profile = {};
-      }
-  
-      this.emit("signIn", accountState);
-  
-      if (accountState && accountState.id) {
-        this.send("login", [
-          this.apiProvider.network,
-          accountState.id && accountState.id.toString(),
-        ]);
-      }
+    if (!this.rollupProvider) return;
 
-      await this.getWalletBalances();
+    let accountState;
+    try {
+      accountState = {...await this.apiProvider.signIn()};
+    } catch (err) {
+      await this.signOut();
+      throw err;
     }
+
+    try {
+      accountState.profile = await this.getProfile(accountState.address);
+    } catch (e) {
+      accountState.profile = {};
+    }
+
+    this.emit("signIn", accountState);
+
+    if (accountState && accountState.id) {
+      this.send("login", [
+        this.apiProvider.network,
+        accountState.id && accountState.id.toString(),
+      ]);
+    }
+    await this.getWalletBalances();
 
     if(this.mainnetProvider) {
       await this.getBalances();
     }
-
-    await this.getPolygonWethBalance();
   }
 
+  getAddress = async () => {
+    if (!this.rollupProvider) return;
+
+    const signer = this.rollupProvider.getSigner();
+    return await signer.getAddress();
+  }
+
+  /*
   getPolygonUrl(network) {
     switch (network) {
       case 1:
@@ -555,8 +565,7 @@ export default class API extends Emitter {
   }
 
   getPolygonWethBalance = async () => {
-    const [account] = await this.web3.eth.getAccounts();
-    if (!account) return;
+    if (!await this.getAddress()) return;
     const polygonEthAddress = this.getPolygonWethContract(
       this.apiProvider.network
     );
@@ -568,7 +577,7 @@ export default class API extends Emitter {
       erc20ContractABI,
       this.polygonProvider
     );
-    const wethBalance = await ethContract.balanceOf(account);
+    const wethBalance = await ethContract.balanceOf(await this.getAddress());
     let p = formatAmount(wethBalance, { decimals: 18 });
 
     this.emit("balanceUpdate", "polygon", {
@@ -643,6 +652,7 @@ export default class API extends Emitter {
       throw e;
     }
   };
+  */
 
   getNetworkName = (network) => {
     const keys = Object.keys(this.networks);
@@ -846,15 +856,14 @@ export default class API extends Emitter {
   approveSpendOfCurrency = async (currency) => {
     const netContract = this.getNetworkContract();
     if (netContract) {
-      const [account] = await this.web3.eth.getAccounts();
       const currencyInfo = this.getCurrencyInfo(currency);
-      const contract = new this.web3.eth.Contract(
+      const contract = new this.mainnetProvider.eth.Contract(
         erc20ContractABI,
         currencyInfo.address
       );
       await contract.methods
         .approve(netContract, MAX_ALLOWANCE)
-        .send({ from: account });
+        .send({ from: await this.getAddress() });
 
       // update allowances after successfull approve
       this.getWalletBalances();
@@ -868,11 +877,10 @@ export default class API extends Emitter {
 
     try {
       const netContract = this.getNetworkContract();
-      const [account] = await this.web3.eth.getAccounts();
-      if (!account || account === "0x") return result;
+      if (!await this.getAddress()) return result;
 
       if (currency === "ETH") {
-        result.balance = await this.mainnetProvider.getBalance(account);
+        result.balance = await this.mainnetProvider.getBalance(await this.getAddress());
         result.allowance = ethersConstants.MaxUint256;
         return result;
       }
@@ -884,10 +892,10 @@ export default class API extends Emitter {
         erc20ContractABI,
         this.mainnetProvider
       );
-      result.balance = await contract.balanceOf(account);
+      result.balance = await contract.balanceOf(await this.getAddress());
       if (netContract) {
         result.allowance = ethers.BigNumber.from(
-          await contract.allowance(account, netContract)
+          await contract.allowance(await this.getAddress(), netContract)
         );
       }
       return result;

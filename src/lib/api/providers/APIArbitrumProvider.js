@@ -215,11 +215,11 @@ export default class APIArbitrumProvider extends APIProvider {
 
   signIn = async () => {
     console.log("signing in to arbitrum");
-    const [account] = await this.api.web3.eth.getAccounts();
+    const address = await this.api.getAddress();
     const balances = await this.getBalances();
     this.accountState = {
-      id: account,
-      address: account,
+      id: address,
+      address: address,
       committed: {
         balances,
       },

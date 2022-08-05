@@ -254,7 +254,6 @@ export const Header = (props) => {
   // state to open or close the sidebar in mobile
   const [show, setShow] = useState(false);
   const connecting = useSelector(isConnectingSelector);
-  // const [connecting, setConnecting] = useState(false);
   const user = useSelector(userSelector);
   const network = useSelector(networkSelector);
   const hasBridge = api.isImplemented("depositL2");
@@ -287,7 +286,6 @@ export const Header = (props) => {
 
   useEffect(() => {
     api.emit("connecting", props.isLoading);
-    // setConnecting(props.isLoading)
   }, [props.isLoading]);
 
   useEffect(() => {
@@ -327,7 +325,7 @@ export const Header = (props) => {
   const changeNetwork = async (text, value) => {
     setNetworkName(text);
 
-    api.setAPIProvider(value);
+    api.setAPIProvider(value, false);
     try {
       await api.refreshNetwork();
     } catch (err) {
