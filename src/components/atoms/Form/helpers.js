@@ -1,6 +1,4 @@
-export const model = (value, setter) => {
-  return {
+export const model = (value, setter) => ({
     value,
     onChange: (val) => setter(val),
-  };
-};
+});

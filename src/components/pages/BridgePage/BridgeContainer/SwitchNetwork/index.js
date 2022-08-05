@@ -1,3 +1,3 @@
-import SwitchNetwork from "./SwitchNetwork";
+import SwitchNetwork from './SwitchNetwork';
 
 export default SwitchNetwork;

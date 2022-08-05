@@ -1,1 +1,1 @@
-export { default as SpotForm } from "./SpotForm";
+export { default as SpotForm } from './SpotForm';

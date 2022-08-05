@@ -1,1 +1,1 @@
-export { default as HighSlippageModal } from "./HighSlippageModal";
+export { default as HighSlippageModal } from './HighSlippageModal';

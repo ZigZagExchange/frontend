@@ -1,3 +1,3 @@
-import SlippageWarningModal from "./SlippageWarningModal";
+import SlippageWarningModal from './SlippageWarningModal';
 
 export default SlippageWarningModal;

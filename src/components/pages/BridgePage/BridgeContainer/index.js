@@ -1,3 +1,3 @@
-import BridgeContainer from "./BridgeContainer";
+import BridgeContainer from './BridgeContainer';
 
 export default BridgeContainer;

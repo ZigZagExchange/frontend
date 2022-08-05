@@ -1,3 +1,3 @@
-import TransferHistory from "./TransferHistory";
+import TransferHistory from './TransferHistory';
 
 export default TransferHistory;

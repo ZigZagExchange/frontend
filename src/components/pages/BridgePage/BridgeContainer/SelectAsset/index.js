@@ -1,3 +1,3 @@
-import SelectAsset from "./SelectAsset";
+import SelectAsset from './SelectAsset';
 
 export default SelectAsset;

@@ -1,3 +1,3 @@
-import TokenDropDownModal from "./TokenDropDownModal";
+import TokenDropDownModal from './TokenDropDownModal';
 
 export default TokenDropDownModal;

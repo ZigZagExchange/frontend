@@ -1,3 +1,3 @@
-import TransactionSettings from "./TransactionSettings";
+import TransactionSettings from './TransactionSettings';
 
 export default TransactionSettings;

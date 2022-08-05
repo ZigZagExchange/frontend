@@ -1,33 +1,35 @@
 class BatchTransferService {
-  #syncProvider = null;
-  #syncWallet = null;
-  #builder = null;
+    #syncProvider = null;
 
-  constructor(syncProvider, syncWallet) {
-    this.#syncProvider = syncProvider;
-    this.#syncWallet = syncWallet;
-  }
+    #syncWallet = null;
 
-  #setNewBuilder() {
-    this.#builder = this.#syncWallet.batchBuilder();
-  }
+    #builder = null;
 
-  #submit = async (feeToken) => {
-    const batch = await this.#builder.build(feeToken);
-    return await this.#syncProvider.submitTxsBatch(batch.txs, batch.signature);
-  };
+    constructor(syncProvider, syncWallet) {
+        this.#syncProvider = syncProvider;
+        this.#syncWallet = syncWallet;
+    }
 
-  sendWithdraw = async (withdraw = {}, feeToken) => {
-    this.#setNewBuilder();
-    this.#builder.addWithdraw(withdraw);
-    return await this.#submit(feeToken);
-  };
+    #setNewBuilder() {
+        this.#builder = this.#syncWallet.batchBuilder();
+    }
 
-  sendTransfer = async (transfer = {}, feeToken) => {
-    this.#setNewBuilder();
-    this.#builder.addTransfer(transfer);
-    return await this.#submit(feeToken);
-  };
+    #submit = async (feeToken) => {
+        const batch = await this.#builder.build(feeToken);
+        return await this.#syncProvider.submitTxsBatch(batch.txs, batch.signature);
+    };
+
+    sendWithdraw = async (withdraw = {}, feeToken) => {
+        this.#setNewBuilder();
+        this.#builder.addWithdraw(withdraw);
+        return await this.#submit(feeToken);
+    };
+
+    sendTransfer = async (transfer = {}, feeToken) => {
+        this.#setNewBuilder();
+        this.#builder.addTransfer(transfer);
+        return await this.#submit(feeToken);
+    };
 }
 
 export default BatchTransferService;
