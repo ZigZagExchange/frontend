@@ -1,0 +1,65 @@
+.react-grid-item > div > div {
+  height: 100%;
+}
+
+.react-grid-item > div > div::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+  position: relative;
+  z-index: 20;
+}
+
+.react-grid-item > div > div::-webkit-scrollbar-track {
+  border-radius: 5px;
+  background: transparent;
+  height: 23px;
+}
+
+.react-grid-item > div > div::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+  background: hsla(0, 0%, 100%, 0.4);
+}
+
+.react-grid-item > div > aside {
+  height: 100%;
+}
+
+.react-grid-item > div > aside::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+  position: relative;
+  z-index: 20;
+}
+
+.react-grid-item > div > aside::-webkit-scrollbar-track {
+  border-radius: 5px;
+  background: transparent;
+  height: 23px;
+}
+
+.react-grid-item > div > aside::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+  background: hsla(0, 0%, 100%, 0.4);
+}
+
+.react-grid-item > div > section {
+  height: 100%;
+}
+
+.react-grid-item > div > section::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+  position: relative;
+  z-index: 20;
+}
+
+.react-grid-item > div > section::-webkit-scrollbar-track {
+  border-radius: 5px;
+  background: transparent;
+  height: 23px;
+}
+
+.react-grid-item > div > section::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+  background: hsla(0, 0%, 100%, 0.4);
+}
