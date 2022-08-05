@@ -1,7 +1,7 @@
 import React, { useState, useLayoutEffect } from "react";
 import { Responsive } from "react-grid-layout";
 //import { Responsive, WidthProvider } from "react-grid-layout";
-import "./gridUtils.js";
+// import "./gridUtils.js";
 import { default as WidthProvider } from "./ReactSizeMe";
 
 import { Row, Col } from "antd";
