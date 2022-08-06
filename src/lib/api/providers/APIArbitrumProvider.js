@@ -185,7 +185,7 @@ export default class APIArbitrumProvider extends APIProvider {
 
     const domain = {
       name: "ZigZag",
-      version: "3",
+      version: "4",
       chainId: this.network,
     };
 
