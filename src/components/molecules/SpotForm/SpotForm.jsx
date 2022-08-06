@@ -19,7 +19,7 @@ class SpotForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      price: props.lastPrice,
+      price: formatPrice(props.lastPrice),
       baseAmount: "",
       quoteAmount: "",
       maxSizeSelected: false,
@@ -408,8 +408,9 @@ class SpotForm extends React.Component {
       }
     );
 
+    let success = false;
     try {
-      await api.approveExchangeContract(
+      success = await api.approveExchangeContract(
         token,
         0 // amount = 0 ==> MAX_ALLOWANCE
       );
@@ -419,9 +420,11 @@ class SpotForm extends React.Component {
     }
 
     toast.dismiss(orderApproveToast);
-    toast.success(`${marketInfo.baseAsset.symbol} approved.`, {
-      toastId: `${marketInfo.baseAsset.symbol} approved.`,
-    });
+    if (success) {
+      toast.success(`${token} approved.`, {
+        toastId: `${token} approved.`,
+      });
+    }
     newstate = { ...this.state };
     this.setState(newstate);
   }
@@ -731,18 +734,12 @@ class SpotForm extends React.Component {
       this.props.orderType !== prevProps.orderType ||
       this.props.side !== prevProps.side
     ) {
-      const newState = { ...this.state };
-      if (this.props.quoteChanged) {
-        // for buy quoteAmount should be fixed
-        newState.baseAmount = newState.quoteAmount / this.currentPrice();
-        newState.baseAmount =
-          newState.baseAmount === 0 ? "" : newState.baseAmount;
-      } else {
-        // for sell baseAmount should be fixed
-        newState.quoteAmount = this.currentPrice() * newState.baseAmount;
-        newState.quoteAmount =
-          newState.quoteAmount === 0 ? "" : newState.quoteAmount;
-      }
+      const newState = {
+        ...this.state,
+        baseAmount: "",
+        quoteAmount: "",
+        price: formatPrice(this.props.lastPrice),
+      };
       this.setState(newState);
     }
 
@@ -756,8 +753,11 @@ class SpotForm extends React.Component {
       newState.updatePrice = true;
       this.setState(newState);
     }
-    if (this.state.updatePrice) {
-      this.setState({ price: this.props.lastPrice, updatePrice: false });
+    if (this.state.updatePrice || (!this.state.price && this.props.lastPrice)) {
+      this.setState({
+        price: formatPrice(this.props.lastPrice),
+        updatePrice: false,
+      });
     }
   }
 
@@ -912,7 +912,7 @@ class SpotForm extends React.Component {
       approveNeeded = false;
     if (this.props.side === "b") {
       buttonType = "BUY";
-      if (quoteAmount > quoteAllowance) {
+      if (quoteAmount <= quoteBalance && quoteAmount > quoteAllowance) {
         buttonText = `Approve ${marketInfo && marketInfo.quoteAsset?.symbol}`;
         if (api.isEVMChain) approveNeeded = true;
       } else {
@@ -944,7 +944,7 @@ class SpotForm extends React.Component {
       );
     } else if (this.props.side === "s") {
       buttonType = "SELL";
-      if (baseAmount > baseAllowance) {
+      if (baseAmount <= baseBalance && baseAmount > baseAllowance) {
         buttonText = `Approve ${marketInfo && marketInfo.baseAsset?.symbol}`;
         if (api.isEVMChain) approveNeeded = true;
       } else {
@@ -1137,13 +1137,14 @@ class SpotForm extends React.Component {
                 width="100%"
                 scale="imd"
                 disabled={
-                  this.isInvalidNumber(this.state.quoteAmount) ||
-                  this.isInvalidNumber(this.state.baseAmount) ||
-                  this.isInvalidNumber(this.currentPrice()) ||
-                  (this.state.quoteAmount > this.getQuoteBalance() &&
-                    this.props.side === "b") ||
-                  (this.state.baseAmount > this.getBaseBalance() &&
-                    this.props.side === "s")
+                  !approveNeeded &&
+                  (this.isInvalidNumber(this.state.quoteAmount) ||
+                    this.isInvalidNumber(this.state.baseAmount) ||
+                    this.isInvalidNumber(this.currentPrice()) ||
+                    (this.state.quoteAmount > this.getQuoteBalance() &&
+                      this.props.side === "b") ||
+                    (this.state.baseAmount > this.getBaseBalance() &&
+                      this.props.side === "s"))
                 }
                 onClick={
                   approveNeeded

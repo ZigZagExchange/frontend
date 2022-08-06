@@ -153,7 +153,7 @@ export default class APIZKProvider extends APIProvider {
         this.syncWallet.isCorrespondingSigningKeySet(),
       ]
     );
-    return accountState.id && signingKeySet && correspondigKeySet;
+    return !!accountState.id && signingKeySet && correspondigKeySet;
   };
 
   submitOrder = async (
@@ -568,8 +568,14 @@ export default class APIZKProvider extends APIProvider {
       this.api.getAccountState(),
       this.checkAccountActivated(),
     ]);
+
     if (!accountActivated) {
-      await this.changePubKey();
+      try {
+        await this.changePubKey();
+      } catch (err) {
+        console.log(err);
+        accountState.err = err.code
+      }
     }
 
     return accountState;

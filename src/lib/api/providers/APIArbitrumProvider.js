@@ -142,6 +142,9 @@ export default class APIArbitrumProvider extends APIProvider {
       balanceBN = ethers.BigNumber.from(this.api.balances[this.network][quoteToken].value);
     }
 
+    // add margin of error to gas fee
+    gasFeeBN = gasFeeBN.mul(100).div(99)
+
     const makerVolumeFeeBN = quoteAmountBN
       .div(10000)
       .mul(marketInfo.makerVolumeFee * 100);
@@ -182,7 +185,7 @@ export default class APIArbitrumProvider extends APIProvider {
 
     const domain = {
       name: "ZigZag",
-      version: "3",
+      version: "4",
       chainId: this.network,
     };
 
@@ -250,11 +253,13 @@ export default class APIArbitrumProvider extends APIProvider {
       signer
     );
 
-    await erc20Contract.approve(exchangeAddress, amountBN);
+    const tx = await erc20Contract.approve(exchangeAddress, amountBN);
+    const { status } = await tx.wait();
 
     // update account balance
-    await this.api.getBalances();
-    return true;
+    if (status) this.api.getBalances();
+    
+    return status;
   };
 
   warpETH = async (amountBN) => {
@@ -314,4 +319,9 @@ export default class APIArbitrumProvider extends APIProvider {
     const marketInfo = this.api.marketInfo[`${this.network}:ZZ-USDC`];
     return marketInfo?.exchangeAddress;
   };
+
+  signMessage = async (message) => {
+    const signer = await this.api.rollupProvider.getSigner();
+    return await signer.signMessage(message);
+  }
 }
