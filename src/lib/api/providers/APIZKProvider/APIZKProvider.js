@@ -111,13 +111,13 @@ export default class APIZKProvider extends APIProvider {
     } else if (balances.WBTC && balances.WBTC > 0.0003e8) {
       feeToken = "WBTC";
     } else {
-      toast.warn(
-        "Your zkSync token balances are very low. You might need to bridge in more funds first.",
-        {
-          toastId:
-            "Your zkSync token balances are very low. You might need to bridge in more funds first.",
-        }
-      );
+      // toast.warn(
+      //   "Your zkSync token balances are very low. You might need to bridge in more funds first.",
+      //   {
+      //     toastId:
+      //       "Your zkSync token balances are very low. You might need to bridge in more funds first.",
+      //   }
+      // );
       let maxValue = 0;
       const tokens = Object.keys(balances);
       const result = tokens.map(async (token) => {
@@ -574,7 +574,7 @@ export default class APIZKProvider extends APIProvider {
         await this.changePubKey();
       } catch (err) {
         console.log(err);
-        accountState.err = err.code
+        accountState.err = err.code;
       }
     }
 
