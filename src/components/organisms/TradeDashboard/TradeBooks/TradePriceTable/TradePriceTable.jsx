@@ -200,10 +200,16 @@ const TradePriceTable = (props) => {
             if (d.side === "s") {
               total_step -= d.td2;
             }
-
-            rowStyle = {
-              background: `linear-gradient(${dir}, ${color}, ${color} ${breakpoint}%, ${theme.colors.backgroundHighEmphasis} 0%)`,
-            };
+            if(!props.settings?.stackOrderbook && d.side === "s"){
+              rowStyle = {
+                background: `linear-gradient(${dir}, ${theme.colors.backgroundHighEmphasis}, ${theme.colors.backgroundHighEmphasis} ${breakpoint}%, ${color} 0%)`,
+              };
+            }
+            else{
+              rowStyle = {
+                background: `linear-gradient(${dir}, ${color}, ${color} ${breakpoint}%, ${theme.colors.backgroundHighEmphasis} 0%)`,              
+              };
+            }
 
             // reduce after, next one needs to be this percentage
             if (props.className === "trade_table_asks") {
