@@ -342,16 +342,18 @@ export default class API extends Emitter {
         params: [{ chainId: ethereumChainId }],
       });
     } catch (switchError) {
-      try {
-        if (switchError.code === 4902) {
-          await window.ethereum.request({
-            method: "wallet_addEthereumChain",
-            params: [ethereumChainInfo],
-          });
+      if (switchError.code === 4902) {
+        try {
+            await window.ethereum.request({
+              method: "wallet_addEthereumChain",
+              params: [ethereumChainInfo],
+            });
+        } catch (addError) {
+          console.error(addError);
+          throw addError;
         }
-      } catch (addError) {
-        console.error(addError);
-        throw addError;
+      } else {
+        throw switchError;
       }
     }
   };
@@ -483,7 +485,6 @@ export default class API extends Emitter {
     this._pendingOrders = [];
     this._pendingFills = [];
     this.isArgent = false;
-    this.rollupProvider = null;
 
     if (this.apiProvider?.network) 
       this.emit("balanceUpdate", this.apiProvider.network, {});
@@ -514,6 +515,8 @@ export default class API extends Emitter {
     } catch (e) {
       accountState.profile = {};
     }
+
+    console.log(accountState.address)
 
     this.emit("signIn", accountState);
 
@@ -965,7 +968,7 @@ export default class API extends Emitter {
   };
 
   getBalances = async () => {
-    if (this.wrongNetwork()) return;
+    if (this.wrongNetwork() || !this.rollupProvider) return;
 
     const balances = await this.apiProvider.getBalances();
     this.balances[this.apiProvider.network] = balances;

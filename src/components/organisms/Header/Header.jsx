@@ -324,8 +324,6 @@ export const Header = (props) => {
   };
 
   const changeNetwork = async (text, value) => {
-    setNetworkName(text);
-
     try {
       api.switchAPIProvider(value, false);
     } catch (err) {
