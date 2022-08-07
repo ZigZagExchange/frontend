@@ -904,10 +904,14 @@ export default class API extends Emitter {
 
     try {
       const netContract = this.getNetworkContract();
-      if (!await this.getAddress()) return result;
+      const address = await this.getAddress()
+      if (
+        !address ||
+        !ethers.utils.isAddress(address)
+      ) return result;
 
       if (currency === "ETH") {
-        result.balance = await this.mainnetProvider.getBalance(await this.getAddress());
+        result.balance = await this.mainnetProvider.getBalance(address);
         result.allowance = ethersConstants.MaxUint256;
         return result;
       }
@@ -919,10 +923,10 @@ export default class API extends Emitter {
         erc20ContractABI,
         this.mainnetProvider
       );
-      result.balance = await contract.balanceOf(await this.getAddress());
-      if (netContract) {
+      result.balance = await contract.balanceOf(address);
+      if (netContract && ethers.utils.isAddress(netContract)) {
         result.allowance = ethers.BigNumber.from(
-          await contract.allowance(await this.getAddress(), netContract)
+          await contract.allowance(address, netContract)
         );
       }
       return result;
