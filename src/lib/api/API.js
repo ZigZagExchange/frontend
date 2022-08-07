@@ -516,8 +516,6 @@ export default class API extends Emitter {
       accountState.profile = {};
     }
 
-    console.log(accountState.address)
-
     this.emit("signIn", accountState);
 
     if (accountState && accountState.id) {
