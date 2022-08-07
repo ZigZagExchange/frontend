@@ -4,6 +4,7 @@ import { Toggle, QuestionHelper } from "components";
 import NumberInput from "../../atoms/Form/NumberInput";
 import { model } from "../../atoms/Form/helpers";
 import styled from "styled-components";
+import axios from "axios";
 
 import {
   forceValidation,
@@ -14,7 +15,6 @@ import {
 import SelectInput from "../../atoms/Form/SelectInput";
 import { Button } from "../../atoms/Form/Submit";
 import TextInput from "../../atoms/Form/TextInput";
-import { BsExclamationCircle } from "react-icons/all";
 import Form from "../../atoms/Form/Form";
 import { TRADING_VIEW_CHART_KEY } from "./ListPairPage";
 import api from "../../../lib/api";
@@ -65,18 +65,16 @@ const ListPairForm = ({ onSubmit, children }) => {
     symbolSetter,
     isInvalidSetter
   ) => {
+    console.log(`assetId ==> ${assetId}`)
     if (assetId && assetId !== "") {
       try {
-        const { symbol } = await api.getTokenInfo(assetId, chainId);
+        const { symbol } = (await axios.get(`https://api.zksync.io/api/v0.2/tokens/${assetId}`)).data.result;
+        const { price: apiPrice } = (await axios.get(`https://api.zksync.io/api/v0.2/tokens/${assetId}/priceIn/usd`)).data.result;
         if (symbol) {
           symbolSetter(symbol);
           isInvalidSetter(false);
 
           try {
-            const { price: apiPrice } = await api.getTokenPrice(
-              assetId,
-              chainId
-            );
             const price = Number(apiPrice);
             if (price === 0) {
               throw Error(`${symbol} price came back as 0`);
