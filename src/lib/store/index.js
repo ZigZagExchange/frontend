@@ -19,6 +19,7 @@ import apiReducer, {
   setConnecting,
   setBridgeConnecting,
   setUISettings,
+  setWrongNetwork,
 } from "lib/store/features/api/apiSlice";
 import autoMergeLevel2 from "redux-persist/lib/stateReconciler/autoMergeLevel2";
 import api from "lib/api";
@@ -121,8 +122,11 @@ api.on("settings", (payload) => {
   store.dispatch(setUISettings(payload));
 });
 
-api.on("resetUser", () => {  
+api.on("resetUserOrders", () => {  
   store.dispatch(clearUserOrders());
 })
 
+api.on("wrongNetwork", (flag) => {
+  store.dispatch(setWrongNetwork(flag));
+})
 export default store;

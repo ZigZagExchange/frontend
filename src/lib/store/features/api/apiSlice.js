@@ -48,6 +48,7 @@ export const apiSlice = createSlice({
     arweaveAllocation: 0,
     isConnecting: false,
     isBridgeConnecting: false,
+    wrongNetwork: false,
     settings: initialUISettings,
     slippageValue: "1.00",
     highSlippageModal: {
@@ -669,6 +670,9 @@ export const apiSlice = createSlice({
     setSlippageValue(state, { payload }) {
       state.slippageValue = payload.value;
     },
+    setWrongNetwork(state, { payload }) {
+      state.wrongNetwork = payload;
+    },
     resetTradeLayout(state) {
       if (!state.settings.stackOrderbook) {
         state.settings.layouts = stackedLayouts;
@@ -697,6 +701,7 @@ export const {
   resetUISettings,
   setSlippageValue,
   resetTradeLayout,
+  setWrongNetwork,
 } = apiSlice.actions;
 
 export const layoutSelector = (state) => state.api.layout;
@@ -724,5 +729,6 @@ export const balancesSelector = (state) =>
 
 export const handleMessage = createAction("api/handleMessage");
 export const slippageValueSelector = (state) => state.api.slippageValue;
+export const wrongNetworkSelector = (state) => state.api.wrongNetwork;
 
 export default apiSlice.reducer;

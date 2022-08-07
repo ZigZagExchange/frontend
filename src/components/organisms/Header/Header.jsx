@@ -266,6 +266,7 @@ export const Header = (props) => {
   const [networkItems, setNetWorkItems] = useState(networkLists);
   const { isDark, toggleTheme } = useTheme();
   const location = useLocation();
+
   useEffect(() => {
     const netName = networkLists.filter((item, i) => {
       return item.value === network;
@@ -325,9 +326,8 @@ export const Header = (props) => {
   const changeNetwork = async (text, value) => {
     setNetworkName(text);
 
-    api.setAPIProvider(value, false);
     try {
-      await api.refreshNetwork();
+      api.switchAPIProvider(value, false);
     } catch (err) {
       console.log(err);
     }
@@ -487,7 +487,7 @@ export const Header = (props) => {
               <ToggleTheme isDark={isDark} toggleTheme={toggleTheme} />
             </LanguageWrapper>
             <VerticalDivider />
-
+            
             <Dropdown
               adClass="network-dropdown"
               width={190}

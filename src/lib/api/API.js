@@ -42,6 +42,8 @@ export default class API extends Emitter {
   _pendingOrders = [];
   _pendingFills = [];
   serverDelta = 0;
+  walletNetwork = null;
+  wrongNetwork = null;
 
   constructor({ infuraId, networks }) {
     super();
@@ -61,21 +63,24 @@ export default class API extends Emitter {
     if (window.ethereum) {
       window.ethereum.on("accountsChanged", async () => {
         this.emit("connecting", true);
-        this.resetUserData();
+        this.resetL2Data();
         await this.updateUserData();
         this.emit("connecting", false);
       });
       window.ethereum.on("chainChanged", (chainId) => {
+        this.walletNetwork = chainMap[chainId] || 0;
+        this.emit("wrongNetwork", this.wrongNetwork());
         this.setAPIProvider(chainMap[chainId], true);
       });
       window.ethereum.on("disconnect", () => {
         this.signOut();
       });
 
-      this.setAPIProvider(chainMap[window.ethereum.chainId] || 1, true);
+      this.walletNetwork = chainMap[window.ethereum.chainId];
+      this.setAPIProvider(chainMap[window.ethereum.chainId] || 1);
     } else {
       console.log(this.networks);
-      this.setAPIProvider(this.networks.zksync[0], true);
+      this.setAPIProvider(this.networks.zksync[0]);
     }
   }
 
@@ -83,24 +88,34 @@ export default class API extends Emitter {
     return this.networks[this.getNetworkName(network)][1];
   };
 
+  switchAPIProvider = async (network, refreshUserData = false) => {
+    await this.refreshNetwork(network);
+    this.setAPIProvider(network, refreshUserData);
+  }
+
   setAPIProvider = (network, refreshUserData = false) => {
     const chainName = this.getChainName(network);
 
     if (!chainName) {
       console.error(`Can't get chainName for ${network}`);
-      this.signOut();
       return;
     }
 
-    this.resetNetworkData();
-
+    this.resetL2Data();
     const oldNetwork = this.apiProvider?.network;
     const apiProvider = this.getAPIProvider(network); 
     this.apiProvider = apiProvider;
     if (this.web3Provider) {
       this.rollupProvider = new ethers.providers.Web3Provider(this.web3Provider);      
-    } else {
-      this.rollupProvider = null;
+    }
+
+    // reset mainnetProvider if L1 chain changed
+    if (this.getChainNameL1(oldNetwork) !== this.getChainNameL1(network)) {
+      this.resetL1Data();    
+      this.mainnetProvider = new ethers.providers.InfuraProvider(
+        this.getChainNameL1(network),
+        this.infuraId
+      );
     }
     
     console.log(`this.apiProvider.defaultMarket ==> ${this.apiProvider.defaultMarket}`)
@@ -167,6 +182,7 @@ export default class API extends Emitter {
       });
     }
 
+    this.emit("wrongNetwork", this.wrongNetwork());
     if (refreshUserData) this.updateUserData();
   };
 
@@ -280,11 +296,11 @@ export default class API extends Emitter {
     }
   };
 
-  refreshNetwork = async () => {
+  refreshNetwork = async (network) => {
     if (!window.ethereum) return;
     let ethereumChainId, ethereumChainInfo;
 
-    switch (this.apiProvider.network) {
+    switch (network) {
       case 1:
         ethereumChainId = "0x1";
         ethereumChainInfo = {
@@ -420,14 +436,13 @@ export default class API extends Emitter {
             this.apiProvider = this.getAPIProvider(network);
           }
 
-          await this.refreshNetwork();
-          await this.sleep(1000);
           this.web3Provider = await this.web3Modal.connect();
           this.rollupProvider = new ethers.providers.Web3Provider(this.web3Provider);
           this.mainnetProvider = new ethers.providers.InfuraProvider(
             this.getChainNameL1(network),
             this.infuraId
           );
+          await this.refreshNetwork(network);
 
           /*
           // set up polygon providers. mumbai for testnet. polygon for mainnet
@@ -457,30 +472,30 @@ export default class API extends Emitter {
     else window.localStorage.removeItem("walletconnect");
 
     this.web3Provider = null;
-    this.rollupProvider = null;
-    this.resetNetworkData();
+    this.resetL1Data();
+    this.resetL2Data();
     this.emit("signOut");
   };
 
-  resetUserData = () => {
+  resetL2Data = () => {
     this.balances = {};
     this._profiles = {};
     this._pendingOrders = [];
     this._pendingFills = [];
     this.isArgent = false;
+    this.rollupProvider = null;
 
-    this.emit("balanceUpdate", "wallet", {});
     if (this.apiProvider?.network) 
       this.emit("balanceUpdate", this.apiProvider.network, {});
-    this.emit("balanceUpdate", "polygon", {});
     this.emit("accountState", {});
-    this.emit("resetUser")
+    this.emit("resetUserOrders")
   }
 
-  resetNetworkData = () => {
-    // if we update the network the user chnages as well
-    this.resetUserData();
+  resetL1Data = () => {
     this.mainnetProvider = null;
+
+    this.emit("balanceUpdate", "wallet", {});
+    this.emit("balanceUpdate", "polygon", {});
   }
 
   updateUserData = async () => {
@@ -720,6 +735,8 @@ export default class API extends Emitter {
   };
 
   cancelOrder = async (orderId) => {
+    if (this.wrongNetwork()) return;
+
     const token = localStorage.getItem(orderId);
     // token is used to cancel the order - otherwiese the user is asked to sign a msg
     if (token) {
@@ -742,6 +759,8 @@ export default class API extends Emitter {
   };
 
   depositL2 = async (amount, token, address) => {
+    if (this.wrongNetwork()) return;
+    
     return this.apiProvider.depositL2(amount, token, address);
   };
 
@@ -758,10 +777,14 @@ export default class API extends Emitter {
   };
 
   withdrawL2 = async (amount, token) => {
+    if (this.wrongNetwork()) return;
+
     return this.apiProvider.withdrawL2(amount, token);
   };
 
   transferToBridge = (amount, token, address, userAddress) => {
+    if (this.wrongNetwork()) return;
+
     return this.apiProvider.transferToBridge(
       amount,
       token,
@@ -802,6 +825,8 @@ export default class API extends Emitter {
   };
 
   cancelAllOrders = async (orderIds) => {
+    if (this.wrongNetwork()) return;
+
     const { id: userId } = await this.getAccountState();
     const tokenArray = [];
     orderIds.forEach(id => {
@@ -828,6 +853,8 @@ export default class API extends Emitter {
   };
 
   cancelAllOrdersAllChains = async () => {
+    if (this.wrongNetwork()) return;
+
     const toastMsg = toast.info('Sign the message to cancel your order...', {
       toastId: "Sign the message to cancel your order...'",
     });
@@ -938,6 +965,8 @@ export default class API extends Emitter {
   };
 
   getBalances = async () => {
+    if (this.wrongNetwork()) return;
+
     const balances = await this.apiProvider.getBalances();
     this.balances[this.apiProvider.network] = balances;
     this.emit("balanceUpdate", this.apiProvider.network, balances);
@@ -977,6 +1006,8 @@ export default class API extends Emitter {
   };
 
   submitOrder = async (market, side, baseAmount, quoteAmount, orderType) => {
+    if (this.wrongNetwork()) return;
+
     if (!quoteAmount || !baseAmount) {
       throw new Error("Set base or quote amount");
     }
@@ -1042,6 +1073,8 @@ export default class API extends Emitter {
   };
 
   warpETH = async (amount) => {
+    if (this.wrongNetwork()) return;
+
     if (!amount) throw new Error("No amount set");
     let amountBN = ethers.utils.parseEther(amount.toFixed(18));
 
@@ -1049,6 +1082,8 @@ export default class API extends Emitter {
   };
 
   unWarpETH = async (amount) => {
+    if (this.wrongNetwork()) return;
+
     if (!amount) throw new Error("No amount set");
     let amountBN = ethers.utils.parseEther(amount.toFixed(18));
 
@@ -1267,5 +1302,9 @@ export default class API extends Emitter {
           throw Error("Chain ID not understood");
       }
     }
+  };
+
+  wrongNetwork = () => {
+    return this.walletNetwork === this.apiProvider.network;
   };
 }
