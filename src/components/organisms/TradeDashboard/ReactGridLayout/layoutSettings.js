@@ -113,7 +113,7 @@ export const initialLayouts = {
   xxs: [
     {
       w: 20,
-      h: 20,
+      h: 25,
       x: 0,
       y: 20,
       i: "a",
@@ -134,7 +134,7 @@ export const initialLayouts = {
     },
     {
       w: 20,
-      h: 20,
+      h: 25,
       x: 20,
       y: 20,
       i: "g",
