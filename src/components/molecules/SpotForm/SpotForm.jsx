@@ -1052,7 +1052,7 @@ class SpotForm extends React.Component {
               placeholder={`Amount (${
                 marketInfo && marketInfo.baseAsset.symbol
                   ? marketInfo.baseAsset.symbol
-                  : "--"
+                  : ""
               })`}
               value={
                 this.state.baseAmount !== ""
@@ -1091,7 +1091,7 @@ class SpotForm extends React.Component {
               placeholder={`Total (${
                 marketInfo && marketInfo.quoteAsset.symbol
                   ? marketInfo.quoteAsset.symbol
-                  : "--"
+                  : ""
               })`}
               value={
                 this.state.quoteAmount !== ""

@@ -257,7 +257,7 @@ const TradeRatesCard = ({
                   ) : (
                     <Text
                       font="primaryMediumSmallSemiBold"
-                      color="foregroundLowEmphasis"
+                      color="foregroundHighEmphasis"
                     >
                       -- | --
                     </Text>
