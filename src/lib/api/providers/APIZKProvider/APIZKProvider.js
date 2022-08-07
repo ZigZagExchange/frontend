@@ -100,39 +100,41 @@ export default class APIZKProvider extends APIProvider {
     let feeToken = "ETH";
     const accountState = await this.syncWallet.getAccountState();
     const balances = accountState.committed.balances;
-    if (balances.ETH && balances.ETH > 0.006e18) {
-      feeToken = "ETH";
-    } else if (balances.USDC && balances.USDC > 15e6) {
-      feeToken = "USDC";
-    } else if (balances.USDT && balances.USDT > 15e6) {
-      feeToken = "USDT";
-    } else if (balances.DAI && balances.DAI > 15e6) {
-      feeToken = "DAI";
-    } else if (balances.WBTC && balances.WBTC > 0.0003e8) {
-      feeToken = "WBTC";
-    } else {
-      // toast.warn(
-      //   "Your zkSync token balances are very low. You might need to bridge in more funds first.",
-      //   {
-      //     toastId:
-      //       "Your zkSync token balances are very low. You might need to bridge in more funds first.",
-      //   }
-      // );
-      let maxValue = 0;
-      const tokens = Object.keys(balances);
-      const result = tokens.map(async (token) => {
-        const tokenInfo = await this.api.getCurrencyInfo(token);
-        if (tokenInfo.enabledForFees) {
-          const priceInfo = tokenInfo.usdPrice;
-          const usdValue =
-            (priceInfo.price * balances[token]) / 10 ** tokenInfo.decimals;
-          if (usdValue > maxValue) {
-            maxValue = usdValue;
-            feeToken = token;
+    if (Object.keys(balances).length > 0) {
+      if (balances.ETH && balances.ETH > 0.006e18) {
+        feeToken = "ETH";
+      } else if (balances.USDC && balances.USDC > 15e6) {
+        feeToken = "USDC";
+      } else if (balances.USDT && balances.USDT > 15e6) {
+        feeToken = "USDT";
+      } else if (balances.DAI && balances.DAI > 15e6) {
+        feeToken = "DAI";
+      } else if (balances.WBTC && balances.WBTC > 0.0003e8) {
+        feeToken = "WBTC";
+      } else {
+        toast.warn(
+          "Your zkSync token balances are very low. You might need to bridge in more funds first.",
+          {
+            toastId:
+              "Your zkSync token balances are very low. You might need to bridge in more funds first.",
           }
-        }
-      });
-      await Promise.all(result);
+        );
+        let maxValue = 0;
+        const tokens = Object.keys(balances);
+        const result = tokens.map(async (token) => {
+          const tokenInfo = await this.api.getCurrencyInfo(token);
+          if (tokenInfo.enabledForFees) {
+            const priceInfo = tokenInfo.usdPrice;
+            const usdValue =
+              (priceInfo.price * balances[token]) / 10 ** tokenInfo.decimals;
+            if (usdValue > maxValue) {
+              maxValue = usdValue;
+              feeToken = token;
+            }
+          }
+        });
+        await Promise.all(result);
+      }
     }
 
     const signingKey = await this.syncWallet.setSigningKey({
