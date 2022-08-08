@@ -79,6 +79,28 @@ const Table = styled.table`
     padding-right: 0px;
   }
 
+  .price-item {
+    position: relative;
+
+    td {
+      position: relative;
+      z-index: 1;
+    }
+
+    &::after {
+      content: " ";
+      display: block;
+      position: absolute;
+      width: 100%;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      background-image: var(--background-image);
+      background-size: cover;
+    }
+  }
+
   @media screen and (min-width: 1800px) {
     width: 100%;
   }
@@ -109,16 +131,27 @@ const TradePriceTable = (props) => {
   const { theme } = useTheme();
   const ref = useRef(null);
   const [isUpdateScroll, setUpdateScroll] = useState(false);
-  const [priceData, setPriceData] = useState([])
+  const [priceData, setPriceData] = useState([]);
   const isMobile = window.innerWidth < 500;
 
-  useEffect(()=>{
+  const ua = navigator.userAgent.toLowerCase();
+  let isSafari = false;
+  if (ua.indexOf("safari") != -1) {
+    if (ua.indexOf("chrome") === -1) {
+      isSafari = true;
+    }
+  }
+
+  useEffect(() => {
     const tmp = _.cloneDeep(props.priceTableData);
-    if(props.priceTableData[0]?.side === "s" && !props.settings?.stackOrderbook) {
+    if (
+      props.priceTableData[0]?.side === "s" &&
+      !props.settings?.stackOrderbook
+    ) {
       tmp.reverse();
     }
-    setPriceData(tmp)
-  }, [props.priceTableData])
+    setPriceData(tmp);
+  }, [props.priceTableData]);
 
   useEffect(() => {
     if (!ref.current) return;
@@ -182,16 +215,15 @@ const TradePriceTable = (props) => {
         </thead>
       )}
       <tbody>
-        { priceData.map((d, i) => {
+        {priceData.map((d, i) => {
           const color =
             d.side === "b" ? theme.colors.success400 : theme.colors.danger400;
 
           let rowStyle;
           if (props.useGradient) {
-            let dir
-            if(!props.settings?.stackOrderbook)
-              dir = "to left"
-            else dir = "to right"
+            let dir;
+            if (!props.settings?.stackOrderbook) dir = "to left";
+            else dir = "to right";
 
             if (d.side === "b") {
               total_step += d.td2;
@@ -200,14 +232,13 @@ const TradePriceTable = (props) => {
             if (d.side === "s") {
               total_step -= d.td2;
             }
-            if(!props.settings?.stackOrderbook && d.side === "s"){
+            if (!props.settings?.stackOrderbook && d.side === "s") {
               rowStyle = {
-                background: `linear-gradient(${dir}, ${theme.colors.backgroundHighEmphasis}, ${theme.colors.backgroundHighEmphasis} ${breakpoint}%, ${color} 0%)`,
+                "--background-image": `linear-gradient(${dir}, ${theme.colors.backgroundHighEmphasis}, ${theme.colors.backgroundHighEmphasis} ${breakpoint}%, ${color} 0%)`,
               };
-            }
-            else{
+            } else {
               rowStyle = {
-                background: `linear-gradient(${dir}, ${color}, ${color} ${breakpoint}%, ${theme.colors.backgroundHighEmphasis} 0%)`,              
+                "--background-image": `linear-gradient(${dir}, ${color}, ${color} ${breakpoint}%, ${theme.colors.backgroundHighEmphasis} 0%)`,
               };
             }
 
@@ -216,7 +247,7 @@ const TradePriceTable = (props) => {
               total_step -= d.td2;
             }
           } else {
-            rowStyle = {};
+            rowStyle = "";
           }
           const price =
             typeof d.td1 === "number" ? d.td1.toPrecision(6) : d.td1;
@@ -225,8 +256,51 @@ const TradePriceTable = (props) => {
           const total =
             typeof d.td3 === "number" ? d.td3.toPrecision(6) : d.td3;
 
-          return (
-            <tr key={i} style={rowStyle} onClick={() => onClickRow(d)}>
+          return isSafari ? (
+            <div className="price-item" style={rowStyle}>
+              <tr key={i} onClick={() => onClickRow(d)}>
+                <td>
+                  <Text
+                    font="tableContent"
+                    color={
+                      d.side === "b"
+                        ? "successHighEmphasis"
+                        : "dangerHighEmphasis"
+                    }
+                  >
+                    {price}
+                  </Text>
+                </td>
+                <td>
+                  <Text
+                    font="tableContent"
+                    color="foregroundHighEmphasis"
+                    textAlign="right"
+                  >
+                    {formatMillonAmount(amount)}
+                  </Text>
+                </td>
+                {!isMobile && (
+                  <td>
+                    <Text
+                      font="tableContent"
+                      color="foregroundHighEmphasis"
+                      textAlign="right"
+                    >
+                      {/* {numStringToSymbol(total, 2)} */}
+                      {formatMillonAmount(total)}
+                    </Text>
+                  </td>
+                )}
+              </tr>
+            </div>
+          ) : (
+            <tr
+              key={i}
+              onClick={() => onClickRow(d)}
+              className="price-item"
+              style={rowStyle}
+            >
               <td>
                 <Text
                   font="tableContent"
