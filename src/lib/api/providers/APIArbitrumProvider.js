@@ -114,27 +114,27 @@ export default class APIArbitrumProvider extends APIProvider {
     const marketInfo = this.api.marketInfo[`${this.network}:${market}`];
 
     const [baseToken, quoteToken] = market.split("-");
-    let makerToken,
-      takerToken,
-      makerAmountBN,
-      takerAmountBN,
+    let sellToken,
+      buyToken,
+      sellAmountBN,
+      buyAmountBN,
       gasFeeBN,
       balanceBN;
     if (side === "s") {
-      makerToken = marketInfo.baseAsset.address;
-      takerToken = marketInfo.quoteAsset.address;
-      makerAmountBN = baseAmountBN;
-      takerAmountBN = quoteAmountBN.mul(99999).div(100000);
+      sellToken = marketInfo.baseAsset.address;
+      buyToken = marketInfo.quoteAsset.address;
+      sellAmountBN = baseAmountBN;
+      buyAmountBN = quoteAmountBN.mul(99999).div(100000);
       gasFeeBN = ethers.utils.parseUnits(
         Number(marketInfo.baseFee).toFixed(marketInfo.baseAsset.decimals),
         marketInfo.baseAsset.decimals
       );
       balanceBN = ethers.BigNumber.from(this.api.balances[this.network][baseToken].value);
     } else {
-      makerToken = marketInfo.quoteAsset.address;
-      takerToken = marketInfo.baseAsset.address;
-      makerAmountBN = quoteAmountBN;
-      takerAmountBN = baseAmountBN.mul(99999).div(100000);
+      sellToken = marketInfo.quoteAsset.address;
+      buyToken = marketInfo.baseAsset.address;
+      sellAmountBN = quoteAmountBN;
+      buyAmountBN = baseAmountBN.mul(99999).div(100000);
       gasFeeBN = ethers.utils.parseUnits(
         Number(marketInfo.quoteFee).toFixed(marketInfo.quoteAsset.decimals),
         marketInfo.quoteAsset.decimals
@@ -158,7 +158,7 @@ export default class APIArbitrumProvider extends APIProvider {
     } else {
       balanceBN = balanceBN.sub(gasFeeBN).sub(takerVolumeFeeBN);
     }
-    const delta = makerAmountBN.mul("1000").div(balanceBN).toNumber();
+    const delta = sellAmountBN.mul("1000").div(balanceBN).toNumber();
     if (delta > 1001) {
       // 100.1 %
       throw new Error(`Amount exceeds balance.`);
@@ -166,18 +166,18 @@ export default class APIArbitrumProvider extends APIProvider {
     // prevent dust issues
     if (delta > 999) {
       // 99.9 %
-      makerAmountBN = balanceBN;
+      sellAmountBN = balanceBN;
     }
 
     let domain, Order, types
     if (marketInfo.contractVersion === 4) {
       Order = {
         makerAddress: this.accountState.address,
-        makerToken: makerToken,
-        takerToken: takerToken,
+        makerToken: sellToken,
+        takerToken: buyToken,
         feeRecipientAddress: marketInfo.feeAddress,
-        makerAssetAmount: makerAmountBN.toString(),
-        takerAssetAmount: takerAmountBN.toString(),
+        makerAssetAmount: sellAmountBN.toString(),
+        takerAssetAmount: buyAmountBN.toString(),
         makerVolumeFee: makerVolumeFeeBN.toString(),
         takerVolumeFee: takerVolumeFeeBN.toString(),
         gasFee: gasFeeBN.toString(),
@@ -209,12 +209,12 @@ export default class APIArbitrumProvider extends APIProvider {
     } else if (marketInfo.contractVersion === 5) {
       Order = {
         user: this.accountState.address,
-        sellToken: makerToken,
-        buyToken: takerToken,
+        sellToken: sellToken,
+        buyToken: buyToken,
         feeRecipientAddress: marketInfo.feeAddress,
         relayerAddress: marketInfo.relayerAddress,
-        sellAmount: makerAmountBN.toString(),
-        buyAmount: takerAmountBN.toString(),
+        sellAmount: sellAmountBN.toString(),
+        buyAmount: buyAmountBN.toString(),
         makerVolumeFee: makerVolumeFeeBN.toString(),
         takerVolumeFee: takerVolumeFeeBN.toString(),
         gasFee: gasFeeBN.toString(),
@@ -230,13 +230,13 @@ export default class APIArbitrumProvider extends APIProvider {
   
       types = {
         Order: [
-          { name: "makerAddress", type: "address" },
-          { name: "makerToken", type: "address" },
-          { name: "takerToken", type: "address" },
+          { name: "user", type: "address" },
+          { name: "sellToken", type: "address" },
+          { name: "buyToken", type: "address" },
           { name: "feeRecipientAddress", type: "address" },
           { name: "relayerAddress", type: "address" },
-          { name: "makerAssetAmount", type: "uint256" },
-          { name: "takerAssetAmount", type: "uint256" },
+          { name: "sellAmount", type: "uint256" },
+          { name: "buyAmount", type: "uint256" },
           { name: "makerVolumeFee", type: "uint256" },
           { name: "takerVolumeFee", type: "uint256" },
           { name: "gasFee", type: "uint256" },
