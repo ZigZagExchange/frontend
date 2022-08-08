@@ -12,9 +12,9 @@ const StyledTradeTables = styled.section`
       : theme.colors.backgroundHighEmphasis};
   overflow: hidden;
 
-  @media screen and (max-width: 991px) {
-    height: 300px;
-  }
+  // @media screen and (max-width: 991px) {
+  //   height: 300px;
+  // }
 `;
 
 export default function TradeTables(props) {

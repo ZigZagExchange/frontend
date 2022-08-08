@@ -3,6 +3,7 @@ import styled from "styled-components";
 import useTheme from "components/hooks/useTheme";
 import { numStringToSymbol, addComma, formatMillonAmount } from "lib/utils";
 import Text from "components/atoms/Text/Text";
+import _ from "lodash";
 
 const Table = styled.table`
   display: flex;
@@ -14,6 +15,14 @@ const Table = styled.table`
   scrollbar-color: ${({ theme }) => theme.colors.foreground400}
     rgba(0, 0, 0, 0.1);
   scrollbar-width: thin !important;
+
+  &.trade_tables_all {
+    flex: 0 0 calc(50% - 76px);
+  }
+
+  &.trade_tables_all.trade_table_asks {
+    flex: 0 0 calc(50% - 47px);
+  }
 
   &:not(.no-space) {
     justify-content: ${({ isLeft }) => (isLeft ? "space-between" : "start")};
@@ -100,7 +109,16 @@ const TradePriceTable = (props) => {
   const { theme } = useTheme();
   const ref = useRef(null);
   const [isUpdateScroll, setUpdateScroll] = useState(false);
+  const [priceData, setPriceData] = useState([])
   const isMobile = window.innerWidth < 500;
+
+  useEffect(()=>{
+    const tmp = _.cloneDeep(props.priceTableData);
+    if(props.priceTableData[0]?.side === "s" && !props.settings?.stackOrderbook) {
+      tmp.reverse();
+    }
+    setPriceData(tmp)
+  }, [props.priceTableData])
 
   useEffect(() => {
     if (!ref.current) return;
@@ -114,7 +132,8 @@ const TradePriceTable = (props) => {
     }
   }, [props.priceTableData.length]);
 
-  let total_total = 0, total_step = 0;
+  let total_total = 0,
+    total_step = 0;
   props.priceTableData.map((d) => (total_total += d.td2));
   if (props.priceTableData.length > 0 && props.priceTableData[0].side === "s") {
     total_step = total_total;
@@ -125,7 +144,11 @@ const TradePriceTable = (props) => {
   else onClickRow = () => null;
 
   return (
-    <Table ref={ref} className={props.adClass} isLeft={props.settings?.stackOrderbook}>
+    <Table
+      ref={ref}
+      className={props.adClass}
+      isLeft={props.settings?.stackOrderbook}
+    >
       {props.head && (
         <thead>
           <tr>
@@ -150,7 +173,8 @@ const TradePriceTable = (props) => {
                   color="foregroundLowEmphasis"
                   textAlign="right"
                 >
-                  Total({props.marketInfo && props.marketInfo.quoteAsset.symbol})
+                  Total({props.marketInfo && props.marketInfo.quoteAsset.symbol}
+                  )
                 </Text>
               </th>
             )}
@@ -158,12 +182,17 @@ const TradePriceTable = (props) => {
         </thead>
       )}
       <tbody>
-        {props.priceTableData.map((d, i) => {
+        { priceData.map((d, i) => {
           const color =
             d.side === "b" ? theme.colors.success400 : theme.colors.danger400;
-          
+
           let rowStyle;
           if (props.useGradient) {
+            let dir
+            if(!props.settings?.stackOrderbook)
+              dir = "to left"
+            else dir = "to right"
+
             if (d.side === "b") {
               total_step += d.td2;
             }
@@ -171,11 +200,17 @@ const TradePriceTable = (props) => {
             if (d.side === "s") {
               total_step -= d.td2;
             }
-            
-            rowStyle = {
-              background: `linear-gradient(to right, ${color}, ${color} ${breakpoint}%, ${theme.colors.backgroundHighEmphasis} 0%)`,
-            };
-            
+            if(!props.settings?.stackOrderbook && d.side === "s"){
+              rowStyle = {
+                background: `linear-gradient(${dir}, ${theme.colors.backgroundHighEmphasis}, ${theme.colors.backgroundHighEmphasis} ${breakpoint}%, ${color} 0%)`,
+              };
+            }
+            else{
+              rowStyle = {
+                background: `linear-gradient(${dir}, ${color}, ${color} ${breakpoint}%, ${theme.colors.backgroundHighEmphasis} 0%)`,              
+              };
+            }
+
             // reduce after, next one needs to be this percentage
             if (props.className === "trade_table_asks") {
               total_step -= d.td2;
