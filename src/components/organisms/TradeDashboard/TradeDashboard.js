@@ -128,7 +128,7 @@ export function TradeDashboard() {
     if (network === 1) {
       networkText = "zksync";
     } else if (network === 1000) {
-      networkText = "zksync-rinkeby";
+      networkText = "zksync-goerli";
     } else if (network === 42161) {
       networkText = "arbitrum";
     }

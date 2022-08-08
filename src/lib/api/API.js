@@ -22,7 +22,7 @@ import get from "lodash/get";
 
 const chainMap = {
   "0x1": 1,
-  "0x4": 1000,
+  "0x5": 1000,
   "0xa4b1": 42161,
 };
 
@@ -294,9 +294,9 @@ export default class API extends Emitter {
         };
         break;
       case 1000:
-        ethereumChainId = "0x4";
+        ethereumChainId = "0x5";
         ethereumChainInfo = {
-          chainId: "0x4",
+          chainId: "0x5",
         };
         break;
       case 42161:
@@ -649,7 +649,7 @@ export default class API extends Emitter {
       case 1:
         return "mainnet";
       case 1000:
-        return "rinkeby";
+        return "goerli";
       case 42161:
         return "arbitrum";
       default:
@@ -663,7 +663,7 @@ export default class API extends Emitter {
       case 42161:
         return "mainnet";
       case 1000:
-        return "rinkeby";
+        return "goerli";
       default:
         return null;
     }
@@ -1224,7 +1224,7 @@ export default class API extends Emitter {
       case 1:
         return "https://zkscan.io/explorer/transactions/" + txhash;
       case 1000:
-        return "https://rinkeby.zkscan.io/explorer/transactions/" + txhash;
+        return "https://goerli.zkscan.io/explorer/transactions/" + txhash;
       case 42161:
         return "https://arbiscan.io/tx/" + txhash;
       default:
@@ -1239,7 +1239,7 @@ export default class API extends Emitter {
         case 42161:
           return "https://etherscan.io/address/" + address;
         case 1000:
-          return "https://rinkeby.etherscan.io/address/" + address;
+          return "https://goerli.etherscan.io/address/" + address;
         default:
           throw Error("Chain ID not understood");
       }
@@ -1248,7 +1248,7 @@ export default class API extends Emitter {
         case 1:
           return "https://zkscan.io/explorer/accounts/" + address;
         case 1000:
-          return "https://rinkeby.zkscan.io/explorer/accounts/" + address;
+          return "https://goerli.zkscan.io/explorer/accounts/" + address;
         case 42161:
           return "https://arbiscan.io/address/" + address;
         default:

@@ -48,11 +48,11 @@ export default class APIZKProvider extends APIProvider {
       return receipt;
     }
     if (target === "ethereum") {
-      const subdomain = this.network === 1 ? "" : "rinkeby.";
+      const subdomain = this.network === 1 ? "" : "goerli.";
       receipt.txId = _receipt.ethTx.hash;
       receipt.txUrl = `https://${subdomain}etherscan.io/tx/${receipt.txId}`;
     } else if (target === "zksync") {
-      const subdomain = this.network === 1 ? "" : "rinkeby.";
+      const subdomain = this.network === 1 ? "" : "goerli.";
       receipt.txId = _receipt.txHash.split(":")[1];
       receipt.txUrl = `https://${subdomain}zkscan.io/explorer/transactions/${receipt.txId}`;
     }
@@ -296,7 +296,7 @@ export default class APIZKProvider extends APIProvider {
           ETH_ZKSYNC_BRIDGE.ethTozkSync,
           "ethereum",
           this.network === 1000
-            ? `https://rinkeby.zksync.io/explorer/accounts/${address}`
+            ? `https://goerli.zksync.io/explorer/accounts/${address}`
             : `https://zkscan.io/explorer/accounts/${address}`
         )
       );
@@ -530,8 +530,8 @@ export default class APIZKProvider extends APIProvider {
 
   signIn = async () => {
     try {
-      this.syncProvider = await zksync.getDefaultProvider(
-        this.network === 1 ? "mainnet" : "rinkeby"
+      this.syncProvider = await zksync.getDefaultRestProvider(
+        this.network === 1 ? "mainnet" : "goerli"
       );
     } catch (e) {
       toast.error("Zksync is down. Try again later");
@@ -685,8 +685,8 @@ export default class APIZKProvider extends APIProvider {
     const chainName = this.api.getChainName(chainId);
     if (chainName === "mainnet") {
       return "https://api.zksync.io/api/v0.2";
-    } else if (chainName === "rinkeby") {
-      return "https://rinkeby-api.zksync.io/api/v0.2";
+    } else if (chainName === "goerli") {
+      return "https://goerli-api.zksync.io/api/v0.2";
     } else {
       throw Error("Uknown chain");
     }

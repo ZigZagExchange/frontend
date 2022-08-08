@@ -7,7 +7,7 @@ const api = new API({
   infuraId: process.env.REACT_APP_INFURA_ID,
   networks: {
     zksync: [1, APIZKProvider, "0xaBEA9132b05A70803a4E85094fD0e1800777fBEF"],
-    "zksync-rinkeby": [
+    "zksync-goerli": [
       1000,
       APIZKProvider,
       "0x82f67958a5474e40e1485742d648c0b0686b6e5d",

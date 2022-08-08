@@ -23,11 +23,10 @@ export default class APIProvider {
     this.api = api;
     this.network = network;
     this.websocketUrl = process.env.REACT_APP_ZIGZAG_WS;
-    if (network === 1000 && process.env.REACT_APP_ZIGZAG_WS_RINKEBY) {
-      this.websocketUrl = process.env.REACT_APP_ZIGZAG_WS_RINKEBY;
-    }
-    if (network === 42161 && process.env.REACT_APP_ZIGZAG_WS_ARBITRUM) {
-      this.websocketUrl = process.env.REACT_APP_ZIGZAG_WS_ARBITRUM;
+
+    // set ws URL to staging server for test networks
+    if ([1000].includes(network) && process.env.REACT_APP_ZIGZAG_WS_STAGING) {
+      this.websocketUrl = process.env.REACT_APP_ZIGZAG_WS_STAGING;
     }
   }
 }

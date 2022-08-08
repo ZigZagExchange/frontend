@@ -16806,10 +16806,10 @@ zksync-crypto@^0.6.1:
   resolved "https://registry.npmjs.org/zksync-crypto/-/zksync-crypto-0.6.2.tgz"
   integrity sha512-Ry8c9kixDu3rlGCZDOg1UhzKDYe93iOZ7/Z6N1bkkrVKhmZJTIc7h+1kOjOyyhaSaHwBt8quMeBAaZKjtUeB2Q==
 
-zksync@^0.12.1:
-  version "0.12.1"
-  resolved "https://registry.npmjs.org/zksync/-/zksync-0.12.1.tgz"
-  integrity sha512-ButCo/yiUnBI/SNzBkTkaUMSTBx3VXB3SCXoAOYveXigGzFZfURR7o0GjBMuL9D+rM+ODZ2DRIoroAMvrss3Lg==
+zksync@0.13.1:
+  version "0.13.1"
+  resolved "https://registry.yarnpkg.com/zksync/-/zksync-0.13.1.tgz#016f78f6c4079e3bdd143833f32f01d5c7c7a2c4"
+  integrity sha512-1WRMommc8qTuwh3qk6/dv34Eb+PnKBmM41sQMaAjkC47aw2Xm4RuqJfvHXPoKnZjtIhBAzXA25rwevxqGukQHw==
   dependencies:
     axios "^0.21.2"
     websocket "^1.0.30"
