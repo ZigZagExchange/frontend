@@ -399,7 +399,7 @@ export const Header = (props) => {
                 <AccountDropdown networkName={networkName} />
               </>
             ) : (
-              <ConnectWalletButton isLoading={!user.address} />
+              <ConnectWalletButton />
             )}
             <MenuButtonWrapper>
               <MenuIcon onClick={() => setShow(!show)} />
@@ -499,7 +499,7 @@ export const Header = (props) => {
             {user.address && !connecting ? (
               <AccountDropdown networkName={networkName} />
             ) : (
-              <ConnectWalletButton isLoading={!user.address} />
+              <ConnectWalletButton />
             )}
           </ActionsWrapper>
         </>

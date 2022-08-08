@@ -63,15 +63,23 @@ export default class API extends Emitter {
     if (window.ethereum) {
       window.ethereum.on("accountsChanged", async () => {
         this.emit("connecting", true);
-        this.resetL2Data();
-        await this.updateUserData();
+        try {
+          this.resetL2Data();
+          await this.updateUserData();
+        } catch (e) {
+          console.warn(`Failed to switchAPIProvider: ${e.message}`)
+        }
         this.emit("connecting", false);
       });
       window.ethereum.on("chainChanged", (chainId) => {
         this.emit("connecting", true);
-        this.walletNetwork = chainMap[chainId] || 0;
-        this.emit("wrongNetwork", this.wrongNetwork());
-        this.setAPIProvider(chainMap[chainId]);
+          try {
+          this.walletNetwork = chainMap[chainId] || 0;
+          this.emit("wrongNetwork", this.wrongNetwork());
+          this.setAPIProvider(chainMap[chainId]);
+        } catch (e) {
+          console.warn(`Failed to switchAPIProvider: ${e.message}`)
+        }
         this.emit("connecting", false);
       });
       window.ethereum.on("disconnect", () => {
@@ -92,8 +100,12 @@ export default class API extends Emitter {
 
   switchAPIProvider = async (network) => {
     this.emit("connecting", true);
-    await this.refreshNetwork(network);
-    await this.setAPIProvider(network);
+    try {
+      await this.refreshNetwork(network);
+      await this.setAPIProvider(network);
+    } catch (e) {
+      console.warn(`Failed to switchAPIProvider: ${e.message}`)
+    }
     this.emit("connecting", false);
   }
 

@@ -18,8 +18,8 @@ const ConnectWalletButton = (props) => {
 
   const connect = async (event) => {
     event.preventDefault();
+    api.emit("connecting", true);
     try {
-      api.emit("connecting", true);
       await api.signIn(network);
       if (api.zksyncCompatible) {
         const balance = balanceData?.[network]?.ETH?.valueReadable;
@@ -33,11 +33,10 @@ const ConnectWalletButton = (props) => {
           history.push("/bridge");
         }
       }
-      api.emit("connecting", false);
     } catch (e) {
       console.error(e);
-      api.emit("connecting", false);
     }
+    api.emit("connecting", false);
   };
 
   return (
