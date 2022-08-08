@@ -169,41 +169,83 @@ export default class APIArbitrumProvider extends APIProvider {
       makerAmountBN = balanceBN;
     }
 
-    const Order = {
-      makerAddress: this.accountState.address,
-      makerToken: makerToken,
-      takerToken: takerToken,
-      feeRecipientAddress: marketInfo.feeAddress,
-      makerAssetAmount: makerAmountBN.toString(),
-      takerAssetAmount: takerAmountBN.toString(),
-      makerVolumeFee: makerVolumeFeeBN.toString(),
-      takerVolumeFee: takerVolumeFeeBN.toString(),
-      gasFee: gasFeeBN.toString(),
-      expirationTimeSeconds: expirationTimeSeconds.toFixed(0),
-      salt: (Math.random() * 123456789).toFixed(0),
-    };
-
-    const domain = {
-      name: "ZigZag",
-      version: "4",
-      chainId: this.network,
-    };
-
-    const types = {
-      Order: [
-        { name: "makerAddress", type: "address" },
-        { name: "makerToken", type: "address" },
-        { name: "takerToken", type: "address" },
-        { name: "feeRecipientAddress", type: "address" },
-        { name: "makerAssetAmount", type: "uint256" },
-        { name: "takerAssetAmount", type: "uint256" },
-        { name: "makerVolumeFee", type: "uint256" },
-        { name: "takerVolumeFee", type: "uint256" },
-        { name: "gasFee", type: "uint256" },
-        { name: "expirationTimeSeconds", type: "uint256" },
-        { name: "salt", type: "uint256" },
-      ],
-    };
+    let domain, Order, types
+    if (marketInfo.contractVersion === 4) {
+      Order = {
+        makerAddress: this.accountState.address,
+        makerToken: makerToken,
+        takerToken: takerToken,
+        feeRecipientAddress: marketInfo.feeAddress,
+        makerAssetAmount: makerAmountBN.toString(),
+        takerAssetAmount: takerAmountBN.toString(),
+        makerVolumeFee: makerVolumeFeeBN.toString(),
+        takerVolumeFee: takerVolumeFeeBN.toString(),
+        gasFee: gasFeeBN.toString(),
+        expirationTimeSeconds: expirationTimeSeconds.toFixed(0),
+        salt: (Math.random() * 123456789).toFixed(0),
+      };
+  
+      domain = {
+        name: "ZigZag",
+        version: "4",
+        chainId: this.network,
+      };
+  
+      types = {
+        Order: [
+          { name: "makerAddress", type: "address" },
+          { name: "makerToken", type: "address" },
+          { name: "takerToken", type: "address" },
+          { name: "feeRecipientAddress", type: "address" },
+          { name: "makerAssetAmount", type: "uint256" },
+          { name: "takerAssetAmount", type: "uint256" },
+          { name: "makerVolumeFee", type: "uint256" },
+          { name: "takerVolumeFee", type: "uint256" },
+          { name: "gasFee", type: "uint256" },
+          { name: "expirationTimeSeconds", type: "uint256" },
+          { name: "salt", type: "uint256" },
+        ],
+      };
+    } else if (marketInfo.contractVersion === 5) {
+      Order = {
+        user: this.accountState.address,
+        sellToken: makerToken,
+        buyToken: takerToken,
+        feeRecipientAddress: marketInfo.feeAddress,
+        relayerAddress: marketInfo.relayerAddress,
+        sellAmount: makerAmountBN.toString(),
+        buyAmount: takerAmountBN.toString(),
+        makerVolumeFee: makerVolumeFeeBN.toString(),
+        takerVolumeFee: takerVolumeFeeBN.toString(),
+        gasFee: gasFeeBN.toString(),
+        expirationTimeSeconds: expirationTimeSeconds.toFixed(0),
+        salt: (Math.random() * 123456789).toFixed(0),
+      };
+  
+      domain = {
+        name: "ZigZag",
+        version: "5",
+        chainId: this.network,
+      };
+  
+      types = {
+        Order: [
+          { name: "makerAddress", type: "address" },
+          { name: "makerToken", type: "address" },
+          { name: "takerToken", type: "address" },
+          { name: "feeRecipientAddress", type: "address" },
+          { name: "relayerAddress", type: "address" },
+          { name: "makerAssetAmount", type: "uint256" },
+          { name: "takerAssetAmount", type: "uint256" },
+          { name: "makerVolumeFee", type: "uint256" },
+          { name: "takerVolumeFee", type: "uint256" },
+          { name: "gasFee", type: "uint256" },
+          { name: "expirationTimeSeconds", type: "uint256" },
+          { name: "salt", type: "uint256" },
+        ],
+      };
+    }
+    
 
     const signer = await this.api.rollupProvider.getSigner();
     const signature = await signer._signTypedData(domain, types, Order);
