@@ -68,9 +68,11 @@ export default class API extends Emitter {
         this.emit("connecting", false);
       });
       window.ethereum.on("chainChanged", (chainId) => {
+        this.emit("connecting", true);
         this.walletNetwork = chainMap[chainId] || 0;
         this.emit("wrongNetwork", this.wrongNetwork());
-        this.setAPIProvider(chainMap[chainId], true);
+        this.setAPIProvider(chainMap[chainId]);
+        this.emit("connecting", false);
       });
       window.ethereum.on("disconnect", () => {
         this.signOut();
@@ -88,12 +90,14 @@ export default class API extends Emitter {
     return this.networks[this.getNetworkName(network)][1];
   };
 
-  switchAPIProvider = async (network, refreshUserData = false) => {
+  switchAPIProvider = async (network) => {
+    this.emit("connecting", true);
     await this.refreshNetwork(network);
-    this.setAPIProvider(network, refreshUserData);
+    await this.setAPIProvider(network);
+    this.emit("connecting", false);
   }
 
-  setAPIProvider = (network, refreshUserData = false) => {
+  setAPIProvider = async (network) => {
     const chainName = this.getChainName(network);
 
     if (!chainName) {
@@ -105,9 +109,6 @@ export default class API extends Emitter {
     const oldNetwork = this.apiProvider?.network;
     const apiProvider = this.getAPIProvider(network); 
     this.apiProvider = apiProvider;
-    if (this.web3Provider) {
-      this.rollupProvider = new ethers.providers.Web3Provider(this.web3Provider);      
-    }
 
     // reset mainnetProvider if L1 chain changed
     if (this.getChainNameL1(oldNetwork) !== this.getChainNameL1(network)) {
@@ -183,7 +184,7 @@ export default class API extends Emitter {
     }
 
     this.emit("wrongNetwork", this.wrongNetwork());
-    if (refreshUserData) this.updateUserData();
+    await this.updateUserData();
   };
 
   getProfile = async (address) => {
@@ -439,7 +440,7 @@ export default class API extends Emitter {
           }
 
           this.web3Provider = await this.web3Modal.connect();
-          this.rollupProvider = new ethers.providers.Web3Provider(this.web3Provider);
+          this.rollupProvider = new ethers.providers.Web3Provider(this.web3Provider, "any");
           this.mainnetProvider = new ethers.providers.InfuraProvider(
             this.getChainNameL1(network),
             this.infuraId
@@ -453,7 +454,7 @@ export default class API extends Emitter {
           );
           */
 
-          await this.updateUserData();
+          await this.updateUserData().catch(e => console.warn(e));
         })
         .finally(() => {
           this._signInProgress = null;
@@ -486,21 +487,16 @@ export default class API extends Emitter {
     this._pendingFills = [];
     this.isArgent = false;
 
-    if (this.apiProvider?.network) 
-      this.emit("balanceUpdate", this.apiProvider.network, {});
     this.emit("accountState", {});
     this.emit("resetUserOrders")
   }
 
   resetL1Data = () => {
     this.mainnetProvider = null;
-
-    this.emit("balanceUpdate", "wallet", {});
-    this.emit("balanceUpdate", "polygon", {});
   }
 
   updateUserData = async () => {
-    if (!this.rollupProvider) return;
+    if (!this.rollupProvider || this.wrongNetwork()) return;
 
     let accountState;
     try {
@@ -524,11 +520,14 @@ export default class API extends Emitter {
         accountState.id && accountState.id.toString(),
       ]);
     }
-    await this.getWalletBalances();
 
-    if(this.mainnetProvider) {
-      await this.getBalances();
+    const { balances } = accountState?.committed;
+    if (balances && Object.keys(balances).length) {
+      this.balances[this.apiProvider.network] = balances;
+      this.emit("balanceUpdate", this.apiProvider.network, balances);
     }
+
+    await this.getWalletBalances();
   }
 
   getAddress = async () => {
@@ -882,7 +881,7 @@ export default class API extends Emitter {
 
   approveSpendOfCurrency = async (currency) => {
     const netContract = this.getNetworkContract();
-    if (netContract) {
+    if (ethers.utils.isAddress(netContract)) {
       const currencyInfo = this.getCurrencyInfo(currency);
       const contract = new this.mainnetProvider.eth.Contract(
         erc20ContractABI,
@@ -902,13 +901,10 @@ export default class API extends Emitter {
     let result = { balance: 0, allowance: ethersConstants.Zero };
     if (!this.mainnetProvider) return result;
 
+    let address;
     try {
-      const netContract = this.getNetworkContract();
-      const address = await this.getAddress()
-      if (
-        !address ||
-        !ethers.utils.isAddress(address)
-      ) return result;
+      address = await this.getAddress()
+      if (!ethers.utils.isAddress(address)) return result;
 
       if (currency === "ETH") {
         result.balance = await this.mainnetProvider.getBalance(address);
@@ -916,7 +912,7 @@ export default class API extends Emitter {
         return result;
       }
 
-      if (!currencyInfo || !currencyInfo.address) return result;
+      if (!ethers.utils.isAddress(currencyInfo?.address)) return result;
 
       const contract = new ethers.Contract(
         currencyInfo.address,
@@ -924,19 +920,21 @@ export default class API extends Emitter {
         this.mainnetProvider
       );
       result.balance = await contract.balanceOf(address);
-      if (netContract && ethers.utils.isAddress(netContract)) {
+      const netContract = this.getNetworkContract();
+      if (ethers.utils.isAddress(netContract)) {
         result.allowance = ethers.BigNumber.from(
           await contract.allowance(address, netContract)
         );
       }
       return result;
     } catch (e) {
-      console.log(e);
+      console.warn(e.message);
       return result;
     }
   };
 
   getWalletBalances = async () => {
+    if (!this.mainnetProvider) return;
     const balances = {};
 
     const getBalance = async (ticker) => {
@@ -954,8 +952,6 @@ export default class API extends Emitter {
           decimals: 18,
         });
       }
-
-      this.emit("balanceUpdate", "wallet", { ...balances });
     };
 
     const tickers = this.getCurrencies();
@@ -966,6 +962,7 @@ export default class API extends Emitter {
 
     await Promise.all(tickers.map((ticker) => getBalance(ticker)));
 
+    this.emit("balanceUpdate", "wallet", { ...balances });
     return balances;
   };
 
@@ -1310,6 +1307,6 @@ export default class API extends Emitter {
   };
 
   wrongNetwork = () => {
-    return this.walletNetwork === this.apiProvider.network;
+    return this.walletNetwork !== this.apiProvider.network;
   };
 }

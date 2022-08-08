@@ -116,7 +116,7 @@ export function TradeDashboard() {
       updateMarketChain(marketFromURL);
     }
     if (chainid && network !== chainid) {
-      api.setAPIProvider(chainid, false);
+      await api.setAPIProvider(chainid);
     }
     api.getWalletBalances();
   }, []);

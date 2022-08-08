@@ -256,6 +256,7 @@ export const Header = (props) => {
   const connecting = useSelector(isConnectingSelector);
   const user = useSelector(userSelector);
   const network = useSelector(networkSelector);
+
   const hasBridge = api.isImplemented("depositL2");
   const isEVM = api.isEVMChain();
   const history = useHistory();
@@ -325,7 +326,7 @@ export const Header = (props) => {
 
   const changeNetwork = async (text, value) => {
     try {
-      api.switchAPIProvider(value, false);
+      await api.switchAPIProvider(value, true);
     } catch (err) {
       console.log(err);
     }
@@ -393,12 +394,12 @@ export const Header = (props) => {
             </Link>
           </LogoWrapper>
           <ButtonWrapper>
-            {user.address ? (
+            {user.address && !connecting ? (
               <>
                 <AccountDropdown networkName={networkName} />
               </>
             ) : (
-              <ConnectWalletButton />
+              <ConnectWalletButton isLoading={!user.address} />
             )}
             <MenuButtonWrapper>
               <MenuIcon onClick={() => setShow(!show)} />
@@ -495,10 +496,10 @@ export const Header = (props) => {
               leftIcon={true}
             />
 
-            {user.address ? (
+            {user.address && !connecting ? (
               <AccountDropdown networkName={networkName} />
             ) : (
-              <ConnectWalletButton />
+              <ConnectWalletButton isLoading={!user.address} />
             )}
           </ActionsWrapper>
         </>
