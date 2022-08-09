@@ -9,7 +9,7 @@ const Table = styled.table`
   display: flex;
   flex: auto;
   overflow: auto;
-  padding: 0px;
+  padding: 0 0 1px 0;
   height: ${({ isLeft }) => (isLeft ? "" : "249px")};
   flex-direction: column;
   scrollbar-color: ${({ theme }) => theme.colors.foreground400}
