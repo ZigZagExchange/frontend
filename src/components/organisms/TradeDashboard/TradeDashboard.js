@@ -163,7 +163,7 @@ export function TradeDashboard() {
         api.off("open", sub);
       }
     };
-  }, [network, currentMarket, api.ws, settings.showNightPriceChange]);
+  }, [currentMarket, api.ws, settings.showNightPriceChange]);
 
   const changeSide = (side) => {
     setSide(side);
