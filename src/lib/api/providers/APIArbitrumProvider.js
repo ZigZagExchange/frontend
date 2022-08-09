@@ -10,7 +10,9 @@ export default class APIArbitrumProvider extends APIProvider {
   evmCompatible = true;
   zksyncCompatible = false;
   _tokenInfo = {};
-  defaultMarket = "USDC-USDT";
+  defaultMarket = {
+    42161: "USDC-USDT",
+  }
 
   getAccountState = async () => {
     return this.accountState;

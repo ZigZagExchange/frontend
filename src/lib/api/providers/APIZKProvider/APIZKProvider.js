@@ -26,7 +26,10 @@ export default class APIZKProvider extends APIProvider {
   _tokenInfo = {};
   eligibleFastWithdrawTokens = ["ETH", "FRAX", "UST"];
   fastWithdrawContractAddress = ZKSYNC_ETHEREUM_FAST_BRIDGE.address;
-  defaultMarket = "ETH-USDC";
+  defaultMarket = {
+    1: "ETH-USDC",
+    1002: "DAI-USDC",
+  }
 
   handleBridgeReceipt = (
     _receipt,
