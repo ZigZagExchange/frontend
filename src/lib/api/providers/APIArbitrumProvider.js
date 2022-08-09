@@ -169,44 +169,8 @@ export default class APIArbitrumProvider extends APIProvider {
       sellAmountBN = balanceBN;
     }
 
-    let domain, Order, types
-    if (marketInfo.contractVersion === 4) {
-      Order = {
-        makerAddress: this.accountState.address,
-        makerToken: sellToken,
-        takerToken: buyToken,
-        feeRecipientAddress: marketInfo.feeAddress,
-        makerAssetAmount: sellAmountBN.toString(),
-        takerAssetAmount: buyAmountBN.toString(),
-        makerVolumeFee: makerVolumeFeeBN.toString(),
-        takerVolumeFee: takerVolumeFeeBN.toString(),
-        gasFee: gasFeeBN.toString(),
-        expirationTimeSeconds: expirationTimeSeconds.toFixed(0),
-        salt: (Math.random() * 123456789).toFixed(0),
-      };
-  
-      domain = {
-        name: "ZigZag",
-        version: "4",
-        chainId: this.network,
-      };
-  
-      types = {
-        Order: [
-          { name: "makerAddress", type: "address" },
-          { name: "makerToken", type: "address" },
-          { name: "takerToken", type: "address" },
-          { name: "feeRecipientAddress", type: "address" },
-          { name: "makerAssetAmount", type: "uint256" },
-          { name: "takerAssetAmount", type: "uint256" },
-          { name: "makerVolumeFee", type: "uint256" },
-          { name: "takerVolumeFee", type: "uint256" },
-          { name: "gasFee", type: "uint256" },
-          { name: "expirationTimeSeconds", type: "uint256" },
-          { name: "salt", type: "uint256" },
-        ],
-      };
-    } else if (marketInfo.contractVersion === 5) {
+    let domain, Order, types;    
+    if (Number(marketInfo.contractVersion) === 5) {
       Order = {
         user: this.accountState.address,
         sellToken: sellToken,
@@ -245,7 +209,6 @@ export default class APIArbitrumProvider extends APIProvider {
         ],
       };
     }
-    
 
     const signer = await this.api.rollupProvider.getSigner();
     const signature = await signer._signTypedData(domain, types, Order);
