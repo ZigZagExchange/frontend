@@ -3,7 +3,6 @@ import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import Button from "../Button/Button";
 import { AccountButton } from "../ExpandableButton";
-import Dropdown from "./Dropdown";
 import { useCoinEstimator } from "components";
 import Loader from "react-loader-spinner";
 import {

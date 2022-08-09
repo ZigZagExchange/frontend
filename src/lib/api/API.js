@@ -71,12 +71,12 @@ export default class API extends Emitter {
         }
         this.emit("connecting", false);
       });
-      window.ethereum.on("chainChanged", (chainId) => {
+      window.ethereum.on("chainChanged", async (chainId) => {
         this.emit("connecting", true);
           try {
           this.walletNetwork = chainMap[chainId] || 0;
           this.emit("wrongNetwork", this.wrongNetwork());
-          this.setAPIProvider(chainMap[chainId]);
+          await this.setAPIProvider(chainMap[chainId]);
         } catch (e) {
           console.warn(`Failed to switchAPIProvider: ${e.message}`)
         }
