@@ -886,22 +886,26 @@ class SpotForm extends React.Component {
         color="foregroundMediumEmphasis"
         textAlign="right"
       >
-        {addComma(
-          formatToken(quoteBalance, marketInfo && marketInfo.quoteAsset?.symbol)
-        )}{" "}
+        {marketInfo &&
+          addComma(
+            formatToken(
+              quoteBalance,
+              marketInfo && marketInfo.quoteAsset?.symbol
+            )
+          )}{" "}
         {marketInfo && marketInfo.quoteAsset?.symbol}
       </Text>
     );
-
     const baseBalanceHtml = (
       <Text
         font="primaryExtraSmallSemiBold"
         color="foregroundMediumEmphasis"
         textAlign="right"
       >
-        {addComma(
-          formatToken(baseBalance, marketInfo && marketInfo.baseAsset?.symbol)
-        )}{" "}
+        {marketInfo &&
+          addComma(
+            formatToken(baseBalance, marketInfo && marketInfo.baseAsset?.symbol)
+          )}{" "}
         {marketInfo && marketInfo.baseAsset?.symbol}
       </Text>
     );
@@ -1008,20 +1012,22 @@ class SpotForm extends React.Component {
                 disabled={!this.props.user.id}
               ></IconButton>
             )}
-            <InputField
-              type="text"
-              pattern="\d+(?:[.,]\d+)?"
-              placeholder={`Price (${
-                marketInfo && marketInfo.baseAsset?.symbol
-              }-${marketInfo && marketInfo.quoteAsset?.symbol})`}
-              value={
-                this.props.orderType === "limit"
-                  ? this.state.price
-                  : addComma(formatPrice(this.currentPrice()))
-              }
-              onChange={this.updatePrice.bind(this)}
-              disabled={this.props.orderType === "market"}
-            />
+            {this.currentPrice() !== 0 && (
+              <InputField
+                type="text"
+                pattern="\d+(?:[.,]\d+)?"
+                placeholder={`Price (${
+                  marketInfo && marketInfo.baseAsset?.symbol
+                }-${marketInfo && marketInfo.quoteAsset?.symbol})`}
+                value={
+                  this.props.orderType === "limit"
+                    ? this.state.price
+                    : addComma(formatPrice(this.currentPrice()))
+                }
+                onChange={this.updatePrice.bind(this)}
+                disabled={this.props.orderType === "market"}
+              />
+            )}
             {this.props.orderType !== "market" && (
               <IconButton
                 variant="secondary"
@@ -1044,7 +1050,9 @@ class SpotForm extends React.Component {
               type="text"
               pattern="\d+(?:[.,]\d+)?"
               placeholder={`Amount (${
-                marketInfo && marketInfo.baseAsset?.symbol
+                marketInfo && marketInfo.baseAsset.symbol
+                  ? marketInfo.baseAsset.symbol
+                  : ""
               })`}
               value={
                 this.state.baseAmount !== ""
@@ -1081,7 +1089,9 @@ class SpotForm extends React.Component {
               type="text"
               pattern="\d+(?:[.,]\d+)?"
               placeholder={`Total (${
-                marketInfo && marketInfo.quoteAsset?.symbol
+                marketInfo && marketInfo.quoteAsset.symbol
+                  ? marketInfo.quoteAsset.symbol
+                  : ""
               })`}
               value={
                 this.state.quoteAmount !== ""

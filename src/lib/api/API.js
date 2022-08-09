@@ -157,6 +157,9 @@ export default class API extends Emitter {
           walletconnect: {
             package: WalletConnectProvider,
             options: {
+              rpc: {
+              42161: `https://arbitrum-mainnet.infura.io/v3/${this.infuraId}`,
+              },
               infuraId: this.infuraId,
             },
           },

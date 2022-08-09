@@ -92,7 +92,8 @@ export default class APIArbitrumProvider extends APIProvider {
   };
 
   getAllowance = async (tokenAddress, contractAddress) => {
-    if (!this.accountState.address || !contractAddress || !tokenAddress) return 0;
+    if (!this.accountState.address || !contractAddress || !tokenAddress)
+      return 0;
     const erc20Contract = new ethers.Contract(
       tokenAddress,
       erc20ContractABI,
@@ -117,36 +118,35 @@ export default class APIArbitrumProvider extends APIProvider {
     const marketInfo = this.api.marketInfo[`${this.network}:${market}`];
 
     const [baseToken, quoteToken] = market.split("-");
-    let makerToken,
-      takerToken,
-      makerAmountBN,
-      takerAmountBN,
-      gasFeeBN,
-      balanceBN;
+    let sellToken, buyToken, sellAmountBN, buyAmountBN, gasFeeBN, balanceBN;
     if (side === "s") {
-      makerToken = marketInfo.baseAsset.address;
-      takerToken = marketInfo.quoteAsset.address;
-      makerAmountBN = baseAmountBN;
-      takerAmountBN = quoteAmountBN.mul(99999).div(100000);
+      sellToken = marketInfo.baseAsset.address;
+      buyToken = marketInfo.quoteAsset.address;
+      sellAmountBN = baseAmountBN;
+      buyAmountBN = quoteAmountBN.mul(99999).div(100000);
       gasFeeBN = ethers.utils.parseUnits(
         Number(marketInfo.baseFee).toFixed(marketInfo.baseAsset.decimals),
         marketInfo.baseAsset.decimals
       );
-      balanceBN = ethers.BigNumber.from(this.api.balances[this.network][baseToken].value);
+      balanceBN = ethers.BigNumber.from(
+        this.api.balances[this.network][baseToken].value
+      );
     } else {
-      makerToken = marketInfo.quoteAsset.address;
-      takerToken = marketInfo.baseAsset.address;
-      makerAmountBN = quoteAmountBN;
-      takerAmountBN = baseAmountBN.mul(99999).div(100000);
+      sellToken = marketInfo.quoteAsset.address;
+      buyToken = marketInfo.baseAsset.address;
+      sellAmountBN = quoteAmountBN;
+      buyAmountBN = baseAmountBN.mul(99999).div(100000);
       gasFeeBN = ethers.utils.parseUnits(
         Number(marketInfo.quoteFee).toFixed(marketInfo.quoteAsset.decimals),
         marketInfo.quoteAsset.decimals
       );
-      balanceBN = ethers.BigNumber.from(this.api.balances[this.network][quoteToken].value);
+      balanceBN = ethers.BigNumber.from(
+        this.api.balances[this.network][quoteToken].value
+      );
     }
 
     // add margin of error to gas fee
-    gasFeeBN = gasFeeBN.mul(100).div(99)
+    gasFeeBN = gasFeeBN.mul(100).div(99);
 
     const makerVolumeFeeBN = quoteAmountBN
       .div(10000)
@@ -161,7 +161,7 @@ export default class APIArbitrumProvider extends APIProvider {
     } else {
       balanceBN = balanceBN.sub(gasFeeBN).sub(takerVolumeFeeBN);
     }
-    const delta = makerAmountBN.mul("1000").div(balanceBN).toNumber();
+    const delta = sellAmountBN.mul("1000").div(balanceBN).toNumber();
     if (delta > 1001) {
       // 100.1 %
       throw new Error(`Amount exceeds balance.`);
@@ -169,44 +169,49 @@ export default class APIArbitrumProvider extends APIProvider {
     // prevent dust issues
     if (delta > 999) {
       // 99.9 %
-      makerAmountBN = balanceBN;
+      sellAmountBN = balanceBN;
     }
 
-    const Order = {
-      makerAddress: this.accountState.address,
-      makerToken: makerToken,
-      takerToken: takerToken,
-      feeRecipientAddress: marketInfo.feeAddress,
-      makerAssetAmount: makerAmountBN.toString(),
-      takerAssetAmount: takerAmountBN.toString(),
-      makerVolumeFee: makerVolumeFeeBN.toString(),
-      takerVolumeFee: takerVolumeFeeBN.toString(),
-      gasFee: gasFeeBN.toString(),
-      expirationTimeSeconds: expirationTimeSeconds.toFixed(0),
-      salt: (Math.random() * 123456789).toFixed(0),
-    };
+    let domain, Order, types;
+    if (Number(marketInfo.contractVersion) === 5) {
+      Order = {
+        user: this.accountState.address,
+        sellToken: sellToken,
+        buyToken: buyToken,
+        feeRecipientAddress: marketInfo.feeAddress,
+        relayerAddress: marketInfo.relayerAddress,
+        sellAmount: sellAmountBN.toString(),
+        buyAmount: buyAmountBN.toString(),
+        makerVolumeFee: makerVolumeFeeBN.toString(),
+        takerVolumeFee: takerVolumeFeeBN.toString(),
+        gasFee: gasFeeBN.toString(),
+        expirationTimeSeconds: expirationTimeSeconds.toFixed(0),
+        salt: (Math.random() * 123456789).toFixed(0),
+      };
 
-    const domain = {
-      name: "ZigZag",
-      version: "4",
-      chainId: this.network,
-    };
+      domain = {
+        name: "ZigZag",
+        version: "5",
+        chainId: this.network,
+      };
 
-    const types = {
-      Order: [
-        { name: "makerAddress", type: "address" },
-        { name: "makerToken", type: "address" },
-        { name: "takerToken", type: "address" },
-        { name: "feeRecipientAddress", type: "address" },
-        { name: "makerAssetAmount", type: "uint256" },
-        { name: "takerAssetAmount", type: "uint256" },
-        { name: "makerVolumeFee", type: "uint256" },
-        { name: "takerVolumeFee", type: "uint256" },
-        { name: "gasFee", type: "uint256" },
-        { name: "expirationTimeSeconds", type: "uint256" },
-        { name: "salt", type: "uint256" },
-      ],
-    };
+      types = {
+        Order: [
+          { name: "user", type: "address" },
+          { name: "sellToken", type: "address" },
+          { name: "buyToken", type: "address" },
+          { name: "feeRecipientAddress", type: "address" },
+          { name: "relayerAddress", type: "address" },
+          { name: "sellAmount", type: "uint256" },
+          { name: "buyAmount", type: "uint256" },
+          { name: "makerVolumeFee", type: "uint256" },
+          { name: "takerVolumeFee", type: "uint256" },
+          { name: "gasFee", type: "uint256" },
+          { name: "expirationTimeSeconds", type: "uint256" },
+          { name: "salt", type: "uint256" },
+        ],
+      };
+    }
 
     const signer = await this.api.rollupProvider.getSigner();
     const signature = await signer._signTypedData(domain, types, Order);
@@ -326,5 +331,5 @@ export default class APIArbitrumProvider extends APIProvider {
   signMessage = async (message) => {
     const signer = await this.api.rollupProvider.getSigner();
     return await signer.signMessage(message);
-  }
+  };
 }
