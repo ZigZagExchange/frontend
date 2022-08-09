@@ -25,7 +25,7 @@ export default class APIProvider {
     this.websocketUrl = process.env.REACT_APP_ZIGZAG_WS;
 
     // set ws URL to staging server for test networks
-    if ([1000].includes(network) && process.env.REACT_APP_ZIGZAG_WS_STAGING) {
+    if ([1002].includes(network) && process.env.REACT_APP_ZIGZAG_WS_STAGING) {
       this.websocketUrl = process.env.REACT_APP_ZIGZAG_WS_STAGING;
     }
   }

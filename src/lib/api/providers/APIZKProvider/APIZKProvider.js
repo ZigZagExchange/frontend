@@ -295,7 +295,7 @@ export default class APIZKProvider extends APIProvider {
           token,
           ETH_ZKSYNC_BRIDGE.ethTozkSync,
           "ethereum",
-          this.network === 1000
+          this.network === 1002
             ? `https://goerli.zksync.io/explorer/accounts/${address}`
             : `https://zkscan.io/explorer/accounts/${address}`
         )
@@ -419,7 +419,7 @@ export default class APIZKProvider extends APIProvider {
           token,
           ZKSYNC_POLYGON_BRIDGE.zkSyncToPolygon,
           "zksync",
-          this.network === 1000
+          this.network === 1002
             ? `https://mumbai.polygonscan.com/address/${userAddress}#tokentxns`
             : `https://polygonscan.com/address/${userAddress}#tokentxns`
         )

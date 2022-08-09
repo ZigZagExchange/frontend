@@ -350,7 +350,7 @@ const BridgeContainer = () => {
           ["o", "b", "m"].includes(o[9])
         );
         if (
-          [1, 1000].includes(network) &&
+          [1, 1002].includes(network) &&
           fromNetwork.id === "zksync" &&
           openOrders.length > 0
         ) {

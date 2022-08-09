@@ -59,7 +59,7 @@ const networkLists = [
   },
   {
     text: "zkSync - Goerli",
-    value: 1000,
+    value: 1002,
     url: "#",
     selectedIcon: <CheckIcon />,
     image: zksyncLogo,
