@@ -471,7 +471,7 @@ export default function OrdersTable(props) {
                         color="foregroundHighEmphasis"
                         textAlign="right"
                       >
-                        {addComma(price.toPrecision(6) / 1)}
+                        {addComma(price?.toPrecision(6) / 1)}
                       </Text>
                     </td>
                   </tr>
@@ -490,9 +490,9 @@ export default function OrdersTable(props) {
                         color="foregroundHighEmphasis"
                         textAlign="right"
                       >
-                        {baseQuantity.toPrecision(6) / 1 -
-                          remaining.toPrecision(6) / 1}{" "}
-                        / {baseQuantity.toPrecision(6) / 1}&nbsp;
+                        {baseQuantity?.toPrecision(6) / 1 -
+                          remaining?.toPrecision(6) / 1}{" "}
+                        / {baseQuantity?.toPrecision(6) / 1}&nbsp;
                         {baseCurrency}
                       </Text>
                     </td>
@@ -778,7 +778,7 @@ export default function OrdersTable(props) {
                       font="primaryExtraSmallSemiBold"
                       color="foregroundHighEmphasis"
                     >
-                      {addComma(price.toPrecision(6) / 1)}
+                      {addComma(price?.toPrecision(6) / 1)}
                     </Text>
                   </td>
                   <td data-label="filled">
@@ -786,9 +786,9 @@ export default function OrdersTable(props) {
                       font="primaryExtraSmallSemiBold"
                       color="foregroundHighEmphasis"
                     >
-                      {baseQuantity.toPrecision(6) / 1 -
-                        remaining.toPrecision(6) / 1}{" "}
-                      / {baseQuantity.toPrecision(6) / 1}&nbsp;
+                      {baseQuantity?.toPrecision(6) / 1 -
+                        remaining?.toPrecision(6) / 1}{" "}
+                      / {baseQuantity?.toPrecision(6) / 1}&nbsp;
                       {baseCurrency}
                     </Text>
                   </td>
@@ -858,8 +858,8 @@ export default function OrdersTable(props) {
             if (feeamount && feetoken) {
               const displayFee =
                 feeamount > 9999
-                  ? feeamount.toFixed(0)
-                  : feeamount.toPrecision(4);
+                  ? feeamount?.toFixed(0)
+                  : feeamount?.toPrecision(4);
               feeText = `${displayFee} ${feetoken}`;
             }
             if (api.isZksyncChain()) {
@@ -1016,7 +1016,7 @@ export default function OrdersTable(props) {
                           color="foregroundHighEmphasis"
                           textAlign="right"
                         >
-                          {price.toPrecision(6) / 1}
+                          {price?.toPrecision(6) / 1}
                         </Text>
                       </td>
                     </tr>
@@ -1035,7 +1035,7 @@ export default function OrdersTable(props) {
                           color="foregroundHighEmphasis"
                           textAlign="right"
                         >
-                          {baseQuantity.toPrecision(6) / 1} {baseCurrency}
+                          {baseQuantity?.toPrecision(6) / 1} {baseCurrency}
                         </Text>
                       </td>
                     </tr>
@@ -1244,8 +1244,8 @@ export default function OrdersTable(props) {
             if (feeamount && feetoken) {
               const displayFee =
                 feeamount > 9999
-                  ? feeamount.toFixed(0)
-                  : feeamount.toPrecision(4);
+                  ? feeamount?.toFixed(0)
+                  : feeamount?.toPrecision(4);
               feeText = `${displayFee} ${feetoken}`;
             }
             if (api.isZksyncChain()) {
@@ -1361,7 +1361,7 @@ export default function OrdersTable(props) {
                     font="primaryExtraSmallSemiBold"
                     color="foregroundHighEmphasis"
                   >
-                    {price?.toPrecision(6) / 1}
+                    {price && price?.toPrecision(6) / 1}
                   </Text>
                 </td>
                 <td data-label="Fee">
