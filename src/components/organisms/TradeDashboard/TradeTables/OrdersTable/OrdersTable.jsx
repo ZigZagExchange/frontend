@@ -129,7 +129,7 @@ export default function OrdersTable(props) {
       .sort((a, b) => b[1] - a[1]);
   };
 
-  const getUserOrderIds = () => {
+  const getOpenUserOrderIds = () => {
     const userOrders = getUserOrders();
     const openOrders = userOrders.filter((o) =>
       ["o", "pf", "pm"].includes(o[9])
@@ -639,7 +639,7 @@ export default function OrdersTable(props) {
                     variant="outlined"
                     width="100px"
                     scale="md"
-                    onClick={() => api.cancelAllOrders(getUserOrderIds())}
+                    onClick={() => api.cancelAllOrders(getOpenUserOrderIds())}
                   >
                     Cancel All
                   </StyledButton>
@@ -1681,7 +1681,7 @@ export default function OrdersTable(props) {
               activeIndex={tab}
               onItemClick={(newIndex) => setTab(newIndex)}
             >
-              <Tab>Open Orders ({getUserOrders().length})</Tab>
+              <Tab>Open Orders ({getOpenUserOrderIds().length})</Tab>
               <Tab>Order History ({getFills().length})</Tab>
               <Tab>Balances</Tab>
             </StyledTabMenu>
