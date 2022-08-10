@@ -137,9 +137,6 @@ export default class APIArbitrumProvider extends APIProvider {
       );
     }
 
-    // add margin of error to gas fee
-    gasFeeBN = gasFeeBN.mul(100).div(99);
-
     const makerVolumeFeeBN = quoteAmountBN
       .div(10000)
       .mul(marketInfo.makerVolumeFee * 100);
