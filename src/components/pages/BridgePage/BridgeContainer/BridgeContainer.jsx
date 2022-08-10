@@ -310,9 +310,9 @@ const BridgeContainer = () => {
     const userBalance = getCurrencyBalance(swapCurrency);
     const max = getMax(swapCurrency, L2FeeToken);
     const bridgeAmount = inputValue - ZigZagFeeAmount;
-    
+
     if (!api.getCurrencyInfo(swapDetails.currency)) {
-      setFormErr('Loading token details...');
+      setFormErr("Loading token details...");
       return;
     }
 
@@ -401,7 +401,7 @@ const BridgeContainer = () => {
     L2FeeAmount,
     L2FeeToken,
     api.marketInfo,
-    balances[swapDetails.currency]
+    balances[swapDetails.currency],
   ]);
 
   const setSwapDetails = async (values) => {
