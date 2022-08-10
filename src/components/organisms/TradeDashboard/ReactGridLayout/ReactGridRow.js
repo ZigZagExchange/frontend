@@ -5,6 +5,7 @@ import { Responsive } from "react-grid-layout";
 import { default as WidthProvider } from "./ReactSizeMe";
 
 import { Row, Col } from "antd";
+import { rowHeight } from "./utils";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -34,6 +35,12 @@ const triggerWindowResize = () => {
 
 const GridLayoutRow = (props) => {
   //const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const [unitHeight, setUnitHeight] = useState(rowHeight());
+  console.log("unit Hiehg it", unitHeight);
+
+  useLayoutEffect(() => {
+    setUnitHeight(rowHeight());
+  }, [rowHeight()]);
 
   useLayoutEffect(() => {
     /*doWhenDocumentReadyStateIsComplete(() => {
@@ -58,6 +65,7 @@ const GridLayoutRow = (props) => {
       >
         <div>
           <ResponsiveGridLayout
+            rowHeight={unitHeight}
             className="layout"
             breakpoints={{
               xl: 1599,

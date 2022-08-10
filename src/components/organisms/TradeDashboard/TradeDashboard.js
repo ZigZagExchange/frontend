@@ -280,7 +280,6 @@ export function TradeDashboard() {
         lastPrices={lastPrices}
       />
       <GridLayoutRow
-        rowHeight={(window.innerHeight - 112) / 30}
         layouts={settings.layouts}
         autoSize={false}
         onChange={(_, layout) => {
