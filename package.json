@@ -126,7 +126,7 @@
     "workbox-webpack-plugin": "5.1.4",
     "ws": "^8.2.2",
     "yarn": "^1.22.19",
-    "zksync": "^0.12.1"
+    "zksync": "0.13.1"
   },
   "scripts": {
     "analyze": "source-map-explorer 'build/static/js/*.js'",

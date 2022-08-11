@@ -10,7 +10,9 @@ export default class APIArbitrumProvider extends APIProvider {
   evmCompatible = true;
   zksyncCompatible = false;
   _tokenInfo = {};
-  defaultMarket = "USDC-USDT";
+  defaultMarket = {
+    42161: "WETH-USDC",
+  }
 
   getAccountState = async () => {
     return this.accountState;
@@ -134,9 +136,6 @@ export default class APIArbitrumProvider extends APIProvider {
         this.api.balances[this.network][quoteToken].value
       );
     }
-
-    // add margin of error to gas fee
-    gasFeeBN = gasFeeBN.mul(100).div(99);
 
     const makerVolumeFeeBN = quoteAmountBN
       .div(10000)
