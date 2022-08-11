@@ -151,7 +151,7 @@ export const initialLayouts = () => {
         w: 20,
         h: upperHeight,
         x: 20,
-        y: upperHeight,
+        y: 20,
         i: "g",
       },
       {
