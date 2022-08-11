@@ -20,11 +20,16 @@ const AppRoutes = () => {
   const settings = useSelector(settingsSelector);
   const dispatch = useDispatch();
 
-  useEffect(() => {
+  const resetLayout = ( ) => {
     if (!settings.layoutsCustomized) {
       dispatch(resetTradeLayout());
     }
+  }
+
+  useEffect(() => {
     dispatch(setUISettings({ key: "editable", value: false }));
+    resetLayout();
+    window.addEventListener("resize", resetLayout);
   }, []);
 
   return (

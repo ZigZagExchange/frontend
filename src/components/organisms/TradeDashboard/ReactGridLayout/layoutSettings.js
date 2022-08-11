@@ -1,5 +1,9 @@
 import { rowHeight } from "./utils";
 
+function max(a, b) {
+  return  a>b?a:b;
+}
+
 export const initialLayouts = () => {
   let unitHeight = rowHeight;
   let upperHeight;
@@ -27,7 +31,7 @@ export const initialLayouts = () => {
       },
       {
         w: 1000,
-        h: 10,
+        h: max(10, 30-upperHeight),
         x: 0,
         y: upperHeight,
         i: "d",
@@ -64,7 +68,7 @@ export const initialLayouts = () => {
       },
       {
         w: 40,
-        h: 10,
+        h: max(10, 30-upperHeight),
         x: 0,
         y: upperHeight,
         i: "d",
@@ -101,7 +105,7 @@ export const initialLayouts = () => {
       },
       {
         w: 40,
-        h: 10,
+        h: max(10, 30-upperHeight),
         x: 0,
         y: upperHeight,
         i: "d",
@@ -188,7 +192,7 @@ export const stackedLayouts = () => {
       },
       {
         w: 1000,
-        h: 10,
+        h: max(10, 30-upperHeight),
         x: 0,
         y: upperHeight,
         i: "d",
@@ -225,7 +229,7 @@ export const stackedLayouts = () => {
       },
       {
         w: 40,
-        h: 10,
+        h: max(10, 30-upperHeight),
         x: 0,
         y: upperHeight,
         i: "d",
@@ -262,7 +266,7 @@ export const stackedLayouts = () => {
       },
       {
         w: 40,
-        h: 10,
+        h: max(10, 30-upperHeight),
         x: 0,
         y: upperHeight,
         i: "d",
