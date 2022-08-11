@@ -288,6 +288,9 @@ export function TradeDashboard() {
         onDragStart={() => {
           dispatch(setUISettings({ key: "layoutsCustomized", value: true }));
         }}
+        onResizeStart={() => {
+          dispatch(setUISettings({ key: "layoutsCustomized", value: true }));
+        }}
         margin={[0, 0]}
         isDraggable={settings.editable}
         isResizable={settings.editable}

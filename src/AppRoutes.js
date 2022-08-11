@@ -21,7 +21,7 @@ const AppRoutes = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (!settings.layouts) {
+    if (!settings.layoutsCustomized) {
       dispatch(resetTradeLayout());
     }
     dispatch(setUISettings({ key: "editable", value: false }));
