@@ -1,3 +1,1 @@
-export const rowHeight =()=>{
-   return (window.innerHeight - 112) / 30;
-} 
+export const rowHeight = (window.innerHeight - 112) / 30;

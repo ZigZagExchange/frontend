@@ -1,9 +1,13 @@
 import { rowHeight } from "./utils";
 
 export const initialLayouts = () => {
-  let unitHeight = rowHeight();
-  let upperHeight = Math.ceil(570 / unitHeight),
-    xxsUpperHeight = Math.ceil(470 / unitHeight);
+  let unitHeight = rowHeight;
+  let upperHeight;
+  if(window.innerWidth < 992 || window.innerHeight < 875) {
+    upperHeight= Math.ceil(470 / unitHeight);
+  } else {
+    upperHeight= Math.ceil(570 / unitHeight);
+  }
 
   return {
     xl: [
@@ -23,7 +27,7 @@ export const initialLayouts = () => {
       },
       {
         w: 1000,
-        h: 30 - upperHeight,
+        h: 10,
         x: 0,
         y: upperHeight,
         i: "d",
@@ -60,7 +64,7 @@ export const initialLayouts = () => {
       },
       {
         w: 40,
-        h: 30 - upperHeight,
+        h: 10,
         x: 0,
         y: upperHeight,
         i: "d",
@@ -97,7 +101,7 @@ export const initialLayouts = () => {
       },
       {
         w: 40,
-        h: 30 - upperHeight,
+        h: 10,
         x: 0,
         y: upperHeight,
         i: "d",
@@ -120,7 +124,7 @@ export const initialLayouts = () => {
     xxs: [
       {
         w: 20,
-        h: xxsUpperHeight,
+        h: upperHeight,
         x: 0,
         y: 20,
         i: "a",
@@ -141,9 +145,9 @@ export const initialLayouts = () => {
       },
       {
         w: 20,
-        h: xxsUpperHeight,
+        h: upperHeight,
         x: 20,
-        y: xxsUpperHeight,
+        y: upperHeight,
         i: "g",
       },
       {
@@ -158,9 +162,13 @@ export const initialLayouts = () => {
 };
 
 export const stackedLayouts = () => {
-  let unitHeight = rowHeight();
-  let upperHeight = Math.ceil(570 / unitHeight),
-    xxsUpperHeight = Math.ceil(470 / unitHeight);
+  let unitHeight = rowHeight;
+  let upperHeight;
+  if(window.innerWidth < 992 || window.innerHeight < 875) {
+    upperHeight= Math.ceil(470 / unitHeight);
+  } else {
+    upperHeight= Math.ceil(570 / unitHeight);
+  }
 
   return {
     xl: [
@@ -180,7 +188,7 @@ export const stackedLayouts = () => {
       },
       {
         w: 1000,
-        h: 30 - upperHeight,
+        h: 10,
         x: 0,
         y: upperHeight,
         i: "d",
@@ -217,7 +225,7 @@ export const stackedLayouts = () => {
       },
       {
         w: 40,
-        h: 30 - upperHeight,
+        h: 10,
         x: 0,
         y: upperHeight,
         i: "d",
@@ -254,7 +262,7 @@ export const stackedLayouts = () => {
       },
       {
         w: 40,
-        h: 30 - upperHeight,
+        h: 10,
         x: 0,
         y: upperHeight,
         i: "d",
@@ -277,7 +285,7 @@ export const stackedLayouts = () => {
     xxs: [
       {
         w: 40,
-        h: xxsUpperHeight,
+        h: upperHeight,
         x: 0,
         y: 20,
         i: "a",
@@ -298,14 +306,14 @@ export const stackedLayouts = () => {
       },
       {
         w: 40,
-        h: xxsUpperHeight,
+        h: upperHeight,
         x: 20,
         y: 20,
         i: "g",
       },
       {
         w: 40,
-        h: xxsUpperHeight,
+        h: upperHeight,
         x: 20,
         y: 30,
         i: "h",

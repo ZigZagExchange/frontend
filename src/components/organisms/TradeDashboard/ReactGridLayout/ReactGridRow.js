@@ -35,12 +35,12 @@ const triggerWindowResize = () => {
 
 const GridLayoutRow = (props) => {
   //const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-  const [unitHeight, setUnitHeight] = useState(rowHeight());
+  const [unitHeight, setUnitHeight] = useState(rowHeight);
   console.log("unit Hiehg it", unitHeight);
 
   useLayoutEffect(() => {
-    setUnitHeight(rowHeight());
-  }, [rowHeight()]);
+    setUnitHeight(rowHeight);
+  }, [rowHeight]);
 
   useLayoutEffect(() => {
     /*doWhenDocumentReadyStateIsComplete(() => {
