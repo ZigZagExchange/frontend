@@ -408,8 +408,9 @@ class SpotForm extends React.Component {
       }
     );
 
+    let success = false;
     try {
-      await api.approveExchangeContract(
+      success = await api.approveExchangeContract(
         token,
         0 // amount = 0 ==> MAX_ALLOWANCE
       );
@@ -419,9 +420,11 @@ class SpotForm extends React.Component {
     }
 
     toast.dismiss(orderApproveToast);
-    toast.success(`${marketInfo.baseAsset.symbol} approved.`, {
-      toastId: `${marketInfo.baseAsset.symbol} approved.`,
-    });
+    if (success) {
+      toast.success(`${token} approved.`, {
+        toastId: `${token} approved.`,
+      });
+    }
     newstate = { ...this.state };
     this.setState(newstate);
   }
@@ -731,18 +734,12 @@ class SpotForm extends React.Component {
       this.props.orderType !== prevProps.orderType ||
       this.props.side !== prevProps.side
     ) {
-      const newState = { ...this.state };
-      if (this.props.quoteChanged) {
-        // for buy quoteAmount should be fixed
-        newState.baseAmount = newState.quoteAmount / this.currentPrice();
-        newState.baseAmount =
-          newState.baseAmount === 0 ? "" : newState.baseAmount;
-      } else {
-        // for sell baseAmount should be fixed
-        newState.quoteAmount = this.currentPrice() * newState.baseAmount;
-        newState.quoteAmount =
-          newState.quoteAmount === 0 ? "" : newState.quoteAmount;
-      }
+      const newState = {
+        ...this.state,
+        baseAmount: "",
+        quoteAmount: "",
+        price: formatPrice(this.props.lastPrice),
+      };
       this.setState(newState);
     }
 
@@ -756,11 +753,11 @@ class SpotForm extends React.Component {
       newState.updatePrice = true;
       this.setState(newState);
     }
-    if (
-      this.state.updatePrice || 
-      (!this.state.price && this.props.lastPrice)
-    ) {
-      this.setState({ price: formatPrice(this.props.lastPrice), updatePrice: false });
+    if (this.state.updatePrice || (!this.state.price && this.props.lastPrice)) {
+      this.setState({
+        price: formatPrice(this.props.lastPrice),
+        updatePrice: false,
+      });
     }
   }
 
@@ -889,22 +886,26 @@ class SpotForm extends React.Component {
         color="foregroundMediumEmphasis"
         textAlign="right"
       >
-        {addComma(
-          formatToken(quoteBalance, marketInfo && marketInfo.quoteAsset?.symbol)
-        )}{" "}
+        {marketInfo &&
+          addComma(
+            formatToken(
+              quoteBalance,
+              marketInfo && marketInfo.quoteAsset?.symbol
+            )
+          )}{" "}
         {marketInfo && marketInfo.quoteAsset?.symbol}
       </Text>
     );
-
     const baseBalanceHtml = (
       <Text
         font="primaryExtraSmallSemiBold"
         color="foregroundMediumEmphasis"
         textAlign="right"
       >
-        {addComma(
-          formatToken(baseBalance, marketInfo && marketInfo.baseAsset?.symbol)
-        )}{" "}
+        {marketInfo &&
+          addComma(
+            formatToken(baseBalance, marketInfo && marketInfo.baseAsset?.symbol)
+          )}{" "}
         {marketInfo && marketInfo.baseAsset?.symbol}
       </Text>
     );
@@ -915,9 +916,7 @@ class SpotForm extends React.Component {
       approveNeeded = false;
     if (this.props.side === "b") {
       buttonType = "BUY";
-      if (
-        (quoteAmount <= quoteBalance) && (quoteAmount > quoteAllowance)
-      ) {
+      if (quoteAmount <= quoteBalance && quoteAmount > quoteAllowance) {
         buttonText = `Approve ${marketInfo && marketInfo.quoteAsset?.symbol}`;
         if (api.isEVMChain) approveNeeded = true;
       } else {
@@ -949,9 +948,7 @@ class SpotForm extends React.Component {
       );
     } else if (this.props.side === "s") {
       buttonType = "SELL";
-      if (
-        (baseAmount <= baseBalance) && (baseAmount > baseAllowance)
-      ) {
+      if (baseAmount <= baseBalance && baseAmount > baseAllowance) {
         buttonText = `Approve ${marketInfo && marketInfo.baseAsset?.symbol}`;
         if (api.isEVMChain) approveNeeded = true;
       } else {
@@ -1015,20 +1012,22 @@ class SpotForm extends React.Component {
                 disabled={!this.props.user.id}
               ></IconButton>
             )}
-            <InputField
-              type="text"
-              pattern="\d+(?:[.,]\d+)?"
-              placeholder={`Price (${
-                marketInfo && marketInfo.baseAsset?.symbol
-              }-${marketInfo && marketInfo.quoteAsset?.symbol})`}
-              value={
-                this.props.orderType === "limit"
-                  ? this.state.price
-                  : addComma(formatPrice(this.currentPrice()))
-              }
-              onChange={this.updatePrice.bind(this)}
-              disabled={this.props.orderType === "market"}
-            />
+            {this.currentPrice() !== 0 && (
+              <InputField
+                type="text"
+                pattern="\d+(?:[.,]\d+)?"
+                placeholder={`Price (${
+                  marketInfo && marketInfo.baseAsset?.symbol
+                }-${marketInfo && marketInfo.quoteAsset?.symbol})`}
+                value={
+                  this.props.orderType === "limit"
+                    ? this.state.price
+                    : addComma(formatPrice(this.currentPrice()))
+                }
+                onChange={this.updatePrice.bind(this)}
+                disabled={this.props.orderType === "market"}
+              />
+            )}
             {this.props.orderType !== "market" && (
               <IconButton
                 variant="secondary"
@@ -1051,7 +1050,9 @@ class SpotForm extends React.Component {
               type="text"
               pattern="\d+(?:[.,]\d+)?"
               placeholder={`Amount (${
-                marketInfo && marketInfo.baseAsset?.symbol
+                marketInfo && marketInfo.baseAsset.symbol
+                  ? marketInfo.baseAsset.symbol
+                  : ""
               })`}
               value={
                 this.state.baseAmount !== ""
@@ -1088,7 +1089,9 @@ class SpotForm extends React.Component {
               type="text"
               pattern="\d+(?:[.,]\d+)?"
               placeholder={`Total (${
-                marketInfo && marketInfo.quoteAsset?.symbol
+                marketInfo && marketInfo.quoteAsset.symbol
+                  ? marketInfo.quoteAsset.symbol
+                  : ""
               })`}
               value={
                 this.state.quoteAmount !== ""
@@ -1144,15 +1147,14 @@ class SpotForm extends React.Component {
                 width="100%"
                 scale="imd"
                 disabled={
-                  !approveNeeded && (
-                    this.isInvalidNumber(this.state.quoteAmount) ||
+                  !approveNeeded &&
+                  (this.isInvalidNumber(this.state.quoteAmount) ||
                     this.isInvalidNumber(this.state.baseAmount) ||
                     this.isInvalidNumber(this.currentPrice()) ||
                     (this.state.quoteAmount > this.getQuoteBalance() &&
                       this.props.side === "b") ||
                     (this.state.baseAmount > this.getBaseBalance() &&
-                      this.props.side === "s")
-                  )                  
+                      this.props.side === "s"))
                 }
                 onClick={
                   approveNeeded

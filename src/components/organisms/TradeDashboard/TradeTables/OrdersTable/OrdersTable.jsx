@@ -7,9 +7,7 @@ import styled from "styled-components";
 import loadingGif from "assets/icons/loading.svg";
 
 import FillCard from "./FillCard";
-import {
-  balancesSelector,
-} from "lib/store/features/api/apiSlice";
+import { balancesSelector } from "lib/store/features/api/apiSlice";
 import api from "lib/api";
 import { formatDate, formatDateTime, formatToken, addComma } from "lib/utils";
 import { Tab } from "components/molecules/TabMenu";
@@ -130,12 +128,14 @@ export default function OrdersTable(props) {
       )
       .sort((a, b) => b[1] - a[1]);
   };
-  
-  const getUserOrderIds = () => {
+
+  const getOpenUserOrderIds = () => {
     const userOrders = getUserOrders();
-    const openOrders = userOrders.filter(o => ['o','pf','pm'].includes(o[9]))
-    return openOrders.map(o => o[1]);
-  }
+    const openOrders = userOrders.filter((o) =>
+      ["o", "pf", "pm"].includes(o[9])
+    );
+    return openOrders.map((o) => o[1]);
+  };
 
   const isOpenStatus = (orders) => {
     return orders.findIndex((order) => order[9] === "o") !== -1;
@@ -471,7 +471,7 @@ export default function OrdersTable(props) {
                         color="foregroundHighEmphasis"
                         textAlign="right"
                       >
-                        {addComma(price.toPrecision(6) / 1)}
+                        {addComma(price?.toPrecision(6) / 1)}
                       </Text>
                     </td>
                   </tr>
@@ -490,9 +490,9 @@ export default function OrdersTable(props) {
                         color="foregroundHighEmphasis"
                         textAlign="right"
                       >
-                        {baseQuantity.toPrecision(6) / 1 -
-                          remaining.toPrecision(6) / 1}{" "}
-                        / {baseQuantity.toPrecision(6) / 1}&nbsp;
+                        {baseQuantity?.toPrecision(6) / 1 -
+                          remaining?.toPrecision(6) / 1}{" "}
+                        / {baseQuantity?.toPrecision(6) / 1}&nbsp;
                         {baseCurrency}
                       </Text>
                     </td>
@@ -632,18 +632,19 @@ export default function OrdersTable(props) {
                 </Text>
               </HeaderWrapper>
             </th>
-            {isOpenStatus(getUserOrders()) && !props.settings?.showCancelOrders && (
-              <th className="w-36">
-                <StyledButton
-                  variant="outlined"
-                  width="100px"
-                  scale="md"
-                  onClick={() => api.cancelAllOrders(getUserOrderIds())}
-                >
-                  Cancel All
-                </StyledButton>
-              </th>
-            )}
+            {isOpenStatus(getUserOrders()) &&
+              !props.settings?.showCancelOrders && (
+                <th className="w-36">
+                  <StyledButton
+                    variant="outlined"
+                    width="100px"
+                    scale="md"
+                    onClick={() => api.cancelAllOrders(getOpenUserOrderIds())}
+                  >
+                    Cancel All
+                  </StyledButton>
+                </th>
+              )}
           </tr>
         </thead>
         <tbody>
@@ -777,7 +778,7 @@ export default function OrdersTable(props) {
                       font="primaryExtraSmallSemiBold"
                       color="foregroundHighEmphasis"
                     >
-                      {addComma(price.toPrecision(6) / 1)}
+                      {addComma(price?.toPrecision(6) / 1)}
                     </Text>
                   </td>
                   <td data-label="filled">
@@ -785,9 +786,9 @@ export default function OrdersTable(props) {
                       font="primaryExtraSmallSemiBold"
                       color="foregroundHighEmphasis"
                     >
-                      {baseQuantity.toPrecision(6) / 1 -
-                        remaining.toPrecision(6) / 1}{" "}
-                      / {baseQuantity.toPrecision(6) / 1}&nbsp;
+                      {baseQuantity?.toPrecision(6) / 1 -
+                        remaining?.toPrecision(6) / 1}{" "}
+                      / {baseQuantity?.toPrecision(6) / 1}&nbsp;
                       {baseCurrency}
                     </Text>
                   </td>
@@ -818,7 +819,9 @@ export default function OrdersTable(props) {
                     )}
                   </td>
                   {isOpenStatus(getUserOrders()) &&
-                    !props.settings?.showCancelOrders && <td className="w-36"></td>}
+                    !props.settings?.showCancelOrders && (
+                      <td className="w-36"></td>
+                    )}
                 </tr>
               </>
             );
@@ -855,8 +858,8 @@ export default function OrdersTable(props) {
             if (feeamount && feetoken) {
               const displayFee =
                 feeamount > 9999
-                  ? feeamount.toFixed(0)
-                  : feeamount.toPrecision(4);
+                  ? feeamount?.toFixed(0)
+                  : feeamount?.toPrecision(4);
               feeText = `${displayFee} ${feetoken}`;
             }
             if (api.isZksyncChain()) {
@@ -1013,7 +1016,7 @@ export default function OrdersTable(props) {
                           color="foregroundHighEmphasis"
                           textAlign="right"
                         >
-                          {price.toPrecision(6) / 1}
+                          {price?.toPrecision(6) / 1}
                         </Text>
                       </td>
                     </tr>
@@ -1032,7 +1035,7 @@ export default function OrdersTable(props) {
                           color="foregroundHighEmphasis"
                           textAlign="right"
                         >
-                          {baseQuantity.toPrecision(6) / 1} {baseCurrency}
+                          {baseQuantity?.toPrecision(6) / 1} {baseCurrency}
                         </Text>
                       </td>
                     </tr>
@@ -1241,8 +1244,8 @@ export default function OrdersTable(props) {
             if (feeamount && feetoken) {
               const displayFee =
                 feeamount > 9999
-                  ? feeamount.toFixed(0)
-                  : feeamount.toPrecision(4);
+                  ? feeamount?.toFixed(0)
+                  : feeamount?.toPrecision(4);
               feeText = `${displayFee} ${feetoken}`;
             }
             if (api.isZksyncChain()) {
@@ -1318,7 +1321,6 @@ export default function OrdersTable(props) {
               default:
                 break;
             }
-
             return (
               <tr key={fillid}>
                 <td data-label="Time">
@@ -1350,7 +1352,7 @@ export default function OrdersTable(props) {
                     font="primaryExtraSmallSemiBold"
                     color="foregroundHighEmphasis"
                   >
-                    {baseQuantity.toPrecision(6) / 1} {baseCurrency}
+                    {baseQuantity?.toPrecision(6) / 1} {baseCurrency}
                   </Text>
                 </td>
                 <td data-label="Price">
@@ -1358,7 +1360,7 @@ export default function OrdersTable(props) {
                     font="primaryExtraSmallSemiBold"
                     color="foregroundHighEmphasis"
                   >
-                    {price.toPrecision(6) / 1}
+                    {price && parseFloat(price)?.toPrecision(6) / 1}
                   </Text>
                 </td>
                 <td data-label="Fee">
@@ -1678,7 +1680,7 @@ export default function OrdersTable(props) {
               activeIndex={tab}
               onItemClick={(newIndex) => setTab(newIndex)}
             >
-              <Tab>Open Orders ({getUserOrders().length})</Tab>
+              <Tab>Open Orders ({getOpenUserOrderIds().length})</Tab>
               <Tab>Order History ({getFills().length})</Tab>
               <Tab>Balances</Tab>
             </StyledTabMenu>

@@ -4,6 +4,10 @@ import { formatPrice } from "lib/utils";
 import api from "lib/api";
 import { getLayout } from "lib/helpers/storage/layouts";
 import FillCard from "components/organisms/TradeDashboard/TradeTables/OrdersTable/FillCard";
+import {
+  initialLayouts,
+  stackedLayouts,
+} from "components/organisms/TradeDashboard/ReactGridLayout/layoutSettings";
 
 const makeScopeUser = (state) => `${state.network}-${state.userId}`;
 const makeScopeMarket = (state) => `${state.network}-${state.currentMarket}`;
@@ -19,6 +23,9 @@ const initialUISettings = {
   hideBalance: false,
   hideGuidePopup: false,
   disableTradeIDCard: false,
+  layouts: initialLayouts,
+  editable: false,
+  hideLayoutGuidePopup: false,
 };
 
 export const apiSlice = createSlice({
@@ -27,7 +34,7 @@ export const apiSlice = createSlice({
     network: 1,
     userId: null,
     layout: getLayout() || 0,
-    currentMarket: api.apiProvider.defaultMarket,
+    currentMarket: api.apiProvider.defaultMarket[1],
     marketFills: {},
     bridgeReceipts: [],
     lastPrices: {},
@@ -676,7 +683,10 @@ export const apiSlice = createSlice({
       state.settings[payload.key] = payload.value;
     },
     resetUISettings(state) {
-      state.settings = initialUISettings;
+      state.settings = {
+        ...initialUISettings,
+        layouts: state.settings.layouts,
+      };
     },
     setSlippageValue(state, { payload }) {
       state.slippageValue = payload.value;
@@ -712,6 +722,14 @@ export const apiSlice = createSlice({
         return fill;
       });
     },
+    resetTradeLayout(state) {
+      if (!state.settings.stackOrderbook) {
+        state.settings.layouts = stackedLayouts;
+      } else {
+        state.settings.layouts = initialLayouts;
+      }
+      state.settings.layoutsCustomized = false;
+    },
   },
 });
 
@@ -732,6 +750,7 @@ export const {
   resetUISettings,
   setSlippageValue,
   setServerDelta,
+  resetTradeLayout,
 } = apiSlice.actions;
 
 export const layoutSelector = (state) => state.api.layout;

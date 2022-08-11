@@ -44,25 +44,25 @@ const langList = [
 
 const networkLists = [
   {
-    text: "zkSync - Mainnet",
+    text: "zkSync",
     value: 1,
     url: "#",
     selectedIcon: <CheckIcon />,
     image: zksyncLogo,
   },
   {
-    text: "zkSync - Rinkeby",
-    value: 1000,
-    url: "#",
-    selectedIcon: <CheckIcon />,
-    image: zksyncLogo,
-  },
-  {
-    text: "Arbitrum (alpha)",
+    text: "Arbitrum",
     value: 42161,
     url: "#",
     selectedIcon: <CheckIcon />,
     image: arbitrumLogo,
+  },
+  {
+    text: "zkSync - Goerli",
+    value: 1002,
+    url: "#",
+    selectedIcon: <CheckIcon />,
+    image: zksyncLogo,
   },
 ];
 

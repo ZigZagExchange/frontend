@@ -30,7 +30,12 @@ const BooksWrapper = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
+  height: 100%;
   gap: 8px;
+
+  table {
+    height: ${({ isStack }) => (!isStack ? "100%" : "")};
+  }
 `;
 
 const HeaderWrapper = styled.div`
@@ -45,11 +50,13 @@ const TableWrapper = styled.div`
   display: flex;
   flex-direction: row;
   width: 100%;
+  height: ${({ isStack }) => (!isStack ? "calc(100% - 80px)" : "auto")};
   gap: 8px;
 `;
 
 const Divider = styled.div`
-  height: 1px;
+  // height: 1px;
+  padding-top: 1px;
   margin-right: 2px;
   background: ${({ theme }) => theme.colors.foreground400};
 `;
@@ -158,7 +165,7 @@ export default function OrdersBook(props) {
                 <>
                   <TradePriceTable
                     head
-                    className="trade_table_asks sell-side"
+                    adClass="trade_table_asks sell-side trade_tables_all"
                     useGradient={!props.settings?.disableOrderBookFlash}
                     priceTableData={props.askBins}
                     currentMarket={props.currentMarket}
@@ -174,6 +181,7 @@ export default function OrdersBook(props) {
                   />
                   <Divider />
                   <TradePriceTable
+                    adClass="trade_tables_all"
                     useGradient={!props.settings?.disableOrderBookFlash}
                     currentMarket={props.currentMarket}
                     priceTableData={props.bidBins}
@@ -247,7 +255,9 @@ export default function OrdersBook(props) {
                       marketSummary={props.marketSummary}
                       marketInfo={props.marketInfo}
                     />
-                    <OrderFooterWrapper isStack={props.settings?.stackOrderbook}>
+                    <OrderFooterWrapper
+                      isStack={props.settings?.stackOrderbook}
+                    >
                       <OrderFooterRight>
                         <OrderButtonWrapper
                           onClick={() => {
@@ -297,7 +307,9 @@ export default function OrdersBook(props) {
                       marketSummary={props.marketSummary}
                       marketInfo={props.marketInfo}
                     />
-                    <OrderFooterWrapper isStack={props.settings?.stackOrderbook}>
+                    <OrderFooterWrapper
+                      isStack={props.settings?.stackOrderbook}
+                    >
                       <OrderFooterRight>
                         <OrderButtonWrapper
                           onClick={() => {
@@ -346,7 +358,9 @@ export default function OrdersBook(props) {
                       marketSummary={props.marketSummary}
                       marketInfo={props.marketInfo}
                     />
-                    <OrderFooterWrapper isStack={props.settings?.stackOrderbook}>
+                    <OrderFooterWrapper
+                      isStack={props.settings?.stackOrderbook}
+                    >
                       <OrderFooterRight>
                         <OrderButtonWrapper
                           onClick={() => {
