@@ -126,10 +126,10 @@ export default class APIZKProvider extends APIProvider {
         const tokens = Object.keys(balances);
         const result = tokens.map(async (token) => {
           const tokenInfo = await this.api.getCurrencyInfo(token);
-          if (tokenInfo.enabledForFees) {
-            const priceInfo = tokenInfo.usdPrice;
+          if (tokenInfo?.enabledForFees && tokenInfo?.usdPrice) {
+            const price = Number(tokenInfo.usdPrice);
             const usdValue =
-              (priceInfo.price * balances[token]) / 10 ** tokenInfo.decimals;
+              price * (balances[token] /10 ** tokenInfo.decimals);
             if (usdValue > maxValue) {
               maxValue = usdValue;
               feeToken = token;
