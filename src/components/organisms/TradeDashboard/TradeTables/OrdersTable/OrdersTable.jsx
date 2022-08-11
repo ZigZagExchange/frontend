@@ -1321,7 +1321,6 @@ export default function OrdersTable(props) {
               default:
                 break;
             }
-
             return (
               <tr key={fillid}>
                 <td data-label="Time">
@@ -1361,7 +1360,7 @@ export default function OrdersTable(props) {
                     font="primaryExtraSmallSemiBold"
                     color="foregroundHighEmphasis"
                   >
-                    {price && price?.toPrecision(6) / 1}
+                    {price && parseFloat(price)?.toPrecision(6) / 1}
                   </Text>
                 </td>
                 <td data-label="Fee">
