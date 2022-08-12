@@ -638,6 +638,19 @@ const BridgeContainer = () => {
     setFromAmounts(0);
   };
 
+  const filterSmallBalances = (balance, currency) => {
+    const usdPrice = coinEstimator(currency);
+    const usd_balance = usdPrice * balance;
+
+    let b = 0;
+    if (usd_balance < 0.02) {
+      b = "0.00";
+    } else {
+      b = balance;
+    }
+    return b;
+  };
+
   const fromTokenOptions = useMemo(() => {
     if (sellTokenList.length > 0) {
       let t = sellTokenList;
@@ -672,7 +685,10 @@ const BridgeContainer = () => {
         return {
           id: index,
           name: item,
-          balance: balances[item]?.valueReadable,
+          balance: filterSmallBalances(
+            balances[item]?.valueReadable,
+            swapDetails.currency
+          ),
           price: `${price}`,
           isFastWithdraw: isFastWithdraw,
         };
