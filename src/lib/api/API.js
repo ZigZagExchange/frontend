@@ -2,7 +2,7 @@ import Web3 from "web3";
 import { createIcon } from "@download/blockies";
 import Web3Modal from "web3modal";
 import Emitter from "tiny-emitter";
-import { ethers, constants as ethersConstants } from "ethers";
+import { ethers } from "ethers";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import { getENSName } from "lib/ens";
 import { formatAmount } from "lib/utils";
@@ -22,7 +22,7 @@ import get from "lodash/get";
 
 const chainMap = {
   "0x1": 1,
-  "0x5": 1002,
+  "0x5": 421613,
   "0xa4b1": 42161,
 };
 
@@ -112,54 +112,73 @@ export default class API extends Emitter {
         )
     );
 
-    if (chainName === "arbitrum") {
-      this.web3Modal = new Web3Modal({
-        network: chainName,
-        cacheProvider: true,
-        theme: "dark",
-        providerOptions: {
-          walletconnect: {
-            package: WalletConnectProvider,
-            options: {
-              rpc: {
-              42161: `https://arbitrum-mainnet.infura.io/v3/${this.infuraId}`,
+    switch (chainName) {
+      case "arbitrum":
+        this.web3Modal = new Web3Modal({
+          network: chainName,
+          cacheProvider: true,
+          theme: "dark",
+          providerOptions: {
+            walletconnect: {
+              package: WalletConnectProvider,
+              options: {
+                rpc: {
+                42161: `https://arbitrum-mainnet.infura.io/v3/${this.infuraId}`,
+                },
+                infuraId: this.infuraId,
               },
-              infuraId: this.infuraId,
             },
           },
-        },
-      });
-    } else {
-      this.web3Modal = new Web3Modal({
-        network: chainName,
-        cacheProvider: true,
-        theme: "dark",
-        providerOptions: {
-          walletconnect: {
-            package: WalletConnectProvider,
-            options: {
-              infuraId: this.infuraId,
+        });
+        break;
+      case "arbitrum-goerli":
+        this.web3Modal = new Web3Modal({
+          network: chainName,
+          cacheProvider: true,
+          theme: "dark",
+          providerOptions: {
+            walletconnect: {
+              package: WalletConnectProvider,
+              options: {
+                rpc: {
+                  421613: `https://goerli-rollup.arbitrum.io/rpc`,
+                }
+              },
             },
           },
-          "custom-argent": {
-            display: {
-              logo: "https://images.prismic.io/argentwebsite/313db37e-055d-42ee-9476-a92bda64e61d_logo.svg?auto=format%2Ccompress&fit=max&q=50",
-              name: "Argent zkSync",
-              description: "Connect to your Argent zkSync wallet",
+        });
+        break;
+      default:
+        this.web3Modal = new Web3Modal({
+          network: chainName,
+          cacheProvider: true,
+          theme: "dark",
+          providerOptions: {
+            walletconnect: {
+              package: WalletConnectProvider,
+              options: {
+                infuraId: this.infuraId,
+              },
             },
-            package: WalletConnectProvider,
-            options: {
-              infuraId: this.infuraId,
-            },
-            connector: async (ProviderPackage, options) => {
-              const provider = new ProviderPackage(options);
-              await provider.enable();
-              this.isArgent = true;
-              return provider;
+            "custom-argent": {
+              display: {
+                logo: "https://images.prismic.io/argentwebsite/313db37e-055d-42ee-9476-a92bda64e61d_logo.svg?auto=format%2Ccompress&fit=max&q=50",
+                name: "Argent zkSync",
+                description: "Connect to your Argent zkSync wallet",
+              },
+              package: WalletConnectProvider,
+              options: {
+                infuraId: this.infuraId,
+              },
+              connector: async (ProviderPackage, options) => {
+                const provider = new ProviderPackage(options);
+                await provider.enable();
+                this.isArgent = true;
+                return provider;
+              },
             },
           },
-        },
-      });
+        });
     }
 
     this.getAccountState().catch((err) => {
@@ -311,6 +330,20 @@ export default class API extends Emitter {
           },
           rpcUrls: ["https://arb1.arbitrum.io/rpc"],
           blockExplorerUrls: ["https://arbiscan.io/"],
+        };
+        break;
+      case 421613:
+        ethereumChainId = "0x66EED";
+        ethereumChainInfo = {
+          chainId: "0x66EED",
+          chainName: "Arbitrum - Goerli",
+          nativeCurrency: {
+            name: "Arbitrum Coin",
+            symbol: "ETH",
+            decimals: 18,
+          },
+          rpcUrls: ["https://goerli-rollup.arbitrum.io/rpc"],
+          blockExplorerUrls: ["https://goerli-rollup-explorer.arbitrum.io/"],
         };
         break;
       default:
@@ -515,6 +548,7 @@ export default class API extends Emitter {
       case 42161:
         return `https://polygon-mainnet.infura.io/v3/${this.infuraId}`;
       case 1002:
+      case 421613:
         return `https://polygon-mumbai.infura.io/v3/${this.infuraId}`;
       default:
         throw new Error(`getPolygonUrl network: ${network} not understood.`);
@@ -527,6 +561,7 @@ export default class API extends Emitter {
       case 42161:
         return "0x89";
       case 1002:
+      case 421613:
         return "0x13881";
       default:
         throw new Error(
@@ -541,6 +576,7 @@ export default class API extends Emitter {
       case 42161:
         return POLYGON_MAINNET_WETH_ADDRESS;
       case 1002:
+      case 421613:
         return POLYGON_MUMBAI_WETH_ADDRESS;
       default:
         throw new Error(
@@ -652,8 +688,10 @@ export default class API extends Emitter {
         return "goerli";
       case 42161:
         return "arbitrum";
+      case 421613:
+        return "arbitrum-goerli";
       default:
-        return null;
+        return;
     }
   };
 
@@ -663,9 +701,10 @@ export default class API extends Emitter {
       case 42161:
         return "mainnet";
       case 1002:
+      case 421613:
         return "goerli";
       default:
-        return null;
+        return;
     }
   };
 
@@ -676,10 +715,13 @@ export default class API extends Emitter {
   getNetworkDisplayName = (network) => {
     switch (network) {
       case 1:
-      case 1002:
         return "zkSync";
+      case 1002:
+        return "zkSync-Goerli";
       case 42161:
         return "Arbitrum";
+      case 421613:
+        return "Arbitrum - Goerli";
       default:
         return "ZigZag";
     }
@@ -856,61 +898,69 @@ export default class API extends Emitter {
     }
   };
 
-  getBalanceOfCurrency = async (currency) => {
-    const currencyInfo = this.getCurrencyInfo(currency);
-    let result = { balance: 0, allowance: ethersConstants.Zero };
-    if (!this.mainnetProvider) return result;
-
-    try {
-      const netContract = this.getNetworkContract();
-      const [account] = await this.web3.eth.getAccounts();
-      if (!account || account === "0x") return result;
-
-      if (currency === "ETH") {
-        result.balance = await this.mainnetProvider.getBalance(account);
-        result.allowance = ethersConstants.MaxUint256;
-        return result;
-      }
-
-      if (!currencyInfo || !currencyInfo.address) return result;
-
-      const contract = new ethers.Contract(
-        currencyInfo.address,
-        erc20ContractABI,
-        this.mainnetProvider
-      );
-      result.balance = await contract.balanceOf(account);
-      if (netContract) {
-        result.allowance = ethers.BigNumber.from(
-          await contract.allowance(account, netContract)
-        );
-      }
-      return result;
-    } catch (e) {
-      console.log(e);
-      return result;
-    }
-  };
-
   getWalletBalances = async () => {
     const balances = {};
+    const netContract = this.getNetworkContract();
+    const [account] = await this.web3.eth.getAccounts();
+
+    const getBalanceOfCurrency = async (token, tokenAddress) => {
+      let result = { balance: 0, allowance: ethers.constants.Zero };
+      if (
+        !this.mainnetProvider ||
+        !account ||
+        account === "0x" ||
+        !tokenAddress
+      ) {
+        return result;
+      }
+  
+      try {  
+        if (token === "ETH") {
+          result.balance = await this.mainnetProvider.getBalance(account);
+          result.allowance = ethers.constants.MaxUint256;
+          return result;
+        }
+  
+        const contract = new ethers.Contract(
+          tokenAddress,
+          erc20ContractABI,
+          this.mainnetProvider
+        );
+        const balanceBN = await contract.balanceOf(account);
+        result.balance = balanceBN.toString()
+        if (netContract && balanceBN.gt(0)) {
+          const allowance = await contract.allowance(account, netContract)
+          result.allowance = allowance.toString()
+        }
+        return result;
+      } catch (e) {
+        console.log(e);
+        return result;
+      }
+    };
 
     const getBalance = async (ticker) => {
       const currencyInfo = this.getCurrencyInfo(ticker);
-      const { balance, allowance } = await this.getBalanceOfCurrency(ticker);
+      if (!currencyInfo) return;
+
+      const { balance, allowance } = await getBalanceOfCurrency(ticker, currencyInfo.address);
+      let valueReadable = "0", allowanceReadable = "0";
+      if (currencyInfo) {
+        if (balance) 
+          valueReadable = ethers.utils.formatUnits(balance, currencyInfo.decimals);
+        if (allowance) 
+          allowanceReadable = ethers.utils.formatUnits(allowance, currencyInfo.decimals);        
+      } else if (ticker === "ETH") {
+        valueReadable = ethers.utils.formatEther(balance);
+        allowanceReadable = ethers.utils.formatEther(allowance);
+      }
+
       balances[ticker] = {
         value: balance,
         allowance,
-        valueReadable: "0",
+        valueReadable,
+        allowanceReadable,
       };
-      if (balance && currencyInfo) {
-        balances[ticker].valueReadable = formatAmount(balance, currencyInfo);
-      } else if (ticker === "ETH") {
-        balances[ticker].valueReadable = formatAmount(balance, {
-          decimals: 18,
-        });
-      }
-
       this.emit("balanceUpdate", "wallet", { ...balances });
     };
 
@@ -928,7 +978,6 @@ export default class API extends Emitter {
   getBalances = async () => {
     const balances = await this.apiProvider.getBalances();
     this.balances[this.apiProvider.network] = balances;
-    this.emit("balanceUpdate", this.apiProvider.network, balances);
     return balances;
   };
 
@@ -1227,6 +1276,8 @@ export default class API extends Emitter {
         return "https://goerli.zkscan.io/explorer/transactions/" + txhash;
       case 42161:
         return "https://arbiscan.io/tx/" + txhash;
+        case 421613:
+          return "https://goerli-rollup-explorer.arbitrum.io/tx/" + txhash;
       default:
         throw Error("Chain ID not understood");
     }
@@ -1239,6 +1290,7 @@ export default class API extends Emitter {
         case 42161:
           return "https://etherscan.io/address/" + address;
         case 1002:
+        case 421613:
           return "https://goerli.etherscan.io/address/" + address;
         default:
           throw Error("Chain ID not understood");
@@ -1251,6 +1303,8 @@ export default class API extends Emitter {
           return "https://goerli.zkscan.io/explorer/accounts/" + address;
         case 42161:
           return "https://arbiscan.io/address/" + address;
+        case 421613:
+          return "https://goerli-rollup-explorer.arbitrum.io/address/" + address;
         default:
           throw Error("Chain ID not understood");
       }

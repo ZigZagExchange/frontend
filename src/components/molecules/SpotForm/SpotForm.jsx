@@ -299,6 +299,7 @@ class SpotForm extends React.Component {
     const marketInfo = this.props.marketInfo;
     if (!marketInfo) return 0;
     let fee = marketInfo.baseFee;
+    if (!fee) return 0;
     fee +=
       marketInfo.makerVolumeFee && amount
         ? amount * marketInfo.makerVolumeFee
@@ -310,6 +311,7 @@ class SpotForm extends React.Component {
     const marketInfo = this.props.marketInfo;
     if (!marketInfo) return 0;
     let fee = marketInfo.quoteFee;
+    if (!fee) return 0;
     fee +=
       marketInfo.makerVolumeFee && amount
         ? amount * marketInfo.makerVolumeFee
@@ -472,6 +474,8 @@ class SpotForm extends React.Component {
       baseAllowance = 0;
       quoteAllowance = 0;
     }
+    const baseAmount = Number(this.state.baseAmount);
+    const quoteAmount = Number(this.state.quoteAmount);
 
     const marketInfo = this.props.marketInfo;
     baseBalance = parseFloat(baseBalance);
@@ -484,15 +488,15 @@ class SpotForm extends React.Component {
         return;
       }
 
-      if (this.state.baseAmount > baseBalance) {
+      if (baseAmount > baseBalance) {
         toast.error(`Amount exceeds ${marketInfo.baseAsset.symbol} balance`, {
           toastId: `Amount exceeds ${marketInfo.baseAsset.symbol} balance`,
         });
         return;
       }
 
-      let fee = this.getBaseFee(this.state.baseAmount);
-      if (this.state.baseAmount < fee) {
+      let fee = Number(this.getBaseFee(baseAmount));
+      if (baseAmount < fee) {
         fee = Number(fee).toPrecision(5);
         toast.error(
           `Minimum order size is ${fee} ${marketInfo.baseAsset.symbol}`
@@ -500,7 +504,7 @@ class SpotForm extends React.Component {
         return;
       }
 
-      if (this.state.baseAmount > baseAllowance) {
+      if (baseAmount > baseAllowance) {
         toast.error(`Amount exceeds ${marketInfo.baseAsset.symbol} allowance`, {
           toastId: `Amount exceeds ${marketInfo.baseAsset.symbol} allowance`,
         });
@@ -514,15 +518,15 @@ class SpotForm extends React.Component {
         return;
       }
 
-      if (this.state.quoteAmount > quoteBalance) {
+      if (quoteAmount > quoteBalance) {
         toast.error(`Amount exceeds ${marketInfo.quoteAsset.symbol} balance`, {
           toastId: `Amount exceeds ${marketInfo.quoteAsset.symbol} balance`,
         });
         return;
       }
 
-      let fee = this.getQuoteFee(this.state.quoteAmount);
-      if (this.state.quoteAmount < fee) {
+      let fee = this.getQuoteFee(quoteAmount);
+      if (quoteAmount < fee) {
         fee = Number(fee).toPrecision(5);
         toast.error(
           `Minimum order size is ${fee} ${marketInfo.quoteAsset.symbol}`,
@@ -533,7 +537,7 @@ class SpotForm extends React.Component {
         return;
       }
 
-      if (this.state.quoteAmount > quoteAllowance) {
+      if (quoteAmount > quoteAllowance) {
         toast.error(`Total exceeds ${marketInfo.quoteAsset.symbol} allowance`, {
           toastId: `Total exceeds ${marketInfo.quoteAsset.symbol} allowance`,
         });
@@ -762,7 +766,7 @@ class SpotForm extends React.Component {
   }
 
   showLabel() {
-    if (this.props.network === 42161) {
+    if ([42161, 421613].includes(this.props.network)) {
       const marketInfo = this.props.marketInfo;
       let gasFee,
         feeToken,

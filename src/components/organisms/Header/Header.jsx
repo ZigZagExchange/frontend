@@ -64,6 +64,13 @@ const networkLists = [
     selectedIcon: <CheckIcon />,
     image: zksyncLogo,
   },
+  {
+    text: "Arbitrum - Goerli",
+    value: 421613,
+    url: "#",
+    selectedIcon: <CheckIcon />,
+    image: arbitrumLogo,
+  },
 ];
 
 const accountLists = [

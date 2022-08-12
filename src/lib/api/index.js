@@ -17,6 +17,11 @@ const api = new API({
       APIArbitrumProvider,
       "0x82f67958a5474e40e1485742d648c0b0686b6e5d", // What is this for?
     ],
+    "arbitrum-goerli": [
+      421613,
+      APIArbitrumProvider,
+      "0x82f67958a5474e40e1485742d648c0b0686b6e5d", // What is this for?
+    ],
     // starknet: [1001, APIStarknetProvider],
   },
 });

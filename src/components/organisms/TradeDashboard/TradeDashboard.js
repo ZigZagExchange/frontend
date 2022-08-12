@@ -124,14 +124,7 @@ export function TradeDashboard() {
 
   // Update URL when market or network update
   useEffect(() => {
-    let networkText;
-    if (network === 1) {
-      networkText = "zksync";
-    } else if (network === 1002) {
-      networkText = "zksync-goerli";
-    } else if (network === 42161) {
-      networkText = "arbitrum";
-    }
+    const networkText = api.getChainName(network);
     history.push(`/?market=${currentMarket}&network=${networkText}`);
   }, [network, currentMarket]);
 
