@@ -104,15 +104,15 @@ export default class APIZKProvider extends APIProvider {
     const accountState = await this.syncWallet.getAccountState();
     const balances = accountState.committed.balances;
     if (Object.keys(balances).length > 0) {
-      if (balances.ETH && balances.ETH > 0.006e18) {
+      if (balances.ETH && balances.ETH > 0.003e18) {
         feeToken = "ETH";
-      } else if (balances.USDC && balances.USDC > 15e6) {
+      } else if (balances.USDC && balances.USDC > 6e6) {
         feeToken = "USDC";
-      } else if (balances.USDT && balances.USDT > 15e6) {
+      } else if (balances.USDT && balances.USDT > 6e6) {
         feeToken = "USDT";
-      } else if (balances.DAI && balances.DAI > 15e6) {
+      } else if (balances.DAI && balances.DAI > 6e6) {
         feeToken = "DAI";
-      } else if (balances.WBTC && balances.WBTC > 0.0003e8) {
+      } else if (balances.WBTC && balances.WBTC > 0.0002e8) {
         feeToken = "WBTC";
       } else {
         toast.warn(
@@ -126,10 +126,10 @@ export default class APIZKProvider extends APIProvider {
         const tokens = Object.keys(balances);
         const result = tokens.map(async (token) => {
           const tokenInfo = await this.api.getCurrencyInfo(token);
-          if (tokenInfo.enabledForFees) {
-            const priceInfo = tokenInfo.usdPrice;
+          if (tokenInfo?.enabledForFees && tokenInfo?.usdPrice) {
+            const price = Number(tokenInfo.usdPrice);
             const usdValue =
-              (priceInfo.price * balances[token]) / 10 ** tokenInfo.decimals;
+              price * (balances[token] /10 ** tokenInfo.decimals);
             if (usdValue > maxValue) {
               maxValue = usdValue;
               feeToken = token;
