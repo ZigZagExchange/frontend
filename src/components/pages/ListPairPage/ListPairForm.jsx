@@ -373,7 +373,7 @@ const ListPairForm = ({ onSubmit, children }) => {
               }
               items={[
                 { name: "zkSync - Mainnet", id: 1 },
-                { name: "zkSync - Rinkeby", id: 1000 },
+                { name: "zkSync - Goerli", id: 1002 },
               ]}
               validate={required}
               rightOfLabel={

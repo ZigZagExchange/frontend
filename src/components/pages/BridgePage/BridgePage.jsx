@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import useTheme from "components/hooks/useTheme";
 import { useSelector } from "react-redux";
 import { userSelector } from "lib/store/features/auth/authSlice";
-import { settingsSelector } from "lib/store/features/api/apiSlice";
+// import { settingsSelector } from "lib/store/features/api/apiSlice";
 import { DefaultTemplate } from "components";
 import BridgeContainer from "./BridgeContainer";
 import TransferHistory from "./TransferHistory";
-import GuidePopup from "./Popup/GuidePopup";
+// import GuidePopup from "./Popup/GuidePopup";
 import GetStartedPopup from "./Popup/GetStartedPopup";
 import WalletConnectedPopup from "./Popup/WalletConnectedPopup";
 import classNames from "classnames";
@@ -18,7 +18,7 @@ export default function BridgePage() {
   const { isDark } = useTheme();
   const [popup, setpopup] = useState("walletconnected");
   const user = useSelector(userSelector);
-  const settings = useSelector(settingsSelector);
+  // const settings = useSelector(settingsSelector);
 
   useEffect(() => {
     document.title = "ZigZag Bridge";
@@ -78,7 +78,7 @@ export default function BridgePage() {
             </Tab.Group>
           </div>
         </div>
-        {!settings.hideGuidePopup && <GuidePopup />}
+        {/* {!settings.hideGuidePopup && <GuidePopup />} */}
       </div>
     </DefaultTemplate>
   );

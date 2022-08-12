@@ -130,8 +130,8 @@ html {
 }
 
 /* WalletConnect customization */
-.walletconnect-modal__base div:nth-child(3) {
-  overflow-y: scroll;
+.walletconnect-modal__close__wrapper {
+  overflow-y: none !important;
 }
 
 .select-wrap {
@@ -202,7 +202,7 @@ html {
   /* background-color: transparent; */
   background: rgba(252, 201, 88, 0.72);
   border-radius: 8px;
-  padding:8px;
+  padding: 8px;
   box-shadow: 0px 8px 16px rgba(1, 1, 1, 0.5);
   backdrop-filter: blur(16px);
 }
