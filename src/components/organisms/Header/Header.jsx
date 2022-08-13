@@ -424,8 +424,8 @@ export const Header = (props) => {
             >
               <Tab>TRADE</Tab>
               <Tab display={false}>CONVERT</Tab>
-              <Tab display={hasBridge}>BRIDGE</Tab>
-              <Tab display={!isEVM}>LIST PAIR</Tab>
+              <Tab display={hasBridge && network !== 1002}>BRIDGE</Tab>
+              <Tab display={!isEVM && network !== 1002}>LIST PAIR</Tab>
               <Tab display={false}>
                 DOCS
                 <ExternalLinkIcon size={12} />
@@ -522,8 +522,8 @@ export const Header = (props) => {
           <TabMenu row activeIndex={index} onItemClick={handleClick}>
             <Tab>TRADE</Tab>
             <Tab display={false}>CONVERT</Tab>
-            <Tab display={hasBridge}>BRIDGE</Tab>
-            <Tab display={!isEVM}>LIST PAIR</Tab>
+            <Tab display={hasBridge && network !== 1002}>BRIDGE</Tab>
+            <Tab display={!isEVM && network !== 1002}>LIST PAIR</Tab>
             <Tab display={false}>
               DOCS
               <ExternalLinkIcon size={12} />
