@@ -280,13 +280,15 @@ export function TradeDashboard() {
         lastPrices={lastPrices}
       />
       <GridLayoutRow
-        rowHeight={(window.innerHeight - 112) / 30}
         layouts={settings.layouts}
         autoSize={false}
         onChange={(_, layout) => {
           dispatch(setUISettings({ key: "layouts", value: layout }));
         }}
         onDragStart={() => {
+          dispatch(setUISettings({ key: "layoutsCustomized", value: true }));
+        }}
+        onResizeStart={() => {
           dispatch(setUISettings({ key: "layoutsCustomized", value: true }));
         }}
         margin={[0, 0]}
