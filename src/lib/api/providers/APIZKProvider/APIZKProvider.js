@@ -29,7 +29,7 @@ export default class APIZKProvider extends APIProvider {
   defaultMarket = {
     1: "ETH-USDC",
     1002: "DAI-USDC",
-  }
+  };
 
   handleBridgeReceipt = (
     _receipt,
@@ -56,7 +56,7 @@ export default class APIZKProvider extends APIProvider {
       receipt.txUrl = `https://${subdomain}etherscan.io/tx/${receipt.txId}`;
     } else if (target === "zksync") {
       const subdomain = this.network === 1 ? "" : "goerli.";
-      receipt.txId = _receipt.txHash.split(":")[1];
+      receipt.txId = _receipt.txHash;
       receipt.txUrl = `https://${subdomain}zkscan.io/explorer/transactions/${receipt.txId}`;
     }
 
@@ -129,7 +129,7 @@ export default class APIZKProvider extends APIProvider {
           if (tokenInfo?.enabledForFees && tokenInfo?.usdPrice) {
             const price = Number(tokenInfo.usdPrice);
             const usdValue =
-              price * (balances[token] /10 ** tokenInfo.decimals);
+              price * (balances[token] / 10 ** tokenInfo.decimals);
             if (usdValue > maxValue) {
               maxValue = usdValue;
               feeToken = token;
@@ -405,7 +405,6 @@ export default class APIZKProvider extends APIProvider {
       );
       return { txHash: hashes[0] };
     };
-
     const { transfer, amountTransferred } = await this.createWithdraw(
       amountDecimals,
       token,

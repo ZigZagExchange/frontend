@@ -447,7 +447,7 @@ export const apiSlice = createSlice({
         const token = payload[11].toString();
         localStorage.setItem(orderId, token);
       }
-      state.userOrders[orderId] = payload.slice(0,12);      
+      state.userOrders[orderId] = payload.slice(0, 12);
     },
     setBalances(state, { payload }) {
       const scope = makeScopeUser(state);
