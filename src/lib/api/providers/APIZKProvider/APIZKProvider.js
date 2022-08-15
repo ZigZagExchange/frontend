@@ -305,7 +305,8 @@ export default class APIZKProvider extends APIProvider {
       );
       return transfer;
     } catch (err) {
-      console.log(err);
+      // toast.error(err.message);
+      throw new Error(err.message);
     }
   };
 
@@ -352,25 +353,28 @@ export default class APIZKProvider extends APIProvider {
       );
       return { txHash: hashes[0] };
     };
-
-    const { transfer, amountTransferred } = await this.createWithdraw(
-      amountDecimals,
-      token,
-      onSameFeeToken,
-      onDiffFeeToken
-    );
-
-    this.api.emit(
-      "bridgeReceipt",
-      this.handleBridgeReceipt(
-        transfer,
-        amountTransferred,
+    try {
+      const { transfer, amountTransferred } = await this.createWithdraw(
+        amountDecimals,
         token,
-        "withdraw",
-        "zksync"
-      )
-    );
-    return transfer;
+        onSameFeeToken,
+        onDiffFeeToken
+      );
+
+      this.api.emit(
+        "bridgeReceipt",
+        this.handleBridgeReceipt(
+          transfer,
+          amountTransferred,
+          token,
+          "withdraw",
+          "zksync"
+        )
+      );
+      return transfer;
+    } catch (err) {
+      throw new Error(err.message);
+    }
   };
 
   transferToBridge = async (amountDecimals, token, address, userAddress) => {
