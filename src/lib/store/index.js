@@ -101,8 +101,7 @@ api.on("signOut", () => {
 });
 
 api.on("providerChange", (network, defaultPair) => {
-  console.log(`Index set pair to default: ${defaultPair}`);
-  store.dispatch(setCurrentMarket(defaultPair));
+  console.log(`Index set pair to default: ${api.apiProvider.defaultMarket[network]}`);
   store.dispatch(setNetwork(network));
   store.dispatch(setCurrentMarket(api.apiProvider.defaultMarket[network]));
 });
