@@ -1062,14 +1062,6 @@ export default class API extends Emitter {
     return response;
   };
 
-  getTokenInfo = (tokenLike, chainId) => {
-    return this.apiProvider.getTokenInfo(tokenLike, chainId);
-  };
-
-  getTokenPrice = (tokenLike, chainId) => {
-    return this.apiProvider.tokenPrice(tokenLike, chainId);
-  };
-
   getCurrencyLogo(currency) {
     try {
       return require(`assets/images/currency/${currency}.svg`).default;
