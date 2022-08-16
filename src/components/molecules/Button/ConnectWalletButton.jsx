@@ -26,6 +26,7 @@ const ConnectWalletButton = (props) => {
         const activationFee = await api.apiProvider.changePubKeyFee("ETH");  
         const activated = await api.apiProvider.checkAccountActivated();
         if (
+          network === 1 &&
           !activated &&
           !/^\/bridge(\/.*)?/.test(location.pathname) &&
           (isNaN(balance) || balance < activationFee)

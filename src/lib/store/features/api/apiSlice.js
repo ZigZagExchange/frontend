@@ -23,7 +23,7 @@ const initialUISettings = {
   hideBalance: false,
   hideGuidePopup: false,
   disableTradeIDCard: false,
-  layouts: initialLayouts,
+  layouts: initialLayouts(),
   editable: false,
   hideLayoutGuidePopup: false,
 };
@@ -34,7 +34,7 @@ export const apiSlice = createSlice({
     network: 1,
     userId: null,
     layout: getLayout() || 0,
-    currentMarket: api.apiProvider.defaultMarket,
+    currentMarket: api.apiProvider.defaultMarket[1],
     marketFills: {},
     bridgeReceipts: [],
     lastPrices: {},
@@ -675,9 +675,9 @@ export const apiSlice = createSlice({
     },
     resetTradeLayout(state) {
       if (!state.settings.stackOrderbook) {
-        state.settings.layouts = stackedLayouts;
+        state.settings.layouts = stackedLayouts();
       } else {
-        state.settings.layouts = initialLayouts;
+        state.settings.layouts = initialLayouts();
       }
       state.settings.layoutsCustomized = false;
     },

@@ -22,7 +22,7 @@ import get from "lodash/get";
 
 const chainMap = {
   "0x1": 1,
-  "0x4": 1000,
+  "0x5": 1002,
   "0xa4b1": 42161,
 };
 
@@ -323,10 +323,10 @@ export default class API extends Emitter {
           chainId: "0x1",
         };
         break;
-      case 1000:
-        ethereumChainId = "0x4";
+      case 1002:
+        ethereumChainId = "0x5";
         ethereumChainInfo = {
-          chainId: "0x4",
+          chainId: "0x5",
         };
         break;
       case 42161:
@@ -558,7 +558,7 @@ export default class API extends Emitter {
       case 1:
       case 42161:
         return `https://polygon-mainnet.infura.io/v3/${this.infuraId}`;
-      case 1000:
+      case 1002:
         return `https://polygon-mumbai.infura.io/v3/${this.infuraId}`;
       default:
         throw new Error(`getPolygonUrl network: ${network} not understood.`);
@@ -570,7 +570,7 @@ export default class API extends Emitter {
       case 1:
       case 42161:
         return "0x89";
-      case 1000:
+      case 1002:
         return "0x13881";
       default:
         throw new Error(
@@ -584,7 +584,7 @@ export default class API extends Emitter {
       case 1:
       case 42161:
         return POLYGON_MAINNET_WETH_ADDRESS;
-      case 1000:
+      case 1002:
         return POLYGON_MUMBAI_WETH_ADDRESS;
       default:
         throw new Error(
@@ -692,8 +692,8 @@ export default class API extends Emitter {
     switch (chainId) {
       case 1:
         return "mainnet";
-      case 1000:
-        return "rinkeby";
+      case 1002:
+        return "goerli";
       case 42161:
         return "arbitrum";
       default:
@@ -706,8 +706,8 @@ export default class API extends Emitter {
       case 1:
       case 42161:
         return "mainnet";
-      case 1000:
-        return "rinkeby";
+      case 1002:
+        return "goerli";
       default:
         return null;
     }
@@ -720,7 +720,7 @@ export default class API extends Emitter {
   getNetworkDisplayName = (network) => {
     switch (network) {
       case 1:
-      case 1000:
+      case 1002:
         return "zkSync";
       case 42161:
         return "Arbitrum";
@@ -1126,14 +1126,6 @@ export default class API extends Emitter {
     return response;
   };
 
-  getTokenInfo = (tokenLike, chainId) => {
-    return this.apiProvider.getTokenInfo(tokenLike, chainId);
-  };
-
-  getTokenPrice = (tokenLike, chainId) => {
-    return this.apiProvider.tokenPrice(tokenLike, chainId);
-  };
-
   getCurrencyLogo(currency) {
     try {
       return require(`assets/images/currency/${currency}.svg`).default;
@@ -1156,7 +1148,7 @@ export default class API extends Emitter {
         FRAX: "0x853d955aCEf822Db058eb8505911ED77F175b99e",
         UST: "0xa693b19d2931d498c5b318df961919bb4aee87a5",
       };
-    } else if (this.apiProvider.network === 1000) {
+    } else if (this.apiProvider.network === 1002) {
       return {
         // these are just tokens on rinkeby with the correct tickers.
         // neither are actually on rinkeby.
@@ -1287,8 +1279,8 @@ export default class API extends Emitter {
     switch (Number(chainId)) {
       case 1:
         return "https://zkscan.io/explorer/transactions/" + txhash;
-      case 1000:
-        return "https://rinkeby.zkscan.io/explorer/transactions/" + txhash;
+      case 1002:
+        return "https://goerli.zkscan.io/explorer/transactions/" + txhash;
       case 42161:
         return "https://arbiscan.io/tx/" + txhash;
       default:
@@ -1302,8 +1294,8 @@ export default class API extends Emitter {
         case 1:
         case 42161:
           return "https://etherscan.io/address/" + address;
-        case 1000:
-          return "https://rinkeby.etherscan.io/address/" + address;
+        case 1002:
+          return "https://goerli.etherscan.io/address/" + address;
         default:
           throw Error("Chain ID not understood");
       }
@@ -1311,8 +1303,8 @@ export default class API extends Emitter {
       switch (Number(chainId)) {
         case 1:
           return "https://zkscan.io/explorer/accounts/" + address;
-        case 1000:
-          return "https://rinkeby.zkscan.io/explorer/accounts/" + address;
+        case 1002:
+          return "https://goerli.zkscan.io/explorer/accounts/" + address;
         case 42161:
           return "https://arbiscan.io/address/" + address;
         default:

@@ -104,6 +104,7 @@ api.on("providerChange", (network, defaultPair) => {
   console.log(`Index set pair to default: ${defaultPair}`);
   store.dispatch(setCurrentMarket(defaultPair));
   store.dispatch(setNetwork(network));
+  store.dispatch(setCurrentMarket(api.apiProvider.defaultMarket[network]));
 });
 
 api.on("message", (operation, args) => {
