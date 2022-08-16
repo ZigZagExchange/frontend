@@ -23,7 +23,7 @@ const initialUISettings = {
   hideBalance: false,
   hideGuidePopup: false,
   disableTradeIDCard: false,
-  layouts: initialLayouts,
+  layouts: initialLayouts(),
   editable: false,
   hideLayoutGuidePopup: false,
 };
@@ -447,7 +447,7 @@ export const apiSlice = createSlice({
         const token = payload[11].toString();
         localStorage.setItem(orderId, token);
       }
-      state.userOrders[orderId] = payload.slice(0,12);      
+      state.userOrders[orderId] = payload.slice(0, 12);
     },
     setBalances(state, { payload }) {
       const scope = makeScopeUser(state);
@@ -671,9 +671,9 @@ export const apiSlice = createSlice({
     },
     resetTradeLayout(state) {
       if (!state.settings.stackOrderbook) {
-        state.settings.layouts = stackedLayouts;
+        state.settings.layouts = stackedLayouts();
       } else {
-        state.settings.layouts = initialLayouts;
+        state.settings.layouts = initialLayouts();
       }
       state.settings.layoutsCustomized = false;
     },
