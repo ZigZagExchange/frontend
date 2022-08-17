@@ -6,6 +6,7 @@ import styled from "styled-components";
 import CheckIcon from "@mui/icons-material/Check";
 import { userSelector } from "lib/store/features/auth/authSlice";
 import { useMediaQuery } from "react-responsive";
+import { useTranslation } from "react-i18next";
 import {
   networkSelector,
   isConnectingSelector,
@@ -26,6 +27,7 @@ import {
   MenuIcon,
 } from "components/atoms/Svg";
 import ToggleTheme from "components/molecules/Toggle/ToggleTheme";
+import LanguageDropdown from "./LangaugeDropdown";
 import useTheme from "components/hooks/useTheme";
 import {
   MdOutlineArticle,
@@ -252,6 +254,7 @@ const ActionSideMenuWrapper = styled.div`
 
 export const Header = (props) => {
   // state to open or close the sidebar in mobile
+
   const [show, setShow] = useState(false);
   const connecting = useSelector(isConnectingSelector);
   // const [connecting, setConnecting] = useState(false);
@@ -267,6 +270,8 @@ export const Header = (props) => {
   const [networkItems, setNetWorkItems] = useState(networkLists);
   const { isDark, toggleTheme } = useTheme();
   const location = useLocation();
+  const { t } = useTranslation();
+
   useEffect(() => {
     const netName = networkLists.filter((item, i) => {
       return item.value === network;
@@ -422,10 +427,10 @@ export const Header = (props) => {
               onItemClick={handleClick}
               style={{ paddingTop: "20px" }}
             >
-              <Tab>TRADE</Tab>
-              <Tab display={false}>CONVERT</Tab>
-              <Tab display={hasBridge && network !== 1002}>BRIDGE</Tab>
-              <Tab display={!isEVM && network !== 1002}>LIST PAIR</Tab>
+              <Tab>{t("trade")}</Tab>
+              <Tab display={false}>{t("convert")}</Tab>
+              <Tab display={hasBridge && network !== 1002}>{t("bridge")}</Tab>
+              <Tab display={!isEVM && network !== 1002}>{t("list_pair")}</Tab>
               <Tab display={false}>
                 DOCS
                 <ExternalLinkIcon size={12} />
@@ -437,7 +442,6 @@ export const Header = (props) => {
             </TabMenu>
           </NavWrapper>
           <ActionsWrapper>
-            <VerticalDivider />
             <Dropdown
               adClass="menu-dropdown"
               width={200}
@@ -454,6 +458,7 @@ export const Header = (props) => {
               leftIcon={true}
               transparent
             />
+            <VerticalDivider />
             <SocialWrapper>
               <SocialLink
                 target="_blank"
@@ -478,6 +483,7 @@ export const Header = (props) => {
               </SocialLink>
             </SocialWrapper>
             <VerticalDivider />
+            <LanguageDropdown />
             <LanguageWrapper>
               {/* <StyledDropdown
                 adClass="lang-dropdown"
