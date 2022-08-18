@@ -75,17 +75,17 @@ const accountLists = [
 
 const supportLists = [
   {
-    text: "Live Support",
+    text: "live_support",
     url: "https://discord.com/invite/zigzag",
     icon: <FaDiscord size={14} />,
   },
   {
-    text: "FAQ",
+    text: "faq",
     url: "https://info.zigzag.exchange/",
     icon: <MdOutlineQuiz size={14} />,
   },
   {
-    text: "Docs",
+    text: "docs",
     url: "https://docs.zigzag.exchange/",
     icon: <MdOutlineArticle size={14} />,
   },
@@ -95,12 +95,12 @@ const supportLists = [
     icon: <FaGithub size={14} />,
   },
   {
-    text: "Uptime Status",
+    text: "uptime_status",
     url: "https://status.zigzag.exchange/",
     icon: <MdSignalCellularAlt size={14} />,
   },
   {
-    text: "Contact",
+    text: "contact",
     url: "https://info.zigzag.exchange/#contact",
     icon: <MdOutlineContactMail size={14} />,
   },
@@ -108,12 +108,12 @@ const supportLists = [
 
 const communityLists = [
   {
-    text: "Governance",
+    text: "governance",
     url: "https://forum.zigzaglabs.io/t/zigzag-exchange",
     icon: <MdAccountBalance size={14} />,
   },
   {
-    text: "Blog",
+    text: "blog",
     url: "https://blog.zigzag.exchange/",
     icon: <MdCreate size={14} />,
   },
@@ -432,11 +432,11 @@ export const Header = (props) => {
               <Tab display={hasBridge && network !== 1002}>{t("bridge")}</Tab>
               <Tab display={!isEVM && network !== 1002}>{t("list_pair")}</Tab>
               <Tab display={false}>
-                DOCS
+                {t("docs")}
                 <ExternalLinkIcon size={12} />
               </Tab>
               <Tab display={isEVM}>
-                WRAP
+                {t("wrap")}
                 <ExternalLinkIcon size={12} />
               </Tab>
             </TabMenu>
@@ -446,7 +446,7 @@ export const Header = (props) => {
               adClass="menu-dropdown"
               width={200}
               item={supportLists}
-              context={"Support"}
+              context={t("support")}
               leftIcon={true}
               transparent
             />
@@ -454,7 +454,7 @@ export const Header = (props) => {
               adClass="menu-dropdown"
               width={162}
               item={communityLists}
-              context={"Community"}
+              context={t("community")}
               leftIcon={true}
               transparent
             />
@@ -526,16 +526,16 @@ export const Header = (props) => {
             leftIcon={true}
           />
           <TabMenu row activeIndex={index} onItemClick={handleClick}>
-            <Tab>TRADE</Tab>
-            <Tab display={false}>CONVERT</Tab>
-            <Tab display={hasBridge && network !== 1002}>BRIDGE</Tab>
-            <Tab display={!isEVM && network !== 1002}>LIST PAIR</Tab>
+            <Tab>{t("trade")}</Tab>
+            <Tab display={false}>{t("convert")}</Tab>
+            <Tab display={hasBridge && network !== 1002}>{t("bridge")}</Tab>
+            <Tab display={!isEVM && network !== 1002}>{t("rist_pair")}</Tab>
             <Tab display={false}>
-              DOCS
+              {t("docs")}
               <ExternalLinkIcon size={12} />
             </Tab>
             <Tab display={isEVM}>
-              WRAP
+              {t("wrap")}
               <ExternalLinkIcon size={12} />
             </Tab>
           </TabMenu>
@@ -559,7 +559,7 @@ export const Header = (props) => {
             adClass="menu-dropdown"
             width={200}
             item={supportLists}
-            context={"Support"}
+            context={t("support")}
             leftIcon={true}
             transparent
           />
@@ -567,7 +567,7 @@ export const Header = (props) => {
             adClass="menu-dropdown"
             width={162}
             item={communityLists}
-            context={"Community"}
+            context={t("community")}
             leftIcon={true}
             transparent
           />

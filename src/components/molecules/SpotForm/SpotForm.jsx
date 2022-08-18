@@ -12,6 +12,7 @@ import { IconButton as BaseIcon } from "../IconButton";
 import { MinusIcon, PlusIcon } from "components/atoms/Svg";
 import { setHighSlippageModal } from "lib/store/features/api/apiSlice";
 import { Box } from "@mui/material";
+import { withTranslation } from "react-i18next";
 
 const isMobile = window.innerWidth < 500;
 
@@ -838,6 +839,7 @@ class SpotForm extends React.Component {
   render() {
     const isMobile = window.innerWidth < 430;
     const marketInfo = this.props.marketInfo;
+    const { t } = this.props;
     let baseAmount, quoteAmount;
     if (typeof this.state.baseAmount === "string") {
       baseAmount = parseFloat(this.state.baseAmount.replace(",", "."));
@@ -926,7 +928,7 @@ class SpotForm extends React.Component {
         <FormHeader>
           <InfoWrapper>
             <Text font="primaryTiny" color="foregroundMediumEmphasis">
-              Network fee
+              {t("network_fee")}
             </Text>
             <QuestionHelper text={this.showLabel()} />
           </InfoWrapper>
@@ -958,7 +960,7 @@ class SpotForm extends React.Component {
         <FormHeader>
           <InfoWrapper>
             <Text font="primaryTiny" color="foregroundMediumEmphasis">
-              Network fee
+              {t("network_fee")}
             </Text>
             <QuestionHelper text={this.showLabel()} />
           </InfoWrapper>
@@ -1016,7 +1018,7 @@ class SpotForm extends React.Component {
               <InputField
                 type="text"
                 pattern="\d+(?:[.,]\d+)?"
-                placeholder={`Price (${
+                placeholder={`${t("price")} (${
                   marketInfo && marketInfo.baseAsset?.symbol
                 }-${marketInfo && marketInfo.quoteAsset?.symbol})`}
                 value={
@@ -1049,7 +1051,7 @@ class SpotForm extends React.Component {
             <InputField
               type="text"
               pattern="\d+(?:[.,]\d+)?"
-              placeholder={`Amount (${
+              placeholder={`${t("amount")} (${
                 marketInfo && marketInfo.baseAsset.symbol
                   ? marketInfo.baseAsset.symbol
                   : ""
@@ -1073,7 +1075,7 @@ class SpotForm extends React.Component {
           </InputBox>
           <FormHeader>
             <Text font="primaryTiny" color="foregroundMediumEmphasis">
-              {isMobile ? "Balance" : "Available balance"}
+              {isMobile ? `${t("balance")}` : `${t("available_balance")}`}
             </Text>
             {baseBalanceHtml}
           </FormHeader>
@@ -1088,7 +1090,7 @@ class SpotForm extends React.Component {
             <InputField
               type="text"
               pattern="\d+(?:[.,]\d+)?"
-              placeholder={`Total (${
+              placeholder={`${t("total")} (${
                 marketInfo && marketInfo.quoteAsset.symbol
                   ? marketInfo.quoteAsset.symbol
                   : ""
@@ -1112,7 +1114,7 @@ class SpotForm extends React.Component {
           </InputBox>
           <FormHeader>
             <Text font="primaryTiny" color="foregroundMediumEmphasis">
-              {isMobile ? "Balance" : "Available balance"}
+              {isMobile ? `${t("balance")}` : `${t("available_balance")}`}
             </Text>
             {quoteBalanceHtml}
           </FormHeader>
@@ -1181,7 +1183,9 @@ const mapStateToProps = (state) => {
   };
 };
 
-export default connect(mapStateToProps, { setHighSlippageModal })(SpotForm);
+export default connect(mapStateToProps, { setHighSlippageModal })(
+  withTranslation()(SpotForm)
+);
 
 const StyledForm = styled.form`
   display: grid;
