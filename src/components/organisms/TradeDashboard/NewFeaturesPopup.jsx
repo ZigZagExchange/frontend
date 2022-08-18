@@ -18,7 +18,7 @@ const NewFeaturesPopup = () => {
 
   return (
     open && (
-      <div className="max-w-lg p-6 mx-1 border rounded-lg shadow-lg md:mx-0 xl:max-w-sm fixed bottom-5 left-5 dark:bg-background-900 dark:border-foreground-400 border-primary-400 bg-foreground-900  dark:text-foreground-900 text-background-900">
+      <div className="max-w-lg p-6 mx-1 border rounded-lg shadow-lg md:mx-0 xl:max-w-sm fixed bottom-5 left-5 dark:bg-background-900 dark:border-foreground-400 border-primary-400 bg-foreground-900  dark:text-foreground-900 text-background-900 z-[2]">
         <div className="relative">
           <CloseIcon
             className="absolute cursor-pointer right-1 hover:opacity-75"
