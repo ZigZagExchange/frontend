@@ -13,6 +13,8 @@ import { formatDate, formatDateTime, formatToken, addComma } from "lib/utils";
 import { Tab } from "components/molecules/TabMenu";
 import Text from "components/atoms/Text/Text";
 
+import { useTranslation } from "react-i18next";
+
 import {
   SortUpIcon,
   SortDownIcon,
@@ -56,9 +58,9 @@ export default function OrdersTable(props) {
   const [tokenSorted, setTokenSorted] = useState(false);
   const [balanceSorted, setBalanceSorted] = useState(false);
   const [sideItems, setSideItems] = useState([
-    { text: "All", url: "#", iconSelected: true, value: "All" },
-    { text: "Buy", url: "#", value: "Buy" },
-    { text: "Sell", url: "#", value: "Sell" },
+    { text: "all", url: "#", iconSelected: true, value: "All" },
+    { text: "buy", url: "#", value: "Buy" },
+    { text: "sell", url: "#", value: "Sell" },
   ]);
   const [tradeTypeItems, setTradeTypeItems] = useState([
     { text: "All", url: "#", iconSelected: true, value: "All" },
@@ -68,6 +70,8 @@ export default function OrdersTable(props) {
   const isMobile = window.innerWidth < 1064;
 
   const wallet = balanceData[props.network];
+
+  const { t } = useTranslation();
 
   useEffect(() => {
     let walletArray = [];
@@ -536,7 +540,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Time
+                  {t("time")}
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -549,7 +553,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Market
+                  {t("market")}
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -564,7 +568,7 @@ export default function OrdersTable(props) {
                   transparent={true}
                   width={162}
                   item={sideItems}
-                  context="Side"
+                  context={t("side")}
                   leftIcon={false}
                   clickFunction={changeSide}
                 />
@@ -576,7 +580,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Price
+                  {t("price")}
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -589,7 +593,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Filled
+                  {t("filled")}
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -602,7 +606,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Expiry
+                  {t("expiry")}
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -615,7 +619,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Order Status
+                  {t("order_status")}
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -628,7 +632,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Action
+                  {t("action")}
                 </Text>
               </HeaderWrapper>
             </th>
@@ -641,7 +645,7 @@ export default function OrdersTable(props) {
                     scale="md"
                     onClick={() => api.cancelAllOrders(getOpenUserOrderIds())}
                   >
-                    Cancel All
+                    {t("cancel_all")}
                   </StyledButton>
                 </th>
               )}
@@ -1680,9 +1684,13 @@ export default function OrdersTable(props) {
               activeIndex={tab}
               onItemClick={(newIndex) => setTab(newIndex)}
             >
-              <Tab>Open Orders ({getOpenUserOrderIds().length})</Tab>
-              <Tab>Order History ({getFills().length})</Tab>
-              <Tab>Balances</Tab>
+              <Tab>
+                {t("open_orders")} ({getOpenUserOrderIds().length})
+              </Tab>
+              <Tab>
+                {t("order_history")} ({getFills().length})
+              </Tab>
+              <Tab>{t("balances")}</Tab>
             </StyledTabMenu>
           </TableHeaderWrapper>
           {isMobile ? (
