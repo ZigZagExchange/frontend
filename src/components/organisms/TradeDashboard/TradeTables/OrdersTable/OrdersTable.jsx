@@ -63,9 +63,9 @@ export default function OrdersTable(props) {
     { text: "sell", url: "#", value: "Sell" },
   ]);
   const [tradeTypeItems, setTradeTypeItems] = useState([
-    { text: "All", url: "#", iconSelected: true, value: "All" },
-    { text: "Maker", url: "#", value: "Maker" },
-    { text: "Taker", url: "#", value: "Taker" },
+    { text: "all", url: "#", iconSelected: true, value: "All" },
+    { text: "maker", url: "#", value: "Maker" },
+    { text: "traker", url: "#", value: "Taker" },
   ]);
   const isMobile = window.innerWidth < 1064;
 
@@ -1102,7 +1102,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Time
+                  {t("time")}
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -1115,7 +1115,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Market
+                  {t("market")}
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -1130,7 +1130,7 @@ export default function OrdersTable(props) {
                   transparent={true}
                   width={162}
                   item={sideItems}
-                  context="Side"
+                  context={t("side")}
                   leftIcon={false}
                   clickFunction={changeSide}
                 />
@@ -1144,7 +1144,7 @@ export default function OrdersTable(props) {
                   transparent={true}
                   width={162}
                   item={tradeTypeItems}
-                  context="Type"
+                  context={t("type")}
                   leftIcon={false}
                   clickFunction={changeTradeType}
                 />
@@ -1156,7 +1156,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Amount
+                  {t("amount")}
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -1169,7 +1169,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Price
+                  {t("price")}
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -1182,7 +1182,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Fee
+                  {t("fee")}
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -1195,7 +1195,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Order Status
+                  {t("order_status")}
                 </Text>
               </HeaderWrapper>
             </th>
@@ -1205,7 +1205,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Trade ID
+                  {t("trade_id")}
                 </Text>
               </HeaderWrapper>
             </th>
@@ -1215,7 +1215,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Action
+                  {t("action")}
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -1519,7 +1519,7 @@ export default function OrdersTable(props) {
                         font="primaryExtraSmallSemiBold"
                         color="foregroundLowEmphasis"
                       >
-                        Token
+                        {t("token")}
                       </Text>
                       {tokenSorted ? (
                         <SortIconWrapper>
@@ -1554,7 +1554,7 @@ export default function OrdersTable(props) {
                         font="primaryExtraSmallSemiBold"
                         color="foregroundLowEmphasis"
                       >
-                        Token balance
+                        {t("token_balance")}
                       </Text>
                       {balanceSorted ? (
                         <SortIconWrapper>
@@ -1583,7 +1583,7 @@ export default function OrdersTable(props) {
                         font="primaryExtraSmallSemiBold"
                         color="foregroundLowEmphasis"
                       >
-                        Available balance
+                        {t("available_balance")}
                       </Text>
                     </HeaderWrapper>
                   </th>
@@ -1599,7 +1599,7 @@ export default function OrdersTable(props) {
                         font="primaryExtraSmallSemiBold"
                         color="foregroundLowEmphasis"
                       >
-                        USD balance
+                        USD {t("balance")}
                       </Text>
                       {balanceSorted ? (
                         <SortIconWrapper>
@@ -1641,7 +1641,7 @@ export default function OrdersTable(props) {
                 )
               }
             >
-              View Account on Explorer
+              {t("view_account_on_explorer")}
             </ActionWrapper>
           </div>
         );
@@ -1664,7 +1664,7 @@ export default function OrdersTable(props) {
                 )
               }
             >
-              View Account on Explorer
+              {t("view_account_on_explorer")}
             </ActionWrapper>
           </div>
         );

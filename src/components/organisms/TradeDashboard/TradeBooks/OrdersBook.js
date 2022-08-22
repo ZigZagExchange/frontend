@@ -8,6 +8,7 @@ import {
   SideSellButton,
   SideBuyButton,
 } from "./OrdersFooter/SideButtons";
+import { useTranslation } from "react-i18next";
 
 const StyledTradeBooks = styled.section`
   display: flex;
@@ -100,6 +101,7 @@ const OrderButtonWrapper = styled.div`
 
 export default function OrdersBook(props) {
   const [side, setSide] = useState("all");
+  const { t } = useTranslation();
 
   const changeSide = (type) => {
     setSide(type);
@@ -115,7 +117,7 @@ export default function OrdersBook(props) {
           {props.settings?.stackOrderbook ? (
             <>
               <Text font="primaryTitleDisplay" color="foregroundHighEmphasis">
-                Order Book
+                {t("order_book")}
               </Text>
               {side === "sell" ? (
                 <>
