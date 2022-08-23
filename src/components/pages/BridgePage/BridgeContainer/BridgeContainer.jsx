@@ -21,6 +21,7 @@ import SelectAsset from "./SelectAsset";
 import TransactionSettings from "./TransactionSettings";
 import SlippageWarningModal from "./SlippageWarningModal";
 import { Button, ConnectWalletButton } from "components/molecules/Button";
+import { useTranslation } from "react-i18next";
 
 import {
   NETWORKS,
@@ -75,6 +76,8 @@ const BridgeContainer = () => {
   const coinEstimator = useCoinEstimator();
   const currencyValue = coinEstimator(swapDetails.currency);
   const userOrders = useSelector(userOrdersSelector);
+
+  const { t } = useTranslation();
 
   const estimatedValue =
     +swapDetails.amount * coinEstimator(swapDetails.currency) || 0;
