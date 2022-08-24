@@ -65,7 +65,7 @@ export default function OrdersTable(props) {
   const [tradeTypeItems, setTradeTypeItems] = useState([
     { text: "all", url: "#", iconSelected: true, value: "All" },
     { text: "maker", url: "#", value: "Maker" },
-    { text: "traker", url: "#", value: "Taker" },
+    { text: "taker", url: "#", value: "Taker" },
   ]);
   const isMobile = window.innerWidth < 1064;
 
@@ -110,14 +110,14 @@ export default function OrdersTable(props) {
       .filter(
         (i) =>
           i[6] === "f" &&
-          (selectedSide === "All" || i[3] === selectedSide.toLowerCase()[0])
+          (selectedSide === "all" || i[3] === selectedSide.toLowerCase()[0])
       )
       .filter(
         (i) =>
-          selectedTradeType === "All" ||
-          (selectedTradeType === "Taker" &&
+          selectedTradeType === "all" ||
+          (selectedTradeType === "taker" &&
             i[8].toLowerCase() === `${props?.user?.id}`.toLowerCase()) ||
-          (selectedTradeType === "Maker" &&
+          (selectedTradeType === "maker" &&
             i[9].toLowerCase() === `${props?.user?.id}`.toLowerCase())
       )
       .sort((a, b) => b[1] - a[1]);
@@ -128,7 +128,7 @@ export default function OrdersTable(props) {
       .filter(
         (i) =>
           i[9] !== "f" &&
-          (selectedSide === "All" || i[3] === selectedSide.toLowerCase()[0])
+          (selectedSide === "all" || i[3] === selectedSide.toLowerCase()[0])
       )
       .sort((a, b) => b[1] - a[1]);
   };
@@ -160,6 +160,7 @@ export default function OrdersTable(props) {
       }
       return acc;
     }, []);
+    console.log(newSide);
     setSelectedSide(newSide);
     setSideItems(newItems);
   };
