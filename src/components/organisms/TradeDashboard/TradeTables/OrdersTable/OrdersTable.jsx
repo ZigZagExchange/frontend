@@ -279,7 +279,7 @@ export default function OrdersTable(props) {
       await api.cancelOrder(orderId);
 
       if (!props.settings?.disableOrderNotification) {
-        toast.info("Order cancelled", {
+        toast.info(t("order_cancelled"), {
           toastId: "Order cancelled.",
         });
       }

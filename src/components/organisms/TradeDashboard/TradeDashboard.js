@@ -44,6 +44,7 @@ import { formatPrice, addComma } from "lib/utils";
 import NewFeaturesPopup from "components/organisms/TradeDashboard/NewFeaturesPopup";
 import classNames from "classnames";
 import useTheme from "components/hooks/useTheme";
+import { useTranslation } from "react-i18next";
 
 const TradeContainer = styled.div`
   color: #aeaebf;
@@ -86,8 +87,10 @@ export function TradeDashboard() {
   const history = useHistory();
   const { isDark } = useTheme();
 
+  const { t } = useTranslation();
+
   const updateMarketChain = (market) => {
-    console.log(`TradeDashboard set pair to ${market}`);    
+    console.log(`TradeDashboard set pair to ${market}`);
     dispatch(setCurrentMarket(market));
   };
 
@@ -138,12 +141,9 @@ export function TradeDashboard() {
   useEffect(() => {
     if (user.address && !user.id && network === 1) {
       history.push("/bridge");
-      toast.error(
-        "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
-        {
-          autoClose: 60000,
-        }
-      );
+      toast.error(t("Your_zksync_account_is_not_activated"), {
+        autoClose: 60000,
+      });
     }
     const sub = () => {
       dispatch(resetData());
