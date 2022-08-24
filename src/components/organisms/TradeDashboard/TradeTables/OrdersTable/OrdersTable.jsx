@@ -50,8 +50,8 @@ export default function OrdersTable(props) {
   const balanceData = useSelector(balancesSelector);
   const coinEstimator = useCoinEstimator();
   const [tab, setTabIndex] = useState(0);
-  const [selectedSide, setSelectedSide] = useState("All");
-  const [selectedTradeType, setSelectedTradeType] = useState("All");
+  const [selectedSide, setSelectedSide] = useState("all");
+  const [selectedTradeType, setSelectedTradeType] = useState("all");
   const [tokenDirection, setTokenDirection] = useState(false);
   const [balanceDirection, setBalanceDirection] = useState(false);
   const [walletList, setWalletList] = useState([]);
