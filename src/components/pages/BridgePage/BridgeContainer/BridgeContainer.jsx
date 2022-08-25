@@ -359,14 +359,11 @@ const BridgeContainer = () => {
         ) {
           error = "Open limit order prevents you from bridging";
           if (!settings.disableOrderNotification) {
-            toast.error(
-              "zkSync 1.0 allows one open order at a time. Please cancel your limit order or wait for it to be filled before bridging. Otherwise your limit order will fail.",
-              {
-                toastId:
-                  "zkSync 1.0 allows one open order at a time. Please cancel your limit order or wait for it to be filled before bridging. Otherwise your limit order will fail.",
-                autoClose: 20000,
-              }
-            );
+            toast.error(t("zksync_1_allows_one_open_order_at_a_time"), {
+              toastId:
+                "zkSync 1.0 allows one open order at a time. Please cancel your limit order or wait for it to be filled before bridging. Otherwise your limit order will fail.",
+              autoClose: 20000,
+            });
           }
         }
       }
@@ -593,9 +590,7 @@ const BridgeContainer = () => {
     const renderGuidContent = () => {
       return (
         <div>
-          <p className="text-sm">
-            Bridge transaction in process. Confirm or Reject to continue...
-          </p>
+          <p className="text-sm">{t("bridge_transaction_in_process")}</p>
         </div>
       );
     };

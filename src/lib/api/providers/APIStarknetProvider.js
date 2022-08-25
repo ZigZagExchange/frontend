@@ -4,6 +4,7 @@ import bigInt from "big-integer";
 import starknetAccountContract from "lib/contracts/Account.json";
 import APIProvider from "./APIProvider";
 
+import i18next from "../../../index";
 export default class APIStarknetProvider extends APIProvider {
   static STARKNET_CONTRACT_ADDRESS =
     "0x074f861a79865af1fb77af6197042e8c73147e28c55ac61e385ac756f89b33d6";
@@ -29,10 +30,13 @@ export default class APIStarknetProvider extends APIProvider {
     const tokenAddress =
       this.api.currencies[sellCurrency].chain[this.network].contractAddress;
     const decimals = this.api.currencies[sellCurrency].decimals;
-    const allowancesToast = toast.info("Checking and setting allowances", {
-      autoClose: false,
-      toastId: "Checking and setting allowances",
-    });
+    const allowancesToast = toast.info(
+      i18next.t("checking_and_setting_allowances"),
+      {
+        autoClose: false,
+        toastId: "Checking and setting allowances",
+      }
+    );
     const allowance = await this._getTokenAllowance(
       tokenAddress,
       this._accountState.address,
@@ -94,7 +98,9 @@ export default class APIStarknetProvider extends APIProvider {
       const starkkey = starknet.ec.getStarkKey(keypair);
       const starkkeyint = bigInt(starkkey.slice(2), 16);
       const deployContractToast = toast.info(
-        "First time using Zigzag Starknet. Deploying account contract...",
+        i18next.t(
+          "first_time_using_zigzag_starkent_deploying_account_contract"
+        ),
         {
           autoClose: false,
           toastId:
@@ -107,7 +113,7 @@ export default class APIStarknetProvider extends APIProvider {
         ]);
       toast.dismiss(deployContractToast);
       userWalletContractAddress = deployContractResponse.address;
-      toast.success("Account contract deployed");
+      toast.success(i18next.t("account_contract_deployed"));
       localStorage.setItem("starknet:account", userWalletContractAddress);
     }
 
@@ -121,10 +127,13 @@ export default class APIStarknetProvider extends APIProvider {
 
     this.api.send("login", [this.network, userWalletContractAddress]);
 
-    const balanceWaitToast = toast.info("Waiting on balances to load...", {
-      autoClose: false,
-      toastId: "Waiting on balances to load...",
-    });
+    const balanceWaitToast = toast.info(
+      i18next.t("waiting_on_balances_to_load"),
+      {
+        autoClose: false,
+        toastId: "Waiting on balances to load...",
+      }
+    );
     let committedBalances;
     try {
       committedBalances = await this._getBalances(userWalletContractAddress);
@@ -137,9 +146,14 @@ export default class APIStarknetProvider extends APIProvider {
     // Mint some tokens if the account is blank
     for (let currency in committedBalances) {
       if (committedBalances[currency].compare(0) === 0) {
-        toast.info(`No ${currency} found. Minting you some`, {
-          toastId: `No ${currency} found. Minting you some`,
-        });
+        toast.info(
+          i18next.t("no_currency_founded_minting_you_some", {
+            currency: currency,
+          }),
+          {
+            toastId: `No ${currency} found. Minting you some`,
+          }
+        );
         let amount;
         if (currency === "ETH") {
           amount = bigInt(1e18).toString();
