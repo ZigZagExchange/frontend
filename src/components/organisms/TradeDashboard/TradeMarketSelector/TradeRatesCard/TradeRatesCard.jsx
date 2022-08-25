@@ -72,7 +72,7 @@ const TradeRatesCard = ({
     if (!user.address) {
       setFaucetButtonState("notConnected");
     } else if (user.address && faucetButtonState === "notConnected") {
-      setFaucetButtonState("connected");
+      setFaucetButtonState("idle");
     }
   }, [user.address])
 
@@ -504,6 +504,7 @@ const TradeRatesCard = ({
               mr="20px"
               style={{ marginRight: "10px" }}
               onClick={handleMintRequest}
+              disabled={faucetButtonState !== "idle"}
             >
               {faucetButtonText}
             </Button>
