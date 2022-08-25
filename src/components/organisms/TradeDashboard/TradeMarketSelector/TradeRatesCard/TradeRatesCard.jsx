@@ -12,7 +12,9 @@ import useTheme from "components/hooks/useTheme";
 import {
   settingsSelector,
   setUISettings,
+  networkSelector,
 } from "lib/store/features/api/apiSlice";
+import { userSelector } from "lib/store/features/auth/authSlice";
 import {
   fetchFavourites,
   addFavourite,
@@ -24,7 +26,8 @@ import LockOpenIcon from "@mui/icons-material/LockOpen";
 import LockIcon from "@mui/icons-material/Lock";
 import _ from "lodash";
 import { darkColors, lightColors } from "lib/theme/colors";
-import classNames from "classnames";
+import { requestTokens } from "lib/api/constants";
+import api from "lib/api";
 
 const TradeRatesCard = ({
   updateMarketChain,
@@ -39,15 +42,71 @@ const TradeRatesCard = ({
   const [isIncrease, setIncrease] = useState(true);
   const [favourites, setFavourites] = useState(fetchFavourites());
   const [isOpen, setOpen] = useState(false);
+  const [faucetButtonState, setFaucetButtonState] = useState("idle");
+  const [faucetButtonText, setFaucetButtonText] = useState("Request tokens");
+
   const dispatch = useDispatch();
 
   const settings = useSelector(settingsSelector);
+  const network = useSelector(networkSelector);
+  const user = useSelector(userSelector);
+
+  const waitForTx = async (txHash) => {
+    try {
+      await api.waitForTxL2(txHash);
+    } catch (e) {
+      console.error(e);
+    }
+
+    api.getBalances();
+    setFaucetButtonState("received");
+  };
 
   useEffect(() => {
     if (marketSummary.price > lastPrice) setIncrease(true);
     else if (marketSummary.price < lastPrice) setIncrease(false);
     setLastPrice(marketSummary.price);
   }, [marketSummary.price]);
+
+  useEffect(() => {
+    if (!user.address) {
+      setFaucetButtonState("notConnected");
+    } else if (user.address && faucetButtonState === "notConnected") {
+      setFaucetButtonState("connected");
+    }
+  }, [user.address])
+
+  useEffect(() => {
+    let buttonText = "";
+    switch (faucetButtonState) {
+      case "success":
+        buttonText = "Transaction pending...";
+        break;
+      case "failure":
+        buttonText = "Request failed";
+        break;
+      case "requestAccepted":
+        buttonText = "Awaiting faucet response...";
+        break;
+      case "requestDenied":
+        buttonText = "Request denied";
+        setTimeout(setFaucetButtonState, 30000, "idle");
+        break;
+      case "requested":
+        buttonText = "Requesting tokens...";
+        break;
+      case "received":
+        buttonText = "Tokens received";
+        break;
+      case "notConnected":
+        buttonText = "No wallet connected";
+        break;
+      default:
+        buttonText = "Request testnet tokens";
+        break;
+    }
+    setFaucetButtonText(buttonText);
+  }, [faucetButtonState]);
 
   const handleOnModalClose = () => {
     onSettingsModalClose();
@@ -59,6 +118,69 @@ const TradeRatesCard = ({
 
   const handleSettings = () => {
     onSettingsModal();
+  };
+
+  const handleMintRequest = () => {
+    if (!user.address) {
+      console.error("Address is null.");
+      return;
+    }
+
+    const wsURL = "wss://faucet-zksync-v2.herokuapp.com";
+    let ws = null;
+    try {
+      ws = new WebSocket(wsURL);
+    } catch (error) {
+      console.error(error);
+      setFaucetButtonState("failure");
+      return;
+    }
+    
+    ws.onmessage = ({ data }) => {
+      console.log(data);
+      try {
+        const msg = JSON.parse(data);
+        if ("accepted" in msg) {
+          const { accepted, error } = msg;
+          if (accepted) {
+            console.log("Server request accepted, processing...");
+            setFaucetButtonState("requestAccepted");
+          } else {
+            setFaucetButtonState("requestDenied");
+            console.error(error);
+          }
+        } else if ("status" in msg) {
+          const { txhash, error } = msg;
+          if (error === null) {
+            console.log("Server sent tokens. Tx hash:", txhash);
+            setFaucetButtonState("success");
+            waitForTx(txhash);
+          } else {
+            console.error(error);
+            setFaucetButtonState("failure");
+          }
+        }
+        console.log("Message from server", msg);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    ws.onclose = (ev) => {
+      console.log(ev);
+    };
+    ws.onerror = (ev) => {
+      console.error(ev);
+    };
+
+    ws.onopen = (ev) => {
+      const msg = {
+        address: user.address,
+        chainId: network,
+        tokens: requestTokens[network].join(","),
+      };
+      ws.send(JSON.stringify(msg));
+      setFaucetButtonState("requested");
+    };
   };
 
   const toggleLayout = () => {
@@ -375,6 +497,20 @@ const TradeRatesCard = ({
         </div>
       ) : (
         <div>
+          {Object.keys(requestTokens).includes(network.toString()) ? (
+            <Button
+              variant="outlined"
+              scale="imd"
+              mr="20px"
+              style={{ marginRight: "10px" }}
+              onClick={handleMintRequest}
+            >
+              {faucetButtonText}
+            </Button>
+          ) : (
+            ""
+          )}
+
           {settings.editable ? (
             <Button
               endIcon={<LockOpenIcon />}

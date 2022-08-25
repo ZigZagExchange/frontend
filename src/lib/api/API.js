@@ -1322,4 +1322,14 @@ export default class API extends Emitter {
       }
     }
   };
+
+  waitForTx = async (txHash) => {
+    return this.mainnetProvider.waitForTx(txHash);
+  }
+
+  waitForTxL2 = async (txHash) => {
+    if (this.isEVMChain()) {
+      return this.rollupProvider.getTransactionReceipt(txHash);
+    }
+  }
 }

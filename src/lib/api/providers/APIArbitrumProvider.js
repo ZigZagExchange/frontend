@@ -11,7 +11,7 @@ export default class APIArbitrumProvider extends APIProvider {
   defaultMarket = {
     42161: "WETH-USDC",
     421613: "DAI-USDC",
-  }
+  };
 
   getAccountState = async () => {
     return this.accountState;
@@ -40,24 +40,24 @@ export default class APIArbitrumProvider extends APIProvider {
       ) {
         return result;
       }
-  
-      try {  
+
+      try {
         if (token === "ETH") {
           result.balance = await this.api.rollupProvider.getBalance(account);
           result.allowance = ethers.constants.MaxUint256;
           return result;
         }
-  
+
         const contract = new ethers.Contract(
           tokenAddress,
           erc20ContractABI,
           this.api.rollupProvider
         );
         const balanceBN = await contract.balanceOf(account);
-        result.balance = balanceBN.toString()
+        result.balance = balanceBN.toString();
         if (exchangeAddress && balanceBN.gt(0)) {
-          const allowance = await contract.allowance(account, exchangeAddress)
-          result.allowance = allowance.toString()
+          const allowance = await contract.allowance(account, exchangeAddress);
+          result.allowance = allowance.toString();
         }
         return result;
       } catch (e) {
@@ -70,13 +70,23 @@ export default class APIArbitrumProvider extends APIProvider {
       const currencyInfo = this.api.getCurrencyInfo(ticker);
       if (!currencyInfo) return;
 
-      const { balance, allowance } = await getBalanceOfCurrency(ticker, currencyInfo.address);
-      let valueReadable = "0", allowanceReadable = "0";
+      const { balance, allowance } = await getBalanceOfCurrency(
+        ticker,
+        currencyInfo.address
+      );
+      let valueReadable = "0",
+        allowanceReadable = "0";
       if (currencyInfo) {
-        if (balance) 
-          valueReadable = ethers.utils.formatUnits(balance, currencyInfo.decimals);
-        if (allowance) 
-          allowanceReadable = ethers.utils.formatUnits(allowance, currencyInfo.decimals);        
+        if (balance)
+          valueReadable = ethers.utils.formatUnits(
+            balance,
+            currencyInfo.decimals
+          );
+        if (allowance)
+          allowanceReadable = ethers.utils.formatUnits(
+            allowance,
+            currencyInfo.decimals
+          );
       } else if (ticker === "ETH") {
         valueReadable = ethers.utils.formatEther(balance);
         allowanceReadable = ethers.utils.formatEther(allowance);
@@ -245,7 +255,6 @@ export default class APIArbitrumProvider extends APIProvider {
 
   approveExchangeContract = async (token, amount) => {
     const exchangeAddress = this.getExchangeAddress();
-    console.log(`exchangeAddress ==> ${exchangeAddress}`)
     if (!exchangeAddress) throw new Error(`No exchange contract address`);
 
     const currencyInfo = this.api.getCurrencyInfo(token);
