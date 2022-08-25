@@ -126,6 +126,7 @@ const TradeRatesCard = ({
       return;
     }
 
+    setFaucetButtonState("requestAccepted");
     const wsURL = "wss://faucet-zksync-v2.herokuapp.com";
     let ws = null;
     try {
@@ -144,7 +145,6 @@ const TradeRatesCard = ({
           const { accepted, error } = msg;
           if (accepted) {
             console.log("Server request accepted, processing...");
-            setFaucetButtonState("requestAccepted");
           } else {
             setFaucetButtonState("requestDenied");
             console.error(error);
