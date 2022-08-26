@@ -249,7 +249,7 @@ const TradePriceTable = (props) => {
               total_step -= d.td2;
             }
           } else {
-            rowStyle = "";
+            rowStyle = {};
           }
           const price =
             typeof d.td1 === "number" ? d.td1.toPrecision(6) : d.td1;

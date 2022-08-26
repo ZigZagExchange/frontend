@@ -21,7 +21,7 @@ const initialUISettings = {
   disableOrderNotification: false,
   stackOrderbook: true,
   disableSlippageWarning: false,
-  disabledisableOrderBookFlash: false,
+  disableOrderBookFlash: false,
   hideAddress: false,
   hideBalance: false,
   hideGuidePopup: false,
