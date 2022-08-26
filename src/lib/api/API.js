@@ -22,7 +22,7 @@ import get from "lodash/get";
 
 const chainMap = {
   "0x1": 1,
-  "0x4": 1000,
+  "0x5": 1002,
   "0xa4b1": 42161,
 };
 
@@ -122,7 +122,7 @@ export default class API extends Emitter {
             package: WalletConnectProvider,
             options: {
               rpc: {
-              42161: `https://arbitrum-mainnet.infura.io/v3/${this.infuraId}`,
+                42161: `https://arbitrum-mainnet.infura.io/v3/${this.infuraId}`,
               },
               infuraId: this.infuraId,
             },
@@ -261,13 +261,15 @@ export default class API extends Emitter {
     if (msg.op === "marketinfo") {
       const marketInfo = msg.args[0];
       if (!marketInfo) return;
-      this.marketInfo[`${marketInfo.zigzagChainId}:${marketInfo.alias}`] = marketInfo;
+      this.marketInfo[`${marketInfo.zigzagChainId}:${marketInfo.alias}`] =
+        marketInfo;
     }
     if (msg.op === "marketinfo2") {
       const marketInfos = msg.args[0];
       marketInfos.forEach((marketInfo) => {
         if (!marketInfo) return;
-        this.marketInfo[`${marketInfo.zigzagChainId}:${marketInfo.alias}`] = marketInfo;
+        this.marketInfo[`${marketInfo.zigzagChainId}:${marketInfo.alias}`] =
+          marketInfo;
       });
     }
     if (msg.op === "lastprice") {
@@ -275,7 +277,7 @@ export default class API extends Emitter {
       const chainId = msg.args[1];
       lastPricesUpdate.forEach((l) => {
         if (!this.lastPrices[chainId]) this.lastPrices[chainId] = {};
-        this.lastPrices[chainId][l[0]] = l
+        this.lastPrices[chainId][l[0]] = l;
       });
     }
   };
@@ -293,10 +295,10 @@ export default class API extends Emitter {
           chainId: "0x1",
         };
         break;
-      case 1000:
-        ethereumChainId = "0x4";
+      case 1002:
+        ethereumChainId = "0x5";
         ethereumChainInfo = {
-          chainId: "0x4",
+          chainId: "0x5",
         };
         break;
       case 42161:
@@ -343,12 +345,12 @@ export default class API extends Emitter {
   };
 
   _socketError = (e) => {
-    console.log(e)
+    console.log(e);
     console.warn("Zigzag websocket connection failed");
   };
 
   calculateServerDelta = async () => {
-    const url = (this.apiProvider.websocketUrl).replace('wss','https');
+    const url = this.apiProvider.websocketUrl.replace("wss", "https");
     let serverTime, res;
     try {
       res = await axios.get(`${url}/api/v1/time`);
@@ -361,11 +363,13 @@ export default class API extends Emitter {
     const clientTime = Date.now();
     this.serverDelta = Math.floor((serverTime - clientTime) / 1000);
     if (this.serverDelta < -5 || this.serverDelta > 5) {
-      console.warn(`Your PC clock is not synced (delta: ${
-        this.serverDelta / 60
-        } min). Please sync it via settings > date/time > sync now`);
+      console.warn(
+        `Your PC clock is not synced (delta: ${
+          this.serverDelta / 60
+        } min). Please sync it via settings > date/time > sync now`
+      );
     }
-  }
+  };
 
   start = () => {
     if (this.ws) this.stop();
@@ -385,7 +389,7 @@ export default class API extends Emitter {
       ]);
     }
 
-    if(!this.serverDelta) this.calculateServerDelta();    
+    if (!this.serverDelta) this.calculateServerDelta();
   };
 
   stop = () => {
@@ -514,7 +518,7 @@ export default class API extends Emitter {
       case 1:
       case 42161:
         return `https://polygon-mainnet.infura.io/v3/${this.infuraId}`;
-      case 1000:
+      case 1002:
         return `https://polygon-mumbai.infura.io/v3/${this.infuraId}`;
       default:
         throw new Error(`getPolygonUrl network: ${network} not understood.`);
@@ -526,7 +530,7 @@ export default class API extends Emitter {
       case 1:
       case 42161:
         return "0x89";
-      case 1000:
+      case 1002:
         return "0x13881";
       default:
         throw new Error(
@@ -540,7 +544,7 @@ export default class API extends Emitter {
       case 1:
       case 42161:
         return POLYGON_MAINNET_WETH_ADDRESS;
-      case 1000:
+      case 1002:
         return POLYGON_MUMBAI_WETH_ADDRESS;
       default:
         throw new Error(
@@ -648,8 +652,8 @@ export default class API extends Emitter {
     switch (chainId) {
       case 1:
         return "mainnet";
-      case 1000:
-        return "rinkeby";
+      case 1002:
+        return "goerli";
       case 42161:
         return "arbitrum";
       default:
@@ -662,8 +666,8 @@ export default class API extends Emitter {
       case 1:
       case 42161:
         return "mainnet";
-      case 1000:
-        return "rinkeby";
+      case 1002:
+        return "goerli";
       default:
         return null;
     }
@@ -676,7 +680,7 @@ export default class API extends Emitter {
   getNetworkDisplayName = (network) => {
     switch (network) {
       case 1:
-      case 1000:
+      case 1002:
         return "zkSync";
       case 42161:
         return "Arbitrum";
@@ -709,26 +713,34 @@ export default class API extends Emitter {
     const token = localStorage.getItem(orderId);
     // token is used to cancel the order - otherwiese the user is asked to sign a msg
     if (token) {
-      await this.send("cancelorder3", [this.apiProvider.network, orderId, token]);
+      await this.send("cancelorder3", [
+        this.apiProvider.network,
+        orderId,
+        token,
+      ]);
     } else {
-      const toastMsg = toast.info('Sign the message to cancel your order...', {
+      const toastMsg = toast.info("Sign the message to cancel your order...", {
         toastId: "Sign the message to cancel your order...'",
       });
 
-      const message = `cancelorder2:${this.apiProvider.network}:${orderId}`
+      const message = `cancelorder2:${this.apiProvider.network}:${orderId}`;
       const signedMessage = await this.apiProvider.signMessage(message);
       try {
-        await this.send("cancelorder2", [this.apiProvider.network, orderId, signedMessage]);
+        await this.send("cancelorder2", [
+          this.apiProvider.network,
+          orderId,
+          signedMessage,
+        ]);
       } finally {
         toast.dismiss(toastMsg);
       }
     }
-    
+
     return true;
   };
 
   depositL2 = async (amount, token, address) => {
-    return this.apiProvider.depositL2(amount, token, address);
+    return await this.apiProvider.depositL2(amount, token, address);
   };
 
   getPolygonFee = async () => {
@@ -744,7 +756,7 @@ export default class API extends Emitter {
   };
 
   withdrawL2 = async (amount, token) => {
-    return this.apiProvider.withdrawL2(amount, token);
+    return await this.apiProvider.withdrawL2(amount, token);
   };
 
   transferToBridge = (amount, token, address, userAddress) => {
@@ -790,21 +802,30 @@ export default class API extends Emitter {
   cancelAllOrders = async (orderIds) => {
     const { id: userId } = await this.getAccountState();
     const tokenArray = [];
-    orderIds.forEach(id => {
+    orderIds.forEach((id) => {
       const token = localStorage.getItem(id);
       if (token) tokenArray.push(token);
-    })
+    });
     if (orderIds.length === tokenArray.length) {
-      await this.send("cancelall3", [this.apiProvider.network, userId, tokenArray]);
+      await this.send("cancelall3", [
+        this.apiProvider.network,
+        userId,
+        tokenArray,
+      ]);
     } else {
-      const toastMsg = toast.info('Sign the message to cancel your order...', {
+      const toastMsg = toast.info("Sign the message to cancel your order...", {
         toastId: "Sign the message to cancel your order...'",
       });
       const validUntil = Math.floor(Date.now() / 1000) + 10;
-      const message = `cancelall2:${this.apiProvider.network}:${validUntil}`
+      const message = `cancelall2:${this.apiProvider.network}:${validUntil}`;
       const signedMessage = await this.apiProvider.signMessage(message);
       try {
-        await this.send("cancelall2", [this.apiProvider.network, userId, validUntil, signedMessage]);
+        await this.send("cancelall2", [
+          this.apiProvider.network,
+          userId,
+          validUntil,
+          signedMessage,
+        ]);
       } finally {
         toast.dismiss(toastMsg);
       }
@@ -814,12 +835,12 @@ export default class API extends Emitter {
   };
 
   cancelAllOrdersAllChains = async () => {
-    const toastMsg = toast.info('Sign the message to cancel your order...', {
+    const toastMsg = toast.info("Sign the message to cancel your order...", {
       toastId: "Sign the message to cancel your order...'",
     });
 
-    const validUntil = (Date.now() / 1000) + 10;
-    const message = `cancelall2:0:${validUntil}`
+    const validUntil = Date.now() / 1000 + 10;
+    const message = `cancelall2:0:${validUntil}`;
     const signedMessage = await this.apiProvider.signMessage(message);
     const { id: userId } = await this.getAccountState();
     try {
@@ -979,10 +1000,10 @@ export default class API extends Emitter {
       marketInfo.quoteAsset.decimals
     );
 
-    const expirationTimeSeconds = orderType === "market"
-      ? Date.now() / 1000 + 60 * 2 // two minutes
-      : Date.now() / 1000 + 60 * 60 * 24 * 7; // one week
-    
+    const expirationTimeSeconds =
+      orderType === "market"
+        ? Date.now() / 1000 + 60 * 2 // two minutes
+        : Date.now() / 1000 + 60 * 60 * 24 * 7; // one week
 
     await this.apiProvider.submitOrder(
       market,
@@ -1062,14 +1083,6 @@ export default class API extends Emitter {
     return response;
   };
 
-  getTokenInfo = (tokenLike, chainId) => {
-    return this.apiProvider.getTokenInfo(tokenLike, chainId);
-  };
-
-  getTokenPrice = (tokenLike, chainId) => {
-    return this.apiProvider.tokenPrice(tokenLike, chainId);
-  };
-
   getCurrencyLogo(currency) {
     try {
       return require(`assets/images/currency/${currency}.svg`).default;
@@ -1092,7 +1105,7 @@ export default class API extends Emitter {
         FRAX: "0x853d955aCEf822Db058eb8505911ED77F175b99e",
         UST: "0xa693b19d2931d498c5b318df961919bb4aee87a5",
       };
-    } else if (this.apiProvider.network === 1000) {
+    } else if (this.apiProvider.network === 1002) {
       return {
         // these are just tokens on rinkeby with the correct tickers.
         // neither are actually on rinkeby.
@@ -1198,7 +1211,7 @@ export default class API extends Emitter {
     const pairs = this.getPairs();
     for (let i = 0; i < pairs.length; i++) {
       const pair = pairs[i];
-      const marketInfo = this.marketInfo[`${this.apiProvider.network}:${pair}`]
+      const marketInfo = this.marketInfo[`${this.apiProvider.network}:${pair}`];
       const baseCurrency = pair.split("-")[0];
       const quoteCurrency = pair.split("-")[1];
       if (baseCurrency === currency && marketInfo) {
@@ -1223,8 +1236,8 @@ export default class API extends Emitter {
     switch (Number(chainId)) {
       case 1:
         return "https://zkscan.io/explorer/transactions/" + txhash;
-      case 1000:
-        return "https://rinkeby.zkscan.io/explorer/transactions/" + txhash;
+      case 1002:
+        return "https://goerli.zkscan.io/explorer/transactions/" + txhash;
       case 42161:
         return "https://arbiscan.io/tx/" + txhash;
       default:
@@ -1238,8 +1251,8 @@ export default class API extends Emitter {
         case 1:
         case 42161:
           return "https://etherscan.io/address/" + address;
-        case 1000:
-          return "https://rinkeby.etherscan.io/address/" + address;
+        case 1002:
+          return "https://goerli.etherscan.io/address/" + address;
         default:
           throw Error("Chain ID not understood");
       }
@@ -1247,8 +1260,8 @@ export default class API extends Emitter {
       switch (Number(chainId)) {
         case 1:
           return "https://zkscan.io/explorer/accounts/" + address;
-        case 1000:
-          return "https://rinkeby.zkscan.io/explorer/accounts/" + address;
+        case 1002:
+          return "https://goerli.zkscan.io/explorer/accounts/" + address;
         case 42161:
           return "https://arbiscan.io/address/" + address;
         default:

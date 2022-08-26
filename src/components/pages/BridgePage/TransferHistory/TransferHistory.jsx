@@ -33,7 +33,6 @@ const TransferHistory = () => {
       }
     });
     setGroupArray(tempArray);
-    console.log(tempArray);
   }, [receipts]);
 
   return (

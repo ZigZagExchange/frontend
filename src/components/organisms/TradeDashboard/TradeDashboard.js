@@ -127,8 +127,8 @@ export function TradeDashboard() {
     let networkText;
     if (network === 1) {
       networkText = "zksync";
-    } else if (network === 1000) {
-      networkText = "zksync-rinkeby";
+    } else if (network === 1002) {
+      networkText = "zksync-goerli";
     } else if (network === 42161) {
       networkText = "arbitrum";
     }
@@ -136,7 +136,7 @@ export function TradeDashboard() {
   }, [network, currentMarket]);
 
   useEffect(() => {
-    if (user.address && !user.id) {
+    if (user.address && !user.id && network === 1) {
       history.push("/bridge");
       toast.error(
         "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
@@ -280,13 +280,15 @@ export function TradeDashboard() {
         lastPrices={lastPrices}
       />
       <GridLayoutRow
-        rowHeight={(window.innerHeight - 112) / 30}
         layouts={settings.layouts}
         autoSize={false}
         onChange={(_, layout) => {
           dispatch(setUISettings({ key: "layouts", value: layout }));
         }}
         onDragStart={() => {
+          dispatch(setUISettings({ key: "layoutsCustomized", value: true }));
+        }}
+        onResizeStart={() => {
           dispatch(setUISettings({ key: "layoutsCustomized", value: true }));
         }}
         margin={[0, 0]}

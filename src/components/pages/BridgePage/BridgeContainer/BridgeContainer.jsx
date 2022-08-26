@@ -310,9 +310,9 @@ const BridgeContainer = () => {
     const userBalance = getCurrencyBalance(swapCurrency);
     const max = getMax(swapCurrency, L2FeeToken);
     const bridgeAmount = inputValue - ZigZagFeeAmount;
-    
+
     if (!api.getCurrencyInfo(swapDetails.currency)) {
-      setFormErr('Loading token details...');
+      setFormErr("Loading token details...");
       return;
     }
 
@@ -350,7 +350,7 @@ const BridgeContainer = () => {
           ["o", "b", "m"].includes(o[9])
         );
         if (
-          [1, 1000].includes(network) &&
+          [1, 1002].includes(network) &&
           fromNetwork.id === "zksync" &&
           openOrders.length > 0
         ) {
@@ -401,7 +401,7 @@ const BridgeContainer = () => {
     L2FeeAmount,
     L2FeeToken,
     api.marketInfo,
-    balances[swapDetails.currency]
+    balances[swapDetails.currency],
   ]);
 
   const setSwapDetails = async (values) => {
@@ -611,9 +611,11 @@ const BridgeContainer = () => {
             setFromAmounts(0);
             api.getWalletBalances();
           }, 1000);
+          if (!settings.disableOrderNotification) {
+            toast.dismiss(orderPendingToast);
+          }
         })
         .catch((e) => {
-          console.error("error sending transaction::", e);
           if (!settings.disableOrderNotification) {
             toast.error(e.message);
             toast.dismiss(orderPendingToast);
@@ -623,8 +625,7 @@ const BridgeContainer = () => {
         .finally(() => {
           setPolygonLoading(false);
           setLoading(false);
-          setSwapDetails({ amount: "" });
-          // setFromAmounts(0);
+          // setSwapDetails({ amount: "" });
         });
     }
   };
@@ -636,6 +637,19 @@ const BridgeContainer = () => {
     sDetails["amount"] = "";
     setSwapDetails(sDetails);
     setFromAmounts(0);
+  };
+
+  const filterSmallBalances = (balance, currency) => {
+    const usdPrice = coinEstimator(currency);
+    const usd_balance = usdPrice * balance;
+
+    let b = 0;
+    if (usd_balance < 0.02) {
+      b = "0.00";
+    } else {
+      b = balance;
+    }
+    return b;
   };
 
   const fromTokenOptions = useMemo(() => {
@@ -672,7 +686,10 @@ const BridgeContainer = () => {
         return {
           id: index,
           name: item,
-          balance: balances[item]?.valueReadable,
+          balance: filterSmallBalances(
+            balances[item]?.valueReadable,
+            swapDetails.currency
+          ),
           price: `${price}`,
           isFastWithdraw: isFastWithdraw,
         };
@@ -724,6 +741,7 @@ const BridgeContainer = () => {
     setToNetwork(fromNetwork);
     setFromNetwork(f.from);
     setSwitchClicking(true);
+    setFromAmounts(0);
   };
 
   const onChangeFromAmounts = (value) => {
