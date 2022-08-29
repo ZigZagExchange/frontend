@@ -140,9 +140,12 @@ export default class APIArbitrumProvider extends APIProvider {
     const makerVolumeFeeBN = quoteAmountBN
       .div(10000)
       .mul(marketInfo.makerVolumeFee * 100);
-    const takerVolumeFeeBN = baseAmountBN
+
+    // Hardcode 0.05% taker fee for now. Can change it back to dynamic later if we want to enforce the fee on the backend
+    const takerVolumeFeeBN = sellAmountBN
+      //.mul(marketInfo.takerVolumeFee * 100);
+      .mul(5)
       .div(10000)
-      .mul(marketInfo.takerVolumeFee * 100);
 
     // size check
     if (makerVolumeFeeBN.gte(takerVolumeFeeBN)) {

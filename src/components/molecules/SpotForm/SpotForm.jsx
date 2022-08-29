@@ -300,10 +300,15 @@ class SpotForm extends React.Component {
     const marketInfo = this.props.marketInfo;
     if (!marketInfo) return 0;
     let fee = marketInfo.baseFee;
-    fee +=
-      marketInfo.makerVolumeFee && amount
-        ? amount * marketInfo.makerVolumeFee
-        : 0;
+
+    // Hardcode 0.05% taker fee for Arbitrum
+    if (this.props.network === 42161) {
+      const amount =
+        this.props.side === "b"
+          ? this.state.quoteAmount
+          : this.state.baseAmount;
+      fee = fee * 1 + amount * 0.0005;
+    }
     return fee;
   }
 
@@ -311,10 +316,15 @@ class SpotForm extends React.Component {
     const marketInfo = this.props.marketInfo;
     if (!marketInfo) return 0;
     let fee = marketInfo.quoteFee;
-    fee +=
-      marketInfo.makerVolumeFee && amount
-        ? amount * marketInfo.makerVolumeFee
-        : 0;
+
+    // Hardcode 0.05% taker fee for Arbitrum
+    if (this.props.network === 42161) {
+      const amount =
+        this.props.side === "b"
+          ? this.state.quoteAmount
+          : this.state.baseAmount;
+      fee = fee * 1 + amount * 0.0005;
+    }
     return fee;
   }
 
@@ -807,6 +817,10 @@ class SpotForm extends React.Component {
   showLabel() {
     if (this.props.network === 42161) {
       const marketInfo = this.props.marketInfo;
+
+      // Hardcode 0.05% taker fee and make it dynamic later if necessary
+      const takerVolumeFee = 0.0005;
+
       let gasFee,
         feeToken,
         gasFeeUsdValue,
@@ -817,18 +831,18 @@ class SpotForm extends React.Component {
       if (marketInfo) {
         gasFee =
           this.props.side === "b" ? marketInfo.quoteFee : marketInfo.baseFee;
-        gasFee = formatToken(gasFee);
+        gasFee = parseFloat(gasFee).toPrecision(4);
         feeToken =
           this.props.side === "b"
             ? marketInfo.quoteAsset.symbol
             : marketInfo.baseAsset.symbol;
         const amount =
-          this.state.side === "b"
+          this.props.side === "b"
             ? this.state.quoteAmount
             : this.state.baseAmount;
         if (amount && !Number.isNaN(amount)) {
           makerFee = amount * marketInfo.makerVolumeFee;
-          takerFee = amount * marketInfo.takerVolumeFee;
+          takerFee = amount * takerVolumeFee;
         } else {
           makerFee = 0;
           takerFee = 0;
@@ -870,7 +884,7 @@ class SpotForm extends React.Component {
               <p className="font-sans text-sm">{`${this.props.t(
                 "taker_fee"
               )} (${
-                marketInfo.takerVolumeFee * 100
+                takerVolumeFee * 100
               } %): ${takerFee} ${feeToken} - (~$ ${takerFeeUsdValue})`}</p>
             </div>
           )}
