@@ -11,14 +11,9 @@ const languages = [
     country_code: "gb",
   },
   {
-    code: "kr",
-    name: "KR",
-    country_code: "kr",
-  },
-  {
-    code: "fr",
-    name: "FR",
-    country_code: "fr",
+    code: "zh",
+    name: "CHN",
+    country_code: "zh",
   },
 ];
 
@@ -46,7 +41,7 @@ export default function LanguageDropdown() {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Listbox.Options className="absolute w-20 py-1 mt-1 overflow-auto text-sm dark:bg-[#191A33] border dark:border-foreground-400 bg-sky-100 rounded-md shadow-lg max-h-60">
+            <Listbox.Options className="absolute w-26 py-1 mt-1 overflow-auto text-sm dark:bg-[#191A33] border dark:border-foreground-400 bg-sky-100 rounded-md shadow-lg max-h-60">
               {languages.map((lang, langIdx) => (
                 <Listbox.Option
                   key={langIdx}
