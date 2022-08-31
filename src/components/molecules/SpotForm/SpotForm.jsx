@@ -774,9 +774,7 @@ class SpotForm extends React.Component {
   showLabel() {
     if (this.props.network === 42161) {
       const marketInfo = this.props.marketInfo;
-
-      // Hardcode 0.05% taker fee and make it dynamic later if necessary
-      const takerVolumeFee = 0.0005;
+      const takerVolumeFee = marketInfo ? marketInfo.takerVolumeFee : 0;
       
       let gasFee,
         feeToken,
