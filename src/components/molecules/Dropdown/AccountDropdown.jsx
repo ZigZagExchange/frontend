@@ -171,7 +171,7 @@ const AccountDropdown = ({ notext, networkName }) => {
     setExplorer(explorerLink);
 
     // if EVM set layer to and disable toggle
-    if(api.isEVM()) {
+    if(api.isEVMChain()) {
       setSelectedLayer(2);
     }
   }, [network, user.address, selectedLayer]);
