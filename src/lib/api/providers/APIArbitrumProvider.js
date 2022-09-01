@@ -151,15 +151,16 @@ export default class APIArbitrumProvider extends APIProvider {
     } else {
       balanceBN = balanceBN.sub(gasFeeBN).sub(takerVolumeFeeBN);
     }
-    const delta = sellAmountBN.mul("1000").div(balanceBN).toNumber();
-    if (delta > 1001) {
+    const delta = sellAmountBN.mul("100000").div(balanceBN).toNumber();
+    if (delta > 100100) {
       // 100.1 %
       throw new Error(`Amount exceeds balance.`);
     }
     // prevent dust issues
-    if (delta > 999) {
+    if (delta > 99990) {
       // 99.9 %
-      sellAmountBN = balanceBN;
+      sellAmountBN = balanceBN;      
+      buyAmountBN = buyAmountBN.mul(100000).div(delta);
     }
 
     let domain, Order, types;
