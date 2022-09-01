@@ -164,7 +164,7 @@ export default class APIArbitrumProvider extends APIProvider {
     }
 
     let domain, Order, types;
-    if (Number(marketInfo.contractVersion) === 5) {
+    if (Number(marketInfo.contractVersion) === 6) {
       Order = {
         user: this.accountState.address,
         sellToken: sellToken,
