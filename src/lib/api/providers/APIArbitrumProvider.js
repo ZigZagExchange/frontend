@@ -12,7 +12,7 @@ export default class APIArbitrumProvider extends APIProvider {
   _tokenInfo = {};
   defaultMarket = {
     42161: "WETH-USDC",
-  }
+  };
 
   getAccountState = async () => {
     return this.accountState;
@@ -139,11 +139,11 @@ export default class APIArbitrumProvider extends APIProvider {
 
     const makerVolumeFeeBN = sellAmountBN
       .mul(marketInfo.makerVolumeFee * 10000)
-      .div(9999)
+      .div(9999);
 
     const takerVolumeFeeBN = sellAmountBN
       .mul(marketInfo.takerVolumeFee * 10000)
-      .div(9999)
+      .div(9999);
 
     // size check
     if (makerVolumeFeeBN.gte(takerVolumeFeeBN)) {
@@ -159,7 +159,7 @@ export default class APIArbitrumProvider extends APIProvider {
     // prevent dust issues
     if (delta > 99990) {
       // 99.9 %
-      sellAmountBN = balanceBN;      
+      sellAmountBN = balanceBN;
       buyAmountBN = buyAmountBN.mul(100000).div(delta);
     }
 

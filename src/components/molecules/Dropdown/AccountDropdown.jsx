@@ -3,7 +3,6 @@ import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import Button from "../Button/Button";
 import { AccountButton } from "../ExpandableButton";
-import Dropdown from "./Dropdown";
 import { useCoinEstimator } from "components";
 import Loader from "react-loader-spinner";
 import {
@@ -20,12 +19,7 @@ import {
 import { userSelector } from "lib/store/features/auth/authSlice";
 import api from "lib/api";
 import Text from "components/atoms/Text/Text";
-import {
-  PlusIcon,
-  CompareArrowIcon,
-  DeleteIcon,
-  ExternalLinkIcon,
-} from "components/atoms/Svg";
+import { ExternalLinkIcon } from "components/atoms/Svg";
 import ToggleButton from "../Toggle/ToggleButton";
 
 const DropdownWrapper = styled.div`
@@ -175,6 +169,11 @@ const AccountDropdown = ({ notext, networkName }) => {
       ? api.getExplorerAccountLink(network, user.address, selectedLayer)
       : null;
     setExplorer(explorerLink);
+
+    // if EVM set layer to and disable toggle
+    if(api.isEVM()) {
+      setSelectedLayer(2);
+    }
   }, [network, user.address, selectedLayer]);
 
   const toggle = () => {
@@ -252,15 +251,17 @@ const AccountDropdown = ({ notext, networkName }) => {
                   : "$ " + addComma(formatUSD(totalBalance))}
               </Text>
             </div>
-            <ToggleButton
-              type="option"
-              size="sm"
-              leftLabel="l1"
-              rightLabel="l2"
-              width="40"
-              selectedLayer={selectedLayer}
-              toggleClick={(num) => setSelectedLayer(num)}
-            />
+            {!api.isEVMChain() && (
+              <ToggleButton
+                type="option"
+                size="sm"
+                leftLabel="l1"
+                rightLabel="l2"
+                width="40"
+                selectedLayer={selectedLayer}
+                toggleClick={(num) => setSelectedLayer(num)}
+              />
+            )}
           </DropdownHeader>
           <Divider />
           <DropdownContent>
