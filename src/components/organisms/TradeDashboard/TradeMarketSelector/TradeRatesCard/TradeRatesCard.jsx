@@ -157,7 +157,7 @@ const TradeRatesCard = ({
                       : lightColors.foregroundHighEmphasis
                   }
                 >
-                  Favorites
+                  {t("favorites")}
                 </Box>
                 {_.map(favourites, (item, index) => {
                   return (
