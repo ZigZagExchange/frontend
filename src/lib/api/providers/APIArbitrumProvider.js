@@ -12,7 +12,7 @@ export default class APIArbitrumProvider extends APIProvider {
   _tokenInfo = {};
   defaultMarket = {
     42161: "WETH-USDC",
-  }
+  };
 
   getAccountState = async () => {
     return this.accountState;
@@ -137,15 +137,13 @@ export default class APIArbitrumProvider extends APIProvider {
       );
     }
 
-    const makerVolumeFeeBN = quoteAmountBN
-      .div(10000)
-      .mul(marketInfo.makerVolumeFee * 100);
+    const makerVolumeFeeBN = sellAmountBN
+      .mul(marketInfo.makerVolumeFee * 10000)
+      .div(9999);
 
-    // Hardcode 0.05% taker fee for now. Can change it back to dynamic later if we want to enforce the fee on the backend
     const takerVolumeFeeBN = sellAmountBN
-      //.mul(marketInfo.takerVolumeFee * 100);
-      .mul(5)
-      .div(10000)
+      .mul(marketInfo.takerVolumeFee * 10000)
+      .div(9999);
 
     // size check
     if (makerVolumeFeeBN.gte(takerVolumeFeeBN)) {
@@ -153,19 +151,20 @@ export default class APIArbitrumProvider extends APIProvider {
     } else {
       balanceBN = balanceBN.sub(gasFeeBN).sub(takerVolumeFeeBN);
     }
-    const delta = sellAmountBN.mul("1000").div(balanceBN).toNumber();
-    if (delta > 1001) {
+    const delta = sellAmountBN.mul("100000").div(balanceBN).toNumber();
+    if (delta > 100100) {
       // 100.1 %
       throw new Error(`Amount exceeds balance.`);
     }
     // prevent dust issues
-    if (delta > 999) {
+    if (delta > 99990) {
       // 99.9 %
       sellAmountBN = balanceBN;
+      buyAmountBN = buyAmountBN.mul(100000).div(delta);
     }
 
     let domain, Order, types;
-    if (Number(marketInfo.contractVersion) === 5) {
+    if (Number(marketInfo.contractVersion) === 6) {
       Order = {
         user: this.accountState.address,
         sellToken: sellToken,
@@ -183,7 +182,7 @@ export default class APIArbitrumProvider extends APIProvider {
 
       domain = {
         name: "ZigZag",
-        version: "5",
+        version: "6",
         chainId: this.network,
       };
 
