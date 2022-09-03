@@ -315,7 +315,7 @@ export default function OrdersTable(props) {
             let remaining = order[10] === null ? baseQuantity : order[10];
             const orderStatus = order[9];
             const baseCurrency = order[2].split("-")[0];
-            const side = order[3] === "b" ? "Buy" : "Sell";
+            const side = order[3] === "b" ? t("buy") : t("sell");
             const sideclassname =
               order[3] === "b" ? "successHighEmphasis" : "dangerHighEmphasis";
             const expiration = order[7];
@@ -662,7 +662,7 @@ export default function OrdersTable(props) {
             let remaining = order[10] === null ? baseQuantity : order[10];
             let orderStatus = order[9];
             const baseCurrency = order[2].split("-")[0];
-            const side = order[3] === "b" ? "Buy" : "Sell";
+            const side = order[3] === "b" ? t("buy") : t("sell");
             const sideclassname =
               order[3] === "b" ? "successHighEmphasis" : "dangerHighEmphasis";
             const expiration = order[7];
@@ -849,13 +849,13 @@ export default function OrdersTable(props) {
             let price = fill[4];
             let baseQuantity = fill[5];
             const fillstatus = fill[6];
-            const sidetext = side === "b" ? "Buy" : "Sell";
+            const sidetext = side === "b" ? t("buy") : t("sell");
             const sideclassname =
               side === "b" ? "successHighEmphasis" : "dangerHighEmphasis";
             const tradeTypeText =
               fill[8].toLowerCase() === `${props?.user?.id}`.toLowerCase()
-                ? "Taker"
-                : "Maker";
+                ? t("taker")
+                : t("maker");
             const txhash = fill[7];
             const feeamount = Number(fill[10]);
             const feetoken = fill[11];
@@ -1235,13 +1235,13 @@ export default function OrdersTable(props) {
             let baseQuantity = fill[5];
             const baseCurrency = fill[2].split("-")[0];
             const fillstatus = fill[6];
-            const sidetext = side === "b" ? "Buy" : "Sell";
+            const sidetext = side === "b" ? t("buy") : t("sell");
             const sideclassname =
               side === "b" ? "successHighEmphasis" : "dangerHighEmphasis";
             const tradeTypeText =
               fill[8].toLowerCase() === `${props?.user?.id}`.toLowerCase()
-                ? "Taker"
-                : "Maker";
+                ? t("taker")
+                : t("maker");
             const txhash = fill[7];
             const feeamount = Number(fill[10]);
             const feetoken = fill[11];
