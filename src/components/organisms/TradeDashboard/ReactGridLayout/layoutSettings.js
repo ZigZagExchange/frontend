@@ -1,4 +1,4 @@
-import { rowHeight } from "./utils";
+import { rowHeight, innerHeight } from './utils';
 
 function max(a, b) {
   return  a>b?a:b;
@@ -7,10 +7,10 @@ function max(a, b) {
 export const initialLayouts = () => {
   let unitHeight = rowHeight;
   let upperHeight;
-  if(window.innerWidth < 992 || window.innerHeight < 875) {
-    upperHeight= Math.ceil(470 / unitHeight);
+  if (window.innerWidth < 992 || innerHeight < 875) {
+    upperHeight = Math.ceil(470 / unitHeight);
   } else {
-    upperHeight= Math.ceil(570 / unitHeight);
+    upperHeight = Math.ceil(570 / unitHeight);
   }
 
   return {

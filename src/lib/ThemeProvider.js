@@ -10,7 +10,7 @@ export const ThemeContext = createContext({
 });
 
 const ThemeProviders = ({ children }) => {
-  const _isDark = localStorage.getItem(CACHE_KEY);
+  const _isDark = localStorage?.getItem(CACHE_KEY);
 
   const [isDark, setIsDark] = useState(() => {
     return _isDark ? JSON.parse(_isDark) : true;
