@@ -611,9 +611,11 @@ const BridgeContainer = () => {
             setFromAmounts(0);
             api.getWalletBalances();
           }, 1000);
+          if (!settings.disableOrderNotification) {
+            toast.dismiss(orderPendingToast);
+          }
         })
         .catch((e) => {
-          console.error("error sending transaction::", e);
           if (!settings.disableOrderNotification) {
             toast.error(e.message);
             toast.dismiss(orderPendingToast);
@@ -623,8 +625,7 @@ const BridgeContainer = () => {
         .finally(() => {
           setPolygonLoading(false);
           setLoading(false);
-          setSwapDetails({ amount: "" });
-          // setFromAmounts(0);
+          // setSwapDetails({ amount: "" });
         });
     }
   };
@@ -740,6 +741,7 @@ const BridgeContainer = () => {
     setToNetwork(fromNetwork);
     setFromNetwork(f.from);
     setSwitchClicking(true);
+    setFromAmounts(0);
   };
 
   const onChangeFromAmounts = (value) => {
