@@ -805,7 +805,7 @@ export default class API extends Emitter {
 
   withdrawL2 = async (amount, token) => {
     if (this.wrongNetwork()) return;
-
+    
     return await this.apiProvider.withdrawL2(amount, token);
   };
 
@@ -891,7 +891,7 @@ export default class API extends Emitter {
   cancelAllOrdersAllChains = async () => {
     if (this.wrongNetwork()) return;
 
-    const toastMsg = toast.info('Sign the message to cancel your order...', {
+    const toastMsg = toast.info("Sign the message to cancel your order...", {
       toastId: "Sign the message to cancel your order...'",
     });
 
