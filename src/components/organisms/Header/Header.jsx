@@ -256,16 +256,12 @@ export const Header = (props) => {
   // state to open or close the sidebar in mobile
 
   const [show, setShow] = useState(false);
-  const connecting = useSelector(isConnectingSelector);
-  // const [connecting, setConnecting] = useState(false);
   const user = useSelector(userSelector);
   const network = useSelector(networkSelector);
   const hasBridge = api.isImplemented("depositL2");
   const isEVM = api.isEVMChain();
   const history = useHistory();
   const [index, setIndex] = useState(0);
-  const [language, setLanguage] = useState(langList[0].text);
-  const [account, setAccount] = useState(accountLists[0].text);
   const [networkName, setNetworkName] = useState("");
   const [networkItems, setNetWorkItems] = useState(networkLists);
   const { isDark, toggleTheme } = useTheme();
@@ -320,14 +316,6 @@ export const Header = (props) => {
         break;
     }
   }, []);
-
-  const changeLanguage = (text) => {
-    setLanguage(text);
-  };
-
-  const changeAccount = (text) => {
-    alert(text);
-  };
 
   const changeNetwork = async (text, value) => {
     setNetworkName(text);

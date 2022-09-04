@@ -189,5 +189,6 @@
   "transaction_successfully": "交易成功",
   "view_transaction": "交易详情",
   "confirm_that_your_funds_have_arrived": "请确认您的资金已转入",
-  "an_unknown_error_has_occurred_while_processing": "运行中发生未知错误"
+  "an_unknown_error_has_occurred_while_processing": "运行中发生未知错误",
+  "committing": "提交"
 }

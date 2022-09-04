@@ -17,6 +17,12 @@ const languages = [
     country_code: "zh",
     icon: "https://raw.githubusercontent.com/OnTheGoSystems/SVG-flags-language-switcher/master/flags/cn.svg",
   },
+  {
+    code: "ir",
+    name: "فارسی",
+    country_code: "ir",
+    icon: "https://raw.githubusercontent.com/OnTheGoSystems/SVG-flags-language-switcher/master/flags/ir.svg",
+  },
 ];
 
 export default function LanguageDropdown() {

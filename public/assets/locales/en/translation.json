@@ -189,5 +189,15 @@
   "transaction_successfully": "Transaction Successful",
   "view_transaction": "View transaction",
   "confirm_that_your_funds_have_arrived": "Confirm that your funds have arrived",
-  "an_unknown_error_has_occurred_while_processing": "An unknown error has occurred while processing"
+  "an_unknown_error_has_occurred_while_processing": "An unknown error has occurred while processing",
+  "committing": "Committing",
+  "rejected": "Rejected",
+  "partial_fill": "Partial fill",
+  "partial_match": "Partial match",
+  "matched": "Matched",
+  "open": "Open",
+  "canceled": "Canceled",
+  "expired": "Expired",
+  "cancel": "Cancel",
+  "view_tx": "View Tx"
 }

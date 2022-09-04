@@ -406,7 +406,7 @@ const TradeRatesCard = ({
             scale="imd"
             onClick={handleSettings}
           >
-            Settings
+            {t("settings")}
           </Button>
         </div>
       )}

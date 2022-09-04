@@ -341,21 +341,21 @@ export default function OrdersTable(props) {
             let statusText, statusClass;
             switch (order[9]) {
               case "r":
-                statusText = "Rejected";
+                statusText = t("rejected");
                 statusClass = "dangerHighEmphasis";
                 break;
               case "pf":
-                statusText = "Partial fill";
+                statusText = t("partial_fill");
                 statusClass = "successHighEmphasis";
                 break;
               case "f":
-                statusText = "Filled";
+                statusText = t("filled");
                 statusClass = "successHighEmphasis";
                 break;
               case "pm":
                 statusText = (
                   <span>
-                    Partial match
+                    {t("partial_match")}
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -368,7 +368,7 @@ export default function OrdersTable(props) {
               case "m":
                 statusText = (
                   <span className="flex items-center gap-1">
-                    Matched{" "}
+                    {t("matched")}{" "}
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -381,7 +381,9 @@ export default function OrdersTable(props) {
               case "b":
                 statusText = (
                   <span>
-                    <span style={{ display: "inline" }}>Committing </span>
+                    <span style={{ display: "inline" }}>
+                      {t("committing")}{" "}
+                    </span>
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -393,15 +395,15 @@ export default function OrdersTable(props) {
                 statusClass = "warningHighEmphasis";
                 break;
               case "o":
-                statusText = "Open";
+                statusText = t("open");
                 statusClass = "successHighEmphasis";
                 break;
               case "c":
-                statusText = "Canceled";
+                statusText = t("canceled");
                 statusClass = "dangerHighEmphasis";
                 break;
               case "e":
-                statusText = "Expired";
+                statusText = t("expired");
                 statusClass = "warningHighEmphasis";
                 break;
               default:
@@ -453,7 +455,7 @@ export default function OrdersTable(props) {
                             textAlign="right"
                             onClick={() => cancelOrder(orderId)}
                           >
-                            Cancel
+                            {t("cancel")}
                           </ActionWrapper>
                         ) : (
                           ""
@@ -467,7 +469,7 @@ export default function OrdersTable(props) {
                         font="primaryExtraSmallSemiBold"
                         color="foregroundLowEmphasis"
                       >
-                        Price
+                        {t("price")}
                       </Text>
                     </td>
                     <td>
@@ -486,7 +488,7 @@ export default function OrdersTable(props) {
                         font="primaryExtraSmallSemiBold"
                         color="foregroundLowEmphasis"
                       >
-                        Filled
+                        {t("filled")}
                       </Text>
                     </td>
                     <td>
@@ -509,7 +511,7 @@ export default function OrdersTable(props) {
                         font="primaryExtraSmallSemiBold"
                         color="foregroundLowEmphasis"
                       >
-                        Expiry
+                        {t("expiry")}
                       </Text>
                     </td>
                     <td>
@@ -693,25 +695,25 @@ export default function OrdersTable(props) {
             let statusText, statusClass;
             switch (orderStatus) {
               case "r":
-                statusText = "Rejected";
+                statusText = t("rejected");
                 statusClass = "dangerHighEmphasis";
                 break;
               case "pf":
-                statusText = "Partial fill";
+                statusText = t("partial_fill");
                 statusClass = "successHighEmphasis";
                 break;
               case "f":
-                statusText = "Filled";
+                statusText = t("filled");
                 statusClass = "successHighEmphasis";
                 break;
               case "pm":
-                statusText = <span>Partial match</span>;
+                statusText = <span>{t("partial_match")}</span>;
                 statusClass = "warningHighEmphasis";
                 break;
               case "m":
                 statusText = (
                   <span className="flex items-center gap-1">
-                    Matched{" "}
+                    {t("matched")}{" "}
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -724,7 +726,9 @@ export default function OrdersTable(props) {
               case "b":
                 statusText = (
                   <span>
-                    <span style={{ display: "inline" }}>Committing </span>
+                    <span style={{ display: "inline" }}>
+                      {t("committing")}{" "}
+                    </span>
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -736,15 +740,15 @@ export default function OrdersTable(props) {
                 statusClass = "warningHighEmphasis";
                 break;
               case "o":
-                statusText = "Open";
+                statusText = t("open");
                 statusClass = "successHighEmphasis";
                 break;
               case "c":
-                statusText = "Canceled";
+                statusText = t("canceled");
                 statusClass = "dangerHighEmphasis";
                 break;
               case "e":
-                statusText = "Expired";
+                statusText = t("expired");
                 statusClass = "warningHighEmphasis";
                 break;
               default:
@@ -817,7 +821,7 @@ export default function OrdersTable(props) {
                         color="primaryHighEmphasis"
                         onClick={() => cancelOrder(orderId)}
                       >
-                        Cancel
+                        {t("cancel")}
                       </ActionWrapper>
                     ) : (
                       ""
@@ -874,21 +878,21 @@ export default function OrdersTable(props) {
             let statusText, statusClass;
             switch (fillstatus) {
               case "r":
-                statusText = "Rejected";
+                statusText = t("rejected");
                 statusClass = "dangerHighEmphasis";
                 break;
               case "pf":
-                statusText = "Partial fill";
+                statusText = t("partial_fill");
                 statusClass = "successHighEmphasis";
                 break;
               case "f":
-                statusText = "Filled";
+                statusText = t("filled");
                 statusClass = "successHighEmphasis";
                 break;
               case "pm":
                 statusText = (
                   <span>
-                    Partial match
+                    {t("partial_match")}
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -901,7 +905,7 @@ export default function OrdersTable(props) {
               case "m":
                 statusText = (
                   <span className="flex items-center gap-1">
-                    Matched{" "}
+                    {t("matched")}{" "}
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -914,7 +918,9 @@ export default function OrdersTable(props) {
               case "b":
                 statusText = (
                   <span>
-                    <span style={{ display: "inline" }}>Committing </span>
+                    <span style={{ display: "inline" }}>
+                      {t("committing")}{" "}
+                    </span>
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -926,15 +932,15 @@ export default function OrdersTable(props) {
                 statusClass = "warningHighEmphasis";
                 break;
               case "o":
-                statusText = "Open";
+                statusText = t("open");
                 statusClass = "successHighEmphasis";
                 break;
               case "c":
-                statusText = "Canceled";
+                statusText = t("canceled");
                 statusClass = "dangerHighEmphasis";
                 break;
               case "e":
-                statusText = "Expired";
+                statusText = t("expired");
                 statusClass = "warningHighEmphasis";
                 break;
               default:
@@ -998,7 +1004,7 @@ export default function OrdersTable(props) {
                                 )
                               }
                             >
-                              View Tx
+                              {t("view_tx")}
                             </ActionWrapper>
                           ) : (
                             ""
@@ -1012,7 +1018,7 @@ export default function OrdersTable(props) {
                           font="primaryExtraSmallSemiBold"
                           color="foregroundLowEmphasis"
                         >
-                          Price
+                          {t("price")}
                         </Text>
                       </td>
                       <td>
@@ -1031,7 +1037,7 @@ export default function OrdersTable(props) {
                           font="primaryExtraSmallSemiBold"
                           color="foregroundLowEmphasis"
                         >
-                          Amount
+                          {t("amount")}
                         </Text>
                       </td>
                       <td>
@@ -1050,7 +1056,7 @@ export default function OrdersTable(props) {
                           font="primaryExtraSmallSemiBold"
                           color="foregroundLowEmphasis"
                         >
-                          Trade ID
+                          {t("trade_id")}
                         </Text>
                       </td>
                       <td>
@@ -1070,7 +1076,7 @@ export default function OrdersTable(props) {
                           font="primaryExtraSmallSemiBold"
                           color="foregroundLowEmphasis"
                         >
-                          Fee
+                          {t("fee")}
                         </Text>
                       </td>
                       <td>
@@ -1260,21 +1266,21 @@ export default function OrdersTable(props) {
             let statusText, statusClass;
             switch (fillstatus) {
               case "r":
-                statusText = "Rejected";
+                statusText = t("rejected");
                 statusClass = "dangerHighEmphasis";
                 break;
               case "pf":
-                statusText = "Partial fill";
+                statusText = t("partial_fill");
                 statusClass = "successHighEmphasis";
                 break;
               case "f":
-                statusText = "Filled";
+                statusText = t("filled");
                 statusClass = "successHighEmphasis";
                 break;
               case "pm":
                 statusText = (
                   <span>
-                    Partial match
+                    {t("partial_match")}
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -1287,7 +1293,7 @@ export default function OrdersTable(props) {
               case "m":
                 statusText = (
                   <span className="flex items-center gap-1">
-                    Matched{" "}
+                    {t("matched")}{" "}
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -1300,7 +1306,9 @@ export default function OrdersTable(props) {
               case "b":
                 statusText = (
                   <span>
-                    <span style={{ display: "inline" }}>Committing </span>
+                    <span style={{ display: "inline" }}>
+                      {t("committing")}{" "}
+                    </span>
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -1312,15 +1320,15 @@ export default function OrdersTable(props) {
                 statusClass = "warningHighEmphasis";
                 break;
               case "o":
-                statusText = "Open";
+                statusText = t("open");
                 statusClass = "successHighEmphasis";
                 break;
               case "c":
-                statusText = "Canceled";
+                statusText = t("canceled");
                 statusClass = "dangerHighEmphasis";
                 break;
               case "e":
-                statusText = "Expired";
+                statusText = t("expired");
                 statusClass = "warningHighEmphasis";
                 break;
               default:
@@ -1404,7 +1412,7 @@ export default function OrdersTable(props) {
                         )
                       }
                     >
-                      View Tx
+                      {t("view_tx")}
                     </ActionWrapper>
                   ) : (
                     ""
@@ -1520,7 +1528,7 @@ export default function OrdersTable(props) {
                         font="primaryExtraSmallSemiBold"
                         color="foregroundLowEmphasis"
                       >
-                        {t("token")}
+                        <p className="whitespace-nowrap">{t("token")}</p>
                       </Text>
                       {tokenSorted ? (
                         <SortIconWrapper>
