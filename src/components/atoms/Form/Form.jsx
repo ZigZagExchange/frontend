@@ -3,7 +3,6 @@ import { Formik, Form as FormikForm, useFormikContext } from "formik";
 import { x } from "@xstyled/styled-components";
 import { jsonify } from "../../../lib/helpers/strings";
 import { Dev } from "../../../lib/helpers/env";
-import { Button } from "./Submit";
 
 const Form = ({ initialValues = {}, onSubmit, children }) => {
   return (
