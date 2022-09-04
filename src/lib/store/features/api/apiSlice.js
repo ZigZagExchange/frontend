@@ -18,12 +18,12 @@ const initialUISettings = {
   disableOrderNotification: false,
   stackOrderbook: true,
   disableSlippageWarning: false,
-  disabledisableOrderBookFlash: false,
+  disableOrderBookFlash: false,
   hideAddress: false,
   hideBalance: false,
   hideGuidePopup: false,
   disableTradeIDCard: false,
-  layouts: initialLayouts,
+  layouts: initialLayouts(),
   editable: false,
   hideLayoutGuidePopup: false,
 };
@@ -469,7 +469,7 @@ export const apiSlice = createSlice({
       }
       state.userOrders[orderId] = payload.slice(0,12); 
       state.userOrders[orderId][7] = 
-        state.userOrders[orderId][7] - state.serverDelta;     
+        state.userOrders[orderId][7] - state.serverDelta;
     },
     setBalances(state, { payload }) {
       const scope = makeScopeUser(state);
@@ -724,9 +724,9 @@ export const apiSlice = createSlice({
     },
     resetTradeLayout(state) {
       if (!state.settings.stackOrderbook) {
-        state.settings.layouts = stackedLayouts;
+        state.settings.layouts = stackedLayouts();
       } else {
-        state.settings.layouts = initialLayouts;
+        state.settings.layouts = initialLayouts();
       }
       state.settings.layoutsCustomized = false;
     },

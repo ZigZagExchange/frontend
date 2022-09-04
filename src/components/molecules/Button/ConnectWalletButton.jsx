@@ -35,6 +35,7 @@ const ConnectWalletButton = (props) => {
         : 0;
 
       if (
+        network === 1 &&
         !state.id &&
         !/^\/bridge(\/.*)?/.test(location.pathname) &&
         (isNaN(walletBalance) || walletBalance < activationFee)

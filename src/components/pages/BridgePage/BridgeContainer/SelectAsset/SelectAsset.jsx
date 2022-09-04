@@ -3,6 +3,7 @@ import api from "lib/api";
 import { utils as ethersUtils } from "ethers";
 import TokenDropDownModal from "components/organisms/TokenDropdownModal";
 import { formatUSD } from "lib/utils";
+import { useCoinEstimator } from "components";
 
 const SelectAsset = ({
   onChangeFromAmounts,
@@ -22,6 +23,7 @@ const SelectAsset = ({
   swapCurrencyInfo,
   allowance,
 }) => {
+  const coinEstimator = useCoinEstimator();
   const onClickMax = () => {
     if (gasFetching) return;
     let max = 0;
@@ -66,6 +68,20 @@ const SelectAsset = ({
 
     onChangeFromAmounts(String(max));
   };
+
+  const filterSmallBalances = (balance, currency) => {
+    const usdPrice = coinEstimator(currency);
+    const usd_balance = usdPrice * balance;
+
+    let b = 0;
+    if (usd_balance < 0.02) {
+      b = "0.00";
+    } else {
+      b = balance;
+    }
+    return b;
+  };
+
   return (
     <div className="p-2 mt-3 border rounded-lg sm:p-4 dark:border-foreground-400 border-primary-500 ">
       <div className="flex items-center justify-between w-full">
@@ -86,7 +102,10 @@ const SelectAsset = ({
         <p className="text-xs font-work">
           Available Balance:{" "}
           {balances[swapDetails.currency]
-            ? balances[swapDetails.currency].valueReadable
+            ? filterSmallBalances(
+                balances[swapDetails.currency].valueReadable,
+                swapDetails.currency
+              )
             : "0.00"}
           {` ${swapDetails.currency}`}
         </p>
