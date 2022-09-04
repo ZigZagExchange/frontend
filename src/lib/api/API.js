@@ -492,8 +492,8 @@ export default class API extends Emitter {
       this.web3Modal.clearCachedProvider();
     }
 
-    if (isMobile) window.localStorage.clear();
-    else window.localStorage.removeItem("walletconnect");
+    if (isMobile) window.localStorage?.clear();
+    else window.localStorage?.removeItem("walletconnect");
 
     this.balances = {};
     this._profiles = {};
@@ -710,7 +710,7 @@ export default class API extends Emitter {
   };
 
   cancelOrder = async (orderId) => {
-    const token = localStorage.getItem(orderId);
+    const token = localStorage?.getItem(orderId);
     // token is used to cancel the order - otherwiese the user is asked to sign a msg
     if (token) {
       await this.send("cancelorder3", [
@@ -803,7 +803,7 @@ export default class API extends Emitter {
     const { id: userId } = await this.getAccountState();
     const tokenArray = [];
     orderIds.forEach((id) => {
-      const token = localStorage.getItem(id);
+      const token = localStorage?.getItem(id);
       if (token) tokenArray.push(token);
     });
     if (orderIds.length === tokenArray.length) {
