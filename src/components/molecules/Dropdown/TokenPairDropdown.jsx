@@ -251,15 +251,13 @@ const TokenPairDropdown = ({
 
   const searchPair = (value) => {
     value = value.toUpperCase().replace("/", "-").replace(" ", "-");
-    let foundPairs = [];
-
     const [base, quote] = value.split("-");
     const reverseValue = quote + "-" + base;
     //
     //search all, if you'd prefer to search the current category just set this to use `state.pairs` instead
     //
 
-    foundPairs = rowData.filter((item) => {
+    rowData.filter((item) => {
       if (!value) return true;
       if (
         item.td1.toLowerCase().includes(value.toLowerCase()) ||
@@ -293,8 +291,6 @@ const TokenPairDropdown = ({
   }, [rowData]);
 
   const categorizePairs = (category_index) => {
-    let foundPairs = [];
-
     setCategorySelected(category_index);
     setPairSorted(false);
     setPairDirection(false);

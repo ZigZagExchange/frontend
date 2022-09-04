@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/alt-text */
 import React, { useState, useRef } from "react";
 import styled from "styled-components";
 import { ExpandableButton } from "../ExpandableButton";
@@ -163,9 +164,8 @@ const Dropdown = ({
           className={`${adClass} ${isMobile ? "mobile-mode" : ""}`}
         >
           {item.map((items) => {
-            const { text, value, url, icon, selectedIcon, iconSelected } =
+            const { text, value, url, icon, iconSelected } =
               items;
-            const menuIcon = iconSelected ? selectedIcon : icon;
             return (
               <DropdownListContainer
                 className={`${adClass} ${
@@ -185,7 +185,7 @@ const Dropdown = ({
                   color="foregroundHighEmphasis"
                   className={!iconSelected ? "selected-icon" : ""}
                 >
-                  {items.image != "" && items.image ? (
+                  {items.image !== "" && items.image ? (
                     <img
                       src={items.image}
                       style={{ width: 14, height: 14, borderRadius: "50%" }}
