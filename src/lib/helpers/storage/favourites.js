@@ -26,7 +26,7 @@ export function addFavourite(item) {
 //remove item from favourites and return complete list, or empty list on failure.
 export function removeFavourite(item) {
   try {
-    var favs_json = storage.getItem("favourites") || "[]";
+    var favs_json = storage?.getItem("favourites") || "[]";
     var favourites = JSON.parse(favs_json);
     favourites = favourites.filter((e) => e !== item);
     storage.setItem("favourites", JSON.stringify(favourites));
