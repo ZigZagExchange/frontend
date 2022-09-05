@@ -190,5 +190,14 @@
   "view_transaction": "交易详情",
   "confirm_that_your_funds_have_arrived": "请确认您的资金已转入",
   "an_unknown_error_has_occurred_while_processing": "运行中发生未知错误",
-  "committing": "提交"
+  "committing": "提交中",
+  "rejected": "已拒绝",
+  "partial_fill": "部分成交",
+  "partial_match": "部分匹配",
+  "matched": "匹配",
+  "open": "开单",
+  "canceled": "已取消",
+  "expired": "过期",
+  "cancel": "取消",
+  "view_tx": "查看交易"
 }
