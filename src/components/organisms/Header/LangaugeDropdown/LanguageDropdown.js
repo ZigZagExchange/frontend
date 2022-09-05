@@ -7,7 +7,7 @@ import i18next from "i18next";
 const languages = [
   {
     code: "en",
-    name: "EN",
+    name: "English",
     country_code: "gb",
     icon: "https://raw.githubusercontent.com/OnTheGoSystems/SVG-flags-language-switcher/master/flags/en.svg",
   },
@@ -54,7 +54,7 @@ export default function LanguageDropdown() {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Listbox.Options className="absolute w-[90px] right-0 py-1 mt-1 overflow-auto text-sm dark:bg-[#191A33] border dark:border-foreground-400 bg-sky-100 rounded-md shadow-lg max-h-60">
+            <Listbox.Options className="absolute min-w-max right-0 py-1 mt-1 overflow-auto text-sm dark:bg-[#191A33] border dark:border-foreground-400 bg-sky-100 rounded-md shadow-lg max-h-60">
               {languages.map((lang, langIdx) => (
                 <Listbox.Option
                   key={langIdx}

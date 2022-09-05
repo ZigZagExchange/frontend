@@ -134,7 +134,7 @@ const SelectAsset = ({
           </div>
         )}
         <button
-          className="bg-[#07071C] px-2 py-1 rounded-md text-sm font-semibold text-primary-900 ml-2.5 hover:bg-slate-800 font-work"
+          className="bg-[#07071C] whitespace-nowrap px-2 py-1 rounded-md text-sm font-semibold text-primary-900 ml-2.5 hover:bg-slate-800 font-work"
           onClick={onClickMax}
         >
           {t("max")}

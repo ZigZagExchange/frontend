@@ -891,7 +891,7 @@ class SpotForm extends React.Component {
         <div>
           <p>
             {this.props.t(
-              "zksyncs_network_swap_fees_are_dynamic_and_sit_around_0"
+              "zksyncs_network_swap_fees_are_dynamic_and_sit_around_0.10"
             )}
           </p>
           <p>
