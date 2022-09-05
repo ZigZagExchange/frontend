@@ -66,7 +66,7 @@ export default class APIStarknetProvider extends APIProvider {
       expiration
     );
     const keypair = starknet.ec.ec.keyFromPrivate(
-      localStorage.getItem("starknet:privkey"),
+      localStorage?.getItem("starknet:privkey"),
       "hex"
     );
     const sig = starknet.ec.sign(keypair, orderhash.hash);
@@ -83,9 +83,9 @@ export default class APIStarknetProvider extends APIProvider {
     let userWalletContractAddress;
     let keypair;
 
-    if (localStorage.getItem("starknet:privkey")) {
+    if (localStorage?.getItem("starknet:privkey")) {
       keypair = starknet.ec.ec.keyFromPrivate(
-        localStorage.getItem("starknet:privkey"),
+        localStorage?.getItem("starknet:privkey"),
         "hex"
       );
     } else {
@@ -93,7 +93,7 @@ export default class APIStarknetProvider extends APIProvider {
       localStorage.setItem("starknet:privkey", keypair.getPrivate("hex"));
     }
     if (localStorage.getItem("starknet:account")) {
-      userWalletContractAddress = localStorage.getItem("starknet:account");
+      userWalletContractAddress = localStorage?.getItem("starknet:account");
     } else {
       const starkkey = starknet.ec.getStarkKey(keypair);
       const starkkeyint = bigInt(starkkey.slice(2), 16);
@@ -274,7 +274,7 @@ export default class APIStarknetProvider extends APIProvider {
 
   _setTokenApproval = async (tokenAddress, userAddress, spender, amount) => {
     const keypair = starknet.ec.ec.keyFromPrivate(
-      localStorage.getItem("starknet:privkey"),
+      localStorage?.getItem("starknet:privkey"),
       "hex"
     );
     const spenderInt = bigInt(spender.slice(2), 16);

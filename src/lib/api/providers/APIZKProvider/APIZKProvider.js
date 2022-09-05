@@ -600,7 +600,7 @@ export default class APIZKProvider extends APIProvider {
   getSeeds = () => {
     try {
       return JSON.parse(
-        window.localStorage.getItem(APIZKProvider.SEEDS_STORAGE_KEY) || "{}"
+        window.localStorage?.getItem(APIZKProvider.SEEDS_STORAGE_KEY) || "{}"
       );
     } catch {
       return {};

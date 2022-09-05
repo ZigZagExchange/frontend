@@ -14,8 +14,6 @@ import { setHighSlippageModal } from "lib/store/features/api/apiSlice";
 import { Box } from "@mui/material";
 import { withTranslation } from "react-i18next";
 
-const isMobile = window.innerWidth < 500;
-
 class SpotForm extends React.Component {
   constructor(props) {
     super(props);
@@ -1062,6 +1060,7 @@ class SpotForm extends React.Component {
       baseAmount,
       quoteAmount
     );
+    // eslint-disable-next-line react/no-direct-mutation-state
     this.state.maxSizeSelected = exchangePercentage === 100;
     const showAmountPlusBox =
       !this.props.user.id ||
