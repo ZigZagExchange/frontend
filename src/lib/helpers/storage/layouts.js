@@ -5,6 +5,6 @@ export const getLayout = () => {
   return layout_json;
 };
 export const setLayout = (layout) => {
-  storage.setItem("layout", layout);
+  storage?.setItem("layout", layout);
   return layout;
 };

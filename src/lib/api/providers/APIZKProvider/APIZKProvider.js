@@ -613,7 +613,7 @@ export default class APIZKProvider extends APIProvider {
         .toString()
         .split(",")
         .map((x) => +x);
-      window.localStorage.setItem(
+      window.localStorage?.setItem(
         APIZKProvider.SEEDS_STORAGE_KEY,
         JSON.stringify(seeds)
       );

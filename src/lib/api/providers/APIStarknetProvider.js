@@ -86,7 +86,7 @@ export default class APIStarknetProvider extends APIProvider {
       );
     } else {
       keypair = starknet.ec.genKeyPair();
-      localStorage.setItem("starknet:privkey", keypair.getPrivate("hex"));
+      localStorage?.setItem("starknet:privkey", keypair.getPrivate("hex"));
     }
     if (localStorage?.getItem("starknet:account")) {
       userWalletContractAddress = localStorage?.getItem("starknet:account");
@@ -108,7 +108,7 @@ export default class APIStarknetProvider extends APIProvider {
       toast.dismiss(deployContractToast);
       userWalletContractAddress = deployContractResponse.address;
       toast.success("Account contract deployed");
-      localStorage.setItem("starknet:account", userWalletContractAddress);
+      localStorage?.setItem("starknet:account", userWalletContractAddress);
     }
 
     // Check account initialized

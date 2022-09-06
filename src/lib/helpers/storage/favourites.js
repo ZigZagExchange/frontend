@@ -14,7 +14,7 @@ export function addFavourite(item) {
     if (!favourites.includes(item)) {
       favourites.push(item);
 
-      storage.setItem("favourites", JSON.stringify(favourites));
+      storage?.setItem("favourites", JSON.stringify(favourites));
     }
     return favourites;
   } catch (e) {
@@ -29,7 +29,7 @@ export function removeFavourite(item) {
     var favs_json = storage?.getItem("favourites") || "[]";
     var favourites = JSON.parse(favs_json);
     favourites = favourites.filter((e) => e !== item);
-    storage.setItem("favourites", JSON.stringify(favourites));
+    storage?.setItem("favourites", JSON.stringify(favourites));
 
     return favourites;
   } catch (e) {

@@ -353,23 +353,23 @@ export const Header = (props) => {
         break;
       case 1:
         setIndex(newIndex);
-        localStorage.setItem("tab_index", newIndex);
+        localStorage?.setItem("tab_index", newIndex);
         history.push("/convert");
         break;
 
       case 2:
         setIndex(newIndex);
-        localStorage.setItem("tab_index", newIndex);
+        localStorage?.setItem("tab_index", newIndex);
         history.push("bridge");
         break;
       case 3:
         setIndex(newIndex);
-        localStorage.setItem("tab_index", newIndex);
+        localStorage?.setItem("tab_index", newIndex);
         history.push("/list-pair");
         break;
       case 4:
         setIndex(newIndex);
-        localStorage.setItem("tab_index", newIndex);
+        localStorage?.setItem("tab_index", newIndex);
         history.push("/dsl");
         break;
       case 5:

@@ -18,7 +18,7 @@ const ThemeProviders = ({ children }) => {
 
   const toggleTheme = () => {
     setIsDark((prevState) => {
-      localStorage.setItem(CACHE_KEY, JSON.stringify(!prevState));
+      localStorage?.setItem(CACHE_KEY, JSON.stringify(!prevState));
       return !prevState;
     });
   };
