@@ -92,7 +92,7 @@ export default class APIStarknetProvider extends APIProvider {
       keypair = starknet.ec.genKeyPair();
       localStorage.setItem("starknet:privkey", keypair.getPrivate("hex"));
     }
-    if (localStorage.getItem("starknet:account")) {
+    if (localStorage?.getItem("starknet:account")) {
       userWalletContractAddress = localStorage?.getItem("starknet:account");
     } else {
       const starkkey = starknet.ec.getStarkKey(keypair);
