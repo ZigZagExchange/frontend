@@ -23,6 +23,12 @@ const languages = [
     country_code: "ir",
     icon: "https://raw.githubusercontent.com/OnTheGoSystems/SVG-flags-language-switcher/master/flags/ir.svg",
   },
+  {
+    code: "tr",
+    name: "Türkçe",
+    country_code: "tr",
+    icon: "https://raw.githubusercontent.com/OnTheGoSystems/SVG-flags-language-switcher/master/flags/tr.svg",
+  },
 ];
 
 export default function LanguageDropdown() {
