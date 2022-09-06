@@ -206,8 +206,9 @@ export default class API extends Emitter {
         getENSName(address),
         reverseUnstoppabledomainsAddress(address),
       ]);
-      if (ensName) return { ensName };
-      if (unstoppabledomainsName) return { unstoppabledomainsName };
+      if (ensName) return { name: ensName };
+      if (unstoppabledomainsName) return { name: unstoppabledomainsName };
+
       return {};
     };
 

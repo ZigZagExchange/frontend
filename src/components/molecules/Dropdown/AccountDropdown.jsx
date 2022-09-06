@@ -171,7 +171,7 @@ const AccountDropdown = ({ notext, networkName }) => {
     setExplorer(explorerLink);
 
     // if EVM set layer to and disable toggle
-    if(api.isEVMChain()) {
+    if (api.isEVMChain()) {
       setSelectedLayer(2);
     }
   }, [network, user.address, selectedLayer]);
@@ -237,6 +237,8 @@ const AccountDropdown = ({ notext, networkName }) => {
         notext={notext}
         expanded={isOpened}
         onClick={toggle}
+        user={user}
+        settings={settings}
       ></AccountButton>
       {isOpened && (
         <DropdownDisplay isMobile={isMobile}>
