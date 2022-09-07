@@ -80,7 +80,9 @@ export default function TradeSidebar(props) {
       ) : (
         <InfoWrapper isDark={isDark}>
           <Text font="primarySmall" color="foregroundHighEmphasis">
-            {t("have_a_question_need_live_support")}
+            <p className="text-center">
+              {t("have_a_question_need_live_support")}
+            </p>
           </Text>
           <Button
             width="150px"
@@ -95,7 +97,7 @@ export default function TradeSidebar(props) {
               color="foregroundHighEmphasis"
               textAlign="center"
             >
-              {t("join")} DISCORD
+              <p className="whitespace-nowrap">{t("join")} DISCORD</p>
             </Text>
           </Button>
         </InfoWrapper>
