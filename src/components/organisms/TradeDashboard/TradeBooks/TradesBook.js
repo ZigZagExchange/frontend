@@ -5,6 +5,7 @@ import TradeRecentTable from "./TradeRecentTable/TradeRecentTable";
 import { marketFillsSelector } from "lib/store/features/api/apiSlice";
 import Text from "components/atoms/Text/Text";
 import { settingsSelector } from "lib/store/features/api/apiSlice";
+import { useTranslation } from "react-i18next";
 
 const StyledTradeBooks = styled.section`
   display: flex;
@@ -12,9 +13,10 @@ const StyledTradeBooks = styled.section`
   flex-direction: row;
   justify-content: space-between;
   padding: ${({ isStack }) => (isStack ? "10px" : "10px 0 10px 0")};
-  margin: ${({ isStack }) => (isStack ? "0": "0 10px 0 10px")};
+  margin: ${({ isStack }) => (isStack ? "0" : "0 10px 0 10px")};
   border-top: 1px solid ${({ theme }) => theme.colors.foreground400};
-  border-bottom: 1px solid ${({ isStack, theme }) => (isStack ? theme.colors.foreground400 : "none")};
+  border-bottom: 1px solid
+    ${({ isStack, theme }) => (isStack ? theme.colors.foreground400 : "none")};
 `;
 
 const TradesWrapper = styled.div`
@@ -28,6 +30,7 @@ const TradesWrapper = styled.div`
 export default function TradesBook(props) {
   const marketFills = useSelector(marketFillsSelector);
   const settings = useSelector(settingsSelector);
+  const { t } = useTranslation();
 
   // Only display recent trades
   // There's a bunch of user trades in this list that are too old to display
@@ -57,7 +60,7 @@ export default function TradesBook(props) {
             font="primaryTitleDisplay"
             color="foregroundHighEmphasis"
           >
-            Market Trades
+            {t("market_trades")}
           </Text>
           <TradeRecentTable
             head

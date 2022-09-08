@@ -14,6 +14,7 @@ import Form from "../../atoms/Form/Form";
 import { x } from "@xstyled/styled-components";
 import { toast } from "react-toastify";
 import { jsonify } from "../../../lib/helpers/strings";
+import { useTranslation } from "react-i18next";
 
 const AllocationModal = ({ onClose, show, onSuccess, bytesToPurchase }) => {
   const user = useSelector(userSelector);
@@ -27,6 +28,7 @@ const AllocationModal = ({ onClose, show, onSuccess, bytesToPurchase }) => {
 
   const [totalPrice, setTotalPrice] = useState(fileSizeKB * pricePerKB);
   const [isUSDCBalanceSufficient, setIsUSDCBalanceSufficient] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => api.getBalances(), []);
 
@@ -107,7 +109,7 @@ const AllocationModal = ({ onClose, show, onSuccess, bytesToPurchase }) => {
             await onSuccess();
           } catch (e) {
             console.error("Error purchasing arweave bytes", e);
-            toast.error("Transaction was rejected");
+            toast.error(t("Transaction was rejected"));
           }
         }}
       >

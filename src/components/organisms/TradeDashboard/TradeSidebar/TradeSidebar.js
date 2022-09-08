@@ -10,6 +10,7 @@ import {
 } from "lib/store/features/api/apiSlice";
 import { Button } from "components/molecules/Button";
 import useTheme from "components/hooks/useTheme";
+import { useTranslation } from "react-i18next";
 
 const StyledTradeSidebar = styled.aside`
   // display: grid;
@@ -70,6 +71,8 @@ export default function TradeSidebar(props) {
   const joinDiscord = () => {
     window.open("https://discord.gg/zigzag", "_blank");
   };
+  const { t } = useTranslation();
+
   return (
     <StyledTradeSidebar isDark={isDark}>
       {isMobile || isSmallScreen ? (
@@ -77,7 +80,9 @@ export default function TradeSidebar(props) {
       ) : (
         <InfoWrapper isDark={isDark}>
           <Text font="primarySmall" color="foregroundHighEmphasis">
-            Have a question? Need live support?
+            <p className="text-center">
+              {t("have_a_question_need_live_support")}
+            </p>
           </Text>
           <Button
             width="150px"
@@ -92,7 +97,7 @@ export default function TradeSidebar(props) {
               color="foregroundHighEmphasis"
               textAlign="center"
             >
-              JOIN DISCORD
+              <p className="whitespace-nowrap">{t("join")} DISCORD</p>
             </Text>
           </Button>
         </InfoWrapper>

@@ -13,6 +13,8 @@ import { formatDate, formatDateTime, formatToken, addComma } from "lib/utils";
 import { Tab } from "components/molecules/TabMenu";
 import Text from "components/atoms/Text/Text";
 
+import { useTranslation } from "react-i18next";
+
 import {
   SortUpIcon,
   SortDownIcon,
@@ -48,26 +50,28 @@ export default function OrdersTable(props) {
   const balanceData = useSelector(balancesSelector);
   const coinEstimator = useCoinEstimator();
   const [tab, setTabIndex] = useState(0);
-  const [selectedSide, setSelectedSide] = useState("All");
-  const [selectedTradeType, setSelectedTradeType] = useState("All");
+  const [selectedSide, setSelectedSide] = useState("all");
+  const [selectedTradeType, setSelectedTradeType] = useState("all");
   const [tokenDirection, setTokenDirection] = useState(false);
   const [balanceDirection, setBalanceDirection] = useState(false);
   const [walletList, setWalletList] = useState([]);
   const [tokenSorted, setTokenSorted] = useState(false);
   const [balanceSorted, setBalanceSorted] = useState(false);
   const [sideItems, setSideItems] = useState([
-    { text: "All", url: "#", iconSelected: true, value: "All" },
-    { text: "Buy", url: "#", value: "Buy" },
-    { text: "Sell", url: "#", value: "Sell" },
+    { text: "all", url: "#", iconSelected: true, value: "All" },
+    { text: "buy", url: "#", value: "Buy" },
+    { text: "sell", url: "#", value: "Sell" },
   ]);
   const [tradeTypeItems, setTradeTypeItems] = useState([
-    { text: "All", url: "#", iconSelected: true, value: "All" },
-    { text: "Maker", url: "#", value: "Maker" },
-    { text: "Taker", url: "#", value: "Taker" },
+    { text: "all", url: "#", iconSelected: true, value: "All" },
+    { text: "maker", url: "#", value: "Maker" },
+    { text: "taker", url: "#", value: "Taker" },
   ]);
   const isMobile = window.innerWidth < 1064;
 
   const wallet = balanceData[props.network];
+
+  const { t } = useTranslation();
 
   useEffect(() => {
     let walletArray = [];
@@ -106,14 +110,14 @@ export default function OrdersTable(props) {
       .filter(
         (i) =>
           i[6] === "f" &&
-          (selectedSide === "All" || i[3] === selectedSide.toLowerCase()[0])
+          (selectedSide === "all" || i[3] === selectedSide.toLowerCase()[0])
       )
       .filter(
         (i) =>
-          selectedTradeType === "All" ||
-          (selectedTradeType === "Taker" &&
+          selectedTradeType === "all" ||
+          (selectedTradeType === "taker" &&
             i[8].toLowerCase() === `${props?.user?.id}`.toLowerCase()) ||
-          (selectedTradeType === "Maker" &&
+          (selectedTradeType === "maker" &&
             i[9].toLowerCase() === `${props?.user?.id}`.toLowerCase())
       )
       .sort((a, b) => b[1] - a[1]);
@@ -124,7 +128,7 @@ export default function OrdersTable(props) {
       .filter(
         (i) =>
           i[9] !== "f" &&
-          (selectedSide === "All" || i[3] === selectedSide.toLowerCase()[0])
+          (selectedSide === "all" || i[3] === selectedSide.toLowerCase()[0])
       )
       .sort((a, b) => b[1] - a[1]);
   };
@@ -156,6 +160,7 @@ export default function OrdersTable(props) {
       }
       return acc;
     }, []);
+    console.log(newSide);
     setSelectedSide(newSide);
     setSideItems(newItems);
   };
@@ -274,7 +279,7 @@ export default function OrdersTable(props) {
       await api.cancelOrder(orderId);
 
       if (!props.settings?.disableOrderNotification) {
-        toast.info("Order cancelled", {
+        toast.info(t("order_cancelled"), {
           toastId: "Order cancelled.",
         });
       }
@@ -310,7 +315,7 @@ export default function OrdersTable(props) {
             let remaining = order[10] === null ? baseQuantity : order[10];
             const orderStatus = order[9];
             const baseCurrency = order[2].split("-")[0];
-            const side = order[3] === "b" ? "Buy" : "Sell";
+            const side = order[3] === "b" ? t("buy") : t("sell");
             const sideclassname =
               order[3] === "b" ? "successHighEmphasis" : "dangerHighEmphasis";
             const expiration = order[7];
@@ -336,21 +341,21 @@ export default function OrdersTable(props) {
             let statusText, statusClass;
             switch (order[9]) {
               case "r":
-                statusText = "Rejected";
+                statusText = t("rejected");
                 statusClass = "dangerHighEmphasis";
                 break;
               case "pf":
-                statusText = "Partial fill";
+                statusText = t("partial_fill");
                 statusClass = "successHighEmphasis";
                 break;
               case "f":
-                statusText = "Filled";
+                statusText = t("filled");
                 statusClass = "successHighEmphasis";
                 break;
               case "pm":
                 statusText = (
                   <span>
-                    Partial match
+                    {t("partial_match")}
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -363,7 +368,7 @@ export default function OrdersTable(props) {
               case "m":
                 statusText = (
                   <span className="flex items-center gap-1">
-                    Matched{" "}
+                    {t("matched")}{" "}
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -376,7 +381,9 @@ export default function OrdersTable(props) {
               case "b":
                 statusText = (
                   <span>
-                    <span style={{ display: "inline" }}>Committing </span>
+                    <span style={{ display: "inline" }}>
+                      {t("committing")}{" "}
+                    </span>
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -388,15 +395,15 @@ export default function OrdersTable(props) {
                 statusClass = "warningHighEmphasis";
                 break;
               case "o":
-                statusText = "Open";
+                statusText = t("open");
                 statusClass = "successHighEmphasis";
                 break;
               case "c":
-                statusText = "Canceled";
+                statusText = t("canceled");
                 statusClass = "dangerHighEmphasis";
                 break;
               case "e":
-                statusText = "Expired";
+                statusText = t("expired");
                 statusClass = "warningHighEmphasis";
                 break;
               default:
@@ -448,7 +455,7 @@ export default function OrdersTable(props) {
                             textAlign="right"
                             onClick={() => cancelOrder(orderId)}
                           >
-                            Cancel
+                            {t("cancel")}
                           </ActionWrapper>
                         ) : (
                           ""
@@ -462,7 +469,7 @@ export default function OrdersTable(props) {
                         font="primaryExtraSmallSemiBold"
                         color="foregroundLowEmphasis"
                       >
-                        Price
+                        {t("price")}
                       </Text>
                     </td>
                     <td>
@@ -481,7 +488,7 @@ export default function OrdersTable(props) {
                         font="primaryExtraSmallSemiBold"
                         color="foregroundLowEmphasis"
                       >
-                        Filled
+                        {t("filled")}
                       </Text>
                     </td>
                     <td>
@@ -504,7 +511,7 @@ export default function OrdersTable(props) {
                         font="primaryExtraSmallSemiBold"
                         color="foregroundLowEmphasis"
                       >
-                        Expiry
+                        {t("expiry")}
                       </Text>
                     </td>
                     <td>
@@ -536,7 +543,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Time
+                  {t("time")}
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -549,7 +556,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Market
+                  {t("market")}
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -564,7 +571,7 @@ export default function OrdersTable(props) {
                   transparent={true}
                   width={162}
                   item={sideItems}
-                  context="Side"
+                  context={t("side")}
                   leftIcon={false}
                   clickFunction={changeSide}
                 />
@@ -576,7 +583,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Price
+                  {t("price")}
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -589,7 +596,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Filled
+                  {t("filled")}
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -602,7 +609,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Expiry
+                  {t("expiry")}
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -615,7 +622,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Order Status
+                  {t("order_status")}
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -628,7 +635,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Action
+                  {t("action")}
                 </Text>
               </HeaderWrapper>
             </th>
@@ -641,7 +648,7 @@ export default function OrdersTable(props) {
                     scale="md"
                     onClick={() => api.cancelAllOrders(getOpenUserOrderIds())}
                   >
-                    Cancel All
+                    {t("cancel_all")}
                   </StyledButton>
                 </th>
               )}
@@ -657,7 +664,7 @@ export default function OrdersTable(props) {
             let remaining = order[10] === null ? baseQuantity : order[10];
             let orderStatus = order[9];
             const baseCurrency = order[2].split("-")[0];
-            const side = order[3] === "b" ? "Buy" : "Sell";
+            const side = order[3] === "b" ? t("buy") : t("sell");
             const sideclassname =
               order[3] === "b" ? "successHighEmphasis" : "dangerHighEmphasis";
             const expiration = order[7];
@@ -688,25 +695,25 @@ export default function OrdersTable(props) {
             let statusText, statusClass;
             switch (orderStatus) {
               case "r":
-                statusText = "Rejected";
+                statusText = t("rejected");
                 statusClass = "dangerHighEmphasis";
                 break;
               case "pf":
-                statusText = "Partial fill";
+                statusText = t("partial_fill");
                 statusClass = "successHighEmphasis";
                 break;
               case "f":
-                statusText = "Filled";
+                statusText = t("filled");
                 statusClass = "successHighEmphasis";
                 break;
               case "pm":
-                statusText = <span>Partial match</span>;
+                statusText = <span>{t("partial_match")}</span>;
                 statusClass = "warningHighEmphasis";
                 break;
               case "m":
                 statusText = (
                   <span className="flex items-center gap-1">
-                    Matched{" "}
+                    {t("matched")}{" "}
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -719,7 +726,9 @@ export default function OrdersTable(props) {
               case "b":
                 statusText = (
                   <span>
-                    <span style={{ display: "inline" }}>Committing </span>
+                    <span style={{ display: "inline" }}>
+                      {t("committing")}{" "}
+                    </span>
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -731,15 +740,15 @@ export default function OrdersTable(props) {
                 statusClass = "warningHighEmphasis";
                 break;
               case "o":
-                statusText = "Open";
+                statusText = t("open");
                 statusClass = "successHighEmphasis";
                 break;
               case "c":
-                statusText = "Canceled";
+                statusText = t("canceled");
                 statusClass = "dangerHighEmphasis";
                 break;
               case "e":
-                statusText = "Expired";
+                statusText = t("expired");
                 statusClass = "warningHighEmphasis";
                 break;
               default:
@@ -812,7 +821,7 @@ export default function OrdersTable(props) {
                         color="primaryHighEmphasis"
                         onClick={() => cancelOrder(orderId)}
                       >
-                        Cancel
+                        {t("cancel")}
                       </ActionWrapper>
                     ) : (
                       ""
@@ -844,13 +853,13 @@ export default function OrdersTable(props) {
             let price = fill[4];
             let baseQuantity = fill[5];
             const fillstatus = fill[6];
-            const sidetext = side === "b" ? "Buy" : "Sell";
+            const sidetext = side === "b" ? t("buy") : t("sell");
             const sideclassname =
               side === "b" ? "successHighEmphasis" : "dangerHighEmphasis";
             const tradeTypeText =
               fill[8].toLowerCase() === `${props?.user?.id}`.toLowerCase()
-                ? "Taker"
-                : "Maker";
+                ? t("taker")
+                : t("maker");
             const txhash = fill[7];
             const feeamount = Number(fill[10]);
             const feetoken = fill[11];
@@ -869,21 +878,21 @@ export default function OrdersTable(props) {
             let statusText, statusClass;
             switch (fillstatus) {
               case "r":
-                statusText = "Rejected";
+                statusText = t("rejected");
                 statusClass = "dangerHighEmphasis";
                 break;
               case "pf":
-                statusText = "Partial fill";
+                statusText = t("partial_fill");
                 statusClass = "successHighEmphasis";
                 break;
               case "f":
-                statusText = "Filled";
+                statusText = t("filled");
                 statusClass = "successHighEmphasis";
                 break;
               case "pm":
                 statusText = (
                   <span>
-                    Partial match
+                    {t("partial_match")}
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -896,7 +905,7 @@ export default function OrdersTable(props) {
               case "m":
                 statusText = (
                   <span className="flex items-center gap-1">
-                    Matched{" "}
+                    {t("matched")}{" "}
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -909,7 +918,9 @@ export default function OrdersTable(props) {
               case "b":
                 statusText = (
                   <span>
-                    <span style={{ display: "inline" }}>Committing </span>
+                    <span style={{ display: "inline" }}>
+                      {t("committing")}{" "}
+                    </span>
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -921,15 +932,15 @@ export default function OrdersTable(props) {
                 statusClass = "warningHighEmphasis";
                 break;
               case "o":
-                statusText = "Open";
+                statusText = t("open");
                 statusClass = "successHighEmphasis";
                 break;
               case "c":
-                statusText = "Canceled";
+                statusText = t("canceled");
                 statusClass = "dangerHighEmphasis";
                 break;
               case "e":
-                statusText = "Expired";
+                statusText = t("expired");
                 statusClass = "warningHighEmphasis";
                 break;
               default:
@@ -993,7 +1004,7 @@ export default function OrdersTable(props) {
                                 )
                               }
                             >
-                              View Tx
+                              {t("view_tx")}
                             </ActionWrapper>
                           ) : (
                             ""
@@ -1007,7 +1018,7 @@ export default function OrdersTable(props) {
                           font="primaryExtraSmallSemiBold"
                           color="foregroundLowEmphasis"
                         >
-                          Price
+                          {t("price")}
                         </Text>
                       </td>
                       <td>
@@ -1026,7 +1037,7 @@ export default function OrdersTable(props) {
                           font="primaryExtraSmallSemiBold"
                           color="foregroundLowEmphasis"
                         >
-                          Amount
+                          {t("amount")}
                         </Text>
                       </td>
                       <td>
@@ -1045,7 +1056,7 @@ export default function OrdersTable(props) {
                           font="primaryExtraSmallSemiBold"
                           color="foregroundLowEmphasis"
                         >
-                          Trade ID
+                          {t("trade_id")}
                         </Text>
                       </td>
                       <td>
@@ -1065,7 +1076,7 @@ export default function OrdersTable(props) {
                           font="primaryExtraSmallSemiBold"
                           color="foregroundLowEmphasis"
                         >
-                          Fee
+                          {t("fee")}
                         </Text>
                       </td>
                       <td>
@@ -1098,7 +1109,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Time
+                  {t("time")}
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -1111,7 +1122,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Market
+                  {t("market")}
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -1126,7 +1137,7 @@ export default function OrdersTable(props) {
                   transparent={true}
                   width={162}
                   item={sideItems}
-                  context="Side"
+                  context={t("side")}
                   leftIcon={false}
                   clickFunction={changeSide}
                 />
@@ -1140,7 +1151,7 @@ export default function OrdersTable(props) {
                   transparent={true}
                   width={162}
                   item={tradeTypeItems}
-                  context="Type"
+                  context={t("type")}
                   leftIcon={false}
                   clickFunction={changeTradeType}
                 />
@@ -1152,7 +1163,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Amount
+                  {t("amount")}
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -1165,7 +1176,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Price
+                  {t("price")}
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -1178,7 +1189,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Fee
+                  {t("fee")}
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -1191,7 +1202,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Order Status
+                  {t("order_status")}
                 </Text>
               </HeaderWrapper>
             </th>
@@ -1201,7 +1212,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Trade ID
+                  {t("trade_id")}
                 </Text>
               </HeaderWrapper>
             </th>
@@ -1211,7 +1222,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Action
+                  {t("action")}
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -1230,13 +1241,13 @@ export default function OrdersTable(props) {
             let baseQuantity = fill[5];
             const baseCurrency = fill[2].split("-")[0];
             const fillstatus = fill[6];
-            const sidetext = side === "b" ? "Buy" : "Sell";
+            const sidetext = side === "b" ? t("buy") : t("sell");
             const sideclassname =
               side === "b" ? "successHighEmphasis" : "dangerHighEmphasis";
             const tradeTypeText =
               fill[8].toLowerCase() === `${props?.user?.id}`.toLowerCase()
-                ? "Taker"
-                : "Maker";
+                ? t("taker")
+                : t("maker");
             const txhash = fill[7];
             const feeamount = Number(fill[10]);
             const feetoken = fill[11];
@@ -1255,21 +1266,21 @@ export default function OrdersTable(props) {
             let statusText, statusClass;
             switch (fillstatus) {
               case "r":
-                statusText = "Rejected";
+                statusText = t("rejected");
                 statusClass = "dangerHighEmphasis";
                 break;
               case "pf":
-                statusText = "Partial fill";
+                statusText = t("partial_fill");
                 statusClass = "successHighEmphasis";
                 break;
               case "f":
-                statusText = "Filled";
+                statusText = t("filled");
                 statusClass = "successHighEmphasis";
                 break;
               case "pm":
                 statusText = (
                   <span>
-                    Partial match
+                    {t("partial_match")}
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -1282,7 +1293,7 @@ export default function OrdersTable(props) {
               case "m":
                 statusText = (
                   <span className="flex items-center gap-1">
-                    Matched{" "}
+                    {t("matched")}{" "}
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -1295,7 +1306,9 @@ export default function OrdersTable(props) {
               case "b":
                 statusText = (
                   <span>
-                    <span style={{ display: "inline" }}>Committing </span>
+                    <span style={{ display: "inline" }}>
+                      {t("committing")}{" "}
+                    </span>
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -1307,15 +1320,15 @@ export default function OrdersTable(props) {
                 statusClass = "warningHighEmphasis";
                 break;
               case "o":
-                statusText = "Open";
+                statusText = t("open");
                 statusClass = "successHighEmphasis";
                 break;
               case "c":
-                statusText = "Canceled";
+                statusText = t("canceled");
                 statusClass = "dangerHighEmphasis";
                 break;
               case "e":
-                statusText = "Expired";
+                statusText = t("expired");
                 statusClass = "warningHighEmphasis";
                 break;
               default:
@@ -1399,7 +1412,7 @@ export default function OrdersTable(props) {
                         )
                       }
                     >
-                      View Tx
+                      {t("view_tx")}
                     </ActionWrapper>
                   ) : (
                     ""
@@ -1515,7 +1528,7 @@ export default function OrdersTable(props) {
                         font="primaryExtraSmallSemiBold"
                         color="foregroundLowEmphasis"
                       >
-                        Token
+                        <p className="whitespace-nowrap">{t("token")}</p>
                       </Text>
                       {tokenSorted ? (
                         <SortIconWrapper>
@@ -1550,7 +1563,7 @@ export default function OrdersTable(props) {
                         font="primaryExtraSmallSemiBold"
                         color="foregroundLowEmphasis"
                       >
-                        Token balance
+                        {t("token_balance")}
                       </Text>
                       {balanceSorted ? (
                         <SortIconWrapper>
@@ -1579,7 +1592,7 @@ export default function OrdersTable(props) {
                         font="primaryExtraSmallSemiBold"
                         color="foregroundLowEmphasis"
                       >
-                        Available balance
+                        {t("available_balance")}
                       </Text>
                     </HeaderWrapper>
                   </th>
@@ -1595,7 +1608,7 @@ export default function OrdersTable(props) {
                         font="primaryExtraSmallSemiBold"
                         color="foregroundLowEmphasis"
                       >
-                        USD balance
+                        USD {t("balance")}
                       </Text>
                       {balanceSorted ? (
                         <SortIconWrapper>
@@ -1637,7 +1650,7 @@ export default function OrdersTable(props) {
                 )
               }
             >
-              View Account on Explorer
+              {t("view_account_on_explorer")}
             </ActionWrapper>
           </div>
         );
@@ -1660,7 +1673,7 @@ export default function OrdersTable(props) {
                 )
               }
             >
-              View Account on Explorer
+              {t("view_account_on_explorer")}
             </ActionWrapper>
           </div>
         );
@@ -1680,9 +1693,13 @@ export default function OrdersTable(props) {
               activeIndex={tab}
               onItemClick={(newIndex) => setTab(newIndex)}
             >
-              <Tab>Open Orders ({getOpenUserOrderIds().length})</Tab>
-              <Tab>Order History ({getFills().length})</Tab>
-              <Tab>Balances</Tab>
+              <Tab>
+                {t("open_orders")} ({getOpenUserOrderIds().length})
+              </Tab>
+              <Tab>
+                {t("order_history")} ({getFills().length})
+              </Tab>
+              <Tab>{t("balances")}</Tab>
             </StyledTabMenu>
           </TableHeaderWrapper>
           {isMobile ? (

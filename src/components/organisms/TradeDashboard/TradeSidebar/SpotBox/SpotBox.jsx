@@ -10,6 +10,7 @@ import {
   networkSelector,
 } from "lib/store/features/api/apiSlice";
 import useTheme from "components/hooks/useTheme";
+import { useTranslation } from "react-i18next";
 
 const SpotBox = ({
   marketInfo,
@@ -38,6 +39,8 @@ const SpotBox = ({
     if (newIndex === 0) updateOrderType("limit");
     else updateOrderType("market");
   };
+
+  const { t } = useTranslation();
 
   const BuyForm = (
     <SpotForm
@@ -89,6 +92,8 @@ const SpotBox = ({
       <ToggleWrapper>
         <StyledToggleButton
           width={window.innerWidth < 600 ? 70 : 126}
+          leftText={t("buy")}
+          rightText={t("sell")}
           leftLabel="BUY"
           rightLabel="SELL"
           selectedLayer={selectedLayer}
@@ -96,8 +101,8 @@ const SpotBox = ({
         />
       </ToggleWrapper>
       <StyledTabMenu left activeIndex={index} onItemClick={handleTabClick}>
-        <Tab>Limit</Tab>
-        <Tab>Market</Tab>
+        <Tab>{t("limit")}</Tab>
+        <Tab>{t("market")}</Tab>
       </StyledTabMenu>
       <SpotFormWrapper>{renderSpotForm()}</SpotFormWrapper>
     </Wrapper>

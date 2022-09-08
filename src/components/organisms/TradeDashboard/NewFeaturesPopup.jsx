@@ -3,10 +3,12 @@ import { useDispatch } from "react-redux";
 import React from "react";
 import { setUISettings } from "lib/store/features/api/apiSlice";
 import { CloseIcon } from "components/atoms/Svg";
+import { useTranslation } from "react-i18next";
 
 const NewFeaturesPopup = () => {
   const [open, setOpen] = useState(true);
   const dispatch = useDispatch();
+  const { t } = useTranslation();
 
   const onClose = () => {
     setOpen(false);
@@ -25,17 +27,17 @@ const NewFeaturesPopup = () => {
             onClick={onClose}
           />
           <p className="text-xl font-semibold font-work">
-            Introducing Dynamic Layouts!
+            {t("introducing_dynamic_layouts")}!
           </p>
           <p className="mt-3 text-base ">
-            You can now adjust the interface to your liking by accessing the
-            dynamic layouts feature in the ''Settings'' tab (top right corner).
+            {t("you_can_now_adjust_the_interface")} ''{t("settings")}''{" "}
+            {t("tab")} ({t("top_right_corner")}).
           </p>
           <button
             className="float-right mt-6 text-primary-900 hover:underline"
             onClick={onDismissPermanently}
           >
-            Dismiss and don’t show again.
+            {t("dismiss_and_dont_show_again")}.
           </button>
         </div>
       </div>

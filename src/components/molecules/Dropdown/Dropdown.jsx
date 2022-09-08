@@ -7,6 +7,7 @@ import { HideMenuOnOutsideClicked } from "lib/utils";
 import { Box } from "@mui/material";
 import { useEffect } from "react";
 import _ from "lodash";
+import { useTranslation } from "react-i18next";
 
 const DropdownWrapper = styled.div`
   position: relative;
@@ -111,6 +112,7 @@ const Dropdown = ({
   const [isOpened, setIsOpened] = useState(false);
   const [index, setIndex] = useState(0);
   const wrapperRef = useRef(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!context) return;
@@ -191,7 +193,7 @@ const Dropdown = ({
                       style={{ width: 14, height: 14, borderRadius: "50%" }}
                     />
                   ) : null}
-                  {text}
+                  {t(text)}
                 </Text>
               </DropdownListContainer>
             );

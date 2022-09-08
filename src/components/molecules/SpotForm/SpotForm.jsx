@@ -12,6 +12,7 @@ import { IconButton as BaseIcon } from "../IconButton";
 import { MinusIcon, PlusIcon } from "components/atoms/Svg";
 import { setHighSlippageModal } from "lib/store/features/api/apiSlice";
 import { Box } from "@mui/material";
+import { withTranslation } from "react-i18next";
 
 class SpotForm extends React.Component {
   constructor(props) {
@@ -297,14 +298,14 @@ class SpotForm extends React.Component {
     const marketInfo = this.props.marketInfo;
     if (!marketInfo) return 0;
     let fee = marketInfo.baseFee;
-    
+
     // Hardcode 0.05% taker fee for Arbitrum
     if (this.props.network === 42161) {
       const amount =
         this.props.side === "b"
           ? this.state.quoteAmount
           : this.state.baseAmount;
-      fee = (fee * 1) + amount * 0.0005;
+      fee = fee * 1 + amount * 0.0005;
     }
     return fee;
   }
@@ -313,14 +314,14 @@ class SpotForm extends React.Component {
     const marketInfo = this.props.marketInfo;
     if (!marketInfo) return 0;
     let fee = marketInfo.quoteFee;
-   
+
     // Hardcode 0.05% taker fee for Arbitrum
     if (this.props.network === 42161) {
       const amount =
         this.props.side === "b"
           ? this.state.quoteAmount
           : this.state.baseAmount;
-      fee = (fee * 1) + amount * 0.0005;
+      fee = fee * 1 + amount * 0.0005;
     }
     return fee;
   }
@@ -409,7 +410,7 @@ class SpotForm extends React.Component {
     let newstate = { ...this.state };
     this.setState(newstate);
     let orderApproveToast = toast.info(
-      "Approve pending. Confirm or Reject to continue...",
+      this.props.t("approve_pending_confirm_or_reject_to_continue"),
       {
         toastId: "Approve pending. Confirm or Reject to continue...",
         autoClose: false,
@@ -429,7 +430,7 @@ class SpotForm extends React.Component {
 
     toast.dismiss(orderApproveToast);
     if (success) {
-      toast.success(`${token} approved.`, {
+      toast.success(`${token} ${this.props.t("approved")}.`, {
         toastId: `${token} approved.`,
       });
     }
@@ -440,7 +441,7 @@ class SpotForm extends React.Component {
   async buySellHandler(e) {
     e.preventDefault();
     if (!this.state.quoteAmount || !this.state.baseAmount) {
-      toast.error("No amount available", {
+      toast.error(this.props.t("no_amount_available"), {
         toastId: "No amount available",
       });
       return;
@@ -448,7 +449,7 @@ class SpotForm extends React.Component {
 
     let price = this.currentPrice();
     if (!price) {
-      toast.error("No price available", {
+      toast.error(this.props.t("no_price_available"), {
         toastId: "No price available",
       });
       return;
@@ -456,14 +457,14 @@ class SpotForm extends React.Component {
 
     price = Number(price);
     if (price < 0) {
-      toast.error(`Price (${price}) can't be below 0`, {
+      toast.error(this.props.t("price_cannot_be_below_0", { price: price }), {
         toastId: `Price (${price}) can't be below 0`,
       });
       return;
     }
 
     if (this.props.activeOrderCount > 0 && api.isZksyncChain()) {
-      toast.error("Only one active order permitted at a time", {
+      toast.error(this.props.t("only_one_active_order_permitted_at_a_time"), {
         toastId: "Only one active order permitted at a time",
       });
       return;
@@ -486,16 +487,26 @@ class SpotForm extends React.Component {
     quoteBalance = parseFloat(quoteBalance);
     if (this.props.side === "s") {
       if (isNaN(baseBalance)) {
-        toast.error(`No ${marketInfo.baseAsset.symbol} balance`, {
-          toastId: `No ${marketInfo.baseAsset.symbol} balance`,
-        });
+        toast.error(
+          this.props.t("no_symbol_balance", {
+            symbol: marketInfo.baseAsset.symbol,
+          }),
+          {
+            toastId: `No ${marketInfo.baseAsset.symbol} balance`,
+          }
+        );
         return;
       }
 
       if (this.state.baseAmount > baseBalance) {
-        toast.error(`Amount exceeds ${marketInfo.baseAsset.symbol} balance`, {
-          toastId: `Amount exceeds ${marketInfo.baseAsset.symbol} balance`,
-        });
+        toast.error(
+          this.props.t("amount_exceeds_symbol_balance", {
+            symbol: marketInfo.baseAsset.symbol,
+          }),
+          {
+            toastId: `Amount exceeds ${marketInfo.baseAsset.symbol} balance`,
+          }
+        );
         return;
       }
 
@@ -503,29 +514,47 @@ class SpotForm extends React.Component {
       if (this.state.baseAmount < fee) {
         fee = Number(fee).toPrecision(5);
         toast.error(
-          `Minimum order size is ${fee} ${marketInfo.baseAsset.symbol}`
+          this.props.t("minimum_order_size_is_fee_symbol", {
+            fee: fee,
+            symbol: marketInfo.baseAsset.symbol,
+          })
         );
         return;
       }
 
       if (this.state.baseAmount > baseAllowance) {
-        toast.error(`Amount exceeds ${marketInfo.baseAsset.symbol} allowance`, {
-          toastId: `Amount exceeds ${marketInfo.baseAsset.symbol} allowance`,
-        });
+        toast.error(
+          this.props.t("amount_exceeds_symbole_allowance", {
+            symbol: marketInfo.baseAsset.symbol,
+          }),
+          {
+            toastId: `Amount exceeds ${marketInfo.baseAsset.symbol} allowance`,
+          }
+        );
         return;
       }
     } else if (this.props.side === "b") {
       if (isNaN(quoteBalance)) {
-        toast.error(`No ${marketInfo.quoteAsset.symbol} balance`, {
-          toastId: `No ${marketInfo.quoteAsset.symbol} balance`,
-        });
+        toast.error(
+          this.props.t("no_symbol_balance", {
+            symbol: marketInfo.quoteAsset.symbol,
+          }),
+          {
+            toastId: `No ${marketInfo.quoteAsset.symbol} balance`,
+          }
+        );
         return;
       }
 
       if (this.state.quoteAmount > quoteBalance) {
-        toast.error(`Amount exceeds ${marketInfo.quoteAsset.symbol} balance`, {
-          toastId: `Amount exceeds ${marketInfo.quoteAsset.symbol} balance`,
-        });
+        toast.error(
+          this.props.t("amount_exceeds_symbol_balance", {
+            symbol: marketInfo.quoteAsset.symbol,
+          }),
+          {
+            toastId: `Amount exceeds ${marketInfo.quoteAsset.symbol} balance`,
+          }
+        );
         return;
       }
 
@@ -533,7 +562,10 @@ class SpotForm extends React.Component {
       if (this.state.quoteAmount < fee) {
         fee = Number(fee).toPrecision(5);
         toast.error(
-          `Minimum order size is ${fee} ${marketInfo.quoteAsset.symbol}`,
+          this.props.t("minimum_order_size_is_fee_symbol", {
+            fee: fee,
+            symbol: marketInfo.quoteAsset.symbol,
+          }),
           {
             toastId: `Minimum order size is ${fee} ${marketInfo.quoteAsset.symbol}`,
           }
@@ -542,9 +574,14 @@ class SpotForm extends React.Component {
       }
 
       if (this.state.quoteAmount > quoteAllowance) {
-        toast.error(`Total exceeds ${marketInfo.quoteAsset.symbol} allowance`, {
-          toastId: `Total exceeds ${marketInfo.quoteAsset.symbol} allowance`,
-        });
+        toast.error(
+          this.props.t("total_exceeds_symbol_allowance", {
+            symbol: marketInfo.quoteAsset.symbol,
+          }),
+          {
+            toastId: `Total exceeds ${marketInfo.quoteAsset.symbol} allowance`,
+          }
+        );
         return;
       }
     }
@@ -595,14 +632,15 @@ class SpotForm extends React.Component {
       return (
         <div>
           <p style={{ fontSize: "14px", lineHeight: "24px" }}>
-            {this.props.side === "s" ? "Sell" : "Buy"} Order pending
+            {this.props.side === "s" ? "Sell" : "Buy"}{" "}
+            {this.props.t("order_pending")}
           </p>
           <p style={{ fontSize: "14px", lineHeight: "24px" }}>
             {addComma(formatPrice(baseAmount))} {marketInfo.baseAsset.symbol} @{" "}
             {addComma(formatPrice(price))} {marketInfo.quoteAsset.symbol}
           </p>
           <p style={{ fontSize: "14px", lineHeight: "24px" }}>
-            Transaction fee:{" "}
+            {this.props.t("transaction_fee")}:{" "}
             {this.props.side === "s"
               ? `${addComma(formatPrice(marketInfo.baseFee))} ${
                   marketInfo.baseAsset.symbol
@@ -612,7 +650,7 @@ class SpotForm extends React.Component {
                 }`}
           </p>
           <p style={{ fontSize: "14px", lineHeight: "24px" }}>
-            Sign or Cancel to continue...
+            {this.props.t("sign_or_cancel_to_continue")}
           </p>
         </div>
       );
@@ -638,16 +676,21 @@ class SpotForm extends React.Component {
       );
 
       if (!this.props.settings.disableOrderNotification) {
-        toast.info("Order placed", {
+        toast.info(this.props.t("order_placed"), {
           toastId: "Order placed.",
         });
       }
     } catch (e) {
       console.log(e);
-      toast.error(`Error submitting the order: ${e.message}`, {
-        autoClose: 20000,
-        toastId: "submitOrder",
-      });
+      toast.error(
+        this.props.t("error_submitting_the_order_message", {
+          message: e.message,
+        }),
+        {
+          autoClose: 20000,
+          toastId: "submitOrder",
+        }
+      );
     }
 
     if (!this.props.settings.disableOrderNotification) {
@@ -773,7 +816,7 @@ class SpotForm extends React.Component {
     if (this.props.network === 42161) {
       const marketInfo = this.props.marketInfo;
       const takerVolumeFee = marketInfo ? marketInfo.takerVolumeFee : 0;
-      
+
       let gasFee,
         feeToken,
         gasFeeUsdValue,
@@ -813,24 +856,32 @@ class SpotForm extends React.Component {
       return (
         <div>
           <p className="font-sans text-sm">
-            Arbitrum's network swap fees are dynamic and
+            {this.props.t("arbitrums_network_swap_fees_are_dynamic_and")}
           </p>
           <p className="font-sans text-sm">
-            covered by the ZigZag operator, but paid by the taker.
+            {this.props.t(
+              "covered_by_the_zigzag_operator_but_paid_by_the_taker"
+            )}
           </p>
           {marketInfo && (
             <div>
               <p className="font-sans text-s">
                 <hr></hr>
               </p>
-              <p className="font-sans text-sm">Breakdown:</p>
-              <p className="font-sans text-sm">{`Gas fee: ${gasFee} ${feeToken} - (~$${gasFeeUsdValue})`}</p>
-              <p className="font-sans text-sm">{`Maker fee (${
+              <p className="font-sans text-sm">{this.props.t("breakdown")}:</p>
+              <p className="font-sans text-sm">{`${this.props.t(
+                "gas_fee"
+              )}: ${gasFee} ${feeToken} - (~$ ${gasFeeUsdValue})`}</p>
+              <p className="font-sans text-sm">{`${this.props.t(
+                "maker_fee"
+              )} (${
                 marketInfo.makerVolumeFee * 100
-              }%): ${makerFee} ${feeToken} - (~$${makerFeeUsdValue})`}</p>
-              <p className="font-sans text-sm">{`Taker fee (${
+              } %): ${makerFee} ${feeToken} - (~$ ${makerFeeUsdValue})`}</p>
+              <p className="font-sans text-sm">{`${this.props.t(
+                "taker_fee"
+              )} (${
                 takerVolumeFee * 100
-              }%): ${takerFee.toPrecision(4)} ${feeToken} - (~$${takerFeeUsdValue})`}</p>
+              } %): ${takerFee} ${feeToken} - (~$ ${takerFeeUsdValue})`}</p>
             </div>
           )}
         </div>
@@ -838,8 +889,14 @@ class SpotForm extends React.Component {
     } else {
       return (
         <div>
-          <p>zkSync's network swap fees are dynamic and sit around ~$0.10</p>
-          <p>covered by the market maker, but paid by the trader</p>
+          <p>
+            {this.props.t(
+              "zksyncs_network_swap_fees_are_dynamic_and_sit_around_0.10"
+            )}
+          </p>
+          <p>
+            {this.props.t("covered_by_the_market_maker_but_paid_by_the_trader")}
+          </p>
         </div>
       );
     }
@@ -848,6 +905,7 @@ class SpotForm extends React.Component {
   render() {
     const isMobile = window.innerWidth < 430;
     const marketInfo = this.props.marketInfo;
+    const { t } = this.props;
     let baseAmount, quoteAmount;
     if (typeof this.state.baseAmount === "string") {
       baseAmount = parseFloat(this.state.baseAmount.replace(",", "."));
@@ -927,16 +985,20 @@ class SpotForm extends React.Component {
     if (this.props.side === "b") {
       buttonType = "BUY";
       if (quoteAmount <= quoteBalance && quoteAmount > quoteAllowance) {
-        buttonText = `Approve ${marketInfo && marketInfo.quoteAsset?.symbol}`;
+        buttonText = `${t("approve")} ${
+          marketInfo && marketInfo.quoteAsset?.symbol
+        }`;
         if (api.isEVMChain) approveNeeded = true;
       } else {
-        buttonText = `BUY ${marketInfo && marketInfo.baseAsset?.symbol}`;
+        buttonText = `${t("buy")} ${
+          marketInfo && marketInfo.baseAsset?.symbol
+        }`;
       }
       feeAmount = (
         <FormHeader>
           <InfoWrapper>
             <Text font="primaryTiny" color="foregroundMediumEmphasis">
-              Network fee
+              {t("network_fee")}
             </Text>
             <QuestionHelper text={this.showLabel()} />
           </InfoWrapper>
@@ -959,16 +1021,20 @@ class SpotForm extends React.Component {
     } else if (this.props.side === "s") {
       buttonType = "SELL";
       if (baseAmount <= baseBalance && baseAmount > baseAllowance) {
-        buttonText = `Approve ${marketInfo && marketInfo.baseAsset?.symbol}`;
+        buttonText = `${t("approve")} ${
+          marketInfo && marketInfo.baseAsset?.symbol
+        }`;
         if (api.isEVMChain) approveNeeded = true;
       } else {
-        buttonText = `SELL ${marketInfo && marketInfo.baseAsset?.symbol}`;
+        buttonText = `${t("sell")} ${
+          marketInfo && marketInfo.baseAsset?.symbol
+        }`;
       }
       feeAmount = (
         <FormHeader>
           <InfoWrapper>
             <Text font="primaryTiny" color="foregroundMediumEmphasis">
-              Network fee
+              {t("network_fee")}
             </Text>
             <QuestionHelper text={this.showLabel()} />
           </InfoWrapper>
@@ -1027,7 +1093,7 @@ class SpotForm extends React.Component {
               <InputField
                 type="text"
                 pattern="\d+(?:[.,]\d+)?"
-                placeholder={`Price (${
+                placeholder={`${t("price")} (${
                   marketInfo && marketInfo.baseAsset?.symbol
                 }-${marketInfo && marketInfo.quoteAsset?.symbol})`}
                 value={
@@ -1060,7 +1126,7 @@ class SpotForm extends React.Component {
             <InputField
               type="text"
               pattern="\d+(?:[.,]\d+)?"
-              placeholder={`Amount (${
+              placeholder={`${t("amount")} (${
                 marketInfo && marketInfo.baseAsset.symbol
                   ? marketInfo.baseAsset.symbol
                   : ""
@@ -1084,7 +1150,7 @@ class SpotForm extends React.Component {
           </InputBox>
           <FormHeader>
             <Text font="primaryTiny" color="foregroundMediumEmphasis">
-              {isMobile ? "Balance" : "Available balance"}
+              {isMobile ? `${t("balance")}` : `${t("available_balance")}`}
             </Text>
             {baseBalanceHtml}
           </FormHeader>
@@ -1099,7 +1165,7 @@ class SpotForm extends React.Component {
             <InputField
               type="text"
               pattern="\d+(?:[.,]\d+)?"
-              placeholder={`Total (${
+              placeholder={`${t("total")} (${
                 marketInfo && marketInfo.quoteAsset.symbol
                   ? marketInfo.quoteAsset.symbol
                   : ""
@@ -1123,7 +1189,7 @@ class SpotForm extends React.Component {
           </InputBox>
           <FormHeader>
             <Text font="primaryTiny" color="foregroundMediumEmphasis">
-              {isMobile ? "Balance" : "Available balance"}
+              {isMobile ? `${t("balance")}` : `${t("available_balance")}`}
             </Text>
             {quoteBalanceHtml}
           </FormHeader>
@@ -1192,7 +1258,9 @@ const mapStateToProps = (state) => {
   };
 };
 
-export default connect(mapStateToProps, { setHighSlippageModal })(SpotForm);
+export default connect(mapStateToProps, { setHighSlippageModal })(
+  withTranslation()(SpotForm)
+);
 
 const StyledForm = styled.form`
   display: grid;
