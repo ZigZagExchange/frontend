@@ -197,15 +197,13 @@ class API extends Emitter {
           profile.name = data.name;
         }
 
-        if (!profile.image) {
-          profile.image = createIcon({ seed: address }).toDataURL();
+        if (profile.image) {
+          profile.image = `https://gateway.ipfs.io/ipfs/${profile.image}`;
         }
 
         return profile;
       } catch (err) {
-        if (!err.response) {
-          throw err;
-        }
+        console.warn(`Failed to get profile from IPFS: ${err}`);
       }
       return {};
     };
@@ -237,8 +235,8 @@ class API extends Emitter {
         ]))
       );
 
-      if (profile.image) {
-        profile.image = `https://gateway.ipfs.io/ipfs/${profile.image}`;
+      if (!profile.image) {
+        profile.image = createIcon({ seed: address }).toDataURL();
       }
     }
 
