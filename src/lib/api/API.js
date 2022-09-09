@@ -4,7 +4,7 @@ import Web3Modal from "web3modal";
 import Emitter from "tiny-emitter";
 import { ethers, constants as ethersConstants } from "ethers";
 import WalletConnectProvider from "@walletconnect/web3-provider";
-import { getENSName } from "lib/ens";
+import { getENSName, reverseUnstoppabledomainsAddress } from "lib/ens";
 import { formatAmount } from "lib/utils";
 import erc20ContractABI from "lib/contracts/ERC20.json";
 import wethContractABI from "lib/contracts/WETH.json";
@@ -203,9 +203,14 @@ class API extends Emitter {
       return {};
     };
 
-    const fetchENSName = async (address) => {
-      let name = await getENSName(address);
-      if (name) return { name };
+    const fetchAddressName = async (address) => {
+      const [ensName, unstoppabledomainsName] = await Promise.all([
+        getENSName(address),
+        reverseUnstoppabledomainsAddress(address),
+      ]);
+      if (ensName) return { name: ensName };
+      if (unstoppabledomainsName) return { name: unstoppabledomainsName };
+
       return {};
     };
 
@@ -225,7 +230,7 @@ class API extends Emitter {
       Object.assign(
         profile,
         ...(await Promise.all([
-          fetchENSName(address),
+          fetchAddressName(address),
           getProfileFromIPFS(address),
         ]))
       );

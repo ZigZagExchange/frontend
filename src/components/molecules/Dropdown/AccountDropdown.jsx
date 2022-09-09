@@ -239,6 +239,8 @@ const AccountDropdown = ({ notext, networkName }) => {
         notext={notext}
         expanded={isOpened}
         onClick={toggle}
+        user={user}
+        settings={settings}
       ></AccountButton>
       {isOpened && (
         <DropdownDisplay isMobile={isMobile}>
