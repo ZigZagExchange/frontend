@@ -1,6 +1,7 @@
 import { createSlice, createAction } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 import { formatPrice } from "lib/utils";
+
 import api from "lib/api";
 import { getLayout } from "lib/helpers/storage/layouts";
 import FillCard from "components/organisms/TradeDashboard/TradeTables/OrdersTable/FillCard";
@@ -8,6 +9,8 @@ import {
   initialLayouts,
   stackedLayouts,
 } from "components/organisms/TradeDashboard/ReactGridLayout/layoutSettings";
+
+import i18next from "../../../i18next";
 
 const makeScopeUser = (state) => `${state.network}-${state.userId}`;
 const makeScopeMarket = (state) => `${state.network}-${state.currentMarket}`;
@@ -75,8 +78,8 @@ export const apiSlice = createSlice({
       const renderToastContent = () => {
         return (
           <>
-            An unknown error has occurred while processing '{op}' (
-            {errorMessage}). Please{" "}
+            {i18next.t("an_unknown_error_has_occurred_while_processing")} '{op}'
+            ({errorMessage}). Please{" "}
             <a
               href={"https://info.zigzag.exchange/#contact"}
               style={{
@@ -208,9 +211,16 @@ export const apiSlice = createSlice({
             ) {
               toast.dismiss("Order placed.");
               toast.success(
-                `Your ${sideText} order #${fillid} for ${Number(
-                  baseQuantity.toPrecision(4)
-                )} ${baseCurrency} was filled @ ${Number(formatPrice(price))}!`,
+                i18next.t(
+                  "your_sidetext_order_fillid_for_basequantity_basecurrency_was_filled_price",
+                  {
+                    sideText: sideText,
+                    fillid: fillid,
+                    baseQuantity: Number(baseQuantity.toPrecision(4)),
+                    baseCurrency: baseCurrency,
+                    price: Number(formatPrice(price)),
+                  }
+                ),
                 {
                   toastId: `Your ${sideText} order #${fillid} for ${Number(
                     baseQuantity.toPrecision(4)
@@ -381,11 +391,16 @@ export const apiSlice = createSlice({
               filledOrder[11] = txHash;
               const noFeeOrder = api.getOrderDetailsWithoutFee(filledOrder);
               toast.error(
-                `Your ${sideText} order for ${
-                  noFeeOrder.baseQuantity.toPrecision(4) / 1
-                } ${baseCurrency} @ ${
-                  noFeeOrder.price.toPrecision(4) / 1
-                } was rejected: ${error}`,
+                i18next.t(
+                  "your_sidetext_order_for_basequantity_basecurrency_price_was_rejected",
+                  {
+                    sideText: sideText,
+                    baseQuantity: noFeeOrder.baseQuantity.toPrecision(4) / 1,
+                    baseCurrency: baseCurrency,
+                    price: noFeeOrder.price.toPrecision(4) / 1,
+                    error: error,
+                  }
+                ),
                 {
                   toastId: `Your ${sideText} order for ${
                     noFeeOrder.baseQuantity.toPrecision(4) / 1
@@ -395,7 +410,9 @@ export const apiSlice = createSlice({
                 }
               );
               toast.info(
-                `This happens occasionally. Run the transaction again and you should be fine.`,
+                i18next.t(
+                  "this_happens_occasionally_run_the_transaction_again_and_you_should_be_fine"
+                ),
                 {
                   toastId: `This happens occasionally. Run the transaction again and you should be fine.`,
                 }
@@ -556,7 +573,7 @@ export const apiSlice = createSlice({
         return (
           <div>
             <p className="mb-2 text-xl font-semibold font-work">
-              Transaction Successful
+              {i18next.t("transaction_successfully")}
             </p>
             Successfully {successMsg} {amount} {token} {targetMsg}
             {type !== "zkSync_to_polygon" &&
@@ -574,7 +591,7 @@ export const apiSlice = createSlice({
                 target="_blank"
                 rel="noreferrer"
               >
-                View transaction
+                {i18next.t("view_transaction")}
               </a>
             </p>
             {type === "withdraw_fast" ? <br /> : ""}
@@ -582,7 +599,7 @@ export const apiSlice = createSlice({
               type === "zkSync_to_polygon" ||
               type === "polygon_to_zkSync") && (
               <div className="mt-3">
-                Confirm that your funds have arrived {targetMsg}
+                {i18next.t("confirm_that_your_funds_have_arrived")} {targetMsg}
                 <p>
                   <a
                     href={walletAddress}

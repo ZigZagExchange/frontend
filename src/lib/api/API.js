@@ -20,13 +20,15 @@ import axios from "axios";
 import { isMobile } from "react-device-detect";
 import get from "lodash/get";
 
+import i18next from "../i18next";
+
 const chainMap = {
   "0x1": 1,
   "0x5": 1002,
   "0xa4b1": 42161,
 };
 
-export default class API extends Emitter {
+class API extends Emitter {
   networks = {};
   ws = null;
   apiProvider = null;
@@ -497,8 +499,8 @@ export default class API extends Emitter {
       this.web3Modal.clearCachedProvider();
     }
 
-    if (isMobile) window.localStorage.clear();
-    else window.localStorage.removeItem("walletconnect");
+    if (isMobile) window.localStorage?.clear();
+    else window.localStorage?.removeItem("walletconnect");
 
     this.balances = {};
     this._profiles = {};
@@ -715,7 +717,7 @@ export default class API extends Emitter {
   };
 
   cancelOrder = async (orderId) => {
-    const token = localStorage.getItem(orderId);
+    const token = localStorage?.getItem(orderId);
     // token is used to cancel the order - otherwiese the user is asked to sign a msg
     if (token) {
       await this.send("cancelorder3", [
@@ -724,9 +726,12 @@ export default class API extends Emitter {
         token,
       ]);
     } else {
-      const toastMsg = toast.info("Sign the message to cancel your order...", {
-        toastId: "Sign the message to cancel your order...'",
-      });
+      const toastMsg = toast.info(
+        i18next.t("sign_the_message_to_cancel_your_order"),
+        {
+          toastId: "Sign the message to cancel your order...'",
+        }
+      );
 
       const message = `cancelorder2:${this.apiProvider.network}:${orderId}`;
       const signedMessage = await this.apiProvider.signMessage(message);
@@ -808,7 +813,7 @@ export default class API extends Emitter {
     const { id: userId } = await this.getAccountState();
     const tokenArray = [];
     orderIds.forEach((id) => {
-      const token = localStorage.getItem(id);
+      const token = localStorage?.getItem(id);
       if (token) tokenArray.push(token);
     });
     if (orderIds.length === tokenArray.length) {
@@ -818,9 +823,12 @@ export default class API extends Emitter {
         tokenArray,
       ]);
     } else {
-      const toastMsg = toast.info("Sign the message to cancel your order...", {
-        toastId: "Sign the message to cancel your order...'",
-      });
+      const toastMsg = toast.info(
+        i18next.t("sign_the_message_to_cancel_your_order"),
+        {
+          toastId: "Sign the message to cancel your order...'",
+        }
+      );
       const validUntil = Math.floor(Date.now() / 1000) + 10;
       const message = `cancelall2:${this.apiProvider.network}:${validUntil}`;
       const signedMessage = await this.apiProvider.signMessage(message);
@@ -840,9 +848,12 @@ export default class API extends Emitter {
   };
 
   cancelAllOrdersAllChains = async () => {
-    const toastMsg = toast.info("Sign the message to cancel your order...", {
-      toastId: "Sign the message to cancel your order...'",
-    });
+    const toastMsg = toast.info(
+      i18next.t("sign_the_message_to_cancel_your_order"),
+      {
+        toastId: "Sign the message to cancel your order...'",
+      }
+    );
 
     const validUntil = Date.now() / 1000 + 10;
     const message = `cancelall2:0:${validUntil}`;
@@ -1275,3 +1286,5 @@ export default class API extends Emitter {
     }
   };
 }
+
+export default API;

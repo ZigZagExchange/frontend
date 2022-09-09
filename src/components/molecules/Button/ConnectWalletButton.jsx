@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import {
   networkSelector,
@@ -8,12 +8,14 @@ import Button from "./Button";
 import api from "../../../lib/api";
 import { useHistory, useLocation } from "react-router-dom";
 import { formatAmount } from "../../../lib/utils";
+import { useTranslation } from "react-i18next";
 
 const ConnectWalletButton = (props) => {
   const network = useSelector(networkSelector);
   const isLoading = useSelector(isConnectingSelector);
   const history = useHistory();
   const location = useLocation();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (props.isLoading) {
@@ -62,7 +64,7 @@ const ConnectWalletButton = (props) => {
       }}
       className={props?.className}
     >
-      CONNECT WALLET
+      {t("connect_wallet")}
     </Button>
   );
 };

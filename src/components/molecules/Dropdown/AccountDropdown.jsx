@@ -21,6 +21,7 @@ import api from "lib/api";
 import Text from "components/atoms/Text/Text";
 import { ExternalLinkIcon } from "components/atoms/Svg";
 import ToggleButton from "../Toggle/ToggleButton";
+import { useTranslation } from "react-i18next";
 
 const DropdownWrapper = styled.div`
   position: relative;
@@ -158,6 +159,7 @@ const AccountDropdown = ({ notext, networkName }) => {
   const coinEstimator = useCoinEstimator();
   const isMobile = window.innerWidth < 490;
   const wrapperRef = useRef(null);
+  const { t } = useTranslation();
 
   HideMenuOnOutsideClicked(wrapperRef, setIsOpened);
 
@@ -245,7 +247,7 @@ const AccountDropdown = ({ notext, networkName }) => {
           <DropdownHeader>
             <div>
               <Text font="primaryTiny" color="foregroundMediumEmphasis">
-                TOTAL BALANCE
+                {t("total_balance")}
               </Text>
               <Text font="primaryHeading6" color="foregroundHighEmphasis">
                 {settings.hideBalance
@@ -257,6 +259,8 @@ const AccountDropdown = ({ notext, networkName }) => {
               <ToggleButton
                 type="option"
                 size="sm"
+                leftText="l1"
+                rightText="l2"
                 leftLabel="l1"
                 rightLabel="l2"
                 width="40"
@@ -344,7 +348,7 @@ const AccountDropdown = ({ notext, networkName }) => {
                 color="foregroundHighEmphasis"
                 textAlign="center"
               >
-                DISCONNECT
+                {t("disconnect")}
               </Text>
             </Button>
           </DropdownFooter>

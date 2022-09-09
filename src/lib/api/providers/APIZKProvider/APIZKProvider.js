@@ -12,6 +12,8 @@ import {
   ETH_ZKSYNC_BRIDGE,
 } from "components/pages/BridgePage/constants";
 
+import i18next from "../../../i18next";
+
 export default class APIZKProvider extends APIProvider {
   static SEEDS_STORAGE_KEY = "@ZZ/ZKSYNC_SEEDS";
   static VALID_SIDES = ["b", "s"];
@@ -82,9 +84,10 @@ export default class APIZKProvider extends APIProvider {
     try {
       const feeUSD = await this.changePubKeyFee();
       toast.info(
-        `You need to sign a one-time transaction to activate your zksync account. The fee for this tx will be $${feeUSD.toFixed(
-          2
-        )}`,
+        i18next.t(
+          "you_need_to_sign_a_one_time_transaction_to_activate_your_zksync_account_usdfee",
+          { feeUSD: feeUSD.toFixed(2) }
+        ),
         {
           toastId: `You need to sign a one-time transaction to activate your zksync account. The fee for this tx will be $${feeUSD.toFixed(
             2
@@ -93,7 +96,9 @@ export default class APIZKProvider extends APIProvider {
       );
     } catch (err) {
       toast.info(
-        `You need to sign a one-time transaction to activate your zksync account. The fee for this tx will be ~$2.5`,
+        i18next.t(
+          "you_need_to_sign_a_one_time_transaction_to_activate_your_zksync_account_the_fee_for_this_tx_will_be_2.5"
+        ),
         {
           toastId: `You need to sign a one-time transaction to activate your zksync account. The fee for this tx will be ~$2.5`,
         }
@@ -116,7 +121,9 @@ export default class APIZKProvider extends APIProvider {
         feeToken = "WBTC";
       } else {
         toast.warn(
-          "Your zkSync token balances are very low. You might need to bridge in more funds first.",
+          i18next.t(
+            "your_zksync_token_balances_are_very_low_you_might_need_to_bridge_in_more_funds_first"
+          ),
           {
             toastId:
               "Your zkSync token balances are very low. You might need to bridge in more funds first.",
@@ -536,11 +543,12 @@ export default class APIZKProvider extends APIProvider {
 
   signIn = async () => {
     try {
+      // toast.error(i18next.t("zksync_is_down_try_again_later"));
       this.syncProvider = await zksync.getDefaultRestProvider(
         this.network === 1 ? "mainnet" : "goerli"
       );
     } catch (e) {
-      toast.error("Zksync is down. Try again later");
+      toast.error(i18next.t("zksync_is_down_try_again_later"));
       throw e;
     }
 
@@ -592,7 +600,7 @@ export default class APIZKProvider extends APIProvider {
   getSeeds = () => {
     try {
       return JSON.parse(
-        window.localStorage.getItem(APIZKProvider.SEEDS_STORAGE_KEY) || "{}"
+        window.localStorage?.getItem(APIZKProvider.SEEDS_STORAGE_KEY) || "{}"
       );
     } catch {
       return {};

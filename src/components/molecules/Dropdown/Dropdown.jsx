@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/alt-text */
 import React, { useState, useRef } from "react";
 import styled from "styled-components";
 import { ExpandableButton } from "../ExpandableButton";
@@ -6,6 +7,7 @@ import { HideMenuOnOutsideClicked } from "lib/utils";
 import { Box } from "@mui/material";
 import { useEffect } from "react";
 import _ from "lodash";
+import { useTranslation } from "react-i18next";
 
 const DropdownWrapper = styled.div`
   position: relative;
@@ -110,6 +112,7 @@ const Dropdown = ({
   const [isOpened, setIsOpened] = useState(false);
   const [index, setIndex] = useState(0);
   const wrapperRef = useRef(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!context) return;
@@ -163,9 +166,8 @@ const Dropdown = ({
           className={`${adClass} ${isMobile ? "mobile-mode" : ""}`}
         >
           {item.map((items) => {
-            const { text, value, url, icon, selectedIcon, iconSelected } =
+            const { text, value, url, icon, iconSelected } =
               items;
-            const menuIcon = iconSelected ? selectedIcon : icon;
             return (
               <DropdownListContainer
                 className={`${adClass} ${
@@ -185,13 +187,13 @@ const Dropdown = ({
                   color="foregroundHighEmphasis"
                   className={!iconSelected ? "selected-icon" : ""}
                 >
-                  {items.image != "" && items.image ? (
+                  {items.image !== "" && items.image ? (
                     <img
                       src={items.image}
                       style={{ width: 14, height: 14, borderRadius: "50%" }}
                     />
                   ) : null}
-                  {text}
+                  {t(text)}
                 </Text>
               </DropdownListContainer>
             );

@@ -25,6 +25,7 @@ import LockIcon from "@mui/icons-material/Lock";
 import _ from "lodash";
 import { darkColors, lightColors } from "lib/theme/colors";
 import classNames from "classnames";
+import { useTranslation } from "react-i18next";
 
 const TradeRatesCard = ({
   updateMarketChain,
@@ -42,6 +43,7 @@ const TradeRatesCard = ({
   const dispatch = useDispatch();
 
   const settings = useSelector(settingsSelector);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (marketSummary.price > lastPrice) setIncrease(true);
@@ -155,7 +157,7 @@ const TradeRatesCard = ({
                       : lightColors.foregroundHighEmphasis
                   }
                 >
-                  Favorites
+                  {t("favorites")}
                 </Box>
                 {_.map(favourites, (item, index) => {
                   return (
@@ -234,8 +236,8 @@ const TradeRatesCard = ({
                 >
                   <>
                     {settings.showNightPriceChange
-                      ? "UTC Change"
-                      : "24h Change"}
+                      ? `UTC ${t("change")}`
+                      : `24h ${t("change")}`}
                   </>
                 </Text>
                 <Text
@@ -270,7 +272,11 @@ const TradeRatesCard = ({
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  <>{settings.showNightPriceChange ? "UTC High" : "24h High"}</>
+                  <>
+                    {settings.showNightPriceChange
+                      ? `UTC ${t("high")}`
+                      : `24h ${t("high")}`}
+                  </>
                 </Text>
                 <Text
                   font="primaryMediumSmallSemiBold"
@@ -287,7 +293,11 @@ const TradeRatesCard = ({
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  <>{settings.showNightPriceChange ? "UTC Low" : "24h Low"}</>
+                  <>
+                    {settings.showNightPriceChange
+                      ? `UTC ${t("low")}`
+                      : `24h ${t("low")}`}
+                  </>
                 </Text>
                 <Text
                   font="primaryMediumSmallSemiBold"
@@ -306,12 +316,12 @@ const TradeRatesCard = ({
                 >
                   <>
                     {settings.showNightPriceChange
-                      ? `UTC Volume(${
+                      ? `UTC ${t("volume")}(${
                           marketInfo && marketInfo.baseAsset.symbol
                             ? marketInfo.baseAsset.symbol
                             : " -- "
                         })`
-                      : `24h Volume(${
+                      : `24h ${t("volume")}(${
                           marketInfo && marketInfo.baseAsset.symbol
                             ? marketInfo && marketInfo.baseAsset.symbol
                             : " -- "
@@ -335,12 +345,12 @@ const TradeRatesCard = ({
                 >
                   <>
                     {settings.showNightPriceChange
-                      ? `UTC Volume(${
+                      ? `UTC ${t("volume")}(${
                           marketInfo && marketInfo.quoteAsset.symbol
                             ? marketInfo.quoteAsset.symbol
                             : " -- "
                         })`
-                      : `24h Volume(${
+                      : `24h ${t("volume")}(${
                           marketInfo && marketInfo.quoteAsset.symbol
                             ? marketInfo.quoteAsset.symbol
                             : " -- "
@@ -396,7 +406,7 @@ const TradeRatesCard = ({
             scale="imd"
             onClick={handleSettings}
           >
-            Settings
+            {t("settings")}
           </Button>
         </div>
       )}

@@ -1,7 +1,6 @@
 import React from "react";
 import styled from "styled-components";
 import Input from "./Input";
-import { x } from "@xstyled/styled-components";
 
 const InputField = styled(Input)`
   cursor: pointer;
