@@ -581,7 +581,7 @@ export default class APIZKProvider extends APIProvider {
     );
 
     const [accountState, accountActivated] = await Promise.all([
-      this.api.getAccountState(),
+      this.getAccountState(),
       this.checkAccountActivated(),
     ]);
 
