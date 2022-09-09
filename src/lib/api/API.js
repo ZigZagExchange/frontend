@@ -175,7 +175,7 @@ class API extends Emitter {
     const getProfileFromIPFS = async (address) => {
       try {
         const controller = new AbortController();
-        setTimeout(() => controller.abort(), 2000);
+        setTimeout(() => controller.abort(), 1500);
 
         const { data } = await axios.get(
           `https://ipfs.3box.io/profile?address=${address}`,
