@@ -196,9 +196,6 @@ class API extends Emitter {
         if (data.name) {
           profile.name = data.name;
         }
-        if (profile.image) {
-          profile.image = `https://gateway.ipfs.io/ipfs/${profile.image}`;
-        }
 
         if (!profile.image) {
           profile.image = createIcon({ seed: address }).toDataURL();
@@ -239,6 +236,10 @@ class API extends Emitter {
           getProfileFromIPFS(address),
         ]))
       );
+
+      if (profile.image) {
+        profile.image = `https://gateway.ipfs.io/ipfs/${profile.image}`;
+      }
     }
 
     return this._profiles[address];
