@@ -174,8 +174,14 @@ class API extends Emitter {
   getProfile = async (address) => {
     const getProfileFromIPFS = async (address) => {
       try {
+        const controller = new AbortController();
+        setTimeout(() => controller.abort(), 2000);
+
         const { data } = await axios.get(
-          `https://ipfs.3box.io/profile?address=${address}`
+          `https://ipfs.3box.io/profile?address=${address}`,
+          {
+            signal: controller.signal,
+          }
         );
         const profile = {
           coverPhoto: get(data, "coverPhoto.0.contentUrl./"),
@@ -193,7 +199,7 @@ class API extends Emitter {
         if (profile.image) {
           profile.image = `https://gateway.ipfs.io/ipfs/${profile.image}`;
         }
-        
+
         if (!profile.image) {
           profile.image = createIcon({ seed: address }).toDataURL();
         }
