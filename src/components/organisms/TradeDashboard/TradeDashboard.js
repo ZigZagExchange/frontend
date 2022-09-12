@@ -139,10 +139,20 @@ export function TradeDashboard() {
   }, [network, currentMarket]);
 
   useEffect(() => {
+    const activeAcc = async () => {
+      const accountActivated = await api.checkAccountActivated();
+      if (!accountActivated) {
+        await api.changePubKeyAPI();
+      }
+    };
+    activeAcc().catch(console.error);
+  }, []);
+
+  useEffect(async () => {
     if (user.address && !user.id && network === 1) {
       history.push("/bridge");
       toast.error(t("Your_zksync_account_is_not_activated"), {
-        autoClose: 60000,
+        autoClose: 30000,
       });
     }
     const sub = () => {
