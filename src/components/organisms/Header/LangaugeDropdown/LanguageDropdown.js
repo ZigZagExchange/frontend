@@ -29,6 +29,12 @@ const languages = [
     country_code: "tr",
     icon: "https://raw.githubusercontent.com/OnTheGoSystems/SVG-flags-language-switcher/master/flags/tr.svg",
   },
+  {
+    code: "kr",
+    name: "한국어",
+    country_code: "kr",
+    icon: "https://raw.githubusercontent.com/OnTheGoSystems/SVG-flags-language-switcher/master/flags/kr.svg",
+  },
 ];
 
 export default function LanguageDropdown() {
