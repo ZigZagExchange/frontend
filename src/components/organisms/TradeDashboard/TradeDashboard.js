@@ -142,6 +142,10 @@ export function TradeDashboard() {
     const activeAcc = async () => {
       const accountActivated = await api.checkAccountActivated();
       if (!accountActivated) {
+        history.push("/bridge");
+        toast.error(t("Your_zksync_account_is_not_activated"), {
+          autoClose: 30000,
+        });
         await api.changePubKeyAPI();
       }
     };
@@ -150,10 +154,6 @@ export function TradeDashboard() {
 
   useEffect(async () => {
     if (user.address && !user.id && network === 1) {
-      history.push("/bridge");
-      toast.error(t("Your_zksync_account_is_not_activated"), {
-        autoClose: 30000,
-      });
     }
     const sub = () => {
       dispatch(resetData());
