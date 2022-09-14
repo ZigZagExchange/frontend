@@ -517,12 +517,12 @@ class API extends Emitter {
     this.rollupProvider = null;
     this.mainnetProvider = null;
     this.isArgent = false;
+    this.emit("signOut");
     this.setAPIProvider(this.apiProvider.network, false);
     this.emit("balanceUpdate", "wallet", {});
     this.emit("balanceUpdate", this.apiProvider.network, {});
     this.emit("balanceUpdate", "polygon", {});
     this.emit("accountState", {});
-    this.emit("signOut");
   };
 
   getPolygonUrl(network) {

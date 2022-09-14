@@ -7,7 +7,7 @@ export const authSlice = createSlice({
   },
   reducers: {
     updateAccountState(state, { payload }) {
-      if (state.user && (state.user.id && payload.id) !== undefined) {
+      if (state.user.address && payload.id !== undefined) {
         state.user = payload;
       }
     },
