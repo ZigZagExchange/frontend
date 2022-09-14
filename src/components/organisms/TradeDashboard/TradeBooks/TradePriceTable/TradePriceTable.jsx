@@ -52,6 +52,7 @@ const Table = styled.table`
     display: table;
     width: 100%;
     background: ${(p) => p.theme.colors.backgroundHighEmphasis};
+    z-index: 10000;
   }
 
   th {
@@ -131,7 +132,6 @@ const Table = styled.table`
 const TradePriceTable = (props) => {
   const { theme } = useTheme();
   const ref = useRef(null);
-  const [isUpdateScroll, setUpdateScroll] = useState(false);
   const [priceData, setPriceData] = useState([]);
   const isMobile = window.innerWidth < 500;
   const { t } = useTranslation();
@@ -157,15 +157,10 @@ const TradePriceTable = (props) => {
 
   useEffect(() => {
     if (!ref.current) return;
-    if (props.priceTableData.length === 0) {
-      setUpdateScroll(false);
-      return;
+    if (props.scrollToBottom) {
+      ref.current.scrollTo(0, ref.current.scrollHeight);
     }
-    if (props.scrollToBottom && !isUpdateScroll) {
-      setUpdateScroll(true);
-      ref.current?.scrollTo(0, ref.current.scrollHeight);
-    }
-  }, [props.priceTableData.length]);
+  }, [props.priceTableData]);
 
   let total_total = 0,
     total_step = 0;
