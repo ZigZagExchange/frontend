@@ -52,7 +52,7 @@ const Table = styled.table`
     display: table;
     width: 100%;
     background: ${(p) => p.theme.colors.backgroundHighEmphasis};
-    z-index: 10000;
+    z-index: 10;
   }
 
   th {

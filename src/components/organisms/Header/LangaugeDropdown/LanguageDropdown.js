@@ -53,7 +53,7 @@ export default function LanguageDropdown() {
             <img
               src={selected.icon}
               alt={selected.name}
-              className="w-5 rounded-full"
+              className="w-5 h-5 rounded-full"
             />
             <span className="block truncate">{selected.name}</span>
             <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
@@ -89,7 +89,7 @@ export default function LanguageDropdown() {
                         <img
                           src={lang.icon}
                           alt={lang.name}
-                          className="w-5 rounded-full"
+                          className="w-5 h-5 rounded-full"
                         />
                         {lang.name}
                       </span>
