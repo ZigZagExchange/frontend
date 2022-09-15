@@ -1067,7 +1067,7 @@ class API extends Emitter {
   };
 
   checkAccountActivated = async () => {
-    if (!this.apiProvider.isZksyncChain) return true;
+    if (!this.isZksyncChain) return true;
     return this.apiProvider.checkAccountActivated();
   };
 
@@ -1289,6 +1289,10 @@ class API extends Emitter {
           throw Error("Chain ID not understood");
       }
     }
+  };
+
+  changePubKeyAPI = async () => {
+    await this.apiProvider.changePubKey();
   };
 }
 
