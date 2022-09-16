@@ -461,11 +461,11 @@ export const apiSlice = createSlice({
         ...orders,
       };
 
-      state.orders = Object.keys(state.orders).map(orderId => {
-        const order = state.orders[orderId];
-        order[7] = order[7] - state.serverDelta;
-        return order;
-      });
+      //state.orders = Object.keys(state.orders).map(orderId => {
+      //  const order = state.orders[orderId];
+      //  order[7] = order[7] - state.serverDelta;
+      //  return order;
+      //});
       
       if (state.userId) {
         for (let i in orders) {
