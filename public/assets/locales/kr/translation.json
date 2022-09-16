@@ -186,8 +186,8 @@
   "your_sidetext_order_fillid_for_basequantity_basecurrency_was_filled_price": "당신의 {{sideText}} 주문 #{{fillid}} 의 {{baseQuantity}} {{baseCurrency}} {{price}} @에 체결되었습니다.",
   "your_sidetext_order_for_basequantity_basecurrency_price_was_rejected": "당신의 {{sideText}} 은 {{baseQuantity}} 의 주문 {{baseCurrency}} @ {{price}} 거절되었습니다. {{error}}",
   "this_happens_occasionally_run_the_transaction_again_and_you_should_be_fine": "이런 일은 가끔 발생합니다. 다시 이체를 해 보세요 그러면 괜찮을 겁니다.",
-  "transaction_successfully": "이체가 성공적 입니다.",
+  "bridge_transaction_pending": "이체가 성공적 입니다.",
   "view_transaction": "이체 내역을 확인하기.",
-  "confirm_that_your_funds_have_arrived": "당신의 자산이 도착했는지 확인해 보세요.",
+  "please_wait_for_your_eth_balance_to_be_available_in_zksync_before_trading": "당신의 자산이 도착했는지 확인해 보세요.",
   "an_unknown_error_has_occurred_while_processing": "알 수 없는 에러가 처리중에 발생했습니다."
 }

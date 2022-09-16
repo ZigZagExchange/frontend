@@ -573,7 +573,7 @@ export const apiSlice = createSlice({
         return (
           <div>
             <p className="mb-2 text-xl font-semibold font-work">
-              {i18next.t("transaction_successfully")}
+              {i18next.t("bridge_transaction_pending")}
             </p>
             Successfully {successMsg} {amount} {token} {targetMsg}
             {type !== "zkSync_to_polygon" &&
@@ -599,7 +599,10 @@ export const apiSlice = createSlice({
               type === "zkSync_to_polygon" ||
               type === "polygon_to_zkSync") && (
               <div className="mt-3">
-                {i18next.t("confirm_that_your_funds_have_arrived")} {targetMsg}
+                {i18next.t(
+                  "please_wait_for_your_eth_balance_to_be_available_in_zksync_before_trading"
+                )}{" "}
+                {targetMsg}
                 <p>
                   <a
                     href={walletAddress}

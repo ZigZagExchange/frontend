@@ -140,14 +140,11 @@ export function TradeDashboard() {
 
   useEffect(() => {
     const activeAcc = async () => {
-      if (!user.id) {
+      if (user.address && !user.id && network === 1) {
         history.push("/bridge");
       }
       const accountActivated = await api.checkAccountActivated();
-      if (!accountActivated) {
-        toast.error(t("Your_zksync_account_is_not_activated"), {
-          autoClose: 30000,
-        });
+      if (!accountActivated && user.address) {
         await api.changePubKeyAPI();
       }
     };
@@ -155,12 +152,6 @@ export function TradeDashboard() {
   }, []);
 
   useEffect(async () => {
-    // if (user.address && !user.id && network === 1) {
-    //   history.push("/bridge");
-    //   toast.error(t("Your_zksync_account_is_not_activated"), {
-    //     autoClose: 60000,
-    //   });
-    // }
     const sub = () => {
       dispatch(resetData());
       api.subscribeToMarket(currentMarket, settings.showNightPriceChange);
