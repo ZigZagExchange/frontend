@@ -64,6 +64,7 @@ export const apiSlice = createSlice({
       userPrice: 0,
       pairPrice: 0,
     },
+    serverDelta: 0,
   },
   reducers: {
     _error(state, { payload }) {
@@ -136,6 +137,9 @@ export const apiSlice = createSlice({
     _fills(state, { payload }) {
       payload[0].forEach((fill) => {
         const fillid = fill[1];
+        const isoString = fill[12];
+        const newTimestamp = new Date(isoString).getTime() - state.serverDelta * 1000;
+        fill[12] = new Date(newTimestamp);
         // taker and maker user ids have to be matched lowercase because addresses
         // sometimes come back in camelcase checksum format
         const takerUserId = fill[8] && fill[8].toLowerCase();
@@ -169,7 +173,11 @@ export const apiSlice = createSlice({
         // console.log(update);
         const fillid = update[1];
         const newstatus = update[2];
-        const timestamp = update[7];
+        let timestamp = update[7];
+        if (timestamp) {
+          const newTimestamp = new Date(timestamp).getTime() - state.serverDelta * 1000;
+          timestamp = new Date(newTimestamp);
+        }
         let txhash;
         let feeamount;
         let feetoken;
@@ -263,9 +271,13 @@ export const apiSlice = createSlice({
     _fillreceipt(state, { payload }) {
       payload[0].forEach((fill) => {
         if (!fill) return;
+        const fillid = fill[1];
+        const isoString = fill[12];
+        const newTimestamp = new Date(isoString).getTime() - state.serverDelta * 1000;
+        fill[12] = new Date(newTimestamp);
+
         const takerUserId = fill[8] && fill[8].toLowerCase();
         const makerUserId = fill[9] && fill[9].toLowerCase();
-        const fillid = fill[1];
         if (fill[2] === state.currentMarket && fill[0] === state.network) {
           state.marketFills[fillid] = fill;
         }
@@ -449,6 +461,12 @@ export const apiSlice = createSlice({
         ...orders,
       };
 
+      state.orders = Object.keys(state.orders).map(orderId => {
+        const order = state.orders[orderId];
+        order[7] = order[7] - state.serverDelta;
+        return order;
+      });
+      
       if (state.userId) {
         for (let i in orders) {
           if (orders[i][8] === state.userId.toString()) {
@@ -461,6 +479,8 @@ export const apiSlice = createSlice({
     _orderreceipt(state, { payload }) {
       const orderId = payload[1];
       state.userOrders[orderId] = payload;
+      state.userOrders[orderId][7] = 
+        state.userOrders[orderId][7] - state.serverDelta;
     },
     _userorderack(state, { payload }) {
       const orderId = payload[1].toString();
@@ -468,7 +488,9 @@ export const apiSlice = createSlice({
         const token = payload[11].toString();
         localStorage.setItem(orderId, token);
       }
-      state.userOrders[orderId] = payload.slice(0, 12);
+      state.userOrders[orderId] = payload.slice(0,12); 
+      state.userOrders[orderId][7] = 
+        state.userOrders[orderId][7] - state.serverDelta;
     },
     setBalances(state, { payload }) {
       const scope = makeScopeUser(state);
@@ -690,6 +712,37 @@ export const apiSlice = createSlice({
     setSlippageValue(state, { payload }) {
       state.slippageValue = payload.value;
     },
+    setServerDelta(state, { payload }) {
+      state.serverDelta = payload;
+
+
+      // update existing fills and orders in case the delta changed
+      state.userOrders = Object.keys(state.userOrders).map(orderId => {
+        const order = state.userOrders[orderId];
+        order[7] = order[7] - payload;
+        return order;
+      });
+      state.orders = Object.keys(state.orders).map(orderId => {
+        const order = state.orders[orderId];
+        order[7] = order[7] - payload;
+        return order;
+      });
+
+      state.userFills = Object.keys(state.userFills).map(fillId => {
+        const fill = state.userFills[fillId];
+        const isoString = fill[12];
+        const newTimestamp = new Date(isoString).getTime() - payload * 1000;
+        fill[12] = new Date(newTimestamp);
+        return fill;
+      });
+      state.marketFills = Object.keys(state.marketFills).map(fillId => {
+        const fill = state.marketFills[fillId];
+        const isoString = fill[12];
+        const newTimestamp = new Date(isoString).getTime() - payload * 1000;
+        fill[12] = new Date(newTimestamp);
+        return fill;
+      });
+    },
     resetTradeLayout(state) {
       if (!state.settings.stackOrderbook) {
         state.settings.layouts = stackedLayouts();
@@ -717,6 +770,7 @@ export const {
   setUISettings,
   resetUISettings,
   setSlippageValue,
+  setServerDelta,
   resetTradeLayout,
 } = apiSlice.actions;
 

@@ -381,6 +381,7 @@ class API extends Emitter {
         } min). Please sync it via settings > date/time > sync now`
       );
     }
+    this.emit("serverDeltaUpdate", this.serverDelta);
   };
 
   start = () => {
