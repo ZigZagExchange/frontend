@@ -452,6 +452,7 @@ export const apiSlice = createSlice({
       const orders = payload[0]
         .filter((order) => order[0] === state.network)
         .reduce((res, order) => {
+          order[7] = order[7] - state.serverDelta;
           res[order[1]] = order;
           return res;
         }, {});
@@ -460,12 +461,6 @@ export const apiSlice = createSlice({
         ...state.orders,
         ...orders,
       };
-
-      //state.orders = Object.keys(state.orders).map(orderId => {
-      //  const order = state.orders[orderId];
-      //  order[7] = order[7] - state.serverDelta;
-      //  return order;
-      //});
       
       if (state.userId) {
         for (let i in orders) {
