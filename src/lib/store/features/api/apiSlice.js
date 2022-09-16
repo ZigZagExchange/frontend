@@ -173,12 +173,15 @@ export const apiSlice = createSlice({
         let txhash;
         let feeamount;
         let feetoken;
+        let price;
         if (update[3]) txhash = update[3];
         if (update[5]) feeamount = update[5];
         if (update[6]) feetoken = update[6];
+        if (update[8]) price = Number(update[8]);
         if (state.marketFills[fillid]) {
           state.marketFills[fillid][6] = newstatus;
           state.marketFills[fillid][12] = timestamp;
+          if (price) state.marketFills[fillid][4] = price;
           if (txhash) state.marketFills[fillid][7] = txhash;
           if (feeamount) state.marketFills[fillid][10] = feeamount;
           if (feetoken) state.marketFills[fillid][11] = feetoken;
@@ -186,6 +189,7 @@ export const apiSlice = createSlice({
         if (state.userFills[fillid]) {
           state.userFills[fillid][6] = newstatus;
           state.userFills[fillid][12] = timestamp;
+          if (price) state.marketFills[fillid][4] = price;
           if (txhash) state.userFills[fillid][7] = txhash;
           if (feeamount) state.userFills[fillid][10] = feeamount;
           if (feetoken) state.userFills[fillid][11] = feetoken;
@@ -195,7 +199,7 @@ export const apiSlice = createSlice({
 
             const baseCurrency = fillDetails[2].split("-")[0];
             const sideText = fillDetails[3] === "b" ? "buy" : "sell";
-            const price = Number(fillDetails[4]);
+            price = price ? price : Number(fillDetails[4]);
             const baseQuantity = Number(fillDetails[5]);
             let p = [];
             for (var i = 0; i < 13; i++) {
