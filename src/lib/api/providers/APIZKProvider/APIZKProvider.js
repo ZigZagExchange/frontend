@@ -81,34 +81,34 @@ export default class APIZKProvider extends APIProvider {
   };
 
   changePubKey = async () => {
-    try {
-      const feeUSD = await this.changePubKeyFee();
-      toast.info(
-        i18next.t(
-          "you_need_to_sign_a_one_time_transaction_to_activate_your_zksync_account_usdfee",
-          { feeUSD: feeUSD.toFixed(2) }
-        ),
-        {
-          toastId: `You need to sign a one-time transaction to activate your zksync account. The fee for this tx will be $${feeUSD.toFixed(
-            2
-          )}`,
-        }
-      );
-    } catch (err) {
-      toast.info(
-        i18next.t(
-          "you_need_to_sign_a_one_time_transaction_to_activate_your_zksync_account_the_fee_for_this_tx_will_be_2.5"
-        ),
-        {
-          toastId: `You need to sign a one-time transaction to activate your zksync account. The fee for this tx will be ~$2.5`,
-        }
-      );
-    }
-
     let feeToken = "ETH";
     const accountState = await this.syncWallet.getAccountState();
     const balances = accountState.committed.balances;
     if (Object.keys(balances).length > 0) {
+      try {
+        const feeUSD = await this.changePubKeyFee();
+        toast.info(
+          i18next.t(
+            "you_need_to_sign_a_one_time_transaction_to_activate_your_zksync_account_usdfee",
+            { feeUSD: feeUSD.toFixed(2) }
+          ),
+          {
+            toastId: `You need to sign a one-time transaction to activate your zksync account. The fee for this tx will be $${feeUSD.toFixed(
+              2
+            )}`,
+            autoClose: 10000,
+          }
+        );
+      } catch (err) {
+        toast.info(
+          i18next.t(
+            "you_need_to_sign_a_one_time_transaction_to_activate_your_zksync_account_the_fee_for_this_tx_will_be_2.5"
+          ),
+          {
+            toastId: `You need to sign a one-time transaction to activate your zksync account. The fee for this tx will be ~$2.5`,
+          }
+        );
+      }
       if (balances.ETH && balances.ETH > 0.003e18) {
         feeToken = "ETH";
       } else if (balances.USDC && balances.USDC > 6e6) {
