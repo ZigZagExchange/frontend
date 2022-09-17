@@ -179,7 +179,7 @@
   "account_contract_deployed": "계정 계약을 배포했습니다.",
   "waiting_on_balances_to_load": "자산을 로딩중입니다...",
   "no_currency_founded_minting_you_some": "{{currency}} 를 찾을 수 없습니다. 당신에게 자금을 발행시켜 드리는 중입니다.",
-  "you_need_to_sign_a_one_time_transaction_to_activate_your_zksync_account_usdfee": "당신의 zksync 계정을 활성시키려면 일회성 서명을 하셔야 합니다. 서명에 사용될 이체 수수료는 {{feeUSD}} 입니다.",
+  "you_need_to_sign_a_one_time_transaction_to_activate_your_zksync_account_usdfee": "당신의 zksync 계정을 활성시키려면 일회성 서명을 하셔야 합니다. 서명에 사용될 이체 수수료는 ${{feeUSD}} 입니다.",
   "you_need_to_sign_a_one_time_transaction_to_activate_your_zksync_account_the_fee_for_this_tx_will_be_2.5": "당신의 zksync 계정을 활성시키려면 일회성 서명을 하셔야 합니다. 서명에 사용될 이체 수수료는 약 ~$2.5 입니다.",
   "your_zksync_token_balances_are_very_low_you_might_need_to_bridge_in_more_funds_first": "당신의 zksync 토큰의 자산이 매우 적습니다. 먼저 자금을 충전하시기 바랍니다.",
   "zksync_is_down_try_again_later": "Zksync 네트워크가 다운되었습니다. 잠시 후 시도해 보세요.",

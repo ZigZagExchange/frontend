@@ -179,7 +179,7 @@
   "account_contract_deployed": "账户合约已部署",
   "waiting_on_balances_to_load": "等待余额加载...",
   "no_currency_founded_minting_you_some": "未发现 {{currency}}。 正为您铸造",
-  "you_need_to_sign_a_one_time_transaction_to_activate_your_zksync_account_usdfee": "你需要签署一笔一次性交易来激活 zkSync 账户。 这笔交易费用为 {{feeUSD}}",
+  "you_need_to_sign_a_one_time_transaction_to_activate_your_zksync_account_usdfee": "你需要签署一笔一次性交易来激活 zkSync 账户。 这笔交易费用为 ${{feeUSD}}",
   "you_need_to_sign_a_one_time_transaction_to_activate_your_zksync_account_the_fee_for_this_tx_will_be_2.5": "你需要签署一笔一次性交易来激活 zkSync 账户。这笔交易费用为 ~$2.5",
   "your_zksync_token_balances_are_very_low_you_might_need_to_bridge_in_more_funds_first": "您的 zkSync 余额很低。您可能需要跨链转入更多资金。",
   "zksync_is_down_try_again_later": "zkSync 网络不正常。请稍后重试。",
