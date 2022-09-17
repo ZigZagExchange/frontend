@@ -96,6 +96,7 @@ export default class APIZKProvider extends APIProvider {
             toastId: `You need to sign a one-time transaction to activate your zksync account. The fee for this tx will be $${feeUSD.toFixed(
               2
             )}`,
+            autoClose: 10000,
           }
         );
       } catch (err) {
