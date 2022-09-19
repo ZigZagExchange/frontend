@@ -155,12 +155,15 @@ const BridgeContainer = () => {
   };
 
   useEffect(() => {
-    if (user.address && !user.id && network === 1) {
-      toast.error(t("Your_zksync_account_is_not_activated"), {
-        autoClose: 30000,
-      });
-    }
-  }, []);
+    setTimeout(() => {
+      if (user.address && !user.id && network === 1) {
+        toast.error(t("Your_zksync_account_is_not_activated"), {
+          toastId: "Your_zksync_account_is_not_activated",
+          autoClose: 30000,
+        });
+      }
+    }, 1000);
+  }, [user]);
 
   useEffect(() => {
     setHasError(formErr && formErr.length > 0);

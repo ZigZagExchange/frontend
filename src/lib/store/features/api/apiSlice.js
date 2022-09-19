@@ -138,7 +138,8 @@ export const apiSlice = createSlice({
       payload[0].forEach((fill) => {
         const fillid = fill[1];
         const isoString = fill[12];
-        const newTimestamp = new Date(isoString).getTime() - state.serverDelta * 1000;
+        const newTimestamp =
+          new Date(isoString).getTime() - state.serverDelta * 1000;
         fill[12] = new Date(newTimestamp);
         // taker and maker user ids have to be matched lowercase because addresses
         // sometimes come back in camelcase checksum format
@@ -175,7 +176,8 @@ export const apiSlice = createSlice({
         const newstatus = update[2];
         let timestamp = update[7];
         if (timestamp) {
-          const newTimestamp = new Date(timestamp).getTime() - state.serverDelta * 1000;
+          const newTimestamp =
+            new Date(timestamp).getTime() - state.serverDelta * 1000;
           timestamp = new Date(newTimestamp);
         }
         let txhash;
@@ -273,7 +275,8 @@ export const apiSlice = createSlice({
         if (!fill) return;
         const fillid = fill[1];
         const isoString = fill[12];
-        const newTimestamp = new Date(isoString).getTime() - state.serverDelta * 1000;
+        const newTimestamp =
+          new Date(isoString).getTime() - state.serverDelta * 1000;
         fill[12] = new Date(newTimestamp);
 
         const takerUserId = fill[8] && fill[8].toLowerCase();
@@ -461,7 +464,7 @@ export const apiSlice = createSlice({
         ...state.orders,
         ...orders,
       };
-      
+
       if (state.userId) {
         for (let i in orders) {
           if (orders[i][8] === state.userId.toString()) {
@@ -474,7 +477,7 @@ export const apiSlice = createSlice({
     _orderreceipt(state, { payload }) {
       const orderId = payload[1];
       state.userOrders[orderId] = payload;
-      state.userOrders[orderId][7] = 
+      state.userOrders[orderId][7] =
         state.userOrders[orderId][7] - state.serverDelta;
     },
     _userorderack(state, { payload }) {
@@ -483,8 +486,8 @@ export const apiSlice = createSlice({
         const token = payload[11].toString();
         localStorage.setItem(orderId, token);
       }
-      state.userOrders[orderId] = payload.slice(0,12); 
-      state.userOrders[orderId][7] = 
+      state.userOrders[orderId] = payload.slice(0, 12);
+      state.userOrders[orderId][7] =
         state.userOrders[orderId][7] - state.serverDelta;
     },
     setBalances(state, { payload }) {
@@ -623,7 +626,7 @@ export const apiSlice = createSlice({
                 {i18next.t(
                   "please_wait_for_your_eth_balance_to_be_available_in_zksync_before_trading"
                 )}{" "}
-                {targetMsg}
+                {/* {targetMsg} */}
                 <p>
                   <a
                     href={walletAddress}
@@ -647,7 +650,7 @@ export const apiSlice = createSlice({
 
       toast.success(renderToastContent(), {
         closeOnClick: false,
-        autoClose: 15000,
+        autoClose: 40000,
         icon: false,
       });
 
@@ -713,27 +716,26 @@ export const apiSlice = createSlice({
     setServerDelta(state, { payload }) {
       state.serverDelta = payload;
 
-
       // update existing fills and orders in case the delta changed
-      state.userOrders = Object.keys(state.userOrders).map(orderId => {
+      state.userOrders = Object.keys(state.userOrders).map((orderId) => {
         const order = state.userOrders[orderId];
         order[7] = order[7] - payload;
         return order;
       });
-      state.orders = Object.keys(state.orders).map(orderId => {
+      state.orders = Object.keys(state.orders).map((orderId) => {
         const order = state.orders[orderId];
         order[7] = order[7] - payload;
         return order;
       });
 
-      state.userFills = Object.keys(state.userFills).map(fillId => {
+      state.userFills = Object.keys(state.userFills).map((fillId) => {
         const fill = state.userFills[fillId];
         const isoString = fill[12];
         const newTimestamp = new Date(isoString).getTime() - payload * 1000;
         fill[12] = new Date(newTimestamp);
         return fill;
       });
-      state.marketFills = Object.keys(state.marketFills).map(fillId => {
+      state.marketFills = Object.keys(state.marketFills).map((fillId) => {
         const fill = state.marketFills[fillId];
         const isoString = fill[12];
         const newTimestamp = new Date(isoString).getTime() - payload * 1000;
