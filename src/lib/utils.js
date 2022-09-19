@@ -52,6 +52,7 @@ export function expToNumber(number) {
   if (mag < 0) {
     z = sign + "0.";
     while (mag++) z += "0";
+    // eslint-disable-next-line no-useless-escape
     return z + str.replace(/^\-/, "");
   }
   mag -= str.length;

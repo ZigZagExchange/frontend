@@ -14,4 +14,3 @@ export default function Tooltip({ text, ...rest }) {
     <Popover content={<TooltipContainer>{text}</TooltipContainer>} {...rest} />
   );
 }
-

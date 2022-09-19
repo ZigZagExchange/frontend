@@ -10,7 +10,6 @@ import {
   resetUISettings,
   resetTradeLayout,
   setUISettings,
-  setLayout,
 } from "lib/store/features/api/apiSlice";
 import { useTranslation } from "react-i18next";
 

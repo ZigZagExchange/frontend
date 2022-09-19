@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import classNames from "classnames";
 import { Dialog, Transition } from "@headlessui/react";
-import { XIcon, SaveAsIcon } from "@heroicons/react/solid";
+import { XIcon } from "@heroicons/react/solid";
 import { AiOutlineWarning } from "react-icons/ai";
 import useTheme from "components/hooks/useTheme";
 import { Fragment } from "react";

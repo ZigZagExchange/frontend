@@ -24,7 +24,6 @@ import LockOpenIcon from "@mui/icons-material/LockOpen";
 import LockIcon from "@mui/icons-material/Lock";
 import _ from "lodash";
 import { darkColors, lightColors } from "lib/theme/colors";
-import classNames from "classnames";
 import { useTranslation } from "react-i18next";
 
 const TradeRatesCard = ({

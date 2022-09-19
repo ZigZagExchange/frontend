@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import useTheme from "components/hooks/useTheme";
-import { numStringToSymbol, addComma, formatMillonAmount } from "lib/utils";
+import { formatMillonAmount } from "lib/utils";
 import Text from "components/atoms/Text/Text";
 import _ from "lodash";
 import { useTranslation } from "react-i18next";
@@ -138,7 +138,7 @@ const TradePriceTable = (props) => {
 
   const ua = navigator.userAgent.toLowerCase();
   let isSafari = false;
-  if (ua.indexOf("safari") != -1) {
+  if (ua.indexOf("safari") !== -1) {
     if (ua.indexOf("chrome") === -1) {
       isSafari = true;
     }

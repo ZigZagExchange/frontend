@@ -14,7 +14,6 @@ import "react-toastify/dist/ReactToastify.css";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import "./ReactGridLayout/custom-grid-layout.css";
-import { toast } from "react-toastify";
 import {
   networkSelector,
   userOrdersSelector,
@@ -22,7 +21,6 @@ import {
   currentMarketSelector,
   setCurrentMarket,
   resetData,
-  layoutSelector,
   settingsSelector,
   setUISettings,
   marketSummarySelector,
@@ -38,13 +36,11 @@ import {
   marketQueryParam,
   networkQueryParam,
 } from "../../pages/ListPairPage/SuccessModal";
-import TradesTable from "./TradeBooks/TradesTable";
 import { HighSlippageModal } from "components/molecules/HighSlippageModal";
 import { formatPrice, addComma } from "lib/utils";
 import NewFeaturesPopup from "components/organisms/TradeDashboard/NewFeaturesPopup";
 import classNames from "classnames";
 import useTheme from "components/hooks/useTheme";
-import { useTranslation } from "react-i18next";
 
 const TradeContainer = styled.div`
   color: #aeaebf;
@@ -70,7 +66,6 @@ export function TradeDashboard() {
   const currentMarket = useSelector(currentMarketSelector);
   const userOrders = useSelector(userOrdersSelector);
   const userFills = useSelector(userFillsSelector);
-  const layout = useSelector(layoutSelector);
   const settings = useSelector(settingsSelector);
   const marketInfo = useSelector(marketInfoSelector);
   const marketSummary = useSelector(marketSummarySelector);
@@ -86,8 +81,6 @@ export function TradeDashboard() {
   const { search } = useLocation();
   const history = useHistory();
   const { isDark } = useTheme();
-
-  const { t } = useTranslation();
 
   const updateMarketChain = (market) => {
     console.log(`TradeDashboard set pair to ${market}`);

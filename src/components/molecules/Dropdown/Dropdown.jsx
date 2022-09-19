@@ -166,8 +166,7 @@ const Dropdown = ({
           className={`${adClass} ${isMobile ? "mobile-mode" : ""}`}
         >
           {item.map((items) => {
-            const { text, value, url, icon, iconSelected } =
-              items;
+            const { text, value, url, icon, iconSelected } = items;
             return (
               <DropdownListContainer
                 className={`${adClass} ${

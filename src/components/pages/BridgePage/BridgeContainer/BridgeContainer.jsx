@@ -1,3 +1,5 @@
+/* eslint-disable no-use-before-define */
+/* eslint-disable no-unused-vars */
 import React, { useState, useMemo, useEffect } from "react";
 import { constants as ethersConstants, utils as ethersUtils } from "ethers";
 import classNames from "classnames";

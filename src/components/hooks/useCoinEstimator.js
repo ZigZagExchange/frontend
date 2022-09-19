@@ -1,8 +1,6 @@
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
-import {
-  lastPricesSelector,
-} from "lib/store/features/api/apiSlice";
+import { lastPricesSelector } from "lib/store/features/api/apiSlice";
 import { stables } from "lib/helpers/categories";
 
 export function useCoinEstimator() {

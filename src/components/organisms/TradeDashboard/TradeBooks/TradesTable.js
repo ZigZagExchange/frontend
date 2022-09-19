@@ -31,10 +31,7 @@ export default function TradesTable(props) {
           askBins={props.askBins}
           bidBins={props.bidBins}
         />
-        <TradesBook
-          currentMarket={props.currentMarket}
-          side={side}
-        />
+        <TradesBook currentMarket={props.currentMarket} side={side} />
       </TradesTableWrapper>
     </>
   );
