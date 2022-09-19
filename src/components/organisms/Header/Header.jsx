@@ -513,11 +513,12 @@ export const Header = (props) => {
             clickFunction={changeNetwork}
             leftIcon={true}
           />
+          <LanguageDropdown />
           <TabMenu row activeIndex={index} onItemClick={handleClick}>
             <Tab>{t("trade")}</Tab>
             <Tab display={false}>{t("convert")}</Tab>
             <Tab display={hasBridge && network !== 1002}>{t("bridge")}</Tab>
-            <Tab display={!isEVM && network !== 1002}>{t("rist_pair")}</Tab>
+            <Tab display={!isEVM && network !== 1002}>{t("list_pair")}</Tab>
             <Tab display={false}>
               {t("docs")}
               <ExternalLinkIcon size={12} />
