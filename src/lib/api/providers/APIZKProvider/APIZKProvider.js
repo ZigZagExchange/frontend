@@ -161,8 +161,8 @@ export default class APIZKProvider extends APIProvider {
     const [accountState, signingKeySet, correspondigKeySet] = await Promise.all(
       [
         this.getAccountState(),
-        this.syncWallet.isSigningKeySet(),
-        this.syncWallet.isCorrespondingSigningKeySet(),
+        this.syncWallet?.isSigningKeySet(),
+        this.syncWallet?.isCorrespondingSigningKeySet(),
       ]
     );
     return !!accountState.id && signingKeySet && correspondigKeySet;
