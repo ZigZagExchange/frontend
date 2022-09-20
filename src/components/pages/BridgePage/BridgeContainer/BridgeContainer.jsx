@@ -508,7 +508,10 @@ const BridgeContainer = () => {
       .catch((err) => {
         console.log(err);
         if (!settings.disableOrderNotification) {
-          toast.error(err.message);
+          toast.error(t("transaction_was_rejected"), {
+            toastId: t("transaction_was_rejected"),
+            autoClose: true,
+          });
         }
         setApproving(false);
       });
@@ -626,7 +629,10 @@ const BridgeContainer = () => {
         })
         .catch((e) => {
           if (!settings.disableOrderNotification) {
-            toast.error(e.message);
+            toast.error(t("transaction_was_rejected"), {
+              toastId: t("transaction_was_rejected"),
+              autoClose: true,
+            });
             toast.dismiss(orderPendingToast);
           }
           setTimeout(() => api.getAccountState(), 1000);
@@ -787,7 +793,10 @@ const BridgeContainer = () => {
       .catch((e) => {
         console.error("error sending transaction::", e);
         if (!settings.disableOrderNotification) {
-          toast.error(e.message);
+          toast.error(t("transaction_was_rejected"), {
+            toastId: t("transaction_was_rejected"),
+            autoClose: true,
+          });
         }
         setTimeout(() => api.getAccountState(), 1000);
       })
