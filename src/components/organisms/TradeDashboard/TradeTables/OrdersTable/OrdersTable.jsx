@@ -284,7 +284,10 @@ export default function OrdersTable(props) {
         });
       }
     } catch (e) {
-      toast.error(e.message);
+      toast.error(t("transaction_was_rejected"), {
+        toastId: t("transaction_was_rejected"),
+        autoClose: true,
+      });
     }
   };
 
