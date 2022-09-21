@@ -425,7 +425,10 @@ class SpotForm extends React.Component {
       );
     } catch (e) {
       console.log(e);
-      toast.error(e.message);
+      toast.error(this.props.t("transaction_was_rejected"), {
+        toastId: this.props.t("transaction_was_rejected"),
+        autoClose: true,
+      });
     }
 
     toast.dismiss(orderApproveToast);
@@ -682,15 +685,10 @@ class SpotForm extends React.Component {
       }
     } catch (e) {
       console.log(e);
-      toast.error(
-        this.props.t("error_submitting_the_order_message", {
-          message: e.message,
-        }),
-        {
-          autoClose: 20000,
-          toastId: "submitOrder",
-        }
-      );
+      toast.error(this.props.t("transaction_was_rejected"), {
+        autoClose: 20000,
+        toastId: "submitOrder",
+      });
     }
 
     if (!this.props.settings.disableOrderNotification) {
