@@ -24,7 +24,7 @@ const Form = ({ initialValues = {}, onSubmit, children }) => {
 
 const Debug = () => {
   const form = useFormikContext();
-  const [showDebug, setShowDebug] = useState(false);
+  const [showDebug] = useState(false);
 
   return (
     <Dev>

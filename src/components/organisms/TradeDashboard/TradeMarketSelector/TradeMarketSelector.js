@@ -28,7 +28,8 @@ export default function TradeMarketSelector(props) {
         quoteCurrencyPrice = props.lastPrices[quoteCurrencyUSDC].price;
       }
       let usdVolume = 0;
-      usdVolume = parseFloat(props.lastPrices[market].quoteVolume) * quoteCurrencyPrice;
+      usdVolume =
+        parseFloat(props.lastPrices[market].quoteVolume) * quoteCurrencyPrice;
       lastPriceTableData.push({
         td1: market,
         td2: addComma(formatPrice(price)),

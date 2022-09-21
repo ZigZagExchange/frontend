@@ -7,10 +7,7 @@ import CheckIcon from "@mui/icons-material/Check";
 import { userSelector } from "lib/store/features/auth/authSlice";
 import { useMediaQuery } from "react-responsive";
 import { useTranslation } from "react-i18next";
-import {
-  networkSelector,
-  isConnectingSelector,
-} from "lib/store/features/api/apiSlice";
+import { networkSelector } from "lib/store/features/api/apiSlice";
 import api from "lib/api";
 import logo from "assets/images/logo.png";
 import zksyncLogo from "assets/images/networks/zksync-network.svg";
@@ -23,7 +20,6 @@ import {
   ExternalLinkIcon,
   TelegramIcon,
   TwitterIcon,
-  DeleteIcon,
   MenuIcon,
 } from "components/atoms/Svg";
 import ToggleTheme from "components/molecules/Toggle/ToggleTheme";
@@ -38,11 +34,6 @@ import {
   MdOutlineContactMail,
 } from "react-icons/md";
 import { FaDiscord, FaGithub } from "react-icons/fa";
-
-const langList = [
-  { text: "EN", url: "#" },
-  { text: "FR", url: "#" },
-];
 
 const networkLists = [
   {
@@ -66,11 +57,6 @@ const networkLists = [
     selectedIcon: <CheckIcon />,
     image: zksyncLogo,
   },
-];
-
-const accountLists = [
-  { text: "0x83AD...83H4", url: "#", icon: <DeleteIcon /> },
-  { text: "0x12BV...b89G", url: "#", icon: <DeleteIcon /> },
 ];
 
 const supportLists = [
@@ -204,11 +190,6 @@ const SocialLink = styled.a`
   svg path {
     fill: ${({ theme }) => theme.colors.foregroundLowEmphasis};
   }
-`;
-
-const StyledDropdown = styled(Dropdown)`
-  padding: 16px 0px 16px 16px;
-  width: auto;
 `;
 
 const VerticalDivider = styled.div`

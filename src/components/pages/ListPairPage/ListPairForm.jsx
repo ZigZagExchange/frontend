@@ -18,7 +18,6 @@ import { Button } from "../../atoms/Form/Submit";
 import TextInput from "../../atoms/Form/TextInput";
 import Form from "../../atoms/Form/Form";
 import { TRADING_VIEW_CHART_KEY } from "./ListPairPage";
-import api from "../../../lib/api";
 import { debounce } from "lodash";
 import useTheme from "components/hooks/useTheme";
 

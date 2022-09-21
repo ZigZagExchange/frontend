@@ -1,15 +1,15 @@
 import { useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import React from "react";
-import styled from 'styled-components';
+import styled from "styled-components";
 import { setUISettings } from "lib/store/features/api/apiSlice";
 import { DiscordIcon } from "components/atoms/Svg";
 import { CloseIcon } from "components/atoms/Svg";
 import PlayBtn from "assets/images/play-btn.svg";
 
 const ModalWrapper = styled.div`
-background-color: ${({theme}) => theme.colors.foreground600} 
-`
+  background-color: ${({ theme }) => theme.colors.foreground600};
+`;
 
 const GuidePopup = () => {
   const { videoRef } = useRef(null);

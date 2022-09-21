@@ -74,13 +74,9 @@ const TransactionSettings = ({
           Estimated gas fee
         </p>
         <div className="flex items-center gap-2 text-base ">
-          {
-            `${formatPrice(transactionFee)} ${
-              feeToken
-            } (~$${
-              estimatedValueFee.toFixed(2)
-            })`
-          }
+          {`${formatPrice(
+            transactionFee
+          )} ${feeToken} (~$${estimatedValueFee.toFixed(2)})`}
         </div>
       </div>
     </div>

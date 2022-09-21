@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 
 import NetworkDropdown from "./NetworkDropdown";
 import { SwitchHorizontalIcon } from "@heroicons/react/solid";

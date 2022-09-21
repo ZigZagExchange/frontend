@@ -12,7 +12,6 @@ import styled from "styled-components";
 import "bootstrap";
 
 import { DefaultTemplate } from "components";
-import Text from "../../atoms/Text/Text";
 import AllocationModal from "./AllocationModal";
 import { Button, ConnectWalletButton } from "components/molecules/Button";
 import { jsonify } from "../../../lib/helpers/strings";
@@ -20,7 +19,6 @@ import SuccessModal from "./SuccessModal";
 import { HiExternalLink } from "react-icons/hi";
 import ListPairForm from "./ListPairForm";
 import { sleep } from "../../../lib/utils";
-import TradeFooter from "components/organisms/TradeDashboard/TradeFooter/TradeFooter";
 import { useTranslation } from "react-i18next";
 
 export const TRADING_VIEW_CHART_KEY = "tradingViewChart";

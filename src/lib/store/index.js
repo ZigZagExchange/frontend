@@ -19,7 +19,7 @@ import apiReducer, {
   setConnecting,
   setBridgeConnecting,
   setUISettings,
-  setServerDelta
+  setServerDelta,
 } from "lib/store/features/api/apiSlice";
 import autoMergeLevel2 from "redux-persist/lib/stateReconciler/autoMergeLevel2";
 import api from "lib/api";

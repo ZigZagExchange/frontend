@@ -15,7 +15,8 @@ export const TradeChart = (props) => {
     ) {
       symbol = props.marketInfo[TRADING_VIEW_CHART_KEY];
     } else {
-      symbol = props.marketInfo.baseAsset.symbol + props.marketInfo.quoteAsset.symbol;
+      symbol =
+        props.marketInfo.baseAsset.symbol + props.marketInfo.quoteAsset.symbol;
     }
   }
 

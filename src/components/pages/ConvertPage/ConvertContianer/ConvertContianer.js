@@ -35,7 +35,7 @@ const ConvertContianer = ({
   // this resets the invert status on type change
   useEffect(() => {
     setInvertRatio(false);
-  }, [transactionType, fromToken, toToken])
+  }, [transactionType, fromToken, toToken]);
 
   return (
     <div className="p-4 mt-5 border rounded-lg dark:border-foreground-400 border-primary-500">
@@ -85,14 +85,21 @@ const ConvertContianer = ({
       <div className="flex items-center justify-between">
         <p className="text-lg font-work">To</p>
         <p className="flex items-center text-sm font-normal ">
-          {transactionType === 'sell'
-            ? invertRatio 
-              ? `1 ${toToken?.name} = ${formatPrice(1 / basePrice)} ${fromToken?.name}`
-              : `1 ${fromToken?.name} = ${formatPrice(basePrice)} ${toToken?.name}`
+          {transactionType === "sell"
+            ? invertRatio
+              ? `1 ${toToken?.name} = ${formatPrice(1 / basePrice)} ${
+                  fromToken?.name
+                }`
+              : `1 ${fromToken?.name} = ${formatPrice(basePrice)} ${
+                  toToken?.name
+                }`
             : invertRatio
-              ? `1 ${toToken?.name} = ${formatPrice(basePrice)} ${fromToken?.name}`
-              : `1 ${fromToken?.name} = ${formatPrice(1 / basePrice)} ${toToken?.name}`
-          }
+            ? `1 ${toToken?.name} = ${formatPrice(basePrice)} ${
+                fromToken?.name
+              }`
+            : `1 ${fromToken?.name} = ${formatPrice(1 / basePrice)} ${
+                toToken?.name
+              }`}
           <button
             onClick={onChangeInverted}
             className="transition-all duration-300 ease-in-out hover:opacity-70 hover:rotate-180"

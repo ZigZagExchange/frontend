@@ -1,6 +1,6 @@
 import { Fragment, useState } from "react";
 import { Listbox, Transition } from "@headlessui/react";
-import { CheckIcon, ChevronDownIcon } from "@heroicons/react/solid";
+import { ChevronDownIcon } from "@heroicons/react/solid";
 import useTheme from "components/hooks/useTheme";
 import classNames from "classnames";
 import i18next from "i18next";
