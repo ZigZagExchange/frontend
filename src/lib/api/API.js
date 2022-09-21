@@ -447,9 +447,10 @@ class API extends Emitter {
             this.apiProvider = this.getAPIProvider(network);
           }
 
-          await this.refreshNetwork();
-          await this.sleep(1000);
+          // await this.refreshNetwork();
+          // await this.sleep(1000);
           const web3Provider = await this.web3Modal.connect();
+
           this.web3.setProvider(web3Provider);
           this.rollupProvider = new ethers.providers.Web3Provider(web3Provider);
 
