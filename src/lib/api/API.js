@@ -4,6 +4,7 @@ import Web3Modal from "web3modal";
 import Emitter from "tiny-emitter";
 import { ethers, constants as ethersConstants } from "ethers";
 import WalletConnectProvider from "@walletconnect/web3-provider";
+import CoinbaseWalletSDK from "@coinbase/wallet-sdk";
 import { getENSName, reverseUnstoppabledomainsAddress } from "lib/ens";
 import { formatAmount } from "lib/utils";
 import erc20ContractABI from "lib/contracts/ERC20.json";
@@ -140,6 +141,13 @@ class API extends Emitter {
           walletconnect: {
             package: WalletConnectProvider,
             options: {
+              infuraId: this.infuraId,
+            },
+          },
+          coinbasewallet: {
+            package: CoinbaseWalletSDK,
+            options: {
+              appName: "Web 3 Modal Demo",
               infuraId: this.infuraId,
             },
           },
@@ -439,9 +447,10 @@ class API extends Emitter {
             this.apiProvider = this.getAPIProvider(network);
           }
 
-          await this.refreshNetwork();
-          await this.sleep(1000);
+          // await this.refreshNetwork();
+          // await this.sleep(1000);
           const web3Provider = await this.web3Modal.connect();
+
           this.web3.setProvider(web3Provider);
           this.rollupProvider = new ethers.providers.Web3Provider(web3Provider);
 

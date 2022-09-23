@@ -25,6 +25,7 @@ const ConnectWalletButton = (props) => {
 
   const connect = async (event) => {
     event.preventDefault();
+
     try {
       api.emit("connecting", true);
       // setConnecting(true);
