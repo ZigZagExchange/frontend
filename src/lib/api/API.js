@@ -1077,7 +1077,7 @@ class API extends Emitter {
   };
 
   checkAccountActivated = async () => {
-    if (!this.isZksyncChain) return true;
+    if (!this.isZksyncChain()) return true;
     return this.apiProvider.checkAccountActivated();
   };
 
