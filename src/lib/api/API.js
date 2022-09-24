@@ -121,6 +121,16 @@ class API extends Emitter {
         cacheProvider: true,
         theme: "dark",
         providerOptions: {
+          coinbasewallet: {
+            package: CoinbaseWalletSDK,
+            options: {
+              rpc: {
+                42161: `https://arbitrum-mainnet.infura.io/v3/${this.infuraId}`,
+              },
+              appName: "Web 3 Modal Demo",
+              infuraId: this.infuraId,
+            },
+          },
           walletconnect: {
             package: WalletConnectProvider,
             options: {
@@ -1078,7 +1088,7 @@ class API extends Emitter {
 
   checkAccountActivated = async () => {
     if (!this.isZksyncChain) return true;
-    return this.apiProvider.checkAccountActivated();
+    return this.apiProvider?.checkAccountActivated();
   };
 
   warpETH = async (amount) => {
