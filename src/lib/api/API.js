@@ -121,15 +121,6 @@ class API extends Emitter {
         cacheProvider: true,
         theme: "dark",
         providerOptions: {
-          coinbasewallet: {
-            package: CoinbaseWalletSDK,
-            options: {
-              rpc: {
-                42161: `https://arbitrum-mainnet.infura.io/v3/${this.infuraId}`,
-              },
-              infuraId: this.infuraId,
-            },
-          },
           walletconnect: {
             package: WalletConnectProvider,
             options: {
