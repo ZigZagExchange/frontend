@@ -127,7 +127,6 @@ class API extends Emitter {
               rpc: {
                 42161: `https://arbitrum-mainnet.infura.io/v3/${this.infuraId}`,
               },
-              appName: "Web 3 Modal Demo",
               infuraId: this.infuraId,
             },
           },
@@ -1087,8 +1086,8 @@ class API extends Emitter {
   };
 
   checkAccountActivated = async () => {
-    if (!this.isZksyncChain) return true;
-    return this.apiProvider?.checkAccountActivated();
+    if (!this.isZksyncChain()) return true;
+    return this.apiProvider.checkAccountActivated();
   };
 
   warpETH = async (amount) => {
