@@ -1,7 +1,5 @@
 import React, { Component } from "react";
 
-import ReactDOM from "react-dom";
-
 import SizeMe from "react-sizeme";
 
 const WidthProvider = (ComposedComponent) =>

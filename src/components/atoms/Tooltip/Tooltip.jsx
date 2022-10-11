@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React from "react";
 import styled from "styled-components";
 import Popover from "./Popover";
 
@@ -14,4 +14,3 @@ export default function Tooltip({ text, ...rest }) {
     <Popover content={<TooltipContainer>{text}</TooltipContainer>} {...rest} />
   );
 }
-

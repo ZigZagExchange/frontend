@@ -1,6 +1,9 @@
 {
-    "compilerOptions": {
-      "baseUrl": "src"
-    },
-    "include": ["src"]
+  "compilerOptions": {
+    "baseUrl": "src"
+  },
+  "include": ["src"],
+  "rules": {
+    "no-unused-declaration": true
   }
+}

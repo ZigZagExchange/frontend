@@ -33,6 +33,7 @@ const WrapContianer = ({
         <img
           src={api.getCurrencyLogo(fromToken)}
           style={{ width: 25, height: 25 }}
+          alt="logo"
         />
         {fromToken && fromToken}
         <button
@@ -70,6 +71,7 @@ const WrapContianer = ({
         <img
           src={api.getCurrencyLogo(toToken)}
           style={{ width: 25, height: 25 }}
+          alt="img"
         />
         {toToken && toToken}
         <input

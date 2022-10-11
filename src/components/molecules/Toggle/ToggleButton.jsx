@@ -56,6 +56,8 @@ const ToggleItem = styled.li`
 const ToggleButton = ({ ...props }) => {
   const {
     type,
+    leftText,
+    rightText,
     leftLabel,
     size,
     width,
@@ -83,7 +85,7 @@ const ToggleButton = ({ ...props }) => {
           }
           textAlign="center"
         >
-          {leftLabel}
+          {leftText}
         </Text>
       </ToggleItem>
       <ToggleItem
@@ -99,7 +101,7 @@ const ToggleButton = ({ ...props }) => {
           color="foregroundHighEmphasis"
           textAlign="center"
         >
-          {rightLabel}
+          {rightText}
         </Text>
       </ToggleItem>
     </ToggleButtonWrapper>

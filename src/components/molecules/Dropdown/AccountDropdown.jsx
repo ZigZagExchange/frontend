@@ -3,7 +3,6 @@ import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import Button from "../Button/Button";
 import { AccountButton } from "../ExpandableButton";
-import Dropdown from "./Dropdown";
 import { useCoinEstimator } from "components";
 import Loader from "react-loader-spinner";
 import {
@@ -20,13 +19,9 @@ import {
 import { userSelector } from "lib/store/features/auth/authSlice";
 import api from "lib/api";
 import Text from "components/atoms/Text/Text";
-import {
-  PlusIcon,
-  CompareArrowIcon,
-  DeleteIcon,
-  ExternalLinkIcon,
-} from "components/atoms/Svg";
+import { ExternalLinkIcon } from "components/atoms/Svg";
 import ToggleButton from "../Toggle/ToggleButton";
+import { useTranslation } from "react-i18next";
 
 const DropdownWrapper = styled.div`
   position: relative;
@@ -164,6 +159,7 @@ const AccountDropdown = ({ notext, networkName }) => {
   const coinEstimator = useCoinEstimator();
   const isMobile = window.innerWidth < 490;
   const wrapperRef = useRef(null);
+  const { t } = useTranslation();
 
   HideMenuOnOutsideClicked(wrapperRef, setIsOpened);
 
@@ -175,6 +171,11 @@ const AccountDropdown = ({ notext, networkName }) => {
       ? api.getExplorerAccountLink(network, user.address, selectedLayer)
       : null;
     setExplorer(explorerLink);
+
+    // if EVM set layer to and disable toggle
+    if (api.isEVMChain()) {
+      setSelectedLayer(2);
+    }
   }, [network, user.address, selectedLayer]);
 
   const toggle = () => {
@@ -238,13 +239,15 @@ const AccountDropdown = ({ notext, networkName }) => {
         notext={notext}
         expanded={isOpened}
         onClick={toggle}
+        user={user}
+        settings={settings}
       ></AccountButton>
       {isOpened && (
         <DropdownDisplay isMobile={isMobile}>
           <DropdownHeader>
             <div>
               <Text font="primaryTiny" color="foregroundMediumEmphasis">
-                TOTAL BALANCE
+                {t("total_balance")}
               </Text>
               <Text font="primaryHeading6" color="foregroundHighEmphasis">
                 {settings.hideBalance
@@ -252,15 +255,19 @@ const AccountDropdown = ({ notext, networkName }) => {
                   : "$ " + addComma(formatUSD(totalBalance))}
               </Text>
             </div>
-            <ToggleButton
-              type="option"
-              size="sm"
-              leftLabel="l1"
-              rightLabel="l2"
-              width="40"
-              selectedLayer={selectedLayer}
-              toggleClick={(num) => setSelectedLayer(num)}
-            />
+            {!api.isEVMChain() && (
+              <ToggleButton
+                type="option"
+                size="sm"
+                leftText="l1"
+                rightText="l2"
+                leftLabel="l1"
+                rightLabel="l2"
+                width="40"
+                selectedLayer={selectedLayer}
+                toggleClick={(num) => setSelectedLayer(num)}
+              />
+            )}
           </DropdownHeader>
           <Divider />
           <DropdownContent>
@@ -341,7 +348,7 @@ const AccountDropdown = ({ notext, networkName }) => {
                 color="foregroundHighEmphasis"
                 textAlign="center"
               >
-                DISCONNECT
+                {t("disconnect")}
               </Text>
             </Button>
           </DropdownFooter>

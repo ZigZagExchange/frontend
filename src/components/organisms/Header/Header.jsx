@@ -6,10 +6,8 @@ import styled from "styled-components";
 import CheckIcon from "@mui/icons-material/Check";
 import { userSelector } from "lib/store/features/auth/authSlice";
 import { useMediaQuery } from "react-responsive";
-import {
-  networkSelector,
-  isConnectingSelector,
-} from "lib/store/features/api/apiSlice";
+import { useTranslation } from "react-i18next";
+import { networkSelector } from "lib/store/features/api/apiSlice";
 import api from "lib/api";
 import logo from "assets/images/logo.png";
 import zksyncLogo from "assets/images/networks/zksync-network.svg";
@@ -22,10 +20,10 @@ import {
   ExternalLinkIcon,
   TelegramIcon,
   TwitterIcon,
-  DeleteIcon,
   MenuIcon,
 } from "components/atoms/Svg";
 import ToggleTheme from "components/molecules/Toggle/ToggleTheme";
+import LanguageDropdown from "./LangaugeDropdown";
 import useTheme from "components/hooks/useTheme";
 import {
   MdOutlineArticle,
@@ -36,11 +34,6 @@ import {
   MdOutlineContactMail,
 } from "react-icons/md";
 import { FaDiscord, FaGithub } from "react-icons/fa";
-
-const langList = [
-  { text: "EN", url: "#" },
-  { text: "FR", url: "#" },
-];
 
 const networkLists = [
   {
@@ -73,24 +66,19 @@ const networkLists = [
   },
 ];
 
-const accountLists = [
-  { text: "0x83AD...83H4", url: "#", icon: <DeleteIcon /> },
-  { text: "0x12BV...b89G", url: "#", icon: <DeleteIcon /> },
-];
-
 const supportLists = [
   {
-    text: "Live Support",
+    text: "live_support",
     url: "https://discord.com/invite/zigzag",
     icon: <FaDiscord size={14} />,
   },
   {
-    text: "FAQ",
+    text: "faq",
     url: "https://info.zigzag.exchange/",
     icon: <MdOutlineQuiz size={14} />,
   },
   {
-    text: "Docs",
+    text: "docs",
     url: "https://docs.zigzag.exchange/",
     icon: <MdOutlineArticle size={14} />,
   },
@@ -100,12 +88,12 @@ const supportLists = [
     icon: <FaGithub size={14} />,
   },
   {
-    text: "Uptime Status",
+    text: "uptime_status",
     url: "https://status.zigzag.exchange/",
     icon: <MdSignalCellularAlt size={14} />,
   },
   {
-    text: "Contact",
+    text: "contact",
     url: "https://info.zigzag.exchange/#contact",
     icon: <MdOutlineContactMail size={14} />,
   },
@@ -113,12 +101,12 @@ const supportLists = [
 
 const communityLists = [
   {
-    text: "Governance",
+    text: "governance",
     url: "https://forum.zigzaglabs.io/t/zigzag-exchange",
     icon: <MdAccountBalance size={14} />,
   },
   {
-    text: "Blog",
+    text: "blog",
     url: "https://blog.zigzag.exchange/",
     icon: <MdCreate size={14} />,
   },
@@ -211,11 +199,6 @@ const SocialLink = styled.a`
   }
 `;
 
-const StyledDropdown = styled(Dropdown)`
-  padding: 16px 0px 16px 16px;
-  width: auto;
-`;
-
 const VerticalDivider = styled.div`
   width: 1px;
   height: 32px;
@@ -259,21 +242,20 @@ const ActionSideMenuWrapper = styled.div`
 
 export const Header = (props) => {
   // state to open or close the sidebar in mobile
+
   const [show, setShow] = useState(false);
-  const connecting = useSelector(isConnectingSelector);
-  // const [connecting, setConnecting] = useState(false);
   const user = useSelector(userSelector);
   const network = useSelector(networkSelector);
   const hasBridge = api.isImplemented("depositL2");
   const isEVM = api.isEVMChain();
   const history = useHistory();
   const [index, setIndex] = useState(0);
-  const [language, setLanguage] = useState(langList[0].text);
-  const [account, setAccount] = useState(accountLists[0].text);
   const [networkName, setNetworkName] = useState("");
   const [networkItems, setNetWorkItems] = useState(networkLists);
   const { isDark, toggleTheme } = useTheme();
   const location = useLocation();
+  const { t } = useTranslation();
+
   useEffect(() => {
     const netName = networkLists.filter((item, i) => {
       return item.value === network;
@@ -323,14 +305,6 @@ export const Header = (props) => {
     }
   }, []);
 
-  const changeLanguage = (text) => {
-    setLanguage(text);
-  };
-
-  const changeAccount = (text) => {
-    alert(text);
-  };
-
   const changeNetwork = async (text, value) => {
     setNetworkName(text);
 
@@ -342,10 +316,10 @@ export const Header = (props) => {
     }
 
     if (
-      (/^\/wrap(\/.*)?/.test(location.pathname) && !api.isEVMChain()) ||
+      (/^\/wrap(\/.*)?/.test(location.pathname) && !isEVM) ||
       (/^\/bridge(\/.*)?/.test(location.pathname) &&
         !api.isImplemented("depositL2")) ||
-      (/^\/list-pair(\/.*)?/.test(location.pathname) && api.isEVMChain())
+      (/^\/list-pair(\/.*)?/.test(location.pathname) && isEVM)
     ) {
       setIndex(0);
       history.push("/");
@@ -429,27 +403,26 @@ export const Header = (props) => {
               onItemClick={handleClick}
               style={{ paddingTop: "20px" }}
             >
-              <Tab>TRADE</Tab>
-              <Tab display={false}>CONVERT</Tab>
-              <Tab display={hasBridge && network !== 1002}>BRIDGE</Tab>
-              <Tab display={!isEVM && network !== 1002}>LIST PAIR</Tab>
+              <Tab>{t("trade")}</Tab>
+              <Tab display={false}>{t("convert")}</Tab>
+              <Tab display={hasBridge && network !== 1002}>{t("bridge")}</Tab>
+              <Tab display={!isEVM && network !== 1002}>{t("list_pair")}</Tab>
               <Tab display={false}>
-                DOCS
+                {t("docs")}
                 <ExternalLinkIcon size={12} />
               </Tab>
               <Tab display={isEVM}>
-                WRAP
+                {t("wrap")}
                 <ExternalLinkIcon size={12} />
               </Tab>
             </TabMenu>
           </NavWrapper>
           <ActionsWrapper>
-            <VerticalDivider />
             <Dropdown
               adClass="menu-dropdown"
               width={200}
               item={supportLists}
-              context={"Support"}
+              context={t("support")}
               leftIcon={true}
               transparent
             />
@@ -457,10 +430,11 @@ export const Header = (props) => {
               adClass="menu-dropdown"
               width={162}
               item={communityLists}
-              context={"Community"}
+              context={t("community")}
               leftIcon={true}
               transparent
             />
+            <VerticalDivider />
             <SocialWrapper>
               <SocialLink
                 target="_blank"
@@ -485,6 +459,7 @@ export const Header = (props) => {
               </SocialLink>
             </SocialWrapper>
             <VerticalDivider />
+            <LanguageDropdown />
             <LanguageWrapper>
               {/* <StyledDropdown
                 adClass="lang-dropdown"
@@ -526,17 +501,18 @@ export const Header = (props) => {
             clickFunction={changeNetwork}
             leftIcon={true}
           />
+          <LanguageDropdown />
           <TabMenu row activeIndex={index} onItemClick={handleClick}>
-            <Tab>TRADE</Tab>
-            <Tab display={false}>CONVERT</Tab>
-            <Tab display={hasBridge && network !== 1002}>BRIDGE</Tab>
-            <Tab display={!isEVM && network !== 1002}>LIST PAIR</Tab>
+            <Tab>{t("trade")}</Tab>
+            <Tab display={false}>{t("convert")}</Tab>
+            <Tab display={hasBridge && network !== 1002}>{t("bridge")}</Tab>
+            <Tab display={!isEVM && network !== 1002}>{t("list_pair")}</Tab>
             <Tab display={false}>
-              DOCS
+              {t("docs")}
               <ExternalLinkIcon size={12} />
             </Tab>
             <Tab display={isEVM}>
-              WRAP
+              {t("wrap")}
               <ExternalLinkIcon size={12} />
             </Tab>
           </TabMenu>
@@ -560,7 +536,7 @@ export const Header = (props) => {
             adClass="menu-dropdown"
             width={200}
             item={supportLists}
-            context={"Support"}
+            context={t("support")}
             leftIcon={true}
             transparent
           />
@@ -568,7 +544,7 @@ export const Header = (props) => {
             adClass="menu-dropdown"
             width={162}
             item={communityLists}
-            context={"Community"}
+            context={t("community")}
             leftIcon={true}
             transparent
           />

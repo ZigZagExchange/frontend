@@ -1,3 +1,5 @@
+/* eslint-disable no-use-before-define */
+/* eslint-disable no-unused-vars */
 import React, { useState, useMemo, useEffect } from "react";
 import { constants as ethersConstants, utils as ethersUtils } from "ethers";
 import classNames from "classnames";
@@ -21,6 +23,7 @@ import SelectAsset from "./SelectAsset";
 import TransactionSettings from "./TransactionSettings";
 import SlippageWarningModal from "./SlippageWarningModal";
 import { Button, ConnectWalletButton } from "components/molecules/Button";
+import { useTranslation } from "react-i18next";
 
 import {
   NETWORKS,
@@ -75,6 +78,8 @@ const BridgeContainer = () => {
   const coinEstimator = useCoinEstimator();
   const currencyValue = coinEstimator(swapDetails.currency);
   const userOrders = useSelector(userOrdersSelector);
+
+  const { t } = useTranslation();
 
   const estimatedValue =
     +swapDetails.amount * coinEstimator(swapDetails.currency) || 0;
@@ -150,6 +155,17 @@ const BridgeContainer = () => {
       api.apiProvider.eligibleFastWithdrawTokens.includes(swapDetails.currency)
     );
   };
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (user.address && !user.id && network === 1) {
+        toast.error(t("Your_zksync_account_is_not_activated"), {
+          toastId: "Your_zksync_account_is_not_activated",
+          autoClose: 30000,
+        });
+      }
+    }, 1000);
+  }, [user]);
 
   useEffect(() => {
     setHasError(formErr && formErr.length > 0);
@@ -356,14 +372,11 @@ const BridgeContainer = () => {
         ) {
           error = "Open limit order prevents you from bridging";
           if (!settings.disableOrderNotification) {
-            toast.error(
-              "zkSync 1.0 allows one open order at a time. Please cancel your limit order or wait for it to be filled before bridging. Otherwise your limit order will fail.",
-              {
-                toastId:
-                  "zkSync 1.0 allows one open order at a time. Please cancel your limit order or wait for it to be filled before bridging. Otherwise your limit order will fail.",
-                autoClose: 20000,
-              }
-            );
+            toast.error(t("zksync_1_allows_one_open_order_at_a_time"), {
+              toastId:
+                "zkSync 1.0 allows one open order at a time. Please cancel your limit order or wait for it to be filled before bridging. Otherwise your limit order will fail.",
+              autoClose: 20000,
+            });
           }
         }
       }
@@ -497,7 +510,10 @@ const BridgeContainer = () => {
       .catch((err) => {
         console.log(err);
         if (!settings.disableOrderNotification) {
-          toast.error(err.message);
+          toast.error(t("transaction_was_rejected"), {
+            toastId: t("transaction_was_rejected"),
+            autoClose: true,
+          });
         }
         setApproving(false);
       });
@@ -590,9 +606,7 @@ const BridgeContainer = () => {
     const renderGuidContent = () => {
       return (
         <div>
-          <p className="text-sm">
-            Bridge transaction in process. Confirm or Reject to continue...
-          </p>
+          <p className="text-sm">{t("bridge_transaction_in_process")}</p>
         </div>
       );
     };
@@ -617,7 +631,10 @@ const BridgeContainer = () => {
         })
         .catch((e) => {
           if (!settings.disableOrderNotification) {
-            toast.error(e.message);
+            toast.error(t("transaction_was_rejected"), {
+              toastId: t("transaction_was_rejected"),
+              autoClose: true,
+            });
             toast.dismiss(orderPendingToast);
           }
           setTimeout(() => api.getAccountState(), 1000);
@@ -778,7 +795,10 @@ const BridgeContainer = () => {
       .catch((e) => {
         console.error("error sending transaction::", e);
         if (!settings.disableOrderNotification) {
-          toast.error(e.message);
+          toast.error(t("transaction_was_rejected"), {
+            toastId: t("transaction_was_rejected"),
+            autoClose: true,
+          });
         }
         setTimeout(() => api.getAccountState(), 1000);
       })

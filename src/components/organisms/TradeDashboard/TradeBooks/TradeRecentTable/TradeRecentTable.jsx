@@ -3,6 +3,7 @@ import styled from "styled-components";
 import useTheme from "components/hooks/useTheme";
 import { addComma, formatMillonAmount } from "lib/utils";
 import Text from "components/atoms/Text/Text";
+import { useTranslation } from "react-i18next";
 
 const Table = styled.table`
   display: flex;
@@ -90,6 +91,7 @@ const Table = styled.table`
 
 const TradeRecentTable = (props) => {
   const { theme } = useTheme();
+  const { t } = useTranslation();
   const scrollToBottom = () => {
     if (props.scrollToBottom) {
       const tableDiv = document.getElementsByClassName(props.className);
@@ -114,7 +116,7 @@ const TradeRecentTable = (props) => {
             <tr>
               <th>
                 <Text font="tableHeader" color="foregroundLowEmphasis">
-                  Price
+                  {t("price")}
                 </Text>
               </th>
               <th>
@@ -123,7 +125,7 @@ const TradeRecentTable = (props) => {
                   color="foregroundLowEmphasis"
                   textAlign="right"
                 >
-                  Amount
+                  {t("amount")}
                 </Text>
               </th>
               <th>
@@ -132,7 +134,7 @@ const TradeRecentTable = (props) => {
                   color="foregroundLowEmphasis"
                   textAlign="right"
                 >
-                  Time
+                  {t("time")}
                 </Text>
               </th>
             </tr>

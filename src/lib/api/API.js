@@ -4,7 +4,8 @@ import Web3Modal from "web3modal";
 import Emitter from "tiny-emitter";
 import { ethers } from "ethers";
 import WalletConnectProvider from "@walletconnect/web3-provider";
-import { getENSName } from "lib/ens";
+import CoinbaseWalletSDK from "@coinbase/wallet-sdk";
+import { getENSName, reverseUnstoppabledomainsAddress } from "lib/ens";
 import { formatAmount } from "lib/utils";
 import erc20ContractABI from "lib/contracts/ERC20.json";
 import wethContractABI from "lib/contracts/WETH.json";
@@ -20,13 +21,15 @@ import axios from "axios";
 import { isMobile } from "react-device-detect";
 import get from "lodash/get";
 
+import i18next from "../i18next";
+
 const chainMap = {
   "0x1": 1,
   "0x5": 421613,
   "0xa4b1": 42161,
 };
 
-export default class API extends Emitter {
+class API extends Emitter {
   networks = {};
   ws = null;
   apiProvider = null;
@@ -145,19 +148,22 @@ export default class API extends Emitter {
               },
             },
           },
-        });
-        break;
-      default:
-        this.web3Modal = new Web3Modal({
-          network: chainName,
-          cacheProvider: true,
-          theme: "dark",
-          providerOptions: {
-            walletconnect: {
-              package: WalletConnectProvider,
-              options: {
-                infuraId: this.infuraId,
-              },
+          coinbasewallet: {
+            package: CoinbaseWalletSDK,
+            options: {
+              appName: "Web 3 Modal Demo",
+              infuraId: this.infuraId,
+            },
+          },
+          "custom-argent": {
+            display: {
+              logo: "https://images.prismic.io/argentwebsite/313db37e-055d-42ee-9476-a92bda64e61d_logo.svg?auto=format%2Ccompress&fit=max&q=50",
+              name: "Argent zkSync",
+              description: "Connect to your Argent zkSync wallet",
+            },
+            package: WalletConnectProvider,
+            options: {
+              infuraId: this.infuraId,
             },
             "custom-argent": {
               display: {
@@ -190,8 +196,14 @@ export default class API extends Emitter {
   getProfile = async (address) => {
     const getProfileFromIPFS = async (address) => {
       try {
+        const controller = new AbortController();
+        setTimeout(() => controller.abort(), 1500);
+
         const { data } = await axios.get(
-          `https://ipfs.3box.io/profile?address=${address}`
+          `https://ipfs.3box.io/profile?address=${address}`,
+          {
+            signal: controller.signal,
+          }
         );
         const profile = {
           coverPhoto: get(data, "coverPhoto.0.contentUrl./"),
@@ -206,22 +218,26 @@ export default class API extends Emitter {
         if (data.name) {
           profile.name = data.name;
         }
+
         if (profile.image) {
           profile.image = `https://gateway.ipfs.io/ipfs/${profile.image}`;
         }
 
         return profile;
       } catch (err) {
-        if (!err.response) {
-          throw err;
-        }
+        console.warn(`Failed to get profile from IPFS: ${err}`);
       }
       return {};
     };
 
-    const fetchENSName = async (address) => {
-      let name = await getENSName(address);
-      if (name) return { name };
+    const fetchAddressName = async (address) => {
+      const [ensName, unstoppabledomainsName] = await Promise.all([
+        getENSName(address),
+        reverseUnstoppabledomainsAddress(address),
+      ]);
+      if (ensName) return { name: ensName };
+      if (unstoppabledomainsName) return { name: unstoppabledomainsName };
+
       return {};
     };
 
@@ -241,7 +257,7 @@ export default class API extends Emitter {
       Object.assign(
         profile,
         ...(await Promise.all([
-          fetchENSName(address),
+          fetchAddressName(address),
           getProfileFromIPFS(address),
         ]))
       );
@@ -401,6 +417,7 @@ export default class API extends Emitter {
         } min). Please sync it via settings > date/time > sync now`
       );
     }
+    this.emit("serverDeltaUpdate", this.serverDelta);
   };
 
   start = () => {
@@ -458,9 +475,10 @@ export default class API extends Emitter {
             this.apiProvider = this.getAPIProvider(network);
           }
 
-          await this.refreshNetwork();
-          await this.sleep(1000);
+          // await this.refreshNetwork();
+          // await this.sleep(1000);
           const web3Provider = await this.web3Modal.connect();
+
           this.web3.setProvider(web3Provider);
           this.rollupProvider = new ethers.providers.Web3Provider(web3Provider);
 
@@ -524,8 +542,8 @@ export default class API extends Emitter {
       this.web3Modal.clearCachedProvider();
     }
 
-    if (isMobile) window.localStorage.clear();
-    else window.localStorage.removeItem("walletconnect");
+    if (isMobile) window.localStorage?.clear();
+    else window.localStorage?.removeItem("walletconnect");
 
     this.balances = {};
     this._profiles = {};
@@ -537,12 +555,12 @@ export default class API extends Emitter {
     this.rollupProvider = null;
     this.mainnetProvider = null;
     this.isArgent = false;
+    this.emit("signOut");
     this.setAPIProvider(this.apiProvider.network, false);
     this.emit("balanceUpdate", "wallet", {});
     this.emit("balanceUpdate", this.apiProvider.network, {});
     this.emit("balanceUpdate", "polygon", {});
     this.emit("accountState", {});
-    this.emit("signOut");
   };
 
   getPolygonUrl(network) {
@@ -751,7 +769,7 @@ export default class API extends Emitter {
   };
 
   cancelOrder = async (orderId) => {
-    const token = localStorage.getItem(orderId);
+    const token = localStorage?.getItem(orderId);
     // token is used to cancel the order - otherwiese the user is asked to sign a msg
     if (token) {
       await this.send("cancelorder3", [
@@ -760,9 +778,12 @@ export default class API extends Emitter {
         token,
       ]);
     } else {
-      const toastMsg = toast.info("Sign the message to cancel your order...", {
-        toastId: "Sign the message to cancel your order...'",
-      });
+      const toastMsg = toast.info(
+        i18next.t("sign_the_message_to_cancel_your_order"),
+        {
+          toastId: "Sign the message to cancel your order...'",
+        }
+      );
 
       const message = `cancelorder2:${this.apiProvider.network}:${orderId}`;
       const signedMessage = await this.apiProvider.signMessage(message);
@@ -844,7 +865,7 @@ export default class API extends Emitter {
     const { id: userId } = await this.getAccountState();
     const tokenArray = [];
     orderIds.forEach((id) => {
-      const token = localStorage.getItem(id);
+      const token = localStorage?.getItem(id);
       if (token) tokenArray.push(token);
     });
     if (orderIds.length === tokenArray.length) {
@@ -854,9 +875,12 @@ export default class API extends Emitter {
         tokenArray,
       ]);
     } else {
-      const toastMsg = toast.info("Sign the message to cancel your order...", {
-        toastId: "Sign the message to cancel your order...'",
-      });
+      const toastMsg = toast.info(
+        i18next.t("sign_the_message_to_cancel_your_order"),
+        {
+          toastId: "Sign the message to cancel your order...'",
+        }
+      );
       const validUntil = Math.floor(Date.now() / 1000) + 10;
       const message = `cancelall2:${this.apiProvider.network}:${validUntil}`;
       const signedMessage = await this.apiProvider.signMessage(message);
@@ -876,9 +900,12 @@ export default class API extends Emitter {
   };
 
   cancelAllOrdersAllChains = async () => {
-    const toastMsg = toast.info("Sign the message to cancel your order...", {
-      toastId: "Sign the message to cancel your order...'",
-    });
+    const toastMsg = toast.info(
+      i18next.t("sign_the_message_to_cancel_your_order"),
+      {
+        toastId: "Sign the message to cancel your order...'",
+      }
+    );
 
     const validUntil = Date.now() / 1000 + 10;
     const message = `cancelall2:0:${validUntil}`;
@@ -1094,7 +1121,7 @@ export default class API extends Emitter {
   };
 
   checkAccountActivated = async () => {
-    if (!this.apiProvider.isZksyncChain) return true;
+    if (!this.isZksyncChain()) return true;
     return this.apiProvider.checkAccountActivated();
   };
 
@@ -1332,4 +1359,9 @@ export default class API extends Emitter {
       return this.rollupProvider.getTransactionReceipt(txHash);
     }
   }
+  changePubKeyAPI = async () => {
+    await this.apiProvider.changePubKey();
+  };
 }
+
+export default API;

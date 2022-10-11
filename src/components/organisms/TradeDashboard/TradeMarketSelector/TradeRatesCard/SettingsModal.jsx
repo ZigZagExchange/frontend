@@ -10,8 +10,8 @@ import {
   resetUISettings,
   resetTradeLayout,
   setUISettings,
-  setLayout,
 } from "lib/store/features/api/apiSlice";
+import { useTranslation } from "react-i18next";
 
 const SettingModalWrapper = styled(GenericModal)`
   position: relative;
@@ -69,6 +69,7 @@ const SettingsModal = ({ onDismiss }) => {
   const toggle = () => setChecked(!checked);
   const dispatch = useDispatch();
   const breakpoints = ["xl", "lg", "md", "xxs"];
+  const { t } = useTranslation();
 
   const onChangeStackOrderBook = () => {
     if (!settings.layoutsCustomized) {
@@ -150,7 +151,7 @@ const SettingsModal = ({ onDismiss }) => {
     <SettingModalWrapper isOpened onClose={onDismiss}>
       <ModalHeader>
         <Text font="primaryHeading6" color="foregroundHighEmphasis">
-          Settings
+          {t("settings")}
         </Text>
         <ActionsWrapper>
           <ActionWrapper onClick={editLayout}>
@@ -160,7 +161,9 @@ const SettingsModal = ({ onDismiss }) => {
               color="foregroundHighEmphasis"
               style={{ cursor: "pointer" }}
             >
-              {settings.editable ? "Lock Layout" : "Unlock & Customise Layout"}
+              {settings.editable
+                ? t("lock_layout")
+                : t("unlock_customise_layout")}
             </Text>
           </ActionWrapper>
           <ActionWrapper onClick={resetLayout}>
@@ -170,7 +173,7 @@ const SettingsModal = ({ onDismiss }) => {
               color="foregroundHighEmphasis"
               style={{ cursor: "pointer" }}
             >
-              Reset Layout
+              {t("reset_layout")}
             </Text>
           </ActionWrapper>
         </ActionsWrapper>
@@ -185,7 +188,7 @@ const SettingsModal = ({ onDismiss }) => {
             settingKey="showCancelOrders"
           />
           <Text font="primarySmall" color="foregroundHighEmphasis">
-            Disable Cancel All button on Open Orders tab
+            {t("disable_cancel_all_button_on_open_orders_tab")}
           </Text>
         </ToggleWrapper>
         <ToggleWrapper>
@@ -196,7 +199,7 @@ const SettingsModal = ({ onDismiss }) => {
             settingKey="disableSlippageWarning"
           />
           <Text font="primarySmall" color="foregroundHighEmphasis">
-            Disable high slippage warning
+            {t("disable_high_lippage_warning")}
           </Text>
         </ToggleWrapper>
         <ToggleWrapper>
@@ -207,7 +210,7 @@ const SettingsModal = ({ onDismiss }) => {
             settingKey="disableOrderBookFlash"
           />
           <Text font="primarySmall" color="foregroundHighEmphasis">
-            Disable orderbook and trade flashes
+            {t("disable_orderbook_and_trade_flashes")}
           </Text>
         </ToggleWrapper>
         <ToggleWrapper>
@@ -218,7 +221,8 @@ const SettingsModal = ({ onDismiss }) => {
             settingKey="disableOrderNotification"
           />
           <Text font="primarySmall" color="foregroundHighEmphasis">
-            Disable order notifications (pending/placed/filled/cancelled)
+            {t("disable_order_notifications")} (
+            {t("pending_placed_filled_cancelled")})
           </Text>
         </ToggleWrapper>
         <ToggleWrapper>
@@ -229,7 +233,7 @@ const SettingsModal = ({ onDismiss }) => {
             settingKey="disableTradeIDCard"
           />
           <Text font="primarySmall" color="foregroundHighEmphasis">
-            Disable Trade ID card notification
+            {t("disable_trade_id_card_notification")}
           </Text>
         </ToggleWrapper>
         <ToggleWrapper>
@@ -240,7 +244,7 @@ const SettingsModal = ({ onDismiss }) => {
             settingKey="hideAddress"
           />
           <Text font="primarySmall" color="foregroundHighEmphasis">
-            Hide addresses
+            {t("hide_addresses")}
           </Text>
         </ToggleWrapper>
         <ToggleWrapper>
@@ -251,7 +255,7 @@ const SettingsModal = ({ onDismiss }) => {
             settingKey="hideBalance"
           />
           <Text font="primarySmall" color="foregroundHighEmphasis">
-            Hide balances
+            {t("hide_balances")}
           </Text>
         </ToggleWrapper>
         <ToggleWrapper>
@@ -262,7 +266,7 @@ const SettingsModal = ({ onDismiss }) => {
             settingKey="showNightPriceChange"
           />
           <Text font="primarySmall" color="foregroundHighEmphasis">
-            Show price change since midnight UTC instead of 24h change
+            {t("show_price_change_since_midnight_utc_instead_of_24h_change")}
           </Text>
         </ToggleWrapper>
         <ToggleWrapper>
@@ -276,7 +280,7 @@ const SettingsModal = ({ onDismiss }) => {
             settingKey="stackOrderbook"
           />
           <Text font="primarySmall" color="foregroundHighEmphasis">
-            Stack orderbooks
+            {t("stack_orderbooks")}
           </Text>
         </ToggleWrapper>
         <ResetAllSettingsWrapper>
@@ -294,7 +298,7 @@ const SettingsModal = ({ onDismiss }) => {
               }}
               textAlign="right"
             >
-              Reset All Settings
+              {t("reset_all_settings")}
             </Text>
           </button>
         </ResetAllSettingsWrapper>

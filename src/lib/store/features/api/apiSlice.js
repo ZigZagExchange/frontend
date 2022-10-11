@@ -1,6 +1,7 @@
 import { createSlice, createAction } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 import { formatPrice } from "lib/utils";
+
 import api from "lib/api";
 import { getLayout } from "lib/helpers/storage/layouts";
 import FillCard from "components/organisms/TradeDashboard/TradeTables/OrdersTable/FillCard";
@@ -8,6 +9,8 @@ import {
   initialLayouts,
   stackedLayouts,
 } from "components/organisms/TradeDashboard/ReactGridLayout/layoutSettings";
+
+import i18next from "../../../i18next";
 
 const makeScopeUser = (state) => `${state.network}-${state.userId}`;
 const makeScopeMarket = (state) => `${state.network}-${state.currentMarket}`;
@@ -18,7 +21,7 @@ const initialUISettings = {
   disableOrderNotification: false,
   stackOrderbook: true,
   disableSlippageWarning: false,
-  disabledisableOrderBookFlash: false,
+  disableOrderBookFlash: false,
   hideAddress: false,
   hideBalance: false,
   hideGuidePopup: false,
@@ -61,6 +64,7 @@ export const apiSlice = createSlice({
       userPrice: 0,
       pairPrice: 0,
     },
+    serverDelta: 0,
   },
   reducers: {
     _error(state, { payload }) {
@@ -75,8 +79,8 @@ export const apiSlice = createSlice({
       const renderToastContent = () => {
         return (
           <>
-            An unknown error has occurred while processing '{op}' (
-            {errorMessage}). Please{" "}
+            {i18next.t("an_unknown_error_has_occurred_while_processing")} '{op}'
+            ({errorMessage}). Please{" "}
             <a
               href={"https://info.zigzag.exchange/#contact"}
               style={{
@@ -133,6 +137,10 @@ export const apiSlice = createSlice({
     _fills(state, { payload }) {
       payload[0].forEach((fill) => {
         const fillid = fill[1];
+        const isoString = fill[12];
+        const newTimestamp =
+          new Date(isoString).getTime() - state.serverDelta * 1000;
+        fill[12] = new Date(newTimestamp);
         // taker and maker user ids have to be matched lowercase because addresses
         // sometimes come back in camelcase checksum format
         const takerUserId = fill[8] && fill[8].toLowerCase();
@@ -166,16 +174,24 @@ export const apiSlice = createSlice({
         // console.log(update);
         const fillid = update[1];
         const newstatus = update[2];
-        const timestamp = update[7];
+        let timestamp = update[7];
+        if (timestamp) {
+          const newTimestamp =
+            new Date(timestamp).getTime() - state.serverDelta * 1000;
+          timestamp = new Date(newTimestamp);
+        }
         let txhash;
         let feeamount;
         let feetoken;
+        let price;
         if (update[3]) txhash = update[3];
         if (update[5]) feeamount = update[5];
         if (update[6]) feetoken = update[6];
+        if (update[8]) price = Number(update[8]);
         if (state.marketFills[fillid]) {
           state.marketFills[fillid][6] = newstatus;
           state.marketFills[fillid][12] = timestamp;
+          if (price) state.marketFills[fillid][4] = price;
           if (txhash) state.marketFills[fillid][7] = txhash;
           if (feeamount) state.marketFills[fillid][10] = feeamount;
           if (feetoken) state.marketFills[fillid][11] = feetoken;
@@ -183,6 +199,7 @@ export const apiSlice = createSlice({
         if (state.userFills[fillid]) {
           state.userFills[fillid][6] = newstatus;
           state.userFills[fillid][12] = timestamp;
+          if (price) state.marketFills[fillid][4] = price;
           if (txhash) state.userFills[fillid][7] = txhash;
           if (feeamount) state.userFills[fillid][10] = feeamount;
           if (feetoken) state.userFills[fillid][11] = feetoken;
@@ -192,7 +209,7 @@ export const apiSlice = createSlice({
 
             const baseCurrency = fillDetails[2].split("-")[0];
             const sideText = fillDetails[3] === "b" ? "buy" : "sell";
-            const price = Number(fillDetails[4]);
+            price = price ? price : Number(fillDetails[4]);
             const baseQuantity = Number(fillDetails[5]);
             let p = [];
             for (var i = 0; i < 13; i++) {
@@ -208,9 +225,16 @@ export const apiSlice = createSlice({
             ) {
               toast.dismiss("Order placed.");
               toast.success(
-                `Your ${sideText} order #${fillid} for ${Number(
-                  baseQuantity.toPrecision(4)
-                )} ${baseCurrency} was filled @ ${Number(formatPrice(price))}!`,
+                i18next.t(
+                  "your_sidetext_order_fillid_for_basequantity_basecurrency_was_filled_price",
+                  {
+                    sideText: sideText,
+                    fillid: fillid,
+                    baseQuantity: Number(baseQuantity.toPrecision(4)),
+                    baseCurrency: baseCurrency,
+                    price: Number(formatPrice(price)),
+                  }
+                ),
                 {
                   toastId: `Your ${sideText} order #${fillid} for ${Number(
                     baseQuantity.toPrecision(4)
@@ -249,9 +273,14 @@ export const apiSlice = createSlice({
     _fillreceipt(state, { payload }) {
       payload[0].forEach((fill) => {
         if (!fill) return;
+        const fillid = fill[1];
+        const isoString = fill[12];
+        const newTimestamp =
+          new Date(isoString).getTime() - state.serverDelta * 1000;
+        fill[12] = new Date(newTimestamp);
+
         const takerUserId = fill[8] && fill[8].toLowerCase();
         const makerUserId = fill[9] && fill[9].toLowerCase();
-        const fillid = fill[1];
         if (fill[2] === state.currentMarket && fill[0] === state.network) {
           state.marketFills[fillid] = fill;
         }
@@ -381,11 +410,16 @@ export const apiSlice = createSlice({
               filledOrder[11] = txHash;
               const noFeeOrder = api.getOrderDetailsWithoutFee(filledOrder);
               toast.error(
-                `Your ${sideText} order for ${
-                  noFeeOrder.baseQuantity.toPrecision(4) / 1
-                } ${baseCurrency} @ ${
-                  noFeeOrder.price.toPrecision(4) / 1
-                } was rejected: ${error}`,
+                i18next.t(
+                  "your_sidetext_order_for_basequantity_basecurrency_price_was_rejected",
+                  {
+                    sideText: sideText,
+                    baseQuantity: noFeeOrder.baseQuantity.toPrecision(4) / 1,
+                    baseCurrency: baseCurrency,
+                    price: noFeeOrder.price.toPrecision(4) / 1,
+                    error: error,
+                  }
+                ),
                 {
                   toastId: `Your ${sideText} order for ${
                     noFeeOrder.baseQuantity.toPrecision(4) / 1
@@ -395,7 +429,9 @@ export const apiSlice = createSlice({
                 }
               );
               toast.info(
-                `This happens occasionally. Run the transaction again and you should be fine.`,
+                i18next.t(
+                  "this_happens_occasionally_run_the_transaction_again_and_you_should_be_fine"
+                ),
                 {
                   toastId: `This happens occasionally. Run the transaction again and you should be fine.`,
                 }
@@ -419,6 +455,7 @@ export const apiSlice = createSlice({
       const orders = payload[0]
         .filter((order) => order[0] === state.network)
         .reduce((res, order) => {
+          order[7] = order[7] - state.serverDelta;
           res[order[1]] = order;
           return res;
         }, {});
@@ -440,6 +477,8 @@ export const apiSlice = createSlice({
     _orderreceipt(state, { payload }) {
       const orderId = payload[1];
       state.userOrders[orderId] = payload;
+      state.userOrders[orderId][7] =
+        state.userOrders[orderId][7] - state.serverDelta;
     },
     _userorderack(state, { payload }) {
       const orderId = payload[1].toString();
@@ -448,6 +487,8 @@ export const apiSlice = createSlice({
         localStorage.setItem(orderId, token);
       }
       state.userOrders[orderId] = payload.slice(0, 12);
+      state.userOrders[orderId][7] =
+        state.userOrders[orderId][7] - state.serverDelta;
     },
     setBalances(state, { payload }) {
       const scope = makeScopeUser(state);
@@ -556,7 +597,7 @@ export const apiSlice = createSlice({
         return (
           <div>
             <p className="mb-2 text-xl font-semibold font-work">
-              Transaction Successful
+              {i18next.t("bridge_transaction_pending")}
             </p>
             Successfully {successMsg} {amount} {token} {targetMsg}
             {type !== "zkSync_to_polygon" &&
@@ -574,7 +615,7 @@ export const apiSlice = createSlice({
                 target="_blank"
                 rel="noreferrer"
               >
-                View transaction
+                {i18next.t("view_transaction")}
               </a>
             </p>
             {type === "withdraw_fast" ? <br /> : ""}
@@ -582,7 +623,10 @@ export const apiSlice = createSlice({
               type === "zkSync_to_polygon" ||
               type === "polygon_to_zkSync") && (
               <div className="mt-3">
-                Confirm that your funds have arrived {targetMsg}
+                {i18next.t(
+                  "please_wait_for_your_eth_balance_to_be_available_in_zksync_before_trading"
+                )}{" "}
+                {/* {targetMsg} */}
                 <p>
                   <a
                     href={walletAddress}
@@ -606,7 +650,7 @@ export const apiSlice = createSlice({
 
       toast.success(renderToastContent(), {
         closeOnClick: false,
-        autoClose: 15000,
+        autoClose: 40000,
         icon: false,
       });
 
@@ -669,6 +713,36 @@ export const apiSlice = createSlice({
     setSlippageValue(state, { payload }) {
       state.slippageValue = payload.value;
     },
+    setServerDelta(state, { payload }) {
+      state.serverDelta = payload;
+
+      // update existing fills and orders in case the delta changed
+      state.userOrders = Object.keys(state.userOrders).map((orderId) => {
+        const order = state.userOrders[orderId];
+        order[7] = order[7] - payload;
+        return order;
+      });
+      state.orders = Object.keys(state.orders).map((orderId) => {
+        const order = state.orders[orderId];
+        order[7] = order[7] - payload;
+        return order;
+      });
+
+      state.userFills = Object.keys(state.userFills).map((fillId) => {
+        const fill = state.userFills[fillId];
+        const isoString = fill[12];
+        const newTimestamp = new Date(isoString).getTime() - payload * 1000;
+        fill[12] = new Date(newTimestamp);
+        return fill;
+      });
+      state.marketFills = Object.keys(state.marketFills).map((fillId) => {
+        const fill = state.marketFills[fillId];
+        const isoString = fill[12];
+        const newTimestamp = new Date(isoString).getTime() - payload * 1000;
+        fill[12] = new Date(newTimestamp);
+        return fill;
+      });
+    },
     resetTradeLayout(state) {
       if (!state.settings.stackOrderbook) {
         state.settings.layouts = stackedLayouts();
@@ -696,6 +770,7 @@ export const {
   setUISettings,
   resetUISettings,
   setSlippageValue,
+  setServerDelta,
   resetTradeLayout,
 } = apiSlice.actions;
 

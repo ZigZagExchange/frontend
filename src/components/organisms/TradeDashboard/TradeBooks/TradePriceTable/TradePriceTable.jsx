@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import useTheme from "components/hooks/useTheme";
-import { numStringToSymbol, addComma, formatMillonAmount } from "lib/utils";
+import { formatMillonAmount } from "lib/utils";
 import Text from "components/atoms/Text/Text";
 import _ from "lodash";
+import { useTranslation } from "react-i18next";
 
 const Table = styled.table`
   display: flex;
@@ -51,6 +52,7 @@ const Table = styled.table`
     display: table;
     width: 100%;
     background: ${(p) => p.theme.colors.backgroundHighEmphasis};
+    z-index: 10;
   }
 
   th {
@@ -130,37 +132,35 @@ const Table = styled.table`
 const TradePriceTable = (props) => {
   const { theme } = useTheme();
   const ref = useRef(null);
-  const [isUpdateScroll, setUpdateScroll] = useState(false);
-  const [priceData, setPriceData] = useState([])
+  const [priceData, setPriceData] = useState([]);
   const isMobile = window.innerWidth < 500;
+  const { t } = useTranslation();
 
   const ua = navigator.userAgent.toLowerCase();
   let isSafari = false;
-  if (ua.indexOf("safari") != -1) {
+  if (ua.indexOf("safari") !== -1) {
     if (ua.indexOf("chrome") === -1) {
       isSafari = true;
     }
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     const tmp = _.cloneDeep(props.priceTableData);
-    if(props.priceTableData[0]?.side === "s" && !props.settings?.stackOrderbook) {
+    if (
+      props.priceTableData[0]?.side === "s" &&
+      !props.settings?.stackOrderbook
+    ) {
       tmp.reverse();
     }
-    setPriceData(tmp)
-  }, [props.priceTableData])
+    setPriceData(tmp);
+  }, [props.priceTableData]);
 
   useEffect(() => {
     if (!ref.current) return;
-    if (props.priceTableData.length === 0) {
-      setUpdateScroll(false);
-      return;
+    if (props.scrollToBottom) {
+      ref.current.scrollTo(0, ref.current.scrollHeight);
     }
-    if (props.scrollToBottom && !isUpdateScroll) {
-      setUpdateScroll(true);
-      ref.current?.scrollTo(0, ref.current.scrollHeight);
-    }
-  }, [props.priceTableData.length]);
+  }, [props.priceTableData]);
 
   let total_total = 0,
     total_step = 0;
@@ -184,7 +184,7 @@ const TradePriceTable = (props) => {
           <tr>
             <th>
               <Text font="tableHeader" color="foregroundLowEmphasis">
-                Price
+                {t("price")}
               </Text>
             </th>
             <th>
@@ -193,7 +193,7 @@ const TradePriceTable = (props) => {
                 color="foregroundLowEmphasis"
                 textAlign="right"
               >
-                Amount
+                {t("amount")}
               </Text>
             </th>
             {!isMobile && (
@@ -203,8 +203,8 @@ const TradePriceTable = (props) => {
                   color="foregroundLowEmphasis"
                   textAlign="right"
                 >
-                  Total({props.marketInfo && props.marketInfo.quoteAsset.symbol}
-                  )
+                  {t("total")}(
+                  {props.marketInfo && props.marketInfo.quoteAsset.symbol})
                 </Text>
               </th>
             )}
@@ -212,16 +212,15 @@ const TradePriceTable = (props) => {
         </thead>
       )}
       <tbody>
-        { priceData.map((d, i) => {
+        {priceData.map((d, i) => {
           const color =
             d.side === "b" ? theme.colors.success400 : theme.colors.danger400;
 
           let rowStyle;
           if (props.useGradient) {
-            let dir
-            if(!props.settings?.stackOrderbook)
-              dir = "to left"
-            else dir = "to right"
+            let dir;
+            if (!props.settings?.stackOrderbook) dir = "to left";
+            else dir = "to right";
 
             if (d.side === "b") {
               total_step += d.td2;
@@ -230,14 +229,13 @@ const TradePriceTable = (props) => {
             if (d.side === "s") {
               total_step -= d.td2;
             }
-            if(!props.settings?.stackOrderbook && d.side === "s"){
+            if (!props.settings?.stackOrderbook && d.side === "s") {
               rowStyle = {
                 "--background-image": `linear-gradient(${dir}, ${theme.colors.backgroundHighEmphasis}, ${theme.colors.backgroundHighEmphasis} ${breakpoint}%, ${color} 0%)`,
               };
-            }
-            else{
+            } else {
               rowStyle = {
-                "--background-image": `linear-gradient(${dir}, ${color}, ${color} ${breakpoint}%, ${theme.colors.backgroundHighEmphasis} 0%)`,              
+                "--background-image": `linear-gradient(${dir}, ${color}, ${color} ${breakpoint}%, ${theme.colors.backgroundHighEmphasis} 0%)`,
               };
             }
 
@@ -246,7 +244,7 @@ const TradePriceTable = (props) => {
               total_step -= d.td2;
             }
           } else {
-            rowStyle = "";
+            rowStyle = {};
           }
           const price =
             typeof d.td1 === "number" ? d.td1.toPrecision(6) : d.td1;

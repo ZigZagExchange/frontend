@@ -8,9 +8,12 @@ import * as htmlToImage from "html-to-image";
 
 import logo from "assets/images/logo.png";
 
+import { useTranslation } from "react-i18next";
+
 const FillCard = ({ fill, closeToast }) => {
   const ref = useRef(null);
   const { isDark } = useTheme();
+  const { t } = useTranslation();
 
   const tradeId = fill[1];
   const market = fill[2];
@@ -77,9 +80,9 @@ const FillCard = ({ fill, closeToast }) => {
                   "text-success-900": fill[3] === "b",
                 })}
               >
-                {fill[3] === "b" ? "Buy" : "Sell"}
+                {fill[3] === "b" ? t("buy") : t("sell")}
               </span>{" "}
-              Order Successful
+              {t("order_successful")}
             </p>
           </div>
           <XIcon
@@ -89,7 +92,7 @@ const FillCard = ({ fill, closeToast }) => {
         </div>
         <div className="pt-3">
           <p className="font-normal font-work dark:text-foreground-900 text-background-900 secret-div">
-            Use the Trade ID to identify old trades.
+            {t("use_the_trade_id_to_identify_old_trades")}
           </p>
           <div className="flex items-start gap-4 mt-3">
             {/* <img src={QR} alt="QR" className="w-36" /> */}
@@ -102,7 +105,7 @@ const FillCard = ({ fill, closeToast }) => {
             </div>
             <div>
               <div className="flex gap-2 text-sm font-normal font-work dark:text-foreground-900 text-background-900">
-                Trade ID:{" "}
+                {t("trade_id")}:{" "}
                 <button
                   onClick={() => {
                     window.open(
@@ -122,28 +125,27 @@ const FillCard = ({ fill, closeToast }) => {
                 />
               </div>
               <div className="mt-3 text-sm font-normal font-work dark:text-foreground-900 text-background-900">
-                Average buy price:
+                {t("average_buy_price")}:
                 <span className="font-bold">
                   {" "}
                   {Number(fill[4])?.toPrecision(6) / 1} {market.split("-")[1]}
                 </span>
               </div>
               <div className="mt-3 text-sm font-normal font-work dark:text-foreground-900 text-background-900">
-                Amount:
+                {t("amount")}:
                 <span className="font-bold">
                   {" "}
                   {Number(fill[5])?.toPrecision(6) / 1} {market.split("-")[0]}
                 </span>
               </div>
               <div className="mt-3 text-sm font-normal font-work dark:text-foreground-900 text-background-900">
-                Fee:
-                <span className="font-bold"> {feeText}</span>
+                {t("fee")}:<span className="font-bold"> {feeText}</span>
               </div>
               <button
                 className="mt-2 text-sm font-semibold text-primary-900 hover:underline hover:underline-offset-1 font-work"
                 onClick={downloadQRCode}
               >
-                Save as Image
+                {t("save_as_image")}
               </button>
             </div>
           </div>

@@ -14,7 +14,6 @@ import "react-toastify/dist/ReactToastify.css";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import "./ReactGridLayout/custom-grid-layout.css";
-import { toast } from "react-toastify";
 import {
   networkSelector,
   userOrdersSelector,
@@ -22,7 +21,6 @@ import {
   currentMarketSelector,
   setCurrentMarket,
   resetData,
-  layoutSelector,
   settingsSelector,
   setUISettings,
   marketSummarySelector,
@@ -38,7 +36,6 @@ import {
   marketQueryParam,
   networkQueryParam,
 } from "../../pages/ListPairPage/SuccessModal";
-import TradesTable from "./TradeBooks/TradesTable";
 import { HighSlippageModal } from "components/molecules/HighSlippageModal";
 import { formatPrice, addComma } from "lib/utils";
 import NewFeaturesPopup from "components/organisms/TradeDashboard/NewFeaturesPopup";
@@ -69,7 +66,6 @@ export function TradeDashboard() {
   const currentMarket = useSelector(currentMarketSelector);
   const userOrders = useSelector(userOrdersSelector);
   const userFills = useSelector(userFillsSelector);
-  const layout = useSelector(layoutSelector);
   const settings = useSelector(settingsSelector);
   const marketInfo = useSelector(marketInfoSelector);
   const marketSummary = useSelector(marketSummarySelector);
@@ -87,7 +83,7 @@ export function TradeDashboard() {
   const { isDark } = useTheme();
 
   const updateMarketChain = (market) => {
-    console.log(`TradeDashboard set pair to ${market}`);    
+    console.log(`TradeDashboard set pair to ${market}`);
     dispatch(setCurrentMarket(market));
   };
 
@@ -129,15 +125,19 @@ export function TradeDashboard() {
   }, [network, currentMarket]);
 
   useEffect(() => {
-    if (user.address && !user.id && network === 1) {
-      history.push("/bridge");
-      toast.error(
-        "Your zkSync account is not activated. Please use the bridge to deposit funds into zkSync and activate your zkSync wallet.",
-        {
-          autoClose: 60000,
-        }
-      );
-    }
+    const activeAcc = async () => {
+      if (user.address && !user.id && network === 1) {
+        history.push("/bridge");
+      }
+      const accountActivated = await api.checkAccountActivated();
+      if (!accountActivated && user.address) {
+        await api.changePubKeyAPI();
+      }
+    };
+    activeAcc().catch(console.error);
+  }, []);
+
+  useEffect(async () => {
     const sub = () => {
       dispatch(resetData());
       api.subscribeToMarket(currentMarket, settings.showNightPriceChange);

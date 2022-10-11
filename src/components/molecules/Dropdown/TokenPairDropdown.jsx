@@ -22,6 +22,7 @@ import {
 } from "lib/helpers/storage/favourites";
 import _ from "lodash";
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 
 const ButtonWrapper = styled.div`
   display: grid;
@@ -235,6 +236,7 @@ const TokenPairDropdown = ({
   const isMobile = window.innerWidth < 500;
   const wrapperRef = useRef(null);
   const [isIncrease, setIsIncrease] = useState([]);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (favourited) setFavourites(favourited);
@@ -251,15 +253,13 @@ const TokenPairDropdown = ({
 
   const searchPair = (value) => {
     value = value.toUpperCase().replace("/", "-").replace(" ", "-");
-    let foundPairs = [];
-
     const [base, quote] = value.split("-");
     const reverseValue = quote + "-" + base;
     //
     //search all, if you'd prefer to search the current category just set this to use `state.pairs` instead
     //
 
-    foundPairs = rowData.filter((item) => {
+    rowData.filter((item) => {
       if (!value) return true;
       if (
         item.td1.toLowerCase().includes(value.toLowerCase()) ||
@@ -293,8 +293,6 @@ const TokenPairDropdown = ({
   }, [rowData]);
 
   const categorizePairs = (category_index) => {
-    let foundPairs = [];
-
     setCategorySelected(category_index);
     setPairSorted(false);
     setPairDirection(false);
@@ -325,7 +323,7 @@ const TokenPairDropdown = ({
     const toggled = !pairDirection;
 
     const sorted_pairs = rowData;
-    
+
     sorted_pairs.sort(function compareFn(firstEl, secondEl) {
       if (toggled) {
         return firstEl.td1 < secondEl.td1 ? -1 : 1;
@@ -373,9 +371,15 @@ const TokenPairDropdown = ({
 
     sorted_pairs.sort(function compareFn(firstEl, secondEl) {
       if (toggled) {
-        return parseFloat(firstEl.td2.replace(',', '')) - parseFloat(secondEl.td2.replace(',', ''));
+        return (
+          parseFloat(firstEl.td2.replace(",", "")) -
+          parseFloat(secondEl.td2.replace(",", ""))
+        );
       } else {
-        return parseFloat(secondEl.td2.replace(',', '')) - parseFloat(firstEl.td2.replace(',', ''));
+        return (
+          parseFloat(secondEl.td2.replace(",", "")) -
+          parseFloat(firstEl.td2.replace(",", ""))
+        );
       }
     });
 
@@ -433,10 +437,9 @@ const TokenPairDropdown = ({
     if (categorySelected === 4) {
       return favourites.includes(row.td1);
     }
-    
-    return true;
 
-  }
+    return true;
+  };
 
   const renderPairs = () => {
     const shown_pairs = rowData
@@ -475,8 +478,7 @@ const TokenPairDropdown = ({
             onClick={(e) => {
               if (selected) return;
               updateMarketChain(pair);
-              if(isMobile)
-                setIsOpened(false);
+              if (isMobile) setIsOpened(false);
             }}
             className={selected ? "selected" : ""}
           >
@@ -545,7 +547,7 @@ const TokenPairDropdown = ({
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Pair
+                  {t("pair")}
                 </Text>
                 {pairSorted ? (
                   <SortIconWrapper>
@@ -568,7 +570,7 @@ const TokenPairDropdown = ({
                   color="foregroundLowEmphasis"
                   align="right"
                 >
-                  Last Price
+                  {t("last_price")}
                 </Text>
                 {priceSorted ? (
                   <SortIconWrapper>
@@ -591,7 +593,7 @@ const TokenPairDropdown = ({
                   color="foregroundLowEmphasis"
                   align="right"
                 >
-                  Volume(24h)
+                  {t("volume")}(24h)
                 </Text>
                 {volumeSorted ? (
                   <SortIconWrapper>
@@ -618,7 +620,7 @@ const TokenPairDropdown = ({
                   color="foregroundLowEmphasis"
                   align="right"
                 >
-                  Change
+                  {t("change")}
                 </Text>
                 {changeSorted ? (
                   <SortIconWrapper>
@@ -670,7 +672,7 @@ const TokenPairDropdown = ({
           <DropdownHeader>
             <InputField
               type="text"
-              placeholder="Search for a token pair"
+              placeholder={t("search_for_a_token_pair")}
               icon="search"
               value={searchValue}
               onChange={updateSearchValue}
@@ -684,11 +686,11 @@ const TokenPairDropdown = ({
               activeIndex={categorySelected}
               onItemClick={categorizePairs}
             >
-              <Tab>All</Tab>
+              <Tab>{t("all")}</Tab>
               <Tab>ETH</Tab>
               <Tab>WBTC</Tab>
-              <Tab>Stables</Tab>
-              <Tab>Favorites</Tab>
+              <Tab>{t("stables")}</Tab>
+              <Tab>{t("favorites")}</Tab>
             </StyledTabMenu>
             <TableContent className="trade_price_btc_table">
               {renderPairs()}

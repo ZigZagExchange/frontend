@@ -11,14 +11,16 @@ import GetStartedPopup from "./Popup/GetStartedPopup";
 import WalletConnectedPopup from "./Popup/WalletConnectedPopup";
 import classNames from "classnames";
 import { Tab } from "@headlessui/react";
+import { useTranslation } from "react-i18next";
 
-const tabList = ["Bridge", "Transfer History"];
+const tabList = ["bridge", "transfer_history"];
 
 export default function BridgePage() {
   const { isDark } = useTheme();
   const [popup, setpopup] = useState("walletconnected");
   const user = useSelector(userSelector);
   // const settings = useSelector(settingsSelector);
+  const { t } = useTranslation();
 
   useEffect(() => {
     document.title = "ZigZag Bridge";
@@ -42,8 +44,8 @@ export default function BridgePage() {
         })}
       >
         <div className="w-full max-w-lg px-1 sm:px-0">
-          <p className="mt-10 text-3xl font-semibold font-work ">
-            ZigZag Bridge
+          <p className="mt-10 text-3xl font-semibold capitalize font-work">
+            ZigZag {t("c_bridge")}
           </p>
           <div className="px-2 py-3 sm:px-0">
             <Tab.Group>
@@ -62,7 +64,7 @@ export default function BridgePage() {
                         )
                       }
                     >
-                      {item}
+                      {t(item)}
                     </Tab>
                   );
                 })}

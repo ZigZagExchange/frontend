@@ -5,6 +5,7 @@ import NumberInput from "../../atoms/Form/NumberInput";
 import { model } from "../../atoms/Form/helpers";
 import styled from "styled-components";
 import axios from "axios";
+import { useTranslation } from "react-i18next";
 
 import {
   forceValidation,
@@ -17,7 +18,6 @@ import { Button } from "../../atoms/Form/Submit";
 import TextInput from "../../atoms/Form/TextInput";
 import Form from "../../atoms/Form/Form";
 import { TRADING_VIEW_CHART_KEY } from "./ListPairPage";
-import api from "../../../lib/api";
 import { debounce } from "lodash";
 import useTheme from "components/hooks/useTheme";
 
@@ -56,6 +56,7 @@ const ListPairForm = ({ onSubmit, children }) => {
   const [zigZagChainId, setZigZagChainId] = useState(1);
   const { isDark } = useTheme();
   const isMobile = window.innerWidth < 500;
+  const { t } = useTranslation();
 
   const getTokenInfo = async (
     assetId,
@@ -65,11 +66,17 @@ const ListPairForm = ({ onSubmit, children }) => {
     symbolSetter,
     isInvalidSetter
   ) => {
-    console.log(`assetId ==> ${assetId}`)
+    console.log(`assetId ==> ${assetId}`);
     if (assetId && assetId !== "") {
       try {
-        const { symbol } = (await axios.get(`https://api.zksync.io/api/v0.2/tokens/${assetId}`)).data.result;
-        const { price: apiPrice } = (await axios.get(`https://api.zksync.io/api/v0.2/tokens/${assetId}/priceIn/usd`)).data.result;
+        const { symbol } = (
+          await axios.get(`https://api.zksync.io/api/v0.2/tokens/${assetId}`)
+        ).data.result;
+        const { price: apiPrice } = (
+          await axios.get(
+            `https://api.zksync.io/api/v0.2/tokens/${assetId}/priceIn/usd`
+          )
+        ).data.result;
         if (symbol) {
           symbolSetter(symbol);
           isInvalidSetter(false);
@@ -126,6 +133,45 @@ const ListPairForm = ({ onSubmit, children }) => {
     queryQuoteTokenInfo(quoteAssetId, zigZagChainId);
   }, [quoteAssetId, zigZagChainId]);
 
+  const renderFeeHint = (assetPrice, assetFee, symbol, feeSetter) => {
+    if (assetPrice) {
+      const notional = (Number(assetPrice) * Number(assetFee)).toFixed(2);
+      if (notional > 0) {
+        return (
+          <x.div
+            pl={2}
+            fontSize={12}
+            color={"blue-gray-500"}
+            mt={1}
+            display={"flex"}
+            alignItems={"center"}
+            justifyContent={"space-between"}
+          >
+            <x.div style={{ wordBreak: "break-all" }}>
+              {assetFee} {symbol} = ${notional}
+            </x.div>
+            {notional > 1 && (
+              <x.div>
+                <Button
+                  ml={1}
+                  variant={"secondary"}
+                  size={"xs"}
+                  onClick={() =>
+                    feeSetter(getAmountForTargetNotional(assetPrice))
+                  }
+                >
+                  {t("set_to_1")}
+                </Button>
+                <x.div />
+              </x.div>
+            )}
+          </x.div>
+        );
+      }
+    }
+    return null;
+  };
+
   return (
     <ListPairContainer>
       <PairPreview
@@ -165,7 +211,7 @@ const ListPairForm = ({ onSubmit, children }) => {
               {...model(baseAssetId, setBaseAssetId)}
               label={
                 <x.span fontSize={{ xs: "xs", md: "14px" }} col>
-                  Base Asset{" "}
+                  {t("base_asset")}{" "}
                   <x.a
                     color={{ _: "blue-gray-500", hover: "primaryHighEmphasis" }}
                     target={"_blank"}
@@ -175,7 +221,7 @@ const ListPairForm = ({ onSubmit, children }) => {
                         : "https://rinkeby.zkscan.io/explorer/tokens"
                     }
                   >
-                    Internal ID
+                    {t("internal_id")}
                   </x.a>
                 </x.span>
               }
@@ -192,8 +238,7 @@ const ListPairForm = ({ onSubmit, children }) => {
               ]}
               rightOfLabel={
                 <QuestionHelper
-                  text="zkSync token ID of the first asset appearing in the pair
-                (BASE/QUOTE)"
+                  text={t("zksync_token_id_of_the_first_asset")}
                   placement={"top"}
                 ></QuestionHelper>
               }
@@ -211,7 +256,7 @@ const ListPairForm = ({ onSubmit, children }) => {
               {...model(quoteAssetId, setQuoteAssetId)}
               label={
                 <x.span fontSize={{ xs: "xs", md: "14px" }}>
-                  Quote Asset{" "}
+                  {t("quote_asset")}{" "}
                   <x.a
                     color={{ _: "blue-gray-500", hover: "primaryHighEmphasis" }}
                     target={"_blank"}
@@ -221,7 +266,7 @@ const ListPairForm = ({ onSubmit, children }) => {
                         : "https://rinkeby.zkscan.io/explorer/tokens"
                     }
                   >
-                    Internal ID
+                    {t("internal_id")}
                   </x.a>
                 </x.span>
               }
@@ -238,8 +283,7 @@ const ListPairForm = ({ onSubmit, children }) => {
               ]}
               rightOfLabel={
                 <QuestionHelper
-                  text="zkSync token ID of the second asset appearing in the pair
-                (BASE/QUOTE)"
+                  text={t("zksync_token_id_of_the_second_asset")}
                   placement="top"
                 ></QuestionHelper>
               }
@@ -260,18 +304,18 @@ const ListPairForm = ({ onSubmit, children }) => {
               label={
                 baseSymbol ? (
                   <x.span fontSize={{ xs: "xs", md: "14px" }}>
-                    {baseSymbol} Swap Fee
+                    {baseSymbol} {t("swap_fee")}
                   </x.span>
                 ) : (
                   <x.span fontSize={{ xs: "xs", md: "14px" }}>
-                    Base Swap Fee
+                    {t("base_swap_fee")}
                   </x.span>
                 )
               }
               validate={[required, min(0)]}
               rightOfLabel={
                 <QuestionHelper
-                  text="Swap fee collected by market makers"
+                  text={t("swap_fee_collected_by_market_makers")}
                   placement={isMobile ? "top" : "left"}
                 ></QuestionHelper>
               }
@@ -293,18 +337,18 @@ const ListPairForm = ({ onSubmit, children }) => {
               label={
                 quoteSymbol ? (
                   <x.span fontSize={{ xs: "xs", md: "14px" }}>
-                    {quoteSymbol} Swap Fee
+                    {quoteSymbol} {t("swap_fee")}
                   </x.span>
                 ) : (
                   <x.span fontSize={{ xs: "xs", md: "14px" }}>
-                    Quote Swap Fee
+                    {t("quote_swap_fee")}
                   </x.span>
                 )
               }
               validate={[required, min(0)]}
               rightOfLabel={
                 <QuestionHelper
-                  text="Swap fee collected by market makers"
+                  text={t("swap_fee_collected_by_market_makers")}
                   placement={isMobile ? "top" : "right"}
                 ></QuestionHelper>
               }
@@ -324,7 +368,7 @@ const ListPairForm = ({ onSubmit, children }) => {
               name={"pricePrecisionDecimals"}
               label={
                 <x.span fontSize={{ xs: "xs", md: "14px" }}>
-                  Price Precision Decimals
+                  {t("price_precision_decimals")}
                 </x.span>
               }
               validate={[required, max(10), min(0)]}
@@ -333,7 +377,9 @@ const ListPairForm = ({ onSubmit, children }) => {
                   text={
                     <>
                       <x.div>
-                        Number of decimal places in the price of the asset pair.
+                        {t(
+                          "number_of_decimal_places_in_the_price_of_the_asset_pair"
+                        )}
                       </x.div>
 
                       <x.div
@@ -342,9 +388,9 @@ const ListPairForm = ({ onSubmit, children }) => {
                         mt={2}
                         gap={0}
                       >
-                        <x.div>ex: ETH/USDC has '2'</x.div>
+                        <x.div>{t("ex_eth_usdc_has_2")}</x.div>
                         <x.div>($3250.61)</x.div>
-                        <x.div>ex: ETH/WBTC has '6'</x.div>
+                        <x.div>{t("ex_eth_wbtc_has_6")}</x.div>
                         <x.div>(0.075225)</x.div>
                       </x.div>
                     </>
@@ -367,7 +413,9 @@ const ListPairForm = ({ onSubmit, children }) => {
               {...model(zigZagChainId, setZigZagChainId)}
               name={"zigzagChainId"}
               label={
-                <x.span fontSize={{ xs: "xs", md: "14px" }}>Network</x.span>
+                <x.span fontSize={{ xs: "xs", md: "14px" }}>
+                  {t("network")}
+                </x.span>
               }
               items={[
                 { name: "zkSync - Mainnet", id: 1 },
@@ -376,7 +424,7 @@ const ListPairForm = ({ onSubmit, children }) => {
               validate={required}
               rightOfLabel={
                 <QuestionHelper
-                  text="zkSync network on which the pair will be listed"
+                  text={t("zksync_network_on_which_the_pair_will_be_listed")}
                   placement={isMobile ? "top" : "right"}
                 ></QuestionHelper>
               }
@@ -396,7 +444,7 @@ const ListPairForm = ({ onSubmit, children }) => {
           <Toggle
             scale="md"
             font="primarySmall"
-            leftLabel="Advanced Settings"
+            leftLabel={t("advanced_settings")}
             onChange={() => setShowAdvancedSettings(!showAdvancedSettings)}
           />
         </x.div>
@@ -423,7 +471,7 @@ const ListPairForm = ({ onSubmit, children }) => {
                 name={TRADING_VIEW_CHART_KEY}
                 label={
                   <x.span fontSize={{ xs: "xs", md: "14px" }}>
-                    Default Chart Ticker
+                    {t("default_chart_ticker")}
                   </x.span>
                 }
                 rightOfLabel={
@@ -431,10 +479,12 @@ const ListPairForm = ({ onSubmit, children }) => {
                     text={
                       <div>
                         <x.div>
-                          Default TradingView chart to be seen on the trade page
+                          {t(
+                            "default_tradingview_chart_to_be_seen_on_the_trade_page"
+                          )}
                         </x.div>
                         <x.div mt={2}>
-                          (ex: show COINBASE:BTCUSD for WBTC-USD)
+                          ({t("ex_show_coinbase_btcusd_for_wbtc_usd")})
                         </x.div>
                       </div>
                     }
@@ -457,6 +507,7 @@ const PairPreview = ({
   quoteSymbol,
 }) => {
   const isMobile = window.innerWidth < 500;
+
   return (
     <>
       {(baseAssetId || quoteAssetId) && (
@@ -502,45 +553,6 @@ const PairPreview = ({
 const getAmountForTargetNotional = (price) => {
   const targetUSDFeeAmount = 1;
   return (targetUSDFeeAmount / price).toFixed(6);
-};
-
-const renderFeeHint = (assetPrice, assetFee, symbol, feeSetter) => {
-  if (assetPrice) {
-    const notional = (Number(assetPrice) * Number(assetFee)).toFixed(2);
-    if (notional > 0) {
-      return (
-        <x.div
-          pl={2}
-          fontSize={12}
-          color={"blue-gray-500"}
-          mt={1}
-          display={"flex"}
-          alignItems={"center"}
-          justifyContent={"space-between"}
-        >
-          <x.div style={{ wordBreak: "break-all" }}>
-            {assetFee} {symbol} = ${notional}
-          </x.div>
-          {notional > 1 && (
-            <x.div>
-              <Button
-                ml={1}
-                variant={"secondary"}
-                size={"xs"}
-                onClick={() =>
-                  feeSetter(getAmountForTargetNotional(assetPrice))
-                }
-              >
-                set to $1
-              </Button>
-              <x.div />
-            </x.div>
-          )}
-        </x.div>
-      );
-    }
-  }
-  return null;
 };
 
 export default ListPairForm;
