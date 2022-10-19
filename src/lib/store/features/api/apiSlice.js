@@ -502,18 +502,18 @@ export const apiSlice = createSlice({
       };
     },
     setCurrentMarketAndNetwork(state, { payload }) {
-      const { newNetwork, newMarket } = payload;
+      const { network, market } = payload;
       console.log(
-        `Executing setCurrentMarketAndNetwork to ${newMarket} on ${newNetwork}`
+        `Executing setCurrentMarketAndNetwork to ${market} on ${network}`
       );
-      if (state.currentMarket !== newMarket || state.network !== newNetwork) {
+      if (state.currentMarket !== market || state.network !== network) {
         state.marketFills = {};
         state.marketSummary = {};
         state.liquidity = [];
         state.orders = {};
       }
-      state.network = newNetwork;
-      state.currentMarket = newMarket;
+      state.network = network;
+      state.currentMarket = market;
     },
     setUserId(state, { payload }) {
       state.userId = payload;
