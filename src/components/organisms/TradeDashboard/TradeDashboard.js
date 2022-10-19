@@ -147,10 +147,7 @@ export function TradeDashboard() {
   useEffect(async () => {
     const sub = () => {
       dispatch(resetData());
-      if (network !== api.apiProvider.network) {
-        
-      }
-      api.subscribeToMarket(currentMarket, settings.showNightPriceChange);
+      api.subscribeToMarket(network, currentMarket, settings.showNightPriceChange);
     };
 
     if (api.ws && api.ws.readyState === 0) {
