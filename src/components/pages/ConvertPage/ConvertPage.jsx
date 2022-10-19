@@ -21,7 +21,7 @@ import {
   currentMarketSelector,
   marketInfoSelector,
   liquiditySelector,
-  setCurrentMarket,
+  setCurrentMarketAndNetwork,
   resetData,
   settingsSelector,
   userOrdersSelector,
@@ -131,8 +131,8 @@ const ConvertPage = () => {
       Object.keys(pairPrices).forEach((pair) => {
         if (pair === p_name) {
           setTtype("sell");
-          console.log(`Convert set sell pair to ${p_name}`);
-          dispatch(setCurrentMarket(p_name));
+          console.log(`Convert set sell pair to ${p_name} on ${network}`);
+          dispatch(setCurrentMarketAndNetwork({ network, market: p_name }));
           c = true;
         }
       });
@@ -140,8 +140,8 @@ const ConvertPage = () => {
         Object.keys(pairPrices).forEach((pair) => {
           if (pair === r_p_name) {
             setTtype("buy");
-            console.log(`Convert set buy pair to ${r_p_name}`);
-            dispatch(setCurrentMarket(r_p_name));
+            console.log(`Convert set buy pair to ${r_p_name} on ${network}`);
+            dispatch(setCurrentMarketAndNetwork({ network, market: r_p_name }));
           }
         });
       }

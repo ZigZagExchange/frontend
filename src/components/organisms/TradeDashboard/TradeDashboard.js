@@ -19,7 +19,7 @@ import {
   userOrdersSelector,
   userFillsSelector,
   currentMarketSelector,
-  setCurrentMarket,
+  setCurrentMarketAndNetwork,
   resetData,
   settingsSelector,
   setUISettings,
@@ -84,7 +84,7 @@ export function TradeDashboard() {
 
   const updateMarketChain = (market) => {
     console.log(`TradeDashboard set pair to ${market}`);
-    dispatch(setCurrentMarket(market));
+    dispatch(setCurrentMarketAndNetwork({ network, market }));
   };
 
   useEffect(() => {

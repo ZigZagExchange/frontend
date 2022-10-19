@@ -501,21 +501,22 @@ export const apiSlice = createSlice({
         },
       };
     },
-    setCurrentMarket(state, { payload }) {
-      console.log(`Executing setCurrentMarket to ${payload}`);
-      if (state.currentMarket !== payload) {
-        state.currentMarket = payload;
+    setCurrentMarketAndNetwork(state, { payload }) {
+      const { newNetwork, newMarket } = payload;
+      console.log(
+        `Executing setCurrentMarketAndNetwork to ${newMarket} on ${newNetwork}`
+      );
+      if (state.currentMarket !== newMarket || state.network !== newNetwork) {
         state.marketFills = {};
         state.marketSummary = {};
         state.liquidity = [];
         state.orders = {};
       }
+      state.network = newNetwork;
+      state.currentMarket = newMarket;
     },
     setUserId(state, { payload }) {
       state.userId = payload;
-    },
-    setNetwork(state, { payload }) {
-      state.network = payload;
     },
     clearBridgeReceipts(state) {
       state.bridgeReceipts = [];
@@ -755,12 +756,11 @@ export const apiSlice = createSlice({
 });
 
 export const {
-  setNetwork,
   clearBridgeReceipts,
   setBalances,
   setUserId,
   addBridgeReceipt,
-  setCurrentMarket,
+  setCurrentMarketAndNetwork,
   resetData,
   clearUserOrders,
   setArweaveAllocation,
