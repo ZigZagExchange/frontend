@@ -711,7 +711,8 @@ class API extends Emitter {
     }
   };
 
-  subscribeToMarket = (market, showNightPriceChange = false) => {
+  subscribeToMarket = (network, market, showNightPriceChange = false) => {
+    console.log(`subscribeToMarket: ${market} on ${network}, acctual ${this.apiProvider.network}`)
     this.send("subscribemarket", [
       this.apiProvider.network,
       market,

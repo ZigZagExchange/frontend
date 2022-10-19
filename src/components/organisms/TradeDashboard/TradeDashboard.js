@@ -147,6 +147,9 @@ export function TradeDashboard() {
   useEffect(async () => {
     const sub = () => {
       dispatch(resetData());
+      if (network !== api.apiProvider.network) {
+        
+      }
       api.subscribeToMarket(currentMarket, settings.showNightPriceChange);
     };
 
