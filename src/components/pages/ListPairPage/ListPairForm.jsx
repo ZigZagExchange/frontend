@@ -418,8 +418,8 @@ const ListPairForm = ({ onSubmit, children }) => {
                 </x.span>
               }
               items={[
-                { name: "zkSync - Mainnet", id: 1 },
-                { name: "zkSync - Goerli", id: 1002 },
+                { name: "zkSync 1.0 - Mainnet", id: 1 },
+                { name: "zkSync 1.0 - Goerli", id: 1002 },
               ]}
               validate={required}
               rightOfLabel={

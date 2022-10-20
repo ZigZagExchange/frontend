@@ -63,7 +63,7 @@ const GuidePopup = () => {
           <p className="max-w-xs text-base">
             Visit our{" "}
             <a
-              href="https://info.zigzag.exchange/#faq"
+              href="https://zigzag.exchange/#faq"
               target="_blank"
               className="text-primary-900 hover:underline"
             >

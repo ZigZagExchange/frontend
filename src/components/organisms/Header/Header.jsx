@@ -37,7 +37,7 @@ import { FaDiscord, FaGithub } from "react-icons/fa";
 
 const networkLists = [
   {
-    text: "zkSync",
+    text: "zkSync 1.0",
     value: 1,
     url: "#",
     selectedIcon: <CheckIcon />,
@@ -51,7 +51,7 @@ const networkLists = [
     image: arbitrumLogo,
   },
   {
-    text: "zkSync - Goerli",
+    text: "zkSync 1.0 - Goerli",
     value: 1002,
     url: "#",
     selectedIcon: <CheckIcon />,
@@ -67,7 +67,7 @@ const supportLists = [
   },
   {
     text: "faq",
-    url: "https://info.zigzag.exchange/",
+    url: "https://zigzag.exchange/",
     icon: <MdOutlineQuiz size={14} />,
   },
   {
@@ -87,7 +87,7 @@ const supportLists = [
   },
   {
     text: "contact",
-    url: "https://info.zigzag.exchange/#contact",
+    url: "https://zigzag.exchange/#contact",
     icon: <MdOutlineContactMail size={14} />,
   },
 ];

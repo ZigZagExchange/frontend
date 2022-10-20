@@ -80,9 +80,9 @@ export const apiSlice = createSlice({
         return (
           <>
             {i18next.t("an_unknown_error_has_occurred_while_processing")} '{op}'
-            ({errorMessage}). Please{" "}
+            ({errorMessage}). Refresh the page and if the problem still persists please {" "}
             <a
-              href={"https://info.zigzag.exchange/#contact"}
+              href={"https://zigzag.exchange/#contact"}
               style={{
                 color: "white",
                 textDecoration: "underline",
@@ -93,7 +93,7 @@ export const apiSlice = createSlice({
             >
               contact us
             </a>{" "}
-            or join the{" "}
+            or join {" "}
             <a
               href={"https://discord.gg/zigzag"}
               style={{
@@ -106,7 +106,7 @@ export const apiSlice = createSlice({
             >
               Discord
             </a>{" "}
-            to report and solve this bug.
+            for live support.
           </>
         );
       };
