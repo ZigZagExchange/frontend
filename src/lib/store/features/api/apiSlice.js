@@ -37,7 +37,7 @@ export const apiSlice = createSlice({
     network: 1,
     userId: null,
     layout: getLayout() || 0,
-    currentMarket: api.apiProvider.defaultMarket[1],
+    currentMarket: api.apiProvider.getDefaultMarket(),
     marketFills: {},
     bridgeReceipts: [],
     lastPrices: {},
