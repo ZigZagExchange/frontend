@@ -712,6 +712,11 @@ class API extends Emitter {
   };
 
   subscribeToMarket = (market, showNightPriceChange = false) => {
+    if (!market) return;
+
+    const allPairs = this.getPairs();
+    if (!allPairs.includes(market)) return;
+
     this.send("subscribemarket", [
       this.apiProvider.network,
       market,
