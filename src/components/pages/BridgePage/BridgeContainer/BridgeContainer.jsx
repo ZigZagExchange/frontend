@@ -185,7 +185,6 @@ const BridgeContainer = () => {
       const type = (transfer.type = "withdraw");
       setTransfer({ type });
     } else {
-      api.getWalletBalances();
       const type = (transfer.type = "deposit");
       setTransfer({ type });
     }
@@ -196,7 +195,6 @@ const BridgeContainer = () => {
       setSellToken({ id: 0, name: "WETH" });
       setFromAmounts();
     } else if (fromNetwork.id === "ethereum") {
-      api.getWalletBalances();
       const currency = switchClicking ? swapDetails.currency : "ETH";
       setSwapDetails({ amount: "", currency });
       setSellToken({ id: 0, name: currency });
