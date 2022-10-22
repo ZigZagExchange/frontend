@@ -167,13 +167,11 @@ const BridgeContainer = () => {
       const type = (transfer.type = "withdraw");
       setTransfer({ type });
     } else {
-      api.getWalletBalances();
       const type = (transfer.type = "deposit");
       setTransfer({ type });
     }
 
     if (fromNetwork.id === "ethereum") {
-      api.getWalletBalances();
       const currency = switchClicking ? swapDetails.currency : "ETH";
       setSwapDetails({ amount: "", currency });
       setSellToken({ id: 0, name: currency });

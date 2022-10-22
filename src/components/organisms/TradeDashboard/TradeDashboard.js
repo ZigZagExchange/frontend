@@ -115,7 +115,6 @@ export function TradeDashboard() {
       api.setAPIProvider(chainid);
       api.signOut();
     }
-    api.getWalletBalances();
   }, []);
 
   // Update URL when market or network update
