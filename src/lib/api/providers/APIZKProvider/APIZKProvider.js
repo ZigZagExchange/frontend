@@ -7,7 +7,6 @@ import axios from "axios";
 import { closestPackableTransactionAmount } from "zksync";
 import BatchTransferService from "./BatchTransferService";
 import {
-  ZKSYNC_POLYGON_BRIDGE,
   ZKSYNC_ETHEREUM_FAST_BRIDGE,
   ETH_ZKSYNC_BRIDGE,
 } from "components/pages/BridgePage/constants";
@@ -386,10 +385,8 @@ export default class APIZKProvider extends APIProvider {
 
   transferToBridge = async (amountDecimals, token, address, userAddress) => {
     if (
-      (ZKSYNC_POLYGON_BRIDGE.address === address &&
-        !ZKSYNC_POLYGON_BRIDGE.eligibleTokensZkSync.includes(token)) ||
-      (ZKSYNC_ETHEREUM_FAST_BRIDGE.address === address &&
-        !ZKSYNC_ETHEREUM_FAST_BRIDGE.eligibleTokensZkSync.includes(token))
+      ZKSYNC_ETHEREUM_FAST_BRIDGE.address === address &&
+      !ZKSYNC_ETHEREUM_FAST_BRIDGE.eligibleTokensZkSync.includes(token)
     ) {
       throw Error("Token not supported for fast withdraw");
     }
@@ -423,21 +420,7 @@ export default class APIZKProvider extends APIProvider {
       onDiffFeeToken
     );
 
-    if (ZKSYNC_POLYGON_BRIDGE.address === address) {
-      this.api.emit(
-        "bridgeReceipt",
-        this.handleBridgeReceipt(
-          transfer,
-          amountTransferred,
-          token,
-          ZKSYNC_POLYGON_BRIDGE.zkSyncToPolygon,
-          "zksync",
-          this.network === 1002
-            ? `https://mumbai.polygonscan.com/address/${userAddress}#tokentxns`
-            : `https://polygonscan.com/address/${userAddress}#tokentxns`
-        )
-      );
-    } else if (ZKSYNC_ETHEREUM_FAST_BRIDGE.address === address) {
+    if (ZKSYNC_ETHEREUM_FAST_BRIDGE.address === address) {
       this.api.emit(
         "bridgeReceipt",
         this.handleBridgeReceipt(
@@ -511,10 +494,7 @@ export default class APIZKProvider extends APIProvider {
     };
 
     if (this.api.rollupProvider) {
-      if (
-        !ZKSYNC_ETHEREUM_FAST_BRIDGE.eligibleTokensZkSync.includes(token) &&
-        !ZKSYNC_POLYGON_BRIDGE.eligibleTokensZkSync.includes(token)
-      ) {
+      if (!ZKSYNC_ETHEREUM_FAST_BRIDGE.eligibleTokensZkSync.includes(token)) {
         throw Error("Token not eligible for fast withdraw");
       }
       const feeData = await this.api.rollupProvider.getFeeData();
