@@ -33,6 +33,10 @@ export default class APIZKProvider extends APIProvider {
     1002: "DAI-USDC",
   };
 
+  getDefaultMarket = () => {
+    return this.defaultMarket[this.network];
+  }
+
   handleBridgeReceipt = (
     _receipt,
     amount,

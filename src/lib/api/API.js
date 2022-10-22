@@ -714,8 +714,14 @@ class API extends Emitter {
   subscribeToMarket = (market, showNightPriceChange = false) => {
     if (!market) return;
 
+    // allow all valid pairs, also allow default market all the time
+    // default market is guaranteed to be up
     const allPairs = this.getPairs();
-    if (!allPairs.includes(market)) return;
+    if (
+      !allPairs.includes(market) &&
+      market !== this.apiProvider.getDefaultMarket()
+    )
+      return;
 
     this.send("subscribemarket", [
       this.apiProvider.network,
