@@ -152,10 +152,6 @@ const TransactionSettings = ({
                 <div className="flex items-center justify-between mt-3">
                   <p className="font-sans text-sm ">{t("you_will_receive")}:</p>
                   <p className="font-sans text-sm ">
-                    {toNetwork.id === "polygon" &&
-                      ` ~${formatPrice(swapDetails.amount - ZigZagFee)} ${t(
-                        "weth_on_polygon"
-                      )}`}
                     {toNetwork.id === "ethereum" &&
                       ` ~${formatPrice(swapDetails.amount - ZigZagFee)} ${
                         swapDetails.currency
@@ -191,20 +187,6 @@ const TransactionSettings = ({
                   </p>
                 </div>
               )}
-              {L1Fee && fromNetwork.id === "polygon" && (
-                <div className="flex items-center justify-between mt-3">
-                  <p className="font-sans text-sm ">
-                    {fromNetwork.id === "polygon" &&
-                      `${t("polygon_gas_fee")}: `}
-                  </p>
-                  <p className="font-sans text-sm ">
-                    {fromNetwork.id === "polygon" &&
-                      `~${formatPrice(L1Fee)} MATIC ($${(
-                        L1Fee * coinEstimator("MATIC")
-                      ).toFixed(2)})`}
-                  </p>
-                </div>
-              )}
               {!L1Fee && !hasError && fromNetwork.id === "ethereum" && (
                 <div>{t("loading")}</div>
               )}
@@ -212,17 +194,9 @@ const TransactionSettings = ({
                 <div className="flex items-center justify-between mt-3">
                   <p className="font-sans text-sm ">{t("you_will_receive")}:</p>
                   <p className="font-sans text-sm ">
-                    {fromNetwork.id === "polygon" &&
-                      ` ~${formatPrice(swapDetails.amount - ZigZagFee)}`}
-                    {toNetwork.id === "polygon" &&
-                      ` ~${formatPrice(swapDetails.amount - ZigZagFee)}`}
                     {fromNetwork.id === "ethereum" &&
                       toNetwork.id === "zksync" &&
                       ` ${formatPrice(swapDetails.amount - ZigZagFee)}`}
-
-                    {fromNetwork.id === "polygon" &&
-                      ` ${t("eth_on_zksync_L2")}`}
-                    {toNetwork.id === "polygon" && ` ${t("weth_on_polygon")}`}
                     {fromNetwork.id === "ethereum" &&
                       toNetwork.id === "zksync" &&
                       ` ${swapDetails.currency} ${t("on_zksync_L2")}`}

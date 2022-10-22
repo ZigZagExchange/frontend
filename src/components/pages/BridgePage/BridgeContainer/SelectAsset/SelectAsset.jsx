@@ -19,7 +19,6 @@ const SelectAsset = ({
   balances,
   swapDetails,
   feeCurrency,
-  isOpenable,
   gasFetching,
   swapCurrencyInfo,
   allowance,
@@ -92,7 +91,6 @@ const SelectAsset = ({
           {t("select_an_asset")}
         </p>
         {swapDetails.currency !== "ETH" &&
-        fromNetwork.id !== "polygon" &&
         (swapCurrencyInfo?.decimals
           ? swapDetails.amount * 10 ** swapCurrencyInfo?.decimals
           : "") > allowance ? (
@@ -114,24 +112,12 @@ const SelectAsset = ({
         </p>
       </div>
       <div className="flex items-center justify-between px-3 py-2 mt-2 rounded-lg dark:bg-foreground-200 bg-primary-300 hover:ring-1 hover:ring-offset-0 hover:dark:ring-foreground-500 hover:ring-primary-600">
-        {isOpenable && fromTokenOptions.length > 0 && (
+        {fromTokenOptions.length > 0 && (
           <TokenDropDownModal
             tickers={fromTokenOptions}
             onSelectedOption={onChangeFromToken}
             selectedOption={fromToken}
           />
-        )}
-        {!isOpenable && (
-          <div className="flex items-center">
-            {
-              <img
-                src={api.getCurrencyLogo("ETH")}
-                alt={"WETH"}
-                style={{ width: 25, height: 25 }}
-              />
-            }
-            <p className="ml-3 text-lg">{swapDetails.currency}</p>
-          </div>
         )}
         <button
           className="bg-[#07071C] whitespace-nowrap px-2 py-1 rounded-md text-sm font-semibold text-primary-900 ml-2.5 hover:bg-slate-800 font-work"
