@@ -16,8 +16,8 @@ const Row = styled.div`
   padding: 10px;
 `;
 const data1 = [
-  { text: "zkSync - Mainnet", value: 1, url: "#" },
-  { text: "zkSync - Rinkeby", value: 1000, url: "#" },
+  { text: "zkSync 1.0 - Mainnet", value: 1, url: "#" },
+  //{ text: "zkSync - Rinkeby", value: 1000, url: "#" },
 ];
 const data2 = [
   { text: "DOCS", url: "#", icon: <DocumentIcon /> },
