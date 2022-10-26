@@ -15,7 +15,7 @@ const NewFeaturesPopup = () => {
   };
 
   const onDismissPermanently = () => {
-    dispatch(setUISettings({ key: "hideLayoutGuidePopup", value: true }));
+    dispatch(setUISettings({ key: "hideZigZagLiveOnArbitrumPopup", value: true }));
   };
 
   return (
