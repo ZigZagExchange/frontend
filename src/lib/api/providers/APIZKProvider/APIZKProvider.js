@@ -84,6 +84,13 @@ export default class APIZKProvider extends APIProvider {
   };
 
   changePubKey = async () => {
+    // safety check
+    const isActivated = await this.checkAccountActivated();
+    if (isActivated) {
+      console.error("changePubKey, account already active");
+      return;
+    }
+
     let feeToken = "ETH";
     const accountState = await this.syncWallet?.getAccountState();
     const balances = accountState.committed.balances;
