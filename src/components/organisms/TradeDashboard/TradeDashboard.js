@@ -353,7 +353,7 @@ export function TradeDashboard() {
       </GridLayoutRow>
       <HighSlippageModal />
 
-      {!settings.hideLayoutGuidePopup && (
+      {!settings.hideZigZagLiveOnArbitrumPopup && (
         <div
           className={classNames({
             dark: isDark,

@@ -28,7 +28,7 @@ const initialUISettings = {
   disableTradeIDCard: false,
   layouts: initialLayouts(),
   editable: false,
-  hideLayoutGuidePopup: false,
+  hideZigZagLiveOnArbitrumPopup: false,
 };
 
 export const apiSlice = createSlice({
