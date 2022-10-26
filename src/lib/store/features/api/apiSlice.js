@@ -82,7 +82,7 @@ export const apiSlice = createSlice({
             {i18next.t("an_unknown_error_has_occurred_while_processing")} '{op}'
             ({errorMessage}). Please{" "}
             <a
-              href={"https://info.zigzag.exchange/#contact"}
+              href={"https://zigzag.exchange/#contact"}
               style={{
                 color: "white",
                 textDecoration: "underline",

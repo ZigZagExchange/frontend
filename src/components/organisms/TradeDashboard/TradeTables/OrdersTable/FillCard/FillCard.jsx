@@ -100,7 +100,7 @@ const FillCard = ({ fill, closeToast }) => {
               <QRCode
                 id="qrCodeEl"
                 size={90}
-                value={"https://info.zigzag.exchange"}
+                value={"https://zigzag.exchange"}
               />
             </div>
             <div>
