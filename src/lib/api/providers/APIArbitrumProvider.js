@@ -15,7 +15,7 @@ export default class APIArbitrumProvider extends APIProvider {
   };
 
   getDefaultMarket = () => {
-    return this.defaultMarket[this.network];
+    return this.defaultMarket[this.network] || "WETH-USDC";
   }
 
   getAccountState = async () => {
