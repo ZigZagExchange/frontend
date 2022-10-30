@@ -1,19 +1,19 @@
 import React, { useEffect } from "react";
 import styled from "styled-components";
-// css
-import "./TradeRecentTable.css";
 import useTheme from "components/hooks/useTheme";
-import { numStringToSymbol, addComma } from "lib/utils";
+import { addComma, formatMillonAmount } from "lib/utils";
 import Text from "components/atoms/Text/Text";
+import { useTranslation } from "react-i18next";
 
 const Table = styled.table`
   display: flex;
   flex: auto;
   overflow: auto;
-  height: 200px;
+  height: 199px;
   padding: 0px;
   flex-direction: column;
-  scrollbar-color: ${({ theme }) => theme.colors.foreground400} rgba(0,0,0,0.1);
+  scrollbar-color: ${({ theme }) => theme.colors.foreground400}
+    rgba(0, 0, 0, 0.1);
   scrollbar-width: thin !important;
 
   tbody {
@@ -75,13 +75,13 @@ const Table = styled.table`
 
   ::-webkit-scrollbar-track {
     border-radius: 0px;
-    background: ${({ theme }) => theme.colors.backgroundHighEmphasis};
+    background: transparent;
     height: 23px;
   }
 
   ::-webkit-scrollbar-thumb {
-    border-radius: 0px;
-    background: ${({ theme }) => theme.colors.foreground400};
+    border-radius: 4px;
+    background: ${({ theme }) => theme.colors.foreground400} !important;
   }
 
   ::-webkit-scrollbar-thumb:window-inactive {
@@ -91,6 +91,7 @@ const Table = styled.table`
 
 const TradeRecentTable = (props) => {
   const { theme } = useTheme();
+  const { t } = useTranslation();
   const scrollToBottom = () => {
     if (props.scrollToBottom) {
       const tableDiv = document.getElementsByClassName(props.className);
@@ -115,7 +116,7 @@ const TradeRecentTable = (props) => {
             <tr>
               <th>
                 <Text font="tableHeader" color="foregroundLowEmphasis">
-                  Price
+                  {t("price")}
                 </Text>
               </th>
               <th>
@@ -124,7 +125,7 @@ const TradeRecentTable = (props) => {
                   color="foregroundLowEmphasis"
                   textAlign="right"
                 >
-                  Amount
+                  {t("amount")}
                 </Text>
               </th>
               <th>
@@ -133,7 +134,7 @@ const TradeRecentTable = (props) => {
                   color="foregroundLowEmphasis"
                   textAlign="right"
                 >
-                  Time
+                  {t("time")}
                 </Text>
               </th>
             </tr>
@@ -187,7 +188,7 @@ const TradeRecentTable = (props) => {
                         textAlign="right"
                       >
                         {/* {numStringToSymbol(amount, 2)} */}
-                        {addComma(amount)}
+                        {formatMillonAmount(amount)}
                       </Text>
                     </td>
                     <td>

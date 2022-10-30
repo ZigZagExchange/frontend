@@ -1,10 +1,15 @@
 import { useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import React from "react";
+import styled from "styled-components";
 import { setUISettings } from "lib/store/features/api/apiSlice";
 import { DiscordIcon } from "components/atoms/Svg";
 import { CloseIcon } from "components/atoms/Svg";
 import PlayBtn from "assets/images/play-btn.svg";
+
+const ModalWrapper = styled.div`
+  background-color: ${({ theme }) => theme.colors.foreground600};
+`;
 
 const GuidePopup = () => {
   const { videoRef } = useRef(null);
@@ -25,7 +30,7 @@ const GuidePopup = () => {
 
   return (
     open && (
-      <div className="max-w-lg p-6 mx-1 border rounded-lg shadow-lg md:mx-0 xl:max-w-sm xl:fixed bottom-5 right-5 dark:bg-background-700 dark:border-foreground-400 border-primary-400 bg-foreground-600">
+      <ModalWrapper className="max-w-lg p-6 mx-1 border rounded-lg shadow-lg md:mx-0 xl:max-w-sm fixed bottom-5 left-5 dark:border-foreground-400 border-primary-400">
         <div className="relative">
           <CloseIcon
             className="absolute cursor-pointer right-1 hover:opacity-75"
@@ -58,7 +63,7 @@ const GuidePopup = () => {
           <p className="max-w-xs text-base">
             Visit our{" "}
             <a
-              href="https://info.zigzag.exchange/#faq"
+              href="https://zigzag.exchange/#faq"
               target="_blank"
               className="text-primary-900 hover:underline"
             >
@@ -88,7 +93,7 @@ const GuidePopup = () => {
             Dismiss and don’t show again.
           </button>
         </div>
-      </div>
+      </ModalWrapper>
     )
   );
 };

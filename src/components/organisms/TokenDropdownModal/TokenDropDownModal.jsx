@@ -51,7 +51,7 @@ const TokenDropDownModal = ({
         <button
           type="button"
           onClick={openModal}
-          className="flex items-center p-2 text-sm font-medium rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 hover:dark:bg-foreground-400 hover:bg-primary-400"
+          className="flex items-center p-2 text-sm font-medium rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 hover:dark:bg-foreground-400 hover:bg-primary-400 "
         >
           {
             <img
@@ -145,58 +145,62 @@ const TokenDropDownModal = ({
                                 key={item.id}
                                 className={({ active }) =>
                                   `relative cursor-default select-none py-2 font-work pl-10 pr-4 mx-3 bg-foreground-100 rounded-md mb-2 border-t border-l border-r border-b dark:border-foreground-400 border-primary-500 ${
-                                    active ? "bg-teal-600" : "hover:opacity-75"
+                                    item.name === selectedOption.name
+                                      ? "bg-teal-600"
+                                      : "hover:opacity-75"
                                   }`
                                 }
                                 value={item}
                               >
-                                {({ selected, active }) => (
-                                  <>
-                                    <div className="flex items-center justify-between">
-                                      <div
-                                        className={`flex items-center truncate   ${
-                                          selected
-                                            ? "font-medium"
-                                            : "font-normal "
-                                        }`}
-                                      >
-                                        <img
-                                          src={api.getCurrencyLogo(item.name)}
-                                          alt={item}
-                                          style={{ width: 25, height: 25 }}
-                                        />
-                                        <p className="pl-3">{item.name}</p>
-                                      </div>
-                                      {item?.isFastWithdraw && (
-                                        <div className="bg-[#07071C] px-2 py-1 rounded-md text-sm font-semibold text-primary-900 ml-2.5 hover:bg-slate-800 font-work">
-                                          Fast
+                                {({ selected, active }) => {
+                                  return (
+                                    <>
+                                      <div className="flex items-center justify-between">
+                                        <div
+                                          className={`flex items-center truncate   ${
+                                            item.name === selectedOption.name
+                                              ? "font-medium"
+                                              : "font-normal "
+                                          }`}
+                                        >
+                                          <img
+                                            src={api.getCurrencyLogo(item.name)}
+                                            alt={item}
+                                            style={{ width: 25, height: 25 }}
+                                          />
+                                          <p className="pl-3">{item.name}</p>
                                         </div>
-                                      )}
-                                      <div className="text-right">
-                                        <p className="text-base text-primary-900">
-                                          {item?.balance}
-                                        </p>
-                                        <p className="text-xs font-work">
-                                          {item?.price}
-                                        </p>
+                                        {item?.isFastWithdraw && (
+                                          <div className="bg-[#07071C] px-2 py-1 rounded-md text-sm font-semibold text-primary-900 ml-2.5 hover:bg-slate-800 font-work">
+                                            Fast
+                                          </div>
+                                        )}
+                                        <div className="text-right">
+                                          <p className="text-base text-primary-900">
+                                            {item?.balance}
+                                          </p>
+                                          <p className="text-xs font-work">
+                                            {item?.price}
+                                          </p>
+                                        </div>
                                       </div>
-                                    </div>
-                                    {selected ? (
-                                      <span
-                                        className={`absolute  inset-y-0 left-0 flex items-center pl-3 ${
-                                          active
-                                            ? "text-white"
-                                            : "text-teal-600"
-                                        }`}
-                                      >
-                                        <CheckIcon
-                                          className="w-5 h-5"
-                                          aria-hidden="true"
-                                        />
-                                      </span>
-                                    ) : null}
-                                  </>
-                                )}
+                                      {item.name === selectedOption.name ? (
+                                        <span
+                                          className={`absolute  inset-y-0 left-0 flex items-center pl-3 ${
+                                            item.name === selectedOption.name
+                                              ? "text-white"
+                                              : "text-teal-600"
+                                          }`}
+                                        >
+                                          <CheckIcon
+                                            className="w-5 h-5"
+                                            aria-hidden="true"
+                                          />
+                                        </span>
+                                      ) : null}
+                                    </>
+                                  );
+                                }}
                               </Combobox.Option>
                             ))
                           )}

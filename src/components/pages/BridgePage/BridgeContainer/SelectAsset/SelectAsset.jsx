@@ -3,6 +3,8 @@ import api from "lib/api";
 import { utils as ethersUtils } from "ethers";
 import TokenDropDownModal from "components/organisms/TokenDropdownModal";
 import { formatUSD } from "lib/utils";
+import { useCoinEstimator } from "components";
+import { useTranslation } from "react-i18next";
 
 const SelectAsset = ({
   onChangeFromAmounts,
@@ -17,11 +19,13 @@ const SelectAsset = ({
   balances,
   swapDetails,
   feeCurrency,
-  isOpenable,
   gasFetching,
   swapCurrencyInfo,
   allowance,
 }) => {
+  const coinEstimator = useCoinEstimator();
+  const { t } = useTranslation();
+
   const onClickMax = () => {
     if (gasFetching) return;
     let max = 0;
@@ -33,8 +37,7 @@ const SelectAsset = ({
         currencyInfo = api.getCurrencyInfo(swapDetails.currency);
       }
       const roundedDecimalDigits = Math.min(currencyInfo.decimals, 8);
-      let actualBalance =
-        balances[swapDetails.currency].value / 10 ** currencyInfo.decimals;
+      let actualBalance = balances[swapDetails.currency].valueReadable;
       if (actualBalance !== 0) {
         let receiveAmount = 0;
         if (feeCurrency === "ETH" && swapDetails.currency === "ETH") {
@@ -67,56 +70,60 @@ const SelectAsset = ({
 
     onChangeFromAmounts(String(max));
   };
+
+  const filterSmallBalances = (balance, currency) => {
+    const usdPrice = coinEstimator(currency);
+    const usd_balance = usdPrice * balance;
+
+    let b = 0;
+    if (usd_balance < 0.02) {
+      b = "0.00";
+    } else {
+      b = balance;
+    }
+    return b;
+  };
+
   return (
     <div className="p-2 mt-3 border rounded-lg sm:p-4 dark:border-foreground-400 border-primary-500 ">
       <div className="flex items-center justify-between w-full">
         <p className="text-sm font-semibold tracking-wide font-work">
-          Select an Asset
+          {t("select_an_asset")}
         </p>
         {swapDetails.currency !== "ETH" &&
-        fromNetwork.id !== "polygon" &&
         (swapCurrencyInfo?.decimals
           ? swapDetails.amount * 10 ** swapCurrencyInfo?.decimals
           : "") > allowance ? (
           <p className="text-xs font-work">
-            Available allowance:{" "}
+            {t("available_allowance")}:{" "}
             {ethersUtils.formatUnits(allowance, swapCurrencyInfo?.decimals)}
             {` ${swapDetails.currency}`}
           </p>
         ) : null}
         <p className="text-xs font-work">
-          Available Balance:{" "}
+          {t("available_balance")}:{" "}
           {balances[swapDetails.currency]
-            ? balances[swapDetails.currency].valueReadable
+            ? filterSmallBalances(
+                balances[swapDetails.currency].valueReadable,
+                swapDetails.currency
+              )
             : "0.00"}
           {` ${swapDetails.currency}`}
         </p>
       </div>
       <div className="flex items-center justify-between px-3 py-2 mt-2 rounded-lg dark:bg-foreground-200 bg-primary-300 hover:ring-1 hover:ring-offset-0 hover:dark:ring-foreground-500 hover:ring-primary-600">
-        {isOpenable && fromTokenOptions.length > 0 && (
+        {fromTokenOptions.length > 0 && (
           <TokenDropDownModal
             tickers={fromTokenOptions}
             onSelectedOption={onChangeFromToken}
             selectedOption={fromToken}
           />
         )}
-        {!isOpenable && (
-          <div className="flex items-center">
-            {
-              <img
-                src={api.getCurrencyLogo("ETH")}
-                alt={"WETH"}
-                style={{ width: 25, height: 25 }}
-              />
-            }
-            <p className="ml-3 text-lg">{swapDetails.currency}</p>
-          </div>
-        )}
         <button
-          className="bg-[#07071C] px-2 py-1 rounded-md text-sm font-semibold text-primary-900 ml-2.5 hover:bg-slate-800 font-work"
+          className="bg-[#07071C] whitespace-nowrap px-2 py-1 rounded-md text-sm font-semibold text-primary-900 ml-2.5 hover:bg-slate-800 font-work"
           onClick={onClickMax}
         >
-          Max
+          {t("max")}
         </button>
         <input
           className="ml-3 text-2xl font-semibold text-right bg-transparent w-36 md:w-64 focus:outline-none"
@@ -126,7 +133,7 @@ const SelectAsset = ({
         />
       </div>
       <p className="mt-1 text-sm font-normal text-right text-slate-400 font-work">
-        Estimated value: ~ ${formatUSD(estimatedValue)}
+        {t("estimated_value")}: ~ ${formatUSD(estimatedValue)}
       </p>
     </div>
   );

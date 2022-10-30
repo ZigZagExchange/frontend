@@ -1,0 +1,204 @@
+{
+  "trade": "معامله",
+  "bridge": "بریج ",
+  "list_pair": "لیست کردن جفت ارز جدید",
+  "docs": "اسناد",
+  "wrap": "رپ کردن توکن",
+  "support": "پشتیبانی",
+  "community": "جامعه",
+  "live_support": "پشتیبانی زنده",
+  "faq": "سوالات متداول",
+  "github": "گیت هاب",
+  "uptime_status": "وضعیت لحظه ای",
+  "contact": "ارتباط با ما",
+  "governance": "گاورننس",
+  "blog": "وبلاگ",
+  "connect_wallet": "اتصال کیف پول",
+  "total_balance": "کل موجودی",
+  "disconnect": "جداکردن کیف پول",
+  "change": "تغییر",
+  "high": "بالاترین",
+  "low": "کم ترین",
+  "volume": "حجم",
+  "search_for_a_token_pair": "جستجوی_یک_جفت ارز",
+  "all": "همه",
+  "stables": "استیبل کوین ها",
+  "favorites": "مورد علاقه ها",
+  "last_price": "آخرین قیمت",
+  "pair": "جفت ارز",
+  "have_a_question_need_live_support": "سوالی دارید؟به پشتیبانی نیاز دارید؟",
+  "join": "پیوستن",
+  "buy": "خرید",
+  "sell": "فروش",
+  "limit": "با قیمت مشخص",
+  "market": "با قیمت بازار",
+  "amount": "مقدار",
+  "available_balance": "موجودی در دسترس",
+  "network_fee": "کارمزد شبکه",
+  "balance": "موجودی",
+  "total": "کل",
+  "price": "قیمت",
+  "open_orders": "باز کردن یک سفارش",
+  "order_history": "تاریخچه سفارشات",
+  "balances": "موجودی",
+  "time": "زمان",
+  "filled": "سفارش پر شده",
+  "expiry": "منقضی شده",
+  "order_status": "وضعیت سفارش",
+  "action": "آکشن",
+  "cancel_all": "لغو کردن همه",
+  "side": "سمت",
+  "trade_id": "آیدی معامله",
+  "type": "نوع",
+  "maker": "بازار ساز",
+  "taker": "گیرنده",
+  "token": "توکن",
+  "token_balance": "موجودی توکن",
+  "view_account_on_explorer": "دیدن اکانت بر روی اکسپلور",
+  "settings": "تنظیمات",
+  "lock_layout": "قفل کردن چیدمان",
+  "unlock_customise_layout": "باز کردن و شخصی سازی چیدمان",
+  "reset_layout": "بازنشانی چیدمان",
+  "disable_cancel_all_button_on_open_orders_tab": "دکمه لغو همه را در صفحه سفارشات باز غیرفعال کنید",
+  "disable_high_lippage_warning": "غیر فعال کردن اخطار اسلیپیج بالا",
+  "disable_orderbook_and_trade_flashes": "غیر فعال کردن اردر بوک و trade flashes",
+  "disable_order_notifications": "غیر فعال کردن اعلانات سفارش",
+  "pending_placed_filled_cancelled": "در انتظار / ثبت شده / پرشده / لغو شده ",
+  "disable_trade_id_card_notification": "غیر فعال کردن  اعلان شناسه معامله",
+  "hide_addresses": "مخفی کردن آدرس",
+  "hide_balances": "مخفی کردن موجودی",
+  "show_price_change_since_midnight_utc_instead_of_24h_change": "نمایش تغییر قیمت از نیمه شب به وقت ساعت جهانی به جای تغییرات 24 ساعته",
+  "stack_orderbooks": "دسته های اردر بوک",
+  "reset_all_settings": "بازنشانی تمام تنظیمات",
+  "order_book": "اردر بوک",
+  "market_trades": "سفارشات بازار",
+  "zigzag_live_on_arbitrum": "ا ZigZag روی Arbitrum نیز فعال است!",
+  "zigzag_live_on_arbitrum_description_p1": "ویژگی‌های جدید: سفارش محدود(لیمیت اردر )بی‌نهایت، پر کردن جزئی سفارش و کارمزدهای پروتکل برای بازپرداخت توکن ZZ ",
+  "zigzag_live_on_arbitrum_description_p2": "برای شروع معامله و ترید، Arbitrum را از گزینه انتخاب  شبکه در گوشه ی بالا  سمت راست  انتخاب کنید.👀",
+  "tab": "صفحه",
+  "top_right_corner": "گوشه سمت راست بالا",
+  "dismiss_and_dont_show_again": "رد کردن. دیگر نمایش داده نشود",
+  "c_bridge": "بریج زدن",
+  "transfer_from": "انتقال از",
+  "transfer_to": "انتقال به",
+  "transfer_history": "تاریخچه انتقال ها",
+  "select_an_asset": "انتخاب یک  دارایی",
+  "available_allowance": "هزینه موجود",
+  "max": "بیشترین مقدار",
+  "estimated_value": "ارزش تخمینی",
+  "transaction_settings": "تنظیمات تراکنش",
+  "address": "آدرس",
+  "withdraw_speed": "سرعت برداشت",
+  "fast_receive_within_seconds_through": "سریع: دریافت ETH, UST وFRAX within در عرض چند ثانیه با استفاده از بریج برداشت سریع زیگ زاگ",
+  "normal_use_bridge_and_receive": "عادی: استفاده از بریج  zksync و دریافت وجوه بعد از چند ساعت",
+  "fast": "سریع",
+  "normal": "عادی",
+  "bridge_fee": "کارمزد بریج زدن",
+  "ethereum_L1_gas": "کارمزد  لایه 1 اتریوم",
+  "zksync_L2_gas_fee": "کارمزد لایه2zksync",
+  "loading": "بارگذاری",
+  "you_will_receive": "دریافت خواهید کرد",
+  "weth_on_polygon": "WETH برروی Polygon",
+  "on_ethereum_L1": "روی لایه 1 اتریوم",
+  "eth_on_zksync_L2": "ETH برروی  zkSync لایه2",
+  "on_zksync_L2": "روی لایه 2zkSync",
+  "one_time_account_activation_fee": "کارمزد فعال سازی حساب برای دفعه اول",
+  "ethereum_gas_fee": "کامزد شبکه اتریوم",
+  "polygon_gas_fee": "کارمزد شبکه پالیگان",
+  "viewing": "مشاهده",
+  "transfers": "انتقال ها",
+  "clear_all": "پاکسازی همه",
+  "no_bridge_receipts_yet": "هنوز رسید بریج وجود ندارد",
+  "withdraw": "برداشت",
+  "deposit": "واریز",
+  "list_new_pair": "لیست کردن جفت ارز جدید",
+  "no_internal_id": "شناه داخلی ندارید؟",
+  "list_your_token_on_zksync": "لیست کردن توکن بر روی zkSync",
+  "insufficient_arweave_allocation": "تخصیص Arweave ناکافی است",
+  "purchase_allocation": "تخصیص خرید",
+  "submit": "ارسال",
+  "please_connect_to_mainnet": "لطفا به شبکه میننت متصل شوید",
+  "base_asset": "دارایی پایه",
+  "internal_id": "شناسه داخلی",
+  "zksync_token_id_of_the_first_asset": "شناسه توکن اولین دارایی ظاهر شده در جفت ارز روی zksync (BASE/QUOTE)",
+  "required": "ضروری",
+  "quote_asset": "دارایی ",
+  "zksync_token_id_of_the_second_asset": "شناسه توکن دومین دارایی ظاهر شده در جفت ارز روی zksync (BASE/QUOTE)",
+  "swap_fee": "کارمزد واپ",
+  "base_swap_fee": "کارمزد پایه سواپ",
+  "swap_fee_collected_by_market_makers": "کارمزد سواپ که توسط بازارسازان جمع آوری می شود",
+  "quote_swap_fee": "کارمزد تخمینی سواپ",
+  "price_precision_decimals": "قیمت دقیق به صورت اعشاری",
+  "number_of_decimal_places_in_the_price_of_the_asset_pair.": "ارقام اعشاری قیمت دارایی جفت ارز",
+  "ex_eth_usdc_has_2": "ex: ETH/USDC has '2'",
+  "ex_eth_wbtc_has_6": "ex: ETH/WBTC has '6'",
+  "network": "شبکه",
+  "zksync_network_on_which_the_pair_will_be_listed": "شبکه zkSync که جفت ارز در آن لیست خواهد شد",
+  "advanced_settings": "تنظیمات پیشرفته",
+  "default_chart_ticker": "نمودار پیش فرض",
+  "default_tradingview_chart_to_be_seen_on_the_trade_page": "نمودار پیش‌فرض تریدینگ ویو برای مشاهده در صفحه معامله",
+  "ex_show_coinbase_btcusd_for_wbtc_usd": "ex: show COINBASE:BTCUSD for WBTC-USD",
+  "set_to_1": "روی تنظیم کنید $1",
+  "approve_pending_confirm_or_reject_to_continue": "تأیید -در انتظار- تایید- یا -ردکردن برای ادامه دادن",
+  "approved": "تایید شده",
+  "no_amount_available": "هیچ مقداری در دسترس نیست",
+  "no_price_available": "قیمتی دردسترس نیست",
+  "price_cannot_be_below_0": "قیمت ({{price}}) نمی‌تواند زیر 0 باشد",
+  "only_one_active_order_permitted_at_a_time": "فقط یک سفارش فعال در هر زمان مجاز است",
+  "no_symbol_balance": "موجودی {{symbol}}وجود ندارد",
+  "amount_exceeds_symbol_balance": "مقدار از موجودی {{symbol}} بیشتر است",
+  "minimum_order_size_is_fee_symbol": "حداقل اندازه سفارش {{fee}} {{symbol}} است",
+  "amount_exceeds_symbole_allowance": "مقدار بیش از مقدار مجاز {{symbol}} است",
+  "total_exceeds_symbol_allowance": "مجموع بیش از مقدار مجاز {{symbol}} است",
+  "order_pending": "سفارش در انتظار تایید",
+  "transaction_fee": "کارمزد تراکنش:",
+  "sign_or_cancel_to_continue": "برای ادامه دادن امضا یا لغو کنید",
+  "order_placed": "سفارش قرار گرفت",
+  "error_submitting_the_order_message": "خطا در ارسال سفارش: {{message}}",
+  "arbitrums_network_swap_fees_are_dynamic_and": "کارمزد های سواپ درشبکه آربیتروم پویا است و",
+  "covered_by_the_zigzag_operator_but_paid_by_the_taker": "تحت پوشش اپراتور ZigZag، اما توسط taker پرداخت می شود.",
+  "breakdown": "تفکیک",
+  "gas_fee": "کارمزد",
+  "maker_fee": "کارمزد بازار ساز",
+  "taker_fee": "کارمزد گیرنده",
+  "zksyncs_network_swap_fees_are_dynamic_and_sit_around_0.10": "کارمزد های مبادله شبکه zkSync پویا است و حدود 0.10 دلار است",
+  "covered_by_the_market_maker_but_paid_by_the_trader": "توسط بازارساز پوشش داده می شود، اما توسط معامله گر پرداخت می شود",
+  "approve": "تایید",
+  "Your_zksync_account_is_not_activated": "حساب zkSync شما فعال نشده است. لطفاً از بریج برای واریز وجوه به zkSync و فعال کردن کیف پول zkSync خود استفاده کنید.",
+  "order_cancelled": "سفارش لغو شده",
+  "order_successful": "سفارش تایید شده",
+  "use_the_trade_id_to_identify_old_trades": "از شناسه معامله برای شناسایی معاملات قدیمی استفاده کنید.",
+  "average_buy_price": "میانگین قیمت خرید",
+  "fee": "کارمزد",
+  "save_as_image": "ذخیره به صورت عکس",
+  "zksync_1_allows_one_open_order_at_a_time": "zkSync 1.0 اجازه می دهد تا یک سفارش باز در یک زمان داشته باشد. لطفاً لیمیت اردر خود را لغو کنید یا منتظر بمانید تا قبل از بریج زدن زدن تکمیل شود. در غیر این صورت لیمیت اردرشما ناموفق خواهد بود.",
+  "bridge_transaction_in_process": "تراکنش بریج در حال انجام است. تایید یا رد برای ادامه",
+  "transaction_was_rejected": "تراکنش رد شد",
+  "sign_the_message_to_cancel_your_order": "پیام را امضا کنید تا سفارش شما لغوشود",
+  "checking_and_setting_allowances": "بررسی و تنظیم هزینه",
+  "first_time_using_zigzag_starkent_deploying_account_contract": "اولین بار با استفاده از ZigZagبرروی Starknet. دیپلوی قرارداد حساب",
+  "account_contract_deployed": "دیپلوی قرارداد حساب",
+  "waiting_on_balances_to_load": "در انتظار برای نمایش موجودی",
+  "no_currency_founded_minting_you_some": "هیچ {{currency}} پیدا نشد.چندتایی مینت کنید",
+  "you_need_to_sign_a_one_time_transaction_to_activate_your_zksync_account_usdfee": "برای فعال کردن حساب zksync خود باید یک تراکنش را برای یک بار را امضا کنید. کارمزد این tx ${{feeUSD}} خواهد بود",
+  "you_need_to_sign_a_one_time_transaction_to_activate_your_zksync_account_the_fee_for_this_tx_will_be_2.5": "برای فعال کردن حساب zksync خود باید یک تراکنش  را امضا کنید. هزینه این tx ~ 2.5 دلار خواهد بود",
+  "your_zksync_token_balances_are_very_low_you_might_need_to_bridge_in_more_funds_first": "موجودی توکن بر روی zkSync شما بسیار کم است. ممکن است ابتدا نیازبه بریج  دارایی بیشتری داشته باشید.",
+  "zksync_is_down_try_again_later": "شبکهZksync ازکار افتاده است دوباره امتحان کنیدr",
+  "your_sidetext_order_fillid_for_basequantity_basecurrency_was_filled_price": "Your {{sideText}} order #{{fillid}} for {{baseQuantity}} {{baseCurrency}} was filled @ {{price}}!",
+  "your_sidetext_order_for_basequantity_basecurrency_price_was_rejected": "Your {{sideText}} order for {{baseQuantity}} {{baseCurrency}} @ {{price}} was rejected: {{error}}",
+  "this_happens_occasionally_run_the_transaction_again_and_you_should_be_fine": "این اتفاق گاهی می افتد تراکنش را دوباره اجرا کنید.",
+  "bridge_transaction_pending": "تراکنش موفق",
+  "view_transaction": "دیدن تراکنش",
+  "please_wait_for_your_eth_balance_to_be_available_in_zksync_before_trading": "تأیید کنید که وجوه شما رسیده است",
+  "an_unknown_error_has_occurred_while_processing": "یک خطای ناشناخته هنگام پردازش رخ داده است",
+  "committing": "سپردن",
+  "rejected": "رد شده",
+  "partial_fill": "پر شدن جزئی",
+  "partial_match": "تطابق جزئی",
+  "matched": "تطابق شده",
+  "open": "باز",
+  "canceled": "لغو‌شدن",
+  "expired": "منقضی شده",
+  "cancel": "لغو‌کردن",
+  "view_tx": "دیدنTx"
+}

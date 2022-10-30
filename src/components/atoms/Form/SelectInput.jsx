@@ -1,23 +1,21 @@
 import React from "react";
 import styled from "styled-components";
 import Input from "./Input";
-import { x } from "@xstyled/styled-components";
-
 
 const InputField = styled(Input)`
   cursor: pointer;
   padding: 5px;
   border: 1px solid;
-  border-color: ${({theme}) => theme.colors.foreground300};
+  border-color: ${({ theme }) => theme.colors.foreground300};
   &:focus {
     outline: none;
   }
   &::before {
-    border: solid ${({theme}) => theme.colors.foregroundHighEmphasis};
+    border: solid ${({ theme }) => theme.colors.foregroundHighEmphasis};
   }
   background: none;
-  color: ${({theme}) => theme.colors.foregroundHighEmphasis};
-`
+  color: ${({ theme }) => theme.colors.foregroundHighEmphasis};
+`;
 
 const SelectWrapper = styled.div`
   position: relative;
@@ -28,14 +26,14 @@ const SelectWrapper = styled.div`
     top: 38px;
     right: 14px;
     position: absolute;
-    border: solid ${({theme}) => theme.colors.foregroundHighEmphasis};
+    border: solid ${({ theme }) => theme.colors.foregroundHighEmphasis};
     border-width: 0 2px 2px 0;
     display: inline-block;
     padding: 2px;
     transform: rotate(45deg);
     -webkit-transform: rotate(45deg);
   }
-`
+`;
 
 const SelectInput = ({
   name,
@@ -48,7 +46,7 @@ const SelectInput = ({
   rightOfLabel,
   fontSize = 18,
   borderRadius = 3,
-  className
+  className,
 }) => {
   return (
     <SelectWrapper>
@@ -69,7 +67,7 @@ const SelectInput = ({
         h={"full"}
       >
         {items.map((item) => (
-          <div data_id={item.id} data_name={item.name}/>
+          <div data_id={item.id} data_name={item.name} />
           // <x.option color={"black"} maxWidth={"100px"} value={item.id}>
           //   {item.name}
           // </x.option>

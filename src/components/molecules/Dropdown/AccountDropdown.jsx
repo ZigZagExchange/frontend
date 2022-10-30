@@ -3,7 +3,6 @@ import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import Button from "../Button/Button";
 import { AccountButton } from "../ExpandableButton";
-import Dropdown from "./Dropdown";
 import { useCoinEstimator } from "components";
 import Loader from "react-loader-spinner";
 import {
@@ -11,18 +10,18 @@ import {
   balancesSelector,
   settingsSelector,
 } from "lib/store/features/api/apiSlice";
-import { formatUSD, formatToken, HideMenuOnOutsideClicked } from "lib/utils";
+import {
+  formatUSD,
+  formatToken,
+  HideMenuOnOutsideClicked,
+  addComma,
+} from "lib/utils";
 import { userSelector } from "lib/store/features/auth/authSlice";
 import api from "lib/api";
-import { IconButton as baseIcon } from "../IconButton";
 import Text from "components/atoms/Text/Text";
-import {
-  PlusIcon,
-  CompareArrowIcon,
-  DeleteIcon,
-  ExternalLinkIcon,
-} from "components/atoms/Svg";
+import { ExternalLinkIcon } from "components/atoms/Svg";
 import ToggleButton from "../Toggle/ToggleButton";
+import { useTranslation } from "react-i18next";
 
 const DropdownWrapper = styled.div`
   position: relative;
@@ -147,25 +146,6 @@ const LoaderContainer = styled.div`
   height: 100px;
 `;
 
-const IconButtonWrapper = styled.div`
-  display: grid;
-  grid-auto-flow: column;
-  gap: 10px;
-`;
-
-const IconButton = styled(baseIcon)`
-  width: 24px;
-  height: 24px;
-  background: transparent;
-  border: 1px solid ${({ theme }) => theme.colors.foreground400};
-  border-radius: 9999px;
-  padding: 0px !important;
-  svg {
-    margin-right: 0px !important;
-    margin-left: 0px !important;
-  }
-`;
-
 const AccountDropdown = ({ notext, networkName }) => {
   const [isOpened, setIsOpened] = useState(false);
   const network = useSelector(networkSelector);
@@ -174,58 +154,52 @@ const AccountDropdown = ({ notext, networkName }) => {
   const balanceData = useSelector(balancesSelector);
   const [totalBalance, setTotalBalance] = useState(0);
   const [selectedLayer, setSelectedLayer] = useState(2);
+  const [explorer, setExplorer] = useState(null);
+
   const coinEstimator = useCoinEstimator();
   const isMobile = window.innerWidth < 490;
   const wrapperRef = useRef(null);
+  const { t } = useTranslation();
 
   HideMenuOnOutsideClicked(wrapperRef, setIsOpened);
 
   const wallet =
     selectedLayer === 1 ? balanceData.wallet : balanceData[network];
 
+  useEffect(() => {
+    const explorerLink = user.address
+      ? api.getExplorerAccountLink(network, user.address, selectedLayer)
+      : null;
+    setExplorer(explorerLink);
+
+    // if EVM set layer to and disable toggle
+    if (api.isEVMChain()) {
+      setSelectedLayer(2);
+    }
+  }, [network, user.address, selectedLayer]);
+
   const toggle = () => {
     setIsOpened(!isOpened);
   };
 
   const disconnect = () => {
-    api.signOut();
+    api.signOut(true);
     toggle();
   };
 
-  const popoutzkScan = () => {
-    if (user.address) {
-      if (selectedLayer === 1) {
-        if (networkName.includes("Rinkeby")) {
-          window.open(
-            `https://rinkeby.etherscan.io/address/${user.address}`,
-            "_blank"
-          );
-        } else {
-          window.open(`https://etherscan.io/address/${user.address}`, "_blank");
-        }
-      } else {
-        if (networkName.includes("Rinkeby")) {
-          window.open(
-            `https://rinkeby.zkscan.io/explorer/accounts/${user.address}`,
-            "_blank"
-          );
-        } else {
-          window.open(
-            `https://zkscan.io/explorer/accounts/${user.address}`,
-            "_blank"
-          );
-        }
-      }
+  const openWallet = () => {
+    if (explorer) {
+      window.open(explorer, "_blank");
     }
   };
 
   const filterSmallBalances = (currency) => {
     const balance = wallet[currency].valueReadable;
-    const usd_balance =
-      coinEstimator(currency) * wallet[currency].valueReadable;
+    const usdPrice = coinEstimator(currency);
+    const usd_balance = usdPrice * wallet[currency].valueReadable;
 
     //filter out small balances L2 below 2cents
-    if (selectedLayer !== 1) {
+    if (selectedLayer !== 1 && Number(usdPrice) !== 0) {
       if (usd_balance < 0.02) return false;
     }
 
@@ -246,15 +220,6 @@ const AccountDropdown = ({ notext, networkName }) => {
     } else return 0;
   };
 
-  const clickItem = (text) => {
-    alert(text);
-  };
-
-  const accountData = [
-    { text: "0x83AD...83H4", url: "#", icon: <DeleteIcon /> },
-    { text: "0x12BV...b89G", url: "#", icon: <DeleteIcon /> },
-  ];
-
   useEffect(() => {
     if (wallet?.length === 0) return;
     if (wallet === null || wallet === undefined) return;
@@ -274,37 +239,35 @@ const AccountDropdown = ({ notext, networkName }) => {
         notext={notext}
         expanded={isOpened}
         onClick={toggle}
+        user={user}
+        settings={settings}
       ></AccountButton>
       {isOpened && (
         <DropdownDisplay isMobile={isMobile}>
-          {/* <DropdownHeader>
-            <Dropdown width={242} item={accountData} rightIcon context="0x83AD...83H4" clickFunction={clickItem} />
-            <IconButtonWrapper>
-              <IconButton variant="secondary" startIcon={<PlusIcon />}></IconButton>
-              <IconButton variant="secondary" startIcon={<CompareArrowIcon />}></IconButton>
-            </IconButtonWrapper>
-          </DropdownHeader>
-          <Divider /> */}
           <DropdownHeader>
             <div>
               <Text font="primaryTiny" color="foregroundMediumEmphasis">
-                TOTAL BALANCE
+                {t("total_balance")}
               </Text>
               <Text font="primaryHeading6" color="foregroundHighEmphasis">
                 {settings.hideBalance
                   ? "****.****"
-                  : "$ " + formatUSD(totalBalance)}
+                  : "$ " + addComma(formatUSD(totalBalance))}
               </Text>
             </div>
-            <ToggleButton
-              type="option"
-              size="sm"
-              leftLabel="l1"
-              rightLabel="l2"
-              width="40"
-              selectedLayer={selectedLayer}
-              toggleClick={(num) => setSelectedLayer(num)}
-            />
+            {!api.isEVMChain() && (
+              <ToggleButton
+                type="option"
+                size="sm"
+                leftText="l1"
+                rightText="l2"
+                leftLabel="l1"
+                rightLabel="l2"
+                width="40"
+                selectedLayer={selectedLayer}
+                toggleClick={(num) => setSelectedLayer(num)}
+              />
+            )}
           </DropdownHeader>
           <Divider />
           <DropdownContent>
@@ -363,7 +326,7 @@ const AccountDropdown = ({ notext, networkName }) => {
             <Button
               variant="outlined"
               scale="imd"
-              onClick={popoutzkScan}
+              onClick={openWallet}
               className="mr-[1rem]"
             >
               <Text
@@ -372,7 +335,11 @@ const AccountDropdown = ({ notext, networkName }) => {
                 textAlign="center"
               >
                 <ExternalLinkIcon size={10} />
-                {selectedLayer === 1 ? "Etherscan" : `zkScan`}
+                {selectedLayer === 1
+                  ? "Etherscan"
+                  : networkName.includes("zkSync")
+                  ? "zkScan"
+                  : "Arbiscan"}
               </Text>
             </Button>
             <Button variant="outlined" scale="imd" onClick={disconnect}>
@@ -381,7 +348,7 @@ const AccountDropdown = ({ notext, networkName }) => {
                 color="foregroundHighEmphasis"
                 textAlign="center"
               >
-                DISCONNECT
+                {t("disconnect")}
               </Text>
             </Button>
           </DropdownFooter>

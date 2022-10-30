@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
-import TextField from "@material-ui/core/TextField";
 import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
@@ -106,14 +104,16 @@ const FormDialog = () => {
     dispatch(
       setHighSlippageModal({
         open: false,
-        confirmed: textValue === "CONFIRM" ? true : false,
+        confirmed: textValue === "confirm" ? true : false,
       })
     );
   };
 
   const onChangeTextValue = (e) => {
-    setConfirmed(e.currentTarget.value === "CONFIRM" ? true : false);
-    setTextValue(e.currentTarget.value);
+    setConfirmed(
+      e.currentTarget.value.toLocaleLowerCase() === "confirm" ? true : false
+    );
+    setTextValue(e.currentTarget.value.toLocaleLowerCase());
   };
 
   const getCapitalize = (text) => {
@@ -142,13 +142,17 @@ const FormDialog = () => {
             color="foregroundHighEmphasis"
             style={{ marginTop: "28px", display: "block", lineHeight: "25px" }}
           >
-            You are placing a {getCapitalize(highSlippageModal.type)} Order for<br />
-            {highSlippageModal.xToken} {baseToken} @{" "}
-            {highSlippageModal.yToken} {quoteToken}<br />which is{" "}
-            {highSlippageModal.delta.toFixed(2)}% ({highSlippageModal.userPrice}{" "}
-            {quoteToken}){" "}
-            {highSlippageModal.type === "sell" ? "under" : "above"}<br />the current
-            market price ({highSlippageModal.pairPrice} {quoteToken}).
+            You are placing a {getCapitalize(highSlippageModal.type)} Order for
+            <br />
+            {highSlippageModal.xToken} {baseToken} @ {highSlippageModal.yToken}{" "}
+            {quoteToken}
+            <br />
+            which is {highSlippageModal.delta.toFixed(2)}% (
+            {highSlippageModal.userPrice} {quoteToken}){" "}
+            {highSlippageModal.type === "sell" ? "under" : "above"}
+            <br />
+            the current market price ({highSlippageModal.pairPrice} {quoteToken}
+            ).
           </Text>
           <Text
             font="primaryHeading6"

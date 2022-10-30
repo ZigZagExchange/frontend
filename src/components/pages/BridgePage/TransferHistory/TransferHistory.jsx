@@ -8,10 +8,15 @@ import {
 } from "lib/store/features/api/apiSlice";
 import api from "lib/api";
 
+import { useTranslation } from "react-i18next";
+
+const isMobile = window.innerWidth < 500;
+
 const TransferHistory = () => {
   const receipts = useSelector(bridgeReceiptsSelector);
   const dispatch = useDispatch();
   const [groupArray, setGroupArray] = useState([]);
+  const { t } = useTranslation();
 
   useEffect(() => {
     let tempArray = [];
@@ -31,7 +36,6 @@ const TransferHistory = () => {
       }
     });
     setGroupArray(tempArray);
-    console.log(tempArray);
   }, [receipts]);
 
   return (
@@ -39,19 +43,19 @@ const TransferHistory = () => {
       {receipts.length > 0 && (
         <div className="flex justify-between mt-4">
           <p className="text-base font-work dark:text-foreground-800 ">
-            Viewing {receipts.length} transfers
+            {t("viewing")} {receipts.length} {t("transfers")}
           </p>
           <button
             className="bg-[#000000] px-2 py-1 rounded-md text-sm font-semibold text-primary-900 ml-2.5 hover:bg-slate-800 font-work"
             onClick={() => dispatch(clearBridgeReceipts())}
           >
-            Clear all
+            {t("clear_all")}
           </button>
         </div>
       )}
       {receipts.length === 0 && (
         <p className="mt-4 text-base font-work dark:text-foreground-800 text-background-800 ">
-          No bridge receipts yet.
+          {t("no_bridge_receipts_yet")}.
         </p>
       )}
       {groupArray.map((group, index) => {
@@ -68,8 +72,8 @@ const TransferHistory = () => {
                     key={idx}
                   >
                     <div className="flex items-center gap-5 ">
-                      <p className="inline-block px-2 py-1 text-xs font-semibold border rounded-lg border-foreground-500">
-                        {type}
+                      <p className="inline-block px-2 py-1 text-xs font-semibold border rounded-lg dark:border-foreground-400 border-primary-500">
+                        {t(type)}
                       </p>
                       <img
                         src={api.getCurrencyLogo(item.token)}
@@ -79,7 +83,8 @@ const TransferHistory = () => {
                         })}
                       />
                       <p className="text-xs font-semibold ">
-                        {item.amount} {item.token}
+                        {Math.round(Number(item.amount) * 10 ** 6) / 10 ** 6}{" "}
+                        {item.token}
                       </p>
                     </div>
                     <div className="flex gap-5">
@@ -88,9 +93,15 @@ const TransferHistory = () => {
                         target="_blank"
                         rel="noreferrer"
                         className="text-xs text-gray-400 hover:underline underline-offset-2"
-                      >{`${item.txId.substr(0, 10)}...${item.txId.substr(
-                        -6
-                      )}`}</a>
+                      >
+                        {isMobile
+                          ? `${item.txId.substr(0, 5)}...${item.txId.substr(
+                              -4
+                            )}`
+                          : `${item.txId.substr(0, 10)}...${item.txId.substr(
+                              -6
+                            )}`}
+                      </a>
                       <p className="text-xs font-semibold text-gray-400 ">
                         {format(item.date, "H:mm")}
                       </p>

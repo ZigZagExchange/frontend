@@ -1,24 +1,22 @@
 import React from "react";
 import TradingViewWidget, { Themes } from "react-tradingview-widget";
 import "./TradeChart.css";
-import { useSelector } from "react-redux";
-import { marketInfoSelector } from "../../../../lib/store/features/api/apiSlice";
 import { TRADING_VIEW_CHART_KEY } from "../../../pages/ListPairPage/ListPairPage";
 import useTheme from "components/hooks/useTheme";
 
-export const TradeChart = () => {
-  const { isDark } = useTheme()
-  const marketInfo = useSelector(marketInfoSelector);
+export const TradeChart = (props) => {
+  const { isDark } = useTheme();
 
   let symbol = "";
-  if (marketInfo) {
+  if (props.marketInfo) {
     if (
-      TRADING_VIEW_CHART_KEY in marketInfo &&
-      marketInfo[TRADING_VIEW_CHART_KEY] !== ""
+      TRADING_VIEW_CHART_KEY in props.marketInfo &&
+      props.marketInfo[TRADING_VIEW_CHART_KEY] !== ""
     ) {
-      symbol = marketInfo[TRADING_VIEW_CHART_KEY];
+      symbol = props.marketInfo[TRADING_VIEW_CHART_KEY];
     } else {
-      symbol = marketInfo.baseAsset.symbol + marketInfo.quoteAsset.symbol;
+      symbol =
+        props.marketInfo.baseAsset.symbol + props.marketInfo.quoteAsset.symbol;
     }
   }
 

@@ -30,7 +30,7 @@ const useStyles = makeStyles(() => ({
   root: {
     height: "40px",
     backgroundColor: "transparent",
-    width: "100%",
+    width: "78%",
     cursor: "pointer",
     display: "inline-block",
     padding: "0",
@@ -77,6 +77,7 @@ export const RangeSlider = (props) => {
         }}
         value={props.value}
         onChange={props.onChange}
+        disabled={props.disabled}
       />
     </>
   );

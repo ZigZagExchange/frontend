@@ -14,12 +14,12 @@ import apiReducer, {
   addBridgeReceipt,
   setNetwork,
   clearUserOrders,
-  clearLastPrices,
   setArweaveAllocation,
   setCurrentMarket,
   setConnecting,
   setBridgeConnecting,
-  setUISettings
+  setUISettings,
+  setServerDelta,
 } from "lib/store/features/api/apiSlice";
 import autoMergeLevel2 from "redux-persist/lib/stateReconciler/autoMergeLevel2";
 import api from "lib/api";
@@ -34,7 +34,14 @@ const persistConfig = {
 
 const apiPersistConfig = {
   key: "api",
-  whitelist: ["userId", "currentMarket", "bridgeReceipts", "network", "settings"],
+  whitelist: [
+    "userId",
+    "currentMarket",
+    "bridgeReceipts",
+    "network",
+    "settings",
+    "slippageValue",
+  ],
   storage,
 };
 
@@ -94,9 +101,10 @@ api.on("signOut", (accountState) => {
 });
 
 api.on("providerChange", (network) => {
-  store.dispatch(clearLastPrices());
+  const defaultMarket = api.apiProvider.getDefaultMarket();
+  console.log(`Index set pair to default: ${defaultMarket}`);
   store.dispatch(setNetwork(network));
-  store.dispatch(setCurrentMarket('ETH-USDC'));
+  store.dispatch(setCurrentMarket(defaultMarket));
 });
 
 api.on("message", (operation, args) => {
@@ -104,15 +112,19 @@ api.on("message", (operation, args) => {
 });
 
 api.on("connecting", (flag) => {
-  store.dispatch(setConnecting(flag))
-})
+  store.dispatch(setConnecting(flag));
+});
 
 api.on("bridge_connecting", (flag) => {
-  store.dispatch(setBridgeConnecting(flag))
-})
+  store.dispatch(setBridgeConnecting(flag));
+});
 
 api.on("settings", (payload) => {
-  store.dispatch(setUISettings(payload))
-})
+  store.dispatch(setUISettings(payload));
+});
+
+api.on("serverDeltaUpdate", (serverDelta) => {
+  store.dispatch(setServerDelta(serverDelta));
+});
 
 export default store;

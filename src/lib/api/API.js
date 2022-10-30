@@ -4,35 +4,41 @@ import Web3Modal from "web3modal";
 import Emitter from "tiny-emitter";
 import { ethers, constants as ethersConstants } from "ethers";
 import WalletConnectProvider from "@walletconnect/web3-provider";
-import { getENSName } from "lib/ens";
+import CoinbaseWalletSDK from "@coinbase/wallet-sdk";
+import { getENSName, reverseUnstoppabledomainsAddress } from "lib/ens";
 import { formatAmount } from "lib/utils";
 import erc20ContractABI from "lib/contracts/ERC20.json";
-import wethContractABI from "lib/contracts/WETH.json";
 import { MAX_ALLOWANCE } from "./constants";
-import {
-  ZKSYNC_POLYGON_BRIDGE,
-  POLYGON_MUMBAI_WETH_ADDRESS,
-  POLYGON_MAINNET_WETH_ADDRESS,
-} from "components/pages/BridgePage/constants";
+import { toast } from "react-toastify";
 
 import axios from "axios";
 import { isMobile } from "react-device-detect";
+import get from "lodash/get";
+
+import i18next from "../i18next";
 
 const chainMap = {
   "0x1": 1,
-  "0x4": 1000,
+  "0x5": 1002,
+  "0xa4b1": 42161,
 };
-export default class API extends Emitter {
+
+class API extends Emitter {
   networks = {};
   ws = null;
   apiProvider = null;
-  ethersProvider = null;
+  mainnetProvider = null;
+  rollupProvider = null;
   currencies = null;
   isArgent = false;
   marketInfo = {};
-  lastprices = {};
+  lastPrices = {};
+  balances = {};
   _signInProgress = null;
   _profiles = {};
+  _pendingOrders = [];
+  _pendingFills = [];
+  serverDelta = 0;
 
   constructor({ infuraId, networks, currencies, validMarkets }) {
     super();
@@ -61,7 +67,8 @@ export default class API extends Emitter {
 
       this.setAPIProvider(chainMap[window.ethereum.chainId] || 1);
     } else {
-      this.setAPIProvider(this.networks.mainnet[0]);
+      console.log(this.networks);
+      this.setAPIProvider(this.networks.zksync[0]);
     }
   }
 
@@ -70,13 +77,14 @@ export default class API extends Emitter {
   };
 
   setAPIProvider = (network, networkChanged = true) => {
-    const networkName = this.getNetworkName(network);
+    const chainName = this.getChainName(network);
 
-    if (!networkName) {
+    if (!chainName) {
+      console.error(`Can't get chainName for ${network}`);
       this.signOut();
       return;
     }
-
+    const oldNetwork = this.apiProvider?.network;
     const apiProvider = this.getAPIProvider(network);
     this.apiProvider = apiProvider;
 
@@ -86,26 +94,62 @@ export default class API extends Emitter {
       const newUrl = new URL(this.apiProvider.websocketUrl);
       if (oldUrl.host !== newUrl.host) {
         // Stopping the WebSocket will trigger an auto-restart in 3 seconds
-        this.stop();
+        this.start();
+      }
+      if (oldNetwork !== this.apiProvider.network) {
+        // get initial marketinfos, returns lastprice and marketinfo2
+        this.send("marketsreq", [this.apiProvider.network, true]);
       }
     }
 
-    if (this.isZksyncChain()) {
-      this.web3 = new Web3(
-        window.ethereum ||
-          new Web3.providers.HttpProvider(
-            `https://${networkName}.infura.io/v3/${this.infuraId}`
-          )
-      );
+    this.web3 = new Web3(
+      window.ethereum ||
+        new Web3.providers.HttpProvider(
+          `https://${chainName}.infura.io/v3/${this.infuraId}`
+        )
+    );
 
+    if (chainName === "arbitrum") {
       this.web3Modal = new Web3Modal({
-        network: networkName,
+        network: chainName,
         cacheProvider: true,
         theme: "dark",
         providerOptions: {
           walletconnect: {
             package: WalletConnectProvider,
             options: {
+              rpc: {
+                42161: `https://arbitrum-mainnet.infura.io/v3/${this.infuraId}`,
+              },
+              infuraId: this.infuraId,
+            },
+          },
+        },
+      });
+    } else {
+      this.web3Modal = new Web3Modal({
+        network: chainName,
+        cacheProvider: true,
+        theme: "dark",
+        providerOptions: {
+          injected: {
+            display: {
+              logo: "data:image/svg+xml;utf8;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMTIiIGhlaWdodD0iMTg5IiB2aWV3Qm94PSIwIDAgMjEyIDE4OSI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj48cG9seWdvbiBmaWxsPSIjQ0RCREIyIiBwb2ludHM9IjYwLjc1IDE3My4yNSA4OC4zMTMgMTgwLjU2MyA4OC4zMTMgMTcxIDkwLjU2MyAxNjguNzUgMTA2LjMxMyAxNjguNzUgMTA2LjMxMyAxODAgMTA2LjMxMyAxODcuODc1IDg5LjQzOCAxODcuODc1IDY4LjYyNSAxNzguODc1Ii8+PHBvbHlnb24gZmlsbD0iI0NEQkRCMiIgcG9pbnRzPSIxMDUuNzUgMTczLjI1IDEzMi43NSAxODAuNTYzIDEzMi43NSAxNzEgMTM1IDE2OC43NSAxNTAuNzUgMTY4Ljc1IDE1MC43NSAxODAgMTUwLjc1IDE4Ny44NzUgMTMzLjg3NSAxODcuODc1IDExMy4wNjMgMTc4Ljg3NSIgdHJhbnNmb3JtPSJtYXRyaXgoLTEgMCAwIDEgMjU2LjUgMCkiLz48cG9seWdvbiBmaWxsPSIjMzkzOTM5IiBwb2ludHM9IjkwLjU2MyAxNTIuNDM4IDg4LjMxMyAxNzEgOTEuMTI1IDE2OC43NSAxMjAuMzc1IDE2OC43NSAxMjMuNzUgMTcxIDEyMS41IDE1Mi40MzggMTE3IDE0OS42MjUgOTQuNSAxNTAuMTg4Ii8+PHBvbHlnb24gZmlsbD0iI0Y4OUMzNSIgcG9pbnRzPSI3NS4zNzUgMjcgODguODc1IDU4LjUgOTUuMDYzIDE1MC4xODggMTE3IDE1MC4xODggMTIzLjc1IDU4LjUgMTM2LjEyNSAyNyIvPjxwb2x5Z29uIGZpbGw9IiNGODlEMzUiIHBvaW50cz0iMTYuMzEzIDk2LjE4OCAuNTYzIDE0MS43NSAzOS45MzggMTM5LjUgNjUuMjUgMTM5LjUgNjUuMjUgMTE5LjgxMyA2NC4xMjUgNzkuMzEzIDU4LjUgODMuODEzIi8+PHBvbHlnb24gZmlsbD0iI0Q4N0MzMCIgcG9pbnRzPSI0Ni4xMjUgMTAxLjI1IDkyLjI1IDEwMi4zNzUgODcuMTg4IDEyNiA2NS4yNSAxMjAuMzc1Ii8+PHBvbHlnb24gZmlsbD0iI0VBOEQzQSIgcG9pbnRzPSI0Ni4xMjUgMTAxLjgxMyA2NS4yNSAxMTkuODEzIDY1LjI1IDEzNy44MTMiLz48cG9seWdvbiBmaWxsPSIjRjg5RDM1IiBwb2ludHM9IjY1LjI1IDEyMC4zNzUgODcuNzUgMTI2IDk1LjA2MyAxNTAuMTg4IDkwIDE1MyA2NS4yNSAxMzguMzc1Ii8+PHBvbHlnb24gZmlsbD0iI0VCOEYzNSIgcG9pbnRzPSI2NS4yNSAxMzguMzc1IDYwLjc1IDE3My4yNSA5MC41NjMgMTUyLjQzOCIvPjxwb2x5Z29uIGZpbGw9IiNFQThFM0EiIHBvaW50cz0iOTIuMjUgMTAyLjM3NSA5NS4wNjMgMTUwLjE4OCA4Ni42MjUgMTI1LjcxOSIvPjxwb2x5Z29uIGZpbGw9IiNEODdDMzAiIHBvaW50cz0iMzkuMzc1IDEzOC45MzggNjUuMjUgMTM4LjM3NSA2MC43NSAxNzMuMjUiLz48cG9seWdvbiBmaWxsPSIjRUI4RjM1IiBwb2ludHM9IjEyLjkzOCAxODguNDM4IDYwLjc1IDE3My4yNSAzOS4zNzUgMTM4LjkzOCAuNTYzIDE0MS43NSIvPjxwb2x5Z29uIGZpbGw9IiNFODgyMUUiIHBvaW50cz0iODguODc1IDU4LjUgNjQuNjg4IDc4Ljc1IDQ2LjEyNSAxMDEuMjUgOTIuMjUgMTAyLjkzOCIvPjxwb2x5Z29uIGZpbGw9IiNERkNFQzMiIHBvaW50cz0iNjAuNzUgMTczLjI1IDkwLjU2MyAxNTIuNDM4IDg4LjMxMyAxNzAuNDM4IDg4LjMxMyAxODAuNTYzIDY4LjA2MyAxNzYuNjI1Ii8+PHBvbHlnb24gZmlsbD0iI0RGQ0VDMyIgcG9pbnRzPSIxMjEuNSAxNzMuMjUgMTUwLjc1IDE1Mi40MzggMTQ4LjUgMTcwLjQzOCAxNDguNSAxODAuNTYzIDEyOC4yNSAxNzYuNjI1IiB0cmFuc2Zvcm09Im1hdHJpeCgtMSAwIDAgMSAyNzIuMjUgMCkiLz48cG9seWdvbiBmaWxsPSIjMzkzOTM5IiBwb2ludHM9IjcwLjMxMyAxMTIuNSA2NC4xMjUgMTI1LjQzOCA4Ni4wNjMgMTE5LjgxMyIgdHJhbnNmb3JtPSJtYXRyaXgoLTEgMCAwIDEgMTUwLjE4OCAwKSIvPjxwb2x5Z29uIGZpbGw9IiNFODhGMzUiIHBvaW50cz0iMTIuMzc1IC41NjMgODguODc1IDU4LjUgNzUuOTM4IDI3Ii8+PHBhdGggZmlsbD0iIzhFNUEzMCIgZD0iTTEyLjM3NTAwMDIsMC41NjI1MDAwMDggTDIuMjUwMDAwMDMsMzEuNTAwMDAwNSBMNy44NzUwMDAxMiw2NS4yNTAwMDEgTDMuOTM3NTAwMDYsNjcuNTAwMDAxIEw5LjU2MjUwMDE0LDcyLjU2MjUgTDUuMDYyNTAwMDgsNzYuNTAwMDAxMSBMMTEuMjUsODIuMTI1MDAxMiBMNy4zMTI1MDAxMSw4NS41MDAwMDEzIEwxNi4zMTI1MDAyLDk2Ljc1MDAwMTQgTDU4LjUwMDAwMDksODMuODEyNTAxMiBDNzkuMTI1MDAxMiw2Ny4zMTI1MDA0IDg5LjI1MDAwMTMsNTguODc1MDAwMyA4OC44NzUwMDEzLDU4LjUwMDAwMDkgQzg4LjUwMDAwMTMsNTguMTI1MDAwOSA2My4wMDAwMDA5LDM4LjgxMjUwMDYgMTIuMzc1MDAwMiwwLjU2MjUwMDAwOCBaIi8+PGcgdHJhbnNmb3JtPSJtYXRyaXgoLTEgMCAwIDEgMjExLjUgMCkiPjxwb2x5Z29uIGZpbGw9IiNGODlEMzUiIHBvaW50cz0iMTYuMzEzIDk2LjE4OCAuNTYzIDE0MS43NSAzOS45MzggMTM5LjUgNjUuMjUgMTM5LjUgNjUuMjUgMTE5LjgxMyA2NC4xMjUgNzkuMzEzIDU4LjUgODMuODEzIi8+PHBvbHlnb24gZmlsbD0iI0Q4N0MzMCIgcG9pbnRzPSI0Ni4xMjUgMTAxLjI1IDkyLjI1IDEwMi4zNzUgODcuMTg4IDEyNiA2NS4yNSAxMjAuMzc1Ii8+PHBvbHlnb24gZmlsbD0iI0VBOEQzQSIgcG9pbnRzPSI0Ni4xMjUgMTAxLjgxMyA2NS4yNSAxMTkuODEzIDY1LjI1IDEzNy44MTMiLz48cG9seWdvbiBmaWxsPSIjRjg5RDM1IiBwb2ludHM9IjY1LjI1IDEyMC4zNzUgODcuNzUgMTI2IDk1LjA2MyAxNTAuMTg4IDkwIDE1MyA2NS4yNSAxMzguMzc1Ii8+PHBvbHlnb24gZmlsbD0iI0VCOEYzNSIgcG9pbnRzPSI2NS4yNSAxMzguMzc1IDYwLjc1IDE3My4yNSA5MCAxNTMiLz48cG9seWdvbiBmaWxsPSIjRUE4RTNBIiBwb2ludHM9IjkyLjI1IDEwMi4zNzUgOTUuMDYzIDE1MC4xODggODYuNjI1IDEyNS43MTkiLz48cG9seWdvbiBmaWxsPSIjRDg3QzMwIiBwb2ludHM9IjM5LjM3NSAxMzguOTM4IDY1LjI1IDEzOC4zNzUgNjAuNzUgMTczLjI1Ii8+PHBvbHlnb24gZmlsbD0iI0VCOEYzNSIgcG9pbnRzPSIxMi45MzggMTg4LjQzOCA2MC43NSAxNzMuMjUgMzkuMzc1IDEzOC45MzggLjU2MyAxNDEuNzUiLz48cG9seWdvbiBmaWxsPSIjRTg4MjFFIiBwb2ludHM9Ijg4Ljg3NSA1OC41IDY0LjY4OCA3OC43NSA0Ni4xMjUgMTAxLjI1IDkyLjI1IDEwMi45MzgiLz48cG9seWdvbiBmaWxsPSIjMzkzOTM5IiBwb2ludHM9IjcwLjMxMyAxMTIuNSA2NC4xMjUgMTI1LjQzOCA4Ni4wNjMgMTE5LjgxMyIgdHJhbnNmb3JtPSJtYXRyaXgoLTEgMCAwIDEgMTUwLjE4OCAwKSIvPjxwb2x5Z29uIGZpbGw9IiNFODhGMzUiIHBvaW50cz0iMTIuMzc1IC41NjMgODguODc1IDU4LjUgNzUuOTM4IDI3Ii8+PHBhdGggZmlsbD0iIzhFNUEzMCIgZD0iTTEyLjM3NTAwMDIsMC41NjI1MDAwMDggTDIuMjUwMDAwMDMsMzEuNTAwMDAwNSBMNy44NzUwMDAxMiw2NS4yNTAwMDEgTDMuOTM3NTAwMDYsNjcuNTAwMDAxIEw5LjU2MjUwMDE0LDcyLjU2MjUgTDUuMDYyNTAwMDgsNzYuNTAwMDAxMSBMMTEuMjUsODIuMTI1MDAxMiBMNy4zMTI1MDAxMSw4NS41MDAwMDEzIEwxNi4zMTI1MDAyLDk2Ljc1MDAwMTQgTDU4LjUwMDAwMDksODMuODEyNTAxMiBDNzkuMTI1MDAxMiw2Ny4zMTI1MDA0IDg5LjI1MDAwMTMsNTguODc1MDAwMyA4OC44NzUwMDEzLDU4LjUwMDAwMDkgQzg4LjUwMDAwMTMsNTguMTI1MDAwOSA2My4wMDAwMDA5LDM4LjgxMjUwMDYgMTIuMzc1MDAwMiwwLjU2MjUwMDAwOCBaIi8+PC9nPjwvZz48L3N2Zz4=",
+              name: "MetaMask",
+              description: "Connect to your MetaMask Wallet",
+            },
+            package: null,
+          },
+          walletconnect: {
+            package: WalletConnectProvider,
+            options: {
+              infuraId: this.infuraId,
+            },
+          },
+          coinbasewallet: {
+            package: CoinbaseWalletSDK,
+            options: {
+              appName: "Web 3 Modal Demo",
               infuraId: this.infuraId,
             },
           },
@@ -137,21 +181,54 @@ export default class API extends Emitter {
     if (networkChanged) this.emit("providerChange", network);
   };
 
-  getExplorer = (address, layer) => {
-    let explorer = "https://etherscan.io/address/";
-    let subdomain = this.apiProvider.network === 1 ? "" : "rinkeby.";
-
-    switch (layer) {
-      case 1:
-        explorer = `https://${subdomain}etherscan.io/address/${address}`;
-        return explorer;
-      default:
-        explorer = `https://${subdomain}zkscan.io/explorer/accounts/${address}`;
-        return explorer;
-    }
-  };
-
   getProfile = async (address) => {
+    const getProfileFromIPFS = async (address) => {
+      try {
+        const controller = new AbortController();
+        setTimeout(() => controller.abort(), 1500);
+
+        const { data } = await axios.get(
+          `https://ipfs.3box.io/profile?address=${address}`,
+          {
+            signal: controller.signal,
+          }
+        );
+        const profile = {
+          coverPhoto: get(data, "coverPhoto.0.contentUrl./"),
+          image: get(data, "image.0.contentUrl./"),
+          description: data.description,
+          emoji: data.emoji,
+          website: data.website,
+          location: data.location,
+          twitter_proof: data.twitter_proof,
+        };
+
+        if (data.name) {
+          profile.name = data.name;
+        }
+
+        if (profile.image) {
+          profile.image = `https://gateway.ipfs.io/ipfs/${profile.image}`;
+        }
+
+        return profile;
+      } catch (err) {
+        console.warn(`Failed to get profile from IPFS: ${err}`);
+      }
+      return {};
+    };
+
+    const fetchAddressName = async (address) => {
+      const [ensName, unstoppabledomainsName] = await Promise.all([
+        getENSName(address),
+        reverseUnstoppabledomainsAddress(address),
+      ]);
+      if (ensName) return { name: ensName };
+      if (unstoppabledomainsName) return { name: unstoppabledomainsName };
+
+      return {};
+    };
+
     if (!this._profiles[address]) {
       const profile = (this._profiles[address] = {
         description: null,
@@ -168,8 +245,8 @@ export default class API extends Emitter {
       Object.assign(
         profile,
         ...(await Promise.all([
-          this._fetchENSName(address),
-          this.apiProvider.getProfile(address),
+          fetchAddressName(address),
+          getProfileFromIPFS(address),
         ]))
       );
 
@@ -179,12 +256,6 @@ export default class API extends Emitter {
     }
 
     return this._profiles[address];
-  };
-
-  _fetchENSName = async (address) => {
-    let name = await getENSName(address);
-    if (name) return { name };
-    return {};
   };
 
   _socketOpen = () => {
@@ -212,27 +283,115 @@ export default class API extends Emitter {
     if (msg.op === "marketinfo") {
       const marketInfo = msg.args[0];
       if (!marketInfo) return;
-      this.apiProvider.marketInfo[marketInfo.alias] = marketInfo;
+      this.marketInfo[`${marketInfo.zigzagChainId}:${marketInfo.alias}`] =
+        marketInfo;
     }
     if (msg.op === "marketinfo2") {
       const marketInfos = msg.args[0];
       marketInfos.forEach((marketInfo) => {
         if (!marketInfo) return;
-        this.apiProvider.marketInfo[marketInfo.alias] = marketInfo;
+        this.marketInfo[`${marketInfo.zigzagChainId}:${marketInfo.alias}`] =
+          marketInfo;
       });
     }
     if (msg.op === "lastprice") {
-      const lastprices = msg.args[0];
-      lastprices.forEach((l) => (this.apiProvider.lastPrices[l[0]] = l));
-      const noInfoPairs = lastprices
-        .map((l) => l[0])
-        .filter((pair) => !this.apiProvider.marketInfo[pair]);
-      this.apiProvider.cacheMarketInfoFromNetwork(noInfoPairs);
+      const lastPricesUpdate = msg.args[0];
+      const chainId = msg.args[1];
+      lastPricesUpdate.forEach((l) => {
+        if (!this.lastPrices[chainId]) this.lastPrices[chainId] = {};
+        this.lastPrices[chainId][l[0]] = l;
+      });
+    }
+  };
+
+  refreshNetwork = async () => {
+    if (!window.ethereum) return;
+    let ethereumChainId, ethereumChainInfo;
+
+    // await this.signOut();
+
+    switch (this.apiProvider.network) {
+      case 1:
+        ethereumChainId = "0x1";
+        ethereumChainInfo = {
+          chainId: "0x1",
+        };
+        break;
+      case 1002:
+        ethereumChainId = "0x5";
+        ethereumChainInfo = {
+          chainId: "0x5",
+        };
+        break;
+      case 42161:
+        ethereumChainId = "0xa4b1";
+        ethereumChainInfo = {
+          chainId: "0xA4B1",
+          chainName: "Arbitrum",
+          nativeCurrency: {
+            name: "Arbitrum Coin",
+            symbol: "ETH",
+            decimals: 18,
+          },
+          rpcUrls: ["https://arb1.arbitrum.io/rpc"],
+          blockExplorerUrls: ["https://arbiscan.io/"],
+        };
+        break;
+      default:
+        return;
+    }
+
+    await window.ethereum.request({
+      method: "eth_requestAccounts",
+      params: [{ eth_accounts: {} }],
+    });
+
+    try {
+      await window.ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: ethereumChainId }],
+      });
+    } catch (switchError) {
+      try {
+        if (switchError.code === 4902) {
+          await window.ethereum.request({
+            method: "wallet_addEthereumChain",
+            params: [ethereumChainInfo],
+          });
+        }
+      } catch (addError) {
+        console.error(addError);
+        throw addError;
+      }
     }
   };
 
   _socketError = (e) => {
+    console.log(e);
     console.warn("Zigzag websocket connection failed");
+  };
+
+  calculateServerDelta = async () => {
+    const url = this.apiProvider.websocketUrl.replace("wss", "https");
+    let serverTime, res;
+    try {
+      res = await axios.get(`${url}/api/v1/time`);
+      serverTime = res.data.serverTimestamp;
+    } catch (e) {
+      console.log(e);
+      console.log(res);
+      serverTime = Date.now();
+    }
+    const clientTime = Date.now();
+    this.serverDelta = Math.floor((serverTime - clientTime) / 1000);
+    if (this.serverDelta < -5 || this.serverDelta > 5) {
+      console.warn(
+        `Your PC clock is not synced (delta: ${
+          this.serverDelta / 60
+        } min). Please sync it via settings > date/time > sync now`
+      );
+    }
+    this.emit("serverDeltaUpdate", this.serverDelta);
   };
 
   start = () => {
@@ -252,6 +411,8 @@ export default class API extends Emitter {
         accountState.id && accountState.id.toString(),
       ]);
     }
+
+    if (!this.serverDelta) this.calculateServerDelta();
   };
 
   stop = () => {
@@ -269,35 +430,11 @@ export default class API extends Emitter {
 
   send = (op, args) => {
     if (!this.ws) return;
-    return this.ws.send(JSON.stringify({ op, args }));
-  };
-
-  refreshNetwork = async () => {
-    if (!window.ethereum) return;
-    let ethereumChainId;
-
-    // await this.signOut();
-
-    switch (this.apiProvider.network) {
-      case 1:
-        ethereumChainId = "0x1";
-        break;
-      case 1000:
-        ethereumChainId = "0x4";
-        break;
-      default:
-        return;
+    if (this.ws.readyState === 1) {
+      return this.ws.send(JSON.stringify({ op, args }));
+    } else {
+      setTimeout(this.send, 500, op, args);
     }
-
-    await window.ethereum.request({
-      method: "eth_requestAccounts",
-      params: [{ eth_accounts: {} }],
-    });
-
-    await window.ethereum.request({
-      method: "wallet_switchEthereumChain",
-      params: [{ chainId: ethereumChainId }],
-    });
   };
 
   sleep = (ms) => {
@@ -308,34 +445,42 @@ export default class API extends Emitter {
     if (!this._signInProgress) {
       this._signInProgress = Promise.resolve()
         .then(async () => {
-          const apiProvider = this.apiProvider;
-
           if (network) {
             this.apiProvider = this.getAPIProvider(network);
           }
 
-          await this.refreshNetwork();
-          await this.sleep(1000);
-          if (this.isZksyncChain()) {
-            const web3Provider = await this.web3Modal.connect();
-            this.web3.setProvider(web3Provider);
-            this.ethersProvider = new ethers.providers.Web3Provider(
-              web3Provider
-            );
-          }
+          // await this.refreshNetwork();
+          // await this.sleep(1000);
+          const web3Provider = await this.web3Modal.connect();
 
-          // set up polygon providers. mumbai for testnet. polygon for mainnet
-          this.polygonProvider = new ethers.providers.JsonRpcProvider(
-            this.getPolygonUrl(network)
+          this.web3.setProvider(web3Provider);
+          this.rollupProvider = new ethers.providers.Web3Provider(web3Provider);
+
+          this.mainnetProvider = new ethers.providers.InfuraProvider(
+            this.getChainNameL1(network),
+            this.infuraId
           );
 
           let accountState;
           try {
-            accountState = await apiProvider.signIn(...args);
+            accountState = await this.apiProvider.signIn(...args);
           } catch (err) {
             await this.signOut();
             throw err;
           }
+
+          if (accountState.err === 4001) {
+            await this.signOut();
+            return;
+          }
+
+          try {
+            accountState.profile = await this.getProfile(accountState.address);
+          } catch (e) {
+            accountState.profile = {};
+          }
+
+          this.emit("signIn", accountState);
 
           if (accountState && accountState.id) {
             this.send("login", [
@@ -344,12 +489,9 @@ export default class API extends Emitter {
             ]);
           }
 
-          this.emit("signIn", accountState);
-
           // fetch blances
           await this.getBalances();
           await this.getWalletBalances();
-          await this.getPolygonWethBalance();
 
           return accountState;
         })
@@ -361,143 +503,31 @@ export default class API extends Emitter {
     return this._signInProgress;
   };
 
-  signOut = async () => {
+  signOut = async (clearCatch = false) => {
     if (!this.apiProvider) {
       return;
-    } else if (this.web3Modal) {
-      await this.web3Modal.clearCachedProvider();
+    } else if (this.web3Modal && clearCatch) {
+      this.web3Modal.clearCachedProvider();
     }
 
-    if (isMobile) window.localStorage.clear();
-    else window.localStorage.removeItem("walletconnect");
+    if (isMobile) window.localStorage?.clear();
+    else window.localStorage?.removeItem("walletconnect");
+
+    this.balances = {};
+    this._profiles = {};
+    this._pendingOrders = [];
+    this._pendingFills = [];
 
     this.web3 = null;
     this.web3Modal = null;
-    this.ethersProvider = null;
+    this.rollupProvider = null;
+    this.mainnetProvider = null;
     this.isArgent = false;
+    this.emit("signOut");
     this.setAPIProvider(this.apiProvider.network, false);
     this.emit("balanceUpdate", "wallet", {});
     this.emit("balanceUpdate", this.apiProvider.network, {});
-    this.emit("balanceUpdate", "polygon", {});
     this.emit("accountState", {});
-    this.emit("signOut");
-  };
-
-  getPolygonUrl(network) {
-    if (network === 1000) {
-      return `https://polygon-mumbai.infura.io/v3/${this.infuraId}`;
-    } else {
-      return `https://polygon-mainnet.infura.io/v3/${this.infuraId}`;
-    }
-  }
-
-  getPolygonChainId(network) {
-    if (network === 1000) {
-      return "0x13881";
-    } else {
-      return "0x89";
-    }
-  }
-
-  getPolygonWethContract(network) {
-    if (network === 1000) {
-      return POLYGON_MUMBAI_WETH_ADDRESS;
-    } else if (network === 1) {
-      return POLYGON_MAINNET_WETH_ADDRESS;
-    }
-  }
-
-  getPolygonWethBalance = async () => {
-    const [account] = await this.web3.eth.getAccounts();
-    if (!account) return;
-    const polygonEthAddress = this.getPolygonWethContract(
-      this.apiProvider.network
-    );
-    if (!this.polygonProvider) return 0;
-    const ethContract = new ethers.Contract(
-      polygonEthAddress,
-      erc20ContractABI,
-      this.polygonProvider
-    );
-    const wethBalance = await ethContract.balanceOf(account);
-    let p = formatAmount(wethBalance, { decimals: 18 });
-
-    this.emit("balanceUpdate", "polygon", {
-      WETH: {
-        value: wethBalance.toString(),
-        allowance: wethBalance,
-        valueReadable: p,
-      },
-    });
-    return wethBalance;
-  };
-
-  transferPolygonWeth = async (amount, walletAddress) => {
-    let networkSwitched = false;
-    this.emit("bridge_connecting", true);
-    try {
-      const polygonChainId = this.getPolygonChainId(this.apiProvider.network);
-      await window.ethereum.request({
-        method: "wallet_switchEthereumChain",
-        params: [{ chainId: polygonChainId }],
-      });
-      const polygonProvider = new ethers.providers.Web3Provider(
-        window.web3.currentProvider
-      );
-      // const currentNetwork = await polygonProvider.getNetwork(); // This is not correct on the brave browser.
-
-      // if ("0x"+currentNetwork.chainId.toString(16) !== polygonChainId)
-      //   throw new Error("Must approve network change");
-      // const signer = polygonProvider.getSigner();
-
-      networkSwitched = true;
-
-      const wethContractAddress = this.getPolygonWethContract(
-        this.apiProvider.network
-      );
-
-      const contract = new this.web3.eth.Contract(
-        wethContractABI,
-        wethContractAddress
-      );
-      // contract.connect(signer);
-      const [account] = await this.web3.eth.getAccounts();
-      const result = await contract.methods
-        .transfer(
-          ZKSYNC_POLYGON_BRIDGE.address,
-          "" + Math.round(amount * 10 ** 18)
-        )
-        .send({
-          from: account,
-          maxPriorityFeePerGas: null,
-          maxFeePerGas: null,
-        });
-
-      const txHash = result.transactionHash;
-
-      let receipt = {
-        date: +new Date(),
-        network: await polygonProvider.getNetwork(),
-        amount,
-        token: "WETH",
-        type: ZKSYNC_POLYGON_BRIDGE.polygonToZkSync,
-        txId: txHash,
-        walletAddress:
-          polygonChainId === "0x13881"
-            ? `https://rinkeby.zksync.io/explorer/accounts/${walletAddress}`
-            : `https://zkscan.io/explorer/accounts/${walletAddress}`,
-      };
-      const subdomain = polygonChainId === "0x13881" ? "mumbai." : "";
-      receipt.txUrl = `https://${subdomain}polygonscan.com/tx/${txHash}`;
-      this.emit("bridgeReceipt", receipt);
-
-      await this.signIn(this.apiProvider.network);
-      this.emit("bridge_connecting", false);
-    } catch (e) {
-      if (networkSwitched) await this.signIn(this.apiProvider.network);
-      this.emit("bridge_connecting", false);
-      throw e;
-    }
   };
 
   getNetworkName = (network) => {
@@ -505,8 +535,64 @@ export default class API extends Emitter {
     return keys[keys.findIndex((key) => network === this.networks[key][0])];
   };
 
+  getChainName = (chainId) => {
+    switch (chainId) {
+      case 1:
+        return "mainnet";
+      case 1002:
+        return "goerli";
+      case 42161:
+        return "arbitrum";
+      default:
+        return null;
+    }
+  };
+
+  getChainNameL1 = (chainId) => {
+    switch (chainId) {
+      case 1:
+      case 42161:
+        return "mainnet";
+      case 1002:
+        return "goerli";
+      default:
+        return null;
+    }
+  };
+
+  getChainIdFromName = (name) => {
+    return this.networks?.[name]?.[0];
+  };
+
+  getNetworkDisplayName = (network) => {
+    switch (network) {
+      case 1:
+      case 1002:
+        return "zkSync";
+      case 42161:
+        return "Arbitrum";
+      default:
+        return "ZigZag";
+    }
+  };
+
   subscribeToMarket = (market, showNightPriceChange = false) => {
-    this.send("subscribemarket", [this.apiProvider.network, market, showNightPriceChange]);
+    if (!market) return;
+
+    // allow all valid pairs, also allow default market all the time
+    // default market is guaranteed to be up
+    const allPairs = this.getPairs();
+    if (
+      !allPairs.includes(market) &&
+      market !== this.apiProvider.getDefaultMarket()
+    )
+      return;
+
+    this.send("subscribemarket", [
+      this.apiProvider.network,
+      market,
+      showNightPriceChange,
+    ]);
   };
 
   unsubscribeToMarket = (market) => {
@@ -517,36 +603,56 @@ export default class API extends Emitter {
     return !!this.apiProvider.zksyncCompatible;
   };
 
+  isEVMChain = () => {
+    return !!this.apiProvider.evmCompatible;
+  };
+
   cancelOrder = async (orderId) => {
-    await this.send("cancelorder", [this.apiProvider.network, orderId]);
+    const token = localStorage?.getItem(orderId);
+    // token is used to cancel the order - otherwiese the user is asked to sign a msg
+    if (token) {
+      await this.send("cancelorder3", [
+        this.apiProvider.network,
+        orderId,
+        token,
+      ]);
+    } else {
+      const toastMsg = toast.info(
+        i18next.t("sign_the_message_to_cancel_your_order"),
+        {
+          toastId: "Sign the message to cancel your order...'",
+        }
+      );
+
+      const message = `cancelorder2:${this.apiProvider.network}:${orderId}`;
+      const signedMessage = await this.apiProvider.signMessage(message);
+      try {
+        await this.send("cancelorder2", [
+          this.apiProvider.network,
+          orderId,
+          signedMessage,
+        ]);
+      } finally {
+        toast.dismiss(toastMsg);
+      }
+    }
+
     return true;
   };
 
   depositL2 = async (amount, token, address) => {
-    return this.apiProvider.depositL2(amount, token, address);
-  };
-
-  getPolygonFee = async () => {
-    const res = await axios.get("https://gasstation-mainnet.matic.network/v2");
-    return res.data;
+    return await this.apiProvider.depositL2(amount, token, address);
   };
 
   getEthereumFee = async () => {
-    if (this.ethersProvider) {
-      const feeData = await this.ethersProvider.getFeeData();
-      return feeData;
-    }
-  };
-
-  getEthereumFee = async () => {
-    if (this.ethersProvider) {
-      const feeData = await this.ethersProvider.getFeeData();
+    if (this.mainnetProvider) {
+      const feeData = await this.mainnetProvider.getFeeData();
       return feeData;
     }
   };
 
   withdrawL2 = async (amount, token) => {
-    return this.apiProvider.withdrawL2(amount, token);
+    return await this.apiProvider.withdrawL2(amount, token);
   };
 
   transferToBridge = (amount, token, address, userAddress) => {
@@ -589,9 +695,61 @@ export default class API extends Emitter {
     }
   };
 
-  cancelAllOrders = async () => {
+  cancelAllOrders = async (orderIds) => {
     const { id: userId } = await this.getAccountState();
-    await this.send("cancelall", [this.apiProvider.network, userId]);
+    const tokenArray = [];
+    orderIds.forEach((id) => {
+      const token = localStorage?.getItem(id);
+      if (token) tokenArray.push(token);
+    });
+    if (orderIds.length === tokenArray.length) {
+      await this.send("cancelall3", [
+        this.apiProvider.network,
+        userId,
+        tokenArray,
+      ]);
+    } else {
+      const toastMsg = toast.info(
+        i18next.t("sign_the_message_to_cancel_your_order"),
+        {
+          toastId: "Sign the message to cancel your order...'",
+        }
+      );
+      const validUntil = Math.floor(Date.now() / 1000) + 10;
+      const message = `cancelall2:${this.apiProvider.network}:${validUntil}`;
+      const signedMessage = await this.apiProvider.signMessage(message);
+      try {
+        await this.send("cancelall2", [
+          this.apiProvider.network,
+          userId,
+          validUntil,
+          signedMessage,
+        ]);
+      } finally {
+        toast.dismiss(toastMsg);
+      }
+    }
+
+    return true;
+  };
+
+  cancelAllOrdersAllChains = async () => {
+    const toastMsg = toast.info(
+      i18next.t("sign_the_message_to_cancel_your_order"),
+      {
+        toastId: "Sign the message to cancel your order...'",
+      }
+    );
+
+    const validUntil = Date.now() / 1000 + 10;
+    const message = `cancelall2:0:${validUntil}`;
+    const signedMessage = await this.apiProvider.signMessage(message);
+    const { id: userId } = await this.getAccountState();
+    try {
+      await this.send("cancelall2", [0, userId, signedMessage]);
+    } finally {
+      toast.dismiss(toastMsg);
+    }
     return true;
   };
 
@@ -624,25 +782,30 @@ export default class API extends Emitter {
   getBalanceOfCurrency = async (currency) => {
     const currencyInfo = this.getCurrencyInfo(currency);
     let result = { balance: 0, allowance: ethersConstants.Zero };
-    if (!this.ethersProvider) return result;
+    if (!this.mainnetProvider) return result;
 
     try {
       const netContract = this.getNetworkContract();
       const [account] = await this.web3.eth.getAccounts();
+      if (!account || account === "0x") return result;
+
       if (currency === "ETH") {
-        result.balance = await this.web3.eth.getBalance(account);
+        result.balance = await this.mainnetProvider.getBalance(account);
+        result.allowance = ethersConstants.MaxUint256;
         return result;
       }
 
-      if (!currencyInfo) return result;
-      const contract = new this.web3.eth.Contract(
+      if (!currencyInfo || !currencyInfo.address) return result;
+
+      const contract = new ethers.Contract(
+        currencyInfo.address,
         erc20ContractABI,
-        currencyInfo.address
+        this.mainnetProvider
       );
-      result.balance = await contract.methods.balanceOf(account).call();
+      result.balance = await contract.balanceOf(account);
       if (netContract) {
         result.allowance = ethers.BigNumber.from(
-          await contract.methods.allowance(account, netContract).call()
+          await contract.allowance(account, netContract)
         );
       }
       return result;
@@ -663,7 +826,7 @@ export default class API extends Emitter {
         allowance,
         valueReadable: "0",
       };
-      if (currencyInfo) {
+      if (balance && currencyInfo) {
         balances[ticker].valueReadable = formatAmount(balance, currencyInfo);
       } else if (ticker === "ETH") {
         balances[ticker].valueReadable = formatAmount(balance, {
@@ -687,6 +850,7 @@ export default class API extends Emitter {
 
   getBalances = async () => {
     const balances = await this.apiProvider.getBalances();
+    this.balances[this.apiProvider.network] = balances;
     this.emit("balanceUpdate", this.apiProvider.network, balances);
     return balances;
   };
@@ -695,9 +859,9 @@ export default class API extends Emitter {
     const side = order[3];
     const baseQuantity = order[5];
     const quoteQuantity = order[4] * order[5];
-    const remaining = isNaN(Number(order[11])) ? order[5] : order[11];
+    const remaining = Number(order[11]) !== null ? order[5] : order[11];
     const market = order[2];
-    const marketInfo = this.apiProvider.marketInfo[market];
+    const marketInfo = this.marketInfo[`${this.apiProvider.network}:${market}`];
     let baseQuantityWithoutFee,
       quoteQuantityWithoutFee,
       priceWithoutFee,
@@ -723,24 +887,32 @@ export default class API extends Emitter {
     };
   };
 
-  submitOrder = async (
-    product,
-    side,
-    price,
-    baseAmount,
-    quoteAmount,
-    orderType
-  ) => {
-    if (!quoteAmount && !baseAmount) {
+  submitOrder = async (market, side, baseAmount, quoteAmount, orderType) => {
+    if (!quoteAmount || !baseAmount) {
       throw new Error("Set base or quote amount");
     }
+
+    const marketInfo = this.marketInfo[`${this.apiProvider.network}:${market}`];
+    let baseAmountBN = ethers.utils.parseUnits(
+      Number(baseAmount).toFixed(marketInfo.baseAsset.decimals),
+      marketInfo.baseAsset.decimals
+    );
+    let quoteAmountBN = ethers.utils.parseUnits(
+      Number(quoteAmount).toFixed(marketInfo.quoteAsset.decimals),
+      marketInfo.quoteAsset.decimals
+    );
+
+    const expirationTimeSeconds =
+      orderType === "market"
+        ? Date.now() / 1000 + 60 * 2 // two minutes
+        : Date.now() / 1000 + 60 * 60 * 24 * 7; // one week
+
     await this.apiProvider.submitOrder(
-      product,
+      market,
       side,
-      price,
-      baseAmount,
-      quoteAmount,
-      orderType
+      baseAmountBN,
+      quoteAmountBN,
+      Math.floor(expirationTimeSeconds + this.serverDelta)
     );
   };
 
@@ -771,6 +943,33 @@ export default class API extends Emitter {
     return this.apiProvider.signMessage(message);
   };
 
+  approveExchangeContract = async (token, amount) => {
+    return this.apiProvider.approveExchangeContract(token, amount);
+  };
+
+  checkAccountActivated = async () => {
+    if (!this.isZksyncChain()) return true;
+    return this.apiProvider.checkAccountActivated();
+  };
+
+  warpETH = async (amount) => {
+    if (!amount) throw new Error("No amount set");
+    let amountBN = ethers.utils.parseEther(amount.toFixed(18));
+
+    return this.apiProvider.warpETH(amountBN);
+  };
+
+  unWarpETH = async (amount) => {
+    if (!amount) throw new Error("No amount set");
+    let amountBN = ethers.utils.parseEther(amount.toFixed(18));
+
+    return this.apiProvider.unWarpETH(amountBN);
+  };
+
+  getWrapFees = async () => {
+    return this.apiProvider.getWrapFees();
+  };
+
   uploadArweaveFile = async (sender, timestamp, signature, file) => {
     const formData = new FormData();
     formData.append("sender", sender);
@@ -785,26 +984,6 @@ export default class API extends Emitter {
     }).then((r) => r.json());
     return response;
   };
-
-  getTokenInfo = (tokenLike, chainId) => {
-    return this.apiProvider.getTokenInfo(tokenLike, chainId);
-  };
-
-  getTokenPrice = (tokenLike, chainId) => {
-    return this.apiProvider.tokenPrice(tokenLike, chainId);
-  };
-
-  getCurrencies = () => {
-    return this.apiProvider.getCurrencies();
-  };
-
-  getPairs = () => {
-    return this.apiProvider.getPairs();
-  };
-
-  getCurrencyInfo(currency) {
-    return this.apiProvider.getCurrencyInfo(currency);
-  }
 
   getCurrencyLogo(currency) {
     try {
@@ -828,7 +1007,7 @@ export default class API extends Emitter {
         FRAX: "0x853d955aCEf822Db058eb8505911ED77F175b99e",
         UST: "0xa693b19d2931d498c5b318df961919bb4aee87a5",
       };
-    } else if (this.apiProvider.network === 1000) {
+    } else if (this.apiProvider.network === 1002) {
       return {
         // these are just tokens on rinkeby with the correct tickers.
         // neither are actually on rinkeby.
@@ -841,21 +1020,21 @@ export default class API extends Emitter {
   }
 
   async getL2FastWithdrawLiquidity() {
-    if (this.ethersProvider) {
+    if (this.mainnetProvider) {
       const currencyMaxes = {};
       if (!this.apiProvider.eligibleFastWithdrawTokens) return currencyMaxes;
       for (const currency of this.apiProvider.eligibleFastWithdrawTokens) {
         let max = 0;
         try {
           if (currency === "ETH") {
-            max = await this.ethersProvider.getBalance(
+            max = await this.mainnetProvider.getBalance(
               this.apiProvider.fastWithdrawContractAddress
             );
           } else {
             const contract = new ethers.Contract(
               this.fastWithdrawTokenAddresses[currency],
               erc20ContractABI,
-              this.ethersProvider
+              this.mainnetProvider
             );
             max = await contract.balanceOf(
               this.apiProvider.fastWithdrawContractAddress
@@ -916,10 +1095,86 @@ export default class API extends Emitter {
     });
     // request status update
     if (fillRequestIds.length > 0) {
-      this.send("fillreceiptreq", [
-        this.apiProvider.network,
-        Number(fillRequestIds),
-      ]);
+      for (let i in fillRequestIds) {
+        this.send("fillreceiptreq", [
+          this.apiProvider.network,
+          Number(fillRequestIds[i]),
+        ]);
+      }
     }
   };
+
+  getPairs = (chainId = this.apiProvider.network) => {
+    if (!this.lastPrices[chainId]) return [];
+    return Object.keys(this.lastPrices[chainId]);
+  };
+
+  getCurrencyInfo = (currency) => {
+    const pairs = this.getPairs();
+    for (let i = 0; i < pairs.length; i++) {
+      const pair = pairs[i];
+      const marketInfo = this.marketInfo[`${this.apiProvider.network}:${pair}`];
+      const baseCurrency = pair.split("-")[0];
+      const quoteCurrency = pair.split("-")[1];
+      if (baseCurrency === currency && marketInfo) {
+        return marketInfo.baseAsset;
+      } else if (quoteCurrency === currency && marketInfo) {
+        return marketInfo.quoteAsset;
+      }
+    }
+    return null;
+  };
+
+  getCurrencies = (chainId = this.apiProvider.network) => {
+    const tickers = new Set();
+    for (let market in this.lastPrices[chainId]) {
+      tickers.add(this.lastPrices[chainId][market][0].split("-")[0]);
+      tickers.add(this.lastPrices[chainId][market][0].split("-")[1]);
+    }
+    return [...tickers];
+  };
+
+  getExplorerTxLink = (chainId, txhash) => {
+    switch (Number(chainId)) {
+      case 1:
+        return "https://zkscan.io/explorer/transactions/" + txhash;
+      case 1002:
+        return "https://goerli.zkscan.io/explorer/transactions/" + txhash;
+      case 42161:
+        return "https://arbiscan.io/tx/" + txhash;
+      default:
+        throw Error("Chain ID not understood");
+    }
+  };
+
+  getExplorerAccountLink = (chainId, address, layer = 2) => {
+    if (layer === 1) {
+      switch (Number(chainId)) {
+        case 1:
+        case 42161:
+          return "https://etherscan.io/address/" + address;
+        case 1002:
+          return "https://goerli.etherscan.io/address/" + address;
+        default:
+          throw Error("Chain ID not understood");
+      }
+    } else {
+      switch (Number(chainId)) {
+        case 1:
+          return "https://zkscan.io/explorer/accounts/" + address;
+        case 1002:
+          return "https://goerli.zkscan.io/explorer/accounts/" + address;
+        case 42161:
+          return "https://arbiscan.io/address/" + address;
+        default:
+          throw Error("Chain ID not understood");
+      }
+    }
+  };
+
+  changePubKeyAPI = async () => {
+    await this.apiProvider.changePubKey();
+  };
 }
+
+export default API;

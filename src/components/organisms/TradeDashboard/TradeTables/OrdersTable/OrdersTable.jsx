@@ -2,21 +2,18 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
-import "./OrdersTable.css";
 import { useCoinEstimator } from "components";
 import styled from "styled-components";
 import loadingGif from "assets/icons/loading.svg";
 
 import FillCard from "./FillCard";
-import {
-  balancesSelector,
-  networkSelector,
-  settingsSelector,
-} from "lib/store/features/api/apiSlice";
+import { balancesSelector } from "lib/store/features/api/apiSlice";
 import api from "lib/api";
 import { formatDate, formatDateTime, formatToken, addComma } from "lib/utils";
 import { Tab } from "components/molecules/TabMenu";
 import Text from "components/atoms/Text/Text";
+
+import { useTranslation } from "react-i18next";
 
 import {
   SortUpIcon,
@@ -50,25 +47,31 @@ const TableHeaderWrapper = styled.div`
 `;
 
 export default function OrdersTable(props) {
-  const network = useSelector(networkSelector);
   const balanceData = useSelector(balancesSelector);
-  const settings = useSelector(settingsSelector);
   const coinEstimator = useCoinEstimator();
   const [tab, setTabIndex] = useState(0);
-  const [selectedSide, setSelectedSide] = useState("All");
+  const [selectedSide, setSelectedSide] = useState("all");
+  const [selectedTradeType, setSelectedTradeType] = useState("all");
   const [tokenDirection, setTokenDirection] = useState(false);
   const [balanceDirection, setBalanceDirection] = useState(false);
   const [walletList, setWalletList] = useState([]);
   const [tokenSorted, setTokenSorted] = useState(false);
   const [balanceSorted, setBalanceSorted] = useState(false);
   const [sideItems, setSideItems] = useState([
-    { text: "All", url: "#", iconSelected: true, value: "All" },
-    { text: "Buy", url: "#", value: "Buy" },
-    { text: "Sell", url: "#", value: "Sell" },
+    { text: "all", url: "#", iconSelected: true, value: "All" },
+    { text: "buy", url: "#", value: "Buy" },
+    { text: "sell", url: "#", value: "Sell" },
+  ]);
+  const [tradeTypeItems, setTradeTypeItems] = useState([
+    { text: "all", url: "#", iconSelected: true, value: "All" },
+    { text: "maker", url: "#", value: "Maker" },
+    { text: "taker", url: "#", value: "Taker" },
   ]);
   const isMobile = window.innerWidth < 1064;
 
-  const wallet = balanceData[network];
+  const wallet = balanceData[props.network];
+
+  const { t } = useTranslation();
 
   useEffect(() => {
     let walletArray = [];
@@ -84,7 +87,7 @@ export default function OrdersTable(props) {
 
     let isSame = true;
 
-    walletArray.map((item) => {
+    walletArray.forEach((item) => {
       let index = walletList.findIndex((item1) => item.token === item1.token);
       if (index === -1) isSame = false;
       else {
@@ -107,7 +110,15 @@ export default function OrdersTable(props) {
       .filter(
         (i) =>
           i[6] === "f" &&
-          (selectedSide === "All" || i[3] === selectedSide.toLowerCase()[0])
+          (selectedSide === "all" || i[3] === selectedSide.toLowerCase()[0])
+      )
+      .filter(
+        (i) =>
+          selectedTradeType === "all" ||
+          (selectedTradeType === "taker" &&
+            i[8].toLowerCase() === `${props?.user?.id}`.toLowerCase()) ||
+          (selectedTradeType === "maker" &&
+            i[9].toLowerCase() === `${props?.user?.id}`.toLowerCase())
       )
       .sort((a, b) => b[1] - a[1]);
   };
@@ -117,9 +128,17 @@ export default function OrdersTable(props) {
       .filter(
         (i) =>
           i[9] !== "f" &&
-          (selectedSide === "All" || i[3] === selectedSide.toLowerCase()[0])
+          (selectedSide === "all" || i[3] === selectedSide.toLowerCase()[0])
       )
       .sort((a, b) => b[1] - a[1]);
+  };
+
+  const getOpenUserOrderIds = () => {
+    const userOrders = getUserOrders();
+    const openOrders = userOrders.filter((o) =>
+      ["o", "pf", "pm"].includes(o[9])
+    );
+    return openOrders.map((o) => o[1]);
   };
 
   const isOpenStatus = (orders) => {
@@ -141,8 +160,28 @@ export default function OrdersTable(props) {
       }
       return acc;
     }, []);
+    console.log(newSide);
     setSelectedSide(newSide);
     setSideItems(newItems);
+  };
+
+  const changeTradeType = (newType) => {
+    const newItems = tradeTypeItems.reduce((acc, item) => {
+      if (item.text === newType) {
+        acc.push({
+          ...item,
+          iconSelected: true,
+        });
+      } else {
+        acc.push({
+          ...item,
+          iconSelected: false,
+        });
+      }
+      return acc;
+    }, []);
+    setSelectedTradeType(newType);
+    setTradeTypeItems(newItems);
   };
 
   const sortByNotional = (cur1, cur2) => {
@@ -157,10 +196,10 @@ export default function OrdersTable(props) {
 
   const filterSmallBalances = (currency) => {
     const balance = wallet[currency].valueReadable;
-    const usd_balance =
-      coinEstimator(currency) * wallet[currency].valueReadable;
+    const usdPrice = coinEstimator(currency);
+    const usd_balance = usdPrice * wallet[currency].valueReadable;
 
-    if (usd_balance < 0.02) return false;
+    if (usd_balance < 0.02 && Number(usdPrice) !== 0) return false;
 
     if (balance) {
       return Number(balance) > 0;
@@ -239,13 +278,16 @@ export default function OrdersTable(props) {
     try {
       await api.cancelOrder(orderId);
 
-      if (!settings.disableOrderNotification) {
-        toast.info("Order cancelled", {
+      if (!props.settings?.disableOrderNotification) {
+        toast.info(t("order_cancelled"), {
           toastId: "Order cancelled.",
         });
       }
     } catch (e) {
-      toast.error(e.message);
+      toast.error(t("transaction_was_rejected"), {
+        toastId: t("transaction_was_rejected"),
+        autoClose: true,
+      });
     }
   };
 
@@ -273,10 +315,10 @@ export default function OrdersTable(props) {
             const time = order[7] && formatDateTime(new Date(order[7] * 1000));
             let price = order[4];
             let baseQuantity = order[5];
-            let remaining = isNaN(Number(order[11])) ? order[5] : order[11];
+            let remaining = order[10] === null ? baseQuantity : order[10];
             const orderStatus = order[9];
             const baseCurrency = order[2].split("-")[0];
-            const side = order[3] === "b" ? "buy" : "sell";
+            const side = order[3] === "b" ? t("buy") : t("sell");
             const sideclassname =
               order[3] === "b" ? "successHighEmphasis" : "dangerHighEmphasis";
             const expiration = order[7];
@@ -293,8 +335,8 @@ export default function OrdersTable(props) {
               expiryText = "--";
             }
 
-            const orderWithoutFee = api.getOrderDetailsWithoutFee(order);
             if (api.isZksyncChain()) {
+              const orderWithoutFee = api.getOrderDetailsWithoutFee(order);
               price = orderWithoutFee.price;
               baseQuantity = orderWithoutFee.baseQuantity;
               remaining = orderWithoutFee.remaining;
@@ -302,21 +344,21 @@ export default function OrdersTable(props) {
             let statusText, statusClass;
             switch (order[9]) {
               case "r":
-                statusText = "rejected";
+                statusText = t("rejected");
                 statusClass = "dangerHighEmphasis";
                 break;
               case "pf":
-                statusText = "partial fill";
+                statusText = t("partial_fill");
                 statusClass = "successHighEmphasis";
                 break;
               case "f":
-                statusText = "filled";
+                statusText = t("filled");
                 statusClass = "successHighEmphasis";
                 break;
               case "pm":
                 statusText = (
                   <span>
-                    partial match
+                    {t("partial_match")}
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -328,8 +370,8 @@ export default function OrdersTable(props) {
                 break;
               case "m":
                 statusText = (
-                  <span>
-                    matched{" "}
+                  <span className="flex items-center gap-1">
+                    {t("matched")}{" "}
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -342,7 +384,9 @@ export default function OrdersTable(props) {
               case "b":
                 statusText = (
                   <span>
-                    <span style={{ display: "inline" }}>committing </span>
+                    <span style={{ display: "inline" }}>
+                      {t("committing")}{" "}
+                    </span>
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -354,15 +398,15 @@ export default function OrdersTable(props) {
                 statusClass = "warningHighEmphasis";
                 break;
               case "o":
-                statusText = "open";
+                statusText = t("open");
                 statusClass = "successHighEmphasis";
                 break;
               case "c":
-                statusText = "canceled";
+                statusText = t("canceled");
                 statusClass = "dangerHighEmphasis";
                 break;
               case "e":
-                statusText = "expired";
+                statusText = t("expired");
                 statusClass = "warningHighEmphasis";
                 break;
               default:
@@ -414,7 +458,7 @@ export default function OrdersTable(props) {
                             textAlign="right"
                             onClick={() => cancelOrder(orderId)}
                           >
-                            Cancel
+                            {t("cancel")}
                           </ActionWrapper>
                         ) : (
                           ""
@@ -428,7 +472,7 @@ export default function OrdersTable(props) {
                         font="primaryExtraSmallSemiBold"
                         color="foregroundLowEmphasis"
                       >
-                        Price
+                        {t("price")}
                       </Text>
                     </td>
                     <td>
@@ -437,7 +481,7 @@ export default function OrdersTable(props) {
                         color="foregroundHighEmphasis"
                         textAlign="right"
                       >
-                        {addComma(price.toPrecision(6) / 1)}
+                        {addComma(price?.toPrecision(6) / 1)}
                       </Text>
                     </td>
                   </tr>
@@ -447,7 +491,7 @@ export default function OrdersTable(props) {
                         font="primaryExtraSmallSemiBold"
                         color="foregroundLowEmphasis"
                       >
-                        Amount
+                        {t("filled")}
                       </Text>
                     </td>
                     <td>
@@ -456,17 +500,21 @@ export default function OrdersTable(props) {
                         color="foregroundHighEmphasis"
                         textAlign="right"
                       >
-                        {baseQuantity.toPrecision(6) / 1} {baseCurrency}
+                        {baseQuantity?.toPrecision(6) / 1 -
+                          remaining?.toPrecision(6) / 1}{" "}
+                        / {baseQuantity?.toPrecision(6) / 1}&nbsp;
+                        {baseCurrency}
                       </Text>
                     </td>
                   </tr>
+
                   <tr>
                     <td>
                       <Text
                         font="primaryExtraSmallSemiBold"
                         color="foregroundLowEmphasis"
                       >
-                        Fee
+                        {t("expiry")}
                       </Text>
                     </td>
                     <td>
@@ -475,7 +523,7 @@ export default function OrdersTable(props) {
                         color="foregroundHighEmphasis"
                         textAlign="right"
                       >
-                        {remaining.toPrecision(6) / 1} {baseCurrency}
+                        {expiryText}
                       </Text>
                     </td>
                   </tr>
@@ -498,7 +546,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Time
+                  {t("time")}
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -511,7 +559,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Market
+                  {t("market")}
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -526,7 +574,7 @@ export default function OrdersTable(props) {
                   transparent={true}
                   width={162}
                   item={sideItems}
-                  context="Side"
+                  context={t("side")}
                   leftIcon={false}
                   clickFunction={changeSide}
                 />
@@ -538,7 +586,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Price
+                  {t("price")}
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -551,7 +599,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Amount
+                  {t("filled")}
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -564,7 +612,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Remaining
+                  {t("expiry")}
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -577,7 +625,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Expiry
+                  {t("order_status")}
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -590,26 +638,23 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Order Status
+                  {t("action")}
                 </Text>
-                {/* <SortIconWrapper>
-                    <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper> */}
               </HeaderWrapper>
             </th>
-            <th scope="col">
-              <HeaderWrapper>
-                <Text
-                  font="primaryExtraSmallSemiBold"
-                  color="foregroundLowEmphasis"
-                >
-                  Action
-                </Text>
-                {/* <SortIconWrapper>
-                    <SortUpIcon /><SortDownIcon />
-                  </SortIconWrapper> */}
-              </HeaderWrapper>
-            </th>
+            {isOpenStatus(getUserOrders()) &&
+              !props.settings?.showCancelOrders && (
+                <th className="w-36">
+                  <StyledButton
+                    variant="outlined"
+                    width="100px"
+                    scale="md"
+                    onClick={() => api.cancelAllOrders(getOpenUserOrderIds())}
+                  >
+                    {t("cancel_all")}
+                  </StyledButton>
+                </th>
+              )}
           </tr>
         </thead>
         <tbody>
@@ -619,10 +664,10 @@ export default function OrdersTable(props) {
             const time = order[7] && formatDate(new Date(order[7] * 1000));
             let price = order[4];
             let baseQuantity = order[5];
-            let remaining = isNaN(Number(order[11])) ? order[5] : order[11];
+            let remaining = order[10] === null ? baseQuantity : order[10];
             let orderStatus = order[9];
             const baseCurrency = order[2].split("-")[0];
-            const side = order[3] === "b" ? "buy" : "sell";
+            const side = order[3] === "b" ? t("buy") : t("sell");
             const sideclassname =
               order[3] === "b" ? "successHighEmphasis" : "dangerHighEmphasis";
             const expiration = order[7];
@@ -644,8 +689,8 @@ export default function OrdersTable(props) {
               orderStatus = "e";
             }
 
-            const orderWithoutFee = api.getOrderDetailsWithoutFee(order);
             if (api.isZksyncChain()) {
+              const orderWithoutFee = api.getOrderDetailsWithoutFee(order);
               price = orderWithoutFee.price;
               baseQuantity = orderWithoutFee.baseQuantity;
               remaining = orderWithoutFee.remaining;
@@ -653,34 +698,25 @@ export default function OrdersTable(props) {
             let statusText, statusClass;
             switch (orderStatus) {
               case "r":
-                statusText = "rejected";
+                statusText = t("rejected");
                 statusClass = "dangerHighEmphasis";
                 break;
               case "pf":
-                statusText = "partial fill";
+                statusText = t("partial_fill");
                 statusClass = "successHighEmphasis";
                 break;
               case "f":
-                statusText = "filled";
+                statusText = t("filled");
                 statusClass = "successHighEmphasis";
                 break;
               case "pm":
-                statusText = (
-                  <span>
-                    partial match
-                    <img
-                      className="loading-gif"
-                      src={loadingGif}
-                      alt="Pending"
-                    />
-                  </span>
-                );
+                statusText = <span>{t("partial_match")}</span>;
                 statusClass = "warningHighEmphasis";
                 break;
               case "m":
                 statusText = (
-                  <span>
-                    matched{" "}
+                  <span className="flex items-center gap-1">
+                    {t("matched")}{" "}
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -693,7 +729,9 @@ export default function OrdersTable(props) {
               case "b":
                 statusText = (
                   <span>
-                    <span style={{ display: "inline" }}>committing </span>
+                    <span style={{ display: "inline" }}>
+                      {t("committing")}{" "}
+                    </span>
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -705,15 +743,15 @@ export default function OrdersTable(props) {
                 statusClass = "warningHighEmphasis";
                 break;
               case "o":
-                statusText = "open";
+                statusText = t("open");
                 statusClass = "successHighEmphasis";
                 break;
               case "c":
-                statusText = "canceled";
+                statusText = t("canceled");
                 statusClass = "dangerHighEmphasis";
                 break;
               case "e":
-                statusText = "expired";
+                statusText = t("expired");
                 statusClass = "warningHighEmphasis";
                 break;
               default:
@@ -752,23 +790,18 @@ export default function OrdersTable(props) {
                       font="primaryExtraSmallSemiBold"
                       color="foregroundHighEmphasis"
                     >
-                      {addComma(price.toPrecision(6) / 1)}
+                      {addComma(price?.toPrecision(6) / 1)}
                     </Text>
                   </td>
-                  <td data-label="Quantity">
+                  <td data-label="filled">
                     <Text
                       font="primaryExtraSmallSemiBold"
                       color="foregroundHighEmphasis"
                     >
-                      {baseQuantity.toPrecision(6) / 1} {baseCurrency}
-                    </Text>
-                  </td>
-                  <td data-label="Remaining">
-                    <Text
-                      font="primaryExtraSmallSemiBold"
-                      color="foregroundHighEmphasis"
-                    >
-                      {remaining.toPrecision(6) / 1} {baseCurrency}
+                      {baseQuantity?.toPrecision(6) / 1 -
+                        remaining?.toPrecision(6) / 1}{" "}
+                      / {baseQuantity?.toPrecision(6) / 1}&nbsp;
+                      {baseCurrency}
                     </Text>
                   </td>
                   <td data-label="Expiry">
@@ -785,18 +818,22 @@ export default function OrdersTable(props) {
                     </Text>
                   </td>
                   <td data-label="Action">
-                    {orderStatus === "o" ? (
+                    {["o", "pf", "pm"].includes(orderStatus) ? (
                       <ActionWrapper
                         font="primaryExtraSmallSemiBold"
                         color="primaryHighEmphasis"
                         onClick={() => cancelOrder(orderId)}
                       >
-                        Cancel
+                        {t("cancel")}
                       </ActionWrapper>
                     ) : (
                       ""
                     )}
                   </td>
+                  {isOpenStatus(getUserOrders()) &&
+                    !props.settings?.showCancelOrders && (
+                      <td className="w-36"></td>
+                    )}
                 </tr>
               </>
             );
@@ -807,18 +844,6 @@ export default function OrdersTable(props) {
   };
 
   const renderFillTable = (fills) => {
-    let baseExplorerUrl;
-    switch (api.apiProvider.network) {
-      case 1001:
-        baseExplorerUrl = "https://goerli.voyager.online/tx/";
-        break;
-      case 1000:
-        baseExplorerUrl = "https://rinkeby.zkscan.io/explorer/transactions/";
-        break;
-      case 1:
-      default:
-        baseExplorerUrl = "https://zkscan.io/explorer/transactions/";
-    }
     return isMobile ? (
       <table>
         <tbody>
@@ -831,9 +856,13 @@ export default function OrdersTable(props) {
             let price = fill[4];
             let baseQuantity = fill[5];
             const fillstatus = fill[6];
-            const sidetext = side === "b" ? "buy" : "sell";
+            const sidetext = side === "b" ? t("buy") : t("sell");
             const sideclassname =
               side === "b" ? "successHighEmphasis" : "dangerHighEmphasis";
+            const tradeTypeText =
+              fill[8].toLowerCase() === `${props?.user?.id}`.toLowerCase()
+                ? t("taker")
+                : t("maker");
             const txhash = fill[7];
             const feeamount = Number(fill[10]);
             const feetoken = fill[11];
@@ -841,8 +870,8 @@ export default function OrdersTable(props) {
             if (feeamount && feetoken) {
               const displayFee =
                 feeamount > 9999
-                  ? feeamount.toFixed(0)
-                  : feeamount.toPrecision(4);
+                  ? feeamount?.toFixed(0)
+                  : feeamount?.toPrecision(4);
               feeText = `${displayFee} ${feetoken}`;
             }
             if (api.isZksyncChain()) {
@@ -852,21 +881,21 @@ export default function OrdersTable(props) {
             let statusText, statusClass;
             switch (fillstatus) {
               case "r":
-                statusText = "rejected";
+                statusText = t("rejected");
                 statusClass = "dangerHighEmphasis";
                 break;
               case "pf":
-                statusText = "partial fill";
+                statusText = t("partial_fill");
                 statusClass = "successHighEmphasis";
                 break;
               case "f":
-                statusText = "filled";
+                statusText = t("filled");
                 statusClass = "successHighEmphasis";
                 break;
               case "pm":
                 statusText = (
                   <span>
-                    partial match
+                    {t("partial_match")}
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -878,8 +907,8 @@ export default function OrdersTable(props) {
                 break;
               case "m":
                 statusText = (
-                  <span>
-                    matched{" "}
+                  <span className="flex items-center gap-1">
+                    {t("matched")}{" "}
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -892,7 +921,9 @@ export default function OrdersTable(props) {
               case "b":
                 statusText = (
                   <span>
-                    <span style={{ display: "inline" }}>committing </span>
+                    <span style={{ display: "inline" }}>
+                      {t("committing")}{" "}
+                    </span>
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -904,22 +935,21 @@ export default function OrdersTable(props) {
                 statusClass = "warningHighEmphasis";
                 break;
               case "o":
-                statusText = "open";
+                statusText = t("open");
                 statusClass = "successHighEmphasis";
                 break;
               case "c":
-                statusText = "canceled";
+                statusText = t("canceled");
                 statusClass = "dangerHighEmphasis";
                 break;
               case "e":
-                statusText = "expired";
+                statusText = t("expired");
                 statusClass = "warningHighEmphasis";
                 break;
               default:
                 break;
             }
 
-            const marketInfo = api.marketInfo[market];
             return (
               <tr key={fillid}>
                 <table>
@@ -938,6 +968,9 @@ export default function OrdersTable(props) {
                             color={sideclassname}
                           >
                             {sidetext}
+                          </Text>
+                          <Text font="primaryExtraSmallSemiBold">
+                            {tradeTypeText}
                           </Text>
                         </div>
                         <Text
@@ -965,10 +998,16 @@ export default function OrdersTable(props) {
                               color="primaryHighEmphasis"
                               textAlign="right"
                               onClick={() =>
-                                window.open(baseExplorerUrl + txhash, "_blank")
+                                window.open(
+                                  api.getExplorerTxLink(
+                                    api.apiProvider.network,
+                                    txhash
+                                  ),
+                                  "_blank"
+                                )
                               }
                             >
-                              View Tx
+                              {t("view_tx")}
                             </ActionWrapper>
                           ) : (
                             ""
@@ -982,7 +1021,7 @@ export default function OrdersTable(props) {
                           font="primaryExtraSmallSemiBold"
                           color="foregroundLowEmphasis"
                         >
-                          Price
+                          {t("price")}
                         </Text>
                       </td>
                       <td>
@@ -991,7 +1030,7 @@ export default function OrdersTable(props) {
                           color="foregroundHighEmphasis"
                           textAlign="right"
                         >
-                          {price.toPrecision(6) / 1}
+                          {price?.toPrecision(6) / 1}
                         </Text>
                       </td>
                     </tr>
@@ -1001,7 +1040,7 @@ export default function OrdersTable(props) {
                           font="primaryExtraSmallSemiBold"
                           color="foregroundLowEmphasis"
                         >
-                          Amount
+                          {t("amount")}
                         </Text>
                       </td>
                       <td>
@@ -1010,7 +1049,7 @@ export default function OrdersTable(props) {
                           color="foregroundHighEmphasis"
                           textAlign="right"
                         >
-                          {baseQuantity.toPrecision(6) / 1} {baseCurrency}
+                          {baseQuantity?.toPrecision(6) / 1} {baseCurrency}
                         </Text>
                       </td>
                     </tr>
@@ -1020,7 +1059,7 @@ export default function OrdersTable(props) {
                           font="primaryExtraSmallSemiBold"
                           color="foregroundLowEmphasis"
                         >
-                          Trade ID
+                          {t("trade_id")}
                         </Text>
                       </td>
                       <td>
@@ -1040,7 +1079,7 @@ export default function OrdersTable(props) {
                           font="primaryExtraSmallSemiBold"
                           color="foregroundLowEmphasis"
                         >
-                          Fee
+                          {t("fee")}
                         </Text>
                       </td>
                       <td>
@@ -1073,7 +1112,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Time
+                  {t("time")}
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -1086,7 +1125,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Market
+                  {t("market")}
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -1101,9 +1140,23 @@ export default function OrdersTable(props) {
                   transparent={true}
                   width={162}
                   item={sideItems}
-                  context="Side"
+                  context={t("side")}
                   leftIcon={false}
                   clickFunction={changeSide}
+                />
+              </HeaderWrapper>
+            </th>
+            <th scope="col">
+              <HeaderWrapper style={{ position: "relative" }}>
+                {/* <Text font="primaryExtraSmallSemiBold" color="foregroundLowEmphasis" onClick>Side</Text> */}
+                <Dropdown
+                  adClass="side-dropdown size-wide"
+                  transparent={true}
+                  width={162}
+                  item={tradeTypeItems}
+                  context={t("type")}
+                  leftIcon={false}
+                  clickFunction={changeTradeType}
                 />
               </HeaderWrapper>
             </th>
@@ -1113,7 +1166,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Amount
+                  {t("amount")}
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -1126,7 +1179,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Price
+                  {t("price")}
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -1139,7 +1192,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Fee
+                  {t("fee")}
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -1152,7 +1205,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Order Status
+                  {t("order_status")}
                 </Text>
               </HeaderWrapper>
             </th>
@@ -1162,7 +1215,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Trade ID
+                  {t("trade_id")}
                 </Text>
               </HeaderWrapper>
             </th>
@@ -1172,7 +1225,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundLowEmphasis"
                 >
-                  Action
+                  {t("action")}
                 </Text>
                 {/* <SortIconWrapper>
                     <SortUpIcon /><SortDownIcon />
@@ -1191,9 +1244,13 @@ export default function OrdersTable(props) {
             let baseQuantity = fill[5];
             const baseCurrency = fill[2].split("-")[0];
             const fillstatus = fill[6];
-            const sidetext = side === "b" ? "buy" : "sell";
+            const sidetext = side === "b" ? t("buy") : t("sell");
             const sideclassname =
               side === "b" ? "successHighEmphasis" : "dangerHighEmphasis";
+            const tradeTypeText =
+              fill[8].toLowerCase() === `${props?.user?.id}`.toLowerCase()
+                ? t("taker")
+                : t("maker");
             const txhash = fill[7];
             const feeamount = Number(fill[10]);
             const feetoken = fill[11];
@@ -1201,8 +1258,8 @@ export default function OrdersTable(props) {
             if (feeamount && feetoken) {
               const displayFee =
                 feeamount > 9999
-                  ? feeamount.toFixed(0)
-                  : feeamount.toPrecision(4);
+                  ? feeamount?.toFixed(0)
+                  : feeamount?.toPrecision(4);
               feeText = `${displayFee} ${feetoken}`;
             }
             if (api.isZksyncChain()) {
@@ -1212,21 +1269,21 @@ export default function OrdersTable(props) {
             let statusText, statusClass;
             switch (fillstatus) {
               case "r":
-                statusText = "rejected";
+                statusText = t("rejected");
                 statusClass = "dangerHighEmphasis";
                 break;
               case "pf":
-                statusText = "partial fill";
+                statusText = t("partial_fill");
                 statusClass = "successHighEmphasis";
                 break;
               case "f":
-                statusText = "filled";
+                statusText = t("filled");
                 statusClass = "successHighEmphasis";
                 break;
               case "pm":
                 statusText = (
                   <span>
-                    partial match
+                    {t("partial_match")}
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -1238,8 +1295,8 @@ export default function OrdersTable(props) {
                 break;
               case "m":
                 statusText = (
-                  <span>
-                    matched{" "}
+                  <span className="flex items-center gap-1">
+                    {t("matched")}{" "}
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -1252,7 +1309,9 @@ export default function OrdersTable(props) {
               case "b":
                 statusText = (
                   <span>
-                    <span style={{ display: "inline" }}>committing </span>
+                    <span style={{ display: "inline" }}>
+                      {t("committing")}{" "}
+                    </span>
                     <img
                       className="loading-gif"
                       src={loadingGif}
@@ -1264,22 +1323,20 @@ export default function OrdersTable(props) {
                 statusClass = "warningHighEmphasis";
                 break;
               case "o":
-                statusText = "open";
+                statusText = t("open");
                 statusClass = "successHighEmphasis";
                 break;
               case "c":
-                statusText = "canceled";
+                statusText = t("canceled");
                 statusClass = "dangerHighEmphasis";
                 break;
               case "e":
-                statusText = "expired";
+                statusText = t("expired");
                 statusClass = "warningHighEmphasis";
                 break;
               default:
                 break;
             }
-
-            const marketInfo = api.marketInfo[market];
             return (
               <tr key={fillid}>
                 <td data-label="Time">
@@ -1303,12 +1360,15 @@ export default function OrdersTable(props) {
                     {sidetext}
                   </Text>
                 </td>
+                <td data-label="Trade">
+                  <Text font="primaryExtraSmallSemiBold">{tradeTypeText}</Text>
+                </td>
                 <td data-label="Quantity">
                   <Text
                     font="primaryExtraSmallSemiBold"
                     color="foregroundHighEmphasis"
                   >
-                    {baseQuantity.toPrecision(6) / 1} {baseCurrency}
+                    {baseQuantity?.toPrecision(6) / 1} {baseCurrency}
                   </Text>
                 </td>
                 <td data-label="Price">
@@ -1316,7 +1376,7 @@ export default function OrdersTable(props) {
                     font="primaryExtraSmallSemiBold"
                     color="foregroundHighEmphasis"
                   >
-                    {price.toPrecision(6) / 1}
+                    {price && parseFloat(price)?.toPrecision(6) / 1}
                   </Text>
                 </td>
                 <td data-label="Fee">
@@ -1346,10 +1406,16 @@ export default function OrdersTable(props) {
                       font="primaryExtraSmallSemiBold"
                       color="primaryHighEmphasis"
                       onClick={() =>
-                        window.open(baseExplorerUrl + txhash, "_blank")
+                        window.open(
+                          api.getExplorerTxLink(
+                            api.apiProvider.network,
+                            txhash
+                          ),
+                          "_blank"
+                        )
                       }
                     >
-                      View Tx
+                      {t("view_tx")}
                     </ActionWrapper>
                   ) : (
                     ""
@@ -1363,18 +1429,6 @@ export default function OrdersTable(props) {
     );
   };
 
-  let explorerLink;
-  switch (api.apiProvider.network) {
-    case 1000:
-      explorerLink =
-        "https://rinkeby.zkscan.io/explorer/accounts/" + props.user.address;
-      break;
-    case 1:
-    default:
-      explorerLink =
-        "https://zkscan.io/explorer/accounts/" + props.user.address;
-  }
-
   let footerContent;
   switch (tab) {
     case 0:
@@ -1385,10 +1439,33 @@ export default function OrdersTable(props) {
       break;
     case 2:
       if (props.user.committed) {
+        const tokenBalanceInOrder = {};
+        const userOrders = getUserOrders();
+        if (userOrders.length > 0) {
+          userOrders.forEach((order) => {
+            if (order.length === 0) return;
+            if (["c", "e", "r", "f"].includes(order[9])) return;
+
+            let sellToken, amount;
+            if (order[3] === "s") {
+              sellToken = order[2].split("-")[0];
+              amount = order[10];
+            } else {
+              sellToken = order[2].split("-")[1];
+              amount = order[4] * order[10];
+            }
+            if (sellToken in tokenBalanceInOrder) {
+              tokenBalanceInOrder[sellToken] += amount;
+            } else {
+              tokenBalanceInOrder[sellToken] = amount;
+            }
+          });
+        }
+
         const balancesContent = walletList.map((token) => {
           return (
             <tr>
-              <td data-label="Token">
+              <td data-label="Token" style={{ width: "80px", paddingRight: 0 }}>
                 <Text
                   font="primaryExtraSmallSemiBold"
                   color="foregroundHighEmphasis"
@@ -1401,7 +1478,7 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundHighEmphasis"
                 >
-                  {settings.hideBalance
+                  {props.settings?.hideBalance
                     ? "****.****"
                     : formatToken(token.valueReadable, token.token)}
                 </Text>
@@ -1411,7 +1488,23 @@ export default function OrdersTable(props) {
                   font="primaryExtraSmallSemiBold"
                   color="foregroundHighEmphasis"
                 >
-                  {settings.hideBalance
+                  {props.settings?.hideBalance
+                    ? "****.****"
+                    : formatToken(
+                        token.valueReadable -
+                          (tokenBalanceInOrder[token.token]
+                            ? tokenBalanceInOrder[token.token]
+                            : 0),
+                        token.token
+                      )}
+                </Text>
+              </td>
+              <td data-label="Balance">
+                <Text
+                  font="primaryExtraSmallSemiBold"
+                  color="foregroundHighEmphasis"
+                >
+                  {props.settings?.hideBalance
                     ? "****.****"
                     : formatToken(
                         token.valueReadable * coinEstimator(token.token)
@@ -1423,12 +1516,12 @@ export default function OrdersTable(props) {
         });
         footerContent = (
           <div style={{ textAlign: "center", marginTop: "8px" }}>
-            <table>
+            <CustomTable>
               <thead>
                 <tr>
                   <th
                     scope="col"
-                    style={{ cursor: "pointer" }}
+                    style={{ cursor: "pointer", width: "80px" }}
                     onClick={() => {
                       sortByToken();
                     }}
@@ -1438,7 +1531,7 @@ export default function OrdersTable(props) {
                         font="primaryExtraSmallSemiBold"
                         color="foregroundLowEmphasis"
                       >
-                        Token
+                        <p className="whitespace-nowrap">{t("token")}</p>
                       </Text>
                       {tokenSorted ? (
                         <SortIconWrapper>
@@ -1473,7 +1566,7 @@ export default function OrdersTable(props) {
                         font="primaryExtraSmallSemiBold"
                         color="foregroundLowEmphasis"
                       >
-                        Token balance
+                        {t("token_balance")}
                       </Text>
                       {balanceSorted ? (
                         <SortIconWrapper>
@@ -1496,6 +1589,16 @@ export default function OrdersTable(props) {
                       )}
                     </HeaderWrapper>
                   </th>
+                  <th scope="col" style={{ cursor: "pointer" }}>
+                    <HeaderWrapper>
+                      <Text
+                        font="primaryExtraSmallSemiBold"
+                        color="foregroundLowEmphasis"
+                      >
+                        {t("available_balance")}
+                      </Text>
+                    </HeaderWrapper>
+                  </th>
                   <th
                     scope="col"
                     style={{ cursor: "pointer" }}
@@ -1508,7 +1611,7 @@ export default function OrdersTable(props) {
                         font="primaryExtraSmallSemiBold"
                         color="foregroundLowEmphasis"
                       >
-                        USD balance
+                        USD {t("balance")}
                       </Text>
                       {balanceSorted ? (
                         <SortIconWrapper>
@@ -1534,16 +1637,23 @@ export default function OrdersTable(props) {
                 </tr>
               </thead>
               <tbody>{balancesContent}</tbody>
-            </table>
-
+            </CustomTable>
             <ActionWrapper
               font="primaryExtraSmallSemiBold"
               color="primaryHighEmphasis"
               textAlign="center"
               className="view-account-button"
-              onClick={() => window.open(explorerLink, "_blank")}
+              onClick={() =>
+                window.open(
+                  api.getExplorerAccountLink(
+                    api.apiProvider.network,
+                    props.user.address
+                  ),
+                  "_blank"
+                )
+              }
             >
-              View Account on Explorer
+              {t("view_account_on_explorer")}
             </ActionWrapper>
           </div>
         );
@@ -1555,9 +1665,18 @@ export default function OrdersTable(props) {
               color="primaryHighEmphasis"
               textAlign="center"
               className="view-account-button"
-              onClick={() => window.open(explorerLink, "_blank")}
+              onClick={() =>
+                window.open(
+                  api.getExplorerAccountLink(
+                    api.apiProvider.network,
+                    props.user.address,
+                    2
+                  ),
+                  "_blank"
+                )
+              }
             >
-              View Account on Explorer
+              {t("view_account_on_explorer")}
             </ActionWrapper>
           </div>
         );
@@ -1577,23 +1696,14 @@ export default function OrdersTable(props) {
               activeIndex={tab}
               onItemClick={(newIndex) => setTab(newIndex)}
             >
-              <Tab>Open Orders ({getUserOrders().length})</Tab>
-              <Tab>Order History ({getFills().length})</Tab>
-              <Tab>Balances</Tab>
+              <Tab>
+                {t("open_orders")} ({getOpenUserOrderIds().length})
+              </Tab>
+              <Tab>
+                {t("order_history")} ({getFills().length})
+              </Tab>
+              <Tab>{t("balances")}</Tab>
             </StyledTabMenu>
-
-            {isOpenStatus(getUserOrders()) && settings.showCancelOrders ? (
-              <StyledButton
-                variant="outlined"
-                width="100px"
-                scale="md"
-                onClick={api.cancelAllOrders}
-              >
-                Cancel All
-              </StyledButton>
-            ) : (
-              ""
-            )}
           </TableHeaderWrapper>
           {isMobile ? (
             <MobileWrapper>{footerContent}</MobileWrapper>
@@ -1605,3 +1715,10 @@ export default function OrdersTable(props) {
     </>
   );
 }
+
+const CustomTable = styled.table`
+  min-width: 600px;
+  @media screen and (max-width: 600px) {
+    min-width: 510px;
+  }
+`;

@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
-import "./SpotBox.css";
 // assets
 import { SpotForm } from "components";
 import { ToggleButton } from "components/molecules/Toggle";
-import { IconButton as baseIcon } from "components/molecules/IconButton";
-import { CalculatorIcon } from "components/atoms/Svg";
 import { TabMenu, Tab } from "components/molecules/TabMenu";
-import { settingsSelector } from "lib/store/features/api/apiSlice";
+import {
+  settingsSelector,
+  networkSelector,
+} from "lib/store/features/api/apiSlice";
+import useTheme from "components/hooks/useTheme";
+import { useTranslation } from "react-i18next";
 
 const SpotBox = ({
   marketInfo,
@@ -18,18 +20,27 @@ const SpotBox = ({
   activeOrderCount,
   liquidity,
   marketSummary,
+  askBins,
+  bidBins,
+  userOrders,
+  balances,
 }) => {
   const [selectedLayer, setSelectedLayer] = useState(1);
   const [index, setIndex] = useState(1);
   const [orderType, updateOrderType] = useState("market");
 
+  const { isDark } = useTheme();
+
   const toggleClick = (num) => setSelectedLayer(num);
   const settings = useSelector(settingsSelector);
+  const network = useSelector(networkSelector);
   const handleTabClick = (newIndex) => {
     setIndex(newIndex);
     if (newIndex === 0) updateOrderType("limit");
     else updateOrderType("market");
   };
+
+  const { t } = useTranslation();
 
   const BuyForm = (
     <SpotForm
@@ -43,6 +54,11 @@ const SpotBox = ({
       marketInfo={marketInfo}
       marketSummary={marketSummary}
       settings={settings}
+      askBins={askBins}
+      bidBins={bidBins}
+      userOrders={userOrders}
+      balances={balances}
+      network={network}
     />
   );
 
@@ -58,6 +74,11 @@ const SpotBox = ({
       marketInfo={marketInfo}
       marketSummary={marketSummary}
       settings={settings}
+      askBins={askBins}
+      bidBins={bidBins}
+      userOrders={userOrders}
+      balances={balances}
+      network={network}
     />
   );
 
@@ -67,22 +88,23 @@ const SpotBox = ({
   const isMobile = window.innerWidth < 992;
 
   return (
-    <Wrapper isMobile={isMobile}>
+    <Wrapper isMobile={isMobile} isDark={isDark}>
       <ToggleWrapper>
         <StyledToggleButton
           width={window.innerWidth < 600 ? 70 : 126}
+          leftText={t("buy")}
+          rightText={t("sell")}
           leftLabel="BUY"
           rightLabel="SELL"
           selectedLayer={selectedLayer}
           toggleClick={toggleClick}
         />
-        {/* <IconButton variant="secondary" startIcon={<CalculatorIcon />}></IconButton> */}
       </ToggleWrapper>
       <StyledTabMenu left activeIndex={index} onItemClick={handleTabClick}>
-        <Tab>Limit</Tab>
-        <Tab>Market</Tab>
+        <Tab>{t("limit")}</Tab>
+        <Tab>{t("market")}</Tab>
       </StyledTabMenu>
-      <SpotFormWrapper>{lastPrice ? renderSpotForm() : ""}</SpotFormWrapper>
+      <SpotFormWrapper>{renderSpotForm()}</SpotFormWrapper>
     </Wrapper>
   );
 };
@@ -92,8 +114,11 @@ export default SpotBox;
 const Wrapper = styled.div`
   // display: grid;
   grid-auto-flow: row;
-  background-color: ${({ theme }) => theme.colors.backgroundMediumEmphasis};
-  height: ${({ isMobile }) => (isMobile ? "457px" : "428px")};
+  background-color: ${({ theme, isDark }) =>
+    isDark
+      ? theme.colors.backgroundMediumEmphasis
+      : theme.colors.backgroundHighEmphasis};
+  height: ${({ isMobile }) => (isMobile ? "457px" : "460px")};
 `;
 
 const ToggleWrapper = styled.div`
@@ -107,18 +132,6 @@ const ToggleWrapper = styled.div`
 
 const StyledToggleButton = styled(ToggleButton)`
   border: 1px solid ${({ theme }) => theme.colors.foreground400} !important;
-`;
-
-const IconButton = styled(baseIcon)`
-  width: 32px;
-  height: 32px;
-  background-color: ${({ theme }) => theme.colors.foreground300};
-  border-radius: 8px;
-  padding: 0px !important;
-  svg {
-    margin-right: 0px !important;
-    margin-left: 0px !important;
-  }
 `;
 
 const StyledTabMenu = styled(TabMenu)`

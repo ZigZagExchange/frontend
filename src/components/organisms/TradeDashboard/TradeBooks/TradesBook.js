@@ -5,15 +5,18 @@ import TradeRecentTable from "./TradeRecentTable/TradeRecentTable";
 import { marketFillsSelector } from "lib/store/features/api/apiSlice";
 import Text from "components/atoms/Text/Text";
 import { settingsSelector } from "lib/store/features/api/apiSlice";
+import { useTranslation } from "react-i18next";
 
 const StyledTradeBooks = styled.section`
   display: flex;
   grid-area: trades;
   flex-direction: row;
   justify-content: space-between;
-  padding: ${({ isLeft }) => isLeft ? '21px 20px 12px 10px' : '10px'};
+  padding: ${({ isStack }) => (isStack ? "10px" : "10px 0 10px 0")};
+  margin: ${({ isStack }) => (isStack ? "0" : "0 10px 0 10px")};
   border-top: 1px solid ${({ theme }) => theme.colors.foreground400};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.foreground400};
+  border-bottom: 1px solid
+    ${({ isStack, theme }) => (isStack ? theme.colors.foreground400 : "none")};
 `;
 
 const TradesWrapper = styled.div`
@@ -22,11 +25,12 @@ const TradesWrapper = styled.div`
   width: 100%;
   gap: 8px;
   padding-top: 10px;
-`
+`;
 
 export default function TradesBook(props) {
   const marketFills = useSelector(marketFillsSelector);
   const settings = useSelector(settingsSelector);
+  const { t } = useTranslation();
 
   // Only display recent trades
   // There's a bunch of user trades in this list that are too old to display
@@ -34,6 +38,7 @@ export default function TradesBook(props) {
   const one_day_ago = Date.now() - 86400 * 1000;
   Object.values(marketFills)
     .filter((fill) => Date.parse(fill[12]) > one_day_ago)
+    .filter((fill) => fill[6] === "f")
     .sort((a, b) => b[1] - a[1])
     .forEach((fill) => {
       fillData.push({
@@ -50,13 +55,18 @@ export default function TradesBook(props) {
       <StyledTradeBooks isStack={settings.stackOrderbook}>
         <TradesWrapper>
           {/* TradePriceTable*/}
-          <Text style={{paddingBottom: '5px'}} font="primaryTitleDisplay" color="foregroundHighEmphasis">Market Trades</Text>
+          <Text
+            style={{ paddingBottom: "5px" }}
+            font="primaryTitleDisplay"
+            color="foregroundHighEmphasis"
+          >
+            {t("market_trades")}
+          </Text>
           <TradeRecentTable
             head
             value="up_value"
             priceTableData={openOrdersLatestTradesData}
             currentMarket={props.currentMarket}
-            fixedPoint={props.fixedPoint}
             side={props.side}
           />
         </TradesWrapper>

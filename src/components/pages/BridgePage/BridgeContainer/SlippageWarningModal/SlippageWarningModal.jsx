@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import classNames from "classnames";
 import { Dialog, Transition } from "@headlessui/react";
-import { XIcon, SaveAsIcon } from "@heroicons/react/solid";
+import { XIcon } from "@heroicons/react/solid";
 import { AiOutlineWarning } from "react-icons/ai";
 import useTheme from "components/hooks/useTheme";
 import { Fragment } from "react";
@@ -84,7 +84,7 @@ const SlippageWarningModal = ({
                   </p>
                   <input
                     value={value}
-                    className="w-full px-2 py-1 mt-3 text-lg text-[#FCC958] font-semibold uppercase border rounded-lg font-work bg-foreground-100 focus:outline-none border-foreground-400"
+                    className="w-full px-2 py-1 mt-3 text-lg text-[#FCC958] font-semibold uppercase border rounded-lg font-work bg-foreground-100 focus:outline-none border-foreground-400 text-center"
                     onChange={(e) => setValue(e.target.value)}
                   />
                   <div className="mt-4">

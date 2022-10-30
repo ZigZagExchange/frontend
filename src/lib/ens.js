@@ -1,4 +1,5 @@
 import Web3 from "web3";
+import { Resolution } from "@unstoppabledomains/resolution";
 
 let contract;
 const CONTRACT_ABI = [
@@ -38,5 +39,17 @@ function getContract() {
 export const getENSName = async (address) => {
   const ReverseRecords = getContract();
   const name = await ReverseRecords.methods.getNames([address]).call();
-  if (name && name[0] && name[0] !== "") return name;
+  if (name && name[0] && name[0] !== "") return name[0];
+};
+
+export const reverseUnstoppabledomainsAddress = async (address) => {
+  const resolution = new Resolution();
+  try {
+    const result = resolution.reverse(address, { location: "UNSLayer2" });
+    return result;
+  } catch (e) {
+    console.warn(
+      `Failed to get name reverseUnstoppabledomainsUrl for ${address}`
+    );
+  }
 };

@@ -1,23 +1,32 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
 import styled from "styled-components";
 import useTheme from "components/hooks/useTheme";
-import { marketInfoSelector, settingsSelector } from "lib/store/features/api/apiSlice";
-import { numStringToSymbol, addComma } from "lib/utils";
+import { formatMillonAmount } from "lib/utils";
 import Text from "components/atoms/Text/Text";
+import _ from "lodash";
+import { useTranslation } from "react-i18next";
 
 const Table = styled.table`
   display: flex;
   flex: auto;
   overflow: auto;
-  padding: 0px;
-  height: ${({ isLeft }) => isLeft ? '' : '242px'};
+  padding: 0 0 1px 0;
+  height: ${({ isLeft }) => (isLeft ? "" : "249px")};
   flex-direction: column;
-  scrollbar-color: ${({ theme }) => theme.colors.foreground400} rgba(0,0,0,0.1);
+  scrollbar-color: ${({ theme }) => theme.colors.foreground400}
+    rgba(0, 0, 0, 0.1);
   scrollbar-width: thin !important;
-  
+
+  &.trade_tables_all {
+    flex: 0 0 calc(50% - 76px);
+  }
+
+  &.trade_tables_all.trade_table_asks {
+    flex: 0 0 calc(50% - 47px);
+  }
+
   &:not(.no-space) {
-    justify-content: ${({ isLeft }) => isLeft ? 'space-between' : 'start'};
+    justify-content: ${({ isLeft }) => (isLeft ? "space-between" : "start")};
   }
 
   &:first-type-of {
@@ -43,6 +52,7 @@ const Table = styled.table`
     display: table;
     width: 100%;
     background: ${(p) => p.theme.colors.backgroundHighEmphasis};
+    z-index: 10;
   }
 
   th {
@@ -71,6 +81,28 @@ const Table = styled.table`
     padding-right: 0px;
   }
 
+  .price-item {
+    position: relative;
+
+    td {
+      position: relative;
+      z-index: 1;
+    }
+
+    &::after {
+      content: " ";
+      display: block;
+      position: absolute;
+      width: 100%;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      background-image: var(--background-image);
+      background-size: cover;
+    }
+  }
+
   @media screen and (min-width: 1800px) {
     width: 100%;
   }
@@ -96,48 +128,63 @@ const Table = styled.table`
     background: ${({ theme }) => theme.colors.foreground400};
   }
 `;
-const Divider = styled.div`
-  height: 1px;
-  background: ${({ theme }) => theme.colors.foreground400};
-  margin-top: 20px;
-`;
 
 const TradePriceTable = (props) => {
   const { theme } = useTheme();
-  const marketInfo = useSelector(marketInfoSelector);
-  const settings = useSelector(settingsSelector);
   const ref = useRef(null);
-  const [isUpdateScroll, setUpdateScroll] = useState(false);
-  const isMobile = window.innerWidth < 500
+  const [priceData, setPriceData] = useState([]);
+  const isMobile = window.innerWidth < 500;
+  const { t } = useTranslation();
+
+  const ua = navigator.userAgent.toLowerCase();
+  let isSafari = false;
+  if (ua.indexOf("safari") !== -1) {
+    if (ua.indexOf("chrome") === -1) {
+      isSafari = true;
+    }
+  }
+
+  useEffect(() => {
+    const tmp = _.cloneDeep(props.priceTableData);
+    if (
+      props.priceTableData[0]?.side === "s" &&
+      !props.settings?.stackOrderbook
+    ) {
+      tmp.reverse();
+    }
+    setPriceData(tmp);
+  }, [props.priceTableData]);
 
   useEffect(() => {
     if (!ref.current) return;
-    if (props.priceTableData.length === 0) {
-      setUpdateScroll(false);
-      return;
+    if (props.scrollToBottom) {
+      ref.current.scrollTo(0, ref.current.scrollHeight);
     }
-    if (props.scrollToBottom && !isUpdateScroll) {
-      setUpdateScroll(true);
-      ref.current?.scrollTo(0, ref.current.scrollHeight);
-    }
-  }, [props.priceTableData.length]);
+  }, [props.priceTableData]);
 
-  let total_total = 0;
+  let total_total = 0,
+    total_step = 0;
   props.priceTableData.map((d) => (total_total += d.td2));
-  let total_step = props.className === "trade_table_asks" ? total_total : 0;
+  if (props.priceTableData.length > 0 && props.priceTableData[0].side === "s") {
+    total_step = total_total;
+  }
 
   let onClickRow;
   if (props.onClickRow) onClickRow = props.onClickRow;
   else onClickRow = () => null;
 
   return (
-    <Table ref={ref} className={props.adClass} isLeft={settings.stackOrderbook}>
+    <Table
+      ref={ref}
+      className={props.adClass}
+      isLeft={props.settings?.stackOrderbook}
+    >
       {props.head && (
         <thead>
           <tr>
             <th>
               <Text font="tableHeader" color="foregroundLowEmphasis">
-                Price
+                {t("price")}
               </Text>
             </th>
             <th>
@@ -146,39 +193,56 @@ const TradePriceTable = (props) => {
                 color="foregroundLowEmphasis"
                 textAlign="right"
               >
-                Amount
+                {t("amount")}
               </Text>
             </th>
-            {!isMobile && <th>
-              <Text
-                font="tableHeader"
-                color="foregroundLowEmphasis"
-                textAlign="right"
-              >
-                Total({marketInfo && marketInfo.quoteAsset.symbol})
-              </Text>
-            </th>}
+            {!isMobile && (
+              <th>
+                <Text
+                  font="tableHeader"
+                  color="foregroundLowEmphasis"
+                  textAlign="right"
+                >
+                  {t("total")}(
+                  {props.marketInfo && props.marketInfo.quoteAsset.symbol})
+                </Text>
+              </th>
+            )}
           </tr>
         </thead>
       )}
       <tbody>
-        {props.priceTableData.map((d, i) => {
+        {priceData.map((d, i) => {
           const color =
             d.side === "b" ? theme.colors.success400 : theme.colors.danger400;
-          if (props.className !== "trade_table_asks") {
-            total_step += d.td2;
-          }
 
-          const breakpoint = Math.round((total_step / total_total) * 100);
           let rowStyle;
           if (props.useGradient) {
-            let dir
-            if((d.side === "b" && !settings.stackOrderbook) || (d.side !== "b" && settings.stackOrderbook))
-              dir = "to left"
-            else dir = "to right"
-            rowStyle = {
-              background: `linear-gradient(${dir}, ${color}, ${color} ${breakpoint}%, ${theme.colors.backgroundHighEmphasis} 0%)`,
-            };
+            let dir;
+            if (!props.settings?.stackOrderbook) dir = "to left";
+            else dir = "to right";
+
+            if (d.side === "b") {
+              total_step += d.td2;
+            }
+            const breakpoint = Math.round((total_step / total_total) * 100);
+            if (d.side === "s") {
+              total_step -= d.td2;
+            }
+            if (!props.settings?.stackOrderbook && d.side === "s") {
+              rowStyle = {
+                "--background-image": `linear-gradient(${dir}, ${theme.colors.backgroundHighEmphasis}, ${theme.colors.backgroundHighEmphasis} ${breakpoint}%, ${color} 0%)`,
+              };
+            } else {
+              rowStyle = {
+                "--background-image": `linear-gradient(${dir}, ${color}, ${color} ${breakpoint}%, ${theme.colors.backgroundHighEmphasis} 0%)`,
+              };
+            }
+
+            // reduce after, next one needs to be this percentage
+            if (props.className === "trade_table_asks") {
+              total_step -= d.td2;
+            }
           } else {
             rowStyle = {};
           }
@@ -189,12 +253,51 @@ const TradePriceTable = (props) => {
           const total =
             typeof d.td3 === "number" ? d.td3.toPrecision(6) : d.td3;
 
-          // reduce after, net one needs to be this percentage
-          if (props.className === "trade_table_asks") {
-            total_step -= d.td2;
-          }
-          return (
-            <tr key={i} style={rowStyle} onClick={() => onClickRow(d)}>
+          return isSafari ? (
+            <div className="price-item" style={rowStyle}>
+              <tr key={i} onClick={() => onClickRow(d)}>
+                <td>
+                  <Text
+                    font="tableContent"
+                    color={
+                      d.side === "b"
+                        ? "successHighEmphasis"
+                        : "dangerHighEmphasis"
+                    }
+                  >
+                    {price}
+                  </Text>
+                </td>
+                <td>
+                  <Text
+                    font="tableContent"
+                    color="foregroundHighEmphasis"
+                    textAlign="right"
+                  >
+                    {formatMillonAmount(amount)}
+                  </Text>
+                </td>
+                {!isMobile && (
+                  <td>
+                    <Text
+                      font="tableContent"
+                      color="foregroundHighEmphasis"
+                      textAlign="right"
+                    >
+                      {/* {numStringToSymbol(total, 2)} */}
+                      {formatMillonAmount(total)}
+                    </Text>
+                  </td>
+                )}
+              </tr>
+            </div>
+          ) : (
+            <tr
+              key={i}
+              onClick={() => onClickRow(d)}
+              className="price-item"
+              style={rowStyle}
+            >
               <td>
                 <Text
                   font="tableContent"
@@ -213,19 +316,21 @@ const TradePriceTable = (props) => {
                   color="foregroundHighEmphasis"
                   textAlign="right"
                 >
-                  {numStringToSymbol(amount, 2)}
+                  {formatMillonAmount(amount)}
                 </Text>
               </td>
-              {!isMobile && <td>
-                <Text
-                  font="tableContent"
-                  color="foregroundHighEmphasis"
-                  textAlign="right"
-                >
-                  {/* {numStringToSymbol(total, 2)} */}
-                  {addComma(total)}
-                </Text>
-              </td>}
+              {!isMobile && (
+                <td>
+                  <Text
+                    font="tableContent"
+                    color="foregroundHighEmphasis"
+                    textAlign="right"
+                  >
+                    {/* {numStringToSymbol(total, 2)} */}
+                    {formatMillonAmount(total)}
+                  </Text>
+                </td>
+              )}
             </tr>
           );
         })}

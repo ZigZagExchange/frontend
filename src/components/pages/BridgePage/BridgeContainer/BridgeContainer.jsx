@@ -1,3 +1,5 @@
+/* eslint-disable no-use-before-define */
+/* eslint-disable no-unused-vars */
 import React, { useState, useMemo, useEffect } from "react";
 import { constants as ethersConstants, utils as ethersUtils } from "ethers";
 import classNames from "classnames";
@@ -12,6 +14,7 @@ import {
   networkSelector,
   balancesSelector,
   userOrdersSelector,
+  settingsSelector,
 } from "lib/store/features/api/apiSlice";
 import { MAX_ALLOWANCE } from "lib/api/constants";
 import { formatUSD } from "lib/utils";
@@ -20,12 +23,9 @@ import SelectAsset from "./SelectAsset";
 import TransactionSettings from "./TransactionSettings";
 import SlippageWarningModal from "./SlippageWarningModal";
 import { Button, ConnectWalletButton } from "components/molecules/Button";
+import { useTranslation } from "react-i18next";
 
-import {
-  NETWORKS,
-  ZKSYNC_ETHEREUM_FAST_BRIDGE,
-  ZKSYNC_POLYGON_BRIDGE,
-} from "./constants";
+import { NETWORKS, ZKSYNC_ETHEREUM_FAST_BRIDGE } from "./constants";
 
 const defaultTransfer = {
   type: "deposit",
@@ -44,6 +44,7 @@ const BridgeContainer = () => {
 
   const user = useSelector(userSelector);
   const balanceData = useSelector(balancesSelector);
+  const settings = useSelector(settingsSelector);
   const [isApproving, setApproving] = useState(false);
   const [formErr, setFormErr] = useState("");
   const [L2FeeAmount, setL2FeeAmount] = useState(null);
@@ -59,7 +60,6 @@ const BridgeContainer = () => {
 
   const [balances, setBalances] = useState([]);
   const [altBalances, setAltBalances] = useState([]);
-  const [polygonLoding, setPolygonLoading] = useState(false);
   const [swapDetails, _setSwapDetails] = useState(() => ({
     amount: "",
     currency: "ETH",
@@ -73,6 +73,8 @@ const BridgeContainer = () => {
   const coinEstimator = useCoinEstimator();
   const currencyValue = coinEstimator(swapDetails.currency);
   const userOrders = useSelector(userOrdersSelector);
+
+  const { t } = useTranslation();
 
   const estimatedValue =
     +swapDetails.amount * coinEstimator(swapDetails.currency) || 0;
@@ -88,16 +90,10 @@ const BridgeContainer = () => {
     () => (balanceData[network] ? balanceData[network] : {}),
     [balanceData, network]
   );
-  const polygonBalances = useMemo(
-    () => (balanceData.polygon ? balanceData.polygon : {}),
-    [balanceData.polygon]
-  );
 
   const _getBalances = (_network) => {
     let balances = [];
-    if (_network === "polygon") {
-      balances = polygonBalances;
-    } else if (_network === "ethereum") {
+    if (_network === "ethereum") {
       balances = walletBalances;
     } else if (_network === "zksync") {
       balances = zkBalances;
@@ -109,8 +105,8 @@ const BridgeContainer = () => {
 
   useEffect(() => {
     setSellTokenList(api.getCurrencies());
-  }, [])
-  
+  }, []);
+
   useEffect(() => {
     setTokenLoading(true);
     const timer = setInterval(() => {
@@ -131,7 +127,7 @@ const BridgeContainer = () => {
     setSellTokenList(api.getCurrencies());
     setBalances(_getBalances(fromNetwork.id));
     setAltBalances(_getBalances(toNetwork.id));
-  }, [network, toNetwork, user.address, walletBalances, zkBalances, polygonBalances]);
+  }, [network, toNetwork, user.address, walletBalances, zkBalances]);
 
   const [withdrawSpeed, setWithdrawSpeed] = useState("fast");
   const isFastWithdraw = () => {
@@ -141,6 +137,17 @@ const BridgeContainer = () => {
       api.apiProvider.eligibleFastWithdrawTokens.includes(swapDetails.currency)
     );
   };
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (user.address && !user.id && network === 1) {
+        toast.error(t("Your_zksync_account_is_not_activated"), {
+          toastId: "Your_zksync_account_is_not_activated",
+          autoClose: 30000,
+        });
+      }
+    }, 1000);
+  }, [user]);
 
   useEffect(() => {
     setHasError(formErr && formErr.length > 0);
@@ -160,18 +167,11 @@ const BridgeContainer = () => {
       const type = (transfer.type = "withdraw");
       setTransfer({ type });
     } else {
-      api.getWalletBalances();
       const type = (transfer.type = "deposit");
       setTransfer({ type });
     }
 
-    if (fromNetwork.id === "polygon") {
-      api.getPolygonWethBalance();
-      setSwapDetails({ amount: "", currency: "WETH" });
-      setSellToken({ id: 0, name: "WETH" });
-      setFromAmounts();
-    } else if (fromNetwork.id === "ethereum") {
-      api.getWalletBalances();
+    if (fromNetwork.id === "ethereum") {
       const currency = switchClicking ? swapDetails.currency : "ETH";
       setSwapDetails({ amount: "", currency });
       setSellToken({ id: 0, name: currency });
@@ -180,10 +180,6 @@ const BridgeContainer = () => {
       const currency = switchClicking ? swapDetails.currency : "ETH";
       setSwapDetails({ amount: "", currency });
       setSellToken({ id: 0, name: currency });
-      setFromAmounts();
-    } else if (fromNetwork.id === "zksync" && toNetwork.id === "polygon") {
-      setSwapDetails({ amount: "", currency: "ETH" });
-      setSellToken({ id: 0, name: "ETH" });
       setFromAmounts();
     }
     setSwitchClicking(false);
@@ -295,12 +291,17 @@ const BridgeContainer = () => {
     const swapCurrency = swapDetails.currency;
     if (balances.length === 0) return false;
     const getCurrencyBalance = (cur) =>
-      balances[cur] && swapCurrencyInfo?.decimals
-        ? balances[cur].value / 10 ** swapCurrencyInfo.decimals
+      balances[cur] && balances[cur].valueReadable
+        ? balances[cur].valueReadable
         : 0;
     const userBalance = getCurrencyBalance(swapCurrency);
     const max = getMax(swapCurrency, L2FeeToken);
     const bridgeAmount = inputValue - ZigZagFeeAmount;
+
+    if (!api.getCurrencyInfo(swapDetails.currency)) {
+      setFormErr("Loading token details...");
+      return;
+    }
 
     let error = null;
     if (inputValue > 0) {
@@ -322,13 +323,6 @@ const BridgeContainer = () => {
           }
         }
       }
-      // 0.0005 -> poly bridge min size
-      else if (
-        bridgeAmount < 0.0005 &&
-        (toNetwork.id === "polygon" || fromNetwork.id === "polygon")
-      ) {
-        error = "Amount too small";
-      }
 
       const userOrderArray = Object.values(userOrders);
       if (userOrderArray.length > 0) {
@@ -336,19 +330,18 @@ const BridgeContainer = () => {
           ["o", "b", "m"].includes(o[9])
         );
         if (
-          [1, 1000].includes(network) &&
+          [1, 1002].includes(network) &&
           fromNetwork.id === "zksync" &&
           openOrders.length > 0
         ) {
           error = "Open limit order prevents you from bridging";
-          toast.error(
-            "zkSync 1.0 allows one open order at a time. Please cancel your limit order or wait for it to be filled before bridging. Otherwise your limit order will fail.",
-            {
+          if (!settings.disableOrderNotification) {
+            toast.error(t("zksync_1_allows_one_open_order_at_a_time"), {
               toastId:
                 "zkSync 1.0 allows one open order at a time. Please cancel your limit order or wait for it to be filled before bridging. Otherwise your limit order will fail.",
               autoClose: 20000,
-            }
-          );
+            });
+          }
         }
       }
     }
@@ -357,24 +350,36 @@ const BridgeContainer = () => {
       setFormErr(error);
       return;
     }
-    
-    const feeCurrencyInfo = api.getCurrencyInfo(L2FeeToken);
-    if (balances.length === 0) return false;
-    const feeTokenBalance = parseFloat(
-      balances[L2FeeToken] &&
-        balances[L2FeeToken].value / 10 ** feeCurrencyInfo.decimals
-    );
 
-    if (inputValue > 0 && L2FeeAmount > feeTokenBalance) {
-      error = "Not enough balance to pay for fees";
+    const feeCurrencyInfo = api.getCurrencyInfo(L2FeeToken);
+    if (feeCurrencyInfo && feeCurrencyInfo.decimals) {
+      if (balances.length === 0) return false;
+      const feeTokenBalance = parseFloat(
+        balances[L2FeeToken] &&
+          balances[L2FeeToken].value / 10 ** feeCurrencyInfo.decimals
+      );
+
+      if (inputValue > 0 && L2FeeAmount > feeTokenBalance) {
+        error = "Not enough balance to pay for fees";
+      }
     }
 
     if (error) {
       setFormErr(error);
     } else {
-      setFormErr("")
+      setFormErr("");
     }
-  }, [swapDetails, ZigZagFeeAmount, userOrders, activationFee, L1FeeAmount, L2FeeAmount, L2FeeToken]);
+  }, [
+    swapDetails,
+    ZigZagFeeAmount,
+    userOrders,
+    activationFee,
+    L1FeeAmount,
+    L2FeeAmount,
+    L2FeeToken,
+    api.marketInfo,
+    balances[swapDetails.currency],
+  ]);
 
   const setSwapDetails = async (values) => {
     const details = {
@@ -388,28 +393,8 @@ const BridgeContainer = () => {
   const calculateFees = async () => {
     setGasFetching(true);
 
-    // polygon -> zkSync
-    if (fromNetwork.id === "polygon" && toNetwork.id === "zksync") {
-      const gasFee = await api.getPolygonFee();
-      if (gasFee) {
-        setL1Fee((35000 * gasFee.fast.maxFee) / 10 ** 9);
-        setL2FeeAmount(null);
-        setL2FeeToken(null);
-        setZigZagFeeToken("ETH");
-        setZigZagFee(0.003);
-      }
-    }
-    // zkSync -> polygon
-    else if (fromNetwork.id === "zksync" && toNetwork.id === "polygon") {
-      let res = await api.transferL2GasFee(swapDetails.currency);
-      setL1Fee(null);
-      setL2FeeAmount(res.amount); // ZigZag fee
-      setL2FeeToken(res.feeToken);
-      setZigZagFeeToken(res.feeToken);
-      setZigZagFee(0.003);
-    }
     // Ethereum -> zkSync aka deposit
-    else if (transfer.type === "deposit") {
+    if (transfer.type === "deposit") {
       const gasFee = await api.getEthereumFee(swapDetails.currency);
       if (gasFee) {
         let maxFee = gasFee.maxFeePerGas / 10 ** 9;
@@ -468,34 +453,14 @@ const BridgeContainer = () => {
       })
       .catch((err) => {
         console.log(err);
+        if (!settings.disableOrderNotification) {
+          toast.error(t("transaction_was_rejected"), {
+            toastId: t("transaction_was_rejected"),
+            autoClose: true,
+          });
+        }
         setApproving(false);
       });
-  };
-
-  const renderGuidContent = () => {
-    return (
-      <div>
-        <p style={{ fontSize: "14px", lineHeight: "24px" }}>
-          1. Connect to Ethereum network
-        </p>
-        <p style={{ fontSize: "14px", lineHeight: "24px" }}>
-          2. Click "transfer" on Polygon -&gt; zkSync
-        </p>
-        <p style={{ fontSize: "14px", lineHeight: "24px" }}>
-          3. Click "Switch network" to Polygon and wait
-        </p>
-        <p style={{ fontSize: "14px", lineHeight: "24px" }}>
-          4. Click "Confirm" on transfer pop up and wait
-        </p>
-        <p style={{ fontSize: "14px", lineHeight: "24px" }}>
-          5. Click "Switch network" to Ethereum
-        </p>
-        <p style={{ fontSize: "14px", lineHeight: "24px" }}>
-          &nbsp;&nbsp;&nbsp;&nbsp;
-          {`Activating a new zkSync wallet costs ~${usdFee}. Enjoy trading on ZigZag!`}
-        </p>
-      </div>
-    );
   };
 
   const doTransfer = (e) => {
@@ -503,24 +468,7 @@ const BridgeContainer = () => {
     let deferredXfer;
     setLoading(true);
 
-    if (fromNetwork.id === "polygon" && toNetwork.id === "zksync") {
-      setPolygonLoading(true);
-      deferredXfer = api.transferPolygonWeth(
-        `${swapDetails.amount}`,
-        user.address
-      );
-      toast.info(renderGuidContent(), {
-        closeOnClick: false,
-        autoClose: 15000,
-      });
-    } else if (fromNetwork.id === "zksync" && toNetwork.id === "polygon") {
-      deferredXfer = api.transferToBridge(
-        `${swapDetails.amount}`,
-        swapDetails.currency,
-        ZKSYNC_POLYGON_BRIDGE.address,
-        user.address
-      );
-    } else if (fromNetwork.id === "ethereum" && toNetwork.id === "zksync") {
+    if (fromNetwork.id === "ethereum" && toNetwork.id === "zksync") {
       deferredXfer = api.depositL2(
         `${swapDetails.amount}`,
         swapDetails.currency,
@@ -553,7 +501,22 @@ const BridgeContainer = () => {
       setFormErr("Wrong from/to combination");
       return false;
     }
+
+    const renderGuidContent = () => {
+      return (
+        <div>
+          <p className="text-sm">{t("bridge_transaction_in_process")}</p>
+        </div>
+      );
+    };
+    let orderPendingToast;
     if (deferredXfer) {
+      if (!settings.disableOrderNotification) {
+        orderPendingToast = toast.info(renderGuidContent(), {
+          toastId: "Order pending",
+          autoClose: true,
+        });
+      }
       deferredXfer
         .then(() => {
           setTimeout(() => {
@@ -561,16 +524,23 @@ const BridgeContainer = () => {
             setFromAmounts(0);
             api.getWalletBalances();
           }, 1000);
+          if (!settings.disableOrderNotification) {
+            toast.dismiss(orderPendingToast);
+          }
         })
         .catch((e) => {
-          console.error("error sending transaction::", e);
+          if (!settings.disableOrderNotification) {
+            toast.error(t("transaction_was_rejected"), {
+              toastId: t("transaction_was_rejected"),
+              autoClose: true,
+            });
+            toast.dismiss(orderPendingToast);
+          }
           setTimeout(() => api.getAccountState(), 1000);
         })
         .finally(() => {
-          setPolygonLoading(false);
           setLoading(false);
-          setSwapDetails({ amount: "" });
-          // setFromAmounts(0);
+          // setSwapDetails({ amount: "" });
         });
     }
   };
@@ -582,6 +552,19 @@ const BridgeContainer = () => {
     sDetails["amount"] = "";
     setSwapDetails(sDetails);
     setFromAmounts(0);
+  };
+
+  const filterSmallBalances = (balance, currency) => {
+    const usdPrice = coinEstimator(currency);
+    const usd_balance = usdPrice * balance;
+
+    let b = 0;
+    if (usd_balance < 0.02) {
+      b = "0.00";
+    } else {
+      b = balance;
+    }
+    return b;
   };
 
   const fromTokenOptions = useMemo(() => {
@@ -618,7 +601,10 @@ const BridgeContainer = () => {
         return {
           id: index,
           name: item,
-          balance: balances[item]?.valueReadable,
+          balance: filterSmallBalances(
+            balances[item]?.valueReadable,
+            swapDetails.currency
+          ),
           price: `${price}`,
           isFastWithdraw: isFastWithdraw,
         };
@@ -642,20 +628,10 @@ const BridgeContainer = () => {
 
   const getToBalance = () => {
     let balance, unit;
-    if (fromNetwork.id === "polygon") {
-      balance = altBalances["ETH"] ? altBalances["ETH"].valueReadable : "0.00";
-      unit = "ETH";
-    } else if (toNetwork.id === "polygon") {
-      balance = altBalances["WETH"]
-        ? altBalances["WETH"].valueReadable
-        : "0.00";
-      unit = "WETH";
-    } else {
-      balance = altBalances[swapDetails.currency]
-        ? altBalances[swapDetails.currency].valueReadable
-        : "0.00";
-      unit = swapDetails.currency;
-    }
+    balance = altBalances[swapDetails.currency]
+      ? altBalances[swapDetails.currency].valueReadable
+      : "0.00";
+    unit = swapDetails.currency;
 
     return balance + " " + unit;
   };
@@ -670,6 +646,7 @@ const BridgeContainer = () => {
     setToNetwork(fromNetwork);
     setFromNetwork(f.from);
     setSwitchClicking(true);
+    setFromAmounts(0);
   };
 
   const onChangeFromAmounts = (value) => {
@@ -705,10 +682,15 @@ const BridgeContainer = () => {
       })
       .catch((e) => {
         console.error("error sending transaction::", e);
+        if (!settings.disableOrderNotification) {
+          toast.error(t("transaction_was_rejected"), {
+            toastId: t("transaction_was_rejected"),
+            autoClose: true,
+          });
+        }
         setTimeout(() => api.getAccountState(), 1000);
       })
       .finally(() => {
-        setPolygonLoading(false);
         setLoading(false);
         setSwapDetails({ amount: "" });
         // setFromAmounts(0);
@@ -753,12 +735,6 @@ const BridgeContainer = () => {
             swapDetails={swapDetails}
             onChange={setSwapDetails}
             feeCurrency={L2FeeToken}
-            isOpenable={
-              !(
-                fromNetwork.id === "polygon" ||
-                (fromNetwork.id === "zksync" && toNetwork.id === "polygon")
-              )
-            }
             gasFetching={gasFetching}
             swapCurrencyInfo={swapCurrencyInfo}
             allowance={allowance}
@@ -792,30 +768,27 @@ const BridgeContainer = () => {
           )}
           {!user.address && (
             <ConnectWalletButton
-              isLoading={polygonLoding}
+              isLoading={loading}
               className="w-full py-3 mt-3 uppercase"
             />
           )}
           {user.address && (
             <>
-              {balances[swapDetails.currency] &&
-                !hasAllowance &&
-                !hasError &&
-                fromNetwork.id !== "polygon" && (
-                  <Button
-                    isLoading={isApproving}
-                    scale="md"
-                    disabled={
-                      formErr.length > 0 ||
-                      Number(swapDetails.amount) === 0 ||
-                      swapDetails.currency === "ETH"
-                    }
-                    onClick={approveSpend}
-                    className="w-full py-3 mt-3 uppercase"
-                  >
-                    APPROVE
-                  </Button>
-                )}
+              {balances[swapDetails.currency] && !hasAllowance && !hasError && (
+                <Button
+                  isLoading={isApproving}
+                  scale="md"
+                  disabled={
+                    formErr.length > 0 ||
+                    Number(swapDetails.amount) === 0 ||
+                    swapDetails.currency === "ETH"
+                  }
+                  onClick={approveSpend}
+                  className="w-full py-3 mt-3 uppercase"
+                >
+                  APPROVE
+                </Button>
+              )}
               {hasError && (
                 <Button
                   variant="sell"

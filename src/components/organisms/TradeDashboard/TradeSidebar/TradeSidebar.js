@@ -6,10 +6,11 @@ import Text from "components/atoms/Text/Text";
 import { DiscordIcon } from "components/atoms/Svg";
 import {
   liquiditySelector,
-  marketSummarySelector,
-  marketInfoSelector,
+  balancesSelector,
 } from "lib/store/features/api/apiSlice";
-import { Button, ConnectWalletButton } from "components/molecules/Button";
+import { Button } from "components/molecules/Button";
+import useTheme from "components/hooks/useTheme";
+import { useTranslation } from "react-i18next";
 
 const StyledTradeSidebar = styled.aside`
   // display: grid;
@@ -18,16 +19,22 @@ const StyledTradeSidebar = styled.aside`
   position: relative;
   //   height: fit-content;
   border: 1px solid ${({ theme }) => theme.colors.foreground300};
-  background: ${({ theme }) => theme.colors.backgroundMediumEmphasis};
-  overflow-y: auto;
-  scrollbar-color: ${({ theme }) => theme.colors.foreground400} rgba(0,0,0,0.1);
-  scrollbar-width: thin !important;
+  background: ${({ theme, isDark }) =>
+    isDark
+      ? theme.colors.backgroundMediumEmphasis
+      : theme.colors.backgroundHighEmphasis};
+  // overflow-y: hidden;
+  scrollbar-color: ${({ theme }) => theme.colors.foreground400}
+    rgba(0, 0, 0, 0.1);
 
-  ::-webkit-scrollbar {
-    width: 5px;
-    position: relative;
-    z-index: 20;
-  }
+  overflow: auto;
+  // scrollbar-width: none !important;
+
+  // ::-webkit-scrollbar {
+  //   width: 5px;
+  //   position: relative;
+  //   z-index: 20;
+  // }
 
   //   ::-webkit-scrollbar-track {
   //     border-radius: 4px;
@@ -48,26 +55,34 @@ const InfoWrapper = styled.div`
   justify-content: center;
   gap: 8px;
   height: 98px;
-  background-color: ${({ theme }) => theme.colors.backgroundMediumEmphasis};
+  background-color: ${({ theme, isDark }) =>
+    isDark
+      ? theme.colors.backgroundMediumEmphasis
+      : theme.colors.backgroundHighEmphasis};
   border-bottom: 1px solid ${({ theme }) => theme.colors.foreground400};
 `;
 
 export default function TradeSidebar(props) {
-  const marketInfo = useSelector(marketInfoSelector);
-  const marketSummary = useSelector(marketSummarySelector);
+  const balances = useSelector(balancesSelector);
   const liquidity = useSelector(liquiditySelector);
+  const { isDark } = useTheme();
   const isMobile = window.innerWidth < 992;
+  const isSmallScreen = window.innerHeight < 875;
   const joinDiscord = () => {
     window.open("https://discord.gg/zigzag", "_blank");
   };
+  const { t } = useTranslation();
+
   return (
-    <StyledTradeSidebar>
-      {isMobile ? (
+    <StyledTradeSidebar isDark={isDark}>
+      {isMobile || isSmallScreen ? (
         <></>
       ) : (
-        <InfoWrapper>
+        <InfoWrapper isDark={isDark}>
           <Text font="primarySmall" color="foregroundHighEmphasis">
-              Have a question? Need live support?
+            <p className="text-center">
+              {t("have_a_question_need_live_support")}
+            </p>
           </Text>
           <Button
             width="150px"
@@ -82,19 +97,23 @@ export default function TradeSidebar(props) {
               color="foregroundHighEmphasis"
               textAlign="center"
             >
-              JOIN DISCORD
+              <p className="whitespace-nowrap">{t("join")} DISCORD</p>
             </Text>
           </Button>
         </InfoWrapper>
       )}
       <SpotBox
-        lastPrice={marketSummary.price}
+        lastPrice={props.lastPrice}
         user={props.user}
         activeOrderCount={props.activeOrderCount}
         liquidity={liquidity}
         currentMarket={props.currentMarket}
-        marketSummary={marketSummary}
-        marketInfo={marketInfo}
+        marketSummary={props.marketInfo}
+        marketInfo={props.marketInfo}
+        balances={balances}
+        askBins={props.askBins}
+        bidBins={props.bidBins}
+        userOrders={props.userOrders}
       />
     </StyledTradeSidebar>
   );

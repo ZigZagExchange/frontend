@@ -2,14 +2,16 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { RiErrorWarningLine } from "react-icons/all";
 import { userSelector } from "lib/store/features/auth/authSlice";
-import { arweaveAllocationSelector, networkSelector } from "lib/store/features/api/apiSlice";
+import {
+  arweaveAllocationSelector,
+  networkSelector,
+} from "lib/store/features/api/apiSlice";
 import api from "lib/api";
 import { x } from "@xstyled/styled-components";
 import styled from "styled-components";
 import "bootstrap";
 
 import { DefaultTemplate } from "components";
-import Text from "../../atoms/Text/Text";
 import AllocationModal from "./AllocationModal";
 import { Button, ConnectWalletButton } from "components/molecules/Button";
 import { jsonify } from "../../../lib/helpers/strings";
@@ -17,7 +19,7 @@ import SuccessModal from "./SuccessModal";
 import { HiExternalLink } from "react-icons/hi";
 import ListPairForm from "./ListPairForm";
 import { sleep } from "../../../lib/utils";
-import TradeFooter from "components/organisms/TradeDashboard/TradeFooter/TradeFooter";
+import { useTranslation } from "react-i18next";
 
 export const TRADING_VIEW_CHART_KEY = "tradingViewChart";
 
@@ -55,7 +57,7 @@ const ListContainer = styled.div`
   @media screen and (max-width: 480px) {
     padding: 0 10px;
   }
-`
+`;
 
 export default function ListPairPage() {
   const user = useSelector(userSelector);
@@ -75,6 +77,8 @@ export default function ListPairPage() {
 
   const network = useSelector(networkSelector);
   const isUserConnectedToMainnet = network === 1;
+
+  const { t } = useTranslation();
 
   // we purchase 500k bytes at once so the user does not have to
   // repeatedly repurchase space if wanting to list more than 1 market
@@ -134,9 +138,9 @@ export default function ListPairPage() {
     });
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     document.title = "ZigZag List Pair";
-  },[])
+  }, []);
 
   useEffect(() => {
     refreshUserArweaveAllocation();
@@ -158,19 +162,30 @@ export default function ListPairPage() {
       <ListPage>
         <ListContainer>
           <x.div mb={4}>
-            <p className="mb-5 mt-10 text-3xl font-semibold font-work ">
-              List New Pair
+            <p className="mt-10 mb-5 text-3xl font-semibold font-work ">
+              {t("list_new_pair")}
             </p>
 
-            <x.div fontSize={{ xs: 'xs', md: '14px' }} lineHeight={1} color={"blue-gray-400"}>
-              <x.div marginBottom="4px">No Internal ID?</x.div>
+            <x.div
+              fontSize={{ xs: "xs", md: "14px" }}
+              lineHeight={1}
+              color={"blue-gray-400"}
+            >
+              <x.div marginBottom="4px">{t("no_internal_id")}</x.div>
               <x.div>
                 <x.a
                   target={"_blank"}
-                  color={{ _: "foregroundHighEmphasis", hover: "foregroundLowEmphasis" }}
-                  href={"https://zkscan.io/explorer/tokens"}>
-                  List your token on zkSync
-                  <HiExternalLink size="14px" style={{ marginLeft: "6px", marginBottom: "2px" }} />
+                  color={{
+                    _: "foregroundHighEmphasis",
+                    hover: "foregroundLowEmphasis",
+                  }}
+                  href={"https://zkscan.io/explorer/tokens"}
+                >
+                  {t("list_your_token_on_zksync")}
+                  <HiExternalLink
+                    size="14px"
+                    style={{ marginLeft: "6px", marginBottom: "2px" }}
+                  />
                 </x.a>
               </x.div>
             </x.div>
@@ -187,7 +202,7 @@ export default function ListPairPage() {
                 <x.div display={"flex"} alignItems={"center"}>
                   <RiErrorWarningLine size={18} color={"red"} />
                   <x.div ml={1} fontSize={12} color={"blue-gray-400"}>
-                    Insufficient Arweave allocation
+                    {t("insufficient_arweave_allocation")}
                   </x.div>
                 </x.div>
                 <x.div color={"blue-gray-400"}>{arweaveAllocationKB} kB</x.div>
@@ -213,14 +228,14 @@ export default function ListPairPage() {
                   return (
                     <Button width="100%">
                       {!isArweaveAllocationSufficient && hasAttemptedSubmit
-                        ? "PURCHASE ALLOCATION"
-                        : "SUBMIT"}
+                        ? t("purchase_allocation")
+                        : t("submit")}
                     </Button>
                   );
                 } else {
                   return (
                     <Button width="100%" variant="outlined" disabled>
-                      Please connect to Mainnet
+                      {t("please_connect_to_mainnet")}
                     </Button>
                   );
                 }

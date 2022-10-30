@@ -27,8 +27,6 @@ export * from "components/atoms/Text";
 // Molecules
 export * from "components/molecules/Chart";
 export * from "components/molecules/SpotForm";
-export * from "components/molecules/AccountDropdown";
-export * from "components/molecules/Tabs";
 export * from "components/molecules/TabMenu";
 export * from "components/molecules/Button";
 export * from "components/molecules/Dropdown";

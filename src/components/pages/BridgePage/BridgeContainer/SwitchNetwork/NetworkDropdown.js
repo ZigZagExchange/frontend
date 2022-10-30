@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useSelector } from "react-redux";
 import { Listbox as ListBoxSelect, Transition } from "@headlessui/react";
 import { CheckIcon, SelectorIcon } from "@heroicons/react/solid";
@@ -17,7 +17,7 @@ const NetworkDropdown = ({ options, setSelectedItem, selectedItem }) => {
             className="rounded-full w-9 h-9"
           />
           <div>
-            <p className="text-base font-bold tracking-wider ">
+            <p className="text-xs font-bold tracking-wider md:text-base font-work ">
               {selectedItem.name}
             </p>
             <p className="text-xs tracking-wider ">
