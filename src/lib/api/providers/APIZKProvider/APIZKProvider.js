@@ -551,14 +551,9 @@ export default class APIZKProvider extends APIProvider {
         );
       } else {
         this.ethWallet = this.api.rollupProvider.getSigner();
-        const { seed, ethSignatureType } = await this.getSeed(this.ethWallet);
-        const syncSigner = await zksync.Signer.fromSeed(seed);
         this.syncWallet = await zksync.Wallet.fromEthSigner(
           this.ethWallet,
-          this.syncProvider,
-          syncSigner,
-          undefined,
-          ethSignatureType
+          this.syncProvider
         );
       }
     } catch (err) {
@@ -586,67 +581,6 @@ export default class APIZKProvider extends APIProvider {
     }
 
     return accountState;
-  };
-
-  getSeeds = () => {
-    try {
-      return JSON.parse(
-        window.localStorage?.getItem(APIZKProvider.SEEDS_STORAGE_KEY) || "{}"
-      );
-    } catch {
-      return {};
-    }
-  };
-
-  getSeedKey = async (ethSigner) => {
-    return `${this.network}-${await ethSigner.getAddress()}`;
-  };
-
-  getSeed = async (ethSigner) => {
-    const seedKey = await this.getSeedKey(ethSigner);
-    let seeds = this.getSeeds(ethSigner);
-
-    if (!seeds[seedKey]) {
-      seeds[seedKey] = await this.genSeed(ethSigner);
-      seeds[seedKey].seed = seeds[seedKey].seed
-        .toString()
-        .split(",")
-        .map((x) => +x);
-      window.localStorage.setItem(
-        APIZKProvider.SEEDS_STORAGE_KEY,
-        JSON.stringify(seeds)
-      );
-    }
-
-    seeds[seedKey].seed = Uint8Array.from(seeds[seedKey].seed);
-    return seeds[seedKey];
-  };
-
-  genSeed = async (ethSigner) => {
-    let chainID = 1;
-    if (ethSigner.provider) {
-      const network = await ethSigner.provider.getNetwork();
-      chainID = network.chainId;
-    }
-    let message =
-      "Access zkSync account.\n\nOnly sign this message for a trusted client!";
-    if (chainID !== 1) {
-      message += `\nChain ID: ${chainID}.`;
-    }
-    const signedBytes = zksync.utils.getSignedBytesFromMessage(message, false);
-    const signature = await zksync.utils.signMessagePersonalAPI(
-      ethSigner,
-      signedBytes
-    );
-    const address = await ethSigner.getAddress();
-    const ethSignatureType = await zksync.utils.getEthSignatureType(
-      ethSigner.provider,
-      message,
-      signature,
-      address
-    );
-    const seed = ethers.utils.arrayify(signature);
-    return { seed, ethSignatureType };
   };
 
   refreshArweaveAllocation = async (address) => {
