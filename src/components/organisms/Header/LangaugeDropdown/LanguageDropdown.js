@@ -4,36 +4,43 @@ import { ChevronDownIcon } from "@heroicons/react/solid";
 import useTheme from "components/hooks/useTheme";
 import classNames from "classnames";
 import i18next from "i18next";
+
+import en from "assets/images/en.svg";
+import cn from "assets/images/cn.svg";
+import ir from "assets/images/ir.svg";
+import tr from "assets/images/tr.svg";
+import kr from "assets/images/kr.svg";
+
 const languages = [
   {
     code: "en",
     name: "English",
     country_code: "gb",
-    icon: "https://raw.githubusercontent.com/OnTheGoSystems/SVG-flags-language-switcher/master/flags/en.svg",
+    icon: en,
   },
   {
     code: "zh",
     name: "中文",
     country_code: "zh",
-    icon: "https://raw.githubusercontent.com/OnTheGoSystems/SVG-flags-language-switcher/master/flags/cn.svg",
+    icon: cn,
   },
   {
     code: "ir",
     name: "فارسی",
     country_code: "ir",
-    icon: "https://raw.githubusercontent.com/OnTheGoSystems/SVG-flags-language-switcher/master/flags/ir.svg",
+    icon: ir,
   },
   {
     code: "tr",
     name: "Türkçe",
     country_code: "tr",
-    icon: "https://raw.githubusercontent.com/OnTheGoSystems/SVG-flags-language-switcher/master/flags/tr.svg",
+    icon: tr,
   },
   {
     code: "kr",
     name: "한국어",
     country_code: "kr",
-    icon: "https://raw.githubusercontent.com/OnTheGoSystems/SVG-flags-language-switcher/master/flags/kr.svg",
+    icon: kr,
   },
 ];
 
