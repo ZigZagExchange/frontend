@@ -6,6 +6,7 @@ import { ethers } from "ethers";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import CoinbaseWalletSDK from "@coinbase/wallet-sdk";
 import { getENSName, reverseUnstoppabledomainsAddress } from "lib/ens";
+import { formatAmount } from "lib/utils";
 import erc20ContractABI from "lib/contracts/ERC20.json";
 import { MAX_ALLOWANCE } from "./constants";
 import { toast } from "react-toastify";
@@ -870,77 +871,23 @@ class API extends Emitter {
 
   getWalletBalances = async () => {
     const balances = {};
-    const netContract = this.getNetworkContract();
-    const [account] = await this.web3.eth.getAccounts();
-
-    const getBalanceOfCurrency = async (token, tokenAddress) => {
-      let result = { balance: 0, allowance: ethers.constants.Zero };
-      if (
-        !this.mainnetProvider ||
-        !account ||
-        account === "0x" ||
-        !tokenAddress
-      ) {
-        return result;
-      }
-
-      try {
-        if (token === "ETH") {
-          result.balance = await this.mainnetProvider.getBalance(account);
-          result.allowance = ethers.constants.MaxUint256;
-          return result;
-        }
-
-        const contract = new ethers.Contract(
-          tokenAddress,
-          erc20ContractABI,
-          this.mainnetProvider
-        );
-        const balanceBN = await contract.balanceOf(account);
-        result.balance = balanceBN.toString();
-        if (netContract && balanceBN.gt(0)) {
-          const allowance = await contract.allowance(account, netContract);
-          result.allowance = allowance.toString();
-        }
-        return result;
-      } catch (e) {
-        console.log(e);
-        return result;
-      }
-    };
 
     const getBalance = async (ticker) => {
       const currencyInfo = this.getCurrencyInfo(ticker);
-      if (!currencyInfo) return;
-
-      const { balance, allowance } = await getBalanceOfCurrency(
-        ticker,
-        currencyInfo.address
-      );
-      let valueReadable = "0",
-        allowanceReadable = "0";
-      if (currencyInfo) {
-        if (balance)
-          valueReadable = ethers.utils.formatUnits(
-            balance,
-            currencyInfo.decimals
-          );
-        if (allowance)
-          allowanceReadable = ethers.utils.formatUnits(
-            allowance,
-            currencyInfo.decimals
-          );
-      } else if (ticker === "ETH") {
-        valueReadable = ethers.utils.formatEther(balance);
-        allowanceReadable = ethers.utils.formatEther(allowance);
-      }
-
+      const { balance, allowance } = await this.getBalanceOfCurrency(ticker);
       balances[ticker] = {
         value: balance,
         allowance,
-        valueReadable,
-        allowanceReadable,
+        valueReadable: "0",
       };
+      if (balance && currencyInfo) {
+        balances[ticker].valueReadable = formatAmount(balance, currencyInfo);
+      } else if (ticker === "ETH") {
+        balances[ticker].valueReadable = formatAmount(balance, {
+          decimals: 18,
+        });
+      }
+
       this.emit("balanceUpdate", "wallet", { ...balances });
     };
 
@@ -958,6 +905,7 @@ class API extends Emitter {
   getBalances = async () => {
     const balances = await this.apiProvider.getBalances();
     this.balances[this.apiProvider.network] = balances;
+    this.emit("balanceUpdate", this.apiProvider.network, balances);
     return balances;
   };
 
