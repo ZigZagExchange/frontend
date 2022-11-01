@@ -2,7 +2,7 @@ import Web3 from "web3";
 import { createIcon } from "@download/blockies";
 import Web3Modal from "web3modal";
 import Emitter from "tiny-emitter";
-import { ethers } from "ethers";
+import { ethers, constants as ethersConstants } from "ethers";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import CoinbaseWalletSDK from "@coinbase/wallet-sdk";
 import { getENSName, reverseUnstoppabledomainsAddress } from "lib/ens";
@@ -866,6 +866,42 @@ class API extends Emitter {
 
       // update allowances after successfull approve
       this.getWalletBalances();
+    }
+  };
+
+  getBalanceOfCurrency = async (currency) => {
+    const currencyInfo = this.getCurrencyInfo(currency);
+    let result = { balance: 0, allowance: ethersConstants.Zero };
+    if (!this.mainnetProvider) return result;
+
+    try {
+      const netContract = this.getNetworkContract();
+      const [account] = await this.web3.eth.getAccounts();
+      if (!account || account === "0x") return result;
+
+      if (currency === "ETH") {
+        result.balance = await this.mainnetProvider.getBalance(account);
+        result.allowance = ethersConstants.MaxUint256;
+        return result;
+      }
+
+      if (!currencyInfo || !currencyInfo.address) return result;
+
+      const contract = new ethers.Contract(
+        currencyInfo.address,
+        erc20ContractABI,
+        this.mainnetProvider
+      );
+      result.balance = await contract.balanceOf(account);
+      if (netContract) {
+        result.allowance = ethers.BigNumber.from(
+          await contract.allowance(account, netContract)
+        );
+      }
+      return result;
+    } catch (e) {
+      console.log(e);
+      return result;
     }
   };
 
