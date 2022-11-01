@@ -418,7 +418,7 @@ class API extends Emitter {
             decimals: 18,
           },
           rpcUrls: ["https://goerli-rollup.arbitrum.io/rpc"],
-          blockExplorerUrls: ["https://goerli-rollup-explorer.arbitrum.io/"],
+          blockExplorerUrls: ["https://goerli.arbiscan.io/"],
         };
         break;
       default:
@@ -1233,7 +1233,7 @@ class API extends Emitter {
       case 42161:
         return "https://arbiscan.io/tx/" + txhash;
       case 421613:
-        return "https://goerli-rollup-explorer.arbitrum.io/tx/" + txhash;
+        return "https://goerli.arbiscan.io/tx/" + txhash;
       default:
         throw Error("Chain ID not understood");
     }
@@ -1261,7 +1261,7 @@ class API extends Emitter {
           return "https://arbiscan.io/address/" + address;
         case 421613:
           return (
-            "https://goerli-rollup-explorer.arbitrum.io/address/" + address
+            "https://goerli.arbiscan.io/address/" + address
           );
         default:
           throw Error("Chain ID not understood");
