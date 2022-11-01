@@ -1,7 +1,9 @@
 import { ethers } from "ethers";
 import APIProvider from "./APIProvider";
+import balanceBundleABI from "lib/contracts/BalanceBundle.json";
 import erc20ContractABI from "lib/contracts/ERC20.json";
 import wethContractABI from "lib/contracts/WETH.json";
+import { balanceBundlerAddress } from "./../constants";
 
 export default class APIArbitrumProvider extends APIProvider {
   accountState = {};
@@ -21,97 +23,68 @@ export default class APIArbitrumProvider extends APIProvider {
     return this.accountState;
   };
 
-  getBalances = async (userAddress) => {
+  getBalances = async () => {
     const balances = {};
+    if (!this.accountState?.address) return balances;
+
+    // generate token list
+    const tokenInfoList = [];
+    const tokenList = [];
+    this.api.getCurrencies().forEach((token) => {
+      const tokenInfo = this.api.getCurrencyInfo(token);
+      if (!tokenInfo || !tokenInfo.address) return;
+
+      tokenInfoList.push(tokenInfo);
+      tokenList.push(tokenInfo.address);
+    });
+
+    // allways get ETH
+    tokenInfoList.push({ decimals: 18, symbol: "ETH" });
+    tokenList.push(ethers.constants.AddressZero);
+
+    // get token balance
+    const erc20Contract = new ethers.Contract(
+      balanceBundlerAddress,
+      balanceBundleABI,
+      this.api.rollupProvider
+    );
+    const balanceList = await erc20Contract.balances(
+      [this.accountState.address],
+      tokenList
+    );
     const exchangeAddress = this.getExchangeAddress();
-    let account = userAddress ? userAddress : this.accountState.address;
-    if (!account) {
-      try {
-        [account] = await this.web3.eth.getAccounts();
-      } catch (e) {
-        console.error("No web3 connected");
-        return;
+
+    // generate object
+    for (let i = 0; i < tokenInfoList.length; i++) {
+      let balanceBN = balanceList[i];
+      const currencyInfo = tokenInfoList[i];
+
+      let allowanceBN = ethers.BigNumber.from(0);
+      if (currencyInfo.symbol === "ETH") {
+        allowanceBN = ethers.constants.MaxUint256;
+      } else if (currencyInfo && exchangeAddress && balanceBN.gt(0)) {
+        allowanceBN = await this.getAllowance(
+          currencyInfo.address,
+          exchangeAddress
+        ); // TODO replace
       }
-    }
+      const valueReadable =
+        balanceBN && currencyInfo
+          ? ethers.utils.formatUnits(balanceBN, currencyInfo.decimals)
+          : 0;
+      const allowanceReadable =
+        allowanceBN && currencyInfo
+          ? ethers.utils.formatUnits(allowanceBN, currencyInfo.decimals)
+          : 0;
 
-    const getBalanceOfCurrency = async (token, tokenAddress) => {
-      let result = { balance: 0, allowance: ethers.constants.Zero };
-      if (
-        !this.api.rollupProvider ||
-        !account ||
-        account === "0x" ||
-        !tokenAddress
-      ) {
-        return result;
-      }
-
-      try {
-        if (token === "ETH") {
-          result.balance = await this.api.rollupProvider.getBalance(account);
-          result.allowance = ethers.constants.MaxUint256;
-          return result;
-        }
-
-        const contract = new ethers.Contract(
-          tokenAddress,
-          erc20ContractABI,
-          this.api.rollupProvider
-        );
-        const balanceBN = await contract.balanceOf(account);
-        result.balance = balanceBN.toString();
-        if (exchangeAddress && balanceBN.gt(0)) {
-          const allowance = await contract.allowance(account, exchangeAddress);
-          result.allowance = allowance.toString();
-        }
-        return result;
-      } catch (e) {
-        console.log(e);
-        return result;
-      }
-    };
-
-    const getBalance = async (ticker) => {
-      const currencyInfo = this.api.getCurrencyInfo(ticker);
-      if (!currencyInfo) return;
-
-      const { balance, allowance } = await getBalanceOfCurrency(
-        ticker,
-        currencyInfo.address
-      );
-      let valueReadable = "0",
-        allowanceReadable = "0";
-      if (currencyInfo) {
-        if (balance)
-          valueReadable = ethers.utils.formatUnits(
-            balance,
-            currencyInfo.decimals
-          );
-        if (allowance)
-          allowanceReadable = ethers.utils.formatUnits(
-            allowance,
-            currencyInfo.decimals
-          );
-      } else if (ticker === "ETH") {
-        valueReadable = ethers.utils.formatEther(balance);
-        allowanceReadable = ethers.utils.formatEther(allowance);
-      }
-
-      balances[ticker] = {
-        value: balance,
-        allowance,
+      balances[currencyInfo.symbol] = {
+        value: balanceBN,
         valueReadable,
+        allowance: allowanceBN,
         allowanceReadable,
       };
-    };
-
-    const tickers = this.api.getCurrencies();
-    // allways fetch ETH for Etherum wallet
-    if (!tickers.includes("ETH")) {
-      tickers.push("ETH");
     }
 
-    await Promise.all(tickers.map((ticker) => getBalance(ticker)));
-    this.api.emit("balanceUpdate", this.network, balances);
     return balances;
   };
 
@@ -299,7 +272,7 @@ export default class APIArbitrumProvider extends APIProvider {
   signIn = async () => {
     console.log("signing in to arbitrum");
     const [account] = await this.api.web3.eth.getAccounts();
-    const balances = await this.getBalances(account);
+    const balances = await this.getBalances();
     this.accountState = {
       id: account,
       address: account,
@@ -399,13 +372,8 @@ export default class APIArbitrumProvider extends APIProvider {
   };
 
   getExchangeAddress = () => {
-    for (const key in this.api.marketInfo) {
-      const marketInfo = this.api.marketInfo[key];
-      if (marketInfo.zigzagChainId === this.network) {
-        return marketInfo.exchangeAddress;
-      }
-    }
-    return null;
+    const marketInfo = this.api.marketInfo[`${this.network}:ZZ-USDC`];
+    return marketInfo?.exchangeAddress;
   };
 
   signMessage = async (message) => {

@@ -125,7 +125,7 @@ class API extends Emitter {
               package: null,
               options: {
                 rpc: {
-                  42161: `https://arbitrum-mainnet.infura.io/v3/${this.infuraId}`,
+                  42161: `https://arb1.arbitrum.io/rpc`,
                 },
               },
             },
@@ -134,7 +134,7 @@ class API extends Emitter {
               options: {
                 infuraId: this.infuraId,
                 rpc: {
-                  42161: `https://arbitrum-mainnet.infura.io/v3/${this.infuraId}`,
+                  42161: `https://arb1.arbitrum.io/rpc`,
                 },
               },
             },
@@ -144,7 +144,7 @@ class API extends Emitter {
                 appName: "ZigZag",
                 infuraId: this.infuraId,
                 rpc: {
-                  42161: `https://arbitrum-mainnet.infura.io/v3/${this.infuraId}`,
+                  42161: `https://arb1.arbitrum.io/rpc`,
                 },
               },
             },
