@@ -125,7 +125,7 @@ class API extends Emitter {
               options: {
                 rpc: {
                   42161: `https://arbitrum-mainnet.infura.io/v3/${this.infuraId}`,
-                }
+                },
               },
             },
             walletconnect: {
@@ -134,7 +134,7 @@ class API extends Emitter {
                 infuraId: this.infuraId,
                 rpc: {
                   42161: `https://arbitrum-mainnet.infura.io/v3/${this.infuraId}`,
-                }
+                },
               },
             },
             coinbasewallet: {
@@ -144,7 +144,7 @@ class API extends Emitter {
                 infuraId: this.infuraId,
                 rpc: {
                   42161: `https://arbitrum-mainnet.infura.io/v3/${this.infuraId}`,
-                }
+                },
               },
             },
           },
@@ -166,7 +166,7 @@ class API extends Emitter {
               options: {
                 rpc: {
                   421613: `https://goerli-rollup.arbitrum.io/rpc`,
-                }
+                },
               },
             },
             walletconnect: {
@@ -175,7 +175,7 @@ class API extends Emitter {
                 infuraId: this.infuraId,
                 rpc: {
                   421613: `https://goerli-rollup.arbitrum.io/rpc`,
-                }
+                },
               },
             },
             coinbasewallet: {
@@ -185,7 +185,7 @@ class API extends Emitter {
                 infuraId: this.infuraId,
                 rpc: {
                   421613: `https://goerli-rollup.arbitrum.io/rpc`,
-                }
+                },
               },
             },
           },
@@ -883,24 +883,24 @@ class API extends Emitter {
       ) {
         return result;
       }
-  
-      try {  
+
+      try {
         if (token === "ETH") {
           result.balance = await this.mainnetProvider.getBalance(account);
           result.allowance = ethers.constants.MaxUint256;
           return result;
         }
-  
+
         const contract = new ethers.Contract(
           tokenAddress,
           erc20ContractABI,
           this.mainnetProvider
         );
         const balanceBN = await contract.balanceOf(account);
-        result.balance = balanceBN.toString()
+        result.balance = balanceBN.toString();
         if (netContract && balanceBN.gt(0)) {
-          const allowance = await contract.allowance(account, netContract)
-          result.allowance = allowance.toString()
+          const allowance = await contract.allowance(account, netContract);
+          result.allowance = allowance.toString();
         }
         return result;
       } catch (e) {
@@ -913,13 +913,23 @@ class API extends Emitter {
       const currencyInfo = this.getCurrencyInfo(ticker);
       if (!currencyInfo) return;
 
-      const { balance, allowance } = await getBalanceOfCurrency(ticker, currencyInfo.address);
-      let valueReadable = "0", allowanceReadable = "0";
+      const { balance, allowance } = await getBalanceOfCurrency(
+        ticker,
+        currencyInfo.address
+      );
+      let valueReadable = "0",
+        allowanceReadable = "0";
       if (currencyInfo) {
-        if (balance) 
-          valueReadable = ethers.utils.formatUnits(balance, currencyInfo.decimals);
-        if (allowance) 
-          allowanceReadable = ethers.utils.formatUnits(allowance, currencyInfo.decimals);        
+        if (balance)
+          valueReadable = ethers.utils.formatUnits(
+            balance,
+            currencyInfo.decimals
+          );
+        if (allowance)
+          allowanceReadable = ethers.utils.formatUnits(
+            allowance,
+            currencyInfo.decimals
+          );
       } else if (ticker === "ETH") {
         valueReadable = ethers.utils.formatEther(balance);
         allowanceReadable = ethers.utils.formatEther(allowance);
@@ -1238,8 +1248,8 @@ class API extends Emitter {
         return "https://goerli.zkscan.io/explorer/transactions/" + txhash;
       case 42161:
         return "https://arbiscan.io/tx/" + txhash;
-        case 421613:
-          return "https://goerli-rollup-explorer.arbitrum.io/tx/" + txhash;
+      case 421613:
+        return "https://goerli-rollup-explorer.arbitrum.io/tx/" + txhash;
       default:
         throw Error("Chain ID not understood");
     }
@@ -1266,7 +1276,9 @@ class API extends Emitter {
         case 42161:
           return "https://arbiscan.io/address/" + address;
         case 421613:
-          return "https://goerli-rollup-explorer.arbitrum.io/address/" + address;
+          return (
+            "https://goerli-rollup-explorer.arbitrum.io/address/" + address
+          );
         default:
           throw Error("Chain ID not understood");
       }
@@ -1275,13 +1287,13 @@ class API extends Emitter {
 
   waitForTx = async (txHash) => {
     return this.mainnetProvider.waitForTx(txHash);
-  }
+  };
 
   waitForTxL2 = async (txHash) => {
     if (this.isEVMChain()) {
       return this.rollupProvider.getTransactionReceipt(txHash);
     }
-  }
+  };
   changePubKeyAPI = async () => {
     await this.apiProvider.changePubKey();
   };
