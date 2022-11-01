@@ -621,9 +621,9 @@ class API extends Emitter {
   getChainName = (chainId) => {
     switch (chainId) {
       case 1:
-        return "mainnet";
+        return "zksync";
       case 1002:
-        return "goerli";
+        return "zksync-goerli";
       case 42161:
         return "arbitrum";
       case 421613:
