@@ -28,7 +28,7 @@ const initialUISettings = {
   disableTradeIDCard: false,
   layouts: initialLayouts(),
   editable: false,
-  hideLayoutGuidePopup: false,
+  hideZigZagLiveOnArbitrumPopup: false,
 };
 
 export const apiSlice = createSlice({
@@ -37,7 +37,7 @@ export const apiSlice = createSlice({
     network: 1,
     userId: null,
     layout: getLayout() || 0,
-    currentMarket: api.apiProvider.defaultMarket[1],
+    currentMarket: api.apiProvider.getDefaultMarket(),
     marketFills: {},
     bridgeReceipts: [],
     lastPrices: {},
@@ -71,7 +71,7 @@ export const apiSlice = createSlice({
       const op = payload[0];
       const errorMessage = payload[1];
       // we dont want to show some errors
-      if (errorMessage.includes("Order is no longer open")) {
+      if (errorMessage.includes("Order is no longer open") || op == "subscribemarket") {
         console.error(`Error at ${op}: ${errorMessage}`);
         return;
       }
@@ -82,7 +82,7 @@ export const apiSlice = createSlice({
             {i18next.t("an_unknown_error_has_occurred_while_processing")} '{op}'
             ({errorMessage}). Please{" "}
             <a
-              href={"https://info.zigzag.exchange/#contact"}
+              href={"https://zigzag.exchange/#contact"}
               style={{
                 color: "white",
                 textDecoration: "underline",
@@ -575,12 +575,6 @@ export const apiSlice = createSlice({
                 : `https://rinkeby.etherscan.io/address/${walletAddress}`,
           };
           break;
-        case "zkSync_to_polygon":
-          successMsg = "transferred";
-          targetMsg = "on Polygon:";
-          extraInfoLink = null;
-          break;
-        case "polygon_to_zkSync":
         case "eth_to_zksync":
           successMsg = "transferred";
           targetMsg = "to zkSync:";
@@ -600,14 +594,12 @@ export const apiSlice = createSlice({
               {i18next.t("bridge_transaction_pending")}
             </p>
             Successfully {successMsg} {amount} {token} {targetMsg}
-            {type !== "zkSync_to_polygon" &&
-              type !== "eth_to_zksync" &&
-              type !== "polygon_to_zkSync" && (
-                <>
-                  <br />
-                  <br />
-                </>
-              )}
+            {type !== "eth_to_zksync" && (
+              <>
+                <br />
+                <br />
+              </>
+            )}
             <p>
               <a
                 href={txUrl}
@@ -619,9 +611,7 @@ export const apiSlice = createSlice({
               </a>
             </p>
             {type === "withdraw_fast" ? <br /> : ""}
-            {(type === "eth_to_zksync" ||
-              type === "zkSync_to_polygon" ||
-              type === "polygon_to_zkSync") && (
+            {type === "eth_to_zksync" && (
               <div className="mt-3">
                 {i18next.t(
                   "please_wait_for_your_eth_balance_to_be_available_in_zksync_before_trading"
@@ -634,9 +624,7 @@ export const apiSlice = createSlice({
                     target="_blank"
                     className="text-base font-bold underline font-work underline-offset-2"
                   >
-                    {type === "zkSync_to_polygon"
-                      ? "Polygon wallet"
-                      : " zkSync wallet"}{" "}
+                    {" zkSync wallet "}
                   </a>
                 </p>
               </div>

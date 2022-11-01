@@ -612,14 +612,7 @@ class SpotForm extends React.Component {
       this.props.side === "b"
         ? ((price - fairPrice) / fairPrice) * 100
         : ((fairPrice - price) / fairPrice) * 100;
-    if (
-      (delta > 10 &&
-        this.props.orderType === "limit" &&
-        !this.props.settings.disableSlippageWarning) ||
-      (delta > 2 &&
-        this.props.orderType === "market" &&
-        !this.props.settings.disableSlippageWarning)
-    ) {
+    if (delta > 2 && !this.props.settings.disableSlippageWarning) {
       if (!this.props.confirmed) {
         this.props.setHighSlippageModal({
           xToken: parseFloat(baseAmount).toPrecision(4),

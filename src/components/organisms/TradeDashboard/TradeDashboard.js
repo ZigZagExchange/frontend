@@ -115,7 +115,6 @@ export function TradeDashboard() {
       api.setAPIProvider(chainid);
       api.signOut();
     }
-    api.getWalletBalances();
   }, []);
 
   // Update URL when market or network update
@@ -347,7 +346,7 @@ export function TradeDashboard() {
       </GridLayoutRow>
       <HighSlippageModal />
 
-      {!settings.hideLayoutGuidePopup && (
+      {!settings.hideZigZagLiveOnArbitrumPopup && (
         <div
           className={classNames({
             dark: isDark,

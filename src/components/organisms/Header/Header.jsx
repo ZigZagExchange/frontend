@@ -37,11 +37,12 @@ import { FaDiscord, FaGithub } from "react-icons/fa";
 
 const networkLists = [
   {
-    text: "zkSync",
+    text: "zkSync 1.0",
     value: 1,
     url: "#",
     selectedIcon: <CheckIcon />,
     image: zksyncLogo,
+    display: true
   },
   {
     text: "Arbitrum",
@@ -49,6 +50,7 @@ const networkLists = [
     url: "#",
     selectedIcon: <CheckIcon />,
     image: arbitrumLogo,
+    display: true
   },
   {
     text: "zkSync - Goerli",
@@ -56,6 +58,7 @@ const networkLists = [
     url: "#",
     selectedIcon: <CheckIcon />,
     image: zksyncLogo,
+    display: false
   },
   {
     text: "Arbitrum - Goerli",
@@ -74,7 +77,7 @@ const supportLists = [
   },
   {
     text: "faq",
-    url: "https://info.zigzag.exchange/",
+    url: "https://zigzag.exchange/#faq",
     icon: <MdOutlineQuiz size={14} />,
   },
   {
@@ -94,7 +97,7 @@ const supportLists = [
   },
   {
     text: "contact",
-    url: "https://info.zigzag.exchange/#contact",
+    url: "https://zigzag.exchange/#contact",
     icon: <MdOutlineContactMail size={14} />,
   },
 ];
@@ -251,7 +254,7 @@ export const Header = (props) => {
   const history = useHistory();
   const [index, setIndex] = useState(0);
   const [networkName, setNetworkName] = useState("");
-  const [networkItems, setNetWorkItems] = useState(networkLists);
+  const [networkItems, setNetWorkItems] = useState(networkLists.filter(n => n.display));
   const { isDark, toggleTheme } = useTheme();
   const location = useLocation();
   const { t } = useTranslation();

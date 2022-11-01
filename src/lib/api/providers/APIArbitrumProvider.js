@@ -13,6 +13,10 @@ export default class APIArbitrumProvider extends APIProvider {
     421613: "DAI-USDC",
   };
 
+  getDefaultMarket = () => {
+    return this.defaultMarket[this.network] || "WETH-USDC";
+  }
+
   getAccountState = async () => {
     return this.accountState;
   };
