@@ -128,7 +128,7 @@ export default class APIArbitrumProvider extends APIProvider {
         this.api.balances[this.network][quoteToken].value
       );
     }
-    
+
     const makerVolumeFeeBN = sellAmountBN
       .mul(marketInfo.makerVolumeFee * 10000)
       .div(9999);
@@ -214,6 +214,9 @@ export default class APIArbitrumProvider extends APIProvider {
       } else {
         balanceBN = balanceBN.sub(takerVolumeFeeBN);
       }
+
+      if (balanceBN.lte(0)) throw new Error(`Amount exceeds balance.`);
+
       const delta = sellAmountBN.mul("100000").div(balanceBN).toNumber();
       if (delta > 100100) {
         // 100.1 %
