@@ -194,7 +194,7 @@ class API extends Emitter {
       case "zksync-goerli":
       case "zksync":
         this.web3Modal = new Web3Modal({
-          network: chainName,
+          network: this.getChainNameL1(network),
           cacheProvider: true,
           theme: "dark",
           providerOptions: {
