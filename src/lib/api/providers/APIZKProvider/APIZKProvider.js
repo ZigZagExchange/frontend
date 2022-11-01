@@ -25,7 +25,7 @@ export default class APIZKProvider extends APIProvider {
   evmCompatible = false;
   _tokenWithdrawFees = {};
   _tokenInfo = {};
-  eligibleFastWithdrawTokens = ["ETH", "FRAX", "UST"];
+  eligibleFastWithdrawTokens = ["ETH"];
   fastWithdrawContractAddress = ZKSYNC_ETHEREUM_FAST_BRIDGE.address;
   defaultMarket = {
     1: "ETH-USDC",
@@ -688,7 +688,7 @@ export default class APIZKProvider extends APIProvider {
 
   getZkSyncBaseUrl = (chainId) => {
     const chainName = this.api.getChainName(chainId);
-    if (chainName === "mainnet") {
+    if (chainName === "zksync") {
       return "https://api.zksync.io/api/v0.2";
     } else if (chainName === "goerli") {
       return "https://goerli-api.zksync.io/api/v0.2";

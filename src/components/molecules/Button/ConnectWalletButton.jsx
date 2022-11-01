@@ -29,7 +29,8 @@ const ConnectWalletButton = (props) => {
     try {
       api.emit("connecting", true);
       // setConnecting(true);
-      const state = await api.signIn(network);
+      await api.signIn(network);
+      const state = await api.getAccountState();
       const walletBalance = formatAmount(state.committed.balances["ETH"], {
         decimals: 18,
       });

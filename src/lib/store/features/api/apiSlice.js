@@ -71,7 +71,7 @@ export const apiSlice = createSlice({
       const op = payload[0];
       const errorMessage = payload[1];
       // we dont want to show some errors
-      if (errorMessage.includes("Order is no longer open") || op == "subscribemarket") {
+      if (errorMessage.includes("Order is no longer open") || op === "subscribemarket") {
         console.error(`Error at ${op}: ${errorMessage}`);
         return;
       }

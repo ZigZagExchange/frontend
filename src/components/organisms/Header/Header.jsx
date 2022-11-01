@@ -42,6 +42,7 @@ const networkLists = [
     url: "#",
     selectedIcon: <CheckIcon />,
     image: zksyncLogo,
+    display: true
   },
   {
     text: "Arbitrum",
@@ -49,14 +50,24 @@ const networkLists = [
     url: "#",
     selectedIcon: <CheckIcon />,
     image: arbitrumLogo,
+    display: true
   },
-  //{
-  //  text: "zkSync - Goerli",
-  //  value: 1002,
-  //  url: "#",
-  //  selectedIcon: <CheckIcon />,
-  //  image: zksyncLogo,
-  //},
+  {
+    text: "zkSync - Goerli",
+    value: 1002,
+    url: "#",
+    selectedIcon: <CheckIcon />,
+    image: zksyncLogo,
+    display: false
+  },
+  {
+    text: "Arbitrum - Goerli",
+    value: 421613,
+    url: "#",
+    selectedIcon: <CheckIcon />,
+    image: arbitrumLogo,
+    display: false
+  },
 ];
 
 const supportLists = [
@@ -244,7 +255,7 @@ export const Header = (props) => {
   const history = useHistory();
   const [index, setIndex] = useState(0);
   const [networkName, setNetworkName] = useState("");
-  const [networkItems, setNetWorkItems] = useState(networkLists);
+  const [networkItems, setNetWorkItems] = useState(networkLists.filter(n => n.display));
   const { isDark, toggleTheme } = useTheme();
   const location = useLocation();
   const { t } = useTranslation();
