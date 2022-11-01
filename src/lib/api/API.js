@@ -1,4 +1,3 @@
-import Web3 from "web3";
 import { createIcon } from "@download/blockies";
 import Web3Modal from "web3modal";
 import Emitter from "tiny-emitter";
@@ -93,7 +92,6 @@ class API extends Emitter {
       const oldUrl = new URL(this.ws.url);
       const newUrl = new URL(this.apiProvider.websocketUrl);
       if (oldUrl.host !== newUrl.host) {
-        // Stopping the WebSocket will trigger an auto-restart in 3 seconds
         this.start();
       }
       if (oldNetwork !== this.apiProvider.network) {
@@ -102,18 +100,17 @@ class API extends Emitter {
       }
     }
 
-    this.web3 = new Web3(
-      window.ethereum ||
-        new Web3.providers.HttpProvider(
+    this.rollupProvider = window.ethereum
+      ? new ethers.providers.Web3Provider(window.ethereum, "any")
+      : new ethers.providers.JsonRpcProvider(
           `https://${chainName}.infura.io/v3/${this.infuraId}`
-        )
-    );
+        );
 
     switch (chainName) {
       case "arbitrum":
         this.web3Modal = new Web3Modal({
           network: chainName,
-          cacheProvider: true,
+          cacheProvider: false,
           theme: "dark",
           providerOptions: {
             injected: {
@@ -154,7 +151,7 @@ class API extends Emitter {
       case "arbitrum-goerli":
         this.web3Modal = new Web3Modal({
           network: chainName,
-          cacheProvider: true,
+          cacheProvider: false,
           theme: "dark",
           providerOptions: {
             injected: {
@@ -196,7 +193,7 @@ class API extends Emitter {
       case "zksync":
         this.web3Modal = new Web3Modal({
           network: this.getChainNameL1(network),
-          cacheProvider: true,
+          cacheProvider: false,
           theme: "dark",
           providerOptions: {
             injected: {
@@ -533,11 +530,11 @@ class API extends Emitter {
             this.apiProvider = this.getAPIProvider(network);
           }
 
-          // await this.refreshNetwork();
-          // await this.sleep(1000);
+          await this.refreshNetwork();
+          await this.sleep(1000);
+
           const web3Provider = await this.web3Modal.connect();
 
-          this.web3.setProvider(web3Provider);
           this.rollupProvider = new ethers.providers.Web3Provider(web3Provider);
 
           this.mainnetProvider = new ethers.providers.InfuraProvider(
@@ -602,7 +599,6 @@ class API extends Emitter {
     this._pendingOrders = [];
     this._pendingFills = [];
 
-    this.web3 = null;
     this.web3Modal = null;
     this.rollupProvider = null;
     this.mainnetProvider = null;
@@ -854,15 +850,13 @@ class API extends Emitter {
   approveSpendOfCurrency = async (currency) => {
     const netContract = this.getNetworkContract();
     if (netContract) {
-      const [account] = await this.web3.eth.getAccounts();
       const currencyInfo = this.getCurrencyInfo(currency);
-      const contract = new this.web3.eth.Contract(
+      const contract = new ethers.Contract(
         erc20ContractABI,
-        currencyInfo.address
+        currencyInfo.address,
+        this.rollupProvider
       );
-      await contract.methods
-        .approve(netContract, MAX_ALLOWANCE)
-        .send({ from: account });
+      await contract.approve(netContract, MAX_ALLOWANCE);
 
       // update allowances after successfull approve
       this.getWalletBalances();
@@ -875,11 +869,11 @@ class API extends Emitter {
 
     try {
       const netContract = this.getNetworkContract();
-      const [account] = await this.web3.eth.getAccounts();
-      if (!account || account === "0x") return result;
+      const address = await this.rollupProvider.getSigner().getAddress();
+      if (!address || address === "0x") return result;
 
       if (currency === "ETH") {
-        result.balance = await this.mainnetProvider.getBalance(account);
+        result.balance = await this.mainnetProvider.getBalance(address);
         result.allowance = ethersConstants.MaxUint256;
         return result;
       }
@@ -891,10 +885,10 @@ class API extends Emitter {
         erc20ContractABI,
         this.mainnetProvider
       );
-      result.balance = await contract.balanceOf(account);
+      result.balance = await contract.balanceOf(address);
       if (netContract) {
         result.allowance = ethers.BigNumber.from(
-          await contract.allowance(account, netContract)
+          await contract.allowance(address, netContract)
         );
       }
       return result;

@@ -3,7 +3,6 @@ import APIProvider from "./APIProvider";
 import erc20ContractABI from "lib/contracts/ERC20.json";
 import wethContractABI from "lib/contracts/WETH.json";
 import { formatAmount } from "lib/utils";
-import { ConsoleView } from "react-device-detect";
 
 export default class APIArbitrumProvider extends APIProvider {
   accountState = {};
@@ -35,8 +34,12 @@ export default class APIArbitrumProvider extends APIProvider {
       };
       if (balance && currencyInfo) {
         balances[ticker].valueReadable = formatAmount(balance, currencyInfo);
+        balances[ticker].allowanceReadable = formatAmount(allowance, currencyInfo);
       } else if (ticker === "ETH") {
         balances[ticker].valueReadable = formatAmount(balance, {
+          decimals: 18,
+        });
+        balances[ticker].allowanceReadable = formatAmount(allowance, {
           decimals: 18,
         });
       }
@@ -195,7 +198,7 @@ export default class APIArbitrumProvider extends APIProvider {
           { name: "salt", type: "uint256" },
         ],
       };
-    } else if (Number(marketInfo.contractVersion) == 2.0) {
+    } else if (Number(marketInfo.contractVersion) === 2.0) {
       // size check
       if (makerVolumeFeeBN.gte(takerVolumeFeeBN)) {
         balanceBN = balanceBN.sub(makerVolumeFeeBN);
@@ -254,11 +257,11 @@ export default class APIArbitrumProvider extends APIProvider {
 
   signIn = async () => {
     console.log("signing in to arbitrum");
-    const [account] = await this.api.web3.eth.getAccounts();
+    const address = await this.api.rollupProvider.getSigner().getAddress();
     const balances = await this.getBalances();
     this.accountState = {
-      id: account,
-      address: account,
+      id: address,
+      address,
       committed: {
         balances,
       },
@@ -355,7 +358,7 @@ export default class APIArbitrumProvider extends APIProvider {
   };
 
   getExchangeAddress = () => {
-    const marketInfo = this.api.marketInfo[`${this.network}:ZZ-USDC`];
+    const marketInfo = this.api.marketInfo[`${this.network}:${this.defaultMarket[this.network]}`];
     return marketInfo?.exchangeAddress;
   };
 
