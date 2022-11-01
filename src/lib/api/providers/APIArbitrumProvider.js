@@ -1,9 +1,9 @@
-import { ethers } from "ethers";
+import { ethers, constants as ethersConstants } from "ethers";
 import APIProvider from "./APIProvider";
-import balanceBundleABI from "lib/contracts/BalanceBundle.json";
 import erc20ContractABI from "lib/contracts/ERC20.json";
 import wethContractABI from "lib/contracts/WETH.json";
-import { balanceBundlerAddress } from "./../constants";
+import { formatAmount } from "lib/utils";
+import { ConsoleView } from "react-device-detect";
 
 export default class APIArbitrumProvider extends APIProvider {
   accountState = {};
@@ -12,7 +12,7 @@ export default class APIArbitrumProvider extends APIProvider {
   _tokenInfo = {};
   defaultMarket = {
     42161: "WETH-USDC",
-    421613: "DAI-USDC",
+    421613: "WBTC-DAI",
   };
 
   getDefaultMarket = () => {
@@ -25,84 +25,67 @@ export default class APIArbitrumProvider extends APIProvider {
 
   getBalances = async () => {
     const balances = {};
-    if (!this.accountState?.address) return balances;
-
-    // generate token list
-    const tokenInfoList = [];
-    const tokenList = [];
-    this.api.getCurrencies().forEach((token) => {
-      const tokenInfo = this.api.getCurrencyInfo(token);
-      if (!tokenInfo || !tokenInfo.address) return;
-
-      tokenInfoList.push(tokenInfo);
-      tokenList.push(tokenInfo.address);
-    });
-
-    // allways get ETH
-    tokenInfoList.push({ decimals: 18, symbol: "ETH" });
-    tokenList.push(ethers.constants.AddressZero);
-
-    // get token balance
-    const erc20Contract = new ethers.Contract(
-      balanceBundlerAddress,
-      balanceBundleABI,
-      this.api.rollupProvider
-    );
-    const balanceList = await erc20Contract.balances(
-      [this.accountState.address],
-      tokenList
-    );
-    const exchangeAddress = this.getExchangeAddress();
-
-    // generate object
-    for (let i = 0; i < tokenInfoList.length; i++) {
-      let balanceBN = balanceList[i];
-      const currencyInfo = tokenInfoList[i];
-
-      let allowanceBN = ethers.BigNumber.from(0);
-      if (currencyInfo.symbol === "ETH") {
-        allowanceBN = ethers.constants.MaxUint256;
-      } else if (currencyInfo && exchangeAddress && balanceBN.gt(0)) {
-        allowanceBN = await this.getAllowance(
-          currencyInfo.address,
-          exchangeAddress
-        ); // TODO replace
-      }
-      const valueReadable =
-        balanceBN && currencyInfo
-          ? ethers.utils.formatUnits(balanceBN, currencyInfo.decimals)
-          : 0;
-      const allowanceReadable =
-        allowanceBN && currencyInfo
-          ? ethers.utils.formatUnits(allowanceBN, currencyInfo.decimals)
-          : 0;
-
-      balances[currencyInfo.symbol] = {
-        value: balanceBN,
-        valueReadable,
-        allowance: allowanceBN,
-        allowanceReadable,
+    const getBalance = async (ticker) => {
+      const currencyInfo = this.api.getCurrencyInfo(ticker);
+      const { balance, allowance } = await this.getBalanceOfCurrency(currencyInfo, ticker);
+      balances[ticker] = {
+        value: balance,
+        allowance,
+        valueReadable: "0",
       };
+      if (balance && currencyInfo) {
+        balances[ticker].valueReadable = formatAmount(balance, currencyInfo);
+      } else if (ticker === "ETH") {
+        balances[ticker].valueReadable = formatAmount(balance, {
+          decimals: 18,
+        });
+      }
+    };
+
+    const tickers = this.api.getCurrencies();
+    // allways fetch ETH for Etherum wallet
+    if (!tickers.includes("ETH")) {
+      tickers.push("ETH");
     }
 
+    await Promise.all(tickers.map((ticker) => getBalance(ticker)));
+
     return balances;
-  };
+  }
 
-  getAllowance = async (tokenAddress, contractAddress) => {
-    if (!this.accountState.address || !contractAddress || !tokenAddress)
-      return 0;
-    const erc20Contract = new ethers.Contract(
-      tokenAddress,
-      erc20ContractABI,
-      this.api.rollupProvider
-    );
+  getBalanceOfCurrency = async (currencyInfo, currency) => {
+    let result = { balance: 0, allowance: ethersConstants.Zero };
+    if (!this.api.rollupProvider) return result;
 
-    const allowance = await erc20Contract.allowance(
-      this.accountState.address,
-      contractAddress
-    );
+    try {
+      const exchangeAddress = this.getExchangeAddress();
+      const account = this.accountState.address;
+      if (!account || account === "0x") return result;
 
-    return ethers.BigNumber.from(allowance);
+      if (currency === "ETH") {
+        result.balance = await this.api.rollupProvider.getBalance(account);
+        result.allowance = ethersConstants.MaxUint256;
+        return result;
+      }
+
+      if (!currencyInfo || !currencyInfo.address) return result;
+
+      const contract = new ethers.Contract(
+        currencyInfo.address,
+        erc20ContractABI,
+        this.api.rollupProvider
+      );
+      result.balance = await contract.balanceOf(account);
+      if (exchangeAddress) {
+        result.allowance = ethers.BigNumber.from(
+          await contract.allowance(account, exchangeAddress)
+        );
+      }
+      return result;
+    } catch (e) {
+      console.log(e);
+      return result;
+    }
   };
 
   submitOrder = async (

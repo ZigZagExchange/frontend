@@ -56,7 +56,7 @@ export function* userPollingSaga() {
       }
     }
 
-    yield delay(6000);
+    yield delay(4000);
   }
 }
 

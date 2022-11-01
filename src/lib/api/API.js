@@ -869,8 +869,7 @@ class API extends Emitter {
     }
   };
 
-  getBalanceOfCurrency = async (currency) => {
-    const currencyInfo = this.getCurrencyInfo(currency);
+  getBalanceOfCurrency = async (currencyInfo, currency) => {
     let result = { balance: 0, allowance: ethersConstants.Zero };
     if (!this.mainnetProvider) return result;
 
@@ -910,7 +909,7 @@ class API extends Emitter {
 
     const getBalance = async (ticker) => {
       const currencyInfo = this.getCurrencyInfo(ticker);
-      const { balance, allowance } = await this.getBalanceOfCurrency(ticker);
+      const { balance, allowance } = await this.getBalanceOfCurrency(currencyInfo, ticker);
       balances[ticker] = {
         value: balance,
         allowance,
