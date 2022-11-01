@@ -66,6 +66,7 @@ const networkLists = [
     url: "#",
     selectedIcon: <CheckIcon />,
     image: arbitrumLogo,
+    display: false
   },
 ];
 
