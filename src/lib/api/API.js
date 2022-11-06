@@ -1171,10 +1171,6 @@ class API extends Emitter {
       }
     }
   };
-
-  changePubKeyAPI = async () => {
-    await this.apiProvider.changePubKey();
-  };
 }
 
 export default API;
