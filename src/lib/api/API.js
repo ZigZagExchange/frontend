@@ -495,6 +495,10 @@ class API extends Emitter {
 
           return accountState;
         })
+        .catch((err) => {
+          console.log(err);
+          throw err;
+        })
         .finally(() => {
           this._signInProgress = null;
         });
@@ -1170,10 +1174,6 @@ class API extends Emitter {
           throw Error("Chain ID not understood");
       }
     }
-  };
-
-  changePubKeyAPI = async () => {
-    await this.apiProvider.changePubKey();
   };
 }
 

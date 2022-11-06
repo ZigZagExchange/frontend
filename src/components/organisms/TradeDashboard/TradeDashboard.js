@@ -135,10 +135,6 @@ export function TradeDashboard() {
       if (user.address && !user.id && network === 1) {
         history.push("/bridge");
       }
-      const accountActivated = await api.checkAccountActivated();
-      if (!accountActivated && user.address) {
-        await api.changePubKeyAPI();
-      }
     };
     activeAcc().catch(console.error);
   }, []);

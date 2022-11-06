@@ -543,27 +543,13 @@ export default class APIZKProvider extends APIProvider {
       throw e;
     }
 
-    try {
-      if (this.api.isArgent) {
-        this.syncWallet = await zksync.RemoteWallet.fromEthSigner(
-          this.api.rollupProvider,
-          this.syncProvider
-        );
-      } else {
-        this.ethWallet = this.api.rollupProvider.getSigner();
-        const { seed, ethSignatureType } = await this.getSeed(this.ethWallet);
-        const syncSigner = await zksync.Signer.fromSeed(seed);
-        this.syncWallet = await zksync.Wallet.fromEthSigner(
-          this.ethWallet,
-          this.syncProvider,
-          syncSigner,
-          undefined,
-          ethSignatureType
-        );
-      }
-    } catch (err) {
-      console.log(err);
-      throw err;
+    if (this.api.isArgent) {
+      this.syncWallet = await zksync.RemoteWallet.fromEthSigner(
+        this.api.rollupProvider,
+        this.syncProvider
+      );
+    } else {
+      this.syncWallet = await this.getSyncWallet();
     }
 
     this.batchTransferService = new BatchTransferService(
@@ -571,22 +557,40 @@ export default class APIZKProvider extends APIProvider {
       this.syncWallet
     );
 
-    const [accountState, accountActivated] = await Promise.all([
+    let [accountState, accountActivated] = await Promise.all([
       this.getAccountState(),
       this.checkAccountActivated(),
     ]);
 
+    // 1st stage: the saved zkSyncPK is wrong
+    // => delete seed and re-create the PK
     if (!accountActivated) {
-      try {
-        await this.changePubKey();
-      } catch (err) {
-        console.log(err);
-        accountState.err = err.code;
-      }
-    }
+      await this.deleteSeed(this.ethWallet);
+      this.syncWallet = await this.getSyncWallet();
+      [accountState, accountActivated] = await Promise.all([
+        this.getAccountState(),
+        this.checkAccountActivated(),
+      ]);
 
+      // 2nd stage: the new zkSyncPK is wrong
+      // => set new PK
+      if (!accountActivated) await this.changePubKey();
+    }
     return accountState;
   };
+
+  getSyncWallet = async () => {
+    this.ethWallet = this.api.rollupProvider.getSigner();
+    const { seed, ethSignatureType } = await this.getSeed(this.ethWallet);
+    const syncSigner = await zksync.Signer.fromSeed(seed);
+    return zksync.Wallet.fromEthSigner(
+      this.ethWallet,
+      this.syncProvider,
+      syncSigner,
+      undefined,
+      ethSignatureType
+    );
+  }
 
   getSeeds = () => {
     try {
@@ -598,13 +602,24 @@ export default class APIZKProvider extends APIProvider {
     }
   };
 
+  deleteSeed = async (ethSigner) => {
+    const seedKey = await this.getSeedKey(ethSigner);
+    const seeds = this.getSeeds();
+
+    delete seeds[seedKey];
+    window.localStorage.setItem(
+      APIZKProvider.SEEDS_STORAGE_KEY,
+      JSON.stringify(seeds)
+    );
+  }
+
   getSeedKey = async (ethSigner) => {
     return `${this.network}-${await ethSigner.getAddress()}`;
   };
 
   getSeed = async (ethSigner) => {
     const seedKey = await this.getSeedKey(ethSigner);
-    let seeds = this.getSeeds(ethSigner);
+    let seeds = this.getSeeds();
 
     if (!seeds[seedKey]) {
       seeds[seedKey] = await this.genSeed(ethSigner);
