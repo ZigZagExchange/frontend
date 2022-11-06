@@ -495,6 +495,10 @@ class API extends Emitter {
 
           return accountState;
         })
+        .catch((err) => {
+          console.log(err);
+          throw err;
+        })
         .finally(() => {
           this._signInProgress = null;
         });
