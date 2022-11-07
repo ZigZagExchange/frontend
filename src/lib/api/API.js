@@ -590,13 +590,14 @@ class API extends Emitter {
       !allPairs.includes(market) &&
       market !== this.apiProvider.getDefaultMarket()
     )
-      return;
+      return false;
 
     this.send("subscribemarket", [
       this.apiProvider.network,
       market,
       showNightPriceChange,
     ]);
+    return true;
   };
 
   unsubscribeToMarket = (market) => {
