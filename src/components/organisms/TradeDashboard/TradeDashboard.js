@@ -140,9 +140,13 @@ export function TradeDashboard() {
   }, []);
 
   useEffect(async () => {
-    const sub = () => {
+    const sub = async () => {
       dispatch(resetData());
-      api.subscribeToMarket(currentMarket, settings.showNightPriceChange);
+      let subscribed = false;
+      while (!subscribed) {
+        subscribed = api.subscribeToMarket(currentMarket, settings.showNightPriceChange);
+        await new Promise(resolve => setTimeout(resolve, 200));
+      }
     };
 
     if (api.ws && api.ws.readyState === 0) {
@@ -158,7 +162,7 @@ export function TradeDashboard() {
         api.off("open", sub);
       }
     };
-  }, [network, currentMarket, api.ws, settings.showNightPriceChange]);
+  }, [network, currentMarket, settings.showNightPriceChange]);
 
   const changeSide = (side) => {
     setSide(side);
