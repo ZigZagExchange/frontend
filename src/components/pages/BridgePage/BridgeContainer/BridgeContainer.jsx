@@ -638,7 +638,7 @@ const BridgeContainer = () => {
 
   const toNetworkOption = useMemo(() => {
     const t = NETWORKS.find((item) => item.from.id === fromNetwork.id);
-    return t.to;
+    return t?.to;
   }, [fromNetwork, NETWORKS]);
 
   const switchTransferType = () => {
