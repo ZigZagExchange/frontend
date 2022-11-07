@@ -502,6 +502,7 @@ class API extends Emitter {
             {
               toastId: "zksync account does not exist",
               onClick: () => window.open("https://wallet.zksync.io", "_blank"),
+              autoClose: false
             }
           );
           throw err;
