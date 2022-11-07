@@ -8,20 +8,20 @@ export const ETH_ZKSYNC_BRIDGE = {
 export const ZKSYNC_ETHEREUM_FAST_BRIDGE = {
   address: "0xCC9557F04633d82Fb6A1741dcec96986cD8689AE",
   key: "zksync_ethereum",
-  eligibleTokensZkSync: ["ETH", "FRAX", "UST"],
+  eligibleTokensZkSync: ["ETH"],
   eligibleTokensEthereum: [],
   receiptKeyZkSync: "withdraw_fast",
 };
 
 export const NETWORKS = [
-  {
-    from: {
-      name: "Ethereum",
-      id: "ethereum",
-      icon: ethLogo,
-    },
-    to: [{ name: "zkSync", id: "zksync", icon: zksyncLogo }],
-  },
+  //{
+  //  from: {
+  //    name: "Ethereum",
+  //    id: "ethereum",
+  //    icon: ethLogo,
+  //  },
+  //  to: [{ name: "zkSync", id: "zksync", icon: zksyncLogo }],
+  //},
   {
     from: {
       name: "zkSync",
