@@ -201,5 +201,5 @@
   "expired": "Expired",
   "cancel": "Cancel",
   "view_tx": "View Tx",
-  "zksync_account_does_not_exist": "Your zksync account does not exist. Click here to use the Zksync Bridge to deposit funds."
+  "click_here_to_bridge_funds": "Your zksync account does not exist. Click here to use the Zksync Bridge to deposit funds."
 }

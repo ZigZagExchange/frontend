@@ -498,7 +498,7 @@ class API extends Emitter {
         .catch((err) => {
           console.log(err);
           const toastMsg = toast.error(
-            i18next.t("zksync_account_does_not_exist"),
+            i18next.t("click_here_to_bridge_funds"),
             {
               toastId: "zksync account does not exist",
               onClick: () => window.open("https://wallet.zksync.io", "_blank"),
