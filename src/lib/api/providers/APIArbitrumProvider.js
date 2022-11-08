@@ -129,76 +129,7 @@ export default class APIArbitrumProvider extends APIProvider {
       .div(9999);
 
     let domain, Order, types;
-    if (Number(marketInfo.contractVersion) === 6) {
-      let gasFeeBN;
-      if (side === "s") {
-        gasFeeBN = ethers.utils.parseUnits(
-          Number(marketInfo.baseFee).toFixed(marketInfo.baseAsset.decimals),
-          marketInfo.baseAsset.decimals
-        );
-      } else {
-        gasFeeBN = ethers.utils.parseUnits(
-          Number(marketInfo.quoteFee).toFixed(marketInfo.quoteAsset.decimals),
-          marketInfo.quoteAsset.decimals
-        );
-      }
-
-      // size check
-      if (makerVolumeFeeBN.gte(takerVolumeFeeBN)) {
-        balanceBN = balanceBN.sub(gasFeeBN).sub(makerVolumeFeeBN);
-      } else {
-        balanceBN = balanceBN.sub(gasFeeBN).sub(takerVolumeFeeBN);
-      }
-      const delta = sellAmountBN.mul("100000").div(balanceBN).toNumber();
-      if (delta > 100100) {
-        // 100.1 %
-        throw new Error(`Amount exceeds balance.`);
-      }
-      // prevent dust issues
-      if (delta > 99990) {
-        // 99.9 %
-        sellAmountBN = balanceBN;
-        buyAmountBN = buyAmountBN.mul(100000).div(delta);
-      }
-
-      Order = {
-        user: this.accountState.address,
-        sellToken: sellToken,
-        buyToken: buyToken,
-        feeRecipientAddress: marketInfo.feeAddress,
-        relayerAddress: marketInfo.relayerAddress,
-        sellAmount: sellAmountBN.toString(),
-        buyAmount: buyAmountBN.toString(),
-        makerVolumeFee: makerVolumeFeeBN.toString(),
-        takerVolumeFee: takerVolumeFeeBN.toString(),
-        gasFee: gasFeeBN.toString(),
-        expirationTimeSeconds: expirationTimeSeconds.toFixed(0),
-        salt: (Math.random() * 123456789).toFixed(0),
-      };
-
-      domain = {
-        name: "ZigZag",
-        version: "6",
-        chainId: this.network,
-      };
-
-      types = {
-        Order: [
-          { name: "user", type: "address" },
-          { name: "sellToken", type: "address" },
-          { name: "buyToken", type: "address" },
-          { name: "feeRecipientAddress", type: "address" },
-          { name: "relayerAddress", type: "address" },
-          { name: "sellAmount", type: "uint256" },
-          { name: "buyAmount", type: "uint256" },
-          { name: "makerVolumeFee", type: "uint256" },
-          { name: "takerVolumeFee", type: "uint256" },
-          { name: "gasFee", type: "uint256" },
-          { name: "expirationTimeSeconds", type: "uint256" },
-          { name: "salt", type: "uint256" },
-        ],
-      };
-    } else if (Number(marketInfo.contractVersion) === 2.0) {
+    if (Number(marketInfo.contractVersion) === 2.0) {
       // size check
       if (makerVolumeFeeBN.gte(takerVolumeFeeBN)) {
         balanceBN = balanceBN.sub(makerVolumeFeeBN);
