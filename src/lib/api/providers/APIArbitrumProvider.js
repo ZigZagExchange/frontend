@@ -1,9 +1,8 @@
-import { ethers } from "ethers";
+import { ethers, constants as ethersConstants } from "ethers";
 import APIProvider from "./APIProvider";
-import balanceBundleABI from "lib/contracts/BalanceBundle.json";
 import erc20ContractABI from "lib/contracts/ERC20.json";
 import wethContractABI from "lib/contracts/WETH.json";
-import { balanceBundlerAddress } from "./../constants";
+import { formatAmount } from "lib/utils";
 
 export default class APIArbitrumProvider extends APIProvider {
   accountState = {};
@@ -12,6 +11,7 @@ export default class APIArbitrumProvider extends APIProvider {
   _tokenInfo = {};
   defaultMarket = {
     42161: "WETH-USDC",
+    421613: "WBTC-DAI",
   };
 
   getDefaultMarket = () => {
@@ -24,84 +24,71 @@ export default class APIArbitrumProvider extends APIProvider {
 
   getBalances = async () => {
     const balances = {};
-    if (!this.accountState?.address) return balances;
-
-    // generate token list
-    const tokenInfoList = [];
-    const tokenList = [];
-    this.api.getCurrencies().forEach((token) => {
-      const tokenInfo = this.api.getCurrencyInfo(token);
-      if (!tokenInfo || !tokenInfo.address) return;
-
-      tokenInfoList.push(tokenInfo);
-      tokenList.push(tokenInfo.address);
-    });
-
-    // allways get ETH
-    tokenInfoList.push({ decimals: 18, symbol: "ETH" });
-    tokenList.push(ethers.constants.AddressZero);
-
-    // get token balance
-    const erc20Contract = new ethers.Contract(
-      balanceBundlerAddress,
-      balanceBundleABI,
-      this.api.rollupProvider
-    );
-    const balanceList = await erc20Contract.balances(
-      [this.accountState.address],
-      tokenList
-    );
-    const exchangeAddress = this.getExchangeAddress();
-
-    // generate object
-    for (let i = 0; i < tokenInfoList.length; i++) {
-      let balanceBN = balanceList[i];
-      const currencyInfo = tokenInfoList[i];
-
-      let allowanceBN = ethers.BigNumber.from(0);
-      if (currencyInfo.symbol === "ETH") {
-        allowanceBN = ethers.constants.MaxUint256;
-      } else if (currencyInfo && exchangeAddress && balanceBN.gt(0)) {
-        allowanceBN = await this.getAllowance(
-          currencyInfo.address,
-          exchangeAddress
-        ); // TODO replace
-      }
-      const valueReadable =
-        balanceBN && currencyInfo
-          ? ethers.utils.formatUnits(balanceBN, currencyInfo.decimals)
-          : 0;
-      const allowanceReadable =
-        allowanceBN && currencyInfo
-          ? ethers.utils.formatUnits(allowanceBN, currencyInfo.decimals)
-          : 0;
-
-      balances[currencyInfo.symbol] = {
-        value: balanceBN,
-        valueReadable,
-        allowance: allowanceBN,
-        allowanceReadable,
+    const getBalance = async (ticker) => {
+      const currencyInfo = this.api.getCurrencyInfo(ticker);
+      const { balance, allowance } = await this.getBalanceOfCurrency(currencyInfo, ticker);
+      balances[ticker] = {
+        value: balance,
+        allowance,
+        valueReadable: "0",
       };
+      if (balance && currencyInfo) {
+        balances[ticker].valueReadable = formatAmount(balance, currencyInfo);
+        balances[ticker].allowanceReadable = formatAmount(allowance, currencyInfo);
+      } else if (ticker === "ETH") {
+        balances[ticker].valueReadable = formatAmount(balance, {
+          decimals: 18,
+        });
+        balances[ticker].allowanceReadable = formatAmount(allowance, {
+          decimals: 18,
+        });
+      }
+    };
+
+    const tickers = this.api.getCurrencies();
+    // allways fetch ETH for Etherum wallet
+    if (!tickers.includes("ETH")) {
+      tickers.push("ETH");
     }
 
+    await Promise.all(tickers.map((ticker) => getBalance(ticker)));
+
     return balances;
-  };
+  }
 
-  getAllowance = async (tokenAddress, contractAddress) => {
-    if (!this.accountState.address || !contractAddress || !tokenAddress)
-      return 0;
-    const erc20Contract = new ethers.Contract(
-      tokenAddress,
-      erc20ContractABI,
-      this.api.rollupProvider
-    );
+  getBalanceOfCurrency = async (currencyInfo, currency) => {
+    let result = { balance: 0, allowance: ethersConstants.Zero };
+    if (!this.api.rollupProvider) return result;
 
-    const allowance = await erc20Contract.allowance(
-      this.accountState.address,
-      contractAddress
-    );
+    try {
+      const exchangeAddress = this.getExchangeAddress();
+      const account = this.accountState.address;
+      if (!account || account === "0x") return result;
 
-    return ethers.BigNumber.from(allowance);
+      if (currency === "ETH") {
+        result.balance = await this.api.rollupProvider.getBalance(account);
+        result.allowance = ethersConstants.MaxUint256;
+        return result;
+      }
+
+      if (!currencyInfo || !currencyInfo.address) return result;
+
+      const contract = new ethers.Contract(
+        currencyInfo.address,
+        erc20ContractABI,
+        this.api.rollupProvider
+      );
+      result.balance = await contract.balanceOf(account);
+      if (exchangeAddress) {
+        result.allowance = ethers.BigNumber.from(
+          await contract.allowance(account, exchangeAddress)
+        );
+      }
+      return result;
+    } catch (e) {
+      console.log(e);
+      return result;
+    }
   };
 
   submitOrder = async (
@@ -114,16 +101,12 @@ export default class APIArbitrumProvider extends APIProvider {
     const marketInfo = this.api.marketInfo[`${this.network}:${market}`];
 
     const [baseToken, quoteToken] = market.split("-");
-    let sellToken, buyToken, sellAmountBN, buyAmountBN, gasFeeBN, balanceBN;
+    let sellToken, buyToken, sellAmountBN, buyAmountBN, balanceBN;
     if (side === "s") {
       sellToken = marketInfo.baseAsset.address;
       buyToken = marketInfo.quoteAsset.address;
       sellAmountBN = baseAmountBN;
       buyAmountBN = quoteAmountBN.mul(99999).div(100000);
-      gasFeeBN = ethers.utils.parseUnits(
-        Number(marketInfo.baseFee).toFixed(marketInfo.baseAsset.decimals),
-        marketInfo.baseAsset.decimals
-      );
       balanceBN = ethers.BigNumber.from(
         this.api.balances[this.network][baseToken].value
       );
@@ -132,10 +115,6 @@ export default class APIArbitrumProvider extends APIProvider {
       buyToken = marketInfo.baseAsset.address;
       sellAmountBN = quoteAmountBN;
       buyAmountBN = baseAmountBN.mul(99999).div(100000);
-      gasFeeBN = ethers.utils.parseUnits(
-        Number(marketInfo.quoteFee).toFixed(marketInfo.quoteAsset.decimals),
-        marketInfo.quoteAsset.decimals
-      );
       balanceBN = ethers.BigNumber.from(
         this.api.balances[this.network][quoteToken].value
       );
@@ -149,26 +128,39 @@ export default class APIArbitrumProvider extends APIProvider {
       .mul(marketInfo.takerVolumeFee * 10000)
       .div(9999);
 
-    // size check
-    if (makerVolumeFeeBN.gte(takerVolumeFeeBN)) {
-      balanceBN = balanceBN.sub(gasFeeBN).sub(makerVolumeFeeBN);
-    } else {
-      balanceBN = balanceBN.sub(gasFeeBN).sub(takerVolumeFeeBN);
-    }
-    const delta = sellAmountBN.mul("100000").div(balanceBN).toNumber();
-    if (delta > 100100) {
-      // 100.1 %
-      throw new Error(`Amount exceeds balance.`);
-    }
-    // prevent dust issues
-    if (delta > 99990) {
-      // 99.9 %
-      sellAmountBN = balanceBN;
-      buyAmountBN = buyAmountBN.mul(100000).div(delta);
-    }
-
     let domain, Order, types;
     if (Number(marketInfo.contractVersion) === 6) {
+      let gasFeeBN;
+      if (side === "s") {
+        gasFeeBN = ethers.utils.parseUnits(
+          Number(marketInfo.baseFee).toFixed(marketInfo.baseAsset.decimals),
+          marketInfo.baseAsset.decimals
+        );
+      } else {
+        gasFeeBN = ethers.utils.parseUnits(
+          Number(marketInfo.quoteFee).toFixed(marketInfo.quoteAsset.decimals),
+          marketInfo.quoteAsset.decimals
+        );
+      }
+
+      // size check
+      if (makerVolumeFeeBN.gte(takerVolumeFeeBN)) {
+        balanceBN = balanceBN.sub(gasFeeBN).sub(makerVolumeFeeBN);
+      } else {
+        balanceBN = balanceBN.sub(gasFeeBN).sub(takerVolumeFeeBN);
+      }
+      const delta = sellAmountBN.mul("100000").div(balanceBN).toNumber();
+      if (delta > 100100) {
+        // 100.1 %
+        throw new Error(`Amount exceeds balance.`);
+      }
+      // prevent dust issues
+      if (delta > 99990) {
+        // 99.9 %
+        sellAmountBN = balanceBN;
+        buyAmountBN = buyAmountBN.mul(100000).div(delta);
+      }
+
       Order = {
         user: this.accountState.address,
         sellToken: sellToken,
@@ -206,6 +198,53 @@ export default class APIArbitrumProvider extends APIProvider {
           { name: "salt", type: "uint256" },
         ],
       };
+    } else if (Number(marketInfo.contractVersion) === 2.0) {
+      // size check
+      if (makerVolumeFeeBN.gte(takerVolumeFeeBN)) {
+        balanceBN = balanceBN.sub(makerVolumeFeeBN);
+      } else {
+        balanceBN = balanceBN.sub(takerVolumeFeeBN);
+      }
+
+      if (balanceBN.lte(0)) throw new Error(`Amount exceeds balance.`);
+
+      const delta = sellAmountBN.mul("100000").div(balanceBN).toNumber();
+      if (delta > 100100) {
+        // 100.1 %
+        throw new Error(`Amount exceeds balance.`);
+      }
+      // prevent dust issues
+      if (delta > 99990) {
+        // 99.9 %
+        sellAmountBN = balanceBN;
+        buyAmountBN = buyAmountBN.mul(100000).div(delta);
+      }
+      Order = {
+        user: this.accountState.address,
+        sellToken,
+        buyToken,
+        sellAmount: sellAmountBN.toString(),
+        buyAmount: buyAmountBN.toString(),
+        expirationTimeSeconds: expirationTimeSeconds.toFixed(0),
+      };
+
+      domain = {
+        name: "ZigZag",
+        version: "2.0",
+        chainId: this.network,
+        verifyingContract: marketInfo.exchangeAddress,
+      };
+
+      types = {
+        Order: [
+          { name: "user", type: "address" },
+          { name: "sellToken", type: "address" },
+          { name: "buyToken", type: "address" },
+          { name: "sellAmount", type: "uint256" },
+          { name: "buyAmount", type: "uint256" },
+          { name: "expirationTimeSeconds", type: "uint256" },
+        ],
+      };
     }
 
     const signer = await this.api.rollupProvider.getSigner();
@@ -218,11 +257,11 @@ export default class APIArbitrumProvider extends APIProvider {
 
   signIn = async () => {
     console.log("signing in to arbitrum");
-    const [account] = await this.api.web3.eth.getAccounts();
+    const address = await this.api.rollupProvider.getSigner().getAddress();
     const balances = await this.getBalances();
     this.accountState = {
-      id: account,
-      address: account,
+      id: address,
+      address,
       committed: {
         balances,
       },
@@ -319,7 +358,7 @@ export default class APIArbitrumProvider extends APIProvider {
   };
 
   getExchangeAddress = () => {
-    const marketInfo = this.api.marketInfo[`${this.network}:ZZ-USDC`];
+    const marketInfo = this.api.marketInfo[`${this.network}:${this.defaultMarket[this.network]}`];
     return marketInfo?.exchangeAddress;
   };
 

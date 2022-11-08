@@ -298,7 +298,7 @@ class SpotForm extends React.Component {
     const marketInfo = this.props.marketInfo;
     if (!marketInfo) return 0;
     let fee = marketInfo.baseFee;
-
+    
     // Hardcode 0.05% taker fee for Arbitrum
     if (this.props.network === 42161) {
       const amount =
@@ -484,6 +484,8 @@ class SpotForm extends React.Component {
       baseAllowance = 0;
       quoteAllowance = 0;
     }
+    const baseAmount = Number(this.state.baseAmount);
+    const quoteAmount = Number(this.state.quoteAmount);
 
     const marketInfo = this.props.marketInfo;
     baseBalance = parseFloat(baseBalance);
@@ -513,8 +515,8 @@ class SpotForm extends React.Component {
         return;
       }
 
-      let fee = this.getBaseFee(this.state.baseAmount);
-      if (this.state.baseAmount < fee) {
+      let fee = Number(this.getBaseFee(baseAmount));
+      if (baseAmount < fee) {
         fee = Number(fee).toPrecision(5);
         toast.error(
           this.props.t("minimum_order_size_is_fee_symbol", {
@@ -561,8 +563,8 @@ class SpotForm extends React.Component {
         return;
       }
 
-      let fee = this.getQuoteFee(this.state.quoteAmount);
-      if (this.state.quoteAmount < fee) {
+      let fee = this.getQuoteFee(quoteAmount);
+      if (quoteAmount < fee) {
         fee = Number(fee).toPrecision(5);
         toast.error(
           this.props.t("minimum_order_size_is_fee_symbol", {
@@ -804,7 +806,7 @@ class SpotForm extends React.Component {
   }
 
   showLabel() {
-    if (this.props.network === 42161) {
+    if ([42161, 421613].includes(this.props.network)) {
       const marketInfo = this.props.marketInfo;
       const takerVolumeFee = marketInfo ? marketInfo.takerVolumeFee : 0;
 

@@ -60,6 +60,14 @@ const networkLists = [
     image: zksyncLogo,
     display: false
   },
+  {
+    text: "Arbitrum - Goerli",
+    value: 421613,
+    url: "#",
+    selectedIcon: <CheckIcon />,
+    image: arbitrumLogo,
+    display: false
+  },
 ];
 
 const supportLists = [
