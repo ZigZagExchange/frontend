@@ -128,18 +128,18 @@ export function TradeDashboard() {
       if (user.address && !user.id && network === 1) {
         history.push("/bridge");
       }
-      const accountActivated = await api.checkAccountActivated();
-      if (!accountActivated && user.address) {
-        await api.changePubKeyAPI();
-      }
     };
     activeAcc().catch(console.error);
   }, []);
 
   useEffect(async () => {
-    const sub = () => {
+    const sub = async () => {
       dispatch(resetData());
-      api.subscribeToMarket(currentMarket, settings.showNightPriceChange);
+      let subscribed = false;
+      while (!subscribed) {
+        subscribed = api.subscribeToMarket(currentMarket, settings.showNightPriceChange);
+        await new Promise(resolve => setTimeout(resolve, 200));
+      }
     };
 
     if (api.ws && api.ws.readyState === 0) {

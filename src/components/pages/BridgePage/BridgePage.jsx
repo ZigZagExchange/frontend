@@ -23,7 +23,7 @@ export default function BridgePage() {
   const { t } = useTranslation();
 
   useEffect(() => {
-    document.title = "ZigZag Bridge";
+    document.title = "ZigZag Fast Bridge";
   }, []);
 
   return (

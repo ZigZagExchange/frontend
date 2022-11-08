@@ -576,6 +576,18 @@ class API extends Emitter {
 
           return accountState;
         })
+        .catch((err) => {
+          console.log(err);
+          const toastMsg = toast.error(
+            i18next.t("click_here_to_bridge_funds"),
+            {
+              toastId: "zksync account does not exist",
+              onClick: () => window.open("https://wallet.zksync.io", "_blank"),
+              autoClose: false
+            }
+          );
+          throw err;
+        })
         .finally(() => {
           this._signInProgress = null;
         });
@@ -672,13 +684,14 @@ class API extends Emitter {
       !allPairs.includes(market) &&
       market !== this.apiProvider.getDefaultMarket()
     )
-      return;
+      return false;
 
     this.send("subscribemarket", [
       this.apiProvider.network,
       market,
       showNightPriceChange,
     ]);
+    return true;
   };
 
   unsubscribeToMarket = (market) => {
@@ -1260,19 +1273,6 @@ class API extends Emitter {
           throw Error("Chain ID not understood");
       }
     }
-  };
-
-  waitForTx = async (txHash) => {
-    return this.mainnetProvider.waitForTx(txHash);
-  };
-
-  waitForTxL2 = async (txHash) => {
-    if (this.isEVMChain()) {
-      return this.rollupProvider.getTransactionReceipt(txHash);
-    }
-  };
-  changePubKeyAPI = async () => {
-    await this.apiProvider.changePubKey();
   };
 }
 
