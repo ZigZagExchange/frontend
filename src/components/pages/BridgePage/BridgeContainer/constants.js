@@ -14,14 +14,14 @@ export const ZKSYNC_ETHEREUM_FAST_BRIDGE = {
 };
 
 export const NETWORKS = [
-  //{
-  //  from: {
-  //    name: "Ethereum",
-  //    id: "ethereum",
-  //    icon: ethLogo,
-  //  },
-  //  to: [{ name: "zkSync", id: "zksync", icon: zksyncLogo }],
-  //},
+  {
+    from: {
+      name: "Ethereum",
+      id: "ethereum",
+      icon: ethLogo,
+    },
+    to: [{ name: "zkSync", id: "zksync", icon: zksyncLogo }],
+  },
   {
     from: {
       name: "zkSync",
