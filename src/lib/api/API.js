@@ -578,14 +578,16 @@ class API extends Emitter {
         })
         .catch((err) => {
           console.log(err);
-          const toastMsg = toast.error(
-            i18next.t("click_here_to_bridge_funds"),
-            {
-              toastId: "zksync account does not exist",
-              onClick: () => window.open("https://wallet.zksync.io", "_blank"),
-              autoClose: false
-            }
-          );
+          if (this.apiProvider.zksyncCompatible) {
+            const toastMsg = toast.error(
+              i18next.t("click_here_to_bridge_funds"),
+              {
+                toastId: "zksync account does not exist",
+                onClick: () => window.open("https://wallet.zksync.io", "_blank"),
+                autoClose: false
+              }
+            );
+          }
           throw err;
         })
         .finally(() => {
