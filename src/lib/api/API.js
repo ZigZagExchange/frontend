@@ -579,7 +579,7 @@ class API extends Emitter {
         .catch((err) => {
           console.log(err);
           if (this.apiProvider.zksyncCompatible) {
-            const toastMsg = toast.error(
+            toast.error(
               i18next.t("click_here_to_bridge_funds"),
               {
                 toastId: "zksync account does not exist",
@@ -863,19 +863,10 @@ class API extends Emitter {
   };
 
   approveSpendOfCurrency = async (currency) => {
-    const netContract = this.getNetworkContract();
-    if (netContract) {
-      const currencyInfo = this.getCurrencyInfo(currency);
-      const contract = new ethers.Contract(
-        currencyInfo.address,
-        erc20ContractABI,
-        this.rollupProvider
-      );
-      await contract.approve(netContract, MAX_ALLOWANCE);
+    await this.apiProvider.approveTransferToBridge(currency);
 
-      // update allowances after successfull approve
-      this.getWalletBalances();
-    }
+    // update allowances after successfull approve
+    this.getWalletBalances();
   };
 
   getBalanceOfCurrency = async (currencyInfo, currency) => {
