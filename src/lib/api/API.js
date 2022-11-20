@@ -867,9 +867,9 @@ class API extends Emitter {
     if (netContract) {
       const currencyInfo = this.getCurrencyInfo(currency);
       const contract = new ethers.Contract(
-        erc20ContractABI,
         currencyInfo.address,
-        this.rollupProvider
+        erc20ContractABI,
+        this.mainnetProvider
       );
       await contract.approve(netContract, MAX_ALLOWANCE);
 
