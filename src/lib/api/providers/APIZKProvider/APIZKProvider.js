@@ -394,6 +394,12 @@ export default class APIZKProvider extends APIProvider {
     }
   };
 
+  approveTransferToBridge = async (token) => {
+    if (token === 'ETH') return;
+    
+    return this.syncWallet.approveERC20TokenDeposits(token);
+  };
+
   transferToBridge = async (amountDecimals, token, address, userAddress) => {
     if (
       ZKSYNC_ETHEREUM_FAST_BRIDGE.address === address &&
