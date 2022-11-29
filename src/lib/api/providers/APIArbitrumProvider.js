@@ -129,54 +129,53 @@ export default class APIArbitrumProvider extends APIProvider {
       .div(9999);
 
     let domain, Order, types;
-    if (Number(marketInfo.contractVersion) === 2.0) {
-      // size check
-      if (makerVolumeFeeBN.gte(takerVolumeFeeBN)) {
-        balanceBN = balanceBN.sub(makerVolumeFeeBN);
-      } else {
-        balanceBN = balanceBN.sub(takerVolumeFeeBN);
-      }
 
-      if (balanceBN.lte(0)) throw new Error(`Amount exceeds balance.`);
-
-      const delta = sellAmountBN.mul("100000").div(balanceBN).toNumber();
-      if (delta > 100100) {
-        // 100.1 %
-        throw new Error(`Amount exceeds balance.`);
-      }
-      // prevent dust issues
-      if (delta > 99990) {
-        // 99.9 %
-        sellAmountBN = balanceBN;
-        buyAmountBN = buyAmountBN.mul(100000).div(delta);
-      }
-      Order = {
-        user: this.accountState.address,
-        sellToken,
-        buyToken,
-        sellAmount: sellAmountBN.toString(),
-        buyAmount: buyAmountBN.toString(),
-        expirationTimeSeconds: expirationTimeSeconds.toFixed(0),
-      };
-
-      domain = {
-        name: "ZigZag",
-        version: "2.0",
-        chainId: this.network,
-        verifyingContract: marketInfo.exchangeAddress,
-      };
-
-      types = {
-        Order: [
-          { name: "user", type: "address" },
-          { name: "sellToken", type: "address" },
-          { name: "buyToken", type: "address" },
-          { name: "sellAmount", type: "uint256" },
-          { name: "buyAmount", type: "uint256" },
-          { name: "expirationTimeSeconds", type: "uint256" },
-        ],
-      };
+    // size check
+    if (makerVolumeFeeBN.gte(takerVolumeFeeBN)) {
+      balanceBN = balanceBN.sub(makerVolumeFeeBN);
+    } else {
+      balanceBN = balanceBN.sub(takerVolumeFeeBN);
     }
+
+    if (balanceBN.lte(0)) throw new Error(`Amount exceeds balance.`);
+
+    const delta = sellAmountBN.mul("100000").div(balanceBN).toNumber();
+    if (delta > 100100) {
+      // 100.1 %
+      throw new Error(`Amount exceeds balance.`);
+    }
+    // prevent dust issues
+    if (delta > 99990) {
+      // 99.9 %
+      sellAmountBN = balanceBN;
+      buyAmountBN = buyAmountBN.mul(100000).div(delta);
+    }
+    Order = {
+      user: this.accountState.address,
+      sellToken,
+      buyToken,
+      sellAmount: sellAmountBN.toString(),
+      buyAmount: buyAmountBN.toString(),
+      expirationTimeSeconds: expirationTimeSeconds.toFixed(0),
+    };
+
+    domain = {
+      name: "ZigZag",
+      version: marketInfo.contractVersion.toString(),
+      chainId: this.network,
+      verifyingContract: marketInfo.exchangeAddress,
+    };
+
+    types = {
+      Order: [
+        { name: "user", type: "address" },
+        { name: "sellToken", type: "address" },
+        { name: "buyToken", type: "address" },
+        { name: "sellAmount", type: "uint256" },
+        { name: "buyAmount", type: "uint256" },
+        { name: "expirationTimeSeconds", type: "uint256" },
+      ],
+    };
 
     const signer = await this.api.rollupProvider.getSigner();
     const signature = await signer._signTypedData(domain, types, Order);
