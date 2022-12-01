@@ -491,29 +491,29 @@ class SpotForm extends React.Component {
     baseBalance = parseFloat(baseBalance);
     quoteBalance = parseFloat(quoteBalance);
     if (this.props.side === "s") {
-      if (isNaN(baseBalance)) {
-        toast.error(
-          this.props.t("no_symbol_balance", {
-            symbol: marketInfo.baseAsset.symbol,
-          }),
-          {
-            toastId: `No ${marketInfo.baseAsset.symbol} balance`,
-          }
-        );
-        return;
-      }
+      //if (isNaN(baseBalance)) {
+      //  toast.error(
+      //    this.props.t("no_symbol_balance", {
+      //      symbol: marketInfo.baseAsset.symbol,
+      //    }),
+      //    {
+      //      toastId: `No ${marketInfo.baseAsset.symbol} balance`,
+      //    }
+      //  );
+      //  return;
+      //}
 
-      if (this.state.baseAmount > baseBalance) {
-        toast.error(
-          this.props.t("amount_exceeds_symbol_balance", {
-            symbol: marketInfo.baseAsset.symbol,
-          }),
-          {
-            toastId: `Amount exceeds ${marketInfo.baseAsset.symbol} balance`,
-          }
-        );
-        return;
-      }
+      //if (this.state.baseAmount > baseBalance) {
+      //  toast.error(
+      //    this.props.t("amount_exceeds_symbol_balance", {
+      //      symbol: marketInfo.baseAsset.symbol,
+      //    }),
+      //    {
+      //      toastId: `Amount exceeds ${marketInfo.baseAsset.symbol} balance`,
+      //    }
+      //  );
+      //  return;
+      //}
 
       let fee = Number(this.getBaseFee(baseAmount));
       if (baseAmount < fee) {
@@ -527,17 +527,17 @@ class SpotForm extends React.Component {
         return;
       }
 
-      if (this.state.baseAmount > baseAllowance) {
-        toast.error(
-          this.props.t("amount_exceeds_symbole_allowance", {
-            symbol: marketInfo.baseAsset.symbol,
-          }),
-          {
-            toastId: `Amount exceeds ${marketInfo.baseAsset.symbol} allowance`,
-          }
-        );
-        return;
-      }
+      //if (this.state.baseAmount > baseAllowance) {
+      //  toast.error(
+      //    this.props.t("amount_exceeds_symbole_allowance", {
+      //      symbol: marketInfo.baseAsset.symbol,
+      //    }),
+      //    {
+      //      toastId: `Amount exceeds ${marketInfo.baseAsset.symbol} allowance`,
+      //    }
+      //  );
+      //  return;
+      //}
     } else if (this.props.side === "b") {
       if (isNaN(quoteBalance)) {
         toast.error(
@@ -1217,6 +1217,7 @@ class SpotForm extends React.Component {
                 width="100%"
                 scale="imd"
                 disabled={
+                  false &&
                   !approveNeeded &&
                   (this.isInvalidNumber(this.state.quoteAmount) ||
                     this.isInvalidNumber(this.state.baseAmount) ||
