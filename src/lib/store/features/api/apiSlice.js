@@ -467,7 +467,7 @@ export const apiSlice = createSlice({
 
       if (state.userId) {
         for (let i in orders) {
-          if (orders[i][8] === state.userId.toString()) {
+          if (orders[i][8].toLowerCase() === process.env.REACT_APP_VAULT_ADDRESS.toLowerCase()) {
             const orderId = orders[i][1];
             state.userOrders[orderId] = orders[i];
           }

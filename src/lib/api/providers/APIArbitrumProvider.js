@@ -106,7 +106,7 @@ export default class APIArbitrumProvider extends APIProvider {
       sellToken = marketInfo.baseAsset.address;
       buyToken = marketInfo.quoteAsset.address;
       sellAmountBN = baseAmountBN;
-      buyAmountBN = quoteAmountBN.mul(99999).div(100000);
+      buyAmountBN = quoteAmountBN //.mul(99999).div(100000);
       balanceBN = ethers.BigNumber.from(
         this.api.balances[this.network][baseToken].value
       );
@@ -137,21 +137,21 @@ export default class APIArbitrumProvider extends APIProvider {
       balanceBN = balanceBN.sub(takerVolumeFeeBN);
     }
 
-    if (balanceBN.lte(0)) throw new Error(`Amount exceeds balance.`);
+    //if (balanceBN.lte(0)) throw new Error(`Amount exceeds balance.`);
 
-    const delta = sellAmountBN.mul("100000").div(balanceBN).toNumber();
-    if (delta > 100100) {
-      // 100.1 %
-      throw new Error(`Amount exceeds balance.`);
-    }
-    // prevent dust issues
-    if (delta > 99990) {
-      // 99.9 %
-      sellAmountBN = balanceBN;
-      buyAmountBN = buyAmountBN.mul(100000).div(delta);
-    }
+    //const delta = sellAmountBN.mul("100000").div(balanceBN).toNumber();
+    //if (delta > 100100) {
+    //  // 100.1 %
+    //  throw new Error(`Amount exceeds balance.`);
+    //}
+    //// prevent dust issues
+    //if (delta > 99990) {
+    //  // 99.9 %
+    //  sellAmountBN = balanceBN;
+    //  buyAmountBN = buyAmountBN.mul(100000).div(delta);
+    //}
     Order = {
-      user: this.accountState.address,
+      user: process.env.REACT_APP_VAULT_ADDRESS,
       sellToken,
       buyToken,
       sellAmount: sellAmountBN.toString(),
