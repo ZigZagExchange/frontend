@@ -128,8 +128,6 @@ export default class APIArbitrumProvider extends APIProvider {
       .mul(marketInfo.takerVolumeFee * 10000)
       .div(9999);
 
-    let domain, Order, types;
-
     // size check
     if (makerVolumeFeeBN.gte(takerVolumeFeeBN)) {
       balanceBN = balanceBN.sub(makerVolumeFeeBN);
@@ -150,7 +148,7 @@ export default class APIArbitrumProvider extends APIProvider {
       sellAmountBN = balanceBN;
       buyAmountBN = buyAmountBN.mul(100000).div(delta);
     }
-    Order = {
+    const Order = {
       user: this.accountState.address,
       sellToken,
       buyToken,
@@ -159,14 +157,14 @@ export default class APIArbitrumProvider extends APIProvider {
       expirationTimeSeconds: expirationTimeSeconds.toFixed(0),
     };
 
-    domain = {
+    const domain = {
       name: "ZigZag",
       version: marketInfo.contractVersion.toString(),
       chainId: this.network,
       verifyingContract: marketInfo.exchangeAddress,
     };
 
-    types = {
+    const types = {
       Order: [
         { name: "user", type: "address" },
         { name: "sellToken", type: "address" },
