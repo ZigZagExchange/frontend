@@ -21,6 +21,7 @@ const StyledLink = styled(Link)`
 `;
 
 const SuccessModal = ({ txid, show, onClose }) => {
+  const [chainId, setChainId] = useState();
   const [pairNetwork, setPairNetwork] = useState();
   const [baseAsset, setBaseAsset] = useState();
   const [quoteAsset, setQuoteAsset] = useState();
@@ -39,6 +40,7 @@ const SuccessModal = ({ txid, show, onClose }) => {
           setQuoteAsset(data.quoteAsset.symbol);
 
           const chainId = Number(data.zigzagChainId);
+          setChainId(chainId)
           setPairNetwork(api.getNetworkName(chainId));
         })
         .catch((err) => console.error(err));
@@ -85,7 +87,9 @@ const SuccessModal = ({ txid, show, onClose }) => {
         mb={6}
         fontSize={14}
       >
-        <ExternalLink href={"trade.zigzag.exchange"}>
+        <ExternalLink href={
+          `https://zigzag-exchange.herokuapp.com/api/v1/marketinfos?chain_id=${chainId}&market=${baseAsset}-${quoteAsset}`
+        }>
           View your market
         </ExternalLink>
         <StyledLink
