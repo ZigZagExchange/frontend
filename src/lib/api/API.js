@@ -56,19 +56,7 @@ class API extends Emitter {
     this.currencies = currencies;
     this.validMarkets = validMarkets;
 
-    if (window.ethereum) {
-      window.ethereum.on("accountsChanged", this.signOut);
-      window.ethereum.on("chainChanged", (chainId) => {
-        this.signOut().then(() => {
-          this.setAPIProvider(chainMap[chainId]);
-        });
-      });
-
-      this.setAPIProvider(chainMap[window.ethereum.chainId] || 1);
-    } else {
-      console.log(this.networks);
-      this.setAPIProvider(this.networks.zksync[0]);
-    }
+    this.setAPIProvider(this.networks.zksync[0]);
   }
 
   getAPIProvider = (network) => {
@@ -610,10 +598,6 @@ class API extends Emitter {
         return "zksync";
       case 1002:
         return "zksync-goerli";
-      case 42161:
-        return "arbitrum";
-      case 421613:
-        return "arbitrum-goerli";
       default:
         return;
     }
@@ -622,10 +606,8 @@ class API extends Emitter {
   getChainNameL1 = (chainId) => {
     switch (chainId) {
       case 1:
-      case 42161:
         return "mainnet";
       case 1002:
-      case 421613:
         return "goerli";
       default:
         return;
