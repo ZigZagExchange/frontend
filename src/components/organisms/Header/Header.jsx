@@ -47,7 +47,7 @@ const networkLists = [
   {
     text: "Arbitrum",
     value: 42161,
-    url: "#",
+    url: "https://swap.zigzag.exchange/",
     selectedIcon: <CheckIcon />,
     image: arbitrumLogo,
     display: true
@@ -58,14 +58,6 @@ const networkLists = [
     url: "#",
     selectedIcon: <CheckIcon />,
     image: zksyncLogo,
-    display: false
-  },
-  {
-    text: "Arbitrum - Goerli",
-    value: 421613,
-    url: "#",
-    selectedIcon: <CheckIcon />,
-    image: arbitrumLogo,
     display: false
   },
 ];

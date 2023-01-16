@@ -346,15 +346,6 @@ export function TradeDashboard() {
       </GridLayoutRow>
       <HighSlippageModal />
 
-      {!settings.hideZigZagLiveOnArbitrumPopup && (
-        <div
-          className={classNames({
-            dark: isDark,
-          })}
-        >
-          <NewFeaturesPopup />
-        </div>
-      )}
     </TradeContainer>
   );
 }

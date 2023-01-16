@@ -612,7 +612,10 @@ class SpotForm extends React.Component {
       this.props.side === "b"
         ? ((price - fairPrice) / fairPrice) * 100
         : ((fairPrice - price) / fairPrice) * 100;
-    if (delta > 2 && !this.props.settings.disableSlippageWarning) {
+
+    // big markets don't need slippage warnings
+    const big_markets = ["ETH-USDC", "ETH-USDT", "USDC-USDT"];
+    if (delta > 2 && !big_markets.includes(this.props.currentMarket) && !this.props.settings.disableSlippageWarning) {
       if (!this.props.confirmed) {
         this.props.setHighSlippageModal({
           xToken: parseFloat(baseAmount).toPrecision(4),
