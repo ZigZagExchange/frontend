@@ -117,7 +117,7 @@ export default function OrdersBook(props) {
           {props.settings?.stackOrderbook ? (
             <>
               <Text font="primaryTitleDisplay" color="foregroundHighEmphasis">
-                {t("order_book")}
+                {t("Liquidity")}
               </Text>
               {side === "sell" ? (
                 <>
