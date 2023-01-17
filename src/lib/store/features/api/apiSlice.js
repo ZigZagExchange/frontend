@@ -344,31 +344,33 @@ export const apiSlice = createSlice({
     },
     _liquidity2(state, { payload }) {
       if (payload[0] === state.network && payload[1] === state.currentMarket) {
-        state.liquidity = state.liquidity = payload[2];
+        state.liquidity = payload[2];
       }
     },
     _orderstatus(state, { payload }) {
+      const newOrders = { ...state.orders };
+      const newUserOrders = { ...state.userOrders };
       (payload[0] || []).forEach(async (update) => {
         let filledOrder;
         const [, orderId, newStatus, txHash, remaining] = update;
         switch (newStatus) {
           case "c":
-            delete state.orders[orderId];
-            if (state.userOrders[orderId]) {
-              state.userOrders[orderId][9] = "c";
+            delete newOrders[orderId];
+            if (newUserOrders[orderId]) {
+              newUserOrders[orderId][9] = "c";
             }
             break;
           case "pm":
           case "pf":
-            if (state.orders[orderId]) {
-              state.orders[orderId][10] = remaining;
+            if (newOrders[orderId]) {
+              newOrders[orderId][10] = remaining;
             }
-            if (state.userOrders[orderId]) {
-              state.userOrders[orderId][10] = remaining;
+            if (newUserOrders[orderId]) {
+              newUserOrders[orderId][10] = remaining;
             }
             break;
           case "m":
-            const matchedOrder = state.orders[orderId];
+            const matchedOrder = newOrders[orderId];
             if (!matchedOrder) return;
             matchedOrder[9] = "m";
             matchedOrder[10] = 0;
@@ -378,30 +380,30 @@ export const apiSlice = createSlice({
               matchedOrder[9] && matchedOrder[9].toLowerCase();
             const orderUserId =
               state.userId && state.userId.toString().toLowerCase();
-            delete state.orders[orderId];
+            delete newOrders[orderId];
             if (
               matchedOrder &&
               (takerUserId === orderUserId || makerUserId === orderUserId)
             ) {
-              state.userOrders[matchedOrder[1]] = matchedOrder;
+              newUserOrders[matchedOrder[1]] = matchedOrder;
             }
             break;
           case "f":
-            filledOrder = state.userOrders[orderId];
+            filledOrder = newUserOrders[orderId];
             if (filledOrder) {
               filledOrder[9] = "f";
               filledOrder[11] = txHash;
             }
             break;
           case "b":
-            filledOrder = state.userOrders[orderId];
+            filledOrder = newUserOrders[orderId];
             if (filledOrder) {
               filledOrder[9] = "b";
               filledOrder[11] = txHash;
             }
             break;
           case "r":
-            filledOrder = state.userOrders[orderId];
+            filledOrder = newUserOrders[orderId];
             if (filledOrder) {
               const sideText = filledOrder[3] === "b" ? "buy" : "sell";
               const error = update[4];
@@ -439,17 +441,19 @@ export const apiSlice = createSlice({
             }
             break;
           case "e":
-            if (state.userOrders[orderId]) {
-              state.userOrders[orderId][9] = "e";
+            if (newUserOrders[orderId]) {
+              newUserOrders[orderId][9] = "e";
             }
-            if (state.orders[orderId]) {
-              state.orders[orderId][9] = "e";
+            if (newOrders[orderId]) {
+              newOrders[orderId][9] = "e";
             }
             break;
           default:
             break;
         }
       });
+      state.orders = newOrders;
+      state.userOrders = newUserOrders;
     },
     _orders(state, { payload }) {
       const orders = payload[0]
