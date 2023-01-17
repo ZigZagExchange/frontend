@@ -470,12 +470,14 @@ export const apiSlice = createSlice({
       };
 
       if (state.userId) {
+        const newUserOrders = { ...state.userOrders };
         for (let i in orders) {
           if (orders[i][8] === state.userId.toString()) {
             const orderId = orders[i][1];
-            state.userOrders[orderId] = orders[i];
+            newUserOrders[orderId] = orders[i];
           }
         }
+        state.userOrders = newUserOrders;
       }
     },
     _orderreceipt(state, { payload }) {
