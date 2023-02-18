@@ -171,7 +171,7 @@
   "average_buy_price": "Ortalama alım fiyatı",
   "fee": "Ücret",
   "save_as_image": "Görsel olarak Kaydet",
-  "zksync_1_allows_one_open_order_at_a_time": "zkSync 1.0 tek seferde yalnızca bir al sat işlemine izin vermektedir. Lütfen limit emrinizi iptal edin veya emrin tamamlanmasını bekleyin. Aksi takdirde, limit emriniz başarısız sonuçlanacaktır.",
+  "zksync_1_allows_one_open_order_at_a_time": "zkSync Lite tek seferde yalnızca bir al sat işlemine izin vermektedir. Lütfen limit emrinizi iptal edin veya emrin tamamlanmasını bekleyin. Aksi takdirde, limit emriniz başarısız sonuçlanacaktır.",
   "bridge_transaction_in_process": "Köprü işlemi işlemdedir. Devam etmek için Doğrula veya Reddet butonuna basınız...",
   "transaction_was_rejected": "İşlem reddedildi",
   "sign_the_message_to_cancel_your_order": "Emri iptal etmek için mesajı imzalayın...",

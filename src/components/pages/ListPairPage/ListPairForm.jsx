@@ -202,11 +202,10 @@ const ListPairForm = ({ onSubmit, children }) => {
         >
           <x.div>
             <NumberInput
-              className={`rounded-lg ${
-                isDark
+              className={`rounded-lg ${isDark
                   ? "bg-foreground-200 hover:ring-foreground-500"
                   : "bg-primary-300 hover:ring-primary-600"
-              } hover:ring-1 hover:ring-offset-0`}
+                } hover:ring-1 hover:ring-offset-0`}
               block
               {...model(baseAssetId, setBaseAssetId)}
               label={
@@ -247,11 +246,10 @@ const ListPairForm = ({ onSubmit, children }) => {
 
           <x.div>
             <NumberInput
-              className={`rounded-lg ${
-                isDark
+              className={`rounded-lg ${isDark
                   ? "bg-foreground-200 hover:ring-foreground-500"
                   : "bg-primary-300 hover:ring-primary-600"
-              } hover:ring-1 hover:ring-offset-0`}
+                } hover:ring-1 hover:ring-offset-0`}
               block
               {...model(quoteAssetId, setQuoteAssetId)}
               label={
@@ -291,11 +289,10 @@ const ListPairForm = ({ onSubmit, children }) => {
           </x.div>
           <x.div>
             <NumberInput
-              className={`rounded-lg ${
-                isDark
+              className={`rounded-lg ${isDark
                   ? "bg-foreground-200 hover:ring-foreground-500"
                   : "bg-primary-300 hover:ring-primary-600"
-              } hover:ring-1 hover:ring-offset-0`}
+                } hover:ring-1 hover:ring-offset-0`}
               block
               name={"baseFee"}
               fontSize={14}
@@ -324,11 +321,10 @@ const ListPairForm = ({ onSubmit, children }) => {
           </x.div>
           <x.div>
             <NumberInput
-              className={`rounded-lg ${
-                isDark
+              className={`rounded-lg ${isDark
                   ? "bg-foreground-200 hover:ring-foreground-500"
                   : "bg-primary-300 hover:ring-primary-600"
-              } hover:ring-1 hover:ring-offset-0`}
+                } hover:ring-1 hover:ring-offset-0`}
               block
               fontSize={14}
               borderRadius={8}
@@ -357,11 +353,10 @@ const ListPairForm = ({ onSubmit, children }) => {
           </x.div>
           <x.div>
             <NumberInput
-              className={`rounded-lg ${
-                isDark
+              className={`rounded-lg ${isDark
                   ? "bg-foreground-200 hover:ring-foreground-500"
                   : "bg-primary-300 hover:ring-primary-600"
-              } hover:ring-1 hover:ring-offset-0`}
+                } hover:ring-1 hover:ring-offset-0`}
               block
               fontSize={14}
               borderRadius={8}
@@ -402,11 +397,10 @@ const ListPairForm = ({ onSubmit, children }) => {
           </x.div>
           <x.div>
             <SelectInput
-              className={`rounded-lg ${
-                isDark
+              className={`rounded-lg ${isDark
                   ? "bg-foreground-200 hover:ring-foreground-500"
                   : "bg-primary-300 hover:ring-primary-600"
-              } hover:ring-1 hover:ring-offset-0`}
+                } hover:ring-1 hover:ring-offset-0`}
               fontSize={14}
               padding={5}
               borderRadius={8}
@@ -418,8 +412,8 @@ const ListPairForm = ({ onSubmit, children }) => {
                 </x.span>
               }
               items={[
-                { name: "zkSync 1.0 - Mainnet", id: 1 },
-              //  { name: "zkSync - Goerli", id: 1002 },
+                { name: "zkSync Lite - Mainnet", id: 1 },
+                //  { name: "zkSync - Goerli", id: 1002 },
               ]}
               validate={required}
               rightOfLabel={
@@ -459,11 +453,10 @@ const ListPairForm = ({ onSubmit, children }) => {
           <x.div>
             {showAdvancedSettings && (
               <TextInput
-                className={`rounded-lg ${
-                  isDark
+                className={`rounded-lg ${isDark
                     ? "bg-foreground-200 hover:ring-foreground-500"
                     : "bg-primary-300 hover:ring-primary-600"
-                } hover:ring-1 hover:ring-offset-0`}
+                  } hover:ring-1 hover:ring-offset-0`}
                 block
                 fontSize={14}
                 padding={5}
