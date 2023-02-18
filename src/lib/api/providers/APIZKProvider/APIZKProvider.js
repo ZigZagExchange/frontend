@@ -25,7 +25,7 @@ export default class APIZKProvider extends APIProvider {
   evmCompatible = false;
   _tokenWithdrawFees = {};
   _tokenInfo = {};
-  eligibleFastWithdrawTokens = ["ETH"];
+  eligibleFastWithdrawTokens = ["ETH", "USDC"];
   fastWithdrawContractAddress = ZKSYNC_ETHEREUM_FAST_BRIDGE.address;
   defaultMarket = {
     1: "ETH-USDC",
@@ -394,6 +394,12 @@ export default class APIZKProvider extends APIProvider {
     }
   };
 
+  approveTransferToBridge = async (token) => {
+    if (token === 'ETH') return;
+    
+    return this.syncWallet.approveERC20TokenDeposits(token);
+  };
+
   transferToBridge = async (amountDecimals, token, address, userAddress) => {
     if (
       ZKSYNC_ETHEREUM_FAST_BRIDGE.address === address &&
@@ -509,18 +515,16 @@ export default class APIZKProvider extends APIProvider {
         throw Error("Token not eligible for fast withdraw");
       }
       const feeData = await this.api.rollupProvider.getFeeData();
-      let bridgeFee = feeData.maxFeePerGas
-        .add(feeData.maxPriorityFeePerGas)
-        .mul(21000);
+      let bridgeFee = feeData.gasPrice
+        .mul(21000)
 
       if (token === "ETH") {
         return getNumberFormatted(bridgeFee);
-      } else if (["FRAX", "UST"].includes(token)) {
-        const tokenInfo = await this.api.getCurrencyInfo("ETH");
-        const priceInfo = tokenInfo.usdPrice;
+      } else if (["USDC"].includes(token)) {
+        const ETH_PRICE_APPROX = 1500; // This is what the  backend uses
         const stableFee = (
           ((bridgeFee.toString() / 1e18) *
-            priceInfo.price *
+            ETH_PRICE_APPROX *
             10 ** currencyInfo.decimals *
             50000) /
           21000

@@ -171,7 +171,7 @@
   "average_buy_price": "Average buy price",
   "fee": "Fee",
   "save_as_image": "Save as Image",
-  "zksync_1_allows_one_open_order_at_a_time": "zkSync 1.0 allows one open order at a time. Please cancel your limit order or wait for it to be filled before bridging. Otherwise your limit order will fail.",
+  "zksync_1_allows_one_open_order_at_a_time": "zkSync Lite allows one open order at a time. Please cancel your limit order or wait for it to be filled before bridging. Otherwise your limit order will fail.",
   "bridge_transaction_in_process": "Bridge transaction in process. Confirm or Reject to continue...",
   "transaction_was_rejected": "Transaction was rejected",
   "sign_the_message_to_cancel_your_order": "Sign the message to cancel your order...",
@@ -201,5 +201,6 @@
   "expired": "Expired",
   "cancel": "Cancel",
   "view_tx": "View Tx",
-  "click_here_to_bridge_funds": "Your zksync account does not exist. CLICK HERE to use the Zksync Bridge to deposit funds."
+  "click_here_to_bridge_funds": "Your zksync account does not exist. CLICK HERE to use the Zksync Bridge to deposit funds.",
+  "liquidity": "Liquidity"
 }

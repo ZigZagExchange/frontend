@@ -37,7 +37,7 @@ import { FaDiscord, FaGithub } from "react-icons/fa";
 
 const networkLists = [
   {
-    text: "zkSync 1.0",
+    text: "zkSync Lite",
     value: 1,
     url: "#",
     selectedIcon: <CheckIcon />,
@@ -47,7 +47,7 @@ const networkLists = [
   {
     text: "Arbitrum",
     value: 42161,
-    url: "#",
+    url: "https://swap.zigzag.exchange/",
     selectedIcon: <CheckIcon />,
     image: arbitrumLogo,
     display: true
@@ -58,14 +58,6 @@ const networkLists = [
     url: "#",
     selectedIcon: <CheckIcon />,
     image: zksyncLogo,
-    display: false
-  },
-  {
-    text: "Arbitrum - Goerli",
-    value: 421613,
-    url: "#",
-    selectedIcon: <CheckIcon />,
-    image: arbitrumLogo,
     display: false
   },
 ];
@@ -134,15 +126,15 @@ const HeaderWrapper = styled.div`
   button {
     &:hover {
       // background-color: ${({ theme }) =>
-        `${theme.colors.foregroundHighEmphasis} !important`};
+    `${theme.colors.foregroundHighEmphasis} !important`};
 
       div {
         color: ${({ theme }) =>
-          `${theme.colors.primaryHighEmphasis} !important`};
+    `${theme.colors.primaryHighEmphasis} !important`};
 
         svg path {
           fill: ${({ theme }) =>
-            `${theme.colors.primaryHighEmphasis} !important`};
+    `${theme.colors.primaryHighEmphasis} !important`};
         }
       }
     }
