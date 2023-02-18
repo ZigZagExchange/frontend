@@ -171,7 +171,7 @@
   "average_buy_price": "买入均价",
   "fee": "费用",
   "save_as_image": "保存为图片",
-  "zksync_1_allows_one_open_order_at_a_time": "zkSync 1.0 只允许运行一个订单。在跨链前，请取消你的限价单或者等待其成交。否则您的限价单会失效",
+  "zksync_1_allows_one_open_order_at_a_time": "zkSync Lite 只允许运行一个订单。在跨链前，请取消你的限价单或者等待其成交。否则您的限价单会失效",
   "bridge_transaction_in_process": "跨链转账进行中。确认或拒绝以继续...",
   "transaction_was_rejected": "交易被拒绝",
   "sign_the_message_to_cancel_your_order": "签名批准该信息以取消交易...",

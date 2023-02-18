@@ -171,7 +171,7 @@
   "average_buy_price": "평균 매수 가격",
   "fee": "수수료",
   "save_as_image": "그림으로 저장하기",
-  "zksync_1_allows_one_open_order_at_a_time": "zkSync 1.0 버젼은 하나의 주문 씩 열어주셔야 합니다. 지정가 주문을 취소하시거나 자금 브릿징하기 전에 해당 주문이 체결되기를 기다리십시오. 그렇지 않으면 당신의 지정가 주문이 취소될 것입니다..",
+  "zksync_1_allows_one_open_order_at_a_time": "zkSync Lite 버젼은 하나의 주문 씩 열어주셔야 합니다. 지정가 주문을 취소하시거나 자금 브릿징하기 전에 해당 주문이 체결되기를 기다리십시오. 그렇지 않으면 당신의 지정가 주문이 취소될 것입니다..",
   "bridge_transaction_in_process": "브릿징을 통해 자금을 이체하는 중입니다. 이어나가기 위해 승인 또는 거절해 주세요.",
   "transaction_was_rejected": "이체가 실패했습니다.",
   "sign_the_message_to_cancel_your_order": "메세지에 서명하시어 당신의 주문을 취소 시키세요.",

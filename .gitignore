@@ -31,3 +31,5 @@ package-lock.json
 
 # intellij users
 .idea
+
+.next
