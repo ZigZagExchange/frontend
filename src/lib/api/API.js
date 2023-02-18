@@ -458,7 +458,8 @@ class API extends Emitter {
         })
         .catch((err) => {
           console.log(err);
-          if (!err.includes('Modal closed by user')) {
+          this.signOut(true);
+          if (!err.includes('Modal closed by user') && err !== "User rejected the request") {
             if (this.apiProvider.zksyncCompatible) {
               toast.error(
                 i18next.t("click_here_to_bridge_funds"),
@@ -469,11 +470,9 @@ class API extends Emitter {
                 }
               );
             }
-            throw err;
           } else {
-            this.signOut(true);
+            throw err;
           }
-
         })
         .finally(() => {
           this._signInProgress = null;
