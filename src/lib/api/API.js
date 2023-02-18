@@ -904,22 +904,17 @@ class API extends Emitter {
   get fastWithdrawTokenAddresses() {
     if (this.apiProvider.network === 1) {
       return {
-        FRAX: "0x853d955aCEf822Db058eb8505911ED77F175b99e",
-        UST: "0xa693b19d2931d498c5b318df961919bb4aee87a5",
+        USDC: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
       };
     } else if (this.apiProvider.network === 1002) {
-      return {
-        // these are just tokens on rinkeby with the correct tickers.
-        // neither are actually on rinkeby.
-        FRAX: "0x6426e27d8c6fDCd1e0c165d0D58c7eC0ef51f3a7",
-        UST: "0x2fd4e2b5340b7a29feb6ce737bc82bc4b3eefdb4",
-      };
+      return {};
     } else {
       throw Error("Network unknown");
     }
   }
 
   async getL2FastWithdrawLiquidity() {
+    console.log(this.mainnetProvider);
     if (this.mainnetProvider) {
       const currencyMaxes = {};
       if (!this.apiProvider.eligibleFastWithdrawTokens) return currencyMaxes;
@@ -931,6 +926,7 @@ class API extends Emitter {
               this.apiProvider.fastWithdrawContractAddress
             );
           } else {
+            console.log(this.fastWithdrawTokenAddresses);
             const contract = new ethers.Contract(
               this.fastWithdrawTokenAddresses[currency],
               erc20ContractABI,
