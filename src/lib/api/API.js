@@ -318,8 +318,8 @@ class API extends Emitter {
             method: "wallet_addEthereumChain",
             params: [ethereumChainInfo],
           });
-        } else {
-          throw switchError
+        } else if (switchError.code === 4001) {
+          throw new Error('User rejected the request')
         }
       } catch (addError) {
         console.error(addError);
