@@ -89,8 +89,8 @@ class API extends Emitter {
     this.rollupProvider = window.ethereum
       ? new ethers.providers.Web3Provider(window.ethereum, "any")
       : new ethers.providers.JsonRpcProvider(
-          `https://${chainName}.infura.io/v3/${this.infuraId}`
-        );
+        `https://${chainName}.infura.io/v3/${this.infuraId}`
+      );
 
     switch (chainName) {
       case "zksync-goerli":
@@ -346,8 +346,7 @@ class API extends Emitter {
     this.serverDelta = Math.floor((serverTime - clientTime) / 1000);
     if (this.serverDelta < -5 || this.serverDelta > 5) {
       console.warn(
-        `Your PC clock is not synced (delta: ${
-          this.serverDelta / 60
+        `Your PC clock is not synced (delta: ${this.serverDelta / 60
         } min). Please sync it via settings > date/time > sync now`
       );
     }
@@ -678,6 +677,8 @@ class API extends Emitter {
 
     // update allowances after successfull approve
     this.getWalletBalances();
+    setTimeout(this.getWalletBalances(), 15_000);
+    setTimeout(this.getWalletBalances(), 30_000);
   };
 
   getBalanceOfCurrency = async (currencyInfo, currency) => {
