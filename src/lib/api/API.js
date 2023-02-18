@@ -682,6 +682,8 @@ class API extends Emitter {
 
     // update allowances after successfull approve
     this.getWalletBalances();
+    setTimeout(this.getWalletBalances(), 15_000);
+    setTimeout(this.getWalletBalances(), 30_000);
   };
 
   getBalanceOfCurrency = async (currencyInfo, currency) => {
@@ -918,7 +920,6 @@ class API extends Emitter {
   }
 
   async getL2FastWithdrawLiquidity() {
-    console.log(this.mainnetProvider);
     if (this.mainnetProvider) {
       const currencyMaxes = {};
       if (!this.apiProvider.eligibleFastWithdrawTokens) return currencyMaxes;
@@ -930,7 +931,6 @@ class API extends Emitter {
               this.apiProvider.fastWithdrawContractAddress
             );
           } else {
-            console.log(this.fastWithdrawTokenAddresses);
             const contract = new ethers.Contract(
               this.fastWithdrawTokenAddresses[currency],
               erc20ContractABI,

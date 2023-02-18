@@ -298,7 +298,7 @@ class SpotForm extends React.Component {
     const marketInfo = this.props.marketInfo;
     if (!marketInfo) return 0;
     let fee = marketInfo.baseFee;
-    
+
     // Hardcode 0.05% taker fee for Arbitrum
     if (this.props.network === 42161) {
       const amount =
@@ -602,7 +602,7 @@ class SpotForm extends React.Component {
     // show msg with no fee
     let fairPrice;
     if (api.isZksyncChain()) {
-      fairPrice = this.getLadderPriceZkSync_v1();
+      fairPrice = this.props.lastPrice;
     } else {
       fairPrice = this.getLadderPrice();
     }
@@ -641,12 +641,10 @@ class SpotForm extends React.Component {
           <p style={{ fontSize: "14px", lineHeight: "24px" }}>
             {this.props.t("transaction_fee")}:{" "}
             {this.props.side === "s"
-              ? `${addComma(formatPrice(marketInfo.baseFee))} ${
-                  marketInfo.baseAsset.symbol
-                }`
-              : `${addComma(formatPrice(marketInfo.quoteFee))} ${
-                  marketInfo.quoteAsset.symbol
-                }`}
+              ? `${addComma(formatPrice(marketInfo.baseFee))} ${marketInfo.baseAsset.symbol
+              }`
+              : `${addComma(formatPrice(marketInfo.quoteFee))} ${marketInfo.quoteAsset.symbol
+              }`}
           </p>
           <p style={{ fontSize: "14px", lineHeight: "24px" }}>
             {this.props.t("sign_or_cancel_to_continue")}
@@ -868,14 +866,12 @@ class SpotForm extends React.Component {
               )}: ${gasFee} ${feeToken} - (~$ ${gasFeeUsdValue})`}</p>
               <p className="font-sans text-sm">{`${this.props.t(
                 "maker_fee"
-              )} (${
-                marketInfo.makerVolumeFee * 100
-              } %): ${makerFee} ${feeToken} - (~$ ${makerFeeUsdValue})`}</p>
+              )} (${marketInfo.makerVolumeFee * 100
+                } %): ${makerFee} ${feeToken} - (~$ ${makerFeeUsdValue})`}</p>
               <p className="font-sans text-sm">{`${this.props.t(
                 "taker_fee"
-              )} (${
-                takerVolumeFee * 100
-              } %): ${takerFee} ${feeToken} - (~$ ${takerFeeUsdValue})`}</p>
+              )} (${takerVolumeFee * 100
+                } %): ${takerFee} ${feeToken} - (~$ ${takerFeeUsdValue})`}</p>
             </div>
           )}
         </div>
@@ -979,14 +975,12 @@ class SpotForm extends React.Component {
     if (this.props.side === "b") {
       buttonType = "BUY";
       if (quoteAmount <= quoteBalance && quoteAmount > quoteAllowance) {
-        buttonText = `${t("approve")} ${
-          marketInfo && marketInfo.quoteAsset?.symbol
-        }`;
+        buttonText = `${t("approve")} ${marketInfo && marketInfo.quoteAsset?.symbol
+          }`;
         if (api.isEVMChain) approveNeeded = true;
       } else {
-        buttonText = `${t("buy")} ${
-          marketInfo && marketInfo.baseAsset?.symbol
-        }`;
+        buttonText = `${t("buy")} ${marketInfo && marketInfo.baseAsset?.symbol
+          }`;
       }
       feeAmount = (
         <FormHeader>
@@ -1015,14 +1009,12 @@ class SpotForm extends React.Component {
     } else if (this.props.side === "s") {
       buttonType = "SELL";
       if (baseAmount <= baseBalance && baseAmount > baseAllowance) {
-        buttonText = `${t("approve")} ${
-          marketInfo && marketInfo.baseAsset?.symbol
-        }`;
+        buttonText = `${t("approve")} ${marketInfo && marketInfo.baseAsset?.symbol
+          }`;
         if (api.isEVMChain) approveNeeded = true;
       } else {
-        buttonText = `${t("sell")} ${
-          marketInfo && marketInfo.baseAsset?.symbol
-        }`;
+        buttonText = `${t("sell")} ${marketInfo && marketInfo.baseAsset?.symbol
+          }`;
       }
       feeAmount = (
         <FormHeader>
@@ -1087,9 +1079,8 @@ class SpotForm extends React.Component {
               <InputField
                 type="text"
                 pattern="\d+(?:[.,]\d+)?"
-                placeholder={`${t("price")} (${
-                  marketInfo && marketInfo.baseAsset?.symbol
-                }-${marketInfo && marketInfo.quoteAsset?.symbol})`}
+                placeholder={`${t("price")} (${marketInfo && marketInfo.baseAsset?.symbol
+                  }-${marketInfo && marketInfo.quoteAsset?.symbol})`}
                 value={
                   this.props.orderType === "limit"
                     ? this.state.price
@@ -1120,11 +1111,10 @@ class SpotForm extends React.Component {
             <InputField
               type="text"
               pattern="\d+(?:[.,]\d+)?"
-              placeholder={`${t("amount")} (${
-                marketInfo && marketInfo.baseAsset.symbol
+              placeholder={`${t("amount")} (${marketInfo && marketInfo.baseAsset.symbol
                   ? marketInfo.baseAsset.symbol
                   : ""
-              })`}
+                })`}
               value={
                 this.state.baseAmount !== ""
                   ? this.state.baseChanged
@@ -1159,11 +1149,10 @@ class SpotForm extends React.Component {
             <InputField
               type="text"
               pattern="\d+(?:[.,]\d+)?"
-              placeholder={`${t("total")} (${
-                marketInfo && marketInfo.quoteAsset.symbol
+              placeholder={`${t("total")} (${marketInfo && marketInfo.quoteAsset.symbol
                   ? marketInfo.quoteAsset.symbol
                   : ""
-              })`}
+                })`}
               value={
                 this.state.quoteAmount !== ""
                   ? this.state.quoteChanged
@@ -1334,7 +1323,7 @@ const RangeWrapper = styled.div`
     &::before {
       border: 2px solid ${({ theme }) => theme.colors.foregroundLowEmphasis} !important;
       background-color: ${({ theme }) =>
-        theme.colors.backgroundMediumEmphasis} !important;
+    theme.colors.backgroundMediumEmphasis} !important;
     }
     &::before {
       width: 10px !important;
@@ -1346,7 +1335,7 @@ const RangeWrapper = styled.div`
     height: 6px;
     transform: translateY(-50%);
     background-color: ${({ theme }) =>
-      theme.colors.foregroundLowEmphasis} !important;
+    theme.colors.foregroundLowEmphasis} !important;
   }
 
   .MuiSlider-track {

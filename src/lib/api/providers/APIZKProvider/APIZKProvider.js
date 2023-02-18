@@ -397,7 +397,8 @@ export default class APIZKProvider extends APIProvider {
   approveTransferToBridge = async (token) => {
     if (token === 'ETH') return;
 
-    return this.syncWallet.approveERC20TokenDeposits(token);
+    const tx = this.syncWallet.approveERC20TokenDeposits(token);
+    await tx.wait()
   };
 
   transferToBridge = async (amountDecimals, token, address, userAddress) => {
