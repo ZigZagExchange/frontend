@@ -1438,7 +1438,7 @@ export default function OrdersTable(props) {
       footerContent = renderFillTable(getFills());
       break;
     case 2:
-      if (props.user.committed) {
+      if (props.user?.committed) {
         const tokenBalanceInOrder = {};
         const userOrders = getUserOrders();
         if (userOrders.length > 0) {
@@ -1491,12 +1491,12 @@ export default function OrdersTable(props) {
                   {props.settings?.hideBalance
                     ? "****.****"
                     : formatToken(
-                        token.valueReadable -
-                          (tokenBalanceInOrder[token.token]
-                            ? tokenBalanceInOrder[token.token]
-                            : 0),
-                        token.token
-                      )}
+                      token.valueReadable -
+                      (tokenBalanceInOrder[token.token]
+                        ? tokenBalanceInOrder[token.token]
+                        : 0),
+                      token.token
+                    )}
                 </Text>
               </td>
               <td data-label="Balance">
@@ -1507,8 +1507,8 @@ export default function OrdersTable(props) {
                   {props.settings?.hideBalance
                     ? "****.****"
                     : formatToken(
-                        token.valueReadable * coinEstimator(token.token)
-                      )}
+                      token.valueReadable * coinEstimator(token.token)
+                    )}
                 </Text>
               </td>
             </tr>

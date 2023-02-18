@@ -93,8 +93,8 @@ export default class APIZKProvider extends APIProvider {
 
     let feeToken = "ETH";
     const accountState = await this.syncWallet?.getAccountState();
-    const balances = accountState.committed.balances;
-    if (Object.keys(balances).length > 0) {
+    const balances = accountState?.committed?.balances;
+    if (balances && Object.keys(balances).length > 0) {
       try {
         const feeUSD = await this.changePubKeyFee();
         toast.info(

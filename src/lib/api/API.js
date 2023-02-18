@@ -456,17 +456,22 @@ class API extends Emitter {
         })
         .catch((err) => {
           console.log(err);
-          if (this.apiProvider.zksyncCompatible) {
-            toast.error(
-              i18next.t("click_here_to_bridge_funds"),
-              {
-                toastId: "zksync account does not exist",
-                onClick: () => window.open("https://wallet.zksync.io", "_blank"),
-                autoClose: false
-              }
-            );
+          if (!err.includes('Modal closed by user')) {
+            if (this.apiProvider.zksyncCompatible) {
+              toast.error(
+                i18next.t("click_here_to_bridge_funds"),
+                {
+                  toastId: "zksync account does not exist",
+                  onClick: () => window.open("https://wallet.zksync.io", "_blank"),
+                  autoClose: false
+                }
+              );
+            }
+            throw err;
+          } else {
+            this.signOut(true);
           }
-          throw err;
+
         })
         .finally(() => {
           this._signInProgress = null;
