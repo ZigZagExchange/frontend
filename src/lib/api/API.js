@@ -468,6 +468,8 @@ class API extends Emitter {
               );
             }
             throw err;
+          } else {
+            this.signOut(true);
           }
 
         })
