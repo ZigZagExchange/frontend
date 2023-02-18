@@ -31,22 +31,24 @@ const ConnectWalletButton = (props) => {
       // setConnecting(true);
       await api.signIn(network);
       const state = await api.getAccountState();
-      const walletBalance = formatAmount(state.committed.balances["ETH"], {
-        decimals: 18,
-      });
-      const activationFee = api.apiProvider.zksyncCompatible
-        ? await api.apiProvider.changePubKeyFee("ETH")
-        : 0;
+      if (state?.committed?.balances?.ETH) {
+        const walletBalance = formatAmount(state.committed.balances["ETH"], {
+          decimals: 18,
+        });
+        const activationFee = api.apiProvider.zksyncCompatible
+          ? await api.apiProvider.changePubKeyFee("ETH")
+          : 0;
 
-      if (
-        network === 1 &&
-        !state.id &&
-        !/^\/bridge(\/.*)?/.test(location.pathname) &&
-        (isNaN(walletBalance) || walletBalance < activationFee)
-      ) {
-        history.push("/bridge");
+        if (
+          network === 1 &&
+          !state.id &&
+          !/^\/bridge(\/.*)?/.test(location.pathname) &&
+          (isNaN(walletBalance) || walletBalance < activationFee)
+        ) {
+          history.push("/bridge");
+        }
       }
-      // setConnecting(false);
+
       api.emit("connecting", false);
     } catch (e) {
       console.error(e);
