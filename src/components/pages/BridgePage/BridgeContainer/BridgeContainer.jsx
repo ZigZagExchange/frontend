@@ -215,13 +215,18 @@ const BridgeContainer = () => {
   }, [balances, swapDetails, isSwapAmountEmpty, fromAmounts]);
 
   useEffect(() => {
-    if (user.address) {
-      api.getL2FastWithdrawLiquidity().then((maxes) => {
-        setFastWithdrawCurrencyMaxes(maxes);
-      });
+    const updateFees = () => {
+      if (api.mainnetProvider) {
+        api.getL2FastWithdrawLiquidity().then((maxes) => {
+          setFastWithdrawCurrencyMaxes(maxes);
+        });
+      }
       calculateFees();
     }
-  }, [user.address]);
+
+    const updateFeeInterval = setInterval(updateFees, 30_000)
+    return () => { clearInterval(updateFeeInterval); };
+  }, [api.apiProvider]);
 
   useEffect(async () => {
     if (

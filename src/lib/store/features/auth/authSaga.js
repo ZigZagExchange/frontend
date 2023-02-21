@@ -4,17 +4,11 @@ import api from "lib/api";
 
 function* handleHydration({ payload }) {
   if (payload && payload.network) {
-    const user = yield select((state) => state.auth && state.auth.user);
     api.setAPIProvider(payload.network);
 
-    if (user && user.id) {
-      try {
-        yield apply(api, api.signIn, [payload.network]);
-      } catch (err) {
-        api.signOut();
-        console.log("There was an error reauthenticating", err);
-      }
-    }
+
+    // reset state after reload
+    api.signOut()
   }
 }
 
