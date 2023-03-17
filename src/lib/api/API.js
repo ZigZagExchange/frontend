@@ -417,10 +417,12 @@ class API extends Emitter {
 
           this.rollupProvider = new ethers.providers.Web3Provider(web3Provider);
 
-          this.mainnetProvider = new ethers.providers.InfuraProvider(
-            this.getChainNameL1(network),
-            this.infuraId
-          );
+          this.mainnetProvider = window.ethereum
+            ? new ethers.providers.Web3Provider(window.ethereum, "any")
+            : new ethers.providers.InfuraProvider(
+              this.getChainNameL1(network),
+              this.infuraId
+            );
 
           let accountState;
           try {
