@@ -110,16 +110,9 @@ class API extends Emitter {
             },
             walletconnect: {
               package: WalletConnectProvider,
-              options: {
-                infuraId: this.infuraId,
-              },
             },
             coinbasewallet: {
               package: CoinbaseWalletSDK,
-              options: {
-                appName: "Web 3 Modal Demo",
-                infuraId: this.infuraId,
-              },
             },
             "custom-argent": {
               display: {
