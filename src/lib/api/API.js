@@ -89,8 +89,12 @@ class API extends Emitter {
     this.rollupProvider = window.ethereum
       ? new ethers.providers.Web3Provider(window.ethereum, "any")
       : new ethers.providers.JsonRpcProvider(
-        `https://${chainName}.infura.io/v3/${this.infuraId}`
-      );
+          `https://${chainName}.infura.io/v3/${this.infuraId}`
+        );
+
+    this.rollupProvider.on("accountsChanged", (accounts) => {
+      console.log("ACCOUNTS CHANGED" + accounts[0]);
+    });
 
     switch (chainName) {
       case "zksync-goerli":
@@ -319,7 +323,7 @@ class API extends Emitter {
             params: [ethereumChainInfo],
           });
         } else if (switchError.code === 4001) {
-          throw new Error('User rejected the request')
+          throw new Error("User rejected the request");
         }
       } catch (addError) {
         console.error(addError);
@@ -348,7 +352,8 @@ class API extends Emitter {
     this.serverDelta = Math.floor((serverTime - clientTime) / 1000);
     if (this.serverDelta < -5 || this.serverDelta > 5) {
       console.warn(
-        `Your PC clock is not synced (delta: ${this.serverDelta / 60
+        `Your PC clock is not synced (delta: ${
+          this.serverDelta / 60
         } min). Please sync it via settings > date/time > sync now`
       );
     }
@@ -420,13 +425,16 @@ class API extends Emitter {
           this.mainnetProvider = window.ethereum
             ? new ethers.providers.Web3Provider(window.ethereum, "any")
             : new ethers.providers.InfuraProvider(
-              this.getChainNameL1(network),
-              this.infuraId
-            );
+                this.getChainNameL1(network),
+                this.infuraId
+              );
 
           let accountState;
           try {
             accountState = await this.apiProvider.signIn(...args);
+            web3Provider.on("accountsChanged", async () => {
+              accountState = await this.apiProvider.signIn(...args);
+            });
           } catch (err) {
             await this.signOut();
             throw err;
@@ -461,16 +469,17 @@ class API extends Emitter {
         .catch((err) => {
           console.log(err);
           this.signOut(true);
-          if (!err.includes('Modal closed by user') && err !== "User rejected the request") {
+          if (
+            !err.includes("Modal closed by user") &&
+            err !== "User rejected the request"
+          ) {
             if (this.apiProvider.zksyncCompatible) {
-              toast.error(
-                i18next.t("click_here_to_bridge_funds"),
-                {
-                  toastId: "zksync account does not exist",
-                  onClick: () => window.open("https://wallet.zksync.io", "_blank"),
-                  autoClose: false
-                }
-              );
+              toast.error(i18next.t("click_here_to_bridge_funds"), {
+                toastId: "zksync account does not exist",
+                onClick: () =>
+                  window.open("https://wallet.zksync.io", "_blank"),
+                autoClose: false,
+              });
             }
           } else {
             throw err;
@@ -729,7 +738,10 @@ class API extends Emitter {
 
     const getBalance = async (ticker) => {
       const currencyInfo = this.getCurrencyInfo(ticker);
-      const { balance, allowance } = await this.getBalanceOfCurrency(currencyInfo, ticker);
+      const { balance, allowance } = await this.getBalanceOfCurrency(
+        currencyInfo,
+        ticker
+      );
       balances[ticker] = {
         value: balance,
         allowance,
@@ -1073,9 +1085,7 @@ class API extends Emitter {
         case 42161:
           return "https://arbiscan.io/address/" + address;
         case 421613:
-          return (
-            "https://goerli.arbiscan.io/address/" + address
-          );
+          return "https://goerli.arbiscan.io/address/" + address;
         default:
           throw Error("Chain ID not understood");
       }
