@@ -92,10 +92,6 @@ class API extends Emitter {
           `https://${chainName}.infura.io/v3/${this.infuraId}`
         );
 
-    this.rollupProvider.on("accountsChanged", (accounts) => {
-      console.log("ACCOUNTS CHANGED" + accounts[0]);
-    });
-
     switch (chainName) {
       case "zksync-goerli":
       case "zksync":
@@ -467,11 +463,10 @@ class API extends Emitter {
           return accountState;
         })
         .catch((err) => {
-          console.log(err);
           this.signOut(true);
           if (
-            !err.includes("Modal closed by user") &&
-            err !== "User rejected the request"
+            !err?.toString().includes("Modal closed by user") &&
+            err?.toString() !== "User rejected the request"
           ) {
             if (this.apiProvider.zksyncCompatible) {
               toast.error(i18next.t("click_here_to_bridge_funds"), {
