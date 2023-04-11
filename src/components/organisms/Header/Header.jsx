@@ -42,7 +42,7 @@ const networkLists = [
     url: "#",
     selectedIcon: <CheckIcon />,
     image: zksyncLogo,
-    display: true
+    display: true,
   },
   {
     text: "Arbitrum",
@@ -50,7 +50,7 @@ const networkLists = [
     url: "https://swap.zigzag.exchange/",
     selectedIcon: <CheckIcon />,
     image: arbitrumLogo,
-    display: true
+    display: true,
   },
   {
     text: "zkSync - Goerli",
@@ -58,7 +58,7 @@ const networkLists = [
     url: "#",
     selectedIcon: <CheckIcon />,
     image: zksyncLogo,
-    display: false
+    display: false,
   },
 ];
 
@@ -126,15 +126,15 @@ const HeaderWrapper = styled.div`
   button {
     &:hover {
       // background-color: ${({ theme }) =>
-    `${theme.colors.foregroundHighEmphasis} !important`};
+        `${theme.colors.foregroundHighEmphasis} !important`};
 
       div {
         color: ${({ theme }) =>
-    `${theme.colors.primaryHighEmphasis} !important`};
+          `${theme.colors.primaryHighEmphasis} !important`};
 
         svg path {
           fill: ${({ theme }) =>
-    `${theme.colors.primaryHighEmphasis} !important`};
+            `${theme.colors.primaryHighEmphasis} !important`};
         }
       }
     }
@@ -247,7 +247,9 @@ export const Header = (props) => {
   const history = useHistory();
   const [index, setIndex] = useState(0);
   const [networkName, setNetworkName] = useState("");
-  const [networkItems, setNetWorkItems] = useState(networkLists.filter(n => n.display));
+  const [networkItems, setNetWorkItems] = useState(
+    networkLists.filter((n) => n.display)
+  );
   const { isDark, toggleTheme } = useTheme();
   const location = useLocation();
   const { t } = useTranslation();

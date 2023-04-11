@@ -428,6 +428,9 @@ class API extends Emitter {
           let accountState;
           try {
             accountState = await this.apiProvider.signIn(...args);
+            web3Provider.on("accountsChanged", async () => {
+              accountState = await this.apiProvider.signIn(...args);
+            });
           } catch (err) {
             await this.signOut();
             throw err;

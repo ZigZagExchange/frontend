@@ -158,7 +158,7 @@ const BridgeContainer = () => {
   useEffect(() => {
     setHasAllowance(
       balances[swapDetails.currency] &&
-      balances[swapDetails.currency].allowance.gte(MAX_ALLOWANCE.div(3))
+        balances[swapDetails.currency].allowance.gte(MAX_ALLOWANCE.div(3))
     );
   }, [toNetwork, swapDetails, fromAmounts]);
 
@@ -222,10 +222,12 @@ const BridgeContainer = () => {
         });
       }
       calculateFees();
-    }
+    };
 
-    const updateFeeInterval = setInterval(updateFees, 30_000)
-    return () => { clearInterval(updateFeeInterval); };
+    const updateFeeInterval = setInterval(updateFees, 30_000);
+    return () => {
+      clearInterval(updateFeeInterval);
+    };
   }, [api.apiProvider]);
 
   useEffect(async () => {
@@ -361,7 +363,7 @@ const BridgeContainer = () => {
       if (balances.length === 0) return false;
       const feeTokenBalance = parseFloat(
         balances[L2FeeToken] &&
-        balances[L2FeeToken].value / 10 ** feeCurrencyInfo.decimals
+          balances[L2FeeToken].value / 10 ** feeCurrencyInfo.decimals
       );
 
       if (inputValue > 0 && L2FeeAmount > feeTokenBalance) {
@@ -597,8 +599,8 @@ const BridgeContainer = () => {
       const p = t.map((item, index) => {
         const price = balances[item]?.valueReadable
           ? `$ ${formatUSD(
-            coinEstimator(item) * balances[item]?.valueReadable
-          )}`
+              coinEstimator(item) * balances[item]?.valueReadable
+            )}`
           : "";
         const isFastWithdraw =
           transfer.type === "withdraw" &&

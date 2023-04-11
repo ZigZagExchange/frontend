@@ -75,7 +75,6 @@ export function useCoinEstimator() {
 
     if ("ETH" in prices && !("WETH" in prices)) prices.WETH = prices.ETH;
     if ("WETH" in prices && !("ETH" in prices)) prices.ETH = prices.WETH;
-
     return (token) => {
       const t = token?.toUpperCase();
       return parseFloat(prices && prices[t] ? prices[t] : 0).toFixed(2);

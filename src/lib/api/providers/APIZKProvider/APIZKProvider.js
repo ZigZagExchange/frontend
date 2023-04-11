@@ -34,7 +34,7 @@ export default class APIZKProvider extends APIProvider {
 
   getDefaultMarket = () => {
     return this.defaultMarket[this.network];
-  }
+  };
 
   handleBridgeReceipt = (
     _receipt,
@@ -395,10 +395,10 @@ export default class APIZKProvider extends APIProvider {
   };
 
   approveTransferToBridge = async (token) => {
-    if (token === 'ETH') return;
+    if (token === "ETH") return;
 
     const tx = this.syncWallet.approveERC20TokenDeposits(token);
-    await tx.wait()
+    await tx.wait();
   };
 
   transferToBridge = async (amountDecimals, token, address, userAddress) => {
@@ -516,8 +516,7 @@ export default class APIZKProvider extends APIProvider {
         throw Error("Token not eligible for fast withdraw");
       }
       const feeData = await this.api.rollupProvider.getFeeData();
-      let bridgeFee = feeData.gasPrice
-        .mul(21000)
+      let bridgeFee = feeData.gasPrice.mul(21000);
 
       if (token === "ETH") {
         return getNumberFormatted(bridgeFee);
@@ -595,7 +594,7 @@ export default class APIZKProvider extends APIProvider {
       undefined,
       ethSignatureType
     );
-  }
+  };
 
   getSeeds = () => {
     try {
@@ -616,7 +615,7 @@ export default class APIZKProvider extends APIProvider {
       APIZKProvider.SEEDS_STORAGE_KEY,
       JSON.stringify(seeds)
     );
-  }
+  };
 
   getSeedKey = async (ethSigner) => {
     return `${this.network}-${await ethSigner.getAddress()}`;
