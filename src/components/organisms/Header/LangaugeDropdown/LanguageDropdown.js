@@ -61,56 +61,49 @@ export default function LanguageDropdown() {
               src={selected.icon}
               alt={selected.name}
               className="w-5 h-5 rounded-full"
+              style={{ width: "1.25rem", height: "1.25rem" }}
             />
             <span className="block truncate">{selected.name}</span>
             <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
               <ChevronDownIcon className="w-5 h-5 mt-1" aria-hidden="true" />
             </span>
           </Listbox.Button>
-          <Transition
-            as={Fragment}
-            leave="transition ease-in duration-100"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <Listbox.Options className="absolute min-w-max right-0 py-1 mt-1 overflow-auto text-sm dark:bg-[#191A33] border dark:border-foreground-400 bg-sky-100 rounded-md shadow-lg max-h-60">
-              {languages.map((lang, langIdx) => (
-                <Listbox.Option
-                  key={langIdx}
-                  className={({ active }) =>
-                    `relative cursor-pointer select-none py-2 px-4 ${
-                      active
-                        ? "dark:bg-[#2B2E4A] bg-[#ecf8fa]"
-                        : "text-white-900"
-                    }`
-                  }
-                  value={lang}
-                >
-                  {({ selected }) => (
-                    <>
-                      <span
-                        className={`flex items-center gap-2 truncate ${
-                          selected ? "font-medium" : "font-normal"
-                        }`}
-                      >
-                        <img
-                          src={lang.icon}
-                          alt={lang.name}
-                          className="w-5 h-5 rounded-full"
-                        />
-                        {lang.name}
-                      </span>
-                      {/* {selected ? (
+          <Listbox.Options className="absolute min-w-max right-0 py-1 mt-1 overflow-auto text-sm dark:bg-[#191A33] border dark:border-foreground-400 bg-sky-100 rounded-md shadow-lg max-h-60">
+            {languages.map((lang, langIdx) => (
+              <Listbox.Option
+                key={langIdx}
+                className={({ active }) =>
+                  `relative cursor-pointer select-none py-2 px-4 ${
+                    active ? "dark:bg-[#2B2E4A] bg-[#ecf8fa]" : "text-white-900"
+                  }`
+                }
+                value={lang}
+              >
+                {({ selected }) => (
+                  <>
+                    <span
+                      className={`flex items-center gap-2 truncate ${
+                        selected ? "font-medium" : "font-normal"
+                      }`}
+                    >
+                      <img
+                        src={lang.icon}
+                        alt={lang.name}
+                        className="w-5 h-5 rounded-full"
+                        style={{ width: "1.25rem", height: "1.25rem" }}
+                      />
+                      {lang.name}
+                    </span>
+                    {/* {selected ? (
                         <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-primary-900">
                           <CheckIcon className="w-5 h-5" aria-hidden="true" />
                         </span>
                       ) : null} */}
-                    </>
-                  )}
-                </Listbox.Option>
-              ))}
-            </Listbox.Options>
-          </Transition>
+                  </>
+                )}
+              </Listbox.Option>
+            ))}
+          </Listbox.Options>
         </div>
       </Listbox>
     </div>
