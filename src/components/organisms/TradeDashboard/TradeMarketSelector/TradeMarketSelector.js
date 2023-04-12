@@ -30,6 +30,13 @@ export default function TradeMarketSelector(props) {
       let usdVolume = 0;
       usdVolume =
         parseFloat(props.lastPrices[market].quoteVolume) * quoteCurrencyPrice;
+
+      if (market === "ETH-WBTC")
+        console.log(
+          market,
+          props.lastPrices[market].quoteVolume,
+          quoteCurrencyPrice
+        );
       lastPriceTableData.push({
         td1: market,
         td2: addComma(formatPrice(price)),

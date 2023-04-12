@@ -201,6 +201,6 @@
   "expired": "Expired",
   "cancel": "Cancel",
   "view_tx": "View Tx",
-  "click_here_to_bridge_funds": "Your zksync account does not exist. CLICK HERE to use the Zksync Bridge to deposit funds.",
+  "click_here_to_bridge_funds": "Using ZigZag with a new account: \n1- Deposit funds: https://lite.zksync.io/\n2- Sign account activation\n3- Connect to ZigZag and start trading!",
   "liquidity": "Liquidity"
 }
