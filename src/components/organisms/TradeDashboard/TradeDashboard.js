@@ -137,8 +137,11 @@ export function TradeDashboard() {
       dispatch(resetData());
       let subscribed = false;
       while (!subscribed) {
-        subscribed = api.subscribeToMarket(currentMarket, settings.showNightPriceChange);
-        await new Promise(resolve => setTimeout(resolve, 200));
+        subscribed = api.subscribeToMarket(
+          currentMarket,
+          settings.showNightPriceChange
+        );
+        await new Promise((resolve) => setTimeout(resolve, 200));
       }
     };
 
@@ -345,7 +348,6 @@ export function TradeDashboard() {
         </div>
       </GridLayoutRow>
       <HighSlippageModal />
-
     </TradeContainer>
   );
 }
