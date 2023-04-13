@@ -28,6 +28,7 @@ import {
   lastPricesSelector,
   liquiditySelector,
   allOrdersSelector,
+  marketInfosSelector,
 } from "lib/store/features/api/apiSlice";
 import { userSelector } from "lib/store/features/auth/authSlice";
 import api from "lib/api";
@@ -72,6 +73,7 @@ export function TradeDashboard() {
   const lastPrices = useSelector(lastPricesSelector);
   const liquidity = useSelector(liquiditySelector);
   const allOrders = useSelector(allOrdersSelector);
+  const marketInfos = useSelector(marketInfosSelector);
 
   const [side, setSide] = useState("all");
   const [currentPairLastPrice, setCurrentPairLastPrice] = useState(0);
@@ -271,6 +273,7 @@ export function TradeDashboard() {
         currentMarket={currentMarket}
         network={network}
         marketInfo={marketInfo}
+        marketInfos={marketInfos}
         marketSummary={marketSummary}
         lastPrices={lastPrices}
       />

@@ -71,7 +71,10 @@ export const apiSlice = createSlice({
       const op = payload[0];
       const errorMessage = payload[1];
       // we dont want to show some errors
-      if (errorMessage.includes("Order is no longer open") || op === "subscribemarket") {
+      if (
+        errorMessage.includes("Order is no longer open") ||
+        op === "subscribemarket"
+      ) {
         console.error(`Error at ${op}: ${errorMessage}`);
         return;
       }
@@ -776,6 +779,7 @@ export const allOrdersSelector = (state) => state.api.orders;
 export const marketFillsSelector = (state) => state.api.marketFills;
 export const lastPricesSelector = (state) =>
   state.api.lastPrices[state.api.network];
+export const marketInfosSelector = (state) => state.api.marketinfos;
 export const marketSummarySelector = (state) => state.api.marketSummary;
 export const liquiditySelector = (state) => state.api.liquidity;
 export const currentMarketSelector = (state) => state.api.currentMarket;
