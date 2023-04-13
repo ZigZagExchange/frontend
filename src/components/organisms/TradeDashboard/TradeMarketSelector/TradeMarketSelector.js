@@ -31,7 +31,7 @@ export default function TradeMarketSelector(props) {
       let usdVolume = 0;
       usdVolume =
         parseFloat(props.lastPrices[market].quoteVolume) *
-        props.marketInfos[`1-${market}`].quoteAsset.usdPrice;
+        props.marketInfos[`1-${market}`]?.quoteAsset?.usdPrice;
 
       lastPriceTableData.push({
         td1: market,
