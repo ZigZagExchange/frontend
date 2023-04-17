@@ -21,7 +21,7 @@ export function useCoinEstimator() {
     let remaining = [];
 
     if (marketInfos) {
-      remaining = Object.keys(pairPrices).filter(
+      remaining = Object.keys(marketInfos).filter(
         (token) => !stables.includes(token)
       );
       Object.keys(marketInfos).forEach((pair) => {
@@ -56,5 +56,5 @@ export function useCoinEstimator() {
       const t = token?.toUpperCase();
       return parseFloat(prices && prices[t] ? prices[t] : 0).toFixed(2);
     };
-  }, [pairPrices]);
+  }, [marketInfos]);
 }
