@@ -5,6 +5,7 @@ import { stables } from "lib/helpers/categories";
 
 export function useCoinEstimator() {
   const pairPrices = useSelector(lastPricesSelector);
+
   let prices = {};
   // add all stablecoins
   stables.forEach((stable) => {
@@ -49,29 +50,29 @@ export function useCoinEstimator() {
     });
 
     // add prices from other pairs
-    priceArray = {};
-    remaining.forEach((pair) => {
-      let pairPrice = pairPrices[pair].price;
-      if (Number.isNaN(pairPrice) || !Number.isFinite(pairPrice)) return;
-      const [base, quote] = pair.split("-").map((s) => s.toUpperCase());
+    // priceArray = {};
+    // remaining.forEach((pair) => {
+    //   let pairPrice = pairPrices[pair].price;
+    //   if (Number.isNaN(pairPrice) || !Number.isFinite(pairPrice)) return;
+    //   const [base, quote] = pair.split("-").map((s) => s.toUpperCase());
+    //   if (quote in prices && !stables.includes(base)) {
+    //     pairPrice *= prices[quote];
+    //     console.log(pairPrice, quote);
+    //     if (base in priceArray) {
+    //       const arr = priceArray[base];
+    //       arr.push(pairPrice);
+    //       priceArray[base] = arr;
+    //     } else {
+    //       priceArray[base] = [pairPrice];
+    //     }
+    //   }
+    // });
 
-      if (quote in prices && !stables.includes(base)) {
-        pairPrice *= prices[quote];
-        if (base in priceArray) {
-          const arr = priceArray[base];
-          arr.push(pairPrice);
-          priceArray[base] = arr;
-        } else {
-          priceArray[base] = [pairPrice];
-        }
-      }
-    });
-
-    // get mid price of all pairs found with other pair
-    Object.keys(priceArray).forEach((token) => {
-      const sum = priceArray[token].reduce((pv, cv) => pv + cv, 0);
-      prices[token] = sum / priceArray[token].length;
-    });
+    // // get mid price of all pairs found with other pair
+    // Object.keys(priceArray).forEach((token) => {
+    //   const sum = priceArray[token].reduce((pv, cv) => pv + cv, 0);
+    //   prices[token] = sum / priceArray[token].length;
+    // });
 
     if ("ETH" in prices && !("WETH" in prices)) prices.WETH = prices.ETH;
     if ("WETH" in prices && !("ETH" in prices)) prices.ETH = prices.WETH;

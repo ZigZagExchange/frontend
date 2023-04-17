@@ -165,7 +165,6 @@ const AccountDropdown = ({ notext, networkName }) => {
 
   const wallet =
     selectedLayer === 1 ? balanceData.wallet : balanceData[network];
-
   useEffect(() => {
     const explorerLink = user.address
       ? api.getExplorerAccountLink(network, user.address, selectedLayer)
