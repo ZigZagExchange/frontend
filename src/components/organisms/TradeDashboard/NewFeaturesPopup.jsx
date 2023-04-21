@@ -33,13 +33,22 @@ const NewFeaturesPopup = () => {
               onClick={onClose}
             />
             <p className="text-xl font-semibold font-work">
-              {t("orderbook_live_on_arbitrum")}
+              Order book live on Arbitrum!
             </p>
             <p className="mt-3 text-base">
-              {t("orderbook_live_on_arbitrum_description_p1")}
+              ZigZag has relaunched its order book on Arbitrum.
             </p>
             <p className="mt-3 text-base">
-              {t("orderbook_live_on_arbitrum_description_p2")}
+              Head over to{" "}
+              <a
+                href="https://arbitrum.zigzag.exchange"
+                target="_blank"
+                rel="noreferrer"
+                className="hover:text-sky-400 text-sky-500"
+              >
+                arbitrum.zigzag.exchange
+              </a>{" "}
+              to enjoy the full benefits of EVM trading on an order book DEX.
             </p>
             <button
               className="float-right mt-6 text-primary-900 hover:underline"
