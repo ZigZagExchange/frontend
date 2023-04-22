@@ -47,7 +47,7 @@ const networkLists = [
   {
     text: "Arbitrum",
     value: 42161,
-    url: "https://swap.zigzag.exchange/",
+    url: "https://arbitrum.zigzag.exchange/",
     selectedIcon: <CheckIcon />,
     image: arbitrumLogo,
     display: true,
