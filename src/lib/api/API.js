@@ -994,7 +994,7 @@ class API extends Emitter {
       if (["b", "m", "pm"].includes(fillStatus)) {
         // _pendingFills is used to only request on the 2nd time
         const index = this._pendingFills.indexOf(fillId);
-        if (index > -1) {
+        if (index > -1 && fillId) {
           this._pendingFills.splice(index, 1);
           fillRequestIds.push(fillId);
         } else {
@@ -1003,13 +1003,11 @@ class API extends Emitter {
       }
     });
     // request status update
-    if (fillRequestIds.length > 0) {
-      for (let i in fillRequestIds) {
-        this.send("fillreceiptreq", [
-          this.apiProvider.network,
-          Number(fillRequestIds[i]),
-        ]);
-      }
+    for (let i = 0; i < fillRequestIds; i++) {
+      this.send("fillreceiptreq", [
+        this.apiProvider.network,
+        Number(fillRequestIds[i]),
+      ]);
     }
   };
 
