@@ -1004,10 +1004,12 @@ class API extends Emitter {
     });
     // request status update
     for (let i = 0; i < fillRequestIds; i++) {
-      this.send("fillreceiptreq", [
-        this.apiProvider.network,
-        Number(fillRequestIds[i]),
-      ]);
+      if (fillRequestIds[i]) {
+        this.send("fillreceiptreq", [
+          this.apiProvider.network,
+          Number(fillRequestIds[i]),
+        ]);
+      }
     }
   };
 
