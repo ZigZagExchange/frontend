@@ -27,13 +27,7 @@ const NewFeaturesPopup = () => {
             onClick={onClose}
           />
           <p className="text-xl font-semibold font-work">
-            {t("zigzag_live_on_arbitrum")}
-          </p>
-          <p className="mt-3 text-base mb-5">
-            {t("zigzag_live_on_arbitrum_description_p1")} 
-          </p>
-          <p className="mt-3 text-base">
-            {t("zigzag_live_on_arbitrum_description_p2")}
+            Our Discord has been compromised. Please do not click on any links related to it. 
           </p>
           <button
             className="float-right mt-6 text-primary-900 hover:underline"

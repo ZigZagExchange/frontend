@@ -63,11 +63,11 @@ const networkLists = [
 ];
 
 const supportLists = [
-  {
-    text: "live_support",
-    url: "https://discord.com/invite/zigzag",
-    icon: <FaDiscord size={14} />,
-  },
+  //{
+  //  text: "live_support",
+  //  url: "https://discord.com/invite/zigzag",
+  //  icon: <FaDiscord size={14} />,
+  //},
   {
     text: "faq",
     url: "https://zigzag.exchange/#faq",
@@ -236,6 +236,12 @@ const ActionSideMenuWrapper = styled.div`
   }
 `;
 
+const AlertMessage = styled.div`
+  background: red;
+  text-align: center;
+  font-size: 16px;
+`;
+
 export const Header = (props) => {
   // state to open or close the sidebar in mobile
 
@@ -363,6 +369,8 @@ export const Header = (props) => {
   const isMobile = useMediaQuery({ maxWidth: 1224 });
 
   return (
+    <>
+    <AlertMessage>Our Discord has been hacked please do not click on links to it</AlertMessage>
     <HeaderWrapper isMobile={isMobile}>
       {isMobile ? (
         <>
@@ -548,13 +556,6 @@ export const Header = (props) => {
             <SocialLink
               target="_blank"
               rel="noreferrer"
-              href="https://discord.gg/zigzag"
-            >
-              <DiscordIcon />
-            </SocialLink>
-            <SocialLink
-              target="_blank"
-              rel="noreferrer"
               href="https://twitter.com/ZigZagExchange"
             >
               <TwitterIcon />
@@ -572,5 +573,6 @@ export const Header = (props) => {
         <></>
       )}
     </HeaderWrapper>
+    </>
   );
 };
