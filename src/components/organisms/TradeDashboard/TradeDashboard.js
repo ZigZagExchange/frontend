@@ -28,6 +28,7 @@ import {
   lastPricesSelector,
   liquiditySelector,
   allOrdersSelector,
+  marketInfosSelector,
 } from "lib/store/features/api/apiSlice";
 import { userSelector } from "lib/store/features/auth/authSlice";
 import api from "lib/api";
@@ -39,8 +40,6 @@ import {
 import { HighSlippageModal } from "components/molecules/HighSlippageModal";
 import { formatPrice, addComma } from "lib/utils";
 import NewFeaturesPopup from "components/organisms/TradeDashboard/NewFeaturesPopup";
-import classNames from "classnames";
-import useTheme from "components/hooks/useTheme";
 
 const TradeContainer = styled.div`
   color: #aeaebf;
@@ -72,6 +71,7 @@ export function TradeDashboard() {
   const lastPrices = useSelector(lastPricesSelector);
   const liquidity = useSelector(liquiditySelector);
   const allOrders = useSelector(allOrdersSelector);
+  const marketInfos = useSelector(marketInfosSelector);
 
   const [side, setSide] = useState("all");
   const [currentPairLastPrice, setCurrentPairLastPrice] = useState(0);
@@ -80,7 +80,6 @@ export function TradeDashboard() {
 
   const { search } = useLocation();
   const history = useHistory();
-  const { isDark } = useTheme();
 
   const updateMarketChain = (market) => {
     console.log(`TradeDashboard set pair to ${market}`);
@@ -137,8 +136,11 @@ export function TradeDashboard() {
       dispatch(resetData());
       let subscribed = false;
       while (!subscribed) {
-        subscribed = api.subscribeToMarket(currentMarket, settings.showNightPriceChange);
-        await new Promise(resolve => setTimeout(resolve, 200));
+        subscribed = api.subscribeToMarket(
+          currentMarket,
+          settings.showNightPriceChange
+        );
+        await new Promise((resolve) => setTimeout(resolve, 200));
       }
     };
 
@@ -268,6 +270,7 @@ export function TradeDashboard() {
         currentMarket={currentMarket}
         network={network}
         marketInfo={marketInfo}
+        marketInfos={marketInfos}
         marketSummary={marketSummary}
         lastPrices={lastPrices}
       />
@@ -345,7 +348,7 @@ export function TradeDashboard() {
         </div>
       </GridLayoutRow>
       <HighSlippageModal />
-
+      {!settings.hideZigZagLiveOnArbitrumPopup && <NewFeaturesPopup />}
     </TradeContainer>
   );
 }

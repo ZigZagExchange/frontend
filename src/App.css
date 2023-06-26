@@ -196,6 +196,7 @@ html {
   backdrop-filter: blur(16px);
   border-radius: 8px;
   padding: 8px;
+  white-space: pre-line;
 }
 
 .Toastify__toast-theme--colored.Toastify__toast--warning {

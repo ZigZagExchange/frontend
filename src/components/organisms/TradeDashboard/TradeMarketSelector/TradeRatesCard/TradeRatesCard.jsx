@@ -51,7 +51,7 @@ const TradeRatesCard = ({
   const settings = useSelector(settingsSelector);
   const network = useSelector(networkSelector);
   const user = useSelector(userSelector);
-  
+
   const { t } = useTranslation();
 
   const waitForTx = async (txHash) => {
@@ -77,7 +77,7 @@ const TradeRatesCard = ({
     } else if (user.address && faucetButtonState === "notConnected") {
       setFaucetButtonState("idle");
     }
-  }, [user.address])
+  }, [user.address]);
 
   useEffect(() => {
     let buttonText = "";
@@ -139,7 +139,7 @@ const TradeRatesCard = ({
       setFaucetButtonState("failure");
       return;
     }
-    
+
     ws.onmessage = ({ data }) => {
       console.log(data);
       try {

@@ -4,9 +4,12 @@ import React from "react";
 import { setUISettings } from "lib/store/features/api/apiSlice";
 import { CloseIcon } from "components/atoms/Svg";
 import { useTranslation } from "react-i18next";
+import useTheme from "components/hooks/useTheme";
+import classNames from "classnames";
 
 const NewFeaturesPopup = () => {
   const [open, setOpen] = useState(true);
+  const { isDark } = useTheme();
   const dispatch = useDispatch();
   const { t } = useTranslation();
 
@@ -15,7 +18,9 @@ const NewFeaturesPopup = () => {
   };
 
   const onDismissPermanently = () => {
-    dispatch(setUISettings({ key: "hideZigZagLiveOnArbitrumPopup", value: true }));
+    dispatch(
+      setUISettings({ key: "hideZigZagLiveOnArbitrumPopup", value: true })
+    );
   };
 
   return (

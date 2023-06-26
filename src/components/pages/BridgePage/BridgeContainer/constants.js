@@ -20,11 +20,11 @@ export const NETWORKS = [
       id: "ethereum",
       icon: ethLogo,
     },
-    to: [{ name: "zkSync", id: "zksync", icon: zksyncLogo }],
+    to: [{ name: "zkSync Lite", id: "zksync", icon: zksyncLogo }],
   },
   {
     from: {
-      name: "zkSync",
+      name: "zkSync Lite",
       id: "zksync",
       icon: zksyncLogo,
     },
