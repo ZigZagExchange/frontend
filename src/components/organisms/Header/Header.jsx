@@ -445,13 +445,6 @@ export const Header = (props) => {
               <SocialLink
                 target="_blank"
                 rel="noreferrer"
-                href="https://discord.gg/zigzag"
-              >
-                <DiscordIcon />
-              </SocialLink>
-              <SocialLink
-                target="_blank"
-                rel="noreferrer"
                 href="https://twitter.com/ZigZagExchange"
               >
                 <TwitterIcon />
