@@ -217,7 +217,7 @@ class API extends Emitter {
         profile,
         ...(await Promise.all([
           fetchAddressName(address),
-          getProfileFromIPFS(address),
+          // getProfileFromIPFS(address),
         ]))
       );
 
@@ -385,7 +385,11 @@ class API extends Emitter {
 
   getAccountState = async () => {
     const accountState = { ...(await this.apiProvider.getAccountState()) };
-    accountState.profile = await this.getProfile(accountState.address);
+    try {
+      accountState.profile = await this.getProfile(accountState.address);
+    } catch (error) {
+      // console.log(error);
+    }
     this.emit("accountState", accountState);
     return accountState;
   };
