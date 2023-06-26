@@ -71,21 +71,6 @@ const GuidePopup = () => {
             </a>
             .
           </p>
-          <p className="text-xl font-semibold mt-7 font-work">
-            Need live support?
-          </p>
-          <p className="flex items-center max-w-xs gap-2 text-base">
-            <DiscordIcon /> Join our{" "}
-            <a
-              href="https://discord.com/invite/zigzag"
-              target="_blank"
-              className="text-primary-900 hover:underline"
-              rel="noreferrer"
-            >
-              Discord
-            </a>{" "}
-            for live support.
-          </p>
           <button
             className="float-right mt-6 text-primary-900 hover:underline"
             onClick={onDismissPermanently}

@@ -75,33 +75,6 @@ export default function TradeSidebar(props) {
 
   return (
     <StyledTradeSidebar isDark={isDark}>
-      {isMobile || isSmallScreen ? (
-        <></>
-      ) : (
-        <InfoWrapper isDark={isDark}>
-          <Text font="primarySmall" color="foregroundHighEmphasis">
-            <p className="text-center">
-              {t("have_a_question_need_live_support")}
-            </p>
-          </Text>
-          <Button
-            width="150px"
-            startIcon={<DiscordIcon />}
-            variant="outlined"
-            scale="imd"
-            mr="8px"
-            onClick={joinDiscord}
-          >
-            <Text
-              font="primaryBoldDisplay"
-              color="foregroundHighEmphasis"
-              textAlign="center"
-            >
-              <p className="whitespace-nowrap">{t("join")} DISCORD</p>
-            </Text>
-          </Button>
-        </InfoWrapper>
-      )}
       <SpotBox
         lastPrice={props.lastPrice}
         user={props.user}
