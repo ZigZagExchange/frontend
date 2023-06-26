@@ -412,7 +412,7 @@ class API extends Emitter {
           }
 
           await this.refreshNetwork();
-          await this.sleep(1000);
+          await this.sleep(500);
 
           const web3Provider = await this.web3Modal.connect();
 
