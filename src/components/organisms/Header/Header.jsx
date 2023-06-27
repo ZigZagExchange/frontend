@@ -50,7 +50,7 @@ const networkLists = [
     url: "https://arbitrum.zigzag.exchange/",
     selectedIcon: <CheckIcon />,
     image: arbitrumLogo,
-    display: true,
+    display: false,
   },
   {
     text: "zkSync - Goerli",
