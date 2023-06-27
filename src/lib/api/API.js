@@ -212,6 +212,10 @@ class API extends Emitter {
         return profile;
       }
 
+      if (!profile.image || profile.image === null) {
+        profile.image = createIcon({ seed: address }).toDataURL();
+      }
+
       profile.name = `${address.substr(0, 6)}…${address.substr(-6)}`;
       Object.assign(
         profile,
@@ -220,10 +224,6 @@ class API extends Emitter {
           // getProfileFromIPFS(address),
         ]))
       );
-
-      if (!profile.image) {
-        profile.image = createIcon({ seed: address }).toDataURL();
-      }
     }
 
     return this._profiles[address];
