@@ -35,7 +35,7 @@ const Tab = ({
   left = false,
   onClick,
   children,
-  display = true,
+  display = "true",
 }) => {
   return (
     <StyledTab onClick={onClick} display={display}>
