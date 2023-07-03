@@ -372,7 +372,6 @@ export const Header = (props) => {
 
   return (
     <>
-    <AlertMessage>Our Discord has been hacked please do not click on links to it</AlertMessage>
     <HeaderWrapper isMobile={isMobile}>
       {isMobile ? (
         <>
