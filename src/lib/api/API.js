@@ -212,18 +212,18 @@ class API extends Emitter {
         return profile;
       }
 
+      if (!profile.image || profile.image === null) {
+        profile.image = createIcon({ seed: address }).toDataURL();
+      }
+
       profile.name = `${address.substr(0, 6)}…${address.substr(-6)}`;
       Object.assign(
         profile,
         ...(await Promise.all([
           fetchAddressName(address),
-          getProfileFromIPFS(address),
+          // getProfileFromIPFS(address),
         ]))
       );
-
-      if (!profile.image) {
-        profile.image = createIcon({ seed: address }).toDataURL();
-      }
     }
 
     return this._profiles[address];
@@ -385,7 +385,11 @@ class API extends Emitter {
 
   getAccountState = async () => {
     const accountState = { ...(await this.apiProvider.getAccountState()) };
-    accountState.profile = await this.getProfile(accountState.address);
+    try {
+      accountState.profile = await this.getProfile(accountState.address);
+    } catch (error) {
+      // console.log(error);
+    }
     this.emit("accountState", accountState);
     return accountState;
   };
@@ -412,7 +416,7 @@ class API extends Emitter {
           }
 
           await this.refreshNetwork();
-          await this.sleep(1000);
+          await this.sleep(500);
 
           const web3Provider = await this.web3Modal.connect();
 

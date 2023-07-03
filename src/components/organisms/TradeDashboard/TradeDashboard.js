@@ -264,91 +264,93 @@ export function TradeDashboard() {
   }
 
   return (
-    <TradeContainer>
-      <TradeMarketSelector
-        updateMarketChain={updateMarketChain}
-        currentMarket={currentMarket}
-        network={network}
-        marketInfo={marketInfo}
-        marketInfos={marketInfos}
-        marketSummary={marketSummary}
-        lastPrices={lastPrices}
-      />
-      <GridLayoutRow
-        layouts={settings.layouts}
-        autoSize={false}
-        onChange={(_, layout) => {
-          dispatch(setUISettings({ key: "layouts", value: layout }));
-        }}
-        onDragStart={() => {
-          dispatch(setUISettings({ key: "layoutsCustomized", value: true }));
-        }}
-        onResizeStart={() => {
-          dispatch(setUISettings({ key: "layoutsCustomized", value: true }));
-        }}
-        margin={[0, 0]}
-        isDraggable={settings.editable}
-        isResizable={settings.editable}
-        draggableHandle=".grid-item__title"
-        editable={settings.editable}
-        useCSSTransforms={false}
-        float={false}
-      >
-        <div key="a">
-          <GridLayoutCell editable={settings.editable}>
-            <TradeSidebar
-              updateMarketChain={updateMarketChain}
-              currentMarket={currentMarket}
-              user={user}
-              activeOrderCount={activeUserOrders}
-              marketInfo={marketInfo}
-              marketSummary={marketSummary}
-              userOrders={userOrders}
-              lastPrice={currentPairLastPrice}
-              askBins={askBins}
-              bidBins={bidBins}
-            />
-          </GridLayoutCell>
-        </div>
-        {/* TradePriceTable, TradePriceHeadSecond */}
-        <div key="g">
-          <GridLayoutCell editable={settings.editable}>
-            <OrdersBook
-              currentMarket={currentMarket}
-              changeSide={changeSide}
-              marketInfo={marketInfo}
-              marketSummary={marketSummary}
-              settings={settings}
-              lastPrice={currentPairLastPrice}
-              askBins={askBins}
-              bidBins={bidBins}
-            />
-          </GridLayoutCell>
-        </div>
-        <div key="h">
-          <GridLayoutCell editable={settings.editable}>
-            <TradesBook currentMarket={currentMarket} side={side} />
-          </GridLayoutCell>
-        </div>
-        <div key="c">
-          <GridLayoutCell editable={settings.editable}>
-            <TradeChartArea marketInfo={marketInfo} />
-          </GridLayoutCell>
-        </div>
-        <div key="d">
-          <GridLayoutCell editable={settings.editable}>
-            <TradeTables
-              userFills={userFills}
-              userOrders={userOrders}
-              user={user}
-              settings={settings}
-              network={network}
-            />
-          </GridLayoutCell>
-        </div>
-      </GridLayoutRow>
-      <HighSlippageModal />
-      {!settings.hideZigZagLiveOnArbitrumPopup && <NewFeaturesPopup />}
-    </TradeContainer>
+    <React.StrictMode>
+      <TradeContainer>
+        <TradeMarketSelector
+          updateMarketChain={updateMarketChain}
+          currentMarket={currentMarket}
+          network={network}
+          marketInfo={marketInfo}
+          marketInfos={marketInfos}
+          marketSummary={marketSummary}
+          lastPrices={lastPrices}
+        />
+        <GridLayoutRow
+          layouts={settings.layouts}
+          autoSize={false}
+          onChange={(_, layout) => {
+            dispatch(setUISettings({ key: "layouts", value: layout }));
+          }}
+          onDragStart={() => {
+            dispatch(setUISettings({ key: "layoutsCustomized", value: true }));
+          }}
+          onResizeStart={() => {
+            dispatch(setUISettings({ key: "layoutsCustomized", value: true }));
+          }}
+          margin={[0, 0]}
+          isDraggable={settings.editable}
+          isResizable={settings.editable}
+          draggableHandle=".grid-item__title"
+          editable={settings.editable}
+          useCSSTransforms={false}
+          float={false}
+        >
+          <div key="a">
+            <GridLayoutCell editable={settings.editable}>
+              <TradeSidebar
+                updateMarketChain={updateMarketChain}
+                currentMarket={currentMarket}
+                user={user}
+                activeOrderCount={activeUserOrders}
+                marketInfo={marketInfo}
+                marketSummary={marketSummary}
+                userOrders={userOrders}
+                lastPrice={currentPairLastPrice}
+                askBins={askBins}
+                bidBins={bidBins}
+              />
+            </GridLayoutCell>
+          </div>
+          {/* TradePriceTable, TradePriceHeadSecond */}
+          <div key="g">
+            <GridLayoutCell editable={settings.editable}>
+              <OrdersBook
+                currentMarket={currentMarket}
+                changeSide={changeSide}
+                marketInfo={marketInfo}
+                marketSummary={marketSummary}
+                settings={settings}
+                lastPrice={currentPairLastPrice}
+                askBins={askBins}
+                bidBins={bidBins}
+              />
+            </GridLayoutCell>
+          </div>
+          <div key="h">
+            <GridLayoutCell editable={settings.editable}>
+              <TradesBook currentMarket={currentMarket} side={side} />
+            </GridLayoutCell>
+          </div>
+          <div key="c">
+            <GridLayoutCell editable={settings.editable}>
+              <TradeChartArea marketInfo={marketInfo} />
+            </GridLayoutCell>
+          </div>
+          <div key="d">
+            <GridLayoutCell editable={settings.editable}>
+              <TradeTables
+                userFills={userFills}
+                userOrders={userOrders}
+                user={user}
+                settings={settings}
+                network={network}
+              />
+            </GridLayoutCell>
+          </div>
+        </GridLayoutRow>
+        <HighSlippageModal />
+        {!settings.hideZigZagLiveOnArbitrumPopup && <NewFeaturesPopup />}
+      </TradeContainer>
+    </React.StrictMode>
   );
 }

@@ -377,9 +377,7 @@ export const Header = (props) => {
         <>
           <LogoWrapper>
             <Link to="/">
-              <a href="/" rel="noreferrer">
-                <img src={logo} alt="logo" height="32" />
-              </a>
+              <img src={logo} alt="logo" height="32" />
             </Link>
           </LogoWrapper>
           <ButtonWrapper>
@@ -399,9 +397,7 @@ export const Header = (props) => {
         <>
           <NavWrapper>
             <Link to="/">
-              <a href="/" rel="noreferrer">
-                <img src={logo} alt="logo" height="32" />
-              </a>
+              <img src={logo} alt="logo" height="32" />
             </Link>
             <TabMenu
               activeIndex={index}

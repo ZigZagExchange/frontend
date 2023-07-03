@@ -71,7 +71,10 @@ export const apiSlice = createSlice({
       const op = payload[0];
       const errorMessage = payload[1];
       // we dont want to show some errors
-      if (["subscribemarket", "orderreceiptreq", "fillreceiptreq"].includes(op) || errorMessage.includes("Order is no longer open")) {
+      if (
+        ["subscribemarket", "orderreceiptreq", "fillreceiptreq"].includes(op) ||
+        errorMessage.includes("Order is no longer open")
+      ) {
         console.error(`Error at ${op}: ${errorMessage}`);
         return;
       }
@@ -272,7 +275,7 @@ export const apiSlice = createSlice({
     },
     _fillreceipt(state, { payload }) {
       payload[0].forEach((fill) => {
-        if (!fill) return;
+        if (!fill || !fill[1] || !fill[12]) return;
         const fillid = fill[1];
         const isoString = fill[12];
         const newTimestamp =
