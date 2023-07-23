@@ -12,6 +12,7 @@ import WalletConnectedPopup from "./Popup/WalletConnectedPopup";
 import classNames from "classnames";
 import { Tab } from "@headlessui/react";
 import { useTranslation } from "react-i18next";
+import { ZapBanner } from "components/atoms/ZapBanner";
 
 const tabList = ["bridge", "transfer_history"];
 
@@ -28,6 +29,7 @@ export default function BridgePage() {
 
   return (
     <DefaultTemplate>
+      <ZapBanner />
       <div className="flex justify-center">
         {user.address && !user.id && popup === "walletconnected" && (
           <WalletConnectedPopup
