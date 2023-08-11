@@ -58,7 +58,7 @@ export default function TradeFooter() {
           <SocialLink
             target="_blank"
             rel="noreferrer"
-            href="https://discord.gg/zigzag"
+            href="https://discord.com/invite/zigzagexchange"
           >
             <DiscordIcon />
           </SocialLink>

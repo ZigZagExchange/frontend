@@ -63,11 +63,11 @@ const networkLists = [
 ];
 
 const supportLists = [
-  //{
-  //  text: "live_support",
-  //  url: "https://discord.com/invite/zigzag",
-  //  icon: <FaDiscord size={14} />,
-  //},
+  {
+    text: "live_support",
+    url: "https://discord.com/invite/zigzag",
+    icon: <FaDiscord size={14} />,
+  },
   {
     text: "faq",
     url: "https://zigzag.exchange/#faq",
@@ -451,17 +451,17 @@ export const Header = (props) => {
               >
                 <TelegramIcon />
               </SocialLink>
+              <SocialLink
+                target="_blank"
+                rel="noreferrer"
+                href="https://discord.com/invite/zigzagexchange"
+              >
+                <DiscordIcon />
+              </SocialLink>
             </SocialWrapper>
             <VerticalDivider />
             <LanguageDropdown />
             <LanguageWrapper>
-              {/* <StyledDropdown
-                adClass="lang-dropdown"
-                transparent
-                item={langList}
-                context={language}
-                clickFunction={changeLanguage}
-              /> */}
               <ToggleTheme isDark={isDark} toggleTheme={toggleTheme} />
             </LanguageWrapper>
             <VerticalDivider />

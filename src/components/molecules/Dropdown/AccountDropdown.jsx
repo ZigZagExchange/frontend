@@ -250,7 +250,7 @@ const AccountDropdown = ({ notext, networkName }) => {
               </Text>
               <Text font="primaryHeading6" color="foregroundHighEmphasis">
                 {settings.hideBalance
-                  ? "****.****"
+                  ? "········"
                   : "$ " + addComma(formatUSD(totalBalance))}
               </Text>
             </div>
@@ -293,7 +293,7 @@ const AccountDropdown = ({ notext, networkName }) => {
                             color="foregroundHighEmphasis"
                           >
                             {settings.hideBalance
-                              ? "****.****"
+                              ? ".········"
                               : formatToken(
                                   wallet[ticker].valueReadable,
                                   ticker
@@ -306,7 +306,7 @@ const AccountDropdown = ({ notext, networkName }) => {
                             color="foregroundMediumEmphasis"
                           >
                             {settings.hideBalance
-                              ? "****.****"
+                              ? "········"
                               : "$" +
                                 formatUSD(
                                   coinEstimator(ticker) *

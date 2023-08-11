@@ -55,7 +55,7 @@ export default function LanguageDropdown() {
   return (
     <div className={classNames({ dark: isDark })}>
       <Listbox value={selected} onChange={onChangeLanguage}>
-        <div className="relative mt-1">
+        <div className="relative">
           <Listbox.Button className="relative flex items-center w-full gap-2 py-2 pl-3 pr-8 text-sm font-semibold text-left cursor-pointer hover:text-primary-900 font-work dark:text-white-900 text-foreground400 ">
             <img
               src={selected.icon}
@@ -68,13 +68,13 @@ export default function LanguageDropdown() {
               <ChevronDownIcon className="w-5 h-5 mt-1" aria-hidden="true" />
             </span>
           </Listbox.Button>
-          <Listbox.Options className="absolute min-w-max right-0 py-1 mt-1 overflow-auto text-sm dark:bg-[#191A33] border dark:border-foreground-400 bg-sky-100 rounded-md shadow-lg max-h-60">
+          <Listbox.Options className="absolute min-w-max right-0 py-1 mt-1 overflow-auto text-sm dark:bg-[#181b26] border dark:border-foreground-400 bg-sky-100 rounded-md shadow-lg max-h-60">
             {languages.map((lang, langIdx) => (
               <Listbox.Option
                 key={langIdx}
                 className={({ active }) =>
                   `relative cursor-pointer select-none py-2 px-4 ${
-                    active ? "dark:bg-[#2B2E4A] bg-[#ecf8fa]" : "text-white-900"
+                    active ? "dark:bg-[#141723] bg-[#ecf8fa]" : "text-white-900"
                   }`
                 }
                 value={lang}

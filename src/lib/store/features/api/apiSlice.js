@@ -98,7 +98,7 @@ export const apiSlice = createSlice({
             </a>{" "}
             or join the{" "}
             <a
-              href={"https://discord.gg/zigzag"}
+              href={"https://discord.com/invite/zigzagexchange"}
               style={{
                 color: "white",
                 textDecoration: "underline",

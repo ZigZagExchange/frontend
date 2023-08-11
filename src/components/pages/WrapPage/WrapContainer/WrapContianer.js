@@ -37,7 +37,7 @@ const WrapContianer = ({
         />
         {fromToken && fromToken}
         <button
-          className="bg-[#07071C] px-2 py-1 rounded-md text-sm font-semibold text-primary-900 ml-2.5 hover:bg-slate-800 "
+          className="bg-[#141723] px-2 py-1 rounded-md text-sm font-semibold text-primary-900 ml-2.5 hover:bg-slate-800 "
           onClick={onClickMax}
         >
           Max

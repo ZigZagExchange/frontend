@@ -37,7 +37,7 @@ const NetworkDropdown = ({ options, setSelectedItem, selectedItem }) => {
         leaveFrom="transform scale-100 opacity-100"
         leaveTo="transform scale-95 opacity-0"
       >
-        <ListBoxSelect.Options className="absolute mt-1 border-l border-r border-t border-b max-h-60 w-full overflow-auto rounded-md  py-1 text-base shadow-lg focus:outline-none dark:bg-[#2B2E4A] bg-sky-100 dark:border-foreground-400">
+        <ListBoxSelect.Options className="absolute mt-1 border-l border-r border-t border-b max-h-60 w-full overflow-auto rounded-md  py-1 text-base shadow-lg focus:outline-none dark:bg-[#2b2e4a] bg-sky-100 dark:border-foreground-400">
           {options.map((item, itemIdx) => (
             <ListBoxSelect.Option
               key={itemIdx}

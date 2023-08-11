@@ -96,7 +96,7 @@ const TokenDropDownModal = ({
               >
                 <Dialog.Panel
                   className={classNames(
-                    "w-full max-w-md transform overflow-hidden rounded-md dark:bg-[#2B2E4A] bg-sky-100 text-left align-middle shadow-xl transition-all"
+                    "w-full max-w-md transform overflow-hidden rounded-md dark:bg-[#181b28] bg-sky-100 text-left align-middle shadow-xl transition-all"
                   )}
                 >
                   <Dialog.Title
@@ -126,7 +126,7 @@ const TokenDropDownModal = ({
                       >
                         <Combobox.Options
                           open
-                          className={`mt-1 h-72 w-full overflow-auto rounded-md dark:bg-[#2B2E4A] 
+                          className={`mt-1 h-72 w-full overflow-auto rounded-md dark:bg-[#181b28] 
                             bg-sky-100 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none 
                             ${
                               isDark
@@ -171,7 +171,7 @@ const TokenDropDownModal = ({
                                           <p className="pl-3">{item.name}</p>
                                         </div>
                                         {item?.isFastWithdraw && (
-                                          <div className="bg-[#07071C] px-2 py-1 rounded-md text-sm font-semibold text-primary-900 ml-2.5 hover:bg-slate-800 font-work">
+                                          <div className="bg-[#181b26] px-2 py-1 rounded-md text-sm font-semibold text-primary-900 ml-2.5 hover:bg-slate-800 font-work">
                                             Fast
                                           </div>
                                         )}

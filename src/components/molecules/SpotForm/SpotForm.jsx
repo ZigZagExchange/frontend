@@ -1370,5 +1370,6 @@ const CustomInput = styled.input`
   background-color: #ffffff0d;
   border-radius: 3px;
   text-align: center;
-  width: 26px;
+  width: 55px;
+  height: 30px;
 `;

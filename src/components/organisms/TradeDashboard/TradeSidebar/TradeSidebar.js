@@ -69,7 +69,7 @@ export default function TradeSidebar(props) {
   const isMobile = window.innerWidth < 992;
   const isSmallScreen = window.innerHeight < 875;
   const joinDiscord = () => {
-    window.open("https://discord.gg/zigzag", "_blank");
+    window.open("https://discord.com/invite/zigzagexchange", "_blank");
   };
   const { t } = useTranslation();
 
