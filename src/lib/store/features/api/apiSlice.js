@@ -202,7 +202,7 @@ export const apiSlice = createSlice({
         if (state.userFills[fillid]) {
           state.userFills[fillid][6] = newstatus;
           state.userFills[fillid][12] = timestamp;
-          if (price) state.marketFills[fillid][4] = price;
+          if (price) state.userFills[fillid][4] = price;
           if (txhash) state.userFills[fillid][7] = txhash;
           if (feeamount) state.userFills[fillid][10] = feeamount;
           if (feetoken) state.userFills[fillid][11] = feetoken;
@@ -274,7 +274,7 @@ export const apiSlice = createSlice({
       });
     },
     _fillreceipt(state, { payload }) {
-      payload[0].forEach((fill) => {
+      payload.forEach((fill) => {
         if (!fill || !fill[1] || !fill[12]) return;
         const fillid = fill[1];
         const isoString = fill[12];
